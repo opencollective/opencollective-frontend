@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
-import { isNil, round } from 'lodash';
+import { useMutation } from '@apollo/client';
+import { clamp, isNil, round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
@@ -38,22 +38,10 @@ const getDefaultFee = (collective, host) => {
 };
 
 const editAccountFeeStructureMutation = gqlV2/* GraphQL */ `
-  mutation EditAccountFeesStructure($account: AccountReferenceInput!, $hostFeePercent: Float!) {
-    editAccountFeeStructure(account: $account, hostFeePercent: $hostFeePercent) {
+  mutation EditAccountFeesStructure($account: AccountReferenceInput!, $hostFeePercent: Float!, $isCustomFee: Boolean!) {
+    editAccountFeeStructure(account: $account, hostFeePercent: $hostFeePercent, isCustomFee: $isCustomFee) {
       id
-      ... on Collective {
-        hostFeesStructure
-        hostFeePercent
-      }
-      ... on Fund {
-        hostFeesStructure
-        hostFeePercent
-      }
-      ... on Event {
-        hostFeesStructure
-        hostFeePercent
-      }
-      ... on Project {
+      ... on AccountWithHost {
         hostFeesStructure
         hostFeePercent
       }
@@ -77,12 +65,6 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
       <ModalBody>
         <P fontSize="16px" lineHeight="24px" fontWeight="500" mb={2}>
           <FormattedMessage id="CollectiveFeesForm.Title" defaultMessage="Set fees structure" />
-        </P>
-        <P color="black.700" fontSize="14px" lineHeight="21px">
-          <FormattedMessage
-            id="CollectiveFeesForm.Description"
-            defaultMessage="This helps you to set different fees per Collective if you need it. You may want to set the fee at 0% for in-house projects, or set a monthly retainer instead of a fee."
-          />
         </P>
 
         <StyledRadioList
@@ -124,11 +106,11 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                     maxWidth={90}
                     appendProps={{ color: 'black.600' }}
                     fontWeight="normal"
-                    value={hostFeePercent}
+                    value={isNaN(hostFeePercent) ? '' : hostFeePercent}
                     step="0.01"
-                    onChange={e => setHostFeePercent(e.target.value)}
+                    onChange={e => setHostFeePercent(parseFloat(e.target.value))}
                     onBlur={e => {
-                      const newValue = round(parseFloat(e.target.value), 2);
+                      const newValue = clamp(round(parseFloat(e.target.value), 2), 0, 100);
                       setHostFeePercent(isNaN(newValue) ? host.hostFeePercent : newValue);
                     }}
                   />
@@ -151,6 +133,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                 variables: {
                   account: { id: collective.id },
                   hostFeePercent: isCustomFee ? hostFeePercent : host.hostFeePercent,
+                  isCustomFee,
                 },
               }).then(props.onClose);
             }}

@@ -1,9 +1,8 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import Markdown from 'react-markdown';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -37,7 +36,7 @@ const messages = defineMessages({
     defaultMessage: 'Apply',
   },
   currency: {
-    id: 'collective.currency.label',
+    id: 'Currency',
     defaultMessage: 'Currency',
   },
   hostFee: {
@@ -62,17 +61,17 @@ const messages = defineMessages({
   },
 });
 
-const applyToHostMutation = gqlV2`
-mutation applyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
-  applyToHost(collective: $collective, host: $host) {
-    id
-    slug
-    host {
+const applyToHostMutation = gqlV2/* GraphQL */ `
+  mutation ApplyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
+    applyToHost(collective: $collective, host: $host) {
       id
       slug
+      host {
+        id
+        slug
+      }
     }
   }
-}
 `;
 
 const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
@@ -83,10 +82,6 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
 
   const [applyToHost, { loading }] = useMutation(applyToHostMutation, {
     context: API_V2_CONTEXT,
-    variables: {
-      collective: { legacyId: collective.id },
-      host: { id: host.id },
-    },
   });
 
   const handleApplication = async () => {
@@ -95,7 +90,12 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
       return;
     }
     try {
-      await applyToHost();
+      await applyToHost({
+        variables: {
+          collective: { legacyId: collective.id },
+          host: { id: host.id },
+        },
+      });
       Router.pushRoute('accept-financial-contributions', {
         slug: collective.slug,
         path: 'host',
@@ -116,18 +116,18 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
       <StyledCollectiveCard collective={host} minWidth={250} height={350} position="relative" {...props}>
         <Container pl={3} flexShrink={1}>
           <Flex data-cy="caption" mb={2} alignItems="flex-end">
-            <P fontSize="LeadParagraph" fontWeight="bold">
+            <P fontSize="16px" fontWeight="bold">
               {host.totalHostedCollectives || 0}
             </P>
-            <P ml={2} fontSize="Caption">
+            <P ml={2} fontSize="12px">
               {formatMessage(messages.collectives)}
             </P>
           </Flex>
           <Flex data-cy="caption" mb={2} alignItems="flex-end">
-            <P fontSize="LeadParagraph" fontWeight="bold">
+            <P fontSize="16px" fontWeight="bold">
               {formatCurrency(host.stats.yearlyBudgetManaged.value * 100, host.currency, { precision: 0 })}
             </P>
-            <P ml={2} fontSize="Caption">
+            <P ml={2} fontSize="12px">
               {host.currency} {formatMessage(messages.managed)}
             </P>
           </Flex>
@@ -150,7 +150,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
         <ModalHeader onClose={() => setShow(false)}>
           <Flex flexDirection="column" alignItems="flex-start" width="100%">
             <Avatar collective={host} radius={64} />
-            <H1 fontSize="H5" color="black.900">
+            <H1 fontSize="20px" color="black.900">
               {host.name}
             </H1>
             <Flex justifyContent="space-between" width="100%">
@@ -161,10 +161,10 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
                 </P>
               </Flex>
               <Flex flexDirection="column">
-                <P fontSize="Caption" color="black.500">
+                <P fontSize="12px" color="black.500">
                   {formatMessage(messages.currency)}
                 </P>
-                <P fontSize="LeadParagraph">{host.currency}</P>
+                <P fontSize="16px">{host.currency}</P>
               </Flex>
               <Flex flexDirection="column">
                 <P>{formatMessage(messages.hostFee)}</P>
@@ -175,11 +175,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
         </ModalHeader>
         <ModalBody>
           <Fragment>
-            {host.longDescription !== null && host.longDescription.slice(0, 1) === '<' ? (
-              <HTMLContent content={host.longDescription} />
-            ) : (
-              <Markdown source={host.longDescription} />
-            )}
+            {host.longDescription && <HTMLContent content={host.longDescription} />}
             {get(host, 'settings.tos') && (
               <Flex flexDirection="column" mx={1} my={4}>
                 <StyledCheckbox

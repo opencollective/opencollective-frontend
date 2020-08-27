@@ -1,19 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { GraphQLContext } from '../../../lib/graphql/context';
 
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H2, P } from '../../Text';
 
-const activateCollectiveAsHostQuery = gql`
-  mutation activateCollectiveAsHost($id: Int!) {
+const activateCollectiveAsHostMutation = gql`
+  mutation ActivateCollectiveAsHost($id: Int!) {
     activateCollectiveAsHost(id: $id) {
       id
       isHost
@@ -21,8 +19,8 @@ const activateCollectiveAsHostQuery = gql`
   }
 `;
 
-const deactivateCollectiveAsHostQuery = gql`
-  mutation deactivateCollectiveAsHost($id: Int!) {
+const deactivateCollectiveAsHostMutation = gql`
+  mutation DeactivateCollectiveAsHost($id: Int!) {
     deactivateCollectiveAsHost(id: $id) {
       id
       isHost
@@ -30,21 +28,23 @@ const deactivateCollectiveAsHostQuery = gql`
   }
 `;
 
-const addActivateCollectiveAsHostMutation = graphql(activateCollectiveAsHostQuery, {
-  props: ({ mutate }) => ({
-    activateCollectiveAsHost: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
-});
+const activateBudgetMutation = gql`
+  mutation ActivateHostBudget($id: Int!) {
+    activateBudget(id: $id) {
+      id
+      isActive
+    }
+  }
+`;
 
-const addDeactivateCollectiveAsHostMutation = graphql(deactivateCollectiveAsHostQuery, {
-  props: ({ mutate }) => ({
-    deactivateCollectiveAsHost: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
-});
+const deactivateBudgetMutation = gql`
+  mutation DeactivateHostBudget($id: Int!) {
+    deactivateBudget(id: $id) {
+      id
+      isActive
+    }
+  }
+`;
 
 const getCollectiveType = type => {
   switch (type) {
@@ -57,57 +57,98 @@ const getCollectiveType = type => {
   }
 };
 
-const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollectiveAsHost }) => {
+const FiscalHosting = ({ collective }) => {
+  const isHostAccount = collective.isHost;
+  const isBudgetActive = collective.isActive;
+
   const collectiveType = getCollectiveType(collective.type);
-  const { refetch } = useContext(GraphQLContext);
-  const [activationStatus, setaActivationStatus] = useState({
+  const [activateAsHostStatus, setActivateAsHostStatus] = useState({
     processing: false,
-    isHostAccount: collective.isHost,
     error: null,
-    confirmationMsg: '',
+  });
+  const [activateBudgetStatus, setActivateBudgetStatus] = useState({
+    processing: false,
+    error: null,
   });
 
-  const { processing, isHostAccount, error } = activationStatus;
-  const defaultAction = isHostAccount ? 'Activate' : 'Deactivate';
-  const [modal, setModal] = useState({ type: defaultAction, show: false });
+  const [activateAsHostModal, setActivateAsHostModal] = useState({
+    type: isHostAccount ? 'Activate' : 'Deactivate',
+    show: false,
+  });
+  const [activateBudgetModal, setActivateBudgetModal] = useState({
+    type: collective.isActive ? 'Activate' : 'Deactivate',
+    show: false,
+  });
 
-  const handleActivateAsHost = async ({ activateCollectiveAsHost, id }) => {
-    setModal({ type: 'Activate', show: false });
+  const [activateCollectiveAsHost] = useMutation(activateCollectiveAsHostMutation);
+  const [deactivateCollectiveAsHost] = useMutation(deactivateCollectiveAsHostMutation);
+
+  const [activateBudget] = useMutation(activateBudgetMutation);
+  const [deactivateBudget] = useMutation(deactivateBudgetMutation);
+
+  const handleActivateAsHost = async ({ id }) => {
+    setActivateAsHostModal({ type: 'Activate', show: false });
     try {
-      setaActivationStatus({ ...activationStatus, processing: true });
-      await activateCollectiveAsHost(id);
-      await refetch();
-      setaActivationStatus({
-        ...activationStatus,
+      setActivateAsHostStatus({ ...activateAsHostStatus, processing: true });
+      await activateCollectiveAsHost({ variables: { id } });
+      setActivateAsHostStatus({
+        ...activateAsHostStatus,
         processing: false,
-        isHostAccount: true,
-        // confirmationMsg: 'The Host status was successfully activated.',
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      setaActivationStatus({ ...activationStatus, processing: false, error: errorMsg });
+      setActivateAsHostStatus({ ...activateAsHostStatus, processing: false, error: errorMsg });
     }
   };
 
-  const handleDeactivateAsHost = async ({ deactivateCollectiveAsHost, id }) => {
-    setModal({ type: 'Deactivate', show: false });
+  const handleDeactivateAsHost = async ({ id }) => {
+    setActivateAsHostModal({ type: 'Deactivate', show: false });
     try {
-      setaActivationStatus({ ...activationStatus, processing: true });
-      await deactivateCollectiveAsHost(id);
-      await refetch();
-      setaActivationStatus({
-        ...activationStatus,
+      setActivateAsHostStatus({ ...activateAsHostStatus, processing: true });
+      await deactivateCollectiveAsHost({ variables: { id } });
+      setActivateAsHostStatus({
+        ...activateAsHostStatus,
         processing: false,
-        isHostAccount: false,
-        // confirmationMsg: 'The Host status was successfully deactivated.',
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      setaActivationStatus({ ...activationStatus, processing: false, error: errorMsg });
+      setActivateAsHostStatus({ ...activateAsHostStatus, processing: false, error: errorMsg });
     }
   };
 
-  const onClose = () => setModal({ ...modal, show: false });
+  const closeActivateAsHost = () => setActivateAsHostModal({ ...activateAsHostModal, show: false });
+
+  const handleActivateBudget = async ({ id }) => {
+    setActivateBudgetModal({ type: 'Activate', show: false });
+    try {
+      setActivateBudgetStatus({ ...activateBudgetStatus, processing: true });
+      await activateBudget({ variables: { id } });
+      setActivateBudgetStatus({
+        ...activateBudgetStatus,
+        processing: false,
+      });
+    } catch (err) {
+      const errorMsg = getErrorFromGraphqlException(err).message;
+      setActivateBudgetStatus({ ...activateBudgetStatus, processing: false, error: errorMsg });
+    }
+  };
+
+  const handleDeactivateBudget = async ({ id }) => {
+    setActivateBudgetModal({ type: 'Deactivate', show: false });
+    try {
+      setActivateBudgetStatus({ ...activateBudgetStatus, processing: true });
+      await deactivateBudget({ variables: { id } });
+      setActivateBudgetStatus({
+        ...activateBudgetStatus,
+        processing: false,
+      });
+    } catch (err) {
+      const errorMsg = getErrorFromGraphqlException(err).message;
+      setActivateBudgetStatus({ ...activateBudgetStatus, processing: false, error: errorMsg });
+    }
+  };
+
+  const closeActivateBudget = () => setActivateBudgetModal({ ...activateBudgetModal, show: false });
 
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
@@ -134,34 +175,28 @@ const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollect
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.hostAccount.deactivate.description"
             defaultMessage={
-              "After deactivating your organization as host, you will not be able to host collectives anymore. The profile will remain active as an {type}'s profile."
+              "After deactivating your {type} as host, you will not be able to host collectives anymore. The profile will remain active as an {type}'s profile."
             }
           />
         </P>
       )}
 
-      {error && <P color="#ff5252">{error}</P>}
+      {activateAsHostStatus.error && <P color="#ff5252">{activateAsHostStatus.error}</P>}
 
       {!isHostAccount && (
-        <StyledButton onClick={() => setModal({ type: 'Activate', show: true })} loading={processing} disabled={false}>
+        <StyledButton
+          onClick={() => setActivateAsHostModal({ type: 'Activate', show: true })}
+          loading={activateAsHostStatus.processing}
+          disabled={false}
+        >
           <FormattedMessage id="collective.activateAsHost" defaultMessage={'Activate as Host'} />
         </StyledButton>
       )}
 
-      {/* isHostAccount && confirmationMsg && (
-        <MessageBox withIcon type="info" mb={4}>
-          <FormattedMessage
-            values={{ message: confirmationMsg }}
-            id="collective.hostAccount.activatedConfirmMessage"
-            defaultMessage={'{message}.'}
-          />
-        </MessageBox>
-      )*/}
-
       {isHostAccount && (
         <StyledButton
-          onClick={() => setModal({ type: 'Deactivate', show: true })}
-          loading={processing}
+          onClick={() => setActivateAsHostModal({ type: 'Deactivate', show: true })}
+          loading={activateAsHostStatus.processing}
           disabled={collective.plan.hostedCollectives > 0}
         >
           <FormattedMessage id="host.deactivate" defaultMessage={'Deactivate as Host'} />
@@ -178,12 +213,12 @@ const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollect
         </P>
       )}
 
-      <Modal show={modal.show} width="570px" onClose={onClose}>
-        <ModalHeader onClose={onClose}>
-          {modal.type === 'Activate' && (
+      <Modal show={activateAsHostModal.show} width="570px" onClose={closeActivateAsHost}>
+        <ModalHeader onClose={closeActivateAsHost}>
+          {activateAsHostModal.type === 'Activate' && (
             <FormattedMessage id="collective.activateAsHost" defaultMessage={'Activate as Host'} />
           )}
-          {modal.type === 'Deactivate' && (
+          {activateAsHostModal.type === 'Deactivate' && (
             <FormattedMessage id="host.deactivate" defaultMessage={'Deactivate as Host'} />
           )}
         </ModalHeader>
@@ -200,13 +235,13 @@ const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollect
             />
           </P>
           <P>
-            {modal.type === 'Activate' && (
+            {activateAsHostModal.type === 'Activate' && (
               <FormattedMessage
                 id="collective.hostAccount.modal.activate.body"
                 defaultMessage={'Are you sure you want to activate this account as Host?'}
               />
             )}
-            {modal.type === 'Deactivate' && (
+            {activateAsHostModal.type === 'Deactivate' && (
               <FormattedMessage
                 id="collective.hostAccount.modal.deactivate.body"
                 defaultMessage={'Are you sure you want to deactivate this account as Host?'}
@@ -216,25 +251,123 @@ const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollect
         </ModalBody>
         <ModalFooter>
           <Container display="flex" justifyContent="flex-end">
-            <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false })}>
+            <StyledButton mx={20} onClick={() => setActivateAsHostModal({ ...activateAsHostModal, show: false })}>
               <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
             </StyledButton>
             <StyledButton
               buttonStyle="primary"
               data-cy="action"
               onClick={() => {
-                if (modal.type === 'Deactivate') {
-                  handleDeactivateAsHost({ deactivateCollectiveAsHost, id: collective.id });
+                if (activateAsHostModal.type === 'Deactivate') {
+                  handleDeactivateAsHost({ id: collective.id });
                 } else {
-                  handleActivateAsHost({ activateCollectiveAsHost, id: collective.id });
+                  handleActivateAsHost({ id: collective.id });
                 }
               }}
             >
-              {modal.type === 'Activate' && (
+              {activateAsHostModal.type === 'Activate' && (
                 <FormattedMessage id="collective.activateAsHost" defaultMessage={'Activate as Host'} />
               )}
-              {modal.type === 'Deactivate' && (
+              {activateAsHostModal.type === 'Deactivate' && (
                 <FormattedMessage id="host.deactivate" defaultMessage={'Deactivate as Host'} />
+              )}
+            </StyledButton>
+          </Container>
+        </ModalFooter>
+      </Modal>
+
+      {isHostAccount && (
+        <Fragment>
+          <H2>
+            <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage={'Activate Host Budget'} />
+          </H2>
+
+          {isBudgetActive ? (
+            <P>
+              <FormattedMessage
+                id="FiscalHosting.budget.deactivate.description"
+                defaultMessage={
+                  'Your Host Budget is activated, you can receive financial contributions and manage expenses directly with this Organization.'
+                }
+              />
+            </P>
+          ) : (
+            <P>
+              <FormattedMessage
+                id="FiscalHosting.budget.activate.description"
+                defaultMessage={
+                  'By activating the Host budget, you will be able to receive financial contributions and manage expenses directly with this Organization.'
+                }
+              />
+            </P>
+          )}
+
+          {activateBudgetStatus.error && <P color="#ff5252">{activateBudgetStatus.error}</P>}
+
+          {isBudgetActive ? (
+            <StyledButton
+              onClick={() => setActivateBudgetModal({ type: 'Deactivate', show: true })}
+              loading={activateBudgetStatus.processing}
+            >
+              <FormattedMessage id="FiscalHosting.budget.deactivate" defaultMessage={'Deactivate Host Budget'} />
+            </StyledButton>
+          ) : (
+            <StyledButton
+              onClick={() => setActivateBudgetModal({ type: 'Activate', show: true })}
+              loading={activateBudgetStatus.processing}
+            >
+              <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage={'Activate Host Budget'} />
+            </StyledButton>
+          )}
+        </Fragment>
+      )}
+
+      <Modal show={activateBudgetModal.show} width="570px" onClose={closeActivateBudget}>
+        <ModalHeader onClose={closeActivateBudget}>
+          {activateBudgetModal.type === 'Activate' && (
+            <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage={'Activate Host Budget'} />
+          )}
+          {activateBudgetModal.type === 'Deactivate' && (
+            <FormattedMessage id="FiscalHosting.budget.deactivate" defaultMessage={'Deactivate Host Budget'} />
+          )}
+        </ModalHeader>
+        <ModalBody>
+          <P>
+            {activateBudgetModal.type === 'Activate' && (
+              <FormattedMessage
+                id="FiscalHosting.budget.modal.activate.body"
+                defaultMessage={'Are you sure you want to activate the Host budget?'}
+              />
+            )}
+            {activateBudgetModal.type === 'Deactivate' && (
+              <FormattedMessage
+                id="FiscalHosting.budget.modal.deactivate.body"
+                defaultMessage={'Are you sure you want to deactivate the Host budget?'}
+              />
+            )}
+          </P>
+        </ModalBody>
+        <ModalFooter>
+          <Container display="flex" justifyContent="flex-end">
+            <StyledButton mx={20} onClick={() => setActivateBudgetModal({ ...activateBudgetModal, show: false })}>
+              <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+            </StyledButton>
+            <StyledButton
+              buttonStyle="primary"
+              data-cy="action"
+              onClick={() => {
+                if (activateBudgetModal.type === 'Deactivate') {
+                  handleDeactivateBudget({ id: collective.id });
+                } else {
+                  handleActivateBudget({ id: collective.id });
+                }
+              }}
+            >
+              {activateBudgetModal.type === 'Activate' && (
+                <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage={'Activate Host Budget'} />
+              )}
+              {activateBudgetModal.type === 'Deactivate' && (
+                <FormattedMessage id="FiscalHosting.budget.deactivate" defaultMessage={'Deactivate Host Budget'} />
               )}
             </StyledButton>
           </Container>
@@ -246,8 +379,6 @@ const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollect
 
 FiscalHosting.propTypes = {
   collective: PropTypes.object.isRequired,
-  activateCollectiveAsHost: PropTypes.func,
-  deactivateCollectiveAsHost: PropTypes.func,
 };
 
-export default addDeactivateCollectiveAsHostMutation(addActivateCollectiveAsHostMutation(FiscalHosting));
+export default FiscalHosting;

@@ -1,5 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
+import { Query } from '@apollo/client/react/components';
 import { Plus } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
@@ -8,6 +10,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { createGlobalStyle } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
+import { isPastEvent } from '../lib/events';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { capitalize } from '../lib/utils';
 import { Link } from '../server/pages';
@@ -25,6 +28,14 @@ import StyledLink from './StyledLink';
 import StyledRoundButton from './StyledRoundButton';
 import { P } from './Text';
 import { withUser } from './UserProvider';
+
+const memberInvitationsCountQuery = gql`
+  query MemberInvitationsCount($memberCollectiveId: Int!) {
+    memberInvitations(MemberCollectiveId: $memberCollectiveId) {
+      id
+    }
+  }
+`;
 
 const CollectiveListItem = styled(ListItem)`
   @media (hover: hover) {
@@ -147,7 +158,7 @@ class TopBarProfileMenu extends React.Component {
           >
             <Flex alignItems="center">
               <Avatar collective={get(membership, 'collective')} radius="2.8rem" mr={2} />
-              <P fontSize="Caption" truncateOverflow>
+              <P fontSize="12px" truncateOverflow>
                 {get(membership, 'collective.name')}
               </P>
             </Flex>
@@ -186,6 +197,12 @@ class TopBarProfileMenu extends React.Component {
         return a.collective.slug.localeCompare(b.collective.slug);
       });
 
+    const events = memberships
+      .filter(m => m.collective.type === 'EVENT' && !isPastEvent(m.collective))
+      .sort((a, b) => {
+        return a.collective.slug.localeCompare(b.collective.slug);
+      });
+
     const funds = memberships
       .filter(m => m.collective.type === 'FUND')
       .sort((a, b) => {
@@ -208,7 +225,7 @@ class TopBarProfileMenu extends React.Component {
         data-cy="user-menu"
       >
         <Flex flexDirection={['column', 'row']} maxHeight={['calc(100vh - 68px)', '100%']}>
-          <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={[3]} bg="#F7F8FA">
+          <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={3} bg="#F7F8FA">
             <Hide xs>
               <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
               <P mt={2} color="#313233" fontWeight="500">
@@ -229,6 +246,30 @@ class TopBarProfileMenu extends React.Component {
                   </StyledLink>
                 </Link>
               </ListItem>
+              <Query
+                query={memberInvitationsCountQuery}
+                variables={{ memberCollectiveId: LoggedInUser.CollectiveId }}
+                fetchPolicy="network-only"
+              >
+                {({ data, loading }) =>
+                  loading === false &&
+                  data &&
+                  data.memberInvitations &&
+                  data.memberInvitations.length > 0 && (
+                    <ListItem py={1}>
+                      <Link route="member-invitations" passHref>
+                        <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                          <FormattedMessage
+                            id="menu.pendingInvitations"
+                            defaultMessage="Pending Invitations ({numberOfInvitations})"
+                            values={{ numberOfInvitations: data.memberInvitations.length }}
+                          />
+                        </StyledLink>
+                      </Link>
+                    </ListItem>
+                  )
+                }
+              </Query>
               <ListItem py={1}>
                 <Link route="editCollective" params={{ slug: LoggedInUser.collective.slug }} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
@@ -329,6 +370,28 @@ class TopBarProfileMenu extends React.Component {
                 </P>
               </Box>
             )}
+            {events.length > 0 && (
+              <div>
+                <Flex alignItems="center" mt={3}>
+                  <P
+                    color="#4E5052"
+                    fontFamily="montserratlight, arial"
+                    fontSize="1rem"
+                    fontWeight="600"
+                    letterSpacing="1px"
+                    pr={2}
+                    textTransform="uppercase"
+                    whiteSpace="nowrap"
+                  >
+                    <FormattedMessage id="events" defaultMessage="my events" />
+                  </P>
+                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                </Flex>
+                <Box as="ul" p={0} my={2}>
+                  {events.map(this.renderMembershipLine)}
+                </Box>
+              </div>
+            )}
             {funds.length > 0 && (
               <Fragment>
                 <Flex alignItems="center" mt={3}>
@@ -370,11 +433,11 @@ class TopBarProfileMenu extends React.Component {
                 <FormattedMessage id="organization" defaultMessage="my organizations" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-                <Link route="/organizations/new" passHref>
+              <ComponentLink route="/organizations/new">
+                <StyledRoundButton ml={2} size={24} color="#C4C7CC">
                   <Plus size={12} color="#76777A" />
-                </Link>
-              </StyledRoundButton>
+                </StyledRoundButton>
+              </ComponentLink>
             </Flex>
             <Box as="ul" p={0} my={2}>
               {orgs.map(this.renderMembershipLine)}
@@ -400,13 +463,12 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <Flex alignItems="center" onClick={this.toggleProfileMenu} data-cy="user-menu-trigger">
-        <Avatar collective={get(LoggedInUser, 'collective')} radius="3rem" mr={2} />
         <Hide xs sm>
           <P
-            color="#46b0ed"
+            color="#4E5052"
             display="inline-block"
-            fontSize="1.2rem"
-            fontWeight="bold"
+            fontSize="13px"
+            fontWeight="500"
             letterSpacing="1px"
             mx={2}
             className="LoginTopBarProfileButton-name"
@@ -416,7 +478,10 @@ class TopBarProfileMenu extends React.Component {
             {LoggedInUser.username}
           </P>
         </Hide>
-        <ChevronDown color="#46b0ed" size="1.5em" cursor="pointer" />
+        <Avatar collective={get(LoggedInUser, 'collective')} radius="3rem" mr={2} />
+        <Hide xs>
+          <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
+        </Hide>
         {showProfileMenu && (
           <React.Fragment>
             <HideGlobalScroll />

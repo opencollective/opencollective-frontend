@@ -4,7 +4,7 @@ const url = require('url');
 
 const express = require('express');
 const proxy = require('express-http-proxy');
-const { template } = require('lodash');
+const { template, trim } = require('lodash');
 
 const intl = require('./intl');
 const pages = require('./pages');
@@ -108,6 +108,19 @@ module.exports = (expressApp, nextApp) => {
       global.__coverage__ = {};
     });
   }
+
+  // Correct slug links that end or start with hyphen
+  app.use((req, res, next) => {
+    if (req.path) {
+      const path = req.path.split('/');
+      const slug = path[1];
+      if (trim(slug, '-') != slug) {
+        path[1] = trim(slug, '-');
+        return res.redirect(301, path.join('/'));
+      }
+    }
+    next();
+  });
 
   app.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', maxAge(86400), (req, res) => {
     const color = req.query.color === 'blue' ? 'blue' : 'white';

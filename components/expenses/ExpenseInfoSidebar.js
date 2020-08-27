@@ -35,7 +35,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
           borderLeft="1px solid"
           borderColor="green.600"
           pl={3}
-          fontSize="H5"
+          fontSize="20px"
           color="black.500"
           data-cy="collective-balance"
         >
@@ -51,7 +51,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
           )}
         </Container>
         {host && (
-          <P fontSize="SmallCaption" color="black.600" mt={2}>
+          <P fontSize="11px" color="black.600" mt={2}>
             <FormattedMessage
               id="withColon"
               defaultMessage="{item}:"
@@ -66,7 +66,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
       {children && <Box my={50}>{children}</Box>}
       <ExpandableExpensePolicies host={host} collective={collective} mt={50} />
       <Box mt={50}>
-        <CreateExpenseFAQ withBorderLeft withNewButtons titleProps={{ fontSize: 'H5', fontWeight: 500, mb: 3 }} />
+        <CreateExpenseFAQ withBorderLeft withNewButtons titleProps={{ fontSize: '20px', fontWeight: 500, mb: 3 }} />
       </Box>
     </Box>
   );

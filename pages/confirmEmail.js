@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Email } from '@styled-icons/material/Email';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -53,7 +53,7 @@ class ConfirmEmailPage extends React.Component {
   async triggerEmailValidation() {
     try {
       this.setState({ validationTriggered: true });
-      await this.props.confirmUserEmail(this.props.token);
+      await this.props.confirmUserEmail({ variables: { token: this.props.token } });
       setTimeout(this.props.refetchLoggedInUser, 3000);
       this.setState({ status: 'success' });
     } catch (e) {
@@ -116,23 +116,18 @@ class ConfirmEmailPage extends React.Component {
   }
 }
 
-export const addConfirmUserEmailMutation = graphql(
-  gql`
-    mutation confirmUserEmail($token: String!) {
-      confirmUserEmail(token: $token) {
-        id
-        email
-        emailWaitingForValidation
-      }
+const confirmUserEmailMutation = gql`
+  mutation ConfirmUserEmail($token: String!) {
+    confirmUserEmail(token: $token) {
+      id
+      email
+      emailWaitingForValidation
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      confirmUserEmail: token => {
-        return mutate({ variables: { token } });
-      },
-    }),
-  },
-);
+  }
+`;
 
-export default addConfirmUserEmailMutation(withUser(ConfirmEmailPage));
+export const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
+  name: 'confirmUserEmail',
+});
+
+export default withUser(addConfirmUserEmailMutation(ConfirmEmailPage));

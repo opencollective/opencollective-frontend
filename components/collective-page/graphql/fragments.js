@@ -1,10 +1,10 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 /**
  * Fields fetched for updates
  */
-export const UpdatesFieldsFragment = gql`
-  fragment UpdatesFieldsFragment on UpdateType {
+export const updatesFieldsFragment = gql`
+  fragment UpdatesFields on UpdateType {
     id
     slug
     title
@@ -26,8 +26,8 @@ export const UpdatesFieldsFragment = gql`
 /**
  * Fields fetched for contributors
  */
-export const ContributorsFieldsFragment = gql`
-  fragment ContributorsFieldsFragment on Contributor {
+export const contributorsFieldsFragment = gql`
+  fragment ContributorsFields on Contributor {
     id
     name
     roles

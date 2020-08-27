@@ -1,6 +1,7 @@
 require('./env');
 
 const withSourceMaps = require('@zeit/next-source-maps')();
+const { getCSPHeaderForNextJS } = require('./server/content-security-policy');
 
 const nextConfig = {
   webpack: (config, { webpack, isServer, buildId }) => {
@@ -22,6 +23,7 @@ const nextConfig = {
         TRANSFERWISE_ENABLED: null,
         NEW_HOST_APPLICATION_FLOW: null,
         TW_API_COLLECTIVE_SLUG: null,
+        OC_ENV: null,
       }),
     );
 
@@ -106,9 +108,9 @@ const nextConfig = {
       },
     });
 
-    // Load SVGs in base64
+    // Load images in base64
     config.module.rules.push({
-      test: /components\/.*\.(svg)$/,
+      test: /components\/.*\.(svg|png|jpg|gif)$/,
       use: {
         loader: 'url-loader',
         options: {
@@ -122,6 +124,14 @@ const nextConfig = {
     }
 
     return config;
+  },
+  async headers() {
+    const cspHeader = getCSPHeaderForNextJS();
+    if (cspHeader) {
+      return [{ source: '/', headers: [cspHeader] }];
+    } else {
+      return [];
+    }
   },
 };
 

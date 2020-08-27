@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
@@ -121,8 +121,8 @@ class HostsWithData extends React.Component {
   }
 }
 
-const getHostsQuery = gql`
-  query allHosts(
+const hostsQuery = gql`
+  query Hosts(
     $tags: [String]
     $currency: String
     $limit: Int
@@ -161,7 +161,7 @@ const getHostsQuery = gql`
   }
 `;
 
-export const addHostsData = graphql(getHostsQuery, {
+export const addHostsData = graphql(hostsQuery, {
   options: props => ({
     variables: {
       tags: props.tags,

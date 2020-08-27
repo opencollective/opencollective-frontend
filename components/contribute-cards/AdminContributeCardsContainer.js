@@ -14,11 +14,23 @@ import DraggableContributeCardWrapper from './DraggableContributeCardWrapper';
 /**
  * Display a list of contribution cards wrapped in a DragAndDrop provider
  */
-const AdminContributeCardsContainer = ({ collective, cards, onContributionCardMove, onContributionCardDrop }) => {
+const AdminContributeCardsContainer = ({
+  collective,
+  cards,
+  onContributionCardMove,
+  onContributionCardDrop,
+  onMount,
+}) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   const createContributionTierRoute = isEvent
     ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/edit#tiers`
     : `/${collective.slug}/edit/tiers`;
+
+  React.useEffect(() => {
+    if (onMount) {
+      onMount();
+    }
+  }, [onMount]);
 
   return (
     <DndProviderHTML5Backend>
@@ -63,6 +75,7 @@ AdminContributeCardsContainer.propTypes = {
   }).isRequired,
   onContributionCardMove: PropTypes.func.isRequired,
   onContributionCardDrop: PropTypes.func.isRequired,
+  onMount: PropTypes.func,
 };
 
 export default AdminContributeCardsContainer;

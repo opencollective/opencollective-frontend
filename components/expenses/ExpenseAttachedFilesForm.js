@@ -19,7 +19,7 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue }) => {
   return (
     <div>
       <Flex alignItems="center" my={16}>
-        <Span color="black.600" fontSize="LeadParagraph" lineHeight="LeadCaption">
+        <Span color="black.600" fontSize="16px" lineHeight="21px">
           <FormattedMessage
             id="OptionalFieldLabel"
             defaultMessage="{field} (optional)"

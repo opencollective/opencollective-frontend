@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
 import { withRouter } from 'next/router';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
@@ -7,7 +9,6 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import colors from '../lib/constants/colors';
-import { addSearchQueryData } from '../lib/graphql/queries';
 import { Link, Router } from '../server/pages';
 
 import Button from '../components/Button';
@@ -93,7 +94,7 @@ class SearchPage extends React.Component {
             <form method="GET" onSubmit={this.refetch}>
               <FormGroup controlId="search" bsSize="large">
                 <ControlLabel className="h1">
-                  <FormattedMessage id="search.OpenCollective" defaultMessage="Search Open Collective" />
+                  <FormattedMessage id="search.OpenCollective" defaultMessage="Search Open Collective..." />
                 </ControlLabel>
                 <Flex alignItems="flex-end" my={3}>
                   <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
@@ -133,7 +134,7 @@ class SearchPage extends React.Component {
                   <Link route="createPledge" params={{ name: term }} passHref>
                     <StyledLink
                       display="block"
-                      fontSize="Paragraph"
+                      fontSize="14px"
                       fontWeight="bold"
                       maxWidth="220px"
                       py={2}
@@ -149,7 +150,7 @@ class SearchPage extends React.Component {
             )}
           </Flex>
           {showCollectives && collectives.length !== 0 && total > limit && (
-            <Container display="flex" justifyContent="center" fontSize="Paragraph" my={3}>
+            <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
               <Pagination offset={offset} total={total} limit={limit} />
             </Container>
           )}
@@ -168,7 +169,7 @@ class SearchPage extends React.Component {
                 <Link route="createPledge" params={{ name: term }} passHref>
                   <StyledLink
                     display="block"
-                    fontSize="Paragraph"
+                    fontSize="14px"
                     fontWeight="bold"
                     maxWidth="220px"
                     py={2}
@@ -190,4 +191,43 @@ class SearchPage extends React.Component {
 
 export { SearchPage as MockSearchPage };
 
-export default addSearchQueryData(withRouter(SearchPage));
+export const searchPageQuery = gql`
+  query SearchPage($term: String!, $limit: Int, $offset: Int) {
+    search(term: $term, limit: $limit, offset: $offset) {
+      collectives {
+        id
+        isActive
+        type
+        slug
+        path
+        name
+        company
+        imageUrl
+        backgroundImage
+        description
+        longDescription
+        website
+        currency
+        stats {
+          id
+          balance
+          totalAmountSpent
+          yearlyBudget
+          backers {
+            all
+          }
+        }
+        memberOf(role: "BACKER") {
+          id
+        }
+      }
+      limit
+      offset
+      total
+    }
+  }
+`;
+
+export const addSearchPageData = graphql(searchPageQuery);
+
+export default withRouter(addSearchPageData(SearchPage));

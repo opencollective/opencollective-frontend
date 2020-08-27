@@ -1,11 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from '@styled-system/css';
 import { cloneDeep, orderBy, partition, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
@@ -26,24 +27,27 @@ import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
-import { H3, P } from '../../Text';
+import { H3, H4, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
-import { EditAccountSettingMutation } from '../graphql/mutations';
-import { getCollectivePageQuery } from '../graphql/queries';
+import { editAccountSettingMutation } from '../graphql/mutations';
+import { collectivePageQuery } from '../graphql/queries';
 import SectionTitle from '../SectionTitle';
 import TopContributors from '../TopContributors';
 
 // Dynamic imports
 const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {
   ssr: false,
-  loading() {
-    return <LoadingPlaceholder height={400} />;
-  },
 });
+
+/** The container for Top Contributors view */
+const TopContributorsContainer = styled.div`
+  padding: 32px 16px;
+  margin-top: 48px;
+  background-color: #f5f7fa;
+`;
 
 const TIERS_ORDER_KEY = 'collectivePage.tiersOrder';
 
@@ -99,16 +103,9 @@ class SectionContribute extends React.PureComponent {
     isSaving: false,
   };
 
-  componentDidUpdate() {
-    if (!this.state.showTiersAdmin && !this.showTiersAdminTimeout) {
-      // Allow some time for the tiers admin component to load
-      this.showTiersAdminTimeout = setTimeout(() => this.setState({ showTiersAdmin: true }), 1500);
-    }
-  }
-
-  componentWillUnmount() {
-    this.showTiersAdminTimeout = null;
-  }
+  onTiersAdminReady = () => {
+    this.setState({ showTiersAdmin: true });
+  };
 
   getTopContributors = memoizeOne(contributors => {
     const topOrgs = [];
@@ -191,9 +188,9 @@ class SectionContribute extends React.PureComponent {
         update: (store, response) => {
           // We need to update the store manually because the response comes from API V2
           const collectivePageQueryVariables = getCollectivePageQueryVariables(collective.slug);
-          const data = store.readQuery({ query: getCollectivePageQuery, variables: collectivePageQueryVariables });
+          const data = store.readQuery({ query: collectivePageQuery, variables: collectivePageQueryVariables });
           const newData = set(cloneDeep(data), 'Collective.settings', response.data.editAccountSetting.settings);
-          store.writeQuery({ query: getCollectivePageQuery, variables: collectivePageQueryVariables, data: newData });
+          store.writeQuery({ query: collectivePageQuery, variables: collectivePageQueryVariables, data: newData });
         },
       });
       this.setState({ isSaving: false, draggingContributionsOrder: null });
@@ -274,7 +271,7 @@ class SectionContribute extends React.PureComponent {
     const sortedTiers = this.getSortedCollectiveTiers(tiers, orderKeys);
     const isEvent = collective.type === CollectiveType.EVENT;
     const isProject = collective.type === CollectiveType.PROJECT;
-    const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
+    const isFund = collective.type === CollectiveType.FUND;
     const hasCustomContribution = !collective.settings?.disableCustomContributions;
     const hasContribute = isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution));
     const hasOtherWaysToContribute =
@@ -303,7 +300,7 @@ class SectionContribute extends React.PureComponent {
         {isAdmin && !hasHost && !isHost && (
           <ContainerSectionContent pt={5} pb={3}>
             <SectionTitle mb={24}>
-              <FormattedMessage id="contributions" defaultMessage="Contributions" />
+              <FormattedMessage id="Contributions" defaultMessage="Contributions" />
             </SectionTitle>
             <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
               <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
@@ -338,7 +335,7 @@ class SectionContribute extends React.PureComponent {
                     <div>
                       <ContainerSectionContent>
                         <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                          <H3 fontSize="H5" fontWeight="600" color="black.700">
+                          <H3 fontSize="20px" fontWeight="600" color="black.700">
                             <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
                           </H3>
                           <Box m={2} flex="0 0 50px">
@@ -365,12 +362,13 @@ class SectionContribute extends React.PureComponent {
                           </ContributeCardsContainer>
                         )}
                         {isAdmin && (
-                          <Container display={showTiersAdmin ? 'block' : 'none'}>
+                          <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
                             <AdminContributeCardsContainer
                               collective={collective}
                               cards={waysToContribute}
                               onContributionCardMove={this.onContributionCardMove}
                               onContributionCardDrop={this.onContributionCardDrop}
+                              onMount={this.onTiersAdminReady}
                             />
                           </Container>
                         )}
@@ -386,7 +384,7 @@ class SectionContribute extends React.PureComponent {
                   <div>
                     <ContainerSectionContent>
                       <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                        <H3 fontSize="H5" fontWeight="600" color="black.700">
+                        <H3 fontSize="20px" fontWeight="600" color="black.700">
                           {connectedCollectives.length > 0 ? (
                             <FormattedMessage
                               id="SectionContribute.MoreWays"
@@ -443,18 +441,28 @@ class SectionContribute extends React.PureComponent {
             {!isEvent && (
               <ContainerSectionContent>
                 <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-                  <StyledButton mt={3} width={1} buttonSize="small" fontSize="Paragraph">
+                  <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
                   </StyledButton>
                 </Link>
               </ContainerSectionContent>
             )}
             {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
-              <TopContributors
-                organizations={topOrganizations}
-                individuals={topIndividuals}
-                currency={collective.currency}
-              />
+              <TopContributorsContainer>
+                <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
+                  <H4 fontWeight="normal" color="black.700" mb={3}>
+                    <FormattedMessage
+                      id="SectionContribute.TopContributors"
+                      defaultMessage="Top financial contributors"
+                    />
+                  </H4>
+                  <TopContributors
+                    organizations={topOrganizations}
+                    individuals={topIndividuals}
+                    currency={collective.currency}
+                  />
+                </Container>
+              </TopContributorsContainer>
             )}
           </Fragment>
         )}
@@ -463,9 +471,9 @@ class SectionContribute extends React.PureComponent {
   }
 }
 
-const withEditAccountSettings = graphql(EditAccountSettingMutation, {
+const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
   name: 'editAccountSettings',
   options: { context: API_V2_CONTEXT },
 });
 
-export default withEditAccountSettings(SectionContribute);
+export default addEditAccountSettingMutation(SectionContribute);

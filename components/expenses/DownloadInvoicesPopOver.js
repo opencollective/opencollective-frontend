@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
 import classnames from 'classnames';
-import gql from 'graphql-tag';
 import { groupBy, omit, uniq } from 'lodash';
 import moment from 'moment';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
@@ -187,8 +187,8 @@ class Overlay extends React.Component {
   }
 }
 
-const getInvoicesQuery = gql`
-  query allInvoices($fromCollectiveSlug: String!) {
+const downloadInvoicesQuery = gql`
+  query DownloadInvoices($fromCollectiveSlug: String!) {
     allInvoices(fromCollectiveSlug: $fromCollectiveSlug) {
       slug
       year
@@ -205,8 +205,6 @@ const getInvoicesQuery = gql`
   }
 `;
 
-const addData = graphql(getInvoicesQuery);
-
 class PopoverButton extends React.Component {
   render() {
     const overlay = <Overlay {...this.props} />;
@@ -221,4 +219,6 @@ class PopoverButton extends React.Component {
   }
 }
 
-export default addData(PopoverButton);
+const addDownloadInvoicesData = graphql(downloadInvoicesQuery);
+
+export default addDownloadInvoicesData(PopoverButton);

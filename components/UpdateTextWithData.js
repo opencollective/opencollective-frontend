@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 
 class UpdateText extends React.Component {
@@ -37,8 +37,8 @@ class UpdateText extends React.Component {
   }
 }
 
-const getUpdateQuery = gql`
-  query Update($id: Int) {
+const updateTextQuery = gql`
+  query UpdateText($id: Int) {
     Update(id: $id) {
       id
       html
@@ -50,6 +50,6 @@ const getUpdateQuery = gql`
   }
 `;
 
-export const addGetUpdate = graphql(getUpdateQuery);
+const addUpdateTextData = graphql(updateTextQuery);
 
-export default addGetUpdate(UpdateText);
+export default addUpdateTextData(UpdateText);

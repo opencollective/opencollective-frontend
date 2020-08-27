@@ -1,5 +1,5 @@
 import React from 'react';
-import { ApolloProvider } from '@apollo/react-components';
+import { ApolloProvider } from '@apollo/client';
 import { get } from 'lodash';
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { ApolloProvider } from '@apollo/react-components';
+import { ApolloProvider } from '@apollo/client';
 import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
@@ -17,7 +17,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'nprogress/nprogress.css';
 import 'react-datetime/css/react-datetime.css';
 import 'react-quill/dist/quill.snow.css';
-import 'react-mde/lib/styles/css/react-mde-all.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import '../public/static/styles/react-tags.css';

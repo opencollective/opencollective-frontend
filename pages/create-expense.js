@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
@@ -8,6 +8,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { CollectiveType } from '../lib/constants/collectives';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -38,6 +39,8 @@ import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
+
+const { USER, ORGANIZATION } = CollectiveType;
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, parentCollectiveSlug } }) {
@@ -159,8 +162,10 @@ class CreateExpensePage extends React.Component {
       this.setState({ isSubmitting: true, error: null });
       const { expense } = this.state;
       const result = await this.props.createExpense({
-        account: { id: this.props.data.account.id },
-        expense: prepareExpenseForSubmit(expense),
+        variables: {
+          account: { id: this.props.data.account.id },
+          expense: prepareExpenseForSubmit(expense),
+        },
       });
 
       // Clear local storage backup if expense submitted successfully
@@ -198,7 +203,14 @@ class CreateExpensePage extends React.Component {
     if (!loggedInAccount) {
       return [];
     } else {
-      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', []).map(member => member.account);
+      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', [])
+        .map(member => member.account)
+        .filter(
+          account =>
+            [USER, ORGANIZATION].includes(account.type) ||
+            // Same Host
+            (account.isActive && this.props.data?.account?.host?.id === account.host?.id),
+        );
       return [loggedInAccount, ...accountsAdminOf];
     }
   });
@@ -211,7 +223,7 @@ class CreateExpensePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
       }
@@ -221,11 +233,7 @@ class CreateExpensePage extends React.Component {
     const host = collective && collective.host;
     const loggedInAccount = data && data.loggedInAccount;
 
-    // Adding that at GraphQL level is buggy
-    // data is coming from CreateExpensePage
-    if (collective && collective.isHost) {
-      collective.host = { ...collective };
-    }
+    const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
 
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
@@ -240,9 +248,9 @@ class CreateExpensePage extends React.Component {
             <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
               <Flex justifyContent="space-between" flexWrap="wrap">
                 <Box flex="1 1 500px" minWidth={300} maxWidth={792} mr={[0, 3, 5]} mb={5}>
-                  <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
+                  <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
                     {step === STEPS.FORM ? (
-                      <FormattedMessage id="create-expense.title" defaultMessage="Submit expense" />
+                      <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
                     ) : (
                       <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
                     )}
@@ -259,7 +267,7 @@ class CreateExpensePage extends React.Component {
                           onSubmit={this.onFormSubmit}
                           expense={this.state.expense}
                           expensesTags={this.getSuggestedTags(collective)}
-                          payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                          payoutProfiles={payoutProfiles}
                           formPersister={this.state.formPersister}
                           shouldLoadValuesFromPersister={this.state.isInitialForm}
                           autoFocusTitle
@@ -331,151 +339,93 @@ class CreateExpensePage extends React.Component {
   }
 }
 
-const getData = graphql(
-  gqlV2`
-    query CreateExpensePage($collectiveSlug: String!) {
-      account(slug: $collectiveSlug, throwIfMissing: false) {
+const hostFieldsFragment = gqlV2/* GraphQL */ `
+  fragment CreateExpenseHostFields on Host {
+    id
+    name
+    slug
+    type
+    expensePolicy
+    settings
+    location {
+      address
+      country
+    }
+    transferwise {
+      availableCurrencies
+    }
+    supportedPayoutMethods
+  }
+`;
+
+const createExpensePageQuery = gqlV2/* GraphQL */ `
+  query CreateExpensePage($collectiveSlug: String!) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      name
+      type
+      description
+      settings
+      imageUrl
+      twitterHandle
+      currency
+      expensePolicy
+      expensesTags {
         id
-        slug
-        name
-        type
-        description
-        settings
-        imageUrl
-        twitterHandle
-        currency
-        expensePolicy
-        expensesTags {
-          id
-          tag
-        }
+        tag
+      }
 
-        ... on Organization {
-          id
-          isHost
-          isActive
-          balance
-          expensePolicy
-          location {
-            address
-            country
-          }
-          transferwise {
-            availableCurrencies
-          }
-        }
+      ... on AccountWithContributions {
+        balance
+      }
 
-        ... on Collective {
-          id
-          isApproved
-          balance
-          host {
-            id
-            name
-            slug
-            type
-            expensePolicy
-            settings
-            location {
-              address
-              country
-            }
-            transferwise {
-              availableCurrencies
-            }
-          }
-        }
-        ... on Fund {
-          id
-          isApproved
-          balance
-          host {
-            id
-            name
-            slug
-            type
-            expensePolicy
-            settings
-            location {
-              address
-              country
-            }
-            transferwise {
-              availableCurrencies
-            }
-          }
-        }
-        ... on Event {
-          id
-          isApproved
-          balance
-          host {
-            id
-            name
-            slug
-            type
-            expensePolicy
-            location {
-              address
-              country
-            }
-            transferwise {
-              availableCurrencies
-            }
-          }
-        }
-        ... on Project {
-          id
-          isApproved
-          balance
-          host {
-            id
-            name
-            slug
-            type
-            expensePolicy
-            location {
-              address
-              country
-            }
-            transferwise {
-              availableCurrencies
-            }
-          }
+      ... on AccountWithHost {
+        isApproved
+        host {
+          ...CreateExpenseHostFields
         }
       }
-      loggedInAccount {
-        ...loggedInAccountExpensePayoutFieldsFragment
+
+      # For Hosts with Budget capabilities
+
+      ... on Organization {
+        balance
+        isHost
+        isActive
+        host {
+          ...CreateExpenseHostFields
+        }
       }
     }
+    loggedInAccount {
+      ...LoggedInAccountExpensePayoutFields
+    }
+  }
 
-    ${loggedInAccountExpensePayoutFieldsFragment}
-  `,
-  {
-    options: {
-      context: API_V2_CONTEXT,
-      fetchPolicy: 'cache-and-network',
-    },
+  ${loggedInAccountExpensePayoutFieldsFragment}
+  ${hostFieldsFragment}
+`;
+
+const addCreateExpensePageData = graphql(createExpensePageQuery, {
+  options: {
+    context: API_V2_CONTEXT,
+    fetchPolicy: 'cache-and-network',
   },
-);
+});
 
-const withCreateExpenseMutation = graphql(
-  gqlV2`
-  mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
+const createExpenseMutation = gqlV2/* GraphQL */ `
+  mutation CreateExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
     createExpense(expense: $expense, account: $account) {
-      ...expensePageExpenseFieldsFragment
+      ...ExpensePageExpenseFields
     }
   }
   ${expensePageExpenseFieldsFragment}
-`,
-  {
-    options: { context: API_V2_CONTEXT },
-    props: ({ mutate }) => ({
-      createExpense: async variables => {
-        return mutate({ variables });
-      },
-    }),
-  },
-);
+`;
 
-export default withUser(getData(withRouter(withCreateExpenseMutation(injectIntl(CreateExpensePage)))));
+const addCreateExpenseMutation = graphql(createExpenseMutation, {
+  name: 'createExpense',
+  options: { context: API_V2_CONTEXT },
+});
+
+export default withUser(addCreateExpensePageData(withRouter(addCreateExpenseMutation(injectIntl(CreateExpensePage)))));

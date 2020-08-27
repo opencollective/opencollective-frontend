@@ -41,12 +41,12 @@ export default class SignIn extends React.Component {
     const { loading, onSecondaryAction } = this.props;
     return typeof onSecondaryAction === 'string' ? (
       <Link route={onSecondaryAction} passHref>
-        <StyledLink disabled={loading} fontSize="Paragraph">
+        <StyledLink disabled={loading} fontSize="14px">
           {message}&nbsp;→
         </StyledLink>
       </Link>
     ) : (
-      <StyledButton asLink fontSize="Paragraph" onClick={onSecondaryAction} disabled={loading}>
+      <StyledButton asLink fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
         {message}&nbsp;→
       </StyledButton>
     );
@@ -73,7 +73,7 @@ export default class SignIn extends React.Component {
           >
             <StyledInput
               error={!!error}
-              fontSize="Paragraph"
+              fontSize="14px"
               id="email"
               name="email"
               minWidth={120}
@@ -116,12 +116,12 @@ export default class SignIn extends React.Component {
             </StyledButton>
           </Flex>
           {error && showError && (
-            <Span display="block" color="red.500" pt={2} fontSize="Tiny" lineHeight="Tiny" aria-live="assertive">
+            <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
               {error}
             </Span>
           )}
           {unknownEmail && (
-            <Span display="block" color="black.600" pt={2} fontSize="Tiny" lineHeight="Tiny" aria-live="assertive">
+            <Span display="block" color="black.600" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
               <FormattedMessage id="signin.unknownEmail" defaultMessage="There is no user with this email address." />{' '}
               {this.renderSecondaryAction(<FormattedMessage id="signin.joinForFree" defaultMessage="Join for free!" />)}
             </Span>
@@ -129,10 +129,10 @@ export default class SignIn extends React.Component {
         </Box>
 
         <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="center">
-          <Span color="black.700" mr={1} fontSize="Paragraph">
+          <Span color="black.700" mr={1} fontSize="14px">
             <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
           </Span>{' '}
-          <Span fontSize="Paragraph">
+          <Span fontSize="14px">
             {this.renderSecondaryAction(<FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />)}
           </Span>
         </Container>

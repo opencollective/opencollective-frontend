@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
 import Error from '../Error';
 import { getI18nLink, I18nSupportLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 
-const getIsTaxFormRequiredQuery = gql`
-  query Expense($id: Int!) {
+const expenseNeedsTaxFormQuery = gql`
+  query ExpenseNeedsTaxForm($id: Int!) {
     Expense(id: $id) {
       id
       userTaxFormRequiredBeforePayment
@@ -59,5 +59,6 @@ class ExpenseNeedsTaxFormMessage extends React.Component {
   }
 }
 
-const addExpenseData = graphql(getIsTaxFormRequiredQuery);
-export default addExpenseData(ExpenseNeedsTaxFormMessage);
+const addExpenseNeedsTaxFormData = graphql(expenseNeedsTaxFormQuery);
+
+export default addExpenseNeedsTaxFormData(ExpenseNeedsTaxFormMessage);

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -19,7 +19,7 @@ import StyledInput from '../StyledInput';
 import StyledInputTags from '../StyledInputTags';
 import { H4, P } from '../Text';
 
-const CreateConversationMutation = gqlV2`
+const createConversationMutation = gqlV2/* GraphQL */ `
   mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
     createConversation(title: $title, html: $html, CollectiveId: $CollectiveId, tags: $tags) {
       id
@@ -74,7 +74,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
   const intl = useIntl();
   const { id: collectiveId, slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();
-  const [createConversation, { error: submitError }] = useMutation(CreateConversationMutation, mutationOptions);
+  const [createConversation, { error: submitError }] = useMutation(createConversationMutation, mutationOptions);
   const [formPersister] = React.useState(new FormPersister());
 
   const { values, errors, getFieldProps, handleSubmit, setFieldValue, setValues, isSubmitting, touched } = useFormik({
@@ -126,7 +126,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
               error={touched.title && errors.title}
               withOutline
               width="100%"
-              fontSize="H4"
+              fontSize="24px"
               border="none"
               maxLength={255}
               px={0}

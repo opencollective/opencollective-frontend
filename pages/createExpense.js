@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
 import { compose } from '../lib/utils';
@@ -24,7 +24,7 @@ class CreateExpensePage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveData
+    slug: PropTypes.string, // for addcreateExpensePageData
     action: PropTypes.string, // not used atm, not clear where it's coming from, not in the route
     createExpense: PropTypes.func.isRequired, // from addMutation
     data: PropTypes.object.isRequired, // from withData
@@ -50,7 +50,7 @@ class CreateExpensePage extends React.Component {
       expense.PayoutMethod = this.getPayoutMethod(expense);
       delete expense.paypalEmail;
       delete expense.payoutMethod;
-      const res = await this.props.createExpense(expense);
+      const res = await this.props.createExpense({ variables: { expense } });
       const expenseCreated = res.data.createExpense;
       Router.pushRoute(`/${this.props.slug}/expenses/${expenseCreated.id}/legacy?createSuccess=true`);
     } catch (e) {
@@ -98,8 +98,8 @@ class CreateExpensePage extends React.Component {
   }
 }
 
-const createExpenseQuery = gql`
-  mutation createExpense($expense: ExpenseInputType!) {
+const createExpenseMutation = gql`
+  mutation CreateExpense($expense: ExpenseInputType!) {
     createExpense(expense: $expense) {
       id
       description
@@ -143,8 +143,8 @@ const createExpenseQuery = gql`
   }
 `;
 
-const getCollectiveQuery = gql`
-  query Collective($slug: String) {
+const createExpensePageQuery = gql`
+  query CreateExpensePage($slug: String) {
     Collective(slug: $slug) {
       id
       type
@@ -211,16 +211,12 @@ const getCollectiveQuery = gql`
   }
 `;
 
-const addMutation = graphql(createExpenseQuery, {
-  props: ({ mutate }) => ({
-    createExpense: async expense => {
-      return await mutate({ variables: { expense } });
-    },
-  }),
+const addCreateExpenseMutation = graphql(createExpenseMutation, {
+  name: 'createExpense',
 });
 
-const addCollectiveData = graphql(getCollectiveQuery);
+const addCreateExpensePageData = graphql(createExpensePageQuery);
 
-const addData = compose(addCollectiveData, addMutation);
+const addGraphql = compose(addCreateExpensePageData, addCreateExpenseMutation);
 
-export default withUser(addData(CreateExpensePage));
+export default withUser(addGraphql(CreateExpensePage));

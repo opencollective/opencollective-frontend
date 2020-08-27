@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { createGlobalStyle } from 'styled-components';
@@ -9,7 +9,7 @@ import { generateNotFoundError } from '../lib/errors';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
-import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
+import { collectivePageQuery } from '../components/collective-page/graphql/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
@@ -134,11 +134,13 @@ class CollectivePage extends React.Component {
     const { slug, data, LoggedInUser, status, step, mode } = this.props;
     const { showOnboardingModal } = this.state;
 
-    if (!data.loading) {
+    const loading = data.loading && !data.Collective;
+
+    if (!loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
-        return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
       } else if (data.Collective.isPledged && !data.Collective.isActive) {
         return <PledgedCollectivePage collective={data.Collective} />;
       } else if (data.Collective.isIncognito) {
@@ -151,7 +153,7 @@ class CollectivePage extends React.Component {
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles smooth={this.state.smooth} />
-        {data.loading ? (
+        {loading ? (
           <Container py={[5, 6]}>
             <Loading />
           </Container>
@@ -214,10 +216,10 @@ export const getCollectivePageQueryVariables = collectiveSlug => {
   };
 };
 
-const getCollective = graphql(getCollectivePageQuery, {
+const addCollectivePageData = graphql(collectivePageQuery, {
   options: props => ({
     variables: getCollectivePageQueryVariables(props.slug),
   }),
 });
 
-export default withUser(getCollective(CollectivePage));
+export default withUser(addCollectivePageData(CollectivePage));

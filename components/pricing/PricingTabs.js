@@ -99,8 +99,8 @@ const PricingTabs = ({ onChange, activeTab }) => {
           <img width="100%" src="/static/images/pricing-star-bg-sm.png" alt="Pricing" />
         </Box>
         <Title
-          fontSize={['H3', null, 'H1']}
-          lineHeight={['40px', null, 'H1']}
+          fontSize={['32px', null, '52px']}
+          lineHeight={['40px', null, '56px']}
           letterSpacing="-0.4px"
           textAlign="center"
         >
@@ -111,9 +111,9 @@ const PricingTabs = ({ onChange, activeTab }) => {
         <Box mx={3} my={2}>
           <P
             textAlign={['left', 'center']}
-            fontSize={['LeadParagraph', null, 'H4']}
+            fontSize={['16px', null, '24px']}
             fontWeight={['bold', null, 500]}
-            lineHeight={['26px', null, 'H3']}
+            lineHeight={['26px', null, '36px']}
             letterSpacing={['-0.012em', null, '-0.4px']}
           >
             <FormattedMessage id="tabs.label" defaultMessage="I want to create…" />

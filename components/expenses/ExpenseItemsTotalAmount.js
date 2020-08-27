@@ -11,7 +11,7 @@ const ExpenseItemsTotalAmount = ({ items, currency }) => {
   const totalAmount = items.reduce((amount, attachment) => amount + (attachment.amount || 0), 0);
   const isValid = items.every(item => item.amount);
   return (
-    <Span color="black.500" fontSize="LeadParagraph" letterSpacing={0} data-cy="expense-items-total-amount">
+    <Span color="black.500" fontSize="16px" letterSpacing={0} data-cy="expense-items-total-amount">
       {isValid ? <FormattedMoneyAmount amount={totalAmount} precision={2} currency={currency} /> : '--.--'}
     </Span>
   );

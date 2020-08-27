@@ -24,10 +24,10 @@ const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAm
       <LinkCollective collective={fromCollective}>{fromCollective.name}</LinkCollective>
     </P>
 
-    <P fontSize="Tiny" lineHeight="16px" textAlign="center" mt={2} px={2} pb={2}>
+    <P fontSize="10px" lineHeight="16px" textAlign="center" mt={2} px={2} pb={2}>
       <FormattedMessage id="PledgeCard.HasPledged" defaultMessage="Has pledged:" />
       <br />
-      <Span fontSize="Caption">
+      <Span fontSize="12px">
         <FormattedMoneyAmount
           amount={totalAmount}
           currency={currency}
@@ -38,7 +38,7 @@ const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAm
       </Span>
     </P>
 
-    <P color="black.600" fontSize="Tiny" textAlign="center" mt={1} px={3} pb={4}>
+    <P color="black.600" fontSize="10px" textAlign="center" mt={1} px={3} pb={4}>
       {publicMessage}
     </P>
   </Container>

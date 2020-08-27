@@ -1,5 +1,12 @@
-# source: http://localhost:3060/graphql/v2
-# timestamp: Mon Jul 27 2020 12:32:00 GMT+0100 (British Summer Time)
+"""
+Exposes a URL that specifies the behaviour of this scalar.
+"""
+directive @specifiedBy(
+  """
+  The URL that specifies the behaviour of this scalar.
+  """
+  url: String!
+) on SCALAR
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -33,7 +40,13 @@ interface Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -130,18 +143,23 @@ interface Account {
   transferwise: TransferWise
 
   """
-  The list of payout methods that this collective can use to get paid
+  The list of payout methods that this account can use to get paid
   """
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders
+  The list of payment methods that this account can use to pay for Orders
   """
   paymentMethods(
     """
     Filter on given types (creditcard, virtualcard...)
     """
     types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
   ): [PaymentMethod]
 
   """
@@ -239,6 +257,93 @@ enum AccountType {
 }
 
 """
+An account that can receive financial contributions
+"""
+interface AccountWithContributions {
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
+  tiers: TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+}
+
+"""
+An account that can be hosted by a Host
+"""
+interface AccountWithHost {
+  """
+  Returns the Fiscal Host
+  """
+  host: Host
+
+  """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent: Float
+
+  """
+  Fees percentage that the platform takes for this collective
+  """
+  platformFeePercent: Int
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
+  Returns whether it's approved by the Fiscal Host
+  """
+  isApproved: Boolean!
+
+  """
+  Returns whether it's active: can accept financial contributions and pay expenses.
+  """
+  isActive: Boolean!
+}
+
+"""
 An activity describing something that happened on the platform
 """
 type Activity {
@@ -323,7 +428,7 @@ A financial amount.
 type Amount {
   value: Float
   currency: Currency
-  valueInCents: Float
+  valueInCents: Int
 }
 
 """
@@ -367,7 +472,13 @@ type Bot implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -411,6 +522,11 @@ type Bot implements Account {
     isHostAccount: Boolean
 
     """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -479,7 +595,14 @@ type Bot implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -520,7 +643,7 @@ interface Collection {
 """
 This represents a Collective account
 """
-type Collective implements Account {
+type Collective implements Account & AccountWithHost & AccountWithContributions {
   id: String
   legacyId: Int
 
@@ -538,7 +661,13 @@ type Collective implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -554,7 +683,7 @@ type Collective implements Account {
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
-  isActive: Boolean
+  isActive: Boolean!
 
   """
   Returns whether the account is setup to Host collectives.
@@ -580,6 +709,11 @@ type Collective implements Account {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -650,7 +784,14 @@ type Collective implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -662,11 +803,6 @@ type Collective implements Account {
   """
   location: Location
   stats: AccountStats
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   Returns the Fiscal Host
@@ -684,6 +820,11 @@ type Collective implements Account {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -691,7 +832,7 @@ type Collective implements Account {
   """
   Returns whether it's approved by the Fiscal Host
   """
-  isApproved: Boolean
+  isApproved: Boolean!
 
   """
   Number of unique financial contributors.
@@ -703,6 +844,32 @@ type Collective implements Account {
     accountType: AccountType
   ): Int!
   tiers: TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 }
 
 input CollectiveCreateInput {
@@ -858,6 +1025,109 @@ enum ConnectedAccountService {
   twitter
   meetup
   transferwise
+}
+
+"""
+A person or an entity that contributes financially or by any other mean to the mission
+of the collective. While "Member" is dedicated to permissions, this type is meant
+to surface all the public contributors.
+"""
+type Contributor {
+  """
+  A unique identifier for this member
+  """
+  id: String!
+
+  """
+  Name of the contributor
+  """
+  name: String!
+
+  """
+  All the roles for a given contributor
+  """
+  roles: [ContributorRole]
+
+  """
+  True if the contributor is a collective admin
+  """
+  isAdmin: Boolean!
+
+  """
+  True if the contributor is a core contributor
+  """
+  isCore: Boolean!
+
+  """
+  True if the contributor is a financial contributor
+  """
+  isBacker: Boolean!
+
+  """
+  Member join date
+  """
+  since: ISODateTime!
+
+  """
+  How much money the user has contributed for this (in cents, using collective currency)
+  """
+  totalAmountDonated: Int!
+
+  """
+  Wether the contributor is an individual, an organization...
+  """
+  type: String!
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
+
+  """
+  Description of how the member contribute. Will usually be a tier name, or "design" or "code".
+  """
+  description: String
+
+  """
+  If the contributor has a page on Open Collective, this is the slug to link to it
+  """
+  collectiveSlug: String
+
+  """
+  Contributor avatar or logo
+  """
+  image(height: Int, format: ImageFormat): String
+
+  """
+  A public message from contributors to describe their contributions
+  """
+  publicMessage: String
+}
+
+"""
+A collection of "Contributor"
+"""
+type ContributorCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Contributor]
+}
+
+"""
+Possible roles for a contributor. Extends `Member.Role`.
+"""
+enum ContributorRole {
+  HOST
+  ADMIN
+  MEMBER
+  CONTRIBUTOR
+  BACKER
+  FUNDRAISER
+  ATTENDEE
+  FOLLOWER
+  CONNECTED_COLLECTIVE
+  ACCOUNTANT
 }
 
 """
@@ -2146,6 +2416,7 @@ This represents a Credit transaction
 """
 type Credit implements Transaction {
   id: String
+  uuid: String
   type: TransactionType
   description: String
   amount: Amount
@@ -2156,8 +2427,28 @@ type Credit implements Transaction {
   host: Account
   createdAt: DateTime
   updatedAt: DateTime
+  expense: Expense
+  order: Order
+  isRefunded: Boolean
+  paymentMethod: PaymentMethod
+
+  """
+  The permissions given to current logged in user for this transaction
+  """
+  permissions: TransactionPermissions!
   fromAccount: Account
   toAccount: Account
+}
+
+input CreditCardCreateInput {
+  token: String!
+  brand: String!
+  country: String!
+  expMonth: Int!
+  expYear: Int!
+  fullName: String
+  funding: String
+  zip: String
 }
 
 """
@@ -2165,24 +2456,19 @@ All supported currencies
 """
 enum Currency {
   """
-  US Dollar
+  Australian Dollar
   """
-  USD
+  AUD
 
   """
-  Euro
+  Bulgarian Lev
   """
-  EUR
+  BGN
 
   """
-  Pound Sterling
+  Brazilian Real
   """
-  GBP
-
-  """
-  Mexican Peso
-  """
-  MXN
+  BRL
 
   """
   Canadian Dollar
@@ -2195,14 +2481,34 @@ enum Currency {
   CHF
 
   """
-  Peso Uruguayo
+  Czech Koruna
   """
-  UYU
+  CZK
 
   """
-  Australian Dollar
+  Danish Krone
   """
-  AUD
+  DKK
+
+  """
+  Euro
+  """
+  EUR
+
+  """
+  Pound Sterling
+  """
+  GBP
+
+  """
+  Kuna
+  """
+  HRK
+
+  """
+  Forint
+  """
+  HUF
 
   """
   Indian Rupee
@@ -2210,14 +2516,19 @@ enum Currency {
   INR
 
   """
+  Iceland Krona
+  """
+  ISK
+
+  """
   Yen
   """
   JPY
 
   """
-  New Zealand Dollar
+  Mexican Peso
   """
-  NZD
+  MXN
 
   """
   Naira
@@ -2225,14 +2536,39 @@ enum Currency {
   NGN
 
   """
-  Czech Koruna
+  Norwegian Krone
   """
-  CZK
+  NOK
 
   """
-  Brazilian Real
+  New Zealand Dollar
   """
-  BRL
+  NZD
+
+  """
+  Zloty
+  """
+  PLN
+
+  """
+  Romanian Leu
+  """
+  RON
+
+  """
+  Swedish Krona
+  """
+  SEK
+
+  """
+  US Dollar
+  """
+  USD
+
+  """
+  Peso Uruguayo
+  """
+  UYU
 }
 
 scalar DateString
@@ -2259,6 +2595,7 @@ This represents a Debit transaction
 """
 type Debit implements Transaction {
   id: String
+  uuid: String
   type: TransactionType
   description: String
   amount: Amount
@@ -2269,6 +2606,15 @@ type Debit implements Transaction {
   host: Account
   createdAt: DateTime
   updatedAt: DateTime
+  expense: Expense
+  order: Order
+  isRefunded: Boolean
+  paymentMethod: PaymentMethod
+
+  """
+  The permissions given to current logged in user for this transaction
+  """
+  permissions: TransactionPermissions!
   fromAccount: Account
   toAccount: Account
 }
@@ -2276,7 +2622,7 @@ type Debit implements Transaction {
 """
 This represents an Event account
 """
-type Event implements Account {
+type Event implements Account & AccountWithHost & AccountWithContributions {
   id: String
   legacyId: Int
 
@@ -2294,7 +2640,13 @@ type Event implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -2310,7 +2662,7 @@ type Event implements Account {
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
-  isActive: Boolean
+  isActive: Boolean!
 
   """
   Returns whether the account is setup to Host collectives.
@@ -2336,6 +2688,11 @@ type Event implements Account {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -2406,7 +2763,14 @@ type Event implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -2418,11 +2782,6 @@ type Event implements Account {
   """
   location: Location
   stats: AccountStats
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   Returns the Fiscal Host
@@ -2440,9 +2799,19 @@ type Event implements Account {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
-  isApproved: Boolean
+  isApproved: Boolean!
 
   """
   Number of unique financial contributors.
@@ -2453,6 +2822,33 @@ type Event implements Account {
     """
     accountType: AccountType
   ): Int!
+  tiers: TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   The Collective hosting this Event
@@ -2480,6 +2876,11 @@ type Expense {
   Title/main description for this expense
   """
   description: String!
+
+  """
+  Longer description for this expense
+  """
+  longDescription: String
 
   """
   Total amount of the expense (sum of the item's amounts).
@@ -2619,6 +3020,11 @@ input ExpenseCreateInput {
   Main title of the expense
   """
   description: String!
+
+  """
+  Longer text to attach to the expense
+  """
+  longDescription: String
 
   """
   Tags associated to the expense (ie. Food, Engineering...)
@@ -2865,18 +3271,41 @@ enum ExpenseStatus {
 }
 
 """
+Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
+"""
+enum ExpenseStatusFilter {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+  ERROR
+  PAID
+  SCHEDULED_FOR_PAYMENT
+
+  """
+  Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
+  """
+  READY_TO_PAY
+}
+
+"""
 All supported expense types
 """
 enum ExpenseType {
   """
-  Invoice: Get paid back for a purchase already made.
+  Invoice: Charge for your time or get paid in advance.
   """
   INVOICE
 
   """
-  Receipt: Charge for your time or get paid in advance
+  Receipt:  Get paid back for a purchase already made.
   """
   RECEIPT
+
+  """
+  Funding Request: Request funding for a project or initiative.
+  """
+  FUNDING_REQUEST
 
   """
   Unclassified expense
@@ -2894,6 +3323,11 @@ input ExpenseUpdateInput {
   Main title of the expense
   """
   description: String
+
+  """
+  Longer text to attach to the expense
+  """
+  longDescription: String
 
   """
   Tags associated to the expense (ie. Food, Engineering...)
@@ -2950,7 +3384,7 @@ input ExpenseUpdateInput {
 """
 This represents an Project account
 """
-type Fund implements Account {
+type Fund implements Account & AccountWithHost & AccountWithContributions {
   id: String
   legacyId: Int
 
@@ -2968,7 +3402,13 @@ type Fund implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -2984,7 +3424,7 @@ type Fund implements Account {
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
-  isActive: Boolean
+  isActive: Boolean!
 
   """
   Returns whether the account is setup to Host collectives.
@@ -3010,6 +3450,11 @@ type Fund implements Account {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -3080,7 +3525,14 @@ type Fund implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -3092,11 +3544,6 @@ type Fund implements Account {
   """
   location: Location
   stats: AccountStats
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   Returns the Fiscal Host
@@ -3114,6 +3561,11 @@ type Fund implements Account {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -3121,7 +3573,7 @@ type Fund implements Account {
   """
   Returns whether it's approved by the Fiscal Host
   """
-  isApproved: Boolean
+  isApproved: Boolean!
 
   """
   Number of unique financial contributors.
@@ -3133,6 +3585,32 @@ type Fund implements Account {
     accountType: AccountType
   ): Int!
   tiers: TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 }
 
 input FundCreateInput {
@@ -3164,7 +3642,13 @@ type Host implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -3208,6 +3692,11 @@ type Host implements Account {
     isHostAccount: Boolean
 
     """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -3276,7 +3765,14 @@ type Host implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -3293,6 +3789,16 @@ type Host implements Account {
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
+
+  """
+  The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
+  """
+  supportedPaymentMethods: [PaymentMethodType]
+
+  """
+  The list of payout methods this Host accepts for its expenses
+  """
+  supportedPayoutMethods: [PayoutMethodType]
 }
 
 """
@@ -3414,7 +3920,13 @@ type Individual implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -3456,6 +3968,11 @@ type Individual implements Account {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -3526,7 +4043,14 @@ type Individual implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -3556,6 +4080,11 @@ scalar ISODateTime
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
 
 """
 Type for a required legal document
@@ -3642,6 +4171,11 @@ type Member {
   Total amount donated
   """
   totalDonations: Amount
+
+  """
+  Custom user message from member to the collective
+  """
+  publicMessage: String
   account: Account
 }
 
@@ -3670,6 +4204,11 @@ type MemberOf {
   Total amount donated
   """
   totalDonations: Amount
+
+  """
+  Custom user message from member to the collective
+  """
+  publicMessage: String
   account: Account
 }
 
@@ -3695,6 +4234,7 @@ enum MemberRole {
   MEMBER
   FUNDRAISER
   FOLLOWER
+  ACCOUNTANT
 }
 
 """
@@ -3924,6 +4464,11 @@ type Mutation {
     The host fee percent to apply to this account
     """
     hostFeePercent: Float!
+
+    """
+    If using a custom fee, set this to true
+    """
+    isCustomFee: Boolean!
   ): Account!
 
   """
@@ -3975,6 +4520,11 @@ type Mutation {
   Remove the given payout method
   """
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
+
+  """
+  To submit a new order
+  """
+  createOrder(order: OrderCreateInput!): Order!
 
   """
   Cancel an order
@@ -4035,6 +4585,36 @@ type Mutation {
     """
     account: AccountReferenceInput
   ): PaymentMethod
+
+  """
+  Refunds transaction
+  """
+  refundTransaction(
+    """
+    Reference of the transaction to refund
+    """
+    transaction: TransactionReferenceInput!
+  ): Transaction!
+
+  """
+  Edit the public message for the given Member of a Collective
+  """
+  editPublicMessage(
+    """
+    Reference to an account for the donating Collective
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the receiving Collective
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    New public message
+    """
+    message: String
+  ): Member!
 }
 
 """
@@ -4059,11 +4639,12 @@ type Order {
   """
   totalDonations: Amount
   paymentMethod: PaymentMethod
+  platformFee: Amount @deprecated(reason: "2020-07-31: Please use platformContributionAmount")
 
   """
-  If an Order has fees on top, we should return the amount
+  Platform contribution attached to the Order.
   """
-  platformFee: Amount
+  platformContributionAmount: Amount
 }
 
 """
@@ -4074,6 +4655,54 @@ type OrderCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Order]
+}
+
+"""
+Input to create a new order
+"""
+input OrderCreateInput {
+  quantity: Int! = 1
+
+  """
+  The contribution amount for 1 quantity, without platform contribution and taxes
+  """
+  amount: AmountInput!
+  frequency: OrderFrequency!
+
+  """
+  The profile making the order
+  """
+  fromAccount: AccountReferenceInput!
+
+  """
+  The profile you want to contribute to
+  """
+  toAccount: AccountReferenceInput!
+
+  """
+  The payment method used for this order
+  """
+  paymentMethod: PaymentMethodInput
+
+  """
+  Platform contribution attached to this order
+  """
+  platformContributionAmount: AmountInput
+
+  """
+  Use this field to set the taxes associated to this order
+  """
+  taxes: [OrderTaxInput]
+
+  """
+  The tier you are contributing to
+  """
+  tier: TierReferenceInput
+
+  """
+  If the tier has some "customFields", use this field to set their values
+  """
+  customData: JSON
 }
 
 """
@@ -4110,6 +4739,34 @@ enum OrderStatus {
 }
 
 """
+Input to set taxes for an order
+"""
+input OrderTaxInput {
+  type: OrderTaxType!
+  amount: AmountInput!
+
+  """
+  Country of the account ordering, to know from where to apply the tax
+  """
+  country: CountryISO!
+
+  """
+  Tax identification number, if any
+  """
+  idNumber: String
+}
+
+"""
+Type for a required legal document
+"""
+enum OrderTaxType {
+  """
+  European Value Added Tax
+  """
+  VAT
+}
+
+"""
 This represents an Organization account
 """
 type Organization implements Account {
@@ -4130,7 +4787,13 @@ type Organization implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -4172,6 +4835,11 @@ type Organization implements Account {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -4242,7 +4910,14 @@ type Organization implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -4276,8 +4951,13 @@ type PaymentMethod {
   id: String
   legacyId: Int
   name: String
-  service: String
-  type: String
+  service: String @deprecated(reason: "2020-08-18: This field is being deprecated in favor of providerType")
+  type: String @deprecated(reason: "2020-08-18: This field is being deprecated in favor of providerType")
+
+  """
+  Defines the type of the payment method. Meant to be moved to "type" in the future.
+  """
+  providerType: PaymentMethodType
 
   """
   Returns the balance amount and the currency of this paymentMethod
@@ -4285,6 +4965,8 @@ type PaymentMethod {
   balance: Amount
   account: Account
   data: JSON
+  limitedToHosts: [Host]
+  expiryDate: ISODateTime
 }
 
 input PaymentMethodCreateInput {
@@ -4303,11 +4985,55 @@ input PaymentMethodDataInput {
   zip: String
 }
 
+"""
+An input to use for creating or retrieving payment methods
+"""
+input PaymentMethodInput {
+  """
+  The id assigned to the payment method
+  """
+  id: String
+
+  """
+  Type of this payment method
+  """
+  type: PaymentMethodType
+
+  """
+  Name of this payment method
+  """
+  name: String
+
+  """
+  Wether this payment method should be saved for future payments
+  """
+  isSavedForLater: Boolean
+
+  """
+  When creating a credit card, use this field to set its info
+  """
+  creditCardInfo: CreditCardCreateInput
+
+  """
+  To pass when type is PAYPAL
+  """
+  paypalInfo: PaypalPaymentInput
+}
+
 input PaymentMethodReferenceInput {
   """
   The id assigned to the payment method
   """
   id: String
+}
+
+enum PaymentMethodType {
+  CREDIT_CARD
+  GIFT_CARD
+  PREPAID_BUDGET
+  ACCOUNT_BALANCE
+  PAYPAL
+  BANK_TRANSFER
 }
 
 """
@@ -4352,6 +5078,12 @@ enum PayoutMethodType {
   OTHER
   PAYPAL
   BANK_ACCOUNT
+  ACCOUNT_BALANCE
+}
+
+input PaypalPaymentInput {
+  token: String!
+  data: JSON
 }
 
 """
@@ -4367,12 +5099,17 @@ input ProcessExpensePaymentParams {
   Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually
   """
   forceManual: Boolean
+
+  """
+  2FA code for if the host account has it turned on and the transaction is large.
+  """
+  twoFactorAuthenticatorCode: String
 }
 
 """
 This represents an Project account
 """
-type Project implements Account {
+type Project implements Account & AccountWithHost & AccountWithContributions {
   id: String
   legacyId: Int
 
@@ -4390,7 +5127,13 @@ type Project implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -4406,7 +5149,7 @@ type Project implements Account {
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
-  isActive: Boolean
+  isActive: Boolean!
 
   """
   Returns whether the account is setup to Host collectives.
@@ -4432,6 +5175,11 @@ type Project implements Account {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -4502,7 +5250,14 @@ type Project implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -4514,11 +5269,6 @@ type Project implements Account {
   """
   location: Location
   stats: AccountStats
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   Returns the Fiscal Host
@@ -4536,9 +5286,19 @@ type Project implements Account {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
-  isApproved: Boolean
+  isApproved: Boolean!
 
   """
   Number of unique financial contributors.
@@ -4549,6 +5309,33 @@ type Project implements Account {
     """
     accountType: AccountType
   ): Int!
+  tiers: TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   The Fund hosting this Project
@@ -4687,7 +5474,7 @@ type Query {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatus
+    status: ExpenseStatusFilter
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -4756,6 +5543,78 @@ type Query {
     """
     tags: [String]
   ): HostCollection
+  tier(
+    """
+    Identifiers to retrieve the tier
+    """
+    tier: TierReferenceInput!
+  ): Tier
+  transactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account that submitted this expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the account where this expense was submitted
+    """
+    account: AccountReferenceInput
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Transaction is attached to Expense
+    """
+    hasExpense: Boolean
+
+    """
+    Transaction is attached to Order
+    """
+    hasOrder: Boolean
+  ): TransactionCollection
   loggedInAccount: Account
 }
 
@@ -4783,7 +5642,8 @@ type TagStat {
 Tier model
 """
 type Tier {
-  id: String
+  id: String!
+  legacyId: Int!
   slug: String
   name: String
   description: String
@@ -4793,8 +5653,11 @@ type Tier {
   """
   orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
   amount: Amount
+  type: TierType!
   interval: TierInterval
   presets: [Int]
+  maxQuantity: Int
+  customFields: JSON
   amountType: TierAmountType!
   minimumAmount: Amount
 }
@@ -4824,6 +5687,20 @@ input TierReferenceInput {
   The id assigned to the Tier
   """
   id: String
+
+  """
+  The DB id assigned to the Tier
+  """
+  legacyId: Int
+}
+
+enum TierType {
+  TIER
+  MEMBERSHIP
+  DONATION
+  TICKET
+  SERVICE
+  PRODUCT
 }
 
 """
@@ -4831,6 +5708,7 @@ Transaction interface shared by all kind of transactions (Debit, Credit)
 """
 interface Transaction {
   id: String
+  uuid: String
   type: TransactionType
   description: String
   amount: Amount
@@ -4843,6 +5721,11 @@ interface Transaction {
   toAccount: Account
   createdAt: DateTime
   updatedAt: DateTime
+  expense: Expense
+  order: Order
+  isRefunded: Boolean
+  paymentMethod: PaymentMethod
+  permissions: TransactionPermissions
 }
 
 """
@@ -4853,6 +5736,33 @@ type TransactionCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Transaction]
+}
+
+"""
+Fields for the user permissions on an transaction
+"""
+type TransactionPermissions {
+  """
+  Whether the current user can edit the transaction
+  """
+  canRefund: Boolean!
+
+  """
+  Whether the current user can download this transaction's invoice
+  """
+  canDownloadInvoice: Boolean!
+}
+
+input TransactionReferenceInput {
+  """
+  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the transaction (ie: 580)
+  """
+  legacyId: Int
 }
 
 """
@@ -4878,7 +5788,7 @@ type TransferWise {
     """
     accountDetails: JSON
   ): [TransferWiseRequiredField]
-  availableCurrencies: [String]
+  availableCurrencies: [JSONObject]
 }
 
 type TransferWiseField {

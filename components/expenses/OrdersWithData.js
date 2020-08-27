@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 
 import Error from '../Error';
 
@@ -50,8 +50,8 @@ class OrdersWithData extends React.Component {
   }
 }
 
-const getOrdersQuery = gql`
-  query allOrders($CollectiveId: Int, $status: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
+const ordersQuery = gql`
+  query Orders($CollectiveId: Int, $status: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
     allOrders(
       CollectiveId: $CollectiveId
       status: $status
@@ -153,7 +153,7 @@ const getOrdersVariables = props => {
 
 const ORDERS_PER_PAGE = 10;
 
-export const addOrdersData = graphql(getOrdersQuery, {
+export const addOrdersData = graphql(ordersQuery, {
   options: props => ({
     variables: getOrdersVariables(props),
   }),

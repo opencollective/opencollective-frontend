@@ -1,22 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { get, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import moment from 'moment';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../lib/constants/collectives';
 import { isPrepaid } from '../lib/constants/payment-methods';
-import { reportValidityHTML5 } from '../lib/utils';
+import { compose, reportValidityHTML5 } from '../lib/utils';
 
 import CollectivePicker from './CollectivePicker';
-import CollectivePickerAsync from './CollectivePickerAsync';
 import Container from './Container';
 import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
 import { Box, Flex } from './Grid';
@@ -209,7 +207,6 @@ class CreateVirtualCardsForm extends Component {
         customMessage: '',
         numberOfVirtualCards: 1,
         limitedToHosts: [],
-        limitedToCollectives: [],
         expiryDate: moment().add(12, 'months').format('YYYY-MM-DD'),
       },
       errors: { emails: [] },
@@ -259,11 +256,11 @@ class CreateVirtualCardsForm extends Component {
       const limitations = {};
       if (this.canLimitToCollectives(paymentMethod)) {
         limitations.limitedToHostCollectiveIds = this.optionsToIdsList(values.limitedToHosts);
-        limitations.limitedToCollectiveIds = this.optionsToIdsList(values.limitedToCollectives);
       }
 
       this.setState({ submitting: true });
-      const params = {
+      const variables = {
+        CollectiveId: this.props.collectiveId,
         amount: values.amount,
         PaymentMethodId: paymentMethod.id,
         expiryDate: values.expiryDate,
@@ -272,14 +269,14 @@ class CreateVirtualCardsForm extends Component {
       };
 
       if (deliverType === 'email') {
-        params.emails = values.emails;
-        params.customMessage = values.customMessage;
+        variables.emails = values.emails;
+        variables.customMessage = values.customMessage;
       } else if (deliverType === 'manual') {
-        params.numberOfVirtualCards = values.numberOfVirtualCards;
+        variables.numberOfVirtualCards = values.numberOfVirtualCards;
       }
 
       this.props
-        .createVirtualCards(params)
+        .createVirtualCards({ variables })
         .then(({ data }) => {
           this.setState({ createdVirtualCards: data.createVirtualCards, submitting: false });
           window.scrollTo(0, 0);
@@ -554,7 +551,7 @@ class CreateVirtualCardsForm extends Component {
               onChange={({ value }) => this.onChange('batch', truncate(value, { length: 200 }))}
               minWidth={300}
               disabled={submitting}
-              fontSize="Paragraph"
+              fontSize="14px"
               options={batchesOptions}
               defaultValue={batchesOptions[0]}
             />
@@ -563,7 +560,9 @@ class CreateVirtualCardsForm extends Component {
           {canLimitToCollectives && (
             <React.Fragment>
               <Entry>
-                <Title>Limitations</Title>
+                <Title>
+                  <FormattedMessage id="GiftCard.Limitations" defaultMessage="Limitations" />
+                </Title>
                 <InlineField
                   name="limitToHosts"
                   label={
@@ -589,36 +588,6 @@ class CreateVirtualCardsForm extends Component {
                     defaultValue={values.limitedToHosts}
                     onChange={options => this.onChange('limitedToHosts', options)}
                     isMulti
-                  />
-                </InlineField>
-
-                <InlineField
-                  name="limitToCollectives"
-                  label={
-                    <Flex flexDirection="column">
-                      <FormattedMessage
-                        id="virtualCards.create.limitToCollectives"
-                        defaultMessage="Limit to the following collectives"
-                      />
-                      <FieldLabelDetails>
-                        <FormattedMessage id="forms.optional" defaultMessage="Optional" />
-                      </FieldLabelDetails>
-                    </Flex>
-                  }
-                >
-                  <CollectivePickerAsync
-                    isMulti
-                    minWidth={300}
-                    maxWidth={600}
-                    preload={values.limitedToHosts.length > 0}
-                    sortFunc={collectives => collectives} /** Sort is handled by the API */
-                    types={[CollectiveType.COLLECTIVE]}
-                    defaultValue={values.limitedToCollectives}
-                    onChange={options => this.onChange('limitedToCollectives', options)}
-                    hostCollectiveIds={this.optionsToIdsList(values.limitedToHosts)}
-                    placeholder={intl.formatMessage(messages.limitToCollectivesPlaceholder, {
-                      nbHosts: values.limitedToHosts.length,
-                    })}
                   />
                 </InlineField>
               </Entry>
@@ -666,8 +635,8 @@ class CreateVirtualCardsForm extends Component {
  * virtual cards, as a virtual card cannot be used as a source payment method
  * for another payment method.
  */
-export const getCollectiveSourcePaymentMethodsQuery = gql`
-  query Collective($id: Int) {
+export const collectiveSourcePaymentMethodsQuery = gql`
+  query CollectiveSourcePaymentMethods($id: Int) {
     Collective(id: $id) {
       id
       virtualCardsBatches {
@@ -701,15 +670,15 @@ export const getCollectiveSourcePaymentMethodsQuery = gql`
   }
 `;
 
-const addData = graphql(getCollectiveSourcePaymentMethodsQuery, {
+const addCollectiveSourcePaymentMethodsQuery = graphql(collectiveSourcePaymentMethodsQuery, {
   options: props => ({
     variables: { id: props.collectiveId },
     fetchPolicy: 'network-only',
   }),
 });
 
-const createVirtualCardsMutationQuery = gql`
-  mutation createVirtualCards(
+const createVirtualCardsMutation = gql`
+  mutation CreateVirtualCards(
     $CollectiveId: Int!
     $numberOfVirtualCards: Int
     $emails: [String]
@@ -720,7 +689,6 @@ const createVirtualCardsMutationQuery = gql`
     $expiryDate: String
     $currency: String
     $limitedToTags: [String]
-    $limitedToCollectiveIds: [Int]
     $limitedToHostCollectiveIds: [Int]
     $customMessage: String
     $batch: String
@@ -734,7 +702,6 @@ const createVirtualCardsMutationQuery = gql`
       expiryDate: $expiryDate
       currency: $currency
       limitedToTags: $limitedToTags
-      limitedToCollectiveIds: $limitedToCollectiveIds
       limitedToHostCollectiveIds: $limitedToHostCollectiveIds
       numberOfVirtualCards: $numberOfVirtualCards
       emails: $emails
@@ -746,7 +713,6 @@ const createVirtualCardsMutationQuery = gql`
       uuid
       batch
       limitedToHostCollectiveIds
-      limitedToCollectiveIds
       description
       initialBalance
       monthlyLimitPerMember
@@ -757,16 +723,10 @@ const createVirtualCardsMutationQuery = gql`
   }
 `;
 
-const addCreateVirtualCardsMutation = graphql(createVirtualCardsMutationQuery, {
-  props: ({ mutate, ownProps }) => ({
-    createVirtualCards: variables =>
-      mutate({
-        variables: {
-          ...variables,
-          CollectiveId: ownProps.collectiveId,
-        },
-      }),
-  }),
+const addCreateVirtualCardsMutation = graphql(createVirtualCardsMutation, {
+  name: 'createVirtualCards',
 });
 
-export default injectIntl(addData(addCreateVirtualCardsMutation(CreateVirtualCardsForm)));
+const addGraphql = compose(addCollectiveSourcePaymentMethodsQuery, addCreateVirtualCardsMutation);
+
+export default injectIntl(addGraphql(CreateVirtualCardsForm));

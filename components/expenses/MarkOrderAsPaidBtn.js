@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
 import SmallButton from '../SmallButton';
@@ -18,7 +18,6 @@ class MarkOrderAsPaidBtn extends React.Component {
     super(props);
     this.state = {
       loading: false,
-      paymentProcessorFeeInHostCurrency: 0,
     };
     this.onClick = this.onClick.bind(this);
   }
@@ -30,7 +29,7 @@ class MarkOrderAsPaidBtn extends React.Component {
     }
     this.setState({ loading: true });
     try {
-      await this.props.markOrderAsPaid(order.id, this.state.paymentProcessorFeeInHostCurrency);
+      await this.props.markOrderAsPaid({ variables: { id: order.id } });
       this.setState({ loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, '');
@@ -97,8 +96,8 @@ class MarkOrderAsPaidBtn extends React.Component {
   }
 }
 
-const markOrderAsPaidQuery = gql`
-  mutation markOrderAsPaid($id: Int!) {
+const markOrderAsPaidMutation = gql`
+  mutation MarkOrderAsPaid($id: Int!) {
     markOrderAsPaid(id: $id) {
       id
       status
@@ -113,12 +112,8 @@ const markOrderAsPaidQuery = gql`
   }
 `;
 
-const addMutation = graphql(markOrderAsPaidQuery, {
-  props: ({ mutate }) => ({
-    markOrderAsPaid: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
+const addMarkOrderAsPaidMutation = graphql(markOrderAsPaidMutation, {
+  name: 'markOrderAsPaid',
 });
 
-export default addMutation(MarkOrderAsPaidBtn);
+export default addMarkOrderAsPaidMutation(MarkOrderAsPaidBtn);

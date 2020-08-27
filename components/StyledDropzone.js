@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
-import { isNil, omit } from 'lodash';
+import { isNil, omit, partition } from 'lodash';
 import { useDropzone } from 'react-dropzone';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import { uploadImageWithXHR } from '../lib/api';
+import { getErrorFromXhrUpload } from '../lib/errors';
+import { allSettled } from '../lib/utils';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -116,10 +118,10 @@ const StyledDropzone = ({
     maxSize,
     multiple: isMulti,
     onDrop: React.useCallback(
-      async (acceptedFiles, rejectedFiles) => {
+      async acceptedFiles => {
         setUploading(true);
         const filesToUpload = isMulti ? acceptedFiles : [acceptedFiles[0]];
-        const files = await Promise.all(
+        const results = await allSettled(
           filesToUpload.map((file, index) =>
             uploadImageWithXHR(file, {
               mockImage: mockImageGenerator && mockImageGenerator(index),
@@ -134,12 +136,16 @@ const StyledDropzone = ({
 
         setUploading(false);
 
-        if (onSuccess) {
-          await onSuccess(isMulti ? files : files[0]);
+        const [successes, failures] = partition(results, r => r.status === 'fulfilled');
+        const getResultValue = r => r.value;
+        const getRejectReason = r => getErrorFromXhrUpload(r.reason);
+
+        if (onSuccess && successes.length > 0) {
+          await onSuccess(isMulti ? successes.map(getResultValue) : getResultValue(successes[0]));
         }
 
-        if (onReject) {
-          onReject(isMulti ? rejectedFiles : rejectedFiles[0]);
+        if (onReject && failures.length > 0) {
+          onReject(isMulti ? failures.map(getRejectReason) : getRejectReason(failures[0]));
         }
       },
       [isMulti, onSuccess, onReject, mockImageGenerator, uploadProgressList],
@@ -176,13 +182,13 @@ const StyledDropzone = ({
           >
             <StyledSpinner size="70%" />
           </Container>
-          {isUploading && <Container fontSize="Caption">{uploadProgress}%</Container>}
+          {isUploading && <Container fontSize="9px">{uploadProgress}%</Container>}
           {isLoading && !isNil(loadingProgress) && <Container>{loadingProgress}%</Container>}
         </Container>
       ) : (
         <Container position="relative">
           {isDragActive ? (
-            <Container color="primary.500" fontSize="Caption">
+            <Container color="primary.500" fontSize="12px">
               <Box mb={2}>
                 <DownloadIcon size={20} />
               </Box>
@@ -269,7 +275,7 @@ StyledDropzone.defaultProps = {
   minHeight: 96,
   mockImageGenerator: () => `https://loremflickr.com/120/120?lock=${uuid()}`,
   isMulti: true,
-  fontSize: 'Paragraph',
+  fontSize: '14px',
 };
 
 export default StyledDropzone;

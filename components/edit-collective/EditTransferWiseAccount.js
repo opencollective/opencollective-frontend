@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { getCollectiveToEditQuery } from '../../lib/graphql/queries';
+import { editCollectivePageQuery } from '../../lib/graphql/queries';
 
 import { getI18nLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
@@ -13,8 +13,8 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 
-const createConnectedAccountMutation = gqlV2`
-  mutation createConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
+const createConnectedAccountMutation = gqlV2/* GraphQL */ `
+  mutation CreateConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
     createConnectedAccount(connectedAccount: $connectedAccount, account: $account) {
       id
       settings
@@ -25,8 +25,8 @@ const createConnectedAccountMutation = gqlV2`
   }
 `;
 
-const deleteConnectedAccountMutation = gqlV2`
-  mutation deleteConnectedAccount($connectedAccount: ConnectedAccountReferenceInput!) {
+const deleteConnectedAccountMutation = gqlV2/* GraphQL */ `
+  mutation DeleteConnectedAccount($connectedAccount: ConnectedAccountReferenceInput!) {
     deleteConnectedAccount(connectedAccount: $connectedAccount) {
       id
     }
@@ -36,7 +36,7 @@ const deleteConnectedAccountMutation = gqlV2`
 const EditTransferWiseAccount = props => {
   const mutationOptions = {
     context: API_V2_CONTEXT,
-    refetchQueries: [{ query: getCollectiveToEditQuery, variables: { slug: props.collective.slug } }],
+    refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: props.collective.slug } }],
     awaitRefetchQueries: true,
   };
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
@@ -80,7 +80,7 @@ const EditTransferWiseAccount = props => {
   if (!connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
-        <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
+        <P lineHeight="0" fontSize="12px" color="black.600" fontWeight="normal">
           <FormattedMessage
             id="collective.create.connectedAccounts.transferwise.description"
             defaultMessage="Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TransferWise, please, <a>read our documentation</a>."

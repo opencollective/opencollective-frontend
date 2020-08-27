@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import classNames from 'classnames';
-import gql from 'graphql-tag';
 import { uniqBy } from 'lodash';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
@@ -195,7 +195,7 @@ class MembersWithData extends React.Component {
   }
 }
 
-const getMembersQuery = gql`
+const membersQuery = gql`
   query Members(
     $CollectiveId: Int!
     $TierId: Int
@@ -243,7 +243,7 @@ const getMembersQuery = gql`
   }
 `;
 
-export const addMembersData = graphql(getMembersQuery, {
+export const addMembersData = graphql(membersQuery, {
   options: props => ({
     variables: {
       CollectiveId: props.collective.id,

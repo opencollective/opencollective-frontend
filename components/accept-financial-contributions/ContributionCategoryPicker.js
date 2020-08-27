@@ -85,7 +85,7 @@ class ContributionCategoryPicker extends React.Component {
         defaultMessage: 'Use my personal bank account',
       },
       host: { id: 'acceptContributions.picker.host', defaultMessage: 'A fiscal host' },
-      organization: { id: 'acceptContributions.picker.organization', defaultMessage: 'Our organization' },
+      organization: { id: 'acceptContributions.organization.subtitle', defaultMessage: 'Our organization' },
       organizationInfo: {
         id: 'acceptContributions.picker.organizationInfo',
         defaultMessage: 'Use my company or organization bank account',
@@ -100,10 +100,16 @@ class ContributionCategoryPicker extends React.Component {
       <div>
         <CollectiveNavbar collective={collective} onlyInfos={true} />
         <Box mb={4} mt={5}>
-          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
+          <H1
+            fontSize={['20px', '32px']}
+            lineHeight={['24px', '36px']}
+            fontWeight="bold"
+            color="black.900"
+            textAlign="center"
+          >
             {intl.formatMessage(this.messages.header)}
           </H1>
-          <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
+          <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
             {intl.formatMessage(this.messages.subtitle)}
           </P>
         </Box>
@@ -136,7 +142,7 @@ class ContributionCategoryPicker extends React.Component {
                     </StyledButton>
                   </Link>
                   <Box minHeight={50} px={3}>
-                    <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
+                    <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                       {intl.formatMessage(this.messages.myselfInfo)}
                     </P>
                   </Box>
@@ -178,7 +184,7 @@ class ContributionCategoryPicker extends React.Component {
                     </StyledButton>
                   </Link>
                   <Box minHeight={50} px={3}>
-                    <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
+                    <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                       {intl.formatMessage(this.messages.organizationInfo)}
                     </P>
                   </Box>
@@ -216,7 +222,7 @@ class ContributionCategoryPicker extends React.Component {
                     </StyledButton>
                   </Link>
                   <Box minHeight={50} px={3}>
-                    <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
+                    <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                       <FormattedMessage
                         id="acceptContributions.picker.hostInfo"
                         defaultMessage="Outsource fundholding to an entity who offers this service ({moreInfo})"

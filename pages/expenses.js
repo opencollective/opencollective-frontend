@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { has, mapValues, omit, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -168,7 +168,7 @@ class ExpensePage extends React.Component {
       if (data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account || !data.expenses?.nodes) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
       }
@@ -289,14 +289,14 @@ class ExpensePage extends React.Component {
   }
 }
 
-const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
-  query ExpensesPageQuery(
+const expensesPageQuery = gqlV2/* GraphQL */ `
+  query ExpensesPage(
     $collectiveSlug: String!
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
     $tags: [String]
-    $status: ExpenseStatus
+    $status: ExpenseStatusFilter
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
@@ -314,6 +314,25 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
         id
         tag
       }
+
+      ... on AccountWithContributions {
+        balance
+      }
+
+      ... on AccountWithHost {
+        host {
+          id
+          name
+          slug
+          type
+          supportedPayoutMethods
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
+        }
+      }
+
       ... on Organization {
         balance
         # We add that for hasFeature
@@ -321,68 +340,21 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
         isActive
       }
 
-      ... on Collective {
-        balance
-        host {
-          id
-          name
-          slug
-          type
-          plan {
-            transferwisePayouts
-            transferwisePayoutsLimit
-          }
-        }
-      }
-      ... on Fund {
-        balance
-        host {
-          id
-          name
-          slug
-          type
-          plan {
-            transferwisePayouts
-            transferwisePayoutsLimit
-          }
-        }
-      }
       ... on Event {
-        balance
         parent {
           id
           name
           slug
           type
-        }
-        host {
-          id
-          name
-          slug
-          type
-          plan {
-            transferwisePayouts
-            transferwisePayoutsLimit
-          }
         }
       }
+
       ... on Project {
-        balance
         parent {
           id
           name
           slug
           type
-        }
-        host {
-          id
-          name
-          slug
-          type
-          plan {
-            transferwisePayouts
-            transferwisePayoutsLimit
-          }
         }
       }
     }
@@ -411,7 +383,7 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
   ${expensesListFieldsFragment}
 `;
 
-const getData = graphql(EXPENSES_PAGE_QUERY, {
+const addExpensesPageData = graphql(expensesPageQuery, {
   options: props => {
     const amountRange = parseAmountRange(props.query.amount);
     const [dateFrom] = getDateRangeFromPeriod(props.query.period);
@@ -435,4 +407,4 @@ const getData = graphql(EXPENSES_PAGE_QUERY, {
   },
 });
 
-export default injectIntl(getData(withUser(ExpensePage)));
+export default injectIntl(addExpensesPageData(withUser(ExpensePage)));

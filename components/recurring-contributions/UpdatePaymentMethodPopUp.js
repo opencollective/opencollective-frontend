@@ -1,8 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
-import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import themeGet from '@styled-system/theme-get';
 import { first, get, pick, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
@@ -22,6 +21,7 @@ import { withStripeLoader } from '../StripeProvider';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledRadioList from '../StyledRadioList';
+import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 
 const PaymentMethodBox = styled(Flex)`
@@ -39,8 +39,8 @@ const messages = defineMessages({
   },
 });
 
-const getPaymentMethodsQuery = gqlV2`
-  query UpdatePaymentMethodPopUpQuery($slug: String) {
+const paymentMethodsQuery = gqlV2/* GraphQL */ `
+  query UpdatePaymentMethodPopUpPaymentMethod($slug: String) {
     account(slug: $slug) {
       id
       paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
@@ -62,7 +62,7 @@ const getPaymentMethodsQuery = gqlV2`
 `;
 
 const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
-  mutation updatePaymentMethod($order: OrderReferenceInput!, $paymentMethod: PaymentMethodReferenceInput!) {
+  mutation UpdatePaymentMethod($order: OrderReferenceInput!, $paymentMethod: PaymentMethodReferenceInput!) {
     updateOrder(order: $order, paymentMethod: $paymentMethod) {
       id
       status
@@ -74,13 +74,15 @@ const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
 `;
 
 const addPaymentMethodMutation = gqlV2/* GraphQL */ `
-  mutation addPaymentMethod($paymentMethod: PaymentMethodCreateInput!, $account: AccountReferenceInput!) {
+  mutation AddPaymentMethod($paymentMethod: PaymentMethodCreateInput!, $account: AccountReferenceInput!) {
     addStripeCreditCard(paymentMethod: $paymentMethod, account: $account) {
       id
       name
     }
   }
 `;
+
+const mutationOptions = { context: API_V2_CONTEXT };
 
 const UpdatePaymentMethodPopUp = ({
   setMenuState,
@@ -103,7 +105,7 @@ const UpdatePaymentMethodPopUp = ({
   const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
 
   // GraphQL mutations and queries
-  const { data } = useQuery(getPaymentMethodsQuery, {
+  const { data } = useQuery(paymentMethodsQuery, {
     variables: {
       slug: router.query.slug,
     },
@@ -111,13 +113,12 @@ const UpdatePaymentMethodPopUp = ({
   });
   const [submitUpdatePaymentMethod, { loading: loadingUpdatePaymentMethod }] = useMutation(
     updatePaymentMethodMutation,
-    {
-      context: API_V2_CONTEXT,
-    },
+    mutationOptions,
   );
-  const [submitAddPaymentMethod, { loading: loadingAddPaymentMethod }] = useMutation(addPaymentMethodMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitAddPaymentMethod, { loading: loadingAddPaymentMethod }] = useMutation(
+    addPaymentMethodMutation,
+    mutationOptions,
+  );
 
   // load stripe on mount
   useEffect(() => {
@@ -166,7 +167,7 @@ const UpdatePaymentMethodPopUp = ({
   return (
     <Fragment>
       <Flex width={1} alignItems="center" justifyContent="center" minHeight={50} px={3}>
-        <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+        <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
           {showAddPaymentMethod
             ? intl.formatMessage(messages.addPaymentMethod)
             : intl.formatMessage(messages.updatePaymentMethod)}
@@ -177,12 +178,13 @@ const UpdatePaymentMethodPopUp = ({
         {showAddPaymentMethod ? (
           <Lock size={20} />
         ) : (
-          <PlusCircle
-            size={20}
+          <StyledRoundButton
+            size={24}
             onClick={() => setShowAddPaymentMethod(true)}
             data-cy="recurring-contribution-add-pm-button"
-            style={{ cursor: 'pointer' }}
-          />
+          >
+            +
+          </StyledRoundButton>
         )}
       </Flex>
       {showAddPaymentMethod ? (
@@ -220,7 +222,7 @@ const UpdatePaymentMethodPopUp = ({
                     {title}
                   </P>
                   {subtitle && (
-                    <P fontSize="Caption" fontWeight={400} lineHeight="Caption" color="black.500">
+                    <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500">
                       {subtitle}
                     </P>
                   )}
@@ -278,7 +280,7 @@ const UpdatePaymentMethodPopUp = ({
                     variables: { paymentMethod: newPaymentMethod, account: { id: account.id } },
                     refetchQueries: [
                       {
-                        query: getPaymentMethodsQuery,
+                        query: paymentMethodsQuery,
                         variables: { slug: router.query.slug },
                         context: API_V2_CONTEXT,
                       },

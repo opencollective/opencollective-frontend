@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { mapValues } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -13,7 +13,11 @@ import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
 import { parseAmountRange } from '../expenses/filters/ExpensesAmountFilter';
 import { getDateRangeFromPeriod } from '../expenses/filters/ExpensesDateFilter';
-import { expensesListAdminFieldsFragment, expensesListFieldsFragment } from '../expenses/graphql/fragments';
+import {
+  expenseHostFields,
+  expensesListAdminFieldsFragment,
+  expensesListFieldsFragment,
+} from '../expenses/graphql/fragments';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
@@ -24,14 +28,14 @@ import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
-const dashboardExpensesQuery = gqlV2/* GraphQL */ `
+const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   query HostDashboardExpenses(
     $hostSlug: String!
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
     $tags: [String]
-    $status: ExpenseStatus
+    $status: ExpenseStatusFilter
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
@@ -39,16 +43,7 @@ const dashboardExpensesQuery = gqlV2/* GraphQL */ `
     $searchTerm: String
   ) {
     host(slug: $hostSlug) {
-      id
-      slug
-      name
-      currency
-      isHost
-      type
-      plan {
-        transferwisePayouts
-        transferwisePayoutsLimit
-      }
+      ...ExpenseHostFields
     }
     expenses(
       host: { slug: $hostSlug }
@@ -88,6 +83,7 @@ const dashboardExpensesQuery = gqlV2/* GraphQL */ `
 
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
+  ${expenseHostFields}
 `;
 
 const EXPENSES_PER_PAGE = 15;
@@ -111,7 +107,7 @@ const getVariablesFromQuery = query => {
 
 const HostDashboardExpenses = ({ hostSlug }) => {
   const { query } = useRouter() || {};
-  const { data, error, loading, variables } = useQuery(dashboardExpensesQuery, {
+  const { data, error, loading, variables, refetch } = useQuery(hostDashboardExpensesQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     context: API_V2_CONTEXT,
   });
@@ -208,6 +204,8 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             host={data?.host}
             expenses={data?.expenses?.nodes}
             view="admin"
+            usePreviewModal
+            onDelete={() => refetch()}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

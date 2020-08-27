@@ -1,5 +1,12 @@
-# source: http://localhost:3060/graphql
-# timestamp: Mon Jul 27 2020 12:31:41 GMT+0100 (British Summer Time)
+"""
+Exposes a URL that specifies the behaviour of this scalar.
+"""
+directive @specifiedBy(
+  """
+  The URL that specifies the behaviour of this scalar.
+  """
+  url: String!
+) on SCALAR
 
 """
 Application model
@@ -616,6 +623,11 @@ enum CollectiveOrderField {
   Order collectives by total donations.
   """
   totalDonations
+
+  """
+  Order collectives by number of financial contributors (unique members).
+  """
+  financialContributors
 }
 
 """
@@ -843,7 +855,7 @@ type Contributor {
   isBacker: Boolean!
 
   """
-  True if the contributor is a core contributor (admin)
+  True if the contributor is a fundraiser
   """
   isFundraiser: Boolean!
 
@@ -911,6 +923,7 @@ enum ContributorRole {
   ATTENDEE
   FOLLOWER
   CONNECTED_COLLECTIVE
+  ACCOUNTANT
 }
 
 """
@@ -2183,6 +2196,26 @@ type Mutation {
     """
     id: Int!
   ): CollectiveInterface
+
+  """
+  Activate budget (For Host Organizations only)
+  """
+  activateBudget(
+    """
+    ID of the "collective" (Host Organization)
+    """
+    id: Int!
+  ): CollectiveInterface
+
+  """
+  Deactivate budget (For Host Organizations only)
+  """
+  deactivateBudget(
+    """
+    ID of the "collective" (Host Organization)
+    """
+    id: Int!
+  ): CollectiveInterface
 }
 
 """
@@ -2321,7 +2354,7 @@ input OrderInputType {
   id: Int
   quantity: Int = 1
   totalAmount: Int
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   platformFee: Int
   isFeesOnTop: Boolean
@@ -2821,7 +2854,7 @@ type PaymentMethodType {
   collective: CollectiveInterface
   emitter: CollectiveInterface
   limitedToTags: JSON
-  limitedToCollectiveIds: [Int]
+  limitedToCollectiveIds: [Int] @deprecated(reason: "2020-08-11: This field does not exist anymore")
   limitedToHostCollectiveIds: [Int]
   orders(
     """
@@ -2862,6 +2895,7 @@ enum PayoutMethodTypeEnum {
   OTHER
   PAYPAL
   BANK_ACCOUNT
+  ACCOUNT_BALANCE
 }
 
 """

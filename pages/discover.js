@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
-import { Query } from '@apollo/react-components';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { Query } from '@apollo/client/react/components';
 import { get, times } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -26,7 +26,8 @@ const AllCardsContainer = styled(Grid).attrs({
   maxWidth: 1200,
   mx: 'auto',
   my: 4,
-  gridTemplateColumns: ['1fr', '1fr 1fr 1fr', null, 'repeat(4, 1fr)'],
+  px: 3,
+  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
   gridGap: [24, null, 50],
   'data-cy': 'container-collectives',
 })``;
@@ -35,8 +36,8 @@ const CollectiveCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
 `;
 
-const DiscoverPageDataQuery = gql`
-  query DiscoverPageDataQuery(
+const DiscoverPageQuery = gql`
+  query DiscoverPageQuery(
     $offset: Int
     $tags: [String]
     $orderBy: CollectiveOrderField
@@ -147,7 +148,7 @@ const DiscoverPage = () => {
   const params = {
     offset: Number(query.offset) || 0,
     tags: !query.show || query.show === 'all' ? undefined : [query.show],
-    orderBy: query.sort === 'newest' ? 'createdAt' : 'totalDonations',
+    orderBy: query.sort === 'newest' ? 'createdAt' : 'financialContributors',
     limit: Number(query.limit) || 40,
     isActive: query.show !== 'pledged',
     isPledged: query.show === 'pledged',
@@ -170,7 +171,7 @@ const DiscoverPage = () => {
 
   return (
     <Page title="Discover">
-      <Query query={DiscoverPageDataQuery} variables={params}>
+      <Query query={DiscoverPageQuery} variables={params}>
         {({ data, error, loading }) => (
           <Fragment>
             <Container
@@ -186,10 +187,15 @@ const DiscoverPage = () => {
               textAlign="center"
               data-cy="discover-banner"
             >
-              <H1 color="white.full" fontSize={['H3', null, 'H2']} lineHeight={['H3', null, 'H2']} textAlign="center">
+              <H1
+                color="white.full"
+                fontSize={['32px', null, '40px']}
+                lineHeight={['36px', null, '44px']}
+                textAlign="center"
+              >
                 <FormattedMessage id="discover.title" defaultMessage="Discover awesome collectives to support" />
               </H1>
-              <P color="white.full" fontSize="H5" lineHeight="H5" mt={1}>
+              <P color="white.full" fontSize="20px" lineHeight="24px" mt={1}>
                 <FormattedMessage id="discover.subTitle" defaultMessage="Let's make great things together." />
               </P>
 
@@ -209,7 +215,7 @@ const DiscoverPage = () => {
               py={[20, 60]}
               width={1}
             >
-              <Flex width={[1]} justifyContent="left" flexWrap="wrap" mb={4} maxWidth={1200} m="0 auto">
+              <Flex width={1} justifyContent="left" flexWrap="wrap" mb={4} maxWidth={1200} m="0 auto">
                 <Flex width={[1, 0.8]} my={2}>
                   <NavList as="ul" p={0} justifyContent="space-between" width={1}>
                     <NavLinkContainer>
@@ -283,7 +289,7 @@ const DiscoverPage = () => {
                     {loading
                       ? times(params.limit, idx => (
                           <CollectiveCardContainer key={idx}>
-                            <LoadingPlaceholder height={360} width={250} />
+                            <LoadingPlaceholder height={334} borderRadius={16} />
                           </CollectiveCardContainer>
                         ))
                       : get(data, 'allCollectives.collectives', []).map(c =>

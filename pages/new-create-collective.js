@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
@@ -11,8 +11,8 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
-const GET_HOST = gqlV2`
-  query host($slug: String!) {
+const createCollectiveHostQuery = gqlV2/* GraphQL */ `
+  query CreateCollectiveHost($slug: String!) {
     host(slug: $slug) {
       id
       type
@@ -29,7 +29,7 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   const router = useRouter();
   const slug = router.query.hostCollectiveSlug;
   const skipQuery = !LoggedInUser || !slug;
-  const { loading, error, data } = useQuery(GET_HOST, {
+  const { loading, error, data } = useQuery(createCollectiveHostQuery, {
     context: API_V2_CONTEXT,
     skip: skipQuery,
     variables: { slug },
@@ -40,7 +40,7 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   }
 
   if (!skipQuery && (!data || !data.host)) {
-    return <ErrorPage error={generateNotFoundError(slug, true)} data={{ error }} log={false} />;
+    return <ErrorPage error={generateNotFoundError(slug)} data={{ error }} log={false} />;
   }
 
   return (

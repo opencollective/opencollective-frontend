@@ -106,7 +106,13 @@ class ApplyToHost extends React.Component {
       <Fragment>
         <CollectiveNavbar collective={collective} onlyInfos={true} />
         <Box mb={4} mt={5}>
-          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
+          <H1
+            fontSize={['20px', '32px']}
+            lineHeight={['24px', '36px']}
+            fontWeight="bold"
+            color="black.900"
+            textAlign="center"
+          >
             {intl.formatMessage(this.messages.header)}
           </H1>
         </Box>
@@ -121,10 +127,10 @@ class ApplyToHost extends React.Component {
           >
             <img src={umbrellaIllustration} width="160px" height="160px" />
             <Box maxWidth={'480px'} ml={[0, 4]}>
-              <H2 fontSize="H5" color="black.900" textAlign={['center', 'left']} my={[3, 0]}>
+              <H2 fontSize="20px" color="black.900" textAlign={['center', 'left']} my={[3, 0]}>
                 {intl.formatMessage(this.messages.applyToHost)}
               </H2>
-              <P mb={2} lineHeight="LeadParagraph" color="black.700">
+              <P mb={2} lineHeight="24px" color="black.700">
                 {intl.formatMessage(this.messages.infoParagraph)}
               </P>
             </Box>
@@ -165,12 +171,12 @@ class ApplyToHost extends React.Component {
             >
               <Box order={[2, 1, 1]}>
                 <H3
-                  fontSize={['LeadParagraph', 'H5']}
+                  fontSize={['16px', '20px']}
                   fontWeight="500"
-                  lineHeight={['LeadParagraph', 'H5']}
+                  lineHeight={['24px', '24px']}
                   color="black.600"
                   textAlign="center"
-                  order={[2]}
+                  order={2}
                   py={[2, 0]}
                 >
                   {intl.formatMessage(this.messages.interestedInHosting)}

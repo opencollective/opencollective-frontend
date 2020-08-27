@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { generateNotFoundError } from '../lib/errors';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveContactForm from '../components/CollectiveContactForm';
@@ -95,8 +94,7 @@ class CollectiveContact extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       }
     }
 
@@ -122,24 +120,23 @@ class CollectiveContact extends React.Component {
   }
 }
 
-// eslint-disable graphql/template-strings
-const getCollective = graphql(
-  gql`
-    query ContactPage($collectiveSlug: String!) {
-      Collective(slug: $collectiveSlug, throwIfMissing: false) {
-        id
-        slug
-        path
-        name
-        type
-        canContact
-        description
-        settings
-        imageUrl
-        twitterHandle
-      }
+const collectiveContactPageQuery = gql`
+  query CollectiveContactPage($collectiveSlug: String!) {
+    Collective(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      path
+      name
+      type
+      canContact
+      description
+      settings
+      imageUrl
+      twitterHandle
     }
-  `,
-);
+  }
+`;
 
-export default withUser(getCollective(CollectiveContact));
+const addCollectiveContactPageData = graphql(collectiveContactPageQuery);
+
+export default withUser(addCollectiveContactPageData(CollectiveContact));

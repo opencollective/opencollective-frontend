@@ -1,8 +1,8 @@
 import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -17,8 +17,8 @@ import StyledCard from './StyledCard';
 import { Span } from './Text';
 
 const PublicMessage = styled.p`
-  font-size: ${themeGet('fontSizes.Tiny')}px;
-  lineheight: ${themeGet('fontSizes.Caption')}px;
+  font-size: 10px;
+  line-height: 14px;
   color: ${themeGet('colors.black.600')};
   margin-top: 12px;
   text-align: center;
@@ -52,8 +52,8 @@ const CollectiveLogoContainer = styled(Flex)`
   }
 `;
 
-const GetMemberQuery = gql`
-  query OrderMember($collectiveId: Int!, $memberCollectiveId: Int!, $tierId: Int) {
+const orderSuccessMemberQuery = gql`
+  query OrderSuccessMember($collectiveId: Int!, $memberCollectiveId: Int!, $tierId: Int) {
     member(CollectiveId: $collectiveId, MemberCollectiveId: $memberCollectiveId, TierId: $tierId) {
       id
       publicMessage
@@ -131,9 +131,9 @@ class OrderSuccessContributorCardWithData extends React.Component {
             mt={2}
             px={2}
             justifyContent="center"
-            fontSize="Paragraph"
+            fontSize="14px"
             fontWeight="bold"
-            lineHeight="Caption"
+            lineHeight="18px"
             color="black.900"
             textAlign="center"
           >
@@ -142,10 +142,10 @@ class OrderSuccessContributorCardWithData extends React.Component {
           <Flex flexDirection="column" p={12} alignItems="center">
             {totalAmount !== 0 && (
               <React.Fragment>
-                <Span fontSize="Tiny">
+                <Span fontSize="10px">
                   <FormattedMessage id="contributeFlow.contributedTotal" defaultMessage="Contributed a total of:" />
                 </Span>
-                <Span fontSize="Caption">
+                <Span fontSize="12px">
                   <FormattedMoneyAmount
                     precision={2}
                     amount={totalAmount}
@@ -166,7 +166,7 @@ class OrderSuccessContributorCardWithData extends React.Component {
               <Span
                 mt={2}
                 cursor="pointer"
-                fontSize="Tiny"
+                fontSize="10px"
                 color="black.600"
                 textAlign="center"
                 onClick={this.showPopup}
@@ -191,15 +191,15 @@ class OrderSuccessContributorCardWithData extends React.Component {
   }
 }
 
-export default injectIntl(
-  graphql(GetMemberQuery, {
-    options: props => {
-      const { collective, fromCollective, tier } = props.order;
-      const variables = { collectiveId: collective.id, memberCollectiveId: fromCollective.id };
-      if (tier) {
-        variables.tierId = tier.id;
-      }
-      return { variables };
-    },
-  })(OrderSuccessContributorCardWithData),
-);
+const addOrderSuccessMemberData = graphql(orderSuccessMemberQuery, {
+  options: props => {
+    const { collective, fromCollective, tier } = props.order;
+    const variables = { collectiveId: collective.id, memberCollectiveId: fromCollective.id };
+    if (tier) {
+      variables.tierId = tier.id;
+    }
+    return { variables };
+  },
+});
+
+export default injectIntl(addOrderSuccessMemberData(OrderSuccessContributorCardWithData));

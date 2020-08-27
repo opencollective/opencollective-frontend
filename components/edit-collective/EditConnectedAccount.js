@@ -147,7 +147,7 @@ class EditConnectedAccount extends React.Component {
       <Flex className="EditConnectedAccount">
         {!connectedAccount && (
           <Box>
-            <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
+            <P lineHeight="0" fontSize="12px" color="black.600" fontWeight="normal">
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
             </P>
             <StyledButton
@@ -162,6 +162,9 @@ class EditConnectedAccount extends React.Component {
         {connectedAccount && (
           <Flex flexDirection="column">
             <Box>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</Box>
+            {connectedAccount.service === 'twitter' && (
+              <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
+            )}
             <Box mt={1}>
               <StyledButton buttonSize="small" onClick={() => this.connect(service)}>
                 {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
@@ -171,9 +174,6 @@ class EditConnectedAccount extends React.Component {
               </StyledButton>
             </Box>
           </Flex>
-        )}
-        {connectedAccount && connectedAccount.service === 'twitter' && collective.type === 'ORGANIZATION' && (
-          <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
         )}
       </Flex>
     );

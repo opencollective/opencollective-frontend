@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -25,8 +25,8 @@ const HostsWrapper = styled(Flex)`
 
 const ApplyButton = styled(StyledButton)`
   font-weight: 500;
-  font-size: ${props => props.theme.fontSizes.Caption}px;
-  line-height: ${props => props.theme.lineHeights.Tiny};
+  font-size: 12px;
+  line-height: 14px;
   border-radius: 100px;
   min-width: 76px;
   background: linear-gradient(180deg, #1869f5 0%, #1659e1 100%);
@@ -52,41 +52,41 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
       <Flex justifyContent="center">
         <Box textAlign={['center', null, 'left']} my={3} color="black.700" width={[1, null, '672px']}>
           <H1
-            fontSize={['H3', null, 'H4']}
+            fontSize={['32px', null, '24px']}
             textAlign="center"
-            lineHeight={['40px', null, 'H4']}
+            lineHeight={['40px', null, '32px']}
             letterSpacing={['-0.4px', null, '-0.2px']}
           >
             <FormattedMessage id="pricing.tab.welcome" defaultMessage="Welcome!" />
           </H1>
-          <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.tab.joinHost"
               defaultMessage="If you don't have access to a bank account you can use, please <strong>join a Fiscal Host</strong>!"
               values={I18nFormatters}
             />
           </P>
-          <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.description"
               defaultMessage="A Fiscal Host is an <strong>organization who offers fund-holding as a service</strong>. They keep your money in their bank account and  <strong>handle things like accounting, taxes, admin, payments, and liability</strong>-so you don’t have to!"
               values={I18nFormatters}
             />
           </P>
-          <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.reasonToJoin"
               defaultMessage="If you join a Fiscal Host, <strong>you don’t need to go on an Open Collective paid plan</strong>, as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives. Open Collective keeps a 5% of the donations you raise via credit card payments (Stripe). All other payment methods such as PayPal and Bank transfers are included in your Host's plan."
               values={I18nFormatters}
             />
           </P>
-          <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.applyOpenSource"
               defaultMessage="If you are an open source project, you can apply to join  the Open Source Collective."
             />
           </P>
-          <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.featured"
               defaultMessage="Below are some of our most popular hosts or <hosts-link>browse all of them</hosts-link>."
@@ -96,13 +96,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
         </Box>
       </Flex>
       <Container my={4} display="flex" flexDirection="column" alignItems="center">
-        <H3
-          color="black.700"
-          textAlign="center"
-          fontSize={['LeadParagraph']}
-          lineHeight={['26px']}
-          letterSpacing={['-0.008em']}
-        >
+        <H3 color="black.700" textAlign="center" fontSize="16px" lineHeight="26px" letterSpacing="-0.008em">
           <FormattedMessage id="pricing.applyFiscalHost" defaultMessage="Apply to a fiscal host" />
         </H3>
         <HostsWrapper width={1} justifyContent={['start', null, 'center']} py={4}>
@@ -117,27 +111,27 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
               >
                 <Container>
                   <Box>
-                    <P my={3} mx={3} fontSize="Caption">
+                    <P my={3} mx={3} fontSize="12px">
                       <FormattedMessage
                         id="pricing.hostCollective.count"
                         defaultMessage="{count, plural, =0 {No collective} one {{prettyCount} collective} other {{prettyCount} collectives} }"
                         values={{
                           count: collective.stats.collectives.hosted,
                           prettyCount: (
-                            <Span fontWeight="bold" fontSize="LeadParagraph">
+                            <Span fontWeight="bold" fontSize="16px">
                               {collective.stats.collectives.hosted}
                             </Span>
                           ),
                         }}
                       />
                     </P>
-                    <P my={3} mx={3} fontSize="Caption">
+                    <P my={3} mx={3} fontSize="12px">
                       <FormattedMessage
                         id="pricing.hostCollective.currency"
                         defaultMessage="{currency} currency"
                         values={{
                           currency: (
-                            <Span fontWeight="bold" fontSize="LeadParagraph">
+                            <Span fontWeight="bold" fontSize="16px">
                               {collective.currency}
                             </Span>
                           ),
@@ -157,7 +151,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
             </Box>
           ))}
         </HostsWrapper>
-        <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+        <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
           <StyledLink href={'/hosts'}>
             <FormattedMessage id="pricing.fiscalHost.more" defaultMessage="See more fiscal hosts" />
           </StyledLink>
@@ -171,8 +165,8 @@ SingleCollectiveWithoutBankAccount.propTypes = {
   data: PropTypes.object,
 };
 
-const getHostsQuery = gql`
-  query allCollectives($slugs: [String]) {
+const pricingHostsQuery = gql`
+  query PricingHosts($slugs: [String]) {
     allCollectives(slugs: $slugs) {
       total
       collectives {
@@ -197,10 +191,10 @@ const getHostsQuery = gql`
   }
 `;
 
-const addHostsData = graphql(getHostsQuery, {
+const addPricingHostsData = graphql(pricingHostsQuery, {
   options: {
     variables: { slugs: featuredHostsSlugs },
   },
 });
 
-export default addHostsData(SingleCollectiveWithoutBankAccount);
+export default addPricingHostsData(SingleCollectiveWithoutBankAccount);

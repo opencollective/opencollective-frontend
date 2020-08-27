@@ -53,14 +53,14 @@ const MemberCard = ({ role, since, collective, ...cardProps }) => (
     </CollectiveLogoContainer>
     <Flex flexDirection="column" alignItems="center" p={2}>
       <Link route="collective" params={{ slug: collective.slug }}>
-        <H5 textAlign="center" fontSize="Paragraph" fontWeight="bold" lineHeight="Caption">
+        <H5 textAlign="center" fontSize="14px" fontWeight="bold" lineHeight="18px">
           {collective.name}
         </H5>
       </Link>
-      <TruncatedText minHeight={15} fontSize="Tiny" textAlign="center" color="black.500">
+      <TruncatedText minHeight={15} fontSize="10px" textAlign="center" color="black.500">
         <UserCompany company={collective.company} />
       </TruncatedText>
-      <Span textAlign="center" fontSize="Caption" color="black.600" mt={2} mb={2}>
+      <Span textAlign="center" fontSize="12px" color="black.600" mt={2} mb={2}>
         <FormattedMessage
           id="membership.description"
           defaultMessage="{role, select, ADMIN {Admin} MEMBER {Core Contributor} BACKER {Contributor}} since {date}"

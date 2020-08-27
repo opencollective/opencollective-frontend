@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
-
-import { addUpdateUserEmailMutation } from '../../lib/graphql/mutations';
 
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -73,7 +71,7 @@ class EditUserEmailForm extends React.Component {
     return (
       <Box mb={4} data-cy="EditUserEmailForm">
         <H2>
-          <FormattedMessage id="EditUserEmailForm.title" defaultMessage="Email address" />
+          <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
         </H2>
         <Flex flexWrap="wrap">
           <StyledInput
@@ -103,7 +101,7 @@ class EditUserEmailForm extends React.Component {
               onClick={async () => {
                 this.setState({ isSubmitting: true });
                 try {
-                  const { data } = await updateUserEmail(newEmail);
+                  const { data } = await updateUserEmail({ variables: { email: newEmail } });
                   this.setState({
                     step: LoggedInUser.email === newEmail ? 'initial' : 'success',
                     error: null,
@@ -127,7 +125,7 @@ class EditUserEmailForm extends React.Component {
                 onClick={async () => {
                   this.setState({ isResendingConfirmation: true });
                   try {
-                    await updateUserEmail(newEmail);
+                    await updateUserEmail({ variables: { email: newEmail } });
                     this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
                   } catch (e) {
                     this.setState({ error: e.message.replace('GraphQL error: ', ''), isResendingConfirmation: false });
@@ -140,7 +138,7 @@ class EditUserEmailForm extends React.Component {
           </Flex>
         </Flex>
         {error && (
-          <Span p={2} color="red.500" fontSize="Caption">
+          <Span p={2} color="red.500" fontSize="12px">
             {error}
           </Span>
         )}
@@ -160,21 +158,34 @@ class EditUserEmailForm extends React.Component {
   }
 }
 
-const withUserEmail = graphql(
-  gql`
-    query LoggedInUserEmail {
-      LoggedInUser {
-        id
-        email
-        emailWaitingForValidation
-      }
+const loggedInUserEmailQuery = gql`
+  query LoggedInUserEmail {
+    LoggedInUser {
+      id
+      email
+      emailWaitingForValidation
     }
-  `,
-  {
-    options: {
-      fetchPolicy: 'network-only',
-    },
-  },
-);
+  }
+`;
 
-export default addUpdateUserEmailMutation(withUserEmail(EditUserEmailForm));
+const addloggedInUserEmailData = graphql(loggedInUserEmailQuery, {
+  options: {
+    fetchPolicy: 'network-only',
+  },
+});
+
+const updateUserEmailMutation = gql`
+  mutation UpdateUserEmail($email: String!) {
+    updateUserEmail(email: $email) {
+      id
+      email
+      emailWaitingForValidation
+    }
+  }
+`;
+
+const addUpdateUserEmailMutation = graphql(updateUserEmailMutation, {
+  name: 'updateUserEmail',
+});
+
+export default addUpdateUserEmailMutation(addloggedInUserEmailData(EditUserEmailForm));

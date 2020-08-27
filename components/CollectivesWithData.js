@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
@@ -123,8 +123,8 @@ class CollectivesWithData extends React.Component {
   }
 }
 
-const getCollectivesQuery = gql`
-  query allCollectives(
+const collectivesQuery = gql`
+  query Collectives(
     $HostCollectiveId: Int
     $hostCollectiveSlug: String
     $ParentCollectiveId: Int
@@ -176,7 +176,7 @@ const getCollectivesQuery = gql`
   }
 `;
 
-export const addCollectivesData = graphql(getCollectivesQuery, {
+export const addCollectivesData = graphql(collectivesQuery, {
   options: props => ({
     variables: {
       ParentCollectiveId: props.ParentCollectiveId,

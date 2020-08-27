@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -151,7 +151,7 @@ class HostDashboardActionsBanner extends React.Component {
             <div className="title">
               <H2 mb={3}>
                 <FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" />{' '}
-                <Span fontSize="H3" fontWeight="normal">
+                <Span fontSize="32px" fontWeight="normal">
                   <FormattedMessage
                     id="expenses.collectivePicker.subtitle"
                     defaultMessage="for {n} {n, plural, one {collective} other {collectives}}"
@@ -231,7 +231,7 @@ class HostDashboardActionsBanner extends React.Component {
 }
 
 const addFundsToCollectiveMutation = gql`
-  mutation addFundsToCollective($order: OrderInputType!) {
+  mutation AddFundsToCollective($order: OrderInputType!) {
     addFundsToCollective(order: $order) {
       id
       fromCollective {
@@ -250,6 +250,8 @@ const addFundsToCollectiveMutation = gql`
   }
 `;
 
-const addMutation = graphql(addFundsToCollectiveMutation, { name: 'addFundsToCollective' });
+const addMutation = graphql(addFundsToCollectiveMutation, {
+  name: 'addFundsToCollective',
+});
 
 export default addMutation(injectIntl(HostDashboardActionsBanner));

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withApollo } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { withApollo } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -12,6 +12,15 @@ import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
 
 import { AddFundsSourcePickerForUserWithData, AddFundsSourcePickerWithData } from './AddFundsSourcePicker';
 import InputField from './InputField';
+
+const addFundsHostQuery = gql`
+  query AddFundsHost($CollectiveId: Int) {
+    Collective(id: $CollectiveId) {
+      id
+      hostFeePercent
+    }
+  }
+`;
 
 class AddFundsForm extends React.Component {
   static propTypes = {
@@ -148,17 +157,9 @@ class AddFundsForm extends React.Component {
   }
 
   retrieveHostFeePercent = async CollectiveId => {
-    const getHostCollectiveQuery = gql`
-      query Collective($CollectiveId: Int) {
-        Collective(id: $CollectiveId) {
-          id
-          hostFeePercent
-        }
-      }
-    `;
     try {
       const result = await this.props.client.query({
-        query: getHostCollectiveQuery,
+        query: addFundsHostQuery,
         variables: { CollectiveId },
       });
       const { hostFeePercent } = result.data.Collective;
@@ -332,7 +333,7 @@ class AddFundsForm extends React.Component {
                 <Col sm={12}>
                   <div className="form-group">
                     <label className="col-sm-2 control-label inputField">
-                      <FormattedMessage id="addfunds.details" defaultMessage="Details" />
+                      <FormattedMessage id="Details" defaultMessage="Details" />
                     </label>
                     <Col sm={10}>
                       <table className="details">

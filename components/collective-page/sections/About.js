@@ -13,7 +13,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
-import { EditCollectiveLongDescriptionMutation } from '../graphql/mutations';
+import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 import SectionTitle from '../SectionTitle';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
@@ -36,7 +36,7 @@ const messages = defineMessages({
 const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
-  const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
+  const isFund = collective.type === CollectiveType.FUND;
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
@@ -55,7 +55,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
 
       <Container width="100%" maxWidth={700} margin="0 auto">
         <InlineEditField
-          mutation={EditCollectiveLongDescriptionMutation}
+          mutation={editCollectiveLongDescriptionMutation}
           values={collective}
           field="longDescription"
           canEdit={canEdit}
@@ -86,7 +86,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                   {canEdit ? (
                     <Flex flexDirection="column" alignItems="center">
                       {isCollective && !isFund && (
-                        <MessageBox type="info" withIcon fontStyle="italic" fontSize="Paragraph" mb={4}>
+                        <MessageBox type="info" withIcon fontStyle="italic" fontSize="14px" mb={4}>
                           <FormattedMessage
                             id="SectionAbout.Why"
                             defaultMessage="Your collective is unique and wants to achieve great things. Here is the place to explain it!"

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -20,7 +20,6 @@ import { fadeIn } from '../../StyledKeyframes';
 import StyledMembershipCard from '../../StyledMembershipCard';
 import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
-// Local imports
 import SectionTitle from '../SectionTitle';
 
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
@@ -79,7 +78,7 @@ const filterFuncs = {
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
 
-const GRID_TEMPLATE_COLUMNS = ['1fr', '1fr 1fr', '1fr 1fr 1fr', 'repeat(4, 1fr)', 'repeat(5, 1fr)'];
+const GRID_TEMPLATE_COLUMNS = 'repeat(auto-fill, minmax(220px, 1fr))';
 
 /** A container for membership cards to ensure we have a smooth transition */
 const MembershipCardContainer = styled.div`
@@ -240,7 +239,7 @@ class SectionContributions extends React.PureComponent {
         {!hasContributions ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
-            <P color="black.600" fontSize="LeadParagraph" mt={5}>
+            <P color="black.600" fontSize="16px" mt={5}>
               <FormattedMessage
                 id="CollectivePage.SectionContributions.Empty"
                 defaultMessage="{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!"
@@ -257,7 +256,7 @@ class SectionContributions extends React.PureComponent {
                     <FormattedMessage id="Contributions" defaultMessage="Contributions" />
                   </SectionTitle>
                   {data.Collective.stats.collectives.hosted > 0 && (
-                    <H3 fontSize="H5" fontWeight="500" color="black.600">
+                    <H3 fontSize="20px" fontWeight="500" color="black.600">
                       <FormattedMessage
                         id="organization.collective.memberOf.collective.host.title"
                         values={{ n: data.Collective.stats.collectives.hosted }}
@@ -346,95 +345,94 @@ class SectionContributions extends React.PureComponent {
   }
 }
 
-const withData = graphql(
-  gql`
-    query SectionContributions($id: Int!) {
-      Collective(id: $id) {
+const contributionsSectionQuery = gql`
+  query ContributionsSection($id: Int!) {
+    Collective(id: $id) {
+      id
+      settings
+      stats {
         id
-        settings
-        stats {
+        collectives {
           id
-          collectives {
-            id
-            hosted
-          }
+          hosted
         }
-        connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+      }
+      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+        id
+        collective: member {
           id
-          collective: member {
+          name
+          slug
+          type
+          currency
+          isIncognito
+          description
+          imageUrl(height: 128)
+          backgroundImageUrl(height: 200)
+          tags
+          settings
+          parentCollective {
             id
+            backgroundImageUrl
             name
             slug
-            type
-            currency
-            isIncognito
-            description
-            imageUrl(height: 128)
-            backgroundImageUrl(height: 200)
-            tags
-            settings
-            parentCollective {
-              id
-              backgroundImageUrl
-              name
-              slug
-            }
-            host {
-              id
-            }
-            stats {
-              id
-              backers {
-                id
-                all
-              }
-            }
           }
-        }
-        memberOf(onlyActiveCollectives: true, limit: 1500) {
-          id
-          role
-          since
-          description
+          host {
+            id
+          }
           stats {
             id
-            totalDonations
+            backers {
+              id
+              all
+            }
           }
-          collective {
+        }
+      }
+      memberOf(onlyActiveCollectives: true, limit: 1500) {
+        id
+        role
+        since
+        description
+        stats {
+          id
+          totalDonations
+        }
+        collective {
+          id
+          name
+          slug
+          type
+          currency
+          isIncognito
+          description
+          imageUrl(height: 128)
+          backgroundImageUrl(height: 200)
+          tags
+          parentCollective {
             id
-            name
-            slug
-            type
-            currency
-            isIncognito
-            description
-            imageUrl(height: 128)
             backgroundImageUrl(height: 200)
-            tags
-            parentCollective {
+          }
+          host {
+            id
+          }
+          stats {
+            id
+            backers {
               id
-              backgroundImageUrl(height: 200)
-            }
-            host {
-              id
-            }
-            stats {
-              id
-              backers {
-                id
-                all
-              }
+              all
             }
           }
         }
       }
     }
-  `,
-  {
-    options: props => ({
-      variables: { id: props.collective.id },
-    }),
-  },
-);
+  }
+`;
 
-export default React.memo(injectIntl(withData(SectionContributions)));
+const addContributionsSectionData = graphql(contributionsSectionQuery, {
+  options: props => ({
+    variables: { id: props.collective.id },
+  }),
+});
+
+export default React.memo(injectIntl(addContributionsSectionData(SectionContributions)));

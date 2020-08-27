@@ -133,18 +133,18 @@ class StyledCheckbox extends React.Component {
     }
 
     if (onChange) {
-      onChange({ name, checked: newValue, type: 'checkbox', target: { name, value: newValue } });
+      onChange({ name, checked: newValue, type: 'checkbox', target: { name, value: newValue, checked: newValue } });
     }
   }
 
   render() {
-    const { name, checked, label, disabled, size, inputId, width, alignItems, isLoading } = this.props;
+    const { name, checked, label, disabled, size, inputId, width, alignItems, isLoading, fontSize } = this.props;
     const realChecked = checked === undefined ? this.state.checked : checked;
 
     return (
       <CheckboxContainer
         onClick={() => this.onChange(!realChecked)}
-        fontSize={size}
+        fontSize={fontSize || size}
         size={size}
         width={width}
         alignItems={alignItems}
@@ -183,6 +183,7 @@ StyledCheckbox.propTypes = {
   label: PropTypes.node,
   /** An optional size */
   size: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  fontSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** Set this to 'auto' to not take the full width */
   width: PropTypes.string,
   /** If true, the checkbox will be replaced by a spinner */

@@ -6,7 +6,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { Box, Flex } from '../Grid';
+import { Box } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledTag from '../StyledTag';
@@ -18,7 +18,7 @@ import RecurringContributionsPopUp from './RecurringContributionsPopUp';
 
 const messages = defineMessages({
   manage: {
-    id: 'Subscriptions.Edit',
+    id: 'Edit',
     defaultMessage: 'Edit',
   },
   tag: {
@@ -47,6 +47,7 @@ const RecurringContributionsCard = ({
     <StyledCollectiveCard
       {...props}
       collective={collective}
+      bodyHeight="290px"
       tag={
         <StyledTag display="inline-block" textTransform="uppercase" my={2} type={isError ? 'error' : undefined}>
           {formatMessage(messages.tag, { status })}
@@ -54,20 +55,20 @@ const RecurringContributionsCard = ({
       }
     >
       <Container p={3}>
-        {contribution.platformFee ? (
+        {contribution.platformContributionAmount ? (
           <Box mb={3}>
-            <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
-              <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
+            <P fontSize="14px" lineHeight="20px" fontWeight="400">
+              <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
             </P>
-            <Flex>
+            <div>
               <P
-                fontSize="Paragraph"
-                lineHeight="Paragraph"
+                fontSize="14px"
+                lineHeight="20px"
                 fontWeight="bold"
                 data-cy="recurring-contribution-amount-contributed"
               >
                 <FormattedMoneyAmount
-                  amount={(contribution.amount.value + contribution.platformFee.value) * 100}
+                  amount={(contribution.amount.value + contribution.platformContributionAmount.value) * 100}
                   interval={contribution.frequency.toLowerCase().slice(0, -2)}
                   currency={contribution.amount.currency}
                 />
@@ -80,7 +81,7 @@ const RecurringContributionsCard = ({
                   />
                 )}
               >
-                <P fontSize="Caption" lineHeight="Paragraph" color="black.700" ml={1}>
+                <P fontSize="12px" lineHeight="20px" color="black.700">
                   (
                   <FormattedMoneyAmount
                     amount={contribution.amount.value * 100}
@@ -91,7 +92,7 @@ const RecurringContributionsCard = ({
                   />{' '}
                   +{' '}
                   <FormattedMoneyAmount
-                    amount={contribution.platformFee.value * 100}
+                    amount={contribution.platformContributionAmount.value * 100}
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
                     precision={0}
@@ -100,19 +101,14 @@ const RecurringContributionsCard = ({
                   )
                 </P>
               </StyledTooltip>
-            </Flex>
+            </div>
           </Box>
         ) : (
           <Box mb={3}>
-            <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
-              <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
+            <P fontSize="14px" lineHeight="20px" fontWeight="400">
+              <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
             </P>
-            <P
-              fontSize="Paragraph"
-              lineHeight="Paragraph"
-              fontWeight="bold"
-              data-cy="recurring-contribution-amount-contributed"
-            >
+            <P fontSize="14px" lineHeight="20px" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
               <FormattedMoneyAmount
                 amount={contribution.amount.value * 100}
                 interval={contribution.frequency.toLowerCase().slice(0, -2)}
@@ -122,10 +118,10 @@ const RecurringContributionsCard = ({
           </Box>
         )}
         <Box mb={3}>
-          <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
+          <P fontSize="14px" lineHeight="20px" fontWeight="400">
             <FormattedMessage id="Subscriptions.ContributedToDate" defaultMessage="Contributed to date" />
           </P>
-          <P fontSize="Paragraph" lineHeight="Paragraph">
+          <P fontSize="14px" lineHeight="20px">
             <FormattedMoneyAmount
               amount={contribution.totalDonations.value * 100}
               currency={contribution.totalDonations.currency}
@@ -158,9 +154,14 @@ const RecurringContributionsCard = ({
 
 RecurringContributionsCard.propTypes = {
   collective: PropTypes.object.isRequired,
-  contribution: PropTypes.object.isRequired,
+  contribution: PropTypes.shape({
+    amount: PropTypes.object.isRequired,
+    platformContributionAmount: PropTypes.object,
+    frequency: PropTypes.string.isRequired,
+    totalDonations: PropTypes.object.isRequired,
+  }),
   status: PropTypes.string.isRequired,
-  LoggedInUser: PropTypes.object.isRequired,
+  LoggedInUser: PropTypes.object,
   createNotification: PropTypes.func,
   account: PropTypes.object.isRequired,
 };

@@ -70,15 +70,15 @@ class OnboardingContentBox extends React.Component {
     return (
       <Container display="flex" flexDirection="column" width={['90%', '80%']} alignItems="center">
         {step === 0 && (
-          <Flex flexDirection="column" alignItems="center" maxWidth={['336px']}>
+          <Flex flexDirection="column" alignItems="center" maxWidth="336px">
             <H1
-              fontSize={['H5']}
-              lineHeight={['H5']}
+              fontSize="20px"
+              lineHeight="24px"
               fontWeight="bold"
               color="black.900"
               textAlign="center"
-              mb={[4]}
-              mx={[2, null]}
+              mb={4}
+              mx={2}
               data-cy="onboarding-collective-created"
             >
               <FormattedMessage
@@ -95,13 +95,13 @@ class OnboardingContentBox extends React.Component {
         )}
         {step === 1 && (
           <Fragment>
-            <Flex maxWidth={['336px']}>
-              <H1 fontSize={['H5']} lineHeight={['H5']} fontWeight="bold" color="black.900" textAlign="center" mb={4}>
+            <Flex maxWidth={336}>
+              <H1 fontSize="20px" lineHeight="24px" fontWeight="bold" color="black.900" textAlign="center" mb={4}>
                 <FormattedMessage id="onboarding.admins.header" defaultMessage="Add administrators" />
               </H1>
             </Flex>
             <Flex px={3} width="100%">
-              <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+              <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
                 <FormattedMessage id="administrators" defaultMessage="Administrators" />
               </P>
               <Flex flexGrow={1} alignItems="center">
@@ -121,7 +121,7 @@ class OnboardingContentBox extends React.Component {
               </Flex>
             )}
             <Flex px={3} width="100%">
-              <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+              <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
                 <FormattedMessage id="onboarding.admins.invite" defaultMessage="Invite administrators" />
               </P>
               <Flex flexGrow={1} alignItems="center">
@@ -149,7 +149,7 @@ class OnboardingContentBox extends React.Component {
                 placeholder={intl.formatMessage(this.messages['placeholder'])}
               />
             </Flex>
-            <P my={2} fontSize="Caption" color="black.500" textAlign="center">
+            <P my={2} fontSize="12px" color="black.500" textAlign="center">
               <FormattedMessage
                 id="onboarding.admins.caption"
                 defaultMessage="Admins can modify the Collective page and approve expenses."
@@ -159,8 +159,8 @@ class OnboardingContentBox extends React.Component {
         )}
         {step === 2 && (
           <Fragment>
-            <Box maxWidth={['336px']}>
-              <H1 fontSize={['H5']} lineHeight={['H5']} fontWeight="bold" color="black.900" textAlign="center" mb={4}>
+            <Box maxWidth="336px">
+              <H1 fontSize="20px" lineHeight="24px" fontWeight="bold" color="black.900" textAlign="center" mb={4}>
                 <FormattedMessage id="onboarding.contact.header" defaultMessage="Links and contact info" />
               </H1>
             </Box>
@@ -188,7 +188,7 @@ class OnboardingContentBox extends React.Component {
               <P>
                 <FormattedMessage id="onboarding.contact.connect" defaultMessage="Connect your social platforms" />
               </P>
-              <P my={2} fontSize="Caption" color="black.500">
+              <P my={2} fontSize="12px" color="black.500">
                 <FormattedMessage
                   id="onboarding.contact.social"
                   defaultMessage="Tell your contributors how to reach your Collective through social media."

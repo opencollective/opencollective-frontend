@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -25,7 +25,7 @@ class PayExpenseBtnLegacy extends React.Component {
     platformFeeInCollectiveCurrency: PropTypes.number,
     lock: PropTypes.func,
     unlock: PropTypes.func,
-    mutate: PropTypes.func,
+    payExpense: PropTypes.func.isRequired,
     refetch: PropTypes.func,
     intl: PropTypes.object.isRequired,
     onError: PropTypes.func,
@@ -68,7 +68,7 @@ class PayExpenseBtnLegacy extends React.Component {
     this.setState({ loading: true });
 
     try {
-      await this.props.mutate({
+      await this.props.payExpense({
         variables: {
           id: expense.id,
           paymentProcessorFeeInCollectiveCurrency: this.props.paymentProcessorFeeInCollectiveCurrency,
@@ -174,5 +174,8 @@ class PayExpenseBtnLegacy extends React.Component {
   }
 }
 
-const addMutation = graphql(payExpenseMutation);
-export default addMutation(injectIntl(PayExpenseBtnLegacy));
+const addPayExpenseMutation = graphql(payExpenseMutation, {
+  name: 'payExpense',
+});
+
+export default injectIntl(addPayExpenseMutation(PayExpenseBtnLegacy));

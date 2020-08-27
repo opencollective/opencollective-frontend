@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -48,6 +48,7 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
         orderBy: $orderBy
         hostFeesStructure: $hostFeesStructure
         searchTerm: $searchTerm
+        isApproved: true
       ) {
         offset
         limit
@@ -72,25 +73,12 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
                 valueInCents
               }
             }
-            ... on Collective {
-              totalFinancialContributors
+            ... on AccountWithHost {
               hostFeesStructure
               hostFeePercent
             }
-            ... on Fund {
+            ... on AccountWithContributions {
               totalFinancialContributors
-              hostFeesStructure
-              hostFeePercent
-            }
-            ... on Project {
-              totalFinancialContributors
-              hostFeesStructure
-              hostFeePercent
-            }
-            ... on Event {
-              totalFinancialContributors
-              hostFeesStructure
-              hostFeePercent
             }
           }
         }
@@ -171,7 +159,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
         </MessageBox>
       ) : (
         <React.Fragment>
-          <Grid gridGap={24} gridTemplateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr', '1fr 1fr 1fr 1fr']}>
+          <Grid gridGap={24} gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))">
             {loading
               ? Array.from(new Array(COLLECTIVES_PER_PAGE)).map((_, index) => (
                   // eslint-disable-next-line react/no-array-index-key

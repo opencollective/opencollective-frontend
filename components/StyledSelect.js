@@ -49,7 +49,7 @@ const MultiValue = ({ children, removeProps }) => {
   }
 
   return (
-    <StyledTag mr="8px" variant="rounded-right" textTransform="uppercase" closeButtonProps={removeProps}>
+    <StyledTag m="4px" variant="rounded-right" maxHeight="none" closeButtonProps={removeProps}>
       {children}
     </StyledTag>
   );
@@ -78,8 +78,8 @@ const GroupHeading = ({ children, ...props }) => (
     <Flex justifyContent="space-between" alignItems="center" mr={2}>
       <P
         fontWeight="600"
-        fontSize="H6"
-        lineHeight="H6"
+        fontSize="9px"
+        lineHeight="14px"
         textTransform="uppercase"
         letterSpacing="0.6px"
         whiteSpace="nowrap"
@@ -218,6 +218,8 @@ StyledSelect.propTypes = {
   hideDropdownIndicator: PropTypes.bool,
   /** If true, options list will not be displayed */
   hideMenu: PropTypes.bool,
+  /** Default placement of the menu in relation to the control */
+  menuPlacement: PropTypes.oneOf(['bottom', 'top', 'auto']),
   /** Displays a red border when truthy */
   error: PropTypes.any,
   /** @ignore from injectIntl */
@@ -232,7 +234,7 @@ StyledSelect.propTypes = {
 };
 
 StyledSelect.defaultProps = {
-  fontSize: 'Paragraph',
+  fontSize: '14px',
   controlStyles: {},
 };
 

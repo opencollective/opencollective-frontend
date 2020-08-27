@@ -1,9 +1,9 @@
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
-import { CommentFieldsFragment } from '../../conversations/graphql';
+import { commentFieldsFragment } from '../../conversations/graphql';
 
-export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
-  fragment loggedInAccountExpensePayoutFieldsFragment on Individual {
+export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
+  fragment LoggedInAccountExpensePayoutFields on Individual {
     id
     slug
     imageUrl
@@ -20,7 +20,11 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
       data
       isSaved
     }
-    adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, INDIVIDUAL]) {
+    adminMemberships: memberOf(
+      role: ADMIN
+      includeIncognito: false
+      accountType: [ORGANIZATION, COLLECTIVE, EVENT, FUND, PROJECT, INDIVIDUAL]
+    ) {
       nodes {
         id
         account {
@@ -29,6 +33,17 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
           imageUrl
           type
           name
+          isActive
+          ... on AccountWithHost {
+            host {
+              id
+            }
+          }
+          ... on Organization {
+            host {
+              id
+            }
+          }
           location {
             address
             country
@@ -46,38 +61,35 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
   }
 `;
 
-const HostFieldsFragment = gqlV2`
-  fragment HostFieldsFragment on Host {
+export const expenseHostFields = gqlV2/* GraphQL */ `
+  fragment ExpenseHostFields on Host {
     id
     name
     slug
     type
+    currency
+    isHost
     expensePolicy
     website
     settings
-    connectedAccounts {
-      id
-      service
-    }
     location {
       address
       country
     }
+    supportedPayoutMethods
     plan {
       transferwisePayouts
       transferwisePayoutsLimit
     }
-    transferwise {
-      availableCurrencies
-    }
   }
 `;
 
-export const expensePageExpenseFieldsFragment = gqlV2`
-  fragment expensePageExpenseFieldsFragment on Expense {
+export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
+  fragment ExpensePageExpenseFields on Expense {
     id
     legacyId
     description
+    longDescription
     currency
     type
     status
@@ -115,6 +127,11 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         data
         isSaved
       }
+      ... on AccountWithHost {
+        host {
+          id
+        }
+      }
     }
     payeeLocation {
       address
@@ -146,38 +163,30 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         address
         country
       }
-      ... on Organization {
-        id
-        isHost
+
+      ... on AccountWithContributions {
         balance
+      }
+
+      ... on AccountWithHost {
+        isApproved
         host {
-          ...HostFieldsFragment
+          ...ExpenseHostFields
         }
       }
 
-      ... on Collective {
-        id
-        isApproved
+      # For Hosts with Budget capabilities
+
+      ... on Organization {
+        isHost
+        isActive
         balance
         host {
-          ...HostFieldsFragment
+          ...ExpenseHostFields
         }
       }
-      ... on Fund {
-        id
-        isApproved
-        balance
-        host {
-          ...HostFieldsFragment
-        }
-      }
+
       ... on Event {
-        id
-        isApproved
-        balance
-        host {
-          ...HostFieldsFragment
-        }
         parent {
           id
           slug
@@ -186,13 +195,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
           imageUrl
         }
       }
-       ... on Project {
-        id
-        isApproved
-        balance
-        host {
-          ...HostFieldsFragment
-        }
+      ... on Project {
         parent {
           id
           slug
@@ -238,8 +241,8 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     }
   }
 
-  ${CommentFieldsFragment}
-  ${HostFieldsFragment}
+  ${commentFieldsFragment}
+  ${expenseHostFields}
 `;
 
 export const expensesListFieldsFragment = gqlV2/* GraphQL */ `

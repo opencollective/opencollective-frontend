@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled, { css } from 'styled-components';
 
@@ -13,7 +13,7 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledRoundButton from '../StyledRoundButton';
 
-const addCommentReactionMutation = gqlV2`
+const addCommentReactionMutation = gqlV2/* GraphQL */ `
   mutation AddCommentReaction($emoji: String!, $comment: CommentReferenceInput!) {
     addCommentReaction(emoji: $emoji, comment: $comment) {
       id
@@ -23,7 +23,7 @@ const addCommentReactionMutation = gqlV2`
   }
 `;
 
-const removeCommentReactionMutation = gqlV2`
+const removeCommentReactionMutation = gqlV2/* GraphQL */ `
   mutation RemoveCommentReaction($emoji: String!, $comment: CommentReferenceInput!) {
     removeCommentReaction(emoji: $emoji, comment: $comment) {
       id

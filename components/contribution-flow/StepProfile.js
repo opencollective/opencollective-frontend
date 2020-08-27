@@ -89,8 +89,8 @@ const useForm = ({ onProfileChange }) => {
     },
     getFieldProps: name => ({
       defaultValue: state[name] || '',
-      fontSize: 'Paragraph',
-      lineHeight: 'Paragraph',
+      fontSize: '14px',
+      lineHeight: '20px',
       onBlur: event => {
         const hasValue = event.target.value;
         const wasUpdatedOnce = Object.prototype.hasOwnProperty.call(state, event.target.name);
@@ -184,8 +184,8 @@ const StepProfile = ({
           <StyledInput
             bare
             type="text"
-            fontSize="Paragraph"
-            lineHeight="Paragraph"
+            fontSize="14px"
+            lineHeight="20px"
             placeholder={intl.formatMessage(messages.filterByName)}
             onChange={onSearch}
             minWidth={75}
@@ -220,7 +220,7 @@ const StepProfile = ({
                 {!value.isIncognito && get(value, 'name', intl.formatMessage(messages['incognito']))}
               </P>
               {!value.isIncognito && value.type && (
-                <P fontSize="Caption" lineHeight="Caption" color="black.500" wordBreak="break-word">
+                <P fontSize="12px" lineHeight="18px" color="black.500" wordBreak="break-word">
                   {value.type === 'USER' && value.name ? (
                     <FormattedMessage
                       id="contributeAs.personal"
@@ -233,7 +233,7 @@ const StepProfile = ({
                 </P>
               )}
               {value.isIncognito && (
-                <P fontSize="Caption" lineHeight="Caption" color="black.500">
+                <P fontSize="12px" lineHeight="18px" color="black.500">
                   <FormattedMessage
                     id="profile.incognito.description"
                     defaultMessage="Keep my contribution private (see FAQ for more info)"

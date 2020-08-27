@@ -12,14 +12,18 @@ import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
+import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { H4, P, Span } from '../Text';
+import { withUser } from '../UserProvider';
 
 const PAYOUT_ACTION_TYPE = defineMessages({
   manual: {
@@ -40,7 +44,7 @@ const getPayoutLabel = (intl, type) => {
   return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
 };
 
-const generatePayoutOptions = (intl, payoutMethodType, collective) => {
+const generatePayoutOptions = (intl, payoutMethodType, host) => {
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return [{ label: payoutMethodLabel, value: { forceManual: true, action: 'PAY' } }];
@@ -56,9 +60,9 @@ const generatePayoutOptions = (intl, payoutMethodType, collective) => {
       },
     ];
     if (
-      hasFeature(collective.host, FEATURES.PAYPAL_PAYOUTS) &&
+      hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
       payoutMethodType === PayoutMethodType.PAYPAL &&
-      collective.host?.connectedAccounts?.find(ca => ca?.service === 'paypal')
+      host.connectedAccounts?.find(ca => ca?.service === 'paypal')
     ) {
       defaultTypes.unshift({
         label: intl.formatMessage(PAYOUT_ACTION_TYPE.schedule, { payoutMethodLabel }),
@@ -69,7 +73,7 @@ const generatePayoutOptions = (intl, payoutMethodType, collective) => {
   }
 };
 
-const DEFAULT_VALUES = { paymentProcessorFee: null };
+const DEFAULT_VALUES = { paymentProcessorFee: null, twoFactorAuthenticatorCode: null };
 
 const validate = values => {
   const errors = {};
@@ -82,10 +86,10 @@ const validate = values => {
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
-const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
+const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedInUser, error }) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
-  const payoutOptions = generatePayoutOptions(intl, payoutMethodType, collective);
+  const payoutOptions = generatePayoutOptions(intl, payoutMethodType, host);
 
   const formik = useFormik({ initialValues: { ...DEFAULT_VALUES, ...payoutOptions[0]?.value }, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
@@ -197,14 +201,57 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
             <br />
             {/** TODO: Add a proper ID/Type to detect this error */}
             {error.startsWith('Not enough funds in your existing Paypal preapproval') && (
-              <StyledLink href={`https://opencollective.com/${collective.host.slug}/dashboard`}>
+              <StyledLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: host.slug }}>
                 <FormattedMessage
                   id="PayExpenseModal.RefillBalanceError"
                   defaultMessage="Refill balance from dashboard"
                 />
               </StyledLink>
             )}
+            {error.startsWith('Host has two-factor authentication enabled for large payouts.') && (
+              <FormattedMessage
+                id="PayExpenseModal.HostTwoFactorAuthEnabled"
+                defaultMessage="Please go to your <SettingsLink>account settings</SettingsLink> to enable two-factor authentication on your account."
+                values={{
+                  SettingsLink: getI18nLink({
+                    as: Link,
+                    route: 'editCollective',
+                    params: { slug: LoggedInUser.collective.slug },
+                  }),
+                }}
+              />
+            )}
           </MessageBox>
+        )}
+        {error && error.startsWith('Two-factor authentication') && (
+          <StyledInputField
+            name="twoFactorAuthenticatorCode"
+            htmlFor="twoFactorAuthenticatorCode"
+            label={
+              <FormattedMessage
+                id="PayExpenseModal.TwoFactorAuthCode"
+                defaultMessage="Two-factor authentication code"
+              />
+            }
+            value={formik.values.twoFactorAuthenticatorCode}
+            mt={2}
+            mb={3}
+          >
+            {inputProps => (
+              <StyledInput
+                {...inputProps}
+                minHeight={50}
+                fontSize="20px"
+                placeholder="123456"
+                pattern="[0-9]{6}"
+                inputMode="numeric"
+                autoFocus
+                onChange={e => {
+                  formik.setFieldValue('twoFactorAuthenticatorCode', e.target.value);
+                }}
+              />
+            )}
+          </StyledInputField>
         )}
         {!error && formik.values.forceManual && (
           <MessageBox type="warning" withIcon my={3}>
@@ -252,16 +299,18 @@ PayExpenseModal.propTypes = {
   collective: PropTypes.shape({
     balance: PropTypes.number,
     currency: PropTypes.string,
-    host: PropTypes.shape({
-      plan: PropTypes.object,
-      slug: PropTypes.string,
-    }),
   }).isRequired,
+  host: PropTypes.shape({
+    plan: PropTypes.object,
+    slug: PropTypes.string,
+  }),
   onClose: PropTypes.func.isRequired,
   /** Function called when users click on one of the "Pay" buttons */
   onSubmit: PropTypes.func.isRequired,
   /** If set, will be displayed in the pay modal */
   error: PropTypes.string,
+  /** From withUser */
+  LoggedInUser: PropTypes.object,
 };
 
-export default PayExpenseModal;
+export default withUser(PayExpenseModal);

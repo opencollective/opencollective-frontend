@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../../../lib/graphql/mutations';
 
 import Container from '../../Container';
 import MessageBox from '../../MessageBox';
@@ -11,8 +11,25 @@ import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H2, P } from '../../Text';
 
-const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective }) => {
-  const collectiveType = collective.settings?.fund ? 'FUND' : collective.type; // Funds MVP, to refactor
+const archiveCollectiveMutation = gql`
+  mutation ArchiveCollective($id: Int!) {
+    archiveCollective(id: $id) {
+      id
+      isArchived
+    }
+  }
+`;
+
+const unarchiveCollectiveMutation = gql`
+  mutation UnarchiveCollective($id: Int!) {
+    unarchiveCollective(id: $id) {
+      id
+      isArchived
+    }
+  }
+`;
+
+const ArchiveCollective = ({ collective }) => {
   const [archiveStatus, setArchiveStatus] = useState({
     processing: false,
     isArchived: collective.isArchived,
@@ -22,11 +39,15 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
   const { processing, isArchived, error, confirmationMsg } = archiveStatus;
   const [modal, setModal] = useState({ type: defaultAction, show: false });
   const defaultAction = isArchived ? 'Archive' : 'Unarchive';
-  const handleArchiveCollective = async ({ archiveCollective, id }) => {
+
+  const [archiveCollective] = useMutation(archiveCollectiveMutation);
+  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation);
+
+  const handleArchiveCollective = async ({ id }) => {
     setModal({ type: 'Archive', show: false });
     try {
       setArchiveStatus({ ...archiveStatus, processing: true });
-      await archiveCollective(id);
+      await archiveCollective({ variables: { id } });
       setArchiveStatus({
         ...archiveStatus,
         processing: false,
@@ -38,11 +59,11 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
     }
   };
 
-  const handleUnarchiveCollective = async ({ unarchiveCollective, id }) => {
+  const handleUnarchiveCollective = async ({ id }) => {
     setModal({ type: 'Unarchive', show: false });
     try {
       setArchiveStatus({ ...archiveStatus, processing: true });
-      await unarchiveCollective(id);
+      await unarchiveCollective({ variables: { id } });
       setArchiveStatus({
         ...archiveStatus,
         processing: false,
@@ -66,7 +87,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           defaultMessage={
             'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
           }
-          values={{ type: collectiveType }}
+          values={{ type: collective.type }}
         />
       </H2>
       {!isArchived && (
@@ -76,7 +97,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             defaultMessage={
               'Archiving {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.'
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
           &nbsp;
           {collective.type === 'COLLECTIVE' && (
@@ -99,7 +120,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             defaultMessage={
               'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
         </StyledButton>
       )}
@@ -110,7 +131,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             defaultMessage={
               "Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option."
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
         </P>
       )}
@@ -121,7 +142,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             defaultMessage={
               "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host, please deactivate as Host first."
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
         </P>
       )}
@@ -138,7 +159,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             defaultMessage={
               'Unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
         </StyledButton>
       )}
@@ -167,7 +188,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
                 defaultMessage={
                   'Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
                 }
-                values={{ type: collectiveType }}
+                values={{ type: collective.type }}
               />
             )}
             {modal.type === 'Unarchive' && (
@@ -176,7 +197,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
                 defaultMessage={
                   'Are you sure you want to unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
                 }
-                values={{ type: collectiveType }}
+                values={{ type: collective.type }}
               />
             )}
           </P>
@@ -191,9 +212,9 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
               data-cy="action"
               onClick={() => {
                 if (modal.type === 'Unarchive') {
-                  handleUnarchiveCollective({ unarchiveCollective, id: collective.id });
+                  handleUnarchiveCollective({ id: collective.id });
                 } else {
-                  handleArchiveCollective({ archiveCollective, id: collective.id });
+                  handleArchiveCollective({ id: collective.id });
                 }
               }}
             >
@@ -216,4 +237,4 @@ ArchiveCollective.propTypes = {
   unarchiveCollective: PropTypes.func,
 };
 
-export default addArchiveCollectiveMutation(addUnarchiveCollectiveMutation(ArchiveCollective));
+export default ArchiveCollective;

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withApollo } from '@apollo/react-hoc';
+import { withApollo } from '@apollo/client/react/hoc';
 import { isEqual } from 'lodash';
 
 import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
@@ -148,6 +148,8 @@ const withUser = WrappedComponent => {
   return WithUser;
 };
 
+const useUser = () => React.useContext(UserContext);
+
 export default withApollo(withLoggedInUser(UserProvider));
 
-export { UserConsumer, withUser };
+export { UserConsumer, withUser, useUser };

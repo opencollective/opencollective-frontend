@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { pick } from 'lodash';
+import { compact, isEmpty, pick, values } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Link } from '../server/pages';
@@ -37,6 +37,10 @@ const messages = defineMessages({
     id: 'Fields.website',
     defaultMessage: 'Website',
   },
+  profileNameError: {
+    id: 'CreateProfile.name.conflict',
+    defaultMessage: "You can't use the same name for your Personal profile and your Organization.",
+  },
 });
 
 const Tab = ({ active, children, setActive }) => (
@@ -65,12 +69,12 @@ Tab.propTypes = {
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
     <Link route={onSecondaryAction} passHref>
-      <StyledLink disabled={loading} fontSize="Paragraph">
+      <StyledLink disabled={loading} fontSize="14px">
         {children}
       </StyledLink>
     </Link>
   ) : (
-    <StyledButton asLink fontSize="Paragraph" onClick={onSecondaryAction} disabled={loading}>
+    <StyledButton asLink fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
       {children}
     </StyledButton>
   );
@@ -99,31 +103,34 @@ NewsletterCheckBox.propTypes = {
   checked: PropTypes.bool,
 };
 
-const useForm = ({ onEmailChange, errors }) => {
+const useForm = ({ onEmailChange, errors, formatMessage }) => {
   const [state, setState] = useState({ errors, newsletterOptIn: false });
 
   return {
     getFieldProps: name => ({
       defaultValue: state[name] || '',
-      fontSize: 'Paragraph',
-      lineHeight: 'Paragraph',
+      fontSize: '14px',
+      lineHeight: '20px',
       type: 'text',
       width: 1,
       onChange: ({ target }) => {
         // Email state is not local so any changes should be handled seprately
+        let value = target.value,
+          error = null;
         if (target.name === 'email') {
+          value = undefined;
           onEmailChange(target.value);
-          setState({
-            ...state,
-            errors: { ...state.errors, [target.name]: null },
-          });
-        } else {
-          setState({
-            ...state,
-            [target.name]: target.value,
-            errors: { ...state.errors, [target.name]: null },
-          });
+        } else if (
+          (target.name === 'name' && target.value === state.orgName) ||
+          (target.name === 'orgName' && target.value === state.name)
+        ) {
+          error = formatMessage(messages.profileNameError);
         }
+        setState({
+          ...state,
+          [target.name]: value,
+          errors: { ...state.errors, [target.name]: error },
+        });
       },
       onInvalid: event => {
         event.persist();
@@ -157,7 +164,8 @@ const CreateProfile = ({
 }) => {
   const { formatMessage } = useIntl();
   const [tab, setTab] = useState('personal');
-  const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors });
+  const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors, formatMessage });
+  const isValid = isEmpty(compact(values(state.errors)));
 
   return (
     <StyledCard width={1} maxWidth={480} {...props}>
@@ -225,7 +233,7 @@ const CreateProfile = ({
 
           <StyledButton
             buttonStyle="primary"
-            disabled={!email || !state.name}
+            disabled={!email || !state.name || !isValid}
             width={1}
             type="submit"
             fontWeight="600"
@@ -254,7 +262,7 @@ const CreateProfile = ({
           }}
           method="POST"
         >
-          <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mb={24} fontWeight="600">
+          <P fontSize="16px" lineHeight="24px" color="black.900" mb={24} fontWeight="600">
             <FormattedMessage id="CreateProfile.PersonalInfo" defaultMessage="Your personal information" />
           </P>
           <Box mb={24}>
@@ -290,7 +298,7 @@ const CreateProfile = ({
             </StyledInputField>
           </Box>
 
-          <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mb={24} fontWeight="600">
+          <P fontSize="16px" lineHeight="24px" color="black.900" mb={24} fontWeight="600">
             <FormattedMessage id="CreateProfile.OrgInfo" defaultMessage="Organization's information" />
           </P>
           <Box mb={24}>
@@ -363,7 +371,7 @@ const CreateProfile = ({
 
           <StyledButton
             buttonStyle="primary"
-            disabled={!email || !state.name || !state.orgName}
+            disabled={!email || !state.name || !state.orgName || !isValid}
             width={1}
             type="submit"
             fontWeight="600"
@@ -375,10 +383,10 @@ const CreateProfile = ({
       )}
 
       <Container alignItems="center" bg="black.50" display="flex" justifyContent="center" px={4} py={3}>
-        <Span color="black.700" mr={1} fontSize="Paragraph">
+        <Span color="black.700" mr={1} fontSize="14px">
           <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
         </Span>{' '}
-        <Span fontSize="Paragraph">
+        <Span fontSize="14px">
           <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
             <FormattedMessage id="signIn" defaultMessage="Sign In" />
             &nbsp;→

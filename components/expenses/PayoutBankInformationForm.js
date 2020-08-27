@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, useFormikContext } from 'formik';
 import { get, kebabCase, partition, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { formatFormErrorMessage } from '../../lib/form-utils';
+import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
@@ -40,31 +40,31 @@ const accountHolderFieldOptions = {
   ],
 };
 
-const requiredFieldsQuery = gqlV2`
-  query Host($slug: String, $currency: String!, $accountDetails: JSON) {
+const requiredFieldsQuery = gqlV2/* GraphQL */ `
+  query PayoutBankInformationRequiredFields($slug: String, $currency: String!, $accountDetails: JSON) {
     host(slug: $slug) {
-        transferwise {
-          requiredFields(currency: $currency, accountDetails: $accountDetails) {
-            type
-            title
-            fields {
+      transferwise {
+        requiredFields(currency: $currency, accountDetails: $accountDetails) {
+          type
+          title
+          fields {
+            name
+            group {
+              key
               name
-              group {
+              type
+              required
+              example
+              validationRegexp
+              refreshRequirementsOnChange
+              valuesAllowed {
                 key
                 name
-                type
-                required
-                example
-                validationRegexp
-                refreshRequirementsOnChange
-                valuesAllowed {
-                  key
-                  name
-                }
               }
             }
           }
         }
+      }
     }
   }
 `;
@@ -91,6 +91,7 @@ const Input = props => {
           {({ field, meta }) => (
             <StyledInputField
               label={input.name}
+              labelFontSize="13px"
               required={input.required}
               error={(meta.touched || disabled) && meta.error}
             >
@@ -117,6 +118,7 @@ const Input = props => {
           {({ field, meta }) => (
             <StyledInputField
               label={input.name}
+              labelFontSize="13px"
               required={input.required}
               error={(meta.touched || disabled) && meta.error}
             >
@@ -217,12 +219,12 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   return (
     <Flex flexDirection="column">
       <Box mt={2} flex="1">
-        <P fontSize="LeadParagraph" fontWeight="bold">
+        <P fontSize="16px" fontWeight="bold">
           {requiredFields.title}
         </P>
       </Box>
       <Box mt={3} flex="1">
-        <P fontSize="Paragraph" fontWeight="bold">
+        <P fontSize="14px" fontWeight="bold">
           Account Information
         </P>
       </Box>
@@ -254,13 +256,11 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           refetch={refetch}
         />
       ))}
-      <Box mt={3} flex="1">
-        <P fontSize="Paragraph" fontWeight="bold">
-          Recipient&apos;s Address&nbsp;
-          <StyledTooltip content="Address of the owner of the bank account (not the address of the bank)">
-            <Info size={16} />
-          </StyledTooltip>
-        </P>
+      <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
+        Recipient&apos;s Address&nbsp;
+        <StyledTooltip content="Address of the owner of the bank account (not the address of the bank)">
+          <Info size={16} />
+        </StyledTooltip>
       </Box>
       {addressFields.map(field => (
         <FieldGroup
@@ -289,8 +289,8 @@ DetailsForm.propTypes = {
   getFieldName: PropTypes.func.isRequired,
 };
 
-const availableCurrenciesQuery = gqlV2`
-  query Host($slug: String) {
+const availableCurrenciesQuery = gqlV2/* GraphQL */ `
+  query PayoutBankInformationAvailableCurrencies($slug: String) {
     host(slug: $slug) {
       slug
       transferwise {
@@ -322,18 +322,36 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
   }
 
   const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
-  const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies);
+  const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies.map(c => c.code));
   const currencyFieldName = getFieldName('data.currency');
   const selectedCurrency = fixedCurrency || get(formik.values, currencyFieldName);
+  const validateCurrencyMinimumAmount = () => {
+    // Only validate minimum amount if the form has items
+    if (formik?.values?.items) {
+      const invoiceTotalAmount = formik.values.items.reduce(
+        (amount, attachment) => amount + (attachment.amount || 0),
+        0,
+      );
+      const minAmountForSelectedCurrency =
+        availableCurrencies.find(c => c.code === selectedCurrency)?.minInvoiceAmount * 100;
+      if (invoiceTotalAmount < minAmountForSelectedCurrency) {
+        return `The minimum amount for ${selectedCurrency} is ${formatCurrency(
+          minAmountForSelectedCurrency,
+          selectedCurrency,
+        )}`;
+      }
+    }
+  };
 
   return (
     <React.Fragment>
-      <Field name={currencyFieldName}>
+      <Field name={currencyFieldName} validate={validateCurrencyMinimumAmount}>
         {({ field, meta }) => (
           <StyledInputField
             name={field.name}
-            error={meta.error && formatFormErrorMessage(meta.error)}
+            error={meta.error}
             label={formatMessage(msg.currency)}
+            labelFontSize="13px"
             mt={3}
             mb={2}
           >
@@ -341,6 +359,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
               <StyledSelect
                 inputId={id}
                 name={field.name}
+                error={meta.error}
                 onChange={({ value }) => {
                   formik.setFieldValue(getFieldName('data'), {});
                   formik.setFieldValue(field.name, value);
@@ -370,7 +389,7 @@ PayoutBankInformationForm.propTypes = {
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     transferwise: PropTypes.shape({
-      availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+      availableCurrencies: PropTypes.arrayOf(PropTypes.object),
     }),
   }).isRequired,
   isNew: PropTypes.bool,

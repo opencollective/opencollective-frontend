@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, pick } from 'lodash';
 import { Col, Form, Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -118,7 +118,7 @@ class EditTwitterAccount extends React.Component {
 
   async onClick() {
     const connectedAccount = pick(this.state.connectedAccount, ['id', 'settings']);
-    await this.props.editConnectedAccount(connectedAccount);
+    await this.props.editConnectedAccount({ variables: { connectedAccount } });
     this.setState({ isModified: false });
   }
 
@@ -207,8 +207,8 @@ class EditTwitterAccount extends React.Component {
   }
 }
 
-const editConnectedAccountQuery = gql`
-  mutation editConnectedAccount($connectedAccount: ConnectedAccountInputType!) {
+const editConnectedAccountMutation = gql`
+  mutation EditConnectedAccount($connectedAccount: ConnectedAccountInputType!) {
     editConnectedAccount(connectedAccount: $connectedAccount) {
       id
       settings
@@ -216,12 +216,8 @@ const editConnectedAccountQuery = gql`
   }
 `;
 
-const addMutation = graphql(editConnectedAccountQuery, {
-  props: ({ mutate }) => ({
-    editConnectedAccount: async connectedAccount => {
-      return await mutate({ variables: { connectedAccount } });
-    },
-  }),
+const addEditConnectedAccountMutation = graphql(editConnectedAccountMutation, {
+  name: 'editConnectedAccount',
 });
 
-export default addMutation(injectIntl(EditTwitterAccount));
+export default injectIntl(addEditConnectedAccountMutation(EditTwitterAccount));

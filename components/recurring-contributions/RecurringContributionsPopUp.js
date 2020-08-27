@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
@@ -52,7 +52,7 @@ const MenuSection = styled(Flex).attrs({
 
 // GraphQL
 const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
-  mutation cancelRecurringContribution($order: OrderReferenceInput!) {
+  mutation CancelRecurringContribution($order: OrderReferenceInput!) {
     cancelOrder(order: $order) {
       id
       status
@@ -83,7 +83,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
       {mainMenu && (
         <MenuSection>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" px={3}>
-            <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+            <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
               <FormattedMessage id="header.options" defaultMessage="Options" />
             </P>
             <Flex flexGrow={1} alignItems="center">
@@ -111,7 +111,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
                 <CreditCard size={20} />
               </Flex>
               <Flex flexGrow={1}>
-                <P fontSize="Paragraph" fontWeight="400">
+                <P fontSize="14px" fontWeight="400">
                   <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
                 </P>
               </Flex>
@@ -131,7 +131,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
               <Dollar size={20} />
             </Flex>
             <Flex flexGrow={1}>
-              <P fontSize="Paragraph" fontWeight="400">
+              <P fontSize="14px" fontWeight="400">
                 <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
               </P>
             </Flex>
@@ -150,7 +150,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
               <RedXCircle size={20} />
             </Flex>
             <Flex flexGrow={1}>
-              <P fontSize="Paragraph" fontWeight="400" color="red.500">
+              <P fontSize="14px" fontWeight="400" color="red.500">
                 <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
               </P>
             </Flex>
@@ -161,7 +161,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
       {cancelMenu && (
         <MenuSection data-cy="recurring-contribution-cancel-menu">
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" px={3}>
-            <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+            <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
               <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
             </P>
             <Flex flexGrow={1} alignItems="center">
@@ -175,7 +175,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             />
           </Flex>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
-            <P fontSize="Paragraph" fontWeight="400">
+            <P fontSize="14px" fontWeight="400">
               <FormattedMessage id="subscription.menu.cancel.yes" defaultMessage="Are you sure? 🥺" />
             </P>
           </Flex>

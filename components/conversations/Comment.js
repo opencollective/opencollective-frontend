@@ -16,15 +16,15 @@ import { P } from '../Text';
 import CommentActions from './CommentActions';
 import CommentReactionPicker from './CommentReactionPicker';
 import CommentReactions from './CommentReactions';
-import { CommentFieldsFragment } from './graphql';
+import { commentFieldsFragment } from './graphql';
 
-const editCommentMutation = gqlV2`
-  mutation editComment($comment: CommentUpdateInput!) {
+const editCommentMutation = gqlV2/* GraphQL */ `
+  mutation EditComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
       ...CommentFields
     }
   }
-  ${CommentFieldsFragment}
+  ${commentFieldsFragment}
 `;
 
 const mutationOptions = { context: API_V2_CONTEXT };
@@ -64,7 +64,7 @@ const Comment = ({
                 {comment.fromCollective.name}
               </P>
             </LinkCollective>
-            <P fontSize="Caption" color="black.600" truncateOverflow title={comment.createdAt}>
+            <P fontSize="12px" color="black.600" truncateOverflow title={comment.createdAt}>
               <FormattedMessage
                 id="Comment.PostedOn"
                 defaultMessage="Posted on {createdAt, date, long}"

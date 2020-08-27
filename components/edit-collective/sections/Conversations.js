@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { cloneDeep, pick, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -15,7 +15,7 @@ import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledCheckbox from '../../StyledCheckbox';
 import { H3, P } from '../../Text';
-import { updateSettingsMutation } from '../mutations';
+import { editCollectiveSettingsMutation } from '../mutations';
 
 import imgPreviewReplies from '../../../public/static/images/conversations/conversation-replies-preview.png';
 import imgPreviewThread from '../../../public/static/images/conversations/conversations-list-preview.png';
@@ -55,7 +55,7 @@ const ScreenshotPreview = styled.div`
 const Conversations = ({ collective }) => {
   const defaultIsChecked = hasFeature(collective, FEATURES.CONVERSATIONS);
   const { formatMessage } = useIntl();
-  const [setSettings, { loading, error }] = useMutation(updateSettingsMutation);
+  const [setSettings, { loading, error }] = useMutation(editCollectiveSettingsMutation);
 
   return (
     <Container>
@@ -88,7 +88,7 @@ const Conversations = ({ collective }) => {
         </Flex>
       </Flex>
       {error && (
-        <MessageBox type="error" fontSize="Paragraph" withIcon mb={3}>
+        <MessageBox type="error" fontSize="14px" withIcon mb={3}>
           {getErrorFromGraphqlException(error).message}
         </MessageBox>
       )}

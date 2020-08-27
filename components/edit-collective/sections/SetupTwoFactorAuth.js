@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, Form, Formik } from 'formik';
 import QRCode from 'qrcode.react';
@@ -42,7 +42,7 @@ const messages = defineMessages({
 
 const content = () => (
   <div>
-    <P fontSize="Caption" lineHeight="Caption">
+    <P fontSize="12px" lineHeight="18px">
       <FormattedMessage
         id="TwoFactorAuth.Setup.AppInfo"
         defaultMessage="You can use apps such as Google Authenticator, Authy, 1Password, LastPass, or Microsoft Authenticator to scan the QR code and receive a code to input."
@@ -65,7 +65,7 @@ class SetupTwoFactorAuth extends React.Component {
     data: PropTypes.object,
     /** From parent component */
     slug: PropTypes.string,
-    collectiveName: PropTypes.string,
+    userEmail: PropTypes.string,
   };
 
   constructor(props) {
@@ -79,15 +79,22 @@ class SetupTwoFactorAuth extends React.Component {
   }
 
   componentDidMount() {
-    const options = {
-      name: `${this.props.collectiveName}'s Open Collective`,
-      length: 64,
-    };
-    const secret = speakeasy.generateSecret(options);
     // speakeasy options object does not add issuer as expected so we add it ourselves to the otp url
     // do not use URLParams from universal-url or the web API to encode the issuer
     // see https://github.com/opencollective/opencollective-frontend/pull/4520#discussion_r447690237 for discussion
-    const issuer = '&issuer=Open%20Collective';
+    let issuer;
+    if (window.location.hostname === 'localhost') {
+      issuer = '&issuer=Open%20Collective%20Local';
+    } else if (window.location.hostname === 'staging.opencollective.com') {
+      issuer = '&issuer=Open%20Collective%20Staging';
+    } else {
+      issuer = '&issuer=Open%20Collective';
+    }
+    const options = {
+      name: this.props.userEmail,
+      length: 64,
+    };
+    const secret = speakeasy.generateSecret(options);
     const fullOTPUrl = secret.otpauth_url + issuer;
     this.setState({ secret, base32: secret.base32, otpauth_url: fullOTPUrl });
   }
@@ -100,6 +107,7 @@ class SetupTwoFactorAuth extends React.Component {
         secret: this.state.base32,
         encoding: 'base32',
         token: twoFactorAuthenticatorCode,
+        window: 2,
       });
 
       // if not verified, ask the user to try again
@@ -248,9 +256,10 @@ class SetupTwoFactorAuth extends React.Component {
                                   {...inputProps}
                                   minWidth={300}
                                   minHeight={75}
-                                  fontSize={'H5'}
+                                  fontSize="20px"
                                   placeholder="123456"
                                   pattern="[0-9]{6}"
+                                  inputMode="numeric"
                                   autoFocus
                                   data-cy="add-two-factor-auth-totp-code-field"
                                 />
@@ -287,51 +296,49 @@ class SetupTwoFactorAuth extends React.Component {
   }
 }
 
-const addTwoFactorAuthToAccountMutation = graphql(
-  gqlV2/* GraphQL */ `
-    mutation AddTwoFactorAuthToAccount($account: AccountReferenceInput!, $token: String!) {
-      addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
-        id
-        ... on Individual {
-          hasTwoFactorAuth
-        }
+const twoFactorAuthToAccountMutation = gqlV2/* GraphQL */ `
+  mutation AddTwoFactorAuthToAccount($account: AccountReferenceInput!, $token: String!) {
+    addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
+      id
+      ... on Individual {
+        hasTwoFactorAuth
       }
     }
-  `,
-  {
-    name: 'addTwoFactorAuthTokenToIndividual',
-    options: { context: API_V2_CONTEXT },
-  },
-);
+  }
+`;
 
-const fetchAccountHasTwoFactorAuth = graphql(
-  gqlV2/* GraphQL */ `
-    query AccountHasTwoFactorAuth($slug: String) {
-      individual(slug: $slug) {
-        id
-        slug
-        name
-        type
-        id
-        slug
-        name
-        type
-        ... on Individual {
-          hasTwoFactorAuth
-        }
+const addTwoFactorAuthToAccountMutation = graphql(twoFactorAuthToAccountMutation, {
+  name: 'addTwoFactorAuthTokenToIndividual',
+  options: { context: API_V2_CONTEXT },
+});
+
+const accountHasTwoFactorAuthQuery = gqlV2/* GraphQL */ `
+  query AccountHasTwoFactorAuth($slug: String) {
+    individual(slug: $slug) {
+      id
+      slug
+      name
+      type
+      id
+      slug
+      name
+      type
+      ... on Individual {
+        hasTwoFactorAuth
       }
     }
-  `,
-  {
-    options: props => ({
-      context: API_V2_CONTEXT,
-      variables: {
-        slug: props.slug,
-      },
-    }),
-  },
-);
+  }
+`;
 
-const inject = compose(addTwoFactorAuthToAccountMutation, fetchAccountHasTwoFactorAuth, withUser, injectIntl);
+const addAccountHasTwoFactorAuthData = graphql(accountHasTwoFactorAuthQuery, {
+  options: props => ({
+    context: API_V2_CONTEXT,
+    variables: {
+      slug: props.slug,
+    },
+  }),
+});
 
-export default inject(SetupTwoFactorAuth);
+const addGraphql = compose(addTwoFactorAuthToAccountMutation, addAccountHasTwoFactorAuthData);
+
+export default injectIntl(withUser(addGraphql(SetupTwoFactorAuth)));

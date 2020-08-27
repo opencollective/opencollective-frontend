@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, difference, get, isEqual, set, uniqBy } from 'lodash';
@@ -208,8 +208,7 @@ const loadSectionsForCollective = collective => {
   const collectiveSections = get(collective, 'settings.collectivePage.sections');
   let defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive);
 
-  // Funds MVP, to refactor
-  if (collective.settings?.fund === true) {
+  if (collective.type === CollectiveType.FUND) {
     defaultSections = difference(defaultSections, [Sections.GOALS, Sections.CONVERSATIONS]);
   }
 

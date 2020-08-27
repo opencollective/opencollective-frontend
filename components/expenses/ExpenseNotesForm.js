@@ -10,7 +10,7 @@ import { Span } from '../Text';
 
 const msg = defineMessages({
   notesPlaceholder: {
-    id: 'ExpenseSummary.addNotesPlaceholder',
+    id: 'ExpenseSummary.addNotesLabel',
     defaultMessage: 'Add notes',
   },
 });
@@ -33,7 +33,7 @@ const ExpenseNotesForm = ({ onChange, disabled, defaultValue, hideLabel }) => {
       name="privateMessage"
       required={false}
       label={hideLabel ? null : <PrivateNoteLabel />}
-      labelProps={{ fontWeight: '500', fontSize: 'LeadCaption' }}
+      labelProps={{ fontWeight: '500', fontSize: '13px' }}
     >
       {inputProps => (
         <Box mt={2}>
@@ -47,7 +47,7 @@ const ExpenseNotesForm = ({ onChange, disabled, defaultValue, hideLabel }) => {
             onChange={onChange}
             disabled={disabled}
             defaultValue={defaultValue}
-            fontSize="LeadCaption"
+            fontSize="13px"
             data-cy="ExpenseNotesEditor"
           />
         </Box>

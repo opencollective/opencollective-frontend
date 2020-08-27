@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
 import { PropTypes } from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Field, Form, Formik } from 'formik';
-import gql from 'graphql-tag';
 import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -182,9 +182,10 @@ class SignInOrJoinFree extends React.Component {
                         {...inputProps}
                         minWidth={300}
                         minHeight={75}
-                        fontSize={'H5'}
+                        fontSize="20px"
                         placeholder="123456"
                         pattern="[0-9]{6}"
+                        inputMode="numeric"
                         autoFocus
                         data-cy="signin-two-factor-auth-input"
                       />
@@ -260,7 +261,7 @@ class SignInOrJoinFree extends React.Component {
                   />
                   <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
                 </Flex>
-                <P mt={4} color="black.500" fontSize="Caption" mb={3} data-cy="join-conditions">
+                <P mt={4} color="black.500" fontSize="12px" mb={3} data-cy="join-conditions">
                   <FormattedMessage
                     id="SignIn.legal"
                     defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
@@ -279,13 +280,8 @@ class SignInOrJoinFree extends React.Component {
   }
 }
 
-const createUserQuery = gql`
-  mutation createUser(
-    $user: UserInputType!
-    $organization: CollectiveInputType
-    $redirect: String
-    $websiteUrl: String
-  ) {
+const signupMutation = gql`
+  mutation Signup($user: UserInputType!, $organization: CollectiveInputType, $redirect: String, $websiteUrl: String) {
     createUser(user: $user, organization: $organization, redirect: $redirect, websiteUrl: $websiteUrl) {
       user {
         id
@@ -300,6 +296,6 @@ const createUserQuery = gql`
   }
 `;
 
-const addCreateUserMutation = graphql(createUserQuery, { name: 'createUser' });
+export const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
 
-export default injectIntl(addCreateUserMutation(SignInOrJoinFree));
+export default injectIntl(addSignupMutation(SignInOrJoinFree));

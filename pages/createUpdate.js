@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular';
-import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -64,7 +64,7 @@ class CreateUpdatePage extends React.Component {
     } = this.props;
     try {
       update.collective = { id: Collective.id };
-      const res = await this.props.createUpdate(update);
+      const res = await this.props.createUpdate({ variables: { update } });
       this.setState({ isModified: false });
       return Router.pushRoute(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
@@ -155,8 +155,8 @@ class CreateUpdatePage extends React.Component {
   }
 }
 
-const createUpdateQuery = gql`
-  mutation createUpdate($update: UpdateInputType!) {
+const createUpdateMutation = gql`
+  mutation CreateUpdate($update: UpdateInputType!) {
     createUpdate(update: $update) {
       id
       slug
@@ -185,14 +185,10 @@ const createUpdateQuery = gql`
   }
 `;
 
-const addMutation = graphql(createUpdateQuery, {
-  props: ({ mutate }) => ({
-    createUpdate: async update => {
-      return await mutate({ variables: { update } });
-    },
-  }),
+const addCreateUpdateMutation = graphql(createUpdateMutation, {
+  name: 'createUpdate',
 });
 
-const addGraphQL = compose(addCollectiveCoverData, addMutation);
+const addGraphql = compose(addCollectiveCoverData, addCreateUpdateMutation);
 
-export default withUser(addGraphQL(CreateUpdatePage));
+export default withUser(addGraphql(CreateUpdatePage));

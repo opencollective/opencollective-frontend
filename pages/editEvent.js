@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 
 import { addEditCollectiveMutation } from '../lib/graphql/mutations';
-import { addEventCollectiveData } from '../lib/graphql/queries';
 import { compose } from '../lib/utils';
 
 import EditCollective from '../components/edit-collective';
@@ -29,17 +30,127 @@ class EditEventPage extends React.Component {
   }
 
   render() {
-    const { data, loadingLoggedInUser, LoggedInUser, editCollective } = this.props;
+    const { data, loadingLoggedInUser, editCollective } = this.props;
 
     if (loadingLoggedInUser || !data.Collective) {
       return <ErrorPage loading={loadingLoggedInUser} data={data} />;
     }
 
     const event = data.Collective;
-    return <EditCollective editCollective={editCollective} collective={event} LoggedInUser={LoggedInUser} />;
+    return <EditCollective editCollective={editCollective} collective={event} />;
   }
 }
 
-const addGraphQL = compose(addEventCollectiveData, addEditCollectiveMutation);
+const editEventPageQuery = gql`
+  query EditEventPage($eventSlug: String) {
+    Collective(slug: $eventSlug) {
+      id
+      type
+      slug
+      path
+      createdByUser {
+        id
+      }
+      name
+      imageUrl
+      backgroundImage
+      description
+      longDescription
+      startsAt
+      endsAt
+      timezone
+      currency
+      settings
+      isDeletable
+      isArchived
+      location {
+        name
+        address
+        country
+        lat
+        long
+      }
+      tiers {
+        id
+        slug
+        type
+        name
+        description
+        amount
+        amountType
+        minimumAmount
+        presets
+        currency
+        maxQuantity
+        stats {
+          id
+          availableQuantity
+        }
+      }
+      parentCollective {
+        id
+        slug
+        name
+        mission
+        currency
+        imageUrl
+        backgroundImage
+        settings
+      }
+      stats {
+        id
+        balance
+        expenses {
+          id
+          all
+        }
+        transactions {
+          id
+          all
+        }
+      }
+      members {
+        id
+        createdAt
+        role
+        member {
+          id
+          name
+          imageUrl
+          slug
+          twitterHandle
+          description
+        }
+      }
+      orders {
+        id
+        createdAt
+        quantity
+        publicMessage
+        fromCollective {
+          id
+          name
+          company
+          image # For Event Sponsors
+          imageUrl
+          slug
+          twitterHandle
+          description
+          ... on User {
+            email
+          }
+        }
+        tier {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
 
-export default withUser(addGraphQL(EditEventPage));
+const addEditEventPageData = graphql(editEventPageQuery);
+
+const addGraphql = compose(addEditEventPageData, addEditCollectiveMutation);
+
+export default withUser(addGraphql(EditEventPage));

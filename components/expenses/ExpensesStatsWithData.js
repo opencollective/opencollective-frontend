@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -97,8 +97,8 @@ class ExpensesStatsWithData extends React.Component {
   }
 }
 
-const getExpensesStatsQuery = gql`
-  query Collective($slug: String) {
+const expensesStatsQuery = gql`
+  query ExpensesStats($slug: String) {
     Collective(slug: $slug) {
       id
       currency
@@ -111,6 +111,6 @@ const getExpensesStatsQuery = gql`
   }
 `;
 
-export const addData = graphql(getExpensesStatsQuery);
+export const addExpensesStatsData = graphql(expensesStatsQuery);
 
-export default addData(ExpensesStatsWithData);
+export default addExpensesStatsData(ExpensesStatsWithData);

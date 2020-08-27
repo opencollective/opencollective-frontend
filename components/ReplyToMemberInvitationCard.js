@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { gql, useMutation } from '@apollo/client';
 import { defineMessages, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
@@ -11,25 +10,13 @@ import formatMemberRole from '../lib/i18n/member-role';
 import Avatar from './Avatar';
 import { Flex } from './Grid';
 import LinkCollective from './LinkCollective';
+import MemberRoleDescription, { hasRoleDescription } from './MemberRoleDescription';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledTag from './StyledTag';
 import { H3, P } from './Text';
 import { withUser } from './UserProvider';
-
-const rolesDetails = defineMessages({
-  [roles.ADMIN]: {
-    id: 'RoleDetails.ADMIN',
-    defaultMessage:
-      'Admins can edit the Collective, change settings, approve expenses, make financial contributions to other Collectives and receive messages from people trying to contact the Collective.',
-  },
-  [roles.MEMBER]: {
-    id: 'RoleDetails.MEMBER',
-    defaultMessage:
-      'Core contributors are major contributors and represent the Collective with their face on the Collective page as part of the team.',
-  },
-});
 
 const messages = defineMessages({
   emailDetails: {
@@ -55,8 +42,8 @@ const messages = defineMessages({
   },
 });
 
-const replyToInvitationMutation = gql`
-  mutation ReplyToInvitation($id: Int!, $accept: Boolean!) {
+const replyToMemberInvitationMutation = gql`
+  mutation ReplyToMemberInvitation($id: Int!, $accept: Boolean!) {
     replyToMemberInvitation(invitationId: $id, accept: $accept)
   }
 `;
@@ -69,14 +56,17 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
   const intl = useIntl();
   const { formatMessage } = intl;
   const [accepted, setAccepted] = React.useState();
-  const [sendReplyToInvitation, { loading, error, data }] = useMutation(replyToInvitationMutation);
-  const isDisabled = loading;
+  const [isSubmitting, setSubmitting] = React.useState(false);
+  const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation);
+  const isDisabled = isSubmitting;
   const hasReplied = data && typeof data.replyToMemberInvitation !== 'undefined';
 
   const buildReplyToInvitation = accept => async () => {
+    setSubmitting(true);
     setAccepted(accept);
     await sendReplyToInvitation({ variables: { id: invitation.id, accept } });
     await refetchLoggedInUser();
+    setSubmitting(false);
   };
 
   return (
@@ -96,12 +86,12 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
       </LinkCollective>
       <hr />
       <StyledTag textTransform="uppercase">{formatMemberRole(intl, invitation.role)}</StyledTag>
-      {rolesDetails[invitation.role] && (
-        <P my={2} color="black.600">
-          {formatMessage(rolesDetails[invitation.role])}
+      {hasRoleDescription(invitation.role) && (
+        <P my={3} px={2} color="black.600" lineHeight="18px">
+          <MemberRoleDescription role={invitation.role} />
         </P>
       )}
-      {hasReplied ? (
+      {hasReplied && !isSubmitting ? (
         <P mt={4} color={accepted ? 'green.500' : 'red.500'} textAlign="center" mb={2} fontWeight="bold">
           {accepted ? `✔️ ${formatMessage(messages.accepted)}` : `❌️ ${formatMessage(messages.declined)}`}
         </P>
@@ -120,7 +110,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
               mx={2}
               minWidth={150}
               disabled={isDisabled}
-              loading={loading && accepted === false}
+              loading={isSubmitting && accepted === false}
               onClick={buildReplyToInvitation(false)}
               data-cy="member-invitation-decline-btn"
             >
@@ -131,7 +121,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
               minWidth={150}
               buttonStyle="primary"
               disabled={isDisabled}
-              loading={loading && accepted === true}
+              loading={isSubmitting && accepted === true}
               onClick={buildReplyToInvitation(true)}
               data-cy="member-invitation-accept-btn"
             >

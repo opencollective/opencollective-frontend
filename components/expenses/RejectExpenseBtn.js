@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
@@ -24,7 +24,7 @@ class RejectExpenseBtn extends React.Component {
   async onClick() {
     const { id } = this.props;
     try {
-      await this.props.rejectExpense(id);
+      await this.props.rejectExpense({ variables: { id } });
       await this.props.refetch();
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;
@@ -43,8 +43,8 @@ class RejectExpenseBtn extends React.Component {
   }
 }
 
-const rejectExpenseQuery = gql`
-  mutation rejectExpense($id: Int!) {
+const rejectExpensemutation = gql`
+  mutation RejectExpense($id: Int!) {
     rejectExpense(id: $id) {
       id
       status
@@ -52,12 +52,8 @@ const rejectExpenseQuery = gql`
   }
 `;
 
-const addMutation = graphql(rejectExpenseQuery, {
-  props: ({ mutate }) => ({
-    rejectExpense: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
+const addRejectExpensemutation = graphql(rejectExpensemutation, {
+  name: 'rejectExpense',
 });
 
-export default addMutation(RejectExpenseBtn);
+export default addRejectExpensemutation(RejectExpenseBtn);

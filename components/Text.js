@@ -26,7 +26,7 @@ export const P = styled.p.attrs(props => ({
 `;
 
 P.defaultProps = {
-  fontSize: 'Paragraph',
+  fontSize: '14px',
   letterSpacing: '-0.4px',
   lineHeight: '1.1em',
 };
@@ -47,10 +47,10 @@ export const H1 = P.withComponent('h1');
 
 H1.defaultProps = {
   ...P.defaultProps,
-  fontSize: 'H1',
+  fontSize: '52px',
   fontWeight: 'bold',
   letterSpacing: '-1.2px',
-  lineHeight: 'H1',
+  lineHeight: '56px',
   textAlign: 'left',
 };
 
@@ -58,39 +58,39 @@ export const H2 = P.withComponent('h2');
 
 H2.defaultProps = {
   ...P.defaultProps,
-  fontSize: 'H2',
+  fontSize: '40px',
   fontWeight: 'bold',
   letterSpacing: '-0.4px',
-  lineHeight: 'H2',
+  lineHeight: '44px',
 };
 
 export const H3 = P.withComponent('h3');
 
 H3.defaultProps = {
   ...P.defaultProps,
-  fontSize: 'H3',
+  fontSize: '32px',
   fontWeight: 'bold',
   letterSpacing: '-0.4px',
-  lineHeight: 'H3',
+  lineHeight: '36px',
 };
 
 export const H4 = P.withComponent('h4');
 
 H4.defaultProps = {
   ...P.defaultProps,
-  fontSize: 'H4',
+  fontSize: '24px',
   fontWeight: 'bold',
   letterSpacing: '-0.4px',
-  lineHeight: 'H4',
+  lineHeight: '32px',
 };
 
 export const H5 = P.withComponent('h5');
 
 H5.defaultProps = {
   ...P.defaultProps,
-  fontSize: 'H5',
+  fontSize: '20px',
   letterSpacing: '-0.4px',
-  lineHeight: 'H5',
+  lineHeight: '24px',
   fontWeight: 500,
   color: 'black.900',
 };

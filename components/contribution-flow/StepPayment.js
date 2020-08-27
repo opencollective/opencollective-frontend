@@ -240,7 +240,7 @@ class StepPayment extends React.Component {
                     {title}
                   </P>
                   {subtitle && (
-                    <P fontSize="Caption" fontWeight={400} lineHeight="Caption" color="black.500">
+                    <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500">
                       {subtitle}
                     </P>
                   )}
@@ -259,7 +259,7 @@ class StepPayment extends React.Component {
                 </Box>
               )}
               {key === 'manual' && checked && data.instructions && (
-                <Box my={3} color="black.600" fontSize="Paragraph">
+                <Box my={3} color="black.600" fontSize="14px">
                   {data.instructions}
                 </Box>
               )}

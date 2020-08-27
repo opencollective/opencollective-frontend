@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
@@ -24,7 +24,7 @@ class ApproveExpenseBtn extends React.Component {
   async onClick() {
     const { id } = this.props;
     try {
-      await this.props.approveExpense(id);
+      await this.props.approveExpense({ variables: { id } });
       await this.props.refetch();
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;
@@ -43,8 +43,8 @@ class ApproveExpenseBtn extends React.Component {
   }
 }
 
-const approveExpenseQuery = gql`
-  mutation approveExpense($id: Int!) {
+const approveExpenseMutation = gql`
+  mutation ApproveExpense($id: Int!) {
     approveExpense(id: $id) {
       id
       status
@@ -52,12 +52,8 @@ const approveExpenseQuery = gql`
   }
 `;
 
-const addMutation = graphql(approveExpenseQuery, {
-  props: ({ mutate }) => ({
-    approveExpense: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
+const addApproveExpenseMutation = graphql(approveExpenseMutation, {
+  name: 'approveExpense',
 });
 
-export default addMutation(ApproveExpenseBtn);
+export default addApproveExpenseMutation(ApproveExpenseBtn);

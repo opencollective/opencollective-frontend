@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { gql, useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -15,7 +14,7 @@ import StyledInputField from './StyledInputField';
 import StyledTextarea from './StyledTextarea';
 import { H2, P } from './Text';
 
-const SendMessageMutation = gql`
+const sendMessageMutation = gql`
   mutation SendMessage($collectiveId: Int!, $message: String!, $subject: String) {
     sendMessageToCollective(collectiveId: $collectiveId, message: $message, subject: $subject) {
       success
@@ -27,7 +26,7 @@ const CollectiveContactForm = ({ collective }) => {
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [error, setError] = React.useState(null);
-  const [submit, { data, loading }] = useMutation(SendMessageMutation);
+  const [submit, { data, loading }] = useMutation(sendMessageMutation);
 
   if (get(data, 'sendMessageToCollective.success')) {
     return (

@@ -175,7 +175,7 @@ const ContributeCard = ({
       </CoverImage>
       <Flex px={3} py={3} flexDirection="column" justifyContent="space-between" flex="1">
         <Flex flexDirection="column" flex="1 1">
-          <P fontSize="H5" mt={1} mb={2} fontWeight="bold" textTransform="capitalize" data-cy="contribute-title">
+          <P fontSize="20px" mt={1} mb={2} fontWeight="bold" textTransform="capitalize" data-cy="contribute-title">
             {title}
           </P>
           <Description data-cy="contribute-description">{children}</Description>
@@ -209,13 +209,13 @@ const ContributeCard = ({
                       </Box>
                     ))}
                     {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
-                      <Container ml={2} pt="0.7em" fontSize="Caption" color="black.600">
+                      <Container ml={2} pt="0.7em" fontSize="12px" color="black.600">
                         + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
                       </Container>
                     )}
                   </Flex>
                   {stats && stats.all > 0 && (
-                    <P mt={2} fontSize="Tiny" color="black.600" letterSpacing="-0.6px">
+                    <P mt={2} fontSize="10px" color="black.600" letterSpacing="-0.6px">
                       {type !== 'TICKET' && (
                         <FormattedMessage
                           id="ContributorsCount"

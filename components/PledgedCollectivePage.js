@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { gql, useQuery } from '@apollo/client';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
-import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
 import { Link } from '../server/pages';
@@ -21,8 +20,8 @@ import { withUser } from './UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
-export const CollectivePledgesQuery = gql`
-  query CollectivePledges($id: Int!) {
+export const pledgedCollectivePageQuery = gql`
+  query PledgedCollectivePage($id: Int!) {
     Collective(id: $id) {
       id
       pledges: orders(status: PENDING) {
@@ -49,7 +48,7 @@ export const CollectivePledgesQuery = gql`
  * Display a collective with all its pledges
  */
 const PledgedCollectivePage = ({ collective }) => {
-  const { loading, error, data } = useQuery(CollectivePledgesQuery, { variables: { id: collective.id } });
+  const { loading, error, data } = useQuery(pledgedCollectivePageQuery, { variables: { id: collective.id } });
 
   if (loading) {
     return (
@@ -101,7 +100,7 @@ const PledgedCollectivePage = ({ collective }) => {
           <H2 as="h1">{collective.name}</H2>
 
           <Box mb={4} mt={3}>
-            <StyledLink href={website} color="primary.500" fontSize="Caption">
+            <StyledLink href={website} color="primary.500" fontSize="12px" openInNewTabNoFollow>
               <ExternalLinkAlt size="1em" /> {website}
             </StyledLink>
           </Box>
@@ -149,7 +148,7 @@ const PledgedCollectivePage = ({ collective }) => {
           />
         </H3>
 
-        <P color="black.600" fontSize="Caption" lineHeight="Caption" my={4}>
+        <P color="black.600" fontSize="12px" lineHeight="18px" my={4}>
           <FormattedMessage
             id="pledge.definition"
             defaultMessage="A pledge is a way for the community to show interest in supporting a cause or project that is not yet on
@@ -167,7 +166,7 @@ const PledgedCollectivePage = ({ collective }) => {
         mb={5}
         px={3}
         data-cy="contributersGrouped"
-        gridTemplateColumns={['1fr', '1fr 1fr 1fr', null, '1fr 1fr 1fr 1fr']}
+        gridTemplateColumns="repeat(auto-fill, minmax(165px, 1fr))"
         gridGap={24}
       >
         {pledges.map((pledge, index) => (
@@ -204,7 +203,7 @@ const PledgedCollectivePage = ({ collective }) => {
                 values={{ collective: <strong>{collective.name}</strong> }}
               />
             </H5>
-            <P fontSize="Caption" color="black.500" mt={3}>
+            <P fontSize="12px" color="black.500" mt={3}>
               <FormattedMessage
                 id="pledge.contactToClaim"
                 defaultMessage="To claim this Collective, contact <SupportLink></SupportLink>."

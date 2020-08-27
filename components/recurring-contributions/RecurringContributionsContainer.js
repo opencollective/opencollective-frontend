@@ -9,6 +9,7 @@ import Container from '../Container';
 import { Flex, Grid } from '../Grid';
 import { fadeIn } from '../StyledKeyframes';
 import { P } from '../Text';
+import { withUser } from '../UserProvider';
 
 import RecurringContributionsCard from './RecurringContributionsCard';
 
@@ -34,16 +35,23 @@ const filterContributions = (contributions, filterName) => {
   }
 };
 
-const RecurringContributionsContainer = ({ recurringContributions, filter, createNotification, account }) => {
-  const displayedRecurringContributions = filterContributions(recurringContributions.nodes, filter);
+const RecurringContributionsContainer = ({
+  recurringContributions,
+  filter,
+  createNotification,
+  account,
+  LoggedInUser,
+}) => {
+  let displayedRecurringContributions = filterContributions(recurringContributions.nodes, filter);
+  const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
+  displayedRecurringContributions = isAdmin
+    ? displayedRecurringContributions
+    : displayedRecurringContributions.filter(contrib => contrib.status !== ORDER_STATUS.ERROR);
+
   return (
     <Container mt={4}>
       {displayedRecurringContributions.length ? (
-        <Grid
-          gridGap={24}
-          gridTemplateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr', 'repeat(4, 1fr)', 'repeat(5, 1fr)']}
-          my={2}
-        >
+        <Grid gridGap={24} gridTemplateColumns="repeat(auto-fill, minmax(220px, 1fr))" my={2}>
           {displayedRecurringContributions.map(contribution => (
             <CollectiveCardContainer key={contribution.id}>
               <RecurringContributionsCard
@@ -61,7 +69,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, creat
       ) : (
         <Flex flexDirection="column" alignItems="center" py={4}>
           <img src={EmptyCollectivesSectionImageSVG} alt="" />
-          <P color="black.600" fontSize="LeadParagraph" mt={5}>
+          <P color="black.600" fontSize="16px" mt={5}>
             <FormattedMessage
               id="RecurringContributions.none"
               defaultMessage="No recurring contributions to see here! 👀"
@@ -78,6 +86,7 @@ RecurringContributionsContainer.propTypes = {
   filter: PropTypes.string.isRequired,
   createNotification: PropTypes.func,
   account: PropTypes.object.isRequired,
+  LoggedInUser: PropTypes.object,
 };
 
-export default RecurringContributionsContainer;
+export default withUser(RecurringContributionsContainer);

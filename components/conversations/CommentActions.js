@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { X } from '@styled-icons/feather/X';
 import { Edit } from '@styled-icons/material/Edit';
 import { FormattedMessage } from 'react-intl';
@@ -96,8 +96,8 @@ AdminActionButtons.propTypes = {
   canDelete: PropTypes.bool,
 };
 
-const deleteCommentMutation = gqlV2`
-  mutation deleteComment($id: String!) {
+const deleteCommentMutation = gqlV2/* GraphQL */ `
+  mutation DeleteComment($id: String!) {
     deleteComment(id: $id) {
       id
     }
@@ -150,8 +150,8 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
           <Flex justifyContent="space-between" alignItems="center" mb={2}>
             <P
               fontWeight="600"
-              fontSize="H6"
-              lineHeight="H6"
+              fontSize="9px"
+              lineHeight="14px"
               textTransform="uppercase"
               letterSpacing="0.6px"
               whiteSpace="nowrap"

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
@@ -19,15 +19,15 @@ import StyledButton from '../StyledButton';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
-import { CommentFieldsFragment } from './graphql';
+import { commentFieldsFragment } from './graphql';
 
-const createCommentMutation = gqlV2`
+const createCommentMutation = gqlV2/* GraphQL */ `
   mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       ...CommentFields
     }
   }
-  ${CommentFieldsFragment}
+  ${commentFieldsFragment}
 `;
 
 const messages = defineMessages({
@@ -93,7 +93,7 @@ const CommentForm = ({
   const [validationError, setValidationError] = useState();
   const { formatMessage } = intl;
 
-  const submitForm = async () => {
+  const submitForm = async event => {
     event.preventDefault();
     event.stopPropagation();
     if (!html) {

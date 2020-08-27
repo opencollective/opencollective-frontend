@@ -95,7 +95,7 @@ class Comment extends React.Component {
 
   async save() {
     const comment = pick(this.state.comment, ['id', 'html']);
-    await this.props.editComment(comment);
+    await this.props.editComment({ variables: { comment } });
     this.setState({ modified: false, mode: 'details' });
   }
 

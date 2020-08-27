@@ -50,7 +50,8 @@ const TextArea = styled.textarea`
     cursor: not-allowed;
   }
 
-  &:focus, &:hover:not(:disabled) {
+  &:focus,
+  &:hover:not(:disabled) {
     border-color: ${themeGet('colors.primary.300')};
   }
 

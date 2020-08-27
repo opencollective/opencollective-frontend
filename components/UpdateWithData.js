@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 
 import NotFound from './NotFound';
 import StyledUpdate from './StyledUpdate';
@@ -43,7 +43,7 @@ class UpdateWithData extends React.Component {
   }
 }
 
-const getUpdateQuery = gql`
+const updateQuery = gql`
   query Update($collectiveSlug: String, $updateSlug: String) {
     Update(collectiveSlug: $collectiveSlug, updateSlug: $updateSlug) {
       id
@@ -51,7 +51,6 @@ const getUpdateQuery = gql`
       createdAt
       publishedAt
       html
-      markdown
       isPrivate
       makePublicOn
       userCanSeeUpdate
@@ -78,6 +77,6 @@ const getUpdateQuery = gql`
   }
 `;
 
-export const addGetUpdate = graphql(getUpdateQuery);
+export const addUpdateData = graphql(updateQuery);
 
-export default addGetUpdate(UpdateWithData);
+export default addUpdateData(UpdateWithData);

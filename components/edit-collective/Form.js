@@ -189,7 +189,7 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Country',
       },
       'currency.label': {
-        id: 'collective.currency.label',
+        id: 'Currency',
         defaultMessage: 'Currency',
       },
       'currency.placeholder': {
@@ -239,7 +239,6 @@ class EditCollectiveForm extends React.Component {
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
     collective.application = get(collective, 'settings.apply');
-    collective.markdown = get(collective, 'settings.markdown');
 
     const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
     const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
@@ -468,7 +467,7 @@ class EditCollectiveForm extends React.Component {
 
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
-        return <SetupTwoFactorAuth slug={collective.slug} collectiveName={collective.name} />;
+        return <SetupTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
 
       default:
         return null;

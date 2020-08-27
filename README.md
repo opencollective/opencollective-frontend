@@ -40,7 +40,12 @@ By default, it will try to connect to the Open Collective staging API, **you don
 In case you want to connect to the Open Collective API running locally:
 
 - clone, install and start [opencollective-api](https://github.com/opencollective/opencollective-api)
-- in this project, copy [`.env.local`](.env.local) to `.env`.
+- in this project, copy the following content to a `.env` file:
+
+```
+API_URL=http://localhost:3060
+API_KEY=dvl-1510egmf4a23d80342403fb599qd
+```
 
 ### Start
 
@@ -96,5 +101,5 @@ More info: [docs/deployment.md](docs/deployment.md)
 ## Discussion
 
 If you have any questions, ping us on Slack
-(https://slack.opencollective.org) or on Twitter
+(https://slack.opencollective.com) or on Twitter
 ([@opencollect](https://twitter.com/opencollect)).

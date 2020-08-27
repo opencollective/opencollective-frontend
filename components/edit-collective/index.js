@@ -4,6 +4,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import { defaultBackgroundImage } from '../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { Router } from '../../server/pages';
 
 import Body from '../Body';
 import CollectiveNavbar from '../CollectiveNavbar';
@@ -11,6 +12,7 @@ import Footer from '../Footer';
 import Header from '../Header';
 import NotificationBar from '../NotificationBar';
 import SignInOrJoinFree from '../SignInOrJoinFree';
+import { withUser } from '../UserProvider';
 
 import Form from './Form';
 
@@ -18,6 +20,7 @@ class EditCollective extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired, // passed from Page with addCollectiveToEditData
     LoggedInUser: PropTypes.object.isRequired, // passed from Page with withUser
+    refetchLoggedInUser: PropTypes.func.isRequired, // passed from Page with withUser
     editCollective: PropTypes.func.isRequired, // passed from Page with addEditCollectiveMutation
     intl: PropTypes.object.isRequired, // from injectIntl
   };
@@ -58,12 +61,10 @@ class EditCollective extends React.Component {
 
     collective.settings = {
       ...this.props.collective.settings,
-      editor: collective.markdown ? 'markdown' : 'html',
       apply: collective.application,
       tos: collective.tos,
     };
 
-    delete collective.markdown;
     delete collective.tos;
     delete collective.application;
 
@@ -72,9 +73,15 @@ class EditCollective extends React.Component {
     try {
       await this.props.editCollective(collective);
       this.setState({ status: 'saved', result: { error: null } });
-      setTimeout(() => {
-        this.setState({ status: null });
-      }, 3000);
+      const { slug, eventSlug } = Router.router.query;
+      if ((eventSlug || slug) !== collective.slug) {
+        Router.replaceRoute('editCollective', { ...Router.router.query });
+        await this.props.refetchLoggedInUser();
+      } else {
+        setTimeout(() => {
+          this.setState({ status: null });
+        }, 3000);
+      }
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: null, result: { error: errorMsg } });
@@ -129,7 +136,7 @@ class EditCollective extends React.Component {
         <Body>
           {collective.isArchived && (
             <NotificationBar
-              status={notification.status || status}
+              status={notification.status}
               title={notification.title}
               description={notification.description}
             />
@@ -170,4 +177,4 @@ class EditCollective extends React.Component {
   }
 }
 
-export default injectIntl(EditCollective);
+export default injectIntl(withUser(EditCollective));

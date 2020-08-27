@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ArrowLeftCircle } from '@styled-icons/feather/ArrowLeftCircle';
-import { ArrowRightCircle } from '@styled-icons/feather/ArrowRightCircle';
 import { throttle } from 'lodash';
 import { Swipeable } from 'react-swipeable';
 import styled from 'styled-components';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import StyledRoundButton from './StyledRoundButton';
 
 const CarouselContainer = styled(Container)`
   display: flex;
@@ -52,11 +51,11 @@ const CarouselSlot = styled(Container)`
 
 const Indicatior = styled(Box)`
   cursor: pointer;
-  width: 14px;
-  height: 14px;
+  width: 8px;
+  height: 8px;
   border: none;
   box-shadow: inset 0px 2px 2px rgba(20, 20, 20, 0.08);
-  border-radius: 5px;
+  border-radius: 8px;
   background: ${props => (props.active ? '#DC5F7D' : '#E8E9EB')};
 `;
 
@@ -170,26 +169,21 @@ class StyledCarousel extends React.Component {
           </Swipeable>
         </Box>
 
-        <Container
-          width={1}
-          display="flex"
-          alignItems="center"
-          justifyContent={showArrowController ? 'space-between' : 'center'}
-        >
-          <Flex mx={4} my={3} display={props.display}>
+        <Container width={1} display="flex" alignItems="center" justifyContent={'center'}>
+          {showArrowController && (
+            <StyledRoundButton size={40} mx={1} onClick={() => this.handleSwipe()}>
+              ←
+            </StyledRoundButton>
+          )}
+          <Flex mx={3} my={3} display={props.display}>
             {Array.from({ length: children.length }, (_, i) => (
               <Indicatior key={i} active={i === activeIndex} mx={1} onClick={() => this.handleOnClickIndicator(i)} />
             ))}
           </Flex>
           {showArrowController && (
-            <Container display="flex" mr={3}>
-              <Box mx={1} color="black.700" onClick={() => this.handleSwipe()}>
-                <ArrowLeftCircle size="24" />
-              </Box>
-              <Box mx={1} color="black.700" onClick={() => this.handleSwipe(true)}>
-                <ArrowRightCircle size="24" />
-              </Box>
-            </Container>
+            <StyledRoundButton size={40} mx={1} onClick={() => this.handleSwipe(true)}>
+              →
+            </StyledRoundButton>
           )}
         </Container>
       </Container>

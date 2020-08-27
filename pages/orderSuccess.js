@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { confettiFireworks } from '../lib/confettis';
-import { formatCurrency } from '../lib/currency-utils';
-import { facebooKShareURL, tweetURL } from '../lib/url_helpers';
+import { facebookShareURL, tweetURL } from '../lib/url_helpers';
 
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
@@ -55,8 +54,8 @@ ShareLink.defaultProps = {
   target: '_blank',
 };
 
-const GetOrderQuery = gql`
-  query OrderSuccess($OrderId: Int!) {
+const orderSuccessPageQuery = gql`
+  query OrderSuccessPage($OrderId: Int!) {
     Order(id: $OrderId) {
       id
       quantity
@@ -114,7 +113,7 @@ class OrderSuccessPage extends React.Component {
     this.messages = defineMessages({
       tweet: {
         id: 'order.created.tweet',
-        defaultMessage: "I've just donated {amount} to {collective}. Consider donating too, every little helps!",
+        defaultMessage: "I've just donated to {collective}. Consider donating too, every little helps!",
       },
       'tweet.event': {
         id: 'order.created.tweet.event',
@@ -138,11 +137,10 @@ class OrderSuccessPage extends React.Component {
   }
 
   getTwitterMessage() {
-    const { collective, totalAmount, currency } = this.props.data.Order;
+    const { collective } = this.props.data.Order;
     let msgId = 'tweet';
     const values = {
       collective: collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name,
-      amount: formatCurrency(totalAmount, currency, { precision: 0 }),
     };
     if (collective.type === 'EVENT') {
       msgId = 'tweet.event';
@@ -241,7 +239,7 @@ class OrderSuccessPage extends React.Component {
                 <Twitter size="1.2em" color="#38A1F3" />
                 <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
               </ShareLink>
-              <ShareLink href={facebooKShareURL({ u: shareURL })}>
+              <ShareLink href={facebookShareURL({ u: shareURL })}>
                 <Facebook size="1.2em" color="#3c5a99" />
                 <FormattedMessage id="shareIt" defaultMessage="Share it" />
               </ShareLink>
@@ -263,8 +261,8 @@ class OrderSuccessPage extends React.Component {
                     key={tag}
                     route="search"
                     params={{ q: tag }}
-                    fontSize="Paragraph"
-                    lineHeight="Caption"
+                    fontSize="14px"
+                    lineHeight="18px"
                     mr={1}
                     textAlign="center"
                   >
@@ -284,4 +282,6 @@ class OrderSuccessPage extends React.Component {
   }
 }
 
-export default withUser(graphql(GetOrderQuery)(injectIntl(OrderSuccessPage)));
+const addOrderSuccessPageData = graphql(orderSuccessPageQuery);
+
+export default withUser(injectIntl(addOrderSuccessPageData(OrderSuccessPage)));

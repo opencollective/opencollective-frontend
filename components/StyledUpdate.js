@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
@@ -19,8 +19,8 @@ import { Box, Flex } from './Grid';
 import Link from './Link';
 import MessageBox from './MessageBox';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
-import Role from './Role';
 import StyledHr from './StyledHr';
+import StyledTag from './StyledTag';
 import { H3 } from './Text';
 import UpdateTextWithData from './UpdateTextWithData';
 
@@ -112,7 +112,7 @@ class StyledUpdate extends Component {
     }
 
     try {
-      await this.props.deleteUpdate(this.props.update.id);
+      await this.props.deleteUpdate({ variables: { id: this.props.update.id } });
       Router.pushRoute('collective', { slug: this.props.collective.slug });
     } catch (err) {
       // TODO: this should be reported to the user
@@ -122,7 +122,7 @@ class StyledUpdate extends Component {
 
   save = async update => {
     update.id = get(this.props, 'update.id');
-    await this.props.editUpdate(update);
+    await this.props.editUpdate({ variables: { update } });
     this.setState({ modified: false, mode: 'details' });
   };
 
@@ -176,7 +176,9 @@ class StyledUpdate extends Component {
             />
           </Box>
         )}
-        <Role role="ADMIN" />
+        <StyledTag fontSize="10px" py={1}>
+          <FormattedMessage id="Member.Role.ADMIN" defaultMessage="Admin" />
+        </StyledTag>
         {editable && (
           <React.Fragment>
             <Box mr={2} fontSize="12px">
@@ -318,13 +320,12 @@ class StyledUpdate extends Component {
   }
 }
 
-const editUpdateQuery = gql`
-  mutation editUpdate($update: UpdateAttributesInputType!) {
+const editUpdateMutation = gql`
+  mutation EditUpdate($update: UpdateAttributesInputType!) {
     editUpdate(update: $update) {
       id
       updatedAt
       title
-      markdown
       html
       isPrivate
       makePublicOn
@@ -332,30 +333,22 @@ const editUpdateQuery = gql`
   }
 `;
 
-const deleteUpdateQuery = gql`
-  mutation deleteUpdate($id: Int!) {
+const deleteUpdateMutation = gql`
+  mutation DeleteUpdate($id: Int!) {
     deleteUpdate(id: $id) {
       id
     }
   }
 `;
 
-const editUpdateMutation = graphql(editUpdateQuery, {
-  props: ({ mutate }) => ({
-    editUpdate: async update => {
-      return await mutate({ variables: { update } });
-    },
-  }),
+const addEditUpdateMutation = graphql(editUpdateMutation, {
+  name: 'editUpdate',
 });
 
-const deleteUpdateMutation = graphql(deleteUpdateQuery, {
-  props: ({ mutate }) => ({
-    deleteUpdate: async updateID => {
-      return await mutate({ variables: { id: updateID } });
-    },
-  }),
+const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
+  name: 'deleteUpdate',
 });
 
-const addUpdateMutations = compose(editUpdateMutation, deleteUpdateMutation);
+const addGraphql = compose(addEditUpdateMutation, addDeleteUpdateMutation);
 
-export default injectIntl(addUpdateMutations(StyledUpdate));
+export default injectIntl(addGraphql(StyledUpdate));

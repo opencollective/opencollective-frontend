@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -20,7 +20,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
     toCollective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     data: PropTypes.object,
-    createOrder: PropTypes.func,
+    sendMoneyToCollective: PropTypes.func,
     confirmTransfer: PropTypes.func,
     isTransferApproved: PropTypes.bool,
   };
@@ -58,7 +58,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
       paymentMethod: { uuid: paymentMethods[0].uuid },
     };
     try {
-      await this.props.createOrder(order);
+      await this.props.sendMoneyToCollective({ variables: { order } });
       this.setState({ loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, '');
@@ -98,8 +98,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
   }
 }
 
-const addPaymentMethodsQuery = gql`
-  query Collective($slug: String) {
+const paymentMethodsQuery = gql`
+  query SendMoneyToCollectivePaymentMethods($slug: String) {
     Collective(slug: $slug) {
       id
       paymentMethods(service: "opencollective") {
@@ -112,7 +112,7 @@ const addPaymentMethodsQuery = gql`
   }
 `;
 
-const addPaymentMethods = graphql(addPaymentMethodsQuery, {
+const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   options: props => ({
     variables: {
       slug: get(props, 'fromCollective.slug'),
@@ -123,8 +123,8 @@ const addPaymentMethods = graphql(addPaymentMethodsQuery, {
   },
 });
 
-const createOrderQuery = gql`
-  mutation createOrder($order: OrderInputType!) {
+const sendMoneyToCollectiveMutation = gql`
+  mutation SendMoneyToCollective($order: OrderInputType!) {
     createOrder(order: $order) {
       id
       fromCollective {
@@ -145,14 +145,10 @@ const createOrderQuery = gql`
   }
 `;
 
-const addMutation = graphql(createOrderQuery, {
-  props: ({ mutate }) => ({
-    createOrder: async order => {
-      return await mutate({ variables: { order } });
-    },
-  }),
+const addSendMoneyToCollectiveMutation = graphql(sendMoneyToCollectiveMutation, {
+  name: 'sendMoneyToCollective',
 });
 
-const addData = compose(addMutation, addPaymentMethods);
+const addGraphql = compose(addPaymentMethodsData, addSendMoneyToCollectiveMutation);
 
-export default addData(SendMoneyToCollectiveBtn);
+export default addGraphql(SendMoneyToCollectiveBtn);

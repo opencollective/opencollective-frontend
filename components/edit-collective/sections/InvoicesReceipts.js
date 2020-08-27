@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -13,7 +13,7 @@ import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledTextarea from '../../StyledTextarea';
 import { H3, H4, P } from '../../Text';
-import { updateSettingsMutation } from '../mutations';
+import { editCollectiveSettingsMutation } from '../mutations';
 
 import imgInvoiceTitlePreview from '../../../public/static/images/invoice-title-preview.jpg';
 
@@ -30,7 +30,7 @@ const InvoicesReceipts = ({ collective }) => {
 
   // For invoice Title
   const defaultValue = get(collective.settings, 'invoiceTitle');
-  const [setSettings, { loading, error, data }] = useMutation(updateSettingsMutation);
+  const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation);
   const [value, setValue] = React.useState(defaultValue);
   const isTouched = value !== defaultValue;
   const isSaved = get(data, 'editCollective.settings.invoiceTitle') === value;
@@ -58,7 +58,7 @@ const InvoicesReceipts = ({ collective }) => {
         &nbsp;<i>Payment Receipt</i>.
       </P>
       {error && (
-        <MessageBox type="error" fontSize="Paragraph" withIcon mb={3}>
+        <MessageBox type="error" fontSize="14px" withIcon mb={3}>
           {getErrorFromGraphqlException(setValue).message}
         </MessageBox>
       )}
@@ -80,7 +80,7 @@ const InvoicesReceipts = ({ collective }) => {
             width="100%"
             height="150px"
             maxWidth={350}
-            fontSize="LeadCaption"
+            fontSize="13px"
             my={2}
           />
 

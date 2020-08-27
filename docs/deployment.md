@@ -20,7 +20,7 @@ about to deploy. It is not required, but you can activate it like this:
 3. Add this token to your `.env` file:
 
 ```bash
-OC_SLACK_USER_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+OC_SLACK_DEPLOY_WEBHOOK=https://hooks.slack.com/services/....
 ```
 
 ## Staging (heroku)

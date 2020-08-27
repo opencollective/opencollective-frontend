@@ -9,7 +9,9 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
+import Container from '../Container';
 import ExpenseFilesPreviewModal from '../expenses/ExpenseFilesPreviewModal';
+import ExpenseModal from '../expenses/ExpenseModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
@@ -66,6 +68,38 @@ const getNbAttachedFiles = expense => {
   }
 };
 
+/**
+ * A link that either link to the page or opens the modal
+ */
+const ExpenseTitleLink = ({ expense, collective, usePreviewModal, onDelete, children }) => {
+  const [showModal, setShowModal] = React.useState(false);
+  const account = expense.account || collective;
+
+  if (!usePreviewModal) {
+    return (
+      <LinkExpense collective={account} expense={expense} data-cy="expense-link">
+        {children}
+      </LinkExpense>
+    );
+  } else {
+    return (
+      <React.Fragment>
+        <ExpenseModal
+          collective={account}
+          expense={expense}
+          show={showModal}
+          onClose={() => setShowModal(false)}
+          permissions={expense.permissions}
+          onDelete={onDelete}
+        />
+        <Container cursor="pointer" onClick={() => setShowModal(true)}>
+          {children}
+        </Container>
+      </React.Fragment>
+    );
+  }
+};
+
 const ExpenseBudgetItem = ({
   isLoading,
   host,
@@ -74,7 +108,9 @@ const ExpenseBudgetItem = ({
   collective,
   expense,
   showProcessActions,
+  usePreviewModal,
   view,
+  onDelete,
 }) => {
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
   const featuredProfile = isInverted ? collective : expense?.payee;
@@ -98,7 +134,12 @@ const ExpenseBudgetItem = ({
             <LoadingPlaceholder height={60} />
           ) : (
             <Box>
-              <LinkExpense collective={expense.account || collective} expense={expense} data-cy="expense-link">
+              <ExpenseTitleLink
+                collective={expense.account || collective}
+                expense={expense}
+                usePreviewModal={usePreviewModal}
+                onDelete={onDelete}
+              >
                 <AutosizeText
                   value={expense.description}
                   maxLength={255}
@@ -119,7 +160,7 @@ const ExpenseBudgetItem = ({
                     </H3>
                   )}
                 </AutosizeText>
-              </LinkExpense>
+              </ExpenseTitleLink>
               <P mt="5px" fontSize="12px" color="black.600">
                 {isAdminView ? (
                   <LinkCollective collective={collective} />
@@ -267,13 +308,15 @@ ExpenseBudgetItem.propTypes = {
   isLoading: PropTypes.bool,
   /** Set this to true to invert who's displayed (payee or collective) */
   isInverted: PropTypes.bool,
+  usePreviewModal: PropTypes.bool,
   showAmountSign: PropTypes.bool,
+  onDelete: PropTypes.func,
   showProcessActions: PropTypes.bool,
   view: PropTypes.oneOf(['public', 'admin']),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     balance: PropTypes.number,
-    currency: PropTypes.number,
+    currency: PropTypes.string,
     parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),

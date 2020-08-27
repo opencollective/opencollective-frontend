@@ -112,8 +112,8 @@ class CreateProjectForm extends React.Component {
         <Flex flexDirection="column" my={[2, 4]}>
           <Box mb={[2, 3]}>
             <H1
-              fontSize={['H5', 'H3']}
-              lineHeight={['H5', 'H3']}
+              fontSize={['20px', '32px']}
+              lineHeight={['24px', '36px']}
               fontWeight="bold"
               textAlign="center"
               color="black.900"
@@ -215,7 +215,7 @@ class CreateProjectForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
-                    <P fontSize="SmallCaption">{intl.formatMessage(messages.descriptionHint)}</P>
+                    <P fontSize="11px">{intl.formatMessage(messages.descriptionHint)}</P>
 
                     <Flex justifyContent={['center', 'left']} mt={5} mb={4}>
                       <StyledButton
@@ -228,7 +228,7 @@ class CreateProjectForm extends React.Component {
                         onSubmit={handleSubmit}
                         data-cy="ccf-form-submit"
                       >
-                        <FormattedMessage id="createProject.button" defaultMessage="Create Project" />
+                        <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
                       </StyledButton>
                     </Flex>
                   </Form>

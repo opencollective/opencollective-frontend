@@ -58,7 +58,7 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
         as={StyledLink}
         href="https://docs.opencollective.com/help/expenses-and-getting-paid/submitting-expenses"
         openInNewTab
-        fontSize="Caption"
+        fontSize="12px"
         color="black.700"
       >
         <FormattedMessage id="moreInfo" defaultMessage="More info" />

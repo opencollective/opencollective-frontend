@@ -1,15 +1,9 @@
-import gql from 'graphql-tag';
-
-import {
-  BudgetItemExpenseFragment,
-  BudgetItemExpenseTypeFragment,
-  BudgetItemOrderFragment,
-} from '../../budget/BudgetItemsList';
+import { gql } from '@apollo/client';
 
 import * as fragments from './fragments';
 
-export const getCollectivePageQuery = gql`
-  query getCollectivePageQuery($slug: String!, $nbContributorsPerContributeCard: Int) {
+export const collectivePageQuery = gql`
+  query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
       id
       slug
@@ -83,10 +77,10 @@ export const getCollectivePageQuery = gql`
         settings
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
-        ...ContributorsFieldsFragment
+        ...ContributorsFields
       }
       financialContributors: contributors(roles: [BACKER], limit: 150) {
-        ...ContributorsFieldsFragment
+        ...ContributorsFields
       }
       tiers {
         id
@@ -203,15 +197,8 @@ export const getCollectivePageQuery = gql`
           }
         }
       }
-      transactions(limit: 3, includeExpenseTransactions: false) {
-        ...BudgetItemOrderFragment
-        ...BudgetItemExpenseFragment
-      }
-      expenses(limit: 3) {
-        ...BudgetItemExpenseTypeFragment
-      }
       updates(limit: 3, onlyPublishedUpdates: true) {
-        ...UpdatesFieldsFragment
+        ...UpdatesFields
       }
       plan {
         hostDashboard
@@ -259,9 +246,6 @@ export const getCollectivePageQuery = gql`
     }
   }
 
-  ${BudgetItemExpenseFragment}
-  ${BudgetItemOrderFragment}
-  ${BudgetItemExpenseTypeFragment}
-  ${fragments.UpdatesFieldsFragment}
-  ${fragments.ContributorsFieldsFragment}
+  ${fragments.updatesFieldsFragment}
+  ${fragments.contributorsFieldsFragment}
 `;

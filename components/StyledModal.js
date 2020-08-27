@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
+import themeGet from '@styled-system/theme-get';
 import { createPortal } from 'react-dom';
 import styled, { createGlobalStyle } from 'styled-components';
-import { background, space } from 'styled-system';
+import { background, margin, overflow, space } from 'styled-system';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -11,24 +12,37 @@ import { Flex } from './Grid';
 import { fadeIn } from './StyledKeyframes';
 import { P } from './Text';
 
-const ModalWrapper = styled(Container).attrs(props => ({
+const Wrapper = styled(Flex)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 3000;
+
+  justify-content: center;
+  align-items: center;
+`;
+
+const Modal = styled(Container).attrs(props => ({
   maxWidth: props.maxWidth || '95%',
   maxHeight: props.maxHeight || '100%',
 }))`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 3000;
   border: 1px solid rgba(9, 10, 10, 0.12);
   border-radius: 8px;
   overflow-y: auto;
+  z-index: 3000;
 
   ${space};
   ${background};
+  ${overflow}
+
+  @media (max-width: ${themeGet('breakpoints.0')}) {
+    max-height: 90vh;
+  }
 `;
 
-ModalWrapper.defaultProps = {
+Modal.defaultProps = {
   background: 'white',
   padding: '20px',
 };
@@ -78,7 +92,7 @@ ModalBody.propTypes = {
 };
 
 const Divider = styled.div`
-  margin: 2rem 0;
+  ${margin}
   width: 100%;
   height: 1px;
   background-color: #e1e4e6;
@@ -130,15 +144,21 @@ CollectiveModalHeader.propTypes = {
 
 CollectiveModalHeader.displayName = 'Header';
 
-export const ModalFooter = ({ children, ...props }) => (
+export const ModalFooter = ({ children, dividerMargin, ...props }) => (
   <Container {...props}>
-    <Divider />
+    <Divider margin={dividerMargin} />
     {children}
   </Container>
 );
 
 ModalFooter.propTypes = {
   children: PropTypes.node,
+  isFullWidth: PropTypes.bool,
+  dividerMargin: PropTypes.string,
+};
+
+ModalFooter.defaultProps = {
+  dividerMargin: '2rem 0',
 };
 
 /**
@@ -150,14 +170,16 @@ const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
     return (
       <React.Fragment>
         <GlobalModalStyle />
-        <ModalWrapper {...props}>
-          {React.Children.map(children, child => {
-            if (child.type.displayName === 'Header') {
-              return React.cloneElement(child, { onClose });
-            }
-            return child;
-          })}
-        </ModalWrapper>
+        <Wrapper>
+          <Modal {...props}>
+            {React.Children.map(children, child => {
+              if (child.type.displayName === 'Header') {
+                return React.cloneElement(child, { onClose });
+              }
+              return child;
+            })}
+          </Modal>
+        </Wrapper>
       </React.Fragment>
     );
   }
@@ -165,15 +187,17 @@ const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
     return createPortal(
       <React.Fragment>
         <GlobalModalStyle />
-        <ModalWrapper {...props}>
-          {React.Children.map(children, child => {
-            if (child.type?.displayName === 'Header') {
-              return React.cloneElement(child, { onClose });
-            }
-            return child;
-          })}
-        </ModalWrapper>
-        <ModalOverlay onClick={onClose} />
+        <Wrapper>
+          <Modal {...props}>
+            {React.Children.map(children, child => {
+              if (child.type?.displayName === 'Header') {
+                return React.cloneElement(child, { onClose });
+              }
+              return child;
+            })}
+          </Modal>
+          <ModalOverlay onClick={onClose} />
+        </Wrapper>
       </React.Fragment>,
       document.body,
     );

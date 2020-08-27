@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql, withApollo } from '@apollo/react-hoc';
+import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -18,7 +18,7 @@ import Comment from '../components/conversations/Comment';
 import CommentForm from '../components/conversations/CommentForm';
 import FollowConversationButton from '../components/conversations/FollowConversationButton';
 import FollowersAvatars from '../components/conversations/FollowersAvatars';
-import { CommentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
+import { commentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
@@ -36,8 +36,8 @@ import StyledTag from '../components/StyledTag';
 import { H2, H4 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-const conversationPageQuery = gqlV2`
-  query Conversation($collectiveSlug: String!, $id: String!) {
+const conversationPageQuery = gqlV2/* GraphQL */ `
+  query ConversationPage($collectiveSlug: String!, $id: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       slug
@@ -82,10 +82,10 @@ const conversationPageQuery = gqlV2`
       }
     }
   }
-  ${CommentFieldsFragment}
+  ${commentFieldsFragment}
 `;
 
-const editConversationMutation = gqlV2`
+const editConversationMutation = gqlV2/* GraphQL */ `
   mutation EditConversation($id: String!, $title: String!, $tags: [String]) {
     editConversation(id: $id, title: $title, tags: $tags) {
       id
@@ -292,7 +292,7 @@ class ConversationPage extends React.Component {
                     <Flex flexDirection={['column', null, null, 'row']} justifyContent="space-between">
                       <Box flex="1 1 50%" maxWidth={700} mb={5}>
                         <Container borderBottom="1px solid" borderColor="black.300" pb={3}>
-                          <H2 fontSize="H4" lineHeight="H4" mb={4} wordBreak="break-word">
+                          <H2 fontSize="24px" lineHeight="32px" mb={4} wordBreak="break-word">
                             <InlineEditField
                               mutation={editConversationMutation}
                               mutationOptions={{ context: API_V2_CONTEXT }}

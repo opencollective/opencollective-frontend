@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -171,7 +171,7 @@ class Expense extends React.Component {
 
   handleUnapproveExpense = async id => {
     try {
-      await this.props.unapproveExpense(id);
+      await this.props.unapproveExpense({ variables: { id } });
       this.setState({ showUnapproveModal: false });
       await this.props.refetch();
     } catch (err) {
@@ -181,7 +181,7 @@ class Expense extends React.Component {
 
   handleDeleteExpense = async id => {
     try {
-      await this.props.deleteExpense(id);
+      await this.props.deleteExpense({ variables: { id } });
       this.setState({ showDeleteExpenseModal: false, error: null });
       await this.props.refetch();
     } catch (err) {
@@ -196,7 +196,7 @@ class Expense extends React.Component {
         id: this.props.expense.id,
         ...this.state.expense,
       };
-      await this.props.editExpense(expense);
+      await this.props.editExpense({ variables: { expense } });
       this.setState({ modified: false, mode: 'details', isSubmitting: false });
     } catch (e) {
       this.setState({ isSubmitting: false });
@@ -612,78 +612,63 @@ class Expense extends React.Component {
   }
 }
 
-const deleteExpense = graphql(
-  gql`
-    mutation deleteExpense($id: Int!) {
-      deleteExpense(id: $id) {
-        id
-        status
-      }
+const deleteExpenseMutation = gql`
+  mutation DeleteExpense($id: Int!) {
+    deleteExpense(id: $id) {
+      id
+      status
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      deleteExpense: async id => {
-        return await mutate({ variables: { id } });
-      },
-    }),
-  },
-);
+  }
+`;
 
-const unapproveExpense = graphql(
-  gql`
-    mutation unapproveExpense($id: Int!) {
-      unapproveExpense(id: $id) {
-        id
-        status
-      }
+const addDeleteExpenseMutation = graphql(deleteExpenseMutation, {
+  name: 'deleteExpense',
+});
+
+const unapproveExpenseMutation = gql`
+  mutation UnapproveExpense($id: Int!) {
+    unapproveExpense(id: $id) {
+      id
+      status
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      unapproveExpense: async id => {
-        return await mutate({ variables: { id } });
-      },
-    }),
-  },
-);
+  }
+`;
 
-const editExpense = graphql(
-  gql`
-    mutation editExpense($expense: ExpenseInputType!) {
-      editExpense(expense: $expense) {
+const addUnapproveExpenseMutation = graphql(unapproveExpenseMutation, {
+  name: 'unapproveExpense',
+});
+
+const editExpenseMutation = gql`
+  mutation EditExpense($expense: ExpenseInputType!) {
+    editExpense(expense: $expense) {
+      id
+      idV2
+      description
+      amount
+      attachment
+      items {
         id
-        idV2
+        url
         description
         amount
-        attachment
-        items {
-          id
-          url
-          description
-          amount
-        }
-        attachedFiles {
-          id
-          url
-        }
-        category
-        type
-        privateMessage
-        payoutMethod
-        status
       }
+      attachedFiles {
+        id
+        url
+      }
+      category
+      type
+      privateMessage
+      payoutMethod
+      status
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      editExpense: async expense => {
-        return await mutate({ variables: { expense } });
-      },
-    }),
-  },
-);
+  }
+`;
 
-const addMutations = compose(unapproveExpense, editExpense, deleteExpense);
+const addEditExpenseMutation = graphql(editExpenseMutation, {
+  name: 'editExpense',
+});
 
-export default injectIntl(addMutations(Expense));
+const addGraphql = compose(addUnapproveExpenseMutation, addEditExpenseMutation, addDeleteExpenseMutation);
+
+export default injectIntl(addGraphql(Expense));

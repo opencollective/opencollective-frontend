@@ -1,6 +1,6 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
-export const getTierPageQuery = gql`
+export const tierPageQuery = gql`
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id
@@ -13,6 +13,7 @@ export const getTierPageQuery = gql`
       currency
       interval
       endsAt
+      button
 
       stats {
         id

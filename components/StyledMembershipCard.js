@@ -21,23 +21,23 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
       <Container p={3}>
         <Box data-cy="caption" mb={2}>
           {role && (
-            <P fontSize="Caption" lineHeight="Caption" mb={3} data-cy="contribution-date-since">
+            <P fontSize="12px" lineHeight="18px" mb={3} data-cy="contribution-date-since">
               <FormattedMessage
                 id="Membership.ContributorSince"
                 defaultMessage="{contributorType} since"
                 values={{ contributorType: formatMemberRole(intl, role) }}
               />{' '}
-              <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
+              <Span display="block" fontSize="16px" fontWeight="bold">
                 <FormattedDate value={since} month="long" year="numeric" />
               </Span>
             </P>
           )}
           {role === roles.BACKER ? (
             <P mt={3} data-cy="amount-contributed">
-              <Span fontSize="Caption" lineHeight="Caption">
+              <Span fontSize="12px" lineHeight="18px">
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />{' '}
               </Span>
-              <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
+              <Span display="block" fontSize="16px" fontWeight="bold">
                 {
                   /** Ideally we should breakdown amounts donated per currency, but for now
                       the API only returns the total amount in collective's currency. */
@@ -46,7 +46,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               </Span>
             </P>
           ) : (
-            <P mt={3} fontSize="Caption" lineHeight="Caption">
+            <P mt={3} fontSize="12px" lineHeight="18px">
               {collective.stats.backers.all > 0 && (
                 <FormattedMessage
                   id="StyledMembershipCard.backers.all"
@@ -54,7 +54,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                   values={{
                     count: collective.stats.backers.all,
                     prettyCount: (
-                      <Span fontWeight="bold" fontSize="LeadParagraph">
+                      <Span fontWeight="bold" fontSize="16px">
                         {collective.stats.backers.all}
                       </Span>
                     ),

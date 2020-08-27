@@ -39,7 +39,12 @@ If it's not already setup, look at the "Install" instructions in the [README](RE
 
 Make sure the Frontend is talking to the local API:
 
-- copy [`.env.local`](.env.local) to `.env`.
+In your `.env`, paste the following content:
+
+```
+API_URL=http://localhost:3060
+API_KEY=dvl-1510egmf4a23d80342403fb599qd
+```
 
 We recommend to run a build of the Frontend. It will be faster and more reliable.
 

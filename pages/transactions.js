@@ -1,22 +1,69 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { graphql } from '@apollo/client/react/hoc';
+import { get, mapValues } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import roles from '../lib/constants/roles';
+import { getErrorFromGraphqlException } from '../lib/errors';
+import { GraphQLContext } from '../lib/graphql/context';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
+import { Router } from '../server/pages';
 
 import Body from '../components/Body';
 import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import TransactionsWithData from '../components/expenses/TransactionsWithData';
+import { parseAmountRange } from '../components/expenses/filters/ExpensesAmountFilter';
+import { getDateRangeFromPeriod } from '../components/expenses/filters/ExpensesDateFilter';
 import Footer from '../components/Footer';
+import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
+import Pagination from '../components/Pagination';
+import SearchBar from '../components/SearchBar';
+import StyledHr from '../components/StyledHr';
+import { H1 } from '../components/Text';
+import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
+import TransactionsDownloadCSV from '../components/transactions/TransactionsDownloadCSV';
+import TransactionsDownloadInvoices from '../components/transactions/TransactionsDownloadInvoices';
+import TransactionsFilters from '../components/transactions/TransactionsFilters';
+import TransactionsList from '../components/transactions/TransactionsList';
 import { withUser } from '../components/UserProvider';
+
+const transactionsPageQuery = gqlV2/* GraphQL */ `
+  query TransactionsPage(
+    $slug: String!
+    $limit: Int!
+    $offset: Int!
+    $type: TransactionType
+    $minAmount: Int
+    $maxAmount: Int
+    $dateFrom: ISODateTime
+    $searchTerm: String
+  ) {
+    transactions(
+      account: { slug: $slug }
+      limit: $limit
+      offset: $offset
+      type: $type
+      minAmount: $minAmount
+      maxAmount: $maxAmount
+      dateFrom: $dateFrom
+      searchTerm: $searchTerm
+    ) {
+      ...TransactionsQueryCollectionFragment
+    }
+  }
+  ${transactionsQueryCollectionFragment}
+`;
 
 const TransactionPageWrapper = styled.div`
   display: flex;
@@ -27,15 +74,36 @@ const TransactionPageWrapper = styled.div`
   }
 `;
 
+const EXPENSES_PER_PAGE = 15;
+
+const getVariablesFromQuery = query => {
+  const amountRange = parseAmountRange(query.amount);
+  const [dateFrom] = getDateRangeFromPeriod(query.period);
+  return {
+    offset: parseInt(query.offset) || 0,
+    limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
+    type: query.type,
+    status: query.status,
+    tags: query.tag ? [query.tag] : undefined,
+    minAmount: amountRange[0] && amountRange[0] * 100,
+    maxAmount: amountRange[1] && amountRange[1] * 100,
+    payoutMethodType: query.payout,
+    dateFrom,
+    searchTerm: query.searchTerm,
+  };
+};
+
 class TransactionsPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug } }) {
-    return { slug: collectiveSlug };
+  static async getInitialProps({ query: { collectiveSlug, ...query } }) {
+    return { slug: collectiveSlug, query };
   }
 
   static propTypes = {
     slug: PropTypes.string, // from getInitialProps, for addCollectiveCoverData
     data: PropTypes.object.isRequired, // from withData
+    transactionsData: PropTypes.object,
     LoggedInUser: PropTypes.object,
+    query: PropTypes.object,
   };
 
   constructor(props) {
@@ -58,54 +126,178 @@ class TransactionsPage extends React.Component {
     if (currentCollective && get(oldProps, 'data.Collective') !== currentCollective) {
       this.setState({ Collective: currentCollective });
     }
+
+    // Refetch to get permissions with the currently logged in user
+    if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
+      this.props.transactionsData?.refetch();
+    }
+  }
+
+  canDownloadInvoices() {
+    const { LoggedInUser } = this.props;
+    const collective = get(this.props, 'data.Collective') || this.state.Collective;
+    if (!collective || !LoggedInUser) {
+      return false;
+    } else if (collective.type !== 'ORGANIZATION' && collective.type !== 'USER') {
+      return false;
+    } else {
+      return (
+        LoggedInUser.isHostAdmin(collective) ||
+        LoggedInUser.canEditCollective(collective) ||
+        LoggedInUser.hasRole(roles.ACCOUNTANT, collective) ||
+        LoggedInUser.hasRole(roles.ACCOUNTANT, collective.host)
+      );
+    }
   }
 
   render() {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser, query, transactionsData, data, slug } = this.props;
     const collective = get(this.props, 'data.Collective') || this.state.Collective;
+    const { transactions, error, loading, variables } = transactionsData;
+    const hasFilters = Object.entries(query).some(([key, value]) => {
+      return !['view', 'offset', 'limit', 'slug'].includes(key) && value;
+    });
+    const canDownloadInvoices = this.canDownloadInvoices();
 
-    if (!collective && this.props.data.loading) {
+    if (!collective && data.loading) {
       return (
         <Page title="Transactions">
           <Loading />
         </Page>
       );
     } else if (!collective) {
-      return <ErrorPage data={this.props.data} />;
+      return <ErrorPage data={data} />;
     }
 
     return (
-      <TransactionPageWrapper className="TransactionsPage">
+      <TransactionPageWrapper>
         <Header collective={collective} LoggedInUser={LoggedInUser} />
-
-        <Body>
-          <Container mb={4}>
-            <CollectiveNavbar
-              collective={collective}
-              isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
-              showEdit
-              selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
-              callsToAction={{
-                hasSubmitExpense: [CollectiveType.COLLECTIVE, CollectiveType.EVENT].includes(collective.type),
-              }}
-            />
-          </Container>
-
-          <div className="content">
-            <TransactionsWithData
-              collective={collective}
-              LoggedInUser={LoggedInUser}
-              showCSVlink={true}
-              filters={true}
-              dateDisplayType="date"
-            />
-          </div>
-        </Body>
-
+        <GraphQLContext.Provider value={transactionsData}>
+          <Body>
+            <Container mb={4}>
+              <CollectiveNavbar
+                collective={collective}
+                isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+                showEdit
+                selectedSection={
+                  collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS
+                }
+                callsToAction={{
+                  hasSubmitExpense: [CollectiveType.COLLECTIVE, CollectiveType.EVENT].includes(collective.type),
+                }}
+              />
+            </Container>
+            <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
+              <Flex justifyContent="space-between">
+                <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
+                  <FormattedMessage id="section.transactions.title" defaultMessage="Transactions" />
+                </H1>
+                <Box p={2} flexGrow={[1, 0]}>
+                  <SearchBar
+                    defaultValue={query.searchTerm}
+                    onSubmit={searchTerm =>
+                      Router.pushRoute('transactions', { ...query, searchTerm, offset: null, collectiveSlug: slug })
+                    }
+                  />
+                </Box>
+              </Flex>
+              <StyledHr my="24px" mx="8px" borderWidth="0.5px" />
+              <Flex
+                mb={['8px', '46px']}
+                mx="8px"
+                justifyContent="space-between"
+                flexDirection={['column', 'row']}
+                alignItems={['stretch', 'flex-end']}
+              >
+                <TransactionsFilters
+                  filters={query}
+                  collective={collective}
+                  onChange={queryParams =>
+                    Router.pushRoute('transactions', {
+                      ...query,
+                      ...queryParams,
+                      collectiveSlug: slug,
+                      offset: null,
+                    })
+                  }
+                />
+                <Flex>
+                  {canDownloadInvoices && (
+                    <Box mr="8px">
+                      <TransactionsDownloadInvoices collective={collective} />
+                    </Box>
+                  )}
+                  <TransactionsDownloadCSV collective={collective} />
+                </Flex>
+              </Flex>
+              {error ? (
+                <MessageBox type="error" withIcon>
+                  {getErrorFromGraphqlException(error).message}
+                </MessageBox>
+              ) : !loading && !transactions?.nodes?.length ? (
+                <MessageBox type="info" withIcon data-cy="zero-transactions-message">
+                  {hasFilters ? (
+                    <FormattedMessage
+                      id="TransactionsList.Empty"
+                      defaultMessage="No transaction matches the given filters, <ResetLink>reset them</ResetLink> to see all transactions."
+                      values={{
+                        ResetLink(text) {
+                          return (
+                            <Link
+                              data-cy="reset-transactions-filters"
+                              route="transactions"
+                              params={{
+                                ...mapValues(query, () => null),
+                                collectiveSlug: collective.slug,
+                                view: 'transactions',
+                              }}
+                            >
+                              {text}
+                            </Link>
+                          );
+                        },
+                      }}
+                    />
+                  ) : (
+                    <FormattedMessage id="transactions.empty" defaultMessage="No transactions" />
+                  )}
+                </MessageBox>
+              ) : (
+                <React.Fragment>
+                  <TransactionsList
+                    isLoading={loading}
+                    nbPlaceholders={variables.limit}
+                    transactions={transactions?.nodes}
+                    displayActions
+                  />
+                  <Flex mt={5} justifyContent="center">
+                    <Pagination
+                      route="transactions"
+                      total={transactions?.totalCount}
+                      limit={variables.limit}
+                      offset={variables.offset}
+                      scrollToTopOnChange
+                    />
+                  </Flex>
+                </React.Fragment>
+              )}
+            </Box>
+          </Body>
+        </GraphQLContext.Provider>
         <Footer />
       </TransactionPageWrapper>
     );
   }
 }
 
-export default withUser(addCollectiveCoverData(TransactionsPage));
+const addTransactionsData = graphql(transactionsPageQuery, {
+  name: 'transactionsData',
+  options: props => {
+    return {
+      variables: { slug: props.slug, ...getVariablesFromQuery(props.query) },
+      context: API_V2_CONTEXT,
+    };
+  },
+});
+
+export default withUser(addTransactionsData(addCollectiveCoverData(TransactionsPage)));

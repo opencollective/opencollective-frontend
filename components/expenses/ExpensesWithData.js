@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 
 import Error from '../Error';
@@ -64,7 +64,7 @@ class ExpensesWithData extends React.Component {
   }
 }
 
-const getExpensesQuery = gql`
+const expensesQuery = gql`
   query Expenses(
     $CollectiveId: Int!
     $status: String
@@ -169,7 +169,7 @@ const getExpensesVariables = props => {
   return vars;
 };
 
-export const addExpensesData = graphql(getExpensesQuery, {
+export const addExpensesData = graphql(expensesQuery, {
   options: props => ({
     variables: getExpensesVariables(props),
     fetchPolicy: 'network-only',

@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
-import gql from 'graphql-tag';
 import { assign, cloneDeep, get, pick } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -41,7 +40,7 @@ const CreateNewMessages = defineMessages({
 
 const msg = defineMessages({
   emailTitle: {
-    id: 'EditUserEmailForm.title',
+    id: 'User.EmailAddress',
     defaultMessage: 'Email address',
   },
   adminEmail: {
@@ -106,7 +105,7 @@ const prepareMutationVariables = collective => {
   }
 };
 
-const CreateCollectiveMutation = gql`
+const createCollectiveMutation = gql`
   mutation CreateCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
@@ -127,7 +126,7 @@ const CreateCollectiveMutation = gql`
   }
 `;
 
-const CreateUserMutation = gql`
+const createUserMutation = gql`
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
       user {
@@ -165,7 +164,7 @@ const CreateCollectiveMiniForm = ({
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
   const noAdminFields = isOrganization && excludeAdminFields;
-  const mutation = isUser ? CreateUserMutation : CreateCollectiveMutation;
+  const mutation = isUser ? createUserMutation : createCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
   const { formatMessage } = useIntl();
 

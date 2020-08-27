@@ -35,7 +35,7 @@ class StripeProvider extends React.Component {
    * Loads stripe asynchronously, then update the Stripe context
    */
   loadStripe = async () => {
-    if (this.state.loading) {
+    if (this.state.loading || this.state.isStripeLoaded) {
       return;
     }
 

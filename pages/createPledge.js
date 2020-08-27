@@ -1,8 +1,8 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import { defaultImage } from '../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { getCollectiveQuery } from '../lib/graphql/queries';
+import { legacyCollectiveQuery } from '../lib/graphql/queries';
 import { imagePreview } from '../lib/image-utils';
 import { compose } from '../lib/utils';
 import { Router } from '../server/pages';
@@ -26,7 +26,7 @@ import I18nFormatters from '../components/I18nFormatters';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
-import { CollectivePledgesQuery } from '../components/PledgedCollectivePage';
+import { pledgedCollectivePageQuery } from '../components/PledgedCollectivePage';
 import StyledButtonSet from '../components/StyledButtonSet';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import StyledInputAmount from '../components/StyledInputAmount';
@@ -47,7 +47,7 @@ const labelStyles = {
 
 const Details = styled.details`
   &[open] {
-    font-size: ${themeGet('fontSizes.Paragraph')}px;
+    font-size: 14px;
     margin-bottom: ${themeGet('space.4')}px;
 
     summary::after {
@@ -57,7 +57,7 @@ const Details = styled.details`
 
   summary {
     color: ${themeGet('colors.black.900')};
-    font-size: ${themeGet('fontSizes.LeadParagraph')}px;
+    font-size: 16px;
     font-weight: 500;
     margin-bottom: ${themeGet('space.3')}px;
   }
@@ -85,7 +85,7 @@ const WordCountTextarea = () => {
         border="1px solid"
         borderColor="black.300"
         borderRadius="4px"
-        fontSize="Paragraph"
+        fontSize="14px"
         as="textarea"
         id="publicMessage"
         name="publicMessage"
@@ -348,13 +348,7 @@ class CreatePledgePage extends React.Component {
               )}
 
               {!loadingLoggedInUser && !LoggedInUser && (
-                <P
-                  mt={[5, null, 4]}
-                  color="black.700"
-                  fontSize="LeadParagraph"
-                  lineHeight="LeadParagraph"
-                  data-cy="signupOrLogin"
-                >
+                <P mt={[5, null, 4]} color="black.700" fontSize="16px" lineHeight="24px" data-cy="signupOrLogin">
                   <FormattedMessage
                     id="createPledge.signinToCreate"
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
@@ -390,7 +384,7 @@ class CreatePledgePage extends React.Component {
                         </P>
                       </Container>
 
-                      <P color="black.500" fontSize="Caption" mt={2}>
+                      <P color="black.500" fontSize="12px" mt={2}>
                         <FormattedMessage
                           id="createPledge.priviledge"
                           defaultMessage="You’ve earned the privilege to name and describe this awesome cause. We’ll create a pledged
@@ -528,7 +522,7 @@ class CreatePledgePage extends React.Component {
                     {data.Collective.name}
                   </H3>
 
-                  <StyledLink fontSize="Paragraph" href={website}>
+                  <StyledLink fontSize="14px" href={website}>
                     {website}
                   </StyledLink>
                 </Container>
@@ -673,77 +667,75 @@ class CreatePledgePage extends React.Component {
   }
 }
 
-const addCollectiveData = graphql(
-  gql`
-    query CreatePledgeQuery($slug: String!) {
-      Collective(slug: $slug) {
-        currency
+const createPledgePageQuery = gql`
+  query CreatePledgePage($slug: String!) {
+    Collective(slug: $slug) {
+      currency
+      id
+      name
+      website
+      githubHandle
+      pledges: orders(status: PENDING) {
         id
-        name
-        website
-        githubHandle
-        pledges: orders(status: PENDING) {
-          id
-          totalAmount
-          fromCollective {
-            id
-            imageUrl(height: 128)
-            slug
-            name
-            type
-          }
-        }
-      }
-    }
-  `,
-  {
-    skip: props => !props.slug,
-  },
-);
-
-export const addCreatePledgeMutation = graphql(
-  gql`
-    mutation createOrder($order: OrderInputType!) {
-      createOrder(order: $order) {
-        id
-        createdAt
-        status
-        createdByUser {
-          id
-        }
+        totalAmount
         fromCollective {
           id
+          imageUrl(height: 128)
           slug
-        }
-        collective {
-          id
-          slug
-        }
-        transactions(type: "CREDIT") {
-          id
-          uuid
+          name
+          type
         }
       }
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      createPledge: async (order, collective) => {
-        return await mutate({
-          variables: { order },
-          refetchQueries: !collective
-            ? []
-            : [
-                { query: getCollectiveQuery, variables: { slug: collective.slug } },
-                { query: CollectivePledgesQuery, variables: { id: collective.id } },
-              ],
-        });
-      },
-    }),
-  },
-);
+  }
+`;
 
-const addGraphQL = compose(addCollectiveData, addCreatePledgeMutation);
+const addCreatePledgePageData = graphql(createPledgePageQuery, {
+  skip: props => !props.slug,
+});
+
+const createPledgeMutation = gql`
+  mutation CreatePledge($order: OrderInputType!) {
+    createOrder(order: $order) {
+      id
+      createdAt
+      status
+      createdByUser {
+        id
+      }
+      fromCollective {
+        id
+        slug
+      }
+      collective {
+        id
+        slug
+      }
+      transactions(type: "CREDIT") {
+        id
+        uuid
+      }
+    }
+  }
+`;
+
+export const addCreatePledgeMutation = graphql(createPledgeMutation, {
+  props: ({ mutate }) => ({
+    createPledge: async (order, collective) => {
+      return await mutate({
+        variables: { order },
+        refetchQueries: !collective
+          ? []
+          : [
+              { query: legacyCollectiveQuery, variables: { slug: collective.slug } },
+              { query: pledgedCollectivePageQuery, variables: { id: collective.id } },
+            ],
+      });
+    },
+  }),
+});
+
+const addGraphql = compose(addCreatePledgePageData, addCreatePledgeMutation);
 
 export { CreatePledgePage as MockCreatePledgePage };
-export default injectIntl(withUser(addGraphQL(CreatePledgePage)));
+export default injectIntl(withUser(addGraphql(CreatePledgePage)));

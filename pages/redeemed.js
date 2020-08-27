@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import sanitizeHtml from 'sanitize-html';
@@ -26,8 +26,8 @@ import { withUser } from '../components/UserProvider';
 import CollectiveCard from '../components/virtual-cards/CollectiveCard';
 import HappyBackground from '../components/virtual-cards/HappyBackground';
 
-const paymentMethodQuery = gql`
-  query PaymentMethod($code: String) {
+const redeemedPaymentMethodQuery = gql`
+  query RedeemedPaymentMethod($code: String) {
     PaymentMethod(code: $code) {
       id
       initialBalance
@@ -125,7 +125,7 @@ class RedeemedPage extends React.Component {
     const { client, code } = this.props;
 
     if (code) {
-      client.query({ query: paymentMethodQuery, variables: { code } }).then(result => {
+      client.query({ query: redeemedPaymentMethodQuery, variables: { code } }).then(result => {
         const { PaymentMethod } = result.data;
         if (PaymentMethod) {
           this.setState({
@@ -228,7 +228,7 @@ class RedeemedPage extends React.Component {
                             mb={3}
                             size={[48, 64]}
                             avatarSize={[24, 32]}
-                            fontSize="Paragraph"
+                            fontSize="14px"
                             boxShadow="0 0 8px rgba(0, 0, 0, 0.24) inset"
                             borderColor="blue.200"
                             p={2}
@@ -311,25 +311,23 @@ class RedeemedPage extends React.Component {
     );
   }
 }
-
-const getCollectiveData = graphql(
-  gql`
-    query RedeemPageData($collectiveSlug: String!) {
-      Collective(slug: $collectiveSlug) {
-        id
-        name
-        type
-        slug
-        imageUrl
-        backgroundImageUrl
-        description
-        settings
-      }
+const redeemedPageQuery = gql`
+  query RedeemedPage($collectiveSlug: String!) {
+    Collective(slug: $collectiveSlug) {
+      id
+      name
+      type
+      slug
+      imageUrl
+      backgroundImageUrl
+      description
+      settings
     }
-  `,
-  {
-    skip: props => !props.collectiveSlug,
-  },
-);
+  }
+`;
 
-export default withUser(withData(getCollectiveData(RedeemedPage)));
+const addRedeemedPageData = graphql(redeemedPageQuery, {
+  skip: props => !props.collectiveSlug,
+});
+
+export default withUser(withData(addRedeemedPageData(RedeemedPage)));

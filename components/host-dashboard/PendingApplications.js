@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { TimesCircle } from '@styled-icons/fa-solid/TimesCircle';
@@ -8,7 +8,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
+import { hostPendingApplicationsQuery } from '../../lib/graphql/queries';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -165,4 +165,6 @@ class HostPendingApplications extends React.Component {
   }
 }
 
-export default withUser(graphql(getHostPendingApplicationsQuery)(HostPendingApplications));
+const addHostPendingApplicationsData = graphql(hostPendingApplicationsQuery);
+
+export default withUser(addHostPendingApplicationsData(HostPendingApplications));

@@ -16,7 +16,7 @@ import { Span } from './Text';
 
 const Message = styled.div`
   border: 1px solid;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: ${themeGet('space.3')}px;
 
   a {
@@ -33,13 +33,17 @@ const Message = styled.div`
   ${flexbox}
 
   ${messageType}
+
+  svg[data-type="message-icon"] {
+    vertical-align: text-bottom;
+  }
 `;
 
 const icons = {
-  info: <InfoCircle size="1em" />,
-  success: <CheckCircle size="1em" />,
-  warning: <ExclamationTriangle size="1em" />,
-  error: <ExclamationCircle size="1em" />,
+  info: <InfoCircle data-type="message-icon" size="1em" color="#5CA3FF" />,
+  success: <CheckCircle data-type="message-icon" size="1em" color="#25B869" />,
+  warning: <ExclamationTriangle data-type="message-icon" size="1em" color="#CCCC18" />,
+  error: <ExclamationCircle data-type="message-icon" size="1em" color="#E03F6A" />,
 };
 
 /**

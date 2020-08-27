@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get, truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -53,11 +53,14 @@ class ApplyToHostBtnLoggedIn extends React.Component {
 
   handleContinueBtn = async () => {
     const { host } = this.props;
-    const CollectiveInputType = {
-      id: this.inactiveCollective.id,
-      HostCollectiveId: host.id,
-    };
-    await this.props.editCollective(CollectiveInputType);
+    await this.props.editCollective({
+      variables: {
+        collective: {
+          id: this.inactiveCollective.id,
+          HostCollectiveId: host.id,
+        },
+      },
+    });
     this.setState({ showModal: false });
   };
 
@@ -191,8 +194,8 @@ class ApplyToHostBtnLoggedIn extends React.Component {
   }
 }
 
-const getInactiveCollectivesQuery = gql`
-  query allCollectives($memberOfCollectiveSlug: String) {
+const inactiveCollectivesQuery = gql`
+  query ApplyToHostInactiveCollectives($memberOfCollectiveSlug: String) {
     allCollectives(
       memberOfCollectiveSlug: $memberOfCollectiveSlug
       role: "ADMIN"
@@ -215,8 +218,8 @@ const getInactiveCollectivesQuery = gql`
   }
 `;
 
-const editCollectiveMutation = gql`
-  mutation editCollective($collective: CollectiveInputType!) {
+const applyToHostMutation = gql`
+  mutation ApplyToHost($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
       isActive
@@ -228,7 +231,7 @@ const editCollectiveMutation = gql`
   }
 `;
 
-const addQuery = graphql(getInactiveCollectivesQuery, {
+const addInactiveCollectivesData = graphql(inactiveCollectivesQuery, {
   options: props => ({
     variables: {
       memberOfCollectiveSlug: props.LoggedInUser.collective.slug,
@@ -236,14 +239,10 @@ const addQuery = graphql(getInactiveCollectivesQuery, {
   }),
 });
 
-const addMutation = graphql(editCollectiveMutation, {
-  props: ({ mutate }) => ({
-    editCollective: async CollectiveInputType => {
-      return await mutate({ variables: { collective: CollectiveInputType } });
-    },
-  }),
+const addApplyToHostMutation = graphql(applyToHostMutation, {
+  name: 'editCollective',
 });
 
-const addGraphQL = compose(addQuery, addMutation);
+const addGraphql = compose(addInactiveCollectivesData, addApplyToHostMutation);
 
-export default addGraphQL(ApplyToHostBtnLoggedIn);
+export default addGraphql(ApplyToHostBtnLoggedIn);

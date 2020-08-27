@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -84,7 +84,7 @@ class CreateConversationPage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
@@ -130,34 +130,33 @@ class CreateConversationPage extends React.Component {
   }
 }
 
-const getCollective = graphql(
-  gqlV2`
-    query CreateConversations($collectiveSlug: String!) {
-      account(slug: $collectiveSlug, throwIfMissing: false) {
+const createConversationPageQuery = gqlV2/* GraphQL */ `
+  query CreateConversationPage($collectiveSlug: String!) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      name
+      type
+      description
+      settings
+      imageUrl
+      twitterHandle
+      conversationsTags {
         id
-        slug
-        name
-        type
-        description
-        settings
-        imageUrl
-        twitterHandle
-        conversationsTags {
-          id
-          tag
-        }
+        tag
+      }
 
-        ... on Collective {
-          isApproved
-        }
+      ... on AccountWithHost {
+        isApproved
       }
     }
-  `,
-  {
-    options: {
-      context: API_V2_CONTEXT,
-    },
-  },
-);
+  }
+`;
 
-export default withUser(getCollective(withRouter(CreateConversationPage)));
+const addCreateConversationPageData = graphql(createConversationPageQuery, {
+  options: {
+    context: API_V2_CONTEXT,
+  },
+});
+
+export default withUser(withRouter(addCreateConversationPageData(CreateConversationPage)));

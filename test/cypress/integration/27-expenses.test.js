@@ -198,9 +198,8 @@ describe('New expense flow', () => {
       cy.getByDataCy('delete-expense-button').click();
       cy.getByDataCy('confirmation-modal-continue').click();
       cy.url().should('eq', `${Cypress.config().baseUrl}/${collective.slug}/expenses`);
-      cy.request({ url: expenseUrl, failOnStatusCode: false }).then(resp => {
-        expect(resp.status).to.eq(404);
-      });
+      cy.visit(expenseUrl);
+      cy.getByDataCy('error-page').contains('Not found');
     });
   });
 });

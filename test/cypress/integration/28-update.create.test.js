@@ -14,7 +14,7 @@ describe('create an update', () => {
     cy.get('[data-cy=updateTitle]', { timeout: 10000 }).contains('New update');
     cy.get('[data-cy=meta]').contains('draft');
     cy.get('[data-cy="privateIcon"]').should('not.exist');
-    cy.get('.UpdatePage .PublishUpdateBtn').contains('Your update will be sent to');
+    cy.get('[data-cy=PublishUpdateBtn]').contains('Your update will be sent to');
     cy.getByDataCy('btn-publish').click();
     cy.get('[data-cy=meta]').contains('draft').should('not.exist');
 

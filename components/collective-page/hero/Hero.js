@@ -59,7 +59,7 @@ const Translations = defineMessages({
 
 const StyledShortDescription = styled.h2`
   margin-top: 8px;
-  font-size: ${props => props.theme.fontSizes.LeadParagraph}px;
+  font-size: 16px;
   line-height: 24px;
 
   @media (min-width: 40em) {
@@ -86,7 +86,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
   const isProject = collective.type === CollectiveType.PROJECT;
-  const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
+  const isFund = collective.type === CollectiveType.FUND;
 
   const handleHeroMessage = msg => {
     if (!msg) {
@@ -168,12 +168,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               </StyledButton>
             </Link>
           )}
-          <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left" data-cy="collective-title">
+          <H1 color="black.800" fontSize="32px" lineHeight="36px" textAlign="left" data-cy="collective-title">
             {collective.name || collective.slug}
           </H1>
 
           {collective.company && (
-            <StyledLink as={UserCompany} fontSize="H5" fontWeight={600} company={collective.company} />
+            <StyledLink as={UserCompany} fontSize="20px" fontWeight={600} company={collective.company} />
           )}
           {!isEvent && (
             <Flex alignItems="center" flexWrap="wrap">
@@ -222,7 +222,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     href={collective.website}
                     title={intl.formatMessage(Translations.website)}
                     aria-label="Website link"
-                    openInNewTab
+                    openInNewTabNoFollow
                   >
                     <StyledRoundButton size={32} mr={3}>
                       <Globe size={14} />
@@ -247,7 +247,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                   />
                 </Container>
               )}
-              {host && collective.isApproved && (
+              {host && collective.isApproved && !collective.isHost && (
                 <Fragment>
                   <Container mx={1} color="#969ba3" my={2}>
                     <FormattedMessage
@@ -268,7 +268,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                   {collective.connectedTo.length !== 0 && (
                     <Container mx={1} color="#969ba3" my="12px">
                       <FormattedMessage
-                        id="Collective.Hero.Parent"
+                        id="Collective.Hero.ParentCollective"
                         defaultMessage="Part of: {parentName}"
                         values={{
                           parentName: (
@@ -294,13 +294,13 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                       borderBottom="2px dotted #969ba3"
                       color="black.700"
                       textDecoration="none"
-                      fontSize="Caption"
+                      fontSize="12px"
                       mr={2}
                     >
                       <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
                     </StyledLink>
                   )}
-                  <Container ml={2} mr={3} color="black.500" fontSize="Caption">
+                  <Container ml={2} mr={3} color="black.500" fontSize="12px">
                     <FormattedMessage
                       id="Hero.HostFee"
                       defaultMessage="Host fee: {fee}"

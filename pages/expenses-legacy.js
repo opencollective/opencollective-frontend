@@ -37,7 +37,7 @@ class ExpensesPage extends React.Component {
     if (!data || data.error || data.loading) {
       return <ErrorPage data={data} />;
     } else if (!data.Collective) {
-      return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
+      return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
     } else if (!hasFeature(data.Collective, FEATURES.RECEIVE_EXPENSES)) {
       return <PageFeatureNotSupported />;
     }
@@ -46,7 +46,7 @@ class ExpensesPage extends React.Component {
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     let action, subtitle, filter;
-    subtitle = <FormattedMessage id="section.expenses.subtitle" defaultMessage="All expenses" />;
+    subtitle = <FormattedMessage id="AllExpenses" defaultMessage="All expenses" />;
 
     if (this.props.value) {
       action = {

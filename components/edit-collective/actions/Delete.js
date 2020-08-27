@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -14,16 +13,16 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H2, P } from '../../Text';
 import { withUser } from '../../UserProvider';
 
-const DELETE_COLLECTIVE = gql`
-  mutation deleteCollective($id: Int!) {
+const deleteCollectiveMutation = gql`
+  mutation DeleteCollective($id: Int!) {
     deleteCollective(id: $id) {
       id
     }
   }
 `;
 
-const DELETE_USER_COLLECTIVE = gql`
-  mutation deleteUserCollective($id: Int!) {
+const deleteUserCollectiveMutation = gql`
+  mutation DeleteUserCollective($id: Int!) {
     deleteUserCollective(id: $id) {
       id
     }
@@ -31,19 +30,18 @@ const DELETE_USER_COLLECTIVE = gql`
 `;
 
 const DeleteCollective = ({ collective, ...props }) => {
-  const collectiveType = collective.settings?.fund ? 'FUND' : collective.type; // Funds MVP, to refactor
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
-  const [deleteCollective] = useMutation(DELETE_COLLECTIVE, { variables: { id: collective.id } });
-  const [deleteUserCollective] = useMutation(DELETE_USER_COLLECTIVE, { variables: { id: collective.id } });
+  const [deleteCollective] = useMutation(deleteCollectiveMutation);
+  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation);
 
   const handleDelete = async () => {
     try {
       setDeleteStatus({ ...deleteStatus, deleting: true });
       if (collective.type === 'USER') {
-        await deleteUserCollective();
+        await deleteUserCollective({ variables: { id: collective.id } });
       } else {
-        await deleteCollective();
+        await deleteCollective({ variables: { id: collective.id } });
         await props.refetchLoggedInUser();
       }
       await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
@@ -65,7 +63,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           defaultMessage={
             'Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
           }
-          values={{ type: collectiveType }}
+          values={{ type: collective.type }}
         />
       </H2>
       <P>
@@ -74,7 +72,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           defaultMessage={
             '{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} will be deleted, along with all related data.'
           }
-          values={{ type: collectiveType }}
+          values={{ type: collective.type }}
         />
       </P>
       {error && <P color="#ff5252">{error}</P>}
@@ -88,7 +86,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           defaultMessage={
             'Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
           }
-          values={{ type: collectiveType }}
+          values={{ type: collective.type }}
         />
       </StyledButton>
       {collective.isHost && (
@@ -98,7 +96,7 @@ const DeleteCollective = ({ collective, ...props }) => {
             defaultMessage={
               "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host, please deactivate as Host first."
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />{' '}
         </P>
       )}
@@ -111,7 +109,7 @@ const DeleteCollective = ({ collective, ...props }) => {
               defaultMessage={
                 '{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.'
               }
-              values={{ type: collectiveType }}
+              values={{ type: collective.type }}
             />{' '}
           </P>
         )}
@@ -123,7 +121,7 @@ const DeleteCollective = ({ collective, ...props }) => {
               defaultMessage={
                 '{type, select, EVENT {Events} PROJECT {Projects}} with transactions, orders or paid expenses cannot be deleted. Please archive it instead.'
               }
-              values={{ type: collectiveType }}
+              values={{ type: collective.type }}
             />
           </P>
         )}
@@ -142,7 +140,7 @@ const DeleteCollective = ({ collective, ...props }) => {
               defaultMessage={
                 'Are you sure you want to delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
               }
-              values={{ type: collectiveType }}
+              values={{ type: collective.type }}
             />
           </P>
         </ModalBody>

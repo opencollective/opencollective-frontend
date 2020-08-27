@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
+import { Mutation } from '@apollo/client/react/components';
 import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { get, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -216,14 +216,7 @@ class InlineEditField extends Component {
                 )}
                 <Box width={1}>
                   {error && (
-                    <MessageBox
-                      type="error"
-                      my={2}
-                      fontSize="Paragraph"
-                      lineHeight="Paragraph"
-                      fontWeight="normal"
-                      withIcon
-                    >
+                    <MessageBox type="error" my={2} fontSize="14px" lineHeight="20px" fontWeight="normal" withIcon>
                       {error.message.replace('GraphQL error: ', '')}
                     </MessageBox>
                   )}

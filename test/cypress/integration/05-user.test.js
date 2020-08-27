@@ -33,28 +33,34 @@ describe('New users profiles', () => {
 
   describe('Transactions section', () => {
     it('Can filter by expense/contributions', () => {
-      cy.get('[data-cy=section-transactions]').click();
-      cy.hash().should('eq', '#section-transactions');
-      cy.get('[data-cy=section-transactions-title]').contains('Transactions');
+      cy.getByDataCy('section-transactions').click();
+      cy.wait(1000);
+      cy.getByDataCy('section-transactions-title').contains('Transactions');
       cy.get('button[data-cy="filter-button expenses"]').click();
+      cy.wait(300);
       cy.get('[data-cy="transaction-sign"]').first().contains('+');
       cy.get('button[data-cy="filter-button contributions"]').click();
+      cy.wait(300);
       cy.get('[data-cy="transaction-sign"]').first().contains('-');
     });
 
     it('Show transactions with all info and links', () => {
-      cy.get('[data-cy="budget-item"]:first a[href="/brusselstogether"]').should('exist');
-      cy.get('[data-cy="budget-item"]')
+      cy.get('[data-cy="transaction-item"]:first a[href="/brusselstogether"]').should('exist');
+      cy.get('[data-cy="transaction-item"]')
         .first()
         .get('[data-cy=transaction-description]')
         .contains('monthly recurring subscription');
-      cy.get('[data-cy="budget-item"]')
+      cy.get('[data-cy="transaction-item"]')
         .first()
         .get('[data-cy=transaction-details] > span[data-cy=transaction-date]')
         .contains('11/30/2017');
-      cy.get('[data-cy="budget-item"]').first().get('[data-cy=transaction-amount] > span').eq(0).contains('-');
-      cy.get('[data-cy="budget-item"]').first().get('[data-cy=transaction-amount] > span').eq(1).contains('€10.00');
-      cy.get('[data-cy="budget-item"]').first().get('[data-cy=transaction-amount] > span').eq(2).contains('EUR');
+      cy.get('[data-cy="transaction-item"]').first().get('[data-cy=transaction-amount] > span').eq(0).contains('-');
+      cy.get('[data-cy="transaction-item"]')
+        .first()
+        .get('[data-cy=transaction-amount] > span')
+        .eq(1)
+        .contains('€10.00');
+      cy.get('[data-cy="transaction-item"]').first().get('[data-cy=transaction-amount] > span').eq(2).contains('EUR');
     });
   });
 });

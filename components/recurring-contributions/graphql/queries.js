@@ -40,7 +40,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
             imageUrl
             settings
           }
-          platformFee {
+          platformContributionAmount {
             value
           }
         }

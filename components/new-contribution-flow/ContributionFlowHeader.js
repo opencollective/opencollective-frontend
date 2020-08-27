@@ -30,7 +30,7 @@ class NewContributionFlowHeader extends React.Component {
 
   render() {
     const { collective } = this.props;
-    const contributors = collective.contributors.nodes;
+    const contributors = collective.contributors?.nodes;
     const loggedInUserIsContributor = false; // TODO
     const loggedInUserTotalDonations = 0; // TODO
 
@@ -66,7 +66,7 @@ class NewContributionFlowHeader extends React.Component {
           <Fragment>
             {contributors?.length > 0 && (
               <Fragment>
-                <P fontSize="LeadParagraph" lineHeight="24px" fontWeight={400} color="black.500" py={2}>
+                <P fontSize="16px" lineHeight="24px" fontWeight={400} color="black.500" py={2}>
                   <FormattedMessage
                     id="NewContributionFlow.Join"
                     defaultMessage="Join {numberOfContributors} other fellow contributors"
@@ -80,7 +80,7 @@ class NewContributionFlowHeader extends React.Component {
                     </Box>
                   ))}
                   {collective.contributors.totalCount > contributors.length && (
-                    <Container fontSize="Caption" color="black.600">
+                    <Container fontSize="12px" color="black.600">
                       + {collective.contributors.totalCount - contributors.length}
                     </Container>
                   )}

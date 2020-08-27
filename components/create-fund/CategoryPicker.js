@@ -36,7 +36,13 @@ const CreateFundCategoryPicker = () => {
   return (
     <Fragment>
       <Box mb={4} mt={5}>
-        <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
+        <H1
+          fontSize={['20px', '32px']}
+          lineHeight={['24px', '36px']}
+          fontWeight="bold"
+          color="black.900"
+          textAlign="center"
+        >
           <FormattedMessage id="createFund.create" defaultMessage="Create a Fund" />
         </H1>
       </Box>

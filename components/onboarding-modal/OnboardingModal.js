@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
-import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { isURL, matches } from 'validator';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { compose } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import Container from '../../components/Container';
@@ -85,7 +86,7 @@ const ResponsiveModalOverlay = styled(ModalOverlay)`
 
 const ModalWithImage = styled(ResponsiveModal)`
   @media screen and (min-width: 40em) {
-    background: white url('/static/images/create-collective/original/onboardingSuccessIllustration.png');
+    background: white url('/static/images/create-collective/onboardingSuccessIllustration.png');
     background-repeat: no-repeat;
     background-size: 100%;
   }
@@ -118,8 +119,8 @@ class OnboardingModal extends React.Component {
     mode: PropTypes.string,
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    EditCollectiveMembers: PropTypes.func,
-    EditCollectiveContact: PropTypes.func,
+    editCollectiveMembers: PropTypes.func,
+    editCollectiveContact: PropTypes.func,
     showOnboardingModal: PropTypes.bool,
     setShowOnboardingModal: PropTypes.func,
     intl: PropTypes.object.isRequired,
@@ -171,16 +172,18 @@ class OnboardingModal extends React.Component {
   submitAdmins = async () => {
     try {
       this.setState({ isSubmitting: true });
-      await this.props.EditCollectiveMembers({
-        collectiveId: this.props.collective.id,
-        members: this.state.members.map(member => ({
-          id: member.id,
-          role: member.role,
-          member: {
-            id: member.member.id,
-            name: member.member.name,
-          },
-        })),
+      await this.props.editCollectiveMembers({
+        variables: {
+          collectiveId: this.props.collective.id,
+          members: this.state.members.map(member => ({
+            id: member.id,
+            role: member.role,
+            member: {
+              id: member.member.id,
+              name: member.member.name,
+            },
+          })),
+        },
       });
     } catch (e) {
       const errorMsg = getErrorFromGraphqlException(e).message;
@@ -195,9 +198,7 @@ class OnboardingModal extends React.Component {
     };
     try {
       this.setState({ isSubmitting: true });
-      await this.props.EditCollectiveContact({
-        collective,
-      });
+      await this.props.editCollectiveContact({ variables: { collective } });
     } catch (e) {
       const errorMsg = getErrorFromGraphqlException(e).message;
       throw new Error(errorMsg);
@@ -271,16 +272,16 @@ class OnboardingModal extends React.Component {
               <ModalBody>
                 <Flex flexDirection="column" alignItems="center">
                   <Container display="flex" flexDirection="column" alignItems="center">
-                    <Box maxWidth={['336px']}>
+                    <Box maxWidth="336px">
                       <H1
-                        fontSize={['H2']}
-                        lineHeight={['H2']}
+                        fontSize="40px"
+                        lineHeight="44px"
                         fontWeight="bold"
                         color="black.900"
                         textAlign="center"
-                        mt={[6]}
-                        mb={[4]}
-                        mx={[2, null]}
+                        mt={6}
+                        mb={4}
+                        mx={2}
                         data-cy="welcome-collective"
                       >
                         <FormattedMessage
@@ -289,15 +290,8 @@ class OnboardingModal extends React.Component {
                         />
                       </H1>
                     </Box>
-                    <Box maxWidth={['450px']}>
-                      <P
-                        fontSize={['LeadParagraph']}
-                        lineHeight={['LeadParagraph']}
-                        color="black.900"
-                        textAlign="center"
-                        mb={[4]}
-                        mx={[2, null]}
-                      >
+                    <Box maxWidth="450px">
+                      <P fontSize="16px" lineHeight="24px" color="black.900" textAlign="center" mb={4} mx={2}>
                         <FormattedMessage
                           id="onboarding.success.text"
                           defaultMessage="You're all set! Now you can make this space your own by customizing the look, start
@@ -396,7 +390,7 @@ class OnboardingModal extends React.Component {
 }
 
 // GraphQL for editing Collective admins info
-const editCoreContributorsMutation = gql`
+const editCollectiveMembersMutation = gql`
   mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
     editCoreContributors(collectiveId: $collectiveId, members: $members) {
       id
@@ -412,14 +406,8 @@ const editCoreContributorsMutation = gql`
   }
 `;
 
-const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
-  props: ({ mutate }) => ({
-    EditCollectiveMembers: async ({ collectiveId, members }) => {
-      return await mutate({
-        variables: { collectiveId, members },
-      });
-    },
-  }),
+const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
+  name: 'editCollectiveMembers',
 });
 
 // GraphQL for editing Collective contact info
@@ -435,13 +423,9 @@ const editCollectiveContactMutation = gql`
 `;
 
 const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, {
-  props: ({ mutate }) => ({
-    EditCollectiveContact: async ({ collective }) => {
-      return await mutate({
-        variables: { collective },
-      });
-    },
-  }),
+  name: 'editCollectiveContact',
 });
 
-export default addEditCollectiveContactMutation(addEditCoreContributorsMutation(injectIntl(OnboardingModal)));
+const addGraphql = compose(addEditCollectiveMembersMutation, addEditCollectiveContactMutation);
+
+export default injectIntl(addGraphql(OnboardingModal));

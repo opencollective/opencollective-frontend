@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
-import gql from 'graphql-tag';
 import { get, isEmpty } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -18,24 +18,25 @@ import LinkCollective from '../../LinkCollective';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
+import StyledLink from '../../StyledLink';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
-import { UpdatesFieldsFragment } from '../graphql/fragments';
+import { updatesFieldsFragment } from '../graphql/fragments';
 import SectionTitle from '../SectionTitle';
 
 /** Query to re-fetch updates */
-const UpdatesQuery = gql`
+const updatesSectionQuery = gql`
   query UpdatesSection($slug: String!, $onlyPublishedUpdates: Boolean) {
     Collective(slug: $slug) {
       id
       updates(limit: 3, onlyPublishedUpdates: $onlyPublishedUpdates) {
-        ...UpdatesFieldsFragment
+        ...UpdatesFields
       }
     }
   }
 
-  ${UpdatesFieldsFragment}
+  ${updatesFieldsFragment}
 `;
 
 const PrivateUpdateMesgBox = styled(MessageBox)`
@@ -131,7 +132,7 @@ class SectionUpdates extends React.PureComponent {
           {isAdmin && (
             <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
               <StyledButton data-cy="create-new-update-btn" buttonStyle="primary">
-                <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
+                <Span fontSize="16px" fontWeight="bold" mr={2}>
                   +
                 </Span>
                 <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
@@ -141,7 +142,7 @@ class SectionUpdates extends React.PureComponent {
         </Flex>
         {isEmpty(updates) ? (
           <div>
-            <MessageBox my={5} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="Paragraph">
+            <MessageBox my={5} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="14px">
               <FormattedMessage
                 id="SectionUpdates.PostFirst"
                 defaultMessage="Use this section to promote your actions and keep your community up-to-date."
@@ -171,7 +172,18 @@ class SectionUpdates extends React.PureComponent {
                       </P>
                     </Link>
                     {update.userCanSeeUpdate ? (
-                      <HTMLContent content={update.summary} />
+                      <Container>
+                        <HTMLContent style={{ display: 'inline' }} content={update.summary} />
+                        {` `}
+                        <StyledLink
+                          as={Link}
+                          fontSize="12px"
+                          route="update"
+                          params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}
+                        >
+                          <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+                        </StyledLink>
+                      </Container>
                     ) : (
                       <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
                         <FormattedMessage
@@ -181,7 +193,7 @@ class SectionUpdates extends React.PureComponent {
                         />
                       </PrivateUpdateMesgBox>
                     )}
-                    <Container color="black.400" mt={2} fontSize="Caption">
+                    <Container color="black.400" mt={2} fontSize="12px">
                       {update.isPrivate && (
                         <StyledTooltip
                           content={() => (
@@ -231,7 +243,7 @@ class SectionUpdates extends React.PureComponent {
         )}
         {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="Paragraph">
+            <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="14px">
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
           </Link>
@@ -241,13 +253,13 @@ class SectionUpdates extends React.PureComponent {
   }
 }
 
-export default injectIntl(
-  graphql(UpdatesQuery, {
-    options: props => ({
-      variables: {
-        slug: props.collective.slug,
-        onlyPublishedUpdates: !props.isAdmin,
-      },
-    }),
-  })(SectionUpdates),
-);
+const addUpdatesSectionData = graphql(updatesSectionQuery, {
+  options: props => ({
+    variables: {
+      slug: props.collective.slug,
+      onlyPublishedUpdates: !props.isAdmin,
+    },
+  }),
+});
+
+export default injectIntl(addUpdatesSectionData(SectionUpdates));

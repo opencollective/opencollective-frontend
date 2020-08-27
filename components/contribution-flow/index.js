@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import * as LibTaxes from '@opencollective/taxes';
 import { themeGet } from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { debounce, findIndex, get, isNil, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -481,7 +481,8 @@ class CreateOrderPage extends React.Component {
     };
 
     try {
-      const orderCreated = (await createOrder(order)).data.createOrder;
+      const res = await createOrder({ variables: { order } });
+      const orderCreated = res.data.createOrder;
       if (orderCreated.stripeError) {
         this.handleStripeError(orderCreated);
       } else {
@@ -505,7 +506,7 @@ class CreateOrderPage extends React.Component {
     this.setState({ submitting: true, error: null });
 
     try {
-      const res = await this.props.confirmOrder(order);
+      const res = await this.props.confirmOrder({ variables: { order } });
       const orderConfirmed = res.data.confirmOrder;
       if (orderConfirmed.stripeError) {
         this.handleStripeError(orderConfirmed);
@@ -603,14 +604,7 @@ class CreateOrderPage extends React.Component {
           m.collective.type !== 'EVENT' &&
           m.collective.type !== 'PROJECT',
       )
-      .map(({ collective }) => collective)
-      .map(collective => {
-        // Funds MVP, to refactor
-        if (collective.settings?.fund) {
-          collective.type = 'FUND';
-        }
-        return collective;
-      });
+      .map(({ collective }) => collective);
   }
 
   /** Guess the country, from the more pricise method (settings) to the less */
@@ -794,6 +788,9 @@ class CreateOrderPage extends React.Component {
   getManualPaymentMethod() {
     const pm = get(this.props.host.settings, 'paymentMethods.manual');
     const interval = get(this.state, 'stepDetails.interval');
+    const totalAmount = get(this.state, 'stepDetails.totalAmount');
+    const platformFeeValue = get(this.state, 'stepDetails.platformFee.value', 0);
+    const amount = totalAmount + platformFeeValue;
 
     if (interval || (!pm && !this.props.LoggedInUser.isRoot())) {
       return null;
@@ -812,7 +809,7 @@ class CreateOrderPage extends React.Component {
       disabled,
       subtitle,
       instructions: this.props.intl.formatMessage(messages.manualPm, {
-        amount: formatCurrency(get(this.state, 'stepDetails.totalAmount'), this.getCurrency()),
+        amount: formatCurrency(amount, this.getCurrency()),
         email: get(this.props, 'LoggedInUser.email', ''),
         host: this.props.host.name,
       }),
@@ -873,7 +870,7 @@ class CreateOrderPage extends React.Component {
     }));
     platformFeeArray.push(
       { label: this.props.intl.formatMessage(messages.platformFeeNoContribution), value: 0 },
-      { label: this.props.intl.formatMessage(messages.platformFeeOther), value: 100 },
+      { label: this.props.intl.formatMessage(messages.platformFeeOther), value: 100, isCustomAmount: true },
     );
     return platformFeeArray;
   };
@@ -946,7 +943,7 @@ class CreateOrderPage extends React.Component {
               quantity={get(stepDetails, 'quantity') || defaultStepDetails.quantity}
               changeIntervalWarning={Boolean(tier)}
               disabledInterval={Boolean(this.props.fixedInterval)}
-              disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.fixedAmount)}
+              disabledAmount={this.isFixedContribution()}
               minAmount={this.getOrderMinAmount()}
               maxQuantity={get(tier, 'stats.availableQuantity') || get(tier, 'maxQuantity')}
               showQuantity={tier && tier.type === 'TICKET'}
@@ -959,7 +956,7 @@ class CreateOrderPage extends React.Component {
               <Fragment>
                 <FeesOnTopContainer p={3} mt={3}>
                   <Box maxWidth={['100%', '75%']}>
-                    <P fontSize="Caption" my={2}>
+                    <P fontSize="12px" my={2}>
                       <FormattedMessage
                         defaultMessage="Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to keep this possible!"
                         id="platformFee.info"
@@ -968,7 +965,7 @@ class CreateOrderPage extends React.Component {
                   </Box>
                   <Flex mt={3} flexDirection={['column', 'row']}>
                     <Box maxWidth="50%">
-                      <P fontSize="Caption" fontWeight="600" my={2}>
+                      <P fontSize="12px" fontWeight="600" my={2}>
                         <FormattedMessage
                           defaultMessage="Thank you for supporting us with a contribution:"
                           id="platformFee.support"
@@ -982,7 +979,6 @@ class CreateOrderPage extends React.Component {
                             stepDetails: {
                               ...state.stepDetails,
                               platformFee: value,
-                              totalAmount: state.stepDetails.totalAmount + value.value,
                             },
                           }));
                         }}
@@ -991,7 +987,7 @@ class CreateOrderPage extends React.Component {
                         my={2}
                         width="100%"
                       />
-                      <P fontSize="Caption" color="colors.black.300" mt={1} textAlign={['right', null]}>
+                      <P fontSize="12px" color="colors.black.300" mt={1} textAlign="right">
                         <FormattedMessage
                           defaultMessage="Total contribution: {amount} {frequency}"
                           id="platformFee.totalContribution"
@@ -1007,10 +1003,10 @@ class CreateOrderPage extends React.Component {
                       </P>
                     </Flex>
                   </Flex>
-                  {stepDetails.platformFee?.label === 'Other' && (
+                  {stepDetails.platformFee?.isCustomAmount && (
                     <Box>
                       <StyledInputField
-                        label="Other amount"
+                        label={this.props.intl.formatMessage(messages.platformFeeOther)}
                         htmlFor="feesOnTopOtherAmount"
                         name="feesOnTopOtherAmount"
                         required
@@ -1044,7 +1040,7 @@ class CreateOrderPage extends React.Component {
                 </FeesOnTopContainer>
                 {taxDeductible && (
                   <Box p={1} mt={2}>
-                    <P fontSize="LeadCaption" color="colors.black.300">
+                    <P fontSize="13px" color="colors.black.300">
                       <FormattedMessage
                         defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contribution will be tax-deductible to the extent allowed by the law."
                         id="platformFee.taxDeductible"
@@ -1289,8 +1285,8 @@ class CreateOrderPage extends React.Component {
   }
 }
 
-const SubmitOrderFragment = gql`
-  fragment SubmitOrderFragment on OrderType {
+const submitOrderFieldsFragment = gql`
+  fragment SubmitOrderFields on OrderType {
     id
     idV2
     status
@@ -1306,38 +1302,32 @@ const SubmitOrderFragment = gql`
   }
 `;
 
-export const addCreateOrderMutation = graphql(
-  gql`
-    mutation createOrder($order: OrderInputType!) {
-      createOrder(order: $order) {
-        ...SubmitOrderFragment
-      }
+const createOrderMutation = gql`
+  mutation CreateOrder($order: OrderInputType!) {
+    createOrder(order: $order) {
+      ...SubmitOrderFields
     }
-    ${SubmitOrderFragment}
-  `,
-  {
-    props: ({ mutate }) => ({
-      createOrder: order => mutate({ variables: { order } }),
-    }),
-  },
-);
+  }
+  ${submitOrderFieldsFragment}
+`;
 
-export const addConfirmOrderMutation = graphql(
-  gql`
-    mutation confirmOrder($order: ConfirmOrderInputType!) {
-      confirmOrder(order: $order) {
-        ...SubmitOrderFragment
-      }
+const addCreateOrderMutation = graphql(createOrderMutation, {
+  name: 'createOrder',
+});
+
+const confirmOrderMutation = gql`
+  mutation ConfirmOrder($order: ConfirmOrderInputType!) {
+    confirmOrder(order: $order) {
+      ...SubmitOrderFields
     }
-    ${SubmitOrderFragment}
-  `,
-  {
-    props: ({ mutate }) => ({
-      confirmOrder: order => mutate({ variables: { order } }),
-    }),
-  },
-);
+  }
+  ${submitOrderFieldsFragment}
+`;
 
-const addGraphQL = compose(addCreateCollectiveMutation, addCreateOrderMutation, addConfirmOrderMutation);
+const addConfirmOrderMutation = graphql(confirmOrderMutation, {
+  name: 'confirmOrder',
+});
 
-export default injectIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));
+const addGraphql = compose(addCreateCollectiveMutation, addCreateOrderMutation, addConfirmOrderMutation);
+
+export default injectIntl(addGraphql(withUser(withStripeLoader(CreateOrderPage))));

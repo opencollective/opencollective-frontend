@@ -19,16 +19,18 @@ const StyledInputField = ({
   required,
   inputType,
   labelFontSize,
+  labelColor,
   labelProps,
+  showLabelRequired,
   ...props
 }) => {
-  const labelContent = label && <Span color="black.800">{label}</Span>;
+  const labelContent = label && <Span color={labelColor}>{label}</Span>;
   const isCheckbox = inputType === 'checkbox';
   htmlFor = htmlFor || (name ? `input-${name}` : undefined);
 
   return (
     <Box {...props}>
-      <Flex flexDirection={isCheckbox ? 'row' : 'column'}>
+      <Flex flexDirection={isCheckbox ? 'row-reverse' : 'column'} justifyContent="flex-end">
         {label && (
           <P
             as="label"
@@ -38,6 +40,8 @@ const StyledInputField = ({
             fontWeight="normal"
             mb={isCheckbox ? 0 : 2}
             mr={2}
+            ml={isCheckbox ? 2 : undefined}
+            cursor={isCheckbox ? 'pointer' : undefined}
             {...labelProps}
           >
             {required === false && !isCheckbox ? (
@@ -45,6 +49,14 @@ const StyledInputField = ({
                 <FormattedMessage
                   id="OptionalFieldLabel"
                   defaultMessage="{field} (optional)"
+                  values={{ field: labelContent }}
+                />
+              </Span>
+            ) : required === true && showLabelRequired && !isCheckbox ? (
+              <Span color="black.500">
+                <FormattedMessage
+                  id="RequiredFieldLabel"
+                  defaultMessage="{field} (required)"
                   values={{ field: labelContent }}
                 />
               </Span>
@@ -66,7 +78,7 @@ const StyledInputField = ({
           : children}
       </Flex>
       {error && typeof error === 'string' && (
-        <Span display="block" color="red.500" pt={2} fontSize="Tiny">
+        <Span display="block" color="red.500" pt={2} fontSize="10px">
           {error}
         </Span>
       )}
@@ -94,11 +106,18 @@ StyledInputField.propTypes = {
   /** If set to false, the field will be marked as optional */
   required: PropTypes.bool,
   /** Font size for the label */
-  labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
+  labelColor: PropTypes.string,
   /** Anything here will be passed down to label */
   labelProps: PropTypes.object,
+  /** Set this to true to display a "(Required)" next to the label when the field is required */
+  showLabelRequired: PropTypes.bool,
   /** All props from `Box` */
   ...Box.propTypes,
+};
+
+StyledInputField.defaultProps = {
+  labelColor: 'black.800',
 };
 
 export default StyledInputField;

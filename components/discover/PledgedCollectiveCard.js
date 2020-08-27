@@ -116,7 +116,7 @@ const StatsItemValue = styled(StatsItem)`
   text-align: center;
   color: #303233;
   font-size: 1rem;
-  margin: 3px 2px 0px;
+  margin: 12px 2px 0px;
 `;
 
 const StatsItemLabel = styled(StatsItem)`

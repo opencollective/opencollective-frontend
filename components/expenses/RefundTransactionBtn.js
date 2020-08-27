@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
-import { getTransactionsQuery, transactionFields } from '../../lib/graphql/queries';
+import { transactionFieldsFragment, transactionsQuery } from '../../lib/graphql/queries';
 
 import SmallButton from '../SmallButton';
 
@@ -139,23 +139,23 @@ class RefundTransactionBtn extends React.Component {
   }
 }
 
-/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
-const refundTransactionQuery = gql`
-  mutation refundTransaction($id: Int!) {
+const refundTransactionMutation = gql`
+  mutation RefundTransaction($id: Int!) {
     refundTransaction(id: $id) {
       id
       refundTransaction {
-        ${transactionFields}
+        ...TransactionFields
         refundTransaction {
-          ${transactionFields}
+          ...TransactionFields
         }
       }
     }
   }
-`;
-/* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
-const addMutation = graphql(refundTransactionQuery, {
+  ${transactionFieldsFragment}
+`;
+
+const addRefundTransactionMutation = graphql(refundTransactionMutation, {
   props: ({ ownProps, mutate }) => ({
     refundTransaction: async id =>
       await mutate({
@@ -169,7 +169,7 @@ const addMutation = graphql(refundTransactionQuery, {
 
           // Retrieve the query from the cache
           const data = proxy.readQuery({
-            query: getTransactionsQuery,
+            query: transactionsQuery,
             variables,
           });
 
@@ -177,10 +177,10 @@ const addMutation = graphql(refundTransactionQuery, {
           data.allTransactions.unshift(refundTransaction.refundTransaction);
 
           // write data back for the query
-          proxy.writeQuery({ query: getTransactionsQuery, variables, data });
+          proxy.writeQuery({ query: transactionsQuery, variables, data });
         },
       }),
   }),
 });
 
-export default addMutation(RefundTransactionBtn);
+export default addRefundTransactionMutation(RefundTransactionBtn);

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -21,7 +21,6 @@ import RecurringContributionsContainer from '../components/recurring-contributio
 import StyledFilters from '../components/StyledFilters';
 import TemporaryNotification from '../components/TemporaryNotification';
 import { P } from '../components/Text';
-import { withUser } from '../components/UserProvider';
 
 const MainContainer = styled(Container)`
   max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
@@ -60,7 +59,6 @@ class recurringContributionsPage extends React.Component {
 
   static propTypes = {
     slug: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -95,7 +93,7 @@ class recurringContributionsPage extends React.Component {
   };
 
   render() {
-    const { slug, data, LoggedInUser, intl } = this.props;
+    const { slug, data, intl } = this.props;
     const { notification, notificationType, notificationText } = this.state;
 
     const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
@@ -104,7 +102,7 @@ class recurringContributionsPage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
-        return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
       }
     }
 
@@ -113,7 +111,7 @@ class recurringContributionsPage extends React.Component {
 
     return (
       <AuthenticatedPage>
-        {data.loading || !LoggedInUser ? (
+        {data.loading ? (
           <Container py={[5, 6]}>
             <Loading />
           </Container>
@@ -177,10 +175,10 @@ class recurringContributionsPage extends React.Component {
   }
 }
 
-const getData = graphql(recurringContributionsQuery, {
+const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
   options: {
     context: API_V2_CONTEXT,
   },
 });
 
-export default injectIntl(withUser(getData(recurringContributionsPage)));
+export default injectIntl(addRecurringContributionsPageData(recurringContributionsPage));

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
+import { Mutation } from '@apollo/client/react/components';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 import { cloneDeep, get, set } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
@@ -21,7 +21,7 @@ import StyledCheckbox from '../../StyledCheckbox';
 import StyledHr from '../../StyledHr';
 import { H3, H4, P, Span } from '../../Text';
 
-import { updateSettingsMutation } from './../mutations';
+import { editCollectiveSettingsMutation } from './../mutations';
 
 const { FUND, PROJECT, EVENT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
@@ -317,7 +317,7 @@ class Tiers extends React.Component {
       return (
         <Flex flexDirection="column">
           <Span>{capitalize(field.label)}</Span>
-          <Span fontSize="Tiny" color="black.400">
+          <Span fontSize="10px" color="black.400">
             (without tax)
           </Span>
         </Flex>
@@ -438,7 +438,7 @@ class Tiers extends React.Component {
             <H4 mb={3}>
               <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
             </H4>
-            <Mutation mutation={updateSettingsMutation}>
+            <Mutation mutation={editCollectiveSettingsMutation}>
               {(editSettings, { loading }) => (
                 <Flex flexWrap="wrap">
                   <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>

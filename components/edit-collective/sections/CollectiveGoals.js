@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get, sortBy } from 'lodash';
 import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -26,12 +26,13 @@ const BORDER = '1px solid #efefef';
 class CollectiveGoals extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
+      id: PropTypes.number.isRequired,
       slug: PropTypes.string.isRequired,
       settings: PropTypes.object,
     }).isRequired,
     currency: PropTypes.string.isRequired,
     intl: PropTypes.object.isRequired,
-    updateSettings: PropTypes.func.isRequired,
+    editCollectiveSettings: PropTypes.func.isRequired,
     title: PropTypes.string,
   };
 
@@ -136,13 +137,16 @@ class CollectiveGoals extends React.Component {
   handleSubmit = async () => {
     try {
       this.setState({ isSubmitting: true });
-
-      await this.props.updateSettings({
-        ...this.props.collective.settings,
-        goals: this.state.goals,
-        collectivePage: this.state.collectivePage,
+      await this.props.editCollectiveSettings({
+        variables: {
+          id: this.props.collective.id,
+          settings: {
+            ...this.props.collective.settings,
+            goals: this.state.goals,
+            collectivePage: this.state.collectivePage,
+          },
+        },
       });
-
       this.setState({ isSubmitting: false, isTouched: false, submitted: true });
       setTimeout(() => this.setState({ submitted: false }), 2000);
     } catch (e) {
@@ -281,20 +285,17 @@ class CollectiveGoals extends React.Component {
   }
 }
 
-const addEditCollectiveSettingsMutation = graphql(
-  gql`
-    mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
-      editCollective(collective: { id: $id, settings: $settings }) {
-        id
-        settings
-      }
+const editCollectiveSettingsMutation = gql`
+  mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
+    editCollective(collective: { id: $id, settings: $settings }) {
+      id
+      settings
     }
-  `,
-  {
-    props: ({ ownProps, mutate }) => ({
-      updateSettings: settings => mutate({ variables: { id: ownProps.collective.id, settings } }),
-    }),
-  },
-);
+  }
+`;
+
+const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation, {
+  name: 'editCollectiveSettings',
+});
 
 export default injectIntl(addEditCollectiveSettingsMutation(CollectiveGoals));

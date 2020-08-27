@@ -126,7 +126,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Webhooks',
   },
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: {
-    id: 'editCollective.menu.tickets',
+    id: 'section.tickets.title',
     defaultMessage: 'Tickets',
   },
   [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: {
@@ -175,17 +175,17 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, CollectiveType.ORGANIZATION, CollectiveType.USER),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
+    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.FUND, CollectiveType.EVENT, CollectiveType.PROJECT) ||
+    (c.type === CollectiveType.ORGANIZATION && c.isActive),
+  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isType(c, CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c =>
     isOneOfTypes(
       c,
       CollectiveType.COLLECTIVE,
-      CollectiveType.FUND,
-      CollectiveType.EVENT,
       CollectiveType.ORGANIZATION,
-      CollectiveType.PROJECT,
-    ),
-  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isType(c, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c =>
-    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION, CollectiveType.USER) && !isFund(c),
+      CollectiveType.USER,
+      CollectiveType.EVENT,
+    ) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
   // Fiscal Host
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,

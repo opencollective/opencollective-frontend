@@ -1,16 +1,20 @@
-/* eslint-disable graphql/template-strings */
+// TODO: REMOVE eslint-disable
+/* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
+import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
+import ErrorPage from '../components/ErrorPage';
 import { Flex } from '../components/Grid';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
@@ -19,6 +23,7 @@ import { STEPS } from '../components/new-contribution-flow/constants';
 import NewContributionFlowSuccess from '../components/new-contribution-flow/ContributionFlowSuccess';
 import NewContributionFlowContainer from '../components/new-contribution-flow/index';
 import Page from '../components/Page';
+import { withStripeLoader } from '../components/StripeProvider';
 import StyledButton from '../components/StyledButton';
 import { withUser } from '../components/UserProvider';
 
@@ -103,6 +108,26 @@ class NewContributionFlowPage extends React.Component {
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
+  componentDidMount() {
+    this.loadExternalScripts();
+  }
+
+  componentDidUpdate(prevProps) {
+    const hostPath = 'data.account.host';
+    if (get(this.props, hostPath) !== get(prevProps, hostPath)) {
+      this.loadExternalScripts();
+    }
+  }
+
+  loadExternalScripts() {
+    // Load stripe
+    const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
+    const hostHasStripe = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
+    if (hostHasStripe) {
+      this.props.loadStripe();
+    }
+  }
+
   getCanonicalURL(collective, tier) {
     if (!tier) {
       return `/${collective.slug}/donate`;
@@ -154,8 +179,6 @@ class NewContributionFlowPage extends React.Component {
   renderPageContent() {
     const { router, data = {}, intl, step } = this.props;
     const { account, tier } = data;
-    const feesOnTopAvailable = get(data, 'Collective.platformFeePercent') === 0;
-    const taxDeductible = get(data, 'Collective.host.settings.taxDeductibleDonations');
 
     if (data.loading) {
       return (
@@ -167,11 +190,11 @@ class NewContributionFlowPage extends React.Component {
       return this.renderMessage('info', intl.formatMessage(messages.missingHost));
     } else if (!account.isActive) {
       return this.renderMessage('info', intl.formatMessage(messages.inactiveCollective));
-    } else if (this.props.tierId && !data.Tier) {
+    } else if (this.props.tierId && !tier) {
       return this.renderMessage('warning', intl.formatMessage(messages.missingTier), true);
-    } else if (data.Tier && data.Tier.endsAt && new Date(data.Tier.endsAt) < new Date()) {
+    } else if (tier && tier.endsAt && new Date(tier.endsAt) < new Date()) {
       return this.renderMessage('warning', intl.formatMessage(messages.expiredTier), true);
-    } else if (account.settings.disableCustomContributions && !data.Tier) {
+    } else if (account.settings.disableCustomContributions && !tier) {
       return this.renderMessage('warning', intl.formatMessage(messages.disableCustomContributions), true);
     } else if (router.query.step === 'success') {
       return <NewContributionFlowSuccess collective={account} />;
@@ -181,27 +204,34 @@ class NewContributionFlowPage extends React.Component {
           collective={account}
           host={account.host}
           tier={tier}
-          feesOnTopAvailable={feesOnTopAvailable}
-          taxDeductible={taxDeductible}
           step={step}
+          verb={this.props.verb}
+          redirect={this.props.redirect}
+          description={this.props.description}
+          defaultQuantity={this.props.quantity}
+          fixedInterval={this.props.interval}
+          fixedAmount={this.props.totalAmount}
+          customData={this.props.customData}
+          skipStepDetails={this.props.skipStepDetails}
+          contributeAs={this.props.contributeAs}
         />
       );
     }
   }
 
   render() {
+    const { data } = this.props;
+    if (!data.loading && !data.account) {
+      const error = data.error
+        ? getErrorFromGraphqlException(data.error)
+        : generateNotFoundError(this.props.collectiveSlug);
+
+      return <ErrorPage error={error} />;
+    }
+
     return <Page {...this.getPageMetadata()}>{this.renderPageContent()}</Page>;
   }
 }
-
-const hostFieldsFragment = gqlV2/* GraphQL */ `
-  fragment HostFields on Host {
-    id
-    slug
-    name
-    settings
-  }
-`;
 
 const accountFieldsFragment = gqlV2/* GraphQL */ `
   fragment ContributionFlowAccountFields on Account {
@@ -217,7 +247,13 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     imageUrl
     isHost
     isActive
-    ... on Collective {
+    settings
+    location {
+      country
+    }
+    ... on AccountWithContributions {
+      platformFeePercent
+      platformContributionAvailable
       contributors(limit: 6) {
         totalCount
         nodes {
@@ -227,27 +263,38 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
           collectiveSlug
         }
       }
+    }
+    ... on AccountWithHost {
+      hostFeePercent
       host {
-        ...HostFields
+        id
+        legacyId
+        slug
+        name
+        settings
+        location {
+          country
+        }
+        supportedPaymentMethods
       }
     }
     ... on Event {
-      host {
-        ...HostFields
-      }
-    }
-    ... on Fund {
-      host {
-        ...HostFields
+      parent {
+        id
+        location {
+          country
+        }
       }
     }
     ... on Project {
-      host {
-        ...HostFields
+      parent {
+        id
+        location {
+          country
+        }
       }
     }
   }
-  ${hostFieldsFragment}
 `;
 
 const accountQuery = gqlV2/* GraphQL */ `
@@ -260,42 +307,51 @@ const accountQuery = gqlV2/* GraphQL */ `
 `;
 
 const accountWithTierQuery = gqlV2/* GraphQL */ `
-  query ContributionFlowAccountQuery($collectiveSlug: String!, $tierId: Int!) {
+  query ContributionFlowAccountQuery($collectiveSlug: String!, $tier: TierReferenceInput!) {
     account(slug: $collectiveSlug) {
       ...ContributionFlowAccountFields
     }
-    tier(id: $tierId) {
+    tier(tier: $tier) {
       id
+      legacyId
       type
       name
       slug
-      endsAt
       description
-      amount
-      amountType
-      minimumAmount
-      currency
-      interval
-      presets
       customFields
       maxQuantity
-      stats {
-        availableQuantity
+      amount {
+        valueInCents
+        currency
       }
+      amountType
+      minimumAmount {
+        valueInCents
+        currency
+      }
+      interval
+      presets
     }
   }
   ${accountFieldsFragment}
 `;
 
-const getData = compose(
-  graphql(accountQuery, {
-    skip: props => Boolean(props.tierId),
-    options: { context: API_V2_CONTEXT },
+const addAccountData = graphql(accountQuery, {
+  skip: props => Boolean(props.tierId),
+  options: props => ({
+    variables: { collectiveSlug: props.collectiveSlug },
+    context: API_V2_CONTEXT,
   }),
-  graphql(accountWithTierQuery, {
-    skip: props => !props.tierId,
-    options: { context: API_V2_CONTEXT },
-  }),
-);
+});
 
-export default getData(withUser(withRouter(injectIntl(NewContributionFlowPage))));
+const addAccountWithTierData = graphql(accountWithTierQuery, {
+  skip: props => !props.tierId,
+  options: props => ({
+    variables: { collectiveSlug: props.collectiveSlug, tier: { legacyId: props.tierId } },
+    context: API_V2_CONTEXT,
+  }),
+});
+
+const addGraphql = compose(addAccountData, addAccountWithTierData);
+
+export default addGraphql(withUser(withRouter(injectIntl(withStripeLoader(NewContributionFlowPage)))));

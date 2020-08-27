@@ -22,7 +22,7 @@ import GithubRepositories from './GithubRepositories';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
-  font-size: ${themeGet('fontSizes.Paragraph')}px;
+  font-size: 14px;
 `;
 
 class ConnectGithub extends React.Component {
@@ -76,9 +76,9 @@ class ConnectGithub extends React.Component {
     const { repositories, loadingRepos, error } = this.state;
 
     return (
-      <Flex flexDirection="column" m={[3, 0]} mb={[4]}>
+      <Flex flexDirection="column" m={[3, 0]} mb={4}>
         <Flex flexDirection="column" my={[2, 4]}>
-          <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
+          <Box textAlign="left" minHeight="32px" marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>
               ←&nbsp;
               <FormattedMessage id="Back" defaultMessage="Back" />
@@ -86,8 +86,8 @@ class ConnectGithub extends React.Component {
           </Box>
           <Box mb={[2, 3]}>
             <H1
-              fontSize={['H5', 'H3']}
-              lineHeight={['H5', 'H3']}
+              fontSize={['20px', '32px']}
+              lineHeight={['24px', '36px']}
               fontWeight="bold"
               textAlign="center"
               color="black.900"
@@ -96,8 +96,8 @@ class ConnectGithub extends React.Component {
               <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
             </H1>
           </Box>
-          <Box textAlign="center" minHeight={['24px']}>
-            <P fontSize="LeadParagraph" color="black.600" mb={2}>
+          <Box textAlign="center" minHeight="24px">
+            <P fontSize="16px" color="black.600" mb={2}>
               <FormattedMessage
                 id="collective.subtitle.seeRepo"
                 defaultMessage="Don't see the repository you're looking for? {helplink}."
@@ -110,7 +110,7 @@ class ConnectGithub extends React.Component {
                 }}
               />
             </P>
-            <P fontSize="LeadParagraph" color="black.600" mb={2}>
+            <P fontSize="16px" color="black.600" mb={2}>
               <FormattedMessage
                 id="collective.subtitle.altVerification"
                 defaultMessage="Want to apply using {altverification}? {applylink}."

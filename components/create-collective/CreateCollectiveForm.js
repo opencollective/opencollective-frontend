@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
+import { trim } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
@@ -22,7 +23,7 @@ import { H1, P } from '../Text';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
-  font-size: ${themeGet('fontSizes.Paragraph')}px;
+  font-size: 14px;
 `;
 
 const ContainerWithImage = styled(Container)`
@@ -66,6 +67,10 @@ const messages = defineMessages({
   errorSlug: {
     id: 'createCollective.form.error.slug',
     defaultMessage: 'Please use fewer than 30 characters',
+  },
+  errorSlugHyphen: {
+    id: 'createCollective.form.error.slug.hyphen',
+    defaultMessage: 'Collective slug can not start nor end with hyphen',
   },
 });
 
@@ -122,6 +127,9 @@ class CreateCollectiveForm extends React.Component {
       if (values.slug.length > 30) {
         errors.slug = intl.formatMessage(messages.errorSlug);
       }
+      if (values.slug !== trim(values.slug, '-')) {
+        errors.slug = intl.formatMessage(messages.errorSlugHyphen);
+      }
 
       if (values.description.length > 160) {
         errors.description = intl.formatMessage(messages.errorDescription);
@@ -144,7 +152,7 @@ class CreateCollectiveForm extends React.Component {
           </Container>
         )}
         <Flex flexDirection="column" my={[2, 4]}>
-          <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
+          <Box textAlign="left" minHeight="32px" marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>
               ←&nbsp;
               <FormattedMessage id="Back" defaultMessage="Back" />
@@ -152,8 +160,8 @@ class CreateCollectiveForm extends React.Component {
           </Box>
           <Box mb={[2, 3]}>
             <H1
-              fontSize={['H5', 'H3']}
-              lineHeight={['H5', 'H3']}
+              fontSize={['20px', '32px']}
+              lineHeight={['24px', '36px']}
               fontWeight="bold"
               textAlign="center"
               color="black.900"
@@ -161,8 +169,8 @@ class CreateCollectiveForm extends React.Component {
               <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
             </H1>
           </Box>
-          <Box textAlign="center" minHeight={['24px']}>
-            <P fontSize="LeadParagraph" color="black.600" mb={2}>
+          <Box textAlign="center" minHeight="24px">
+            <P fontSize="16px" color="black.600" mb={2}>
               <FormattedMessage
                 id="createCollective.subtitle.introduce"
                 defaultMessage="Introduce your Collective to the community."
@@ -196,7 +204,7 @@ class CreateCollectiveForm extends React.Component {
                     strict: true,
                   };
 
-                  return slugify(value, slugOptions);
+                  return trim(slugify(value, slugOptions), '-');
                 };
 
                 const handleSlugChange = e => {
@@ -245,7 +253,7 @@ class CreateCollectiveForm extends React.Component {
                       )}
                     </StyledInputField>
                     {values.name.length > 0 && !touched.slug && (
-                      <P fontSize="Tiny">{intl.formatMessage(messages.suggestedLabel)}</P>
+                      <P fontSize="10px">{intl.formatMessage(messages.suggestedLabel)}</P>
                     )}
                     <StyledInputField
                       name="description"
@@ -266,7 +274,7 @@ class CreateCollectiveForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
-                    <P fontSize="SmallCaption">{intl.formatMessage(messages.descriptionHint)}</P>
+                    <P fontSize="11px">{intl.formatMessage(messages.descriptionHint)}</P>
 
                     <Flex flexDirection="column" mx={1} my={4}>
                       <StyledCheckbox

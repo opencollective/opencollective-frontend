@@ -22,8 +22,8 @@ const GoalContainer = styled.div`
   transition: width 3s;
   height: 15px;
   color: ${props => props.theme.colors.black[500]};
-  border-right: 1px solid ${props =>
-    props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme)};
+  border-right: 1px solid
+    ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme))};
   width: ${props => `${props.goal.progress * 100}%`};
   z-index: ${props => (['balance', 'yearlyBudget'].includes(props.goal.slug) ? 310 : (20 - props.index) * 10)};
   transition: ${props =>

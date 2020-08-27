@@ -1,14 +1,56 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { Query } from '@apollo/client/react/components';
+import { graphql } from '@apollo/client/react/hoc';
+import { partition } from 'lodash';
 import Head from 'next/head';
 import { FormattedMessage } from 'react-intl';
 
+import { CollectiveType } from '../lib/constants/collectives';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+
+import TopContributors from '../components/collective-page/TopContributors';
+import { Box, Flex } from '../components/Grid';
+import Loading from '../components/Loading';
 import MembersWithData from '../components/MembersWithData';
+import MessageBoxGraphqlError from '../components/MessageBoxGraphqlError';
+import StyledLink from '../components/StyledLink';
+import { H3 } from '../components/Text';
+
+const topContributorsQuery = gqlV2/* GraphQL */ `
+  query BannerTopContributors($collectiveSlug: String!) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      currency
+      slug
+      ... on AccountWithContributions {
+        contributors(limit: 150) {
+          totalCount
+          nodes {
+            id
+            name
+            roles
+            isAdmin
+            isCore
+            isBacker
+            since
+            image
+            description
+            collectiveSlug
+            totalAmountDonated
+            type
+            publicMessage
+            isIncognito
+          }
+        }
+      }
+    }
+  }
+`;
 
 class BannerIframe extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, id, style }, req, res }) {
+  static getInitialProps({ query: { collectiveSlug, id, style, useNewFormat }, req, res }) {
     // Allow to be embedded as Iframe everywhere
     if (res) {
       res.removeHeader('X-Frame-Options');
@@ -17,14 +59,15 @@ class BannerIframe extends React.Component {
       }
     }
 
-    return { collectiveSlug, id, style };
+    return { collectiveSlug, id, style, useNewFormat: Boolean(useNewFormat) };
   }
 
   static propTypes = {
-    collectiveSlug: PropTypes.string, // from getInitialProps, for addCollectiveData
+    collectiveSlug: PropTypes.string, // from getInitialProps, for addCollectiveBannerIframeData
     id: PropTypes.string, // from getInitialProps
     style: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
+    useNewFormat: PropTypes.bool,
   };
 
   constructor(props) {
@@ -73,8 +116,54 @@ class BannerIframe extends React.Component {
     window.parent.postMessage(message, '*');
   };
 
+  renderTopContributors = collective => {
+    const [orgs, individuals] = partition(collective.contributors.nodes, c => c.type !== CollectiveType.USER);
+    return <TopContributors organizations={orgs} individuals={individuals} currency={collective.currency} />;
+  };
+
+  renderNewFormat = () => {
+    return (
+      <Query
+        query={topContributorsQuery}
+        variables={{ collectiveSlug: this.props.collectiveSlug }}
+        context={API_V2_CONTEXT}
+      >
+        {({ data, error, loading }) =>
+          loading ? (
+            <Loading />
+          ) : error ? (
+            <MessageBoxGraphqlError error={error} />
+          ) : (
+            <Box>
+              <Flex flexDirection="column" alignItems="center" mb={3}>
+                <H3 fontSize="18px" lineHeight="28px">
+                  <FormattedMessage
+                    id="NewContributionFlow.Join"
+                    defaultMessage="Join {numberOfContributors} other fellow contributors"
+                    values={{ numberOfContributors: data.account.contributors.totalCount }}
+                  />
+                </H3>
+                <StyledLink openInNewTab href={`https://opencollective.com/${this.props.collectiveSlug}`}>
+                  <FormattedMessage
+                    id="widget.contributeOnOpenCollective"
+                    defaultMessage="Contribute on Open Collective"
+                  />
+                </StyledLink>
+              </Flex>
+              {this.renderTopContributors(data.account)}
+            </Box>
+          )
+        }
+      </Query>
+    );
+  };
+
   render() {
-    const { collectiveSlug, data } = this.props;
+    const { collectiveSlug, data, useNewFormat } = this.props;
+
+    if (useNewFormat) {
+      return this.renderNewFormat();
+    }
 
     let style;
     try {
@@ -385,8 +474,8 @@ class BannerIframe extends React.Component {
   }
 }
 
-const getMembersQuery = gql`
-  query Collective($collectiveSlug: String) {
+const collectiveBannerIframeQuery = gql`
+  query CollectiveBannerIfame($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
       name
@@ -404,6 +493,6 @@ const getMembersQuery = gql`
   }
 `;
 
-export const addCollectiveData = graphql(getMembersQuery);
+export const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery);
 
-export default addCollectiveData(BannerIframe);
+export default addCollectiveBannerIframeData(BannerIframe);

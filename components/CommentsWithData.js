@@ -1,23 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
-import PrivateInfoIcon from './icons/PrivateInfoIcon';
+import PrivateCommentsMessage from './expenses/PrivateCommentsMessage';
 import CommentForm from './CommentForm';
 import Comments from './Comments';
 import Error from './Error';
-import { Flex } from './Grid';
-import LoadingPlaceholder from './LoadingPlaceholder';
 import LoginBtn from './LoginBtn';
-import MessageBox from './MessageBox';
-import { P } from './Text';
-
-const gqlV2 = gql; // Needed for lint validation of api v2 schema.
 
 class CommentsWithData extends React.Component {
   static propTypes = {
@@ -115,21 +109,7 @@ class CommentsWithData extends React.Component {
     }
 
     if (!expenseComments?.comments) {
-      return loading || this.props.loadingLoggedInUser ? (
-        <LoadingPlaceholder height={76} borderRadius={8} />
-      ) : (
-        <MessageBox type="info" px={4}>
-          <Flex alignItems="center">
-            <PrivateInfoIcon size={42} withoutTooltip />
-            <P ml={3} fontSize="Paragraph" lineHeight="Paragraph">
-              <FormattedMessage
-                id="expense.privateCommentsWarning"
-                defaultMessage="Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them."
-              />
-            </P>
-          </Flex>
-        </MessageBox>
-      );
+      return <PrivateCommentsMessage isLoading={loading || this.props.loadingLoggedInUser} isAllowed={false} />;
     }
 
     return (
@@ -151,11 +131,11 @@ class CommentsWithData extends React.Component {
   }
 }
 
-const getCommentsQuery = gqlV2`
-  query getCommentsQuery($id: String!, $limit: Int, $offset: Int) {
+const commentsQuery = gqlV2/* GraphQL */ `
+  query Comments($id: String!, $limit: Int, $offset: Int) {
     expense(id: $id) {
       id
-      comments(limit: $limit, offset: $offset, orderBy: {direction: ASC}) {
+      comments(limit: $limit, offset: $offset, orderBy: { direction: ASC }) {
         totalCount
         nodes {
           id
@@ -194,7 +174,8 @@ const getCommentsQueryVariables = ({ expense, limit = COMMENTS_PER_PAGE }) => ({
 });
 
 const COMMENTS_PER_PAGE = 10;
-export const commentsQuery = graphql(getCommentsQuery, {
+
+export const addCommentsQuery = graphql(commentsQuery, {
   skip: props => !props.LoggedInUser,
   options: props => ({
     context: { apiVersion: '2' },
@@ -224,8 +205,8 @@ export const commentsQuery = graphql(getCommentsQuery, {
   }),
 });
 
-const createCommentQuery = gqlV2`
-  mutation createComment($comment: CommentCreateInput!) {
+const createCommentMutation = gqlV2/* GraphQL */ `
+  mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       id
       html
@@ -254,16 +235,14 @@ const createCommentQuery = gqlV2`
   }
 `;
 
-const createCommentMutation = graphql(createCommentQuery, {
-  options: {
-    context: { apiVersion: '2' },
-  },
+const addCreateCommentMutation = graphql(createCommentMutation, {
+  options: { context: API_V2_CONTEXT },
   props: ({ ownProps, mutate }) => ({
     createComment: async comment => {
       return await mutate({
         variables: { comment },
         update: (proxy, { data: { createComment } }) => {
-          const query = getCommentsQuery;
+          const query = commentsQuery;
           const variables = getCommentsQueryVariables(ownProps);
           /**
            * In other to fire a component re-render it is necessary to deep clone the
@@ -281,24 +260,22 @@ const createCommentMutation = graphql(createCommentQuery, {
   }),
 });
 
-const deleteCommentQuery = gqlV2`
-  mutation deleteComment($id: String!) {
+const deleteCommentMutation = gqlV2/* GraphQL */ `
+  mutation DeleteComment($id: String!) {
     deleteComment(id: $id) {
       id
     }
   }
 `;
 
-const deleteCommentMutation = graphql(deleteCommentQuery, {
-  options: {
-    context: { apiVersion: '2' },
-  },
+const addDeleteCommentMutation = graphql(deleteCommentMutation, {
+  options: { context: API_V2_CONTEXT },
   props: ({ ownProps, mutate }) => ({
     deleteComment: async id => {
       return await mutate({
         variables: { id },
         update: (proxy, { data: { deleteComment } }) => {
-          const query = getCommentsQuery;
+          const query = commentsQuery;
           const variables = getCommentsQueryVariables(ownProps);
           /**
            * In other to fire a component re-render it is necessary to deep clone the
@@ -316,8 +293,8 @@ const deleteCommentMutation = graphql(deleteCommentQuery, {
   }),
 });
 
-const editCommentQuery = gqlV2`
-  mutation editComment($comment: CommentUpdateInput!) {
+const editCommentMutation = gqlV2/* GraphQL */ `
+  mutation EditComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
       id
       html
@@ -346,20 +323,16 @@ const editCommentQuery = gqlV2`
   }
 `;
 
-const editCommentMutation = graphql(editCommentQuery, {
-  options: {
-    context: { apiVersion: '2' },
-  },
-  props: ({ mutate }) => ({
-    editComment: async comment => {
-      return await mutate({ variables: { comment } });
-    },
-  }),
+const addEditCommentMutation = graphql(editCommentMutation, {
+  name: 'editComment',
+  options: { context: API_V2_CONTEXT },
 });
 
-export default compose(
-  commentsQuery,
-  createCommentMutation,
-  editCommentMutation,
-  deleteCommentMutation,
-)(CommentsWithData);
+const addGraphql = compose(
+  addCommentsQuery,
+  addCreateCommentMutation,
+  addEditCommentMutation,
+  addDeleteCommentMutation,
+);
+
+export default addGraphql(CommentsWithData);

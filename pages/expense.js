@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql, withApollo } from '@apollo/react-hoc';
+import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { CollectiveType } from '../lib/constants/collectives';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -28,17 +29,17 @@ import {
   loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
+import PrivateCommentsMessage from '../components/expenses/PrivateCommentsMessage';
 import { Box, Flex } from '../components/Grid';
 import HTMLContent from '../components/HTMLContent';
 import I18nFormatters, { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
-import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
 import TemporaryNotification from '../components/TemporaryNotification';
-import { H1, H5, P, Span } from '../components/Text';
+import { H1, H5, Span } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 const messages = defineMessages({
@@ -48,14 +49,14 @@ const messages = defineMessages({
   },
 });
 
-const expensePageQuery = gqlV2`
+const expensePageQuery = gqlV2/* GraphQL */ `
   query ExpensePage($legacyExpenseId: Int!) {
     expense(expense: { legacyId: $legacyExpenseId }) {
-      ...expensePageExpenseFieldsFragment
+      ...ExpensePageExpenseFields
     }
 
     loggedInAccount {
-      ...loggedInAccountExpensePayoutFieldsFragment
+      ...LoggedInAccountExpensePayoutFields
     }
   }
 
@@ -63,10 +64,10 @@ const expensePageQuery = gqlV2`
   ${expensePageExpenseFieldsFragment}
 `;
 
-const editExpenseMutation = gqlV2`
-  mutation editExpense($expense: ExpenseUpdateInput!) {
+const editExpenseMutation = gqlV2/* GraphQL */ `
+  mutation EditExpense($expense: ExpenseUpdateInput!) {
     editExpense(expense: $expense) {
-      ...expensePageExpenseFieldsFragment
+      ...ExpensePageExpenseFields
     }
   }
 
@@ -75,7 +76,7 @@ const editExpenseMutation = gqlV2`
 
 const PrivateNoteLabel = () => {
   return (
-    <Span fontSize="Caption" color="black.700" fontWeight="bold">
+    <Span fontSize="12px" color="black.700" fontWeight="bold">
       <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
       &nbsp;&nbsp;
       <PrivateInfoIcon color="#969BA3" />
@@ -85,6 +86,8 @@ const PrivateNoteLabel = () => {
 
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
+
+const { USER, ORGANIZATION } = CollectiveType;
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, createSuccess } }) {
@@ -108,8 +111,8 @@ class ExpensePage extends React.Component {
     client: PropTypes.object.isRequired,
     /** from withData */
     data: PropTypes.object.isRequired,
-    /** from withData */
-    mutate: PropTypes.func.isRequired,
+    /** from addEditExpenseMutation */
+    editExpense: PropTypes.func.isRequired,
     /** from injectIntl */
     intl: PropTypes.object,
     expensesTags: PropTypes.arrayOf(
@@ -203,7 +206,7 @@ class ExpensePage extends React.Component {
     try {
       this.setState({ isSubmitting: true, error: null });
       const { editedExpense } = this.state;
-      await this.props.mutate({ variables: { expense: prepareExpenseForSubmit(editedExpense) } });
+      await this.props.editExpense({ variables: { expense: prepareExpenseForSubmit(editedExpense) } });
       this.setState({ status: PAGE_STATUS.VIEW, isSubmitting: false, editedExpense: undefined, error: null });
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
@@ -260,7 +263,14 @@ class ExpensePage extends React.Component {
     if (!loggedInAccount) {
       return [];
     } else {
-      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', []).map(member => member.account);
+      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', [])
+        .map(member => member.account)
+        .filter(
+          account =>
+            [USER, ORGANIZATION].includes(account.type) ||
+            // Same Host
+            (account.isActive && this.props.data?.account?.host?.id === account.host?.id),
+        );
       return [loggedInAccount, ...accountsAdminOf];
     }
   });
@@ -295,6 +305,15 @@ class ExpensePage extends React.Component {
     return this.setState(() => ({ status: PAGE_STATUS.EDIT, editedExpense: this.props.data.expense }));
   };
 
+  onDelete = async expense => {
+    const collective = expense.account;
+    return Router.replaceRoute('expenses', {
+      parentCollectiveSlug: collective.parent?.slug,
+      collectiveType: collective.parent ? getCollectiveTypeForUrl(collective) : undefined,
+      collectiveSlug: collective.slug,
+    });
+  };
+
   render() {
     const { collectiveSlug, data, loadingLoggedInUser, createSuccess, intl } = this.props;
     const { isRefetchingDataForUser, error, status, editedExpense, successMessageDismissed } = this.state;
@@ -303,9 +322,9 @@ class ExpensePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.expense) {
-        return <ErrorPage error={generateNotFoundError(null, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(null)} log={false} />;
       } else if (!data.expense.account || this.props.collectiveSlug !== data.expense.account.slug) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       }
     }
 
@@ -319,11 +338,7 @@ class ExpensePage extends React.Component {
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
 
-    // Adding that at GraphQL level is buggy
-    // data is coming from expensePageQuery and expensePageExpenseFieldsFragment
-    if (expense && expense.account.isHost) {
-      expense.account.host = { ...expense.account };
-    }
+    const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
 
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>
@@ -358,12 +373,13 @@ class ExpensePage extends React.Component {
                   permissions={expense?.permissions}
                   onError={error => this.setState({ error })}
                   onEdit={this.onEditBtnClick}
+                  onDelete={this.onDelete}
                 />
               )}
             </Flex>
           </Container>
           <Box flex="1 1 650px" minWidth={300} maxWidth={792} mr={[null, 2, 3, 4, 5]} px={2} ref={this.expenseTopRef}>
-            <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
+            <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
               <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
             </H1>
             {error && (
@@ -401,7 +417,7 @@ class ExpensePage extends React.Component {
                   <React.Fragment>
                     {hasAttachedFiles && (
                       <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                        <H5 fontSize="LeadParagraph" mb={3}>
+                        <H5 fontSize="16px" mb={3}>
                           <FormattedMessage id="Expense.Downloads" defaultMessage="Downloads" />
                         </H5>
                         <ExpenseAttachedFiles
@@ -414,11 +430,11 @@ class ExpensePage extends React.Component {
                     )}
                     {expense?.privateMessage && (
                       <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                        <H5 fontSize="LeadParagraph" mb={3}>
+                        <H5 fontSize="16px" mb={3}>
                           <FormattedMessage id="expense.notes" defaultMessage="Notes" />
                         </H5>
                         <PrivateNoteLabel mb={2} />
-                        <HTMLContent color="black.700" mt={1} fontSize="LeadCaption" content={expense.privateMessage} />
+                        <HTMLContent color="black.700" mt={1} fontSize="13px" content={expense.privateMessage} />
                       </Container>
                     )}
                   </React.Fragment>
@@ -466,7 +482,7 @@ class ExpensePage extends React.Component {
                   loading={loadingLoggedInUser}
                   expense={editedExpense}
                   expensesTags={this.getSuggestedTags(collective)}
-                  payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                  payoutProfiles={payoutProfiles}
                   onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
                   validateOnChange
                   disableSubmitIfUntouched
@@ -479,25 +495,12 @@ class ExpensePage extends React.Component {
                 />
               </Box>
             )}
-            {!expense?.permissions.canComment && (
-              <Box my={4}>
-                {loadingLoggedInUser || isRefetchingDataForUser ? (
-                  <LoadingPlaceholder height={76} borderRadius={8} />
-                ) : (
-                  <MessageBox type="info" px={4}>
-                    <Flex alignItems="center">
-                      <PrivateInfoIcon size={42} withoutTooltip />
-                      <P ml={3} fontSize="Paragraph" lineHeight="Paragraph">
-                        <FormattedMessage
-                          id="expense.privateCommentsWarning"
-                          defaultMessage="Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them."
-                        />
-                      </P>
-                    </Flex>
-                  </MessageBox>
-                )}
-              </Box>
-            )}
+            <Box my={4}>
+              <PrivateCommentsMessage
+                isAllowed={expense?.permissions.canComment}
+                isLoading={loadingLoggedInUser || isRefetchingDataForUser}
+              />
+            </Box>
             {expense && (
               <Box mb={3} pt={3}>
                 <Thread
@@ -536,16 +539,13 @@ class ExpensePage extends React.Component {
   }
 }
 
-const getData = graphql(expensePageQuery, {
-  options: {
-    context: API_V2_CONTEXT,
-  },
+const addExpensePageData = graphql(expensePageQuery, {
+  options: { context: API_V2_CONTEXT },
 });
 
-const withEditExpenseMutation = graphql(editExpenseMutation, {
-  options: {
-    context: API_V2_CONTEXT,
-  },
+const addEditExpenseMutation = graphql(editExpenseMutation, {
+  name: 'editExpense',
+  options: { context: API_V2_CONTEXT },
 });
 
-export default injectIntl(getData(withApollo(withUser(withEditExpenseMutation(ExpensePage)))));
+export default injectIntl(addExpensePageData(withApollo(withUser(addEditExpenseMutation(ExpensePage)))));

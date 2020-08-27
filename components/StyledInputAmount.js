@@ -34,7 +34,11 @@ const floatAmountToCents = floatAmount => {
 };
 
 /** Formats value is valid, fallsback on rawValue otherwise */
-const getValue = (value, rawValue) => {
+const getValue = (value, rawValue, isEmpty) => {
+  if (isEmpty) {
+    return '';
+  }
+
   return isNaN(value) || value === null ? rawValue : value / 100;
 };
 
@@ -51,6 +55,7 @@ const StyledInputAmount = ({
   value,
   onBlur,
   onChange,
+  isEmpty,
   ...props
 }) => {
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
@@ -82,8 +87,11 @@ const StyledInputAmount = ({
       type="number"
       inputMode="decimal"
       defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
-      value={isControlled ? getValue(value, rawValue) : undefined}
-      onWheel={e => e.preventDefault()}
+      value={isControlled ? getValue(value, rawValue, isEmpty) : undefined}
+      onWheel={e => {
+        e.preventDefault();
+        e.target.blur();
+      }}
       onChange={e => {
         e.stopPropagation();
         dispatchValue(e, parseValueFromEvent(e, precision));
@@ -127,6 +135,8 @@ StyledInputAmount.propTypes = {
   currencyDisplay: PropTypes.oneOf(['SYMBOL', 'CODE', 'FULL']),
   /** Number of decimals */
   precision: PropTypes.number,
+  /** A special prop to force the empty state */
+  isEmpty: PropTypes.bool,
   /** Accept all PropTypes from `StyledInputGroup` */
   ...StyledInputGroup.propTypes,
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
 import Error from './Error';
@@ -98,7 +98,7 @@ class UpdatesWithData extends React.Component {
   }
 }
 
-const getUpdatesQuery = gql`
+const updatesQuery = gql`
   query Updates($CollectiveId: Int!, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
     allUpdates(
       CollectiveId: $CollectiveId
@@ -144,7 +144,7 @@ const getUpdatesVariables = props => {
 
 const UPDATES_PER_PAGE = 10;
 
-export const addUpdatesData = graphql(getUpdatesQuery, {
+export const addUpdatesData = graphql(updatesQuery, {
   options: props => ({
     variables: getUpdatesVariables(props),
   }),

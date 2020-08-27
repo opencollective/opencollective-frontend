@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -74,7 +74,7 @@ const ProgressInfoContainer = styled.div`
 `;
 
 /** A mutation with all the info that user is allowed to edit on this page */
-const EditTierMutation = gql`
+const editTierMutation = gql`
   mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String, $videoUrl: String) {
     editTier(
       tier: { id: $id, description: $description, name: $name, longDescription: $longDescription, videoUrl: $videoUrl }
@@ -114,6 +114,7 @@ class TierPage extends Component {
       interval: PropTypes.string.isRequired,
       currency: PropTypes.string,
       endsAt: PropTypes.string,
+      button: PropTypes.string,
       goal: PropTypes.number,
       description: PropTypes.string,
       longDescription: PropTypes.string,
@@ -146,7 +147,7 @@ class TierPage extends Component {
     const pageUrl = `${getWebsiteUrl()}${this.props.router.asPath}`;
     return (
       <div>
-        <P fontSize="LeadParagraph" color="black.700" fontWeight="bold" mt={4} mb={3}>
+        <P fontSize="16px" color="black.700" fontWeight="bold" mt={4} mb={3}>
           <FormattedMessage id="TierPage.ShareGoal" defaultMessage="Share this goal" />
         </P>
         <ShareButtons pageUrl={pageUrl} collective={this.props.collective} />
@@ -199,12 +200,12 @@ class TierPage extends Component {
                 py={[4, 5]}
                 boxShadow="-3px 11px 13px rgba(75, 75, 75, 0.1)"
               >
-                <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
+                <P fontSize="16px" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>
-                <H1 fontSize="H2" textAlign="left" color="black.900" wordBreak="break-word" mb={3} data-cy="TierName">
+                <H1 fontSize="40px" textAlign="left" color="black.900" wordBreak="break-word" mb={3} data-cy="TierName">
                   <InlineEditField
-                    mutation={EditTierMutation}
+                    mutation={editTierMutation}
                     canEdit={canEdit}
                     values={tier}
                     field="name"
@@ -214,7 +215,7 @@ class TierPage extends Component {
                 </H1>
                 <H2
                   color="black.600"
-                  fontSize="H5"
+                  fontSize="20px"
                   lineHeight="1.5em"
                   mb={4}
                   whiteSpace="pre-line"
@@ -222,7 +223,7 @@ class TierPage extends Component {
                   wordBreak="break-word"
                 >
                   <InlineEditField
-                    mutation={EditTierMutation}
+                    mutation={editTierMutation}
                     canEdit={canEdit}
                     values={tier}
                     field="description"
@@ -234,7 +235,7 @@ class TierPage extends Component {
                 </H2>
                 <Container display="flex" flexDirection="column-reverse" position="relative" flexWrap="wrap">
                   <div>
-                    <TierLongDescription tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
+                    <TierLongDescription tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </div>
                   <Container
                     position={['relative', null, null, 'absolute']}
@@ -243,7 +244,7 @@ class TierPage extends Component {
                     mb={[4, 5]}
                     top={[0, null, null, -50]}
                   >
-                    <TierVideo tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
+                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </Container>
                 </Container>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
@@ -271,9 +272,9 @@ class TierPage extends Component {
               <ProgressInfoContainer>
                 {tier.goal && (
                   <P
-                    fontSize={['Caption', 'Paragraph', null, 'H5']}
+                    fontSize={['12px', '14px', null, '20px']}
                     color="black.500"
-                    lineHeight={['LeadParagraph', null, null, 'H3']}
+                    lineHeight={['24px', null, null, '36px']}
                     mb={[0, null, null, 3]}
                     truncateOverflow
                   >
@@ -297,9 +298,9 @@ class TierPage extends Component {
                   </P>
                 )}
                 <P
-                  fontSize={['Tiny', 'Paragraph']}
+                  fontSize={['10px', '14px']}
                   color="black.500"
-                  lineHeight={['Caption', null, 'LeadParagraph']}
+                  lineHeight={['18px', null, '24px']}
                   mb={[0, null, null, 2]}
                   truncateOverflow
                 >
@@ -356,7 +357,7 @@ class TierPage extends Component {
                       }}
                     >
                       <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
-                        <FormattedMessage id="Contribute" defaultMessage="Contribute" />
+                        {tier.button ? tier.button : <FormattedMessage id="Contribute" defaultMessage="Contribute" />}
                       </StyledButton>
                     </Link>
                   )}

@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { groupBy, isEqual, last, sortBy, truncate } from 'lodash';
+import { groupBy, intersection, isEqual, last, sortBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import ReactDOM from 'react-dom';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
+import styled from 'styled-components';
 import { isEmail } from 'validator';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -45,6 +46,13 @@ const Messages = defineMessages({
   },
 });
 
+const CollectiveLabelTextContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-left: 8px;
+`;
+
 /**
  * Default label builder used to render a collective. For sections titles and custom options,
  * this will just return the default label.
@@ -52,14 +60,14 @@ const Messages = defineMessages({
 const DefaultCollectiveLabel = ({ value: collective }) => (
   <Flex alignItems="center">
     <Avatar collective={collective} radius={28} />
-    <Flex flexDirection="column" ml={2}>
-      <Span fontSize="Caption" fontWeight="500" lineHeight="18px" color="black.700">
+    <CollectiveLabelTextContainer>
+      <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
         {truncate(collective.name, { length: 40 })}
       </Span>
-      <Span fontSize="SmallCaption" lineHeight="16px" color="black.500">
+      <Span fontSize="11px" lineHeight="13px" color="black.500">
         @{collective.slug}
       </Span>
-    </Flex>
+    </CollectiveLabelTextContainer>
   </Flex>
 );
 
@@ -74,8 +82,12 @@ DefaultCollectiveLabel.propTypes = {
 };
 
 // Some flags to differentiate options in the picker
-const FLAG_COLLECTIVE_PICKER_COLLECTIVE = '__collective_picker_collective__';
+export const FLAG_COLLECTIVE_PICKER_COLLECTIVE = '__collective_picker_collective__';
 const FLAG_NEW_COLLECTIVE = '__collective_picker_new__';
+
+const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
+
+const sortedAccountTypes = ['INDIVIDUAL', USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT];
 
 /**
  * An overset og `StyledSelect` specialized to display, filter and pick a collective from a given list.
@@ -126,7 +138,8 @@ class CollectivePicker extends React.PureComponent {
 
     // Group collectives under categories, sort the categories labels and the collectives inside them
     const collectivesByTypes = groupBy(collectives, 'type');
-    const sortedActiveTypes = Object.keys(collectivesByTypes).sort();
+    const sortedActiveTypes = intersection(sortedAccountTypes, Object.keys(collectivesByTypes));
+
     return sortedActiveTypes.map(type => {
       const sectionI18n = CollectiveTypesI18n[type];
       const sortedCollectives = sortFunc(collectivesByTypes[type]);
