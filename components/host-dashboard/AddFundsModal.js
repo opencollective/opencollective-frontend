@@ -4,7 +4,6 @@ import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
-import { OC_FEE_PERCENT } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -75,7 +74,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
 const getInitialValues = values => ({
   amount: null,
   hostFeePercent: null,
-  platformFeePercent: OC_FEE_PERCENT,
+  platformFeePercent: 0,
   description: '',
   fromAccount: null,
   ...values,
@@ -114,7 +113,7 @@ const AddFunds = ({ host, collective, ...props }) => {
       >
         {({ values, isSubmitting, isValid, dirty }) => {
           const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
-          const platformFeePercent = isNaN(values.platformFeePercent) ? OC_FEE_PERCENT : values.platformFeePercent;
+          const platformFeePercent = isNaN(values.platformFeePercent) ? 0 : values.platformFeePercent;
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
           const platformFee = Math.round(values.amount * (platformFeePercent / 100));
 
@@ -176,7 +175,7 @@ const AddFunds = ({ host, collective, ...props }) => {
                     {({ form, field }) => (
                       <StyledInputPercentage
                         id={field.id}
-                        placeholder={OC_FEE_PERCENT}
+                        placeholder="0"
                         value={field.value}
                         error={field.error}
                         onChange={value => form.setFieldValue(field.name, value)}
