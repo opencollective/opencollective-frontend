@@ -206,6 +206,7 @@ const AddFunds = ({ host, collective, ...props }) => {
                       creatable
                       menuPortalTarget={document.body}
                       error={field.error}
+                      createCollectiveOptionalFields={['location.address', 'location.country']}
                       onBlur={() => form.setFieldTouched(field.name, true)}
                       customOptions={[{ value: host, label: <DefaultCollectiveLabel value={host} /> }]}
                       onChange={({ value }) => form.setFieldValue(field.name, value)}
