@@ -252,10 +252,7 @@ class TopBarProfileMenu extends React.Component {
                 fetchPolicy="network-only"
               >
                 {({ data, loading }) =>
-                  loading === false &&
-                  data &&
-                  data.memberInvitations &&
-                  data.memberInvitations.length > 0 && (
+                  loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (
                     <ListItem py={1}>
                       <Link route="member-invitations" passHref>
                         <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
@@ -267,7 +264,7 @@ class TopBarProfileMenu extends React.Component {
                         </StyledLink>
                       </Link>
                     </ListItem>
-                  )
+                  ) : null
                 }
               </Query>
               <ListItem py={1}>

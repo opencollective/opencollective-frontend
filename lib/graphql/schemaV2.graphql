@@ -3809,9 +3809,19 @@ type Host implements Account {
   supportedPaymentMethods: [PaymentMethodType]
 
   """
+  Paypal preapproval info. Returns null if PayPal account is not connected.
+  """
+  paypalPreApproval: PaymentMethod
+
+  """
   The list of payout methods this Host accepts for its expenses
   """
   supportedPayoutMethods: [PayoutMethodType]
+
+  """
+  Transferwise balances. Returns null if Transferwise account is not connected.
+  """
+  transferwiseBalances: [Amount]
 }
 
 """
@@ -4985,6 +4995,7 @@ type PaymentMethod {
   data: JSON
   limitedToHosts: [Host]
   expiryDate: ISODateTime
+  createdAt: ISODateTime
 }
 
 input PaymentMethodCreateInput {

@@ -72,6 +72,13 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     expensePolicy
     website
     settings
+    paypalPreApproval {
+      id
+      balance {
+        currency
+        valueInCents
+      }
+    }
     location {
       address
       country
