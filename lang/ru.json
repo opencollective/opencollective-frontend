@@ -336,7 +336,7 @@
   "ContactCollective": "Связаться с {collective}",
   "contribuion.minimumAmount": "Минимальная сумма: {minAmount} {currency}",
   "Contribute": "Внести вклад",
-  "contribute.changeFrequency.confirmMsg": "Если вы меняете частоту, вы не будете участвовать в этом определенном уровне \"{tierName}\"",
+  "contribute.changeFrequency.warning": "If you change the frequency, you will not contribute to this specific {tierName} tier",
   "contribute.changeTaxNumber": "Изменить номер {taxName}",
   "contribute.ContributionDetailsTitle": "Детали участия:",
   "contribute.contributorType": "Внести свой вклад в уровень {name}",
