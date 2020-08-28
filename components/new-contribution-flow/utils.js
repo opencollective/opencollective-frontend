@@ -109,7 +109,7 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
     }
 
     // Paypal
-    if (hostHasPaypal) {
+    if (hostHasPaypal && !stepDetails.interval) {
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
