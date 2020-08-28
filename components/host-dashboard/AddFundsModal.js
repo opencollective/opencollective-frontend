@@ -87,7 +87,7 @@ const validate = values => {
 
 // Build an account reference. Compatible with accounts from V1 and V2.
 const buildAccountReference = input => {
-  return typeof input.id === 'string' ? { id: input.id } : { legacyId: input.legacyId };
+  return typeof input.id === 'string' ? { id: input.id } : { legacyId: input.id };
 };
 
 const AddFunds = ({ host, collective, ...props }) => {
