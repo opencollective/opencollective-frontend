@@ -107,7 +107,7 @@ const SECTION_LABELS = defineMessages({
   },
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: {
     id: 'editCollective.menu.members',
-    defaultMessage: 'Core Contributors',
+    defaultMessage: 'Team',
   },
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: {
     id: 'editCollective.menu.paymentMethods',
