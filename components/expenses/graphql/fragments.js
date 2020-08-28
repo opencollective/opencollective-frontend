@@ -238,6 +238,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       id
       type
       createdAt
+      data
       individual {
         id
         type
