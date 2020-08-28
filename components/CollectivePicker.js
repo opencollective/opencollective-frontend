@@ -308,11 +308,18 @@ class CollectivePicker extends React.PureComponent {
                     zIndex: 9999,
                   }}
                 >
-                  <StyledCard p={3} my={1} boxShadow="-2px 4px 7px 0 rgba(78, 78, 78, 14%)">
+                  <StyledCard
+                    p={3}
+                    my={1}
+                    boxShadow="-2px 4px 7px 0 rgba(78, 78, 78, 14%)"
+                    maxHeight={315}
+                    overflowY="auto"
+                  >
                     <CreateCollectiveMiniForm
                       type={createFormCollectiveType}
                       onCancel={this.setCreateFormCollectiveType}
                       addLoggedInUserAsAdmin={addLoggedInUserAsAdmin}
+                      optionalFields={this.props.createCollectiveOptionalFields}
                       onSuccess={collective => {
                         if (onChange) {
                           onChange({ label: collective.name, value: collective });
@@ -349,7 +356,7 @@ CollectivePicker.propTypes = {
   /** Custom options to be passed to styled select */
   customOptions: PropTypes.arrayOf(
     PropTypes.shape({
-      label: PropTypes.string,
+      label: PropTypes.node,
       value: PropTypes.any,
     }),
   ),
@@ -391,6 +398,8 @@ CollectivePicker.propTypes = {
     type: PropTypes.string,
     name: PropTypes.string,
   }),
+  /** A list of optional fields to include in the form */
+  createCollectiveOptionalFields: PropTypes.array,
 };
 
 CollectivePicker.defaultProps = {
