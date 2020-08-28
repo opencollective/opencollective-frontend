@@ -57,7 +57,7 @@ const CollectiveLabelTextContainer = styled.div`
  * Default label builder used to render a collective. For sections titles and custom options,
  * this will just return the default label.
  */
-const DefaultCollectiveLabel = ({ value: collective }) => (
+export const DefaultCollectiveLabel = ({ value: collective }) => (
   <Flex alignItems="center">
     <Avatar collective={collective} radius={28} />
     <CollectiveLabelTextContainer>
@@ -308,7 +308,7 @@ class CollectivePicker extends React.PureComponent {
                     zIndex: 9999,
                   }}
                 >
-                  <StyledCard p={3} my={1}>
+                  <StyledCard p={3} my={1} boxShadow="-2px 4px 7px 0 rgba(78, 78, 78, 14%)">
                     <CreateCollectiveMiniForm
                       type={createFormCollectiveType}
                       onCancel={this.setCreateFormCollectiveType}
