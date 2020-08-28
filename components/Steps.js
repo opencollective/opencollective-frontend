@@ -187,7 +187,7 @@ export default class Steps extends React.Component {
    */
   goToStep = async (step, opts = {}) => {
     const currentStep = this.getStepByName(this.props.currentStepName);
-    if (step.index < currentStep.index) {
+    if (step.index < currentStep?.index) {
       opts.action = 'prev';
     }
 

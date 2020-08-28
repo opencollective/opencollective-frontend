@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
-import { TierTypes } from '../../lib/constants/tiers-types';
+import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 
@@ -12,6 +12,7 @@ import { Box } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
 import StyledInputField from '../../components/StyledInputField';
 
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledAmountPicker from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
@@ -23,22 +24,42 @@ import TierCustomFields from './TierCustomFields';
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
   const intl = useIntl();
   const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
+  const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
   return (
     <Box width={1}>
-      <Box mb={3}>
-        <StyledAmountPicker
-          currency={collective.currency}
-          presets={presets}
-          min={getTierMinAmount(tier)}
-          value={data?.amount}
-          onChange={amount => dispatchChange('amount', amount)}
+      {tier?.amountType !== AmountTypes.FIXED ? (
+        <Box mb={3}>
+          <StyledAmountPicker
+            currency={collective.currency}
+            presets={presets}
+            min={getTierMinAmount(tier)}
+            value={data?.amount}
+            onChange={amount => dispatchChange('amount', amount)}
+          />
+        </Box>
+      ) : tier.amount.valueInCents ? (
+        <Box mb={3}>
+          <FormattedMessage
+            id="contribute.tierDetails"
+            defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month { monthly} year { yearly} other {}}."
+            values={{
+              interval: tier.interval,
+              amount: <FormattedMoneyAmount amount={tier.amount.valueInCents} currency={collective.currency} />,
+            }}
+          />
+        </Box>
+      ) : !hasQuantity ? (
+        <FormattedMessage
+          id="contribute.freeTier"
+          defaultMessage="This is a free tier, you can submit your order directly."
         />
-      </Box>
-      {tier?.type === TierTypes.TICKET && (
+      ) : null}
+
+      {hasQuantity && (
         <Box mb={3}>
           <StyledInputField
             htmlFor="quantity"
@@ -60,12 +81,13 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
                 onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
                 fontSize="20px"
                 lineHeight="26px"
+                minWidth={100}
               />
             )}
           </StyledInputField>
         </Box>
       )}
-      {(!tier || tier.amountType === 'FLEXIBLE') && (
+      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && (
         <StyledInputField
           label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
           htmlFor="interval"
@@ -149,9 +171,13 @@ StepDetails.propTypes = {
   }).isRequired,
   tier: PropTypes.shape({
     amountType: PropTypes.string,
+    interval: PropTypes.string,
     maxQuantity: PropTypes.number,
     type: PropTypes.oneOf(Object.values(TierTypes)),
     customFields: PropTypes.array,
+    amount: PropTypes.shape({
+      valueInCents: PropTypes.number,
+    }),
     minAmount: PropTypes.shape({
       valueInCents: PropTypes.number,
     }),
