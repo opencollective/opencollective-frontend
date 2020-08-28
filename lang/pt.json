@@ -336,7 +336,7 @@
   "ContactCollective": "Contate {collective}",
   "contribuion.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "Contribute": "Contribua",
-  "contribute.changeFrequency.confirmMsg": "Se você estiver mudando a frequência, você não vai contribuir para este nível específico \"{tierName}\"",
+  "contribute.changeFrequency.warning": "If you change the frequency, you will not contribute to this specific {tierName} tier",
   "contribute.changeTaxNumber": "Alterar número de {taxName}",
   "contribute.ContributionDetailsTitle": "Detalhes de contribuição:",
   "contribute.contributorType": "Contribuir no nível \"{name}\"",

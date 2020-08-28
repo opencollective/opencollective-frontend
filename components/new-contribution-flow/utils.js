@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
@@ -18,6 +19,8 @@ import CreditCardInactive from '../../components/icons/CreditCardInactive';
 /** Returns true if taxes may apply with this tier/host */
 export const taxesMayApply = (collective, host, tier) => {
   if (!tier) {
+    return false;
+  } else if (tier.amountType === AmountTypes.FIXED && !tier.amount.valueInCents) {
     return false;
   }
 
@@ -106,7 +109,7 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
     }
 
     // Paypal
-    if (hostHasPaypal) {
+    if (hostHasPaypal && !stepDetails.interval) {
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
