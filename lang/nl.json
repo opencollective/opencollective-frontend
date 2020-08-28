@@ -336,7 +336,7 @@
   "ContactCollective": "Contacteer {collective}",
   "contribuion.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "Contribute": "Contribute",
-  "contribute.changeFrequency.confirmMsg": "Als u de frequentie wijzigt, draagt ​​u niet bij aan deze specifieke rang \"{tierName}\"",
+  "contribute.changeFrequency.warning": "If you change the frequency, you will not contribute to this specific {tierName} tier",
   "contribute.changeTaxNumber": "Verander {taxName} nummer",
   "contribute.ContributionDetailsTitle": "Details Bijdrage:",
   "contribute.contributorType": "Draag bij aan \"{name}\" rang",

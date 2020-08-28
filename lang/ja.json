@@ -336,7 +336,7 @@
   "ContactCollective": "{collective}にお問い合わせ",
   "contribuion.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "Contribute": "コントリビュート",
-  "contribute.changeFrequency.confirmMsg": "If you're changing the frequency, you will not contribute to this specific tier \"{tierName}\"",
+  "contribute.changeFrequency.warning": "If you change the frequency, you will not contribute to this specific {tierName} tier",
   "contribute.changeTaxNumber": "{taxName} 番号を変更",
   "contribute.ContributionDetailsTitle": "コントリビュートの詳細:",
   "contribute.contributorType": "Contribute to \"{name}\" tier",

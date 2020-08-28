@@ -7,6 +7,7 @@ import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
+import { Router } from '../../server/pages';
 
 import { Box } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
@@ -18,20 +19,23 @@ import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
 
+import ChangeTierWarningModal from './ChangeTierWarningModal';
 import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
 
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
   const intl = useIntl();
+  const [temporaryInterval, setTemporaryInterval] = React.useState(null);
   const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
+  const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
   return (
     <Box width={1}>
-      {tier?.amountType !== AmountTypes.FIXED ? (
+      {!isFixedContribution ? (
         <Box mb={3}>
           <StyledAmountPicker
             currency={collective.currency}
@@ -105,7 +109,13 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
               items={[null, INTERVALS.month, INTERVALS.year]}
               selected={data?.interval || null}
               buttonProps={{ p: 2 }}
-              onChange={interval => dispatchChange('interval', interval)}
+              onChange={interval => {
+                if (tier) {
+                  setTemporaryInterval(interval);
+                } else {
+                  dispatchChange('interval', interval);
+                }
+              }}
             >
               {({ item, isSelected }) => (
                 <Span fontSize="18px" lineHeight="21px" fontWeight={isSelected ? 500 : 'normal'}>
@@ -150,6 +160,18 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           />
         </Box>
       )}
+      {temporaryInterval && (
+        <ChangeTierWarningModal
+          show
+          tierName={tier.name}
+          onClose={() => setTemporaryInterval(null)}
+          onConfirm={() => {
+            dispatchChange('interval', temporaryInterval);
+            setTemporaryInterval(null);
+            Router.pushRoute(`/${collective.slug}/new-donate/details`);
+          }}
+        />
+      )}
     </Box>
   );
 };
@@ -165,6 +187,7 @@ StepDetails.propTypes = {
     customFieldsData: PropTypes.object,
   }),
   collective: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     type: PropTypes.string,
     host: PropTypes.object,
@@ -172,6 +195,7 @@ StepDetails.propTypes = {
   tier: PropTypes.shape({
     amountType: PropTypes.string,
     interval: PropTypes.string,
+    name: PropTypes.string,
     maxQuantity: PropTypes.number,
     type: PropTypes.oneOf(Object.values(TierTypes)),
     customFields: PropTypes.array,

@@ -254,13 +254,11 @@ const StepDetails = ({
           <FormattedMessage id="Frequency.change" defaultMessage={'Change frequency?'} />
         </ModalHeader>
         <ModalBody>
-          <P>
+          <P fontSize="14px" lineHeight="18px">
             <FormattedMessage
-              id="contribute.changeFrequency.confirmMsg"
-              values={{ tierName }}
-              defaultMessage={
-                'If you\'re changing the frequency, you will not contribute to this specific tier "{tierName}"'
-              }
+              id="contribute.changeFrequency.warning"
+              defaultMessage="If you change the frequency, you will not contribute to this specific {tierName} tier"
+              values={{ tierName: <q>{tierName}</q> }}
             />
           </P>
         </ModalBody>

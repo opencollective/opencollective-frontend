@@ -336,7 +336,7 @@
   "ContactCollective": "Contacte amb {collective}",
   "contribuion.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "Contribute": "Contribute",
-  "contribute.changeFrequency.confirmMsg": "If you're changing the frequency, you will not contribute to this specific tier \"{tierName}\"",
+  "contribute.changeFrequency.warning": "If you change the frequency, you will not contribute to this specific {tierName} tier",
   "contribute.changeTaxNumber": "Change {taxName} number",
   "contribute.ContributionDetailsTitle": "Contribution details:",
   "contribute.contributorType": "Contribute to \"{name}\" tier",
