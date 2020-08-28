@@ -17,6 +17,7 @@ import Container from './Container';
 import EditUpdateForm from './EditUpdateForm';
 import { Box, Flex } from './Grid';
 import Link from './Link';
+import LinkCollective from './LinkCollective';
 import MessageBox from './MessageBox';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import StyledHr from './StyledHr';
@@ -154,7 +155,7 @@ class StyledUpdate extends Component {
                 }),
                 author: (
                   <Box as="span" mr={2} fontSize="12px">
-                    {update.fromCollective.name}
+                    <LinkCollective collective={update.fromCollective} />
                   </Box>
                 ),
               }}
@@ -164,12 +165,12 @@ class StyledUpdate extends Component {
           <Box as="span" mr={1} fontSize="12px">
             <FormattedMessage
               id="update.createdAtBy"
-              defaultMessage={'Created on {date} (draft) by {author}'}
+              defaultMessage="Created on {date} (draft) by {author}"
               values={{
                 date: formatDate(update.createdAt),
                 author: (
                   <Box as="span" mr={2} fontSize="12px">
-                    {update.fromCollective.name}
+                    <LinkCollective collective={update.fromCollective} />
                   </Box>
                 ),
               }}
@@ -292,9 +293,9 @@ class StyledUpdate extends Component {
             <Container width="100%">
               <Flex mb={2}>
                 <Container mr={20}>
-                  <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
+                  <LinkCollective collective={update.fromCollective}>
                     <Avatar collective={update.fromCollective} radius={40} />
-                  </a>
+                  </LinkCollective>
                 </Container>
                 <Box>
                   {this.renderUpdateTitle()}
