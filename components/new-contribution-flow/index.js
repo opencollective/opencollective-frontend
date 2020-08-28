@@ -12,7 +12,7 @@ import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods'
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { getWebsiteUrl } from '../../lib/utils';
 import { Router } from '../../server/pages';
@@ -78,6 +78,7 @@ class ContributionFlow extends React.Component {
     intl: PropTypes.object,
     createUser: PropTypes.func,
     createOrder: PropTypes.func.isRequired,
+    confirmOrder: PropTypes.func.isRequired,
     fixedInterval: PropTypes.string,
     fixedAmount: PropTypes.number,
     skipStepDetails: PropTypes.bool,
@@ -115,7 +116,7 @@ class ContributionFlow extends React.Component {
     this.setState({ error: null });
 
     try {
-      const order = await this.props.createOrder({
+      const response = await this.props.createOrder({
         variables: {
           order: {
             quantity: stepDetails.quantity,
@@ -138,17 +139,45 @@ class ContributionFlow extends React.Component {
         },
       });
 
-      // TODO: Handle Stripe errors (3D secure)
-      return this.handleSuccess(order);
+      return this.handleOrderResponse(response.data.createOrder);
     } catch (e) {
       this.showError(getErrorFromGraphqlException(e));
+    }
+  };
+
+  handleOrderResponse = async ({ order, stripeError }) => {
+    if (stripeError) {
+      return this.handleStripeError(order, stripeError);
+    } else {
+      return this.handleSuccess(order);
+    }
+  };
+
+  handleStripeError = async (order, stripeError) => {
+    const { message, account, response } = stripeError;
+    if (!response) {
+      this.setState({ isSubmitting: false, error: message });
+    } else if (response.paymentIntent) {
+      const stripe = await getStripe(null, account);
+      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
+      if (result.error) {
+        this.setState({ isSubmitting: false, error: result.error.message });
+      } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
+        this.setState({ isSubmitting: true, error: null });
+        try {
+          const response = await this.props.confirmOrder({ variables: { order: { id: order.id } } });
+          return this.handleOrderResponse(response.data.confirmOrder);
+        } catch (e) {
+          this.setState({ isSubmitting: false, error: e.message });
+        }
+      }
     }
   };
 
   handleSuccess = order => {
     this.setState({ isSubmitted: true });
     this.props.refetchLoggedInUser(); // to update memberships
-    return this.pushStepRoute('success', { OrderId: order.data.createOrder.id });
+    return this.pushStepRoute('success', { OrderId: order.id });
   };
 
   showError = error => {
@@ -472,26 +501,55 @@ class ContributionFlow extends React.Component {
   }
 }
 
+const orderResponseFragment = gqlV2`
+  fragment OrderResponseFragment on OrderWithPayment {
+    order {
+      id
+      status
+      frequency
+      amount {
+        valueInCents
+      }
+    }
+    stripeError {
+      message
+      account
+      response
+    }
+  }
+`;
+
 // TODO: Use a fragment to retrieve the fields from success page in there
 const addCreateOrderMutation = graphql(
   gqlV2/* GraphQL */ `
     mutation CreateOrder($order: OrderCreateInput!) {
       createOrder(order: $order) {
-        id
-        status
-        frequency
-        amount {
-          valueInCents
-        }
+        ...OrderResponseFragment
       }
     }
+    ${orderResponseFragment}
   `,
   {
     name: 'createOrder',
-    options: {
-      context: API_V2_CONTEXT,
-    },
+    options: { context: API_V2_CONTEXT },
   },
 );
 
-export default injectIntl(withUser(addSignupMutation(addCreateOrderMutation(ContributionFlow))));
+const addConfirmOrderMutation = graphql(
+  gqlV2/* GraphQL */ `
+    mutation CreateOrder($order: OrderReferenceInput!) {
+      confirmOrder(order: $order) {
+        ...OrderResponseFragment
+      }
+    }
+    ${orderResponseFragment}
+  `,
+  {
+    name: 'confirmOrder',
+    options: { context: API_V2_CONTEXT },
+  },
+);
+
+export default injectIntl(
+  withUser(addSignupMutation(addConfirmOrderMutation(addCreateOrderMutation(ContributionFlow)))),
+);

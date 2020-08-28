@@ -229,24 +229,24 @@ type AccountStats {
   """
   Amount of money in cents in the currency of the collective currently available to spend
   """
-  balance: Amount
+  balance: Amount!
 
   """
   Average amount spent per month based on the last 90 days
   """
-  monthlySpending: Amount
+  monthlySpending: Amount!
 
   """
   Total amount spent
   """
-  totalAmountSpent: Amount
+  totalAmountSpent: Amount!
 
   """
   Net amount received
   """
-  totalAmountReceived: Amount
-  yearlyBudget: Amount
-  yearlyBudgetManaged: Amount
+  totalAmountReceived: Amount!
+  yearlyBudget: Amount!
+  yearlyBudgetManaged: Amount!
 }
 
 """
@@ -1033,6 +1033,12 @@ enum ConnectedAccountService {
   twitter
   meetup
   transferwise
+}
+
+enum ContributionFrequency {
+  MONTHLY
+  YEARLY
+  ONETIME
 }
 
 """
@@ -2427,11 +2433,11 @@ type Credit implements Transaction {
   uuid: String
   type: TransactionType
   description: String
-  amount: Amount
-  netAmount: Amount
-  platformFee: Amount
-  hostFee: Amount
-  paymentProcessorFee: Amount
+  amount: Amount!
+  netAmount: Amount!
+  platformFee: Amount!
+  hostFee: Amount!
+  paymentProcessorFee: Amount!
   host: Account
   createdAt: DateTime
   updatedAt: DateTime
@@ -2607,11 +2613,11 @@ type Debit implements Transaction {
   uuid: String
   type: TransactionType
   description: String
-  amount: Amount
-  netAmount: Amount
-  platformFee: Amount
-  hostFee: Amount
-  paymentProcessorFee: Amount
+  amount: Amount!
+  netAmount: Amount!
+  platformFee: Amount!
+  hostFee: Amount!
+  paymentProcessorFee: Amount!
   host: Account
   createdAt: DateTime
   updatedAt: DateTime
@@ -4194,7 +4200,7 @@ type Member {
   """
   Total amount donated
   """
-  totalDonations: Amount
+  totalDonations: Amount!
 
   """
   Custom user message from member to the collective
@@ -4227,7 +4233,7 @@ type MemberOf {
   """
   Total amount donated
   """
-  totalDonations: Amount
+  totalDonations: Amount!
 
   """
   Custom user message from member to the collective
@@ -4563,7 +4569,7 @@ type Mutation {
   """
   To submit a new order
   """
-  createOrder(order: OrderCreateInput!): Order!
+  createOrder(order: OrderCreateInput!): OrderWithPayment!
 
   """
   Cancel an order
@@ -4609,6 +4615,37 @@ type Mutation {
     """
     amount: AmountInput
   ): Order
+  confirmOrder(order: OrderReferenceInput!): OrderWithPayment!
+
+  """
+  Add a new payment method to be used with an Order
+  """
+  addCreditCard(
+    """
+    A Payment Method to add to an Account
+    """
+    paymentMethod: PaymentMethodCreateInput
+
+    """
+    The credit card info
+    """
+    creditCardInfo: CreditCardCreateInput
+
+    """
+    Name associated to this credit card
+    """
+    name: String
+
+    """
+    Wether this payment method should be saved for future payments
+    """
+    isSavedForLater: Boolean = true
+
+    """
+    Account to add Payment Method to
+    """
+    account: AccountReferenceInput!
+  ): PaymentMethod!
 
   """
   Add a new payment method to be used with an Order
@@ -4620,10 +4657,25 @@ type Mutation {
     paymentMethod: PaymentMethodCreateInput
 
     """
+    The credit card info
+    """
+    creditCardInfo: CreditCardCreateInput
+
+    """
+    Name associated to this credit card
+    """
+    name: String
+
+    """
+    Wether this payment method should be saved for future payments
+    """
+    isSavedForLater: Boolean = true
+
+    """
     Account to add Payment Method to
     """
-    account: AccountReferenceInput
-  ): PaymentMethod
+    account: AccountReferenceInput!
+  ): PaymentMethod! @deprecated(reason: "2020-08-24: Use addCreditCard")
 
   """
   Refunds transaction
@@ -4662,9 +4714,9 @@ Order model
 type Order {
   id: String
   description: String
-  amount: Amount
+  amount: Amount!
   status: OrderStatus
-  frequency: OrderFrequency
+  frequency: ContributionFrequency
   tier: Tier
   fromAccount: Account
   toAccount: Account
@@ -4676,7 +4728,7 @@ type Order {
   cases especially when looking on the Order level, as the order id is not used
   in calculating this.
   """
-  totalDonations: Amount
+  totalDonations: Amount!
   paymentMethod: PaymentMethod
   platformFee: Amount @deprecated(reason: "2020-07-31: Please use platformContributionAmount")
 
@@ -4706,7 +4758,7 @@ input OrderCreateInput {
   The contribution amount for 1 quantity, without platform contribution and taxes
   """
   amount: AmountInput!
-  frequency: OrderFrequency!
+  frequency: ContributionFrequency!
 
   """
   The profile making the order
@@ -4750,12 +4802,6 @@ Possible directions in which to order a list of items
 enum OrderDirection {
   ASC
   DESC
-}
-
-enum OrderFrequency {
-  MONTHLY
-  YEARLY
-  ONETIME
 }
 
 input OrderReferenceInput {
@@ -4806,6 +4852,18 @@ enum OrderTaxType {
   European Value Added Tax
   """
   VAT
+}
+
+type OrderWithPayment {
+  """
+  The order created
+  """
+  order: Order!
+
+  """
+  This field will be set if the order was created but there was an error with Stripe during the payment
+  """
+  stripeError: StripeError
 }
 
 """
@@ -5005,7 +5063,7 @@ type PaymentMethod {
   """
   Returns the balance amount and the currency of this paymentMethod
   """
-  balance: Amount
+  balance: Amount!
   account: Account
   data: JSON
   limitedToHosts: [Host]
@@ -5669,6 +5727,12 @@ type Query {
   loggedInAccount: Account
 }
 
+type StripeError {
+  message: String
+  account: String
+  response: JSON
+}
+
 """
 Statistics for a given tag
 """
@@ -5703,14 +5767,15 @@ type Tier {
   Get all orders
   """
   orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
-  amount: Amount
+  amount: Amount!
   type: TierType!
-  interval: TierInterval
+  interval: TierInterval @deprecated(reason: "2020-08-24: Please use \"frequency\"")
+  frequency: ContributionFrequency
   presets: [Int]
   maxQuantity: Int
   customFields: JSON
   amountType: TierAmountType!
-  minimumAmount: Amount
+  minimumAmount: Amount!
 }
 
 enum TierAmountType {
@@ -5762,9 +5827,9 @@ interface Transaction {
   uuid: String
   type: TransactionType
   description: String
-  amount: Amount
-  netAmount: Amount
-  platformFee: Amount
+  amount: Amount!
+  netAmount: Amount!
+  platformFee: Amount!
   hostFee: Amount
   paymentProcessorFee: Amount
   host: Account
