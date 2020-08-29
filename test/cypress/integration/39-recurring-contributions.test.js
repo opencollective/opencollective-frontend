@@ -1,4 +1,4 @@
-describe('Recurring contributions', () => {
+describe.skip('Recurring contributions', () => {
   let user;
 
   before(() => {
