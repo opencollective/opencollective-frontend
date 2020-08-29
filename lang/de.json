@@ -98,7 +98,7 @@
   "bankaccount.instructions.reference": "unique id to track when the order is received",
   "bankaccount.instructions.variables": "You can use the following variables in the instructions:",
   "BankInfo.Type": "Typ: {type}",
-  "BillingAddress": "Billing address",
+  "BillingAddress": "Rechnungsadresse",
   "button.submit": "Absenden",
   "ByUser": "Von {userName}",
   "CancelEdit": "Bearbeitung abbrechen",
