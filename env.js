@@ -16,7 +16,7 @@ const defaults = {
   PDF_SERVICE_URL: 'https://invoices-staging.opencollective.com',
   PAYPAL_ENVIRONMENT: 'sandbox',
   STRIPE_KEY: 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8',
-  GOOGLE_MAPS_API_KEY: 'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',
+  GOOGLE_MAPS_API_KEY: 'AIzaSyAZJnIxtBw5bxnu2QoCUiLCjV1nk84Vnk0',
   RECAPTCHA_SITE_KEY: '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
   RECAPTCHA_ENABLED: false,
   CLIENT_ANALYTICS_ENABLED: false,
