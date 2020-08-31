@@ -252,7 +252,7 @@
   "CollectiveFeesForm.Title": "Set fees structure",
   "CollectivePage.AddLongDescription": "Добавить описание",
   "CollectivePage.AllOfUs": "{collectiveName} это все мы",
-  "CollectivePage.Contribute.Custom.Description": "Внести свой собственный единоразовый или регулярный вклад в поддержку этого коллектива.",
+  "CollectivePage.Contribute.Custom.Description": "Make a custom one time or recurring contribution.",
   "CollectivePage.ContributorsDescription": "Все, кто поддерживал {collectiveName}. Люди и организации, верящие и принимающие на себя ответственность – наша цель.",
   "CollectivePage.NavBar.Participants": "Участники",
   "CollectivePage.OurContributors": "Нас поддерживают {count}",
