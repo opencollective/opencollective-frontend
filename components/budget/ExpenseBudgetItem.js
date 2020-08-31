@@ -267,8 +267,8 @@ const ExpenseBudgetItem = ({
                       <MaximizeIcon size={10} />
                       &nbsp;&nbsp;
                       <FormattedMessage
-                        id="ExepenseReceipts.count"
-                        defaultMessage="{count, plural, one {# receipt} other {# receipts}}"
+                        id="ExepenseAttachments.count"
+                        defaultMessage="{count, plural, one {# attachment} other {# attachments}}"
                         values={{ count: nbAttachedFiles }}
                       />
                     </StyledButton>

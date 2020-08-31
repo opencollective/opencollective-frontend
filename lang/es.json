@@ -707,7 +707,7 @@
   "Events": "Eventos",
   "events": "my events",
   "events.create.login": "Necesitas ser un colaborador de este colective para crear un evento.",
-  "ExepenseReceipts.count": "{count, plural, one {# receipt} other {# receipts}}",
+  "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "Expense.Activity.Approved": "Gasto aprobado",
   "Expense.Activity.Error": "Error de gasto",
   "Expense.Activity.MarkedAsUnpaid": "Gasto marcado como no pagado",

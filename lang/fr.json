@@ -707,7 +707,7 @@
   "Events": "Événements",
   "events": "my events",
   "events.create.login": "Vous devez vous identifier en tant qu'administrateur de ce collectif pour pouvoir créer un événement.",
-  "ExepenseReceipts.count": "{count, plural, one {# reçu} other {# reçus}}",
+  "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "Expense.Activity.Approved": "Dépense approuvée",
   "Expense.Activity.Error": "Erreur lors du traitement",
   "Expense.Activity.MarkedAsUnpaid": "Dépense marquée comme impayée",
