@@ -165,7 +165,7 @@ const ThreadActivity = ({ activity }) => {
       {MESSAGES[activity.type] && (
         <ActivityMessage color={activityColor}>
           {formatMessage(MESSAGES[activity.type])}
-          {activity.data?.error?.message ? `: ${activity.data?.error?.message}` : ''}
+          {activity.data?.error?.message ? `: ${activity.data.error.message}` : ''}
         </ActivityMessage>
       )}
     </div>
