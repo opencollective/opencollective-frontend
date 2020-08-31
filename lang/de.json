@@ -252,7 +252,7 @@
   "CollectiveFeesForm.Title": "Set fees structure",
   "CollectivePage.AddLongDescription": "Fügen Sie eine Beschreibung hinzu",
   "CollectivePage.AllOfUs": "Wir alle sind {collectiveName}",
-  "CollectivePage.Contribute.Custom.Description": "Leisten Sie einen selbst­ge­wählten einmaligen oder wiederkehrenden Beitrag, um diese Gemeinschaft zu unterstützen.",
+  "CollectivePage.Contribute.Custom.Description": "Make a custom one time or recurring contribution.",
   "CollectivePage.ContributorsDescription": "Jeder der {collectiveName} unterstützt hat. Einzelne Personen oder Organisationen die an unser Ziel glauben.",
   "CollectivePage.NavBar.Participants": "Teilnehmer",
   "CollectivePage.OurContributors": "Unsere Unterstützer {count}",

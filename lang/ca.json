@@ -252,7 +252,7 @@
   "CollectiveFeesForm.Title": "Set fees structure",
   "CollectivePage.AddLongDescription": "Afegeix una descripció",
   "CollectivePage.AllOfUs": "{collectiveName} is all of us",
-  "CollectivePage.Contribute.Custom.Description": "Feu una contribució personalitzada única o periòdica per donar suport a aquest col·lectiu.",
+  "CollectivePage.Contribute.Custom.Description": "Make a custom one time or recurring contribution.",
   "CollectivePage.ContributorsDescription": "Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose.",
   "CollectivePage.NavBar.Participants": "Participants",
   "CollectivePage.OurContributors": "Our contributors {count}",

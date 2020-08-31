@@ -252,7 +252,7 @@
   "CollectiveFeesForm.Title": "Set fees structure",
   "CollectivePage.AddLongDescription": "Přidat popis",
   "CollectivePage.AllOfUs": "{collectiveName} je nás všech",
-  "CollectivePage.Contribute.Custom.Description": "Vytvořte vlastní jednorázový nebo opakující se příspěvek na podporu tohoto kolektivu.",
+  "CollectivePage.Contribute.Custom.Description": "Make a custom one time or recurring contribution.",
   "CollectivePage.ContributorsDescription": "Každý, kdo podpořil {collectiveName}. Jednotlivci a organizace, které věří v náš účel – a převezmou jej.",
   "CollectivePage.NavBar.Participants": "Účastníci",
   "CollectivePage.OurContributors": "Naši přispěvatelé {count}",
