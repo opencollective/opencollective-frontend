@@ -15,6 +15,7 @@ describe('event.create.test.js', () => {
   });
 
   it('create an event', () => {
+    cy.wait(1000); // Make sure Google API is loaded
     cy.get('.inputs .inputField.name input', { timeout: 20000 }).type(title);
     cy.get('.inputField.endsAt input').focus();
     cy.get('.rdtNext span').click;
