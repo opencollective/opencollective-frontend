@@ -95,7 +95,6 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
           options={options}
           onChange={setSelectedOption}
           value={selectedOption}
-          menuPortalTarget={typeof document === 'undefined' ? undefined : document.body}
         />
       </Flex>
       {selectedOption.value === 'CUSTOM' && (

@@ -115,7 +115,9 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     error,
     controlStyles,
     isSearchable,
+    menuPortalTarget,
   }) => ({
+    menuPortalTarget: menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body,
     isDisabled: disabled || isDisabled,
     placeholder: placeholder || intl.formatMessage(Messages.placeholder),
     loadingMessage: () => intl.formatMessage(Messages.loading),
@@ -227,6 +229,8 @@ StyledSelect.propTypes = {
   /** Default option */
   defaultValue: PropTypes.object,
   controlStyles: PropTypes.object,
+  /** To render menu in a portal */
+  menuPortalTarget: PropTypes.any,
   // Styled-system
   ...propTypes.typography,
   ...propTypes.layout,
