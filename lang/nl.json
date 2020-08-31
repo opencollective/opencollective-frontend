@@ -252,7 +252,7 @@
   "CollectiveFeesForm.Title": "Set fees structure",
   "CollectivePage.AddLongDescription": "Voeg een omschrijving toe",
   "CollectivePage.AllOfUs": "wij zijn {collectiveName}",
-  "CollectivePage.Contribute.Custom.Description": "Maak een eenmalige of terugkerende bijdrage om dit collectief te ondersteunen.",
+  "CollectivePage.Contribute.Custom.Description": "Make a custom one time or recurring contribution.",
   "CollectivePage.ContributorsDescription": "Iedereen die {collectiveName} heeft gesteund. Individuen en organisaties die geloven in en mede-eigenaar worden van ons doel.",
   "CollectivePage.NavBar.Participants": "Deelnemers",
   "CollectivePage.OurContributors": "Onze bijdragers {count}",
