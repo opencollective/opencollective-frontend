@@ -31,6 +31,7 @@ const COMMON_DIRECTIVES = {
     'wtfismyip.com',
     '*.paypal.com',
     '*.paypalobjects.com',
+    'sentry.io',
     '*.sentry.io',
   ],
   scriptSrc: [
