@@ -353,7 +353,6 @@ const CreateCollectiveMiniForm = ({
                           <InputTypeCountry
                             {...field}
                             onChange={country => form.setFieldValue(name, country)}
-                            menuPortalTarget={document?.body}
                             maxMenuHeight={95}
                           />
                         );

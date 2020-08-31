@@ -203,7 +203,6 @@ const AddFunds = ({ host, collective, ...props }) => {
                       inputId={field.id}
                       types={['USER', 'ORGANIZATION']}
                       creatable
-                      menuPortalTarget={document.body}
                       error={field.error}
                       createCollectiveOptionalFields={['location.address', 'location.country']}
                       onBlur={() => form.setFieldTouched(field.name, true)}
