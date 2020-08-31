@@ -4115,4 +4115,5 @@ input UserInputType {
   website: String
   paypalEmail: String
   newsletterOptIn: Boolean
+  location: LocationInputType
 }
