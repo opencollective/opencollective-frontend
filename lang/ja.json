@@ -252,7 +252,7 @@
   "CollectiveFeesForm.Title": "Set fees structure",
   "CollectivePage.AddLongDescription": "説明を追加",
   "CollectivePage.AllOfUs": "{collectiveName} is all of us",
-  "CollectivePage.Contribute.Custom.Description": "Make a custom one time or recurring contribution to support this collective.",
+  "CollectivePage.Contribute.Custom.Description": "Make a custom one time or recurring contribution.",
   "CollectivePage.ContributorsDescription": "Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose.",
   "CollectivePage.NavBar.Participants": "参加者",
   "CollectivePage.OurContributors": "私達のコントリビューター {count}",
