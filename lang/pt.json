@@ -252,7 +252,7 @@
   "CollectiveFeesForm.Title": "Set fees structure",
   "CollectivePage.AddLongDescription": "Adicione uma descrição",
   "CollectivePage.AllOfUs": "{collectiveName} é todos nós",
-  "CollectivePage.Contribute.Custom.Description": "Faça uma doação única ou uma contribuição recorrente para auxiliar este coletivo.",
+  "CollectivePage.Contribute.Custom.Description": "Make a custom one time or recurring contribution.",
   "CollectivePage.ContributorsDescription": "Todos que colaboraram com {collectiveName}. Indivíduos e organizações que acreditam - e tomam posse - de nosso propósito.",
   "CollectivePage.NavBar.Participants": "Participantes",
   "CollectivePage.OurContributors": "Nossos colaboradores {count}",
