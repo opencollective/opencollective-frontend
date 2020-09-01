@@ -62,9 +62,11 @@ const ExpenseModal = ({ expense, onDelete, onProcess, onClose, show }) => {
         minHeight={80}
       >
         {error && (
-          <MessageBox flex="1 0 100%" type="error" withIcon>
-            {formatErrorMessage(intl, error)}
-          </MessageBox>
+          <Box p={2}>
+            <MessageBox flex="1 0 100%" type="error" withIcon>
+              {formatErrorMessage(intl, error)}
+            </MessageBox>
+          </Box>
         )}
         {data?.expense && (
           <Flex p={3} justifyContent="space-between" alignItems="center">

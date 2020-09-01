@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import MessageBox from '../MessageBox';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
@@ -76,13 +76,13 @@ const ProcessExpenseButtons = ({
       const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
       const processedExpense = await processExpense({ variables });
       if (onSuccess) {
-        onSuccess(processedExpense, action, paymentParams);
+        await onSuccess(processedExpense, action, paymentParams);
       }
 
       return processedExpense;
     } catch (e) {
       if (onError && selectedAction !== 'PAY') {
-        onError(getErrorFromGraphqlException(error));
+        onError(getErrorFromGraphqlException(e));
       }
     }
   };
@@ -100,9 +100,7 @@ const ProcessExpenseButtons = ({
   return (
     <React.Fragment>
       {!loading && showError && error && selectedAction !== 'PAY' && (
-        <MessageBox flex="1 0 100%" type="error" withIcon>
-          {getErrorFromGraphqlException(error).message}
-        </MessageBox>
+        <MessageBoxGraphqlError flex="1 0 100%" error={error} />
       )}
       {permissions.canApprove && (
         <StyledButton {...getButtonProps('APPROVE')} buttonStyle="secondary" data-cy="approve-button">

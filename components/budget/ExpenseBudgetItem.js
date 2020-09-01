@@ -42,6 +42,11 @@ const ButtonsContainer = styled.div`
   flex-wrap: wrap;
   margin-top: 8px;
   transition: opacity 0.05s;
+  justify-content: flex-end;
+
+  @media (max-width: 40em) {
+    justify-content: center;
+  }
 
   & > *:last-child {
     margin-right: 0;
