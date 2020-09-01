@@ -707,7 +707,7 @@
   "Events": "Eventos",
   "events": "my events",
   "events.create.login": "Você precisa estar logado como um colaborador central deste coletivo para poder criar uma atualização.",
-  "ExepenseReceipts.count": "{count, plural, one {# receipt} other {# receipts}}",
+  "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "Expense.Activity.Approved": "Despesa aprovada",
   "Expense.Activity.Error": "Erro de despesa",
   "Expense.Activity.MarkedAsUnpaid": "Despesa marcada como não paga",

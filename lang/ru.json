@@ -707,7 +707,7 @@
   "Events": "Мероприятия",
   "events": "my events",
   "events.create.login": "Вы должны войти в систему как основной участник этого Коллектива, чтобы иметь возможность создать мероприятие.",
-  "ExepenseReceipts.count": "{count, plural, one {# receipt} other {# receipts}}",
+  "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "Expense.Activity.Approved": "Расход принят",
   "Expense.Activity.Error": "Ошибка расхода",
   "Expense.Activity.MarkedAsUnpaid": "Расходы, помеченные как неоплаченные",

@@ -707,7 +707,7 @@
   "Events": "イベント",
   "events": "my events",
   "events.create.login": "コアメンバーとしてイベントを作成するためにはログインする必要があります。",
-  "ExepenseReceipts.count": "{count, plural, one {# receipt} other {# receipts}}",
+  "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "Expense.Activity.Approved": "Expense approved",
   "Expense.Activity.Error": "Expense error",
   "Expense.Activity.MarkedAsUnpaid": "Expense marked as unpaid",
