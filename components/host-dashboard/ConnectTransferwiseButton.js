@@ -33,7 +33,7 @@ const ConnectTransferwiseButton = ({ isConnected }) => {
 };
 
 ConnectTransferwiseButton.propTypes = {
-  isConnected: PropTypes.boolean,
+  isConnected: PropTypes.bool,
 };
 
 export default ConnectTransferwiseButton;
