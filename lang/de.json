@@ -1431,6 +1431,7 @@
   "SignIn.SuccessDetails": "Sie werden von dem Link in der E-Mail weitergeleitet, Sie können diesen Tab schließen.",
   "signin.unknownEmail": "Es gibt kein Konto mit dieser E-Mail-Adresse.",
   "signin.usingEmail": "Melden Sie sich mit Ihrer E-Mail-Adresse an:",
+  "signinLinkSent.": "<Link>Learn more</Link> about passwordless login.",
   "SkipOnboarding": "Skip onboarding",
   "SortBy": "Sort by",
   "startDateAndTime": "start date and time",
