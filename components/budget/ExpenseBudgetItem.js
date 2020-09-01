@@ -71,7 +71,7 @@ const getNbAttachedFiles = expense => {
 /**
  * A link that either link to the page or opens the modal
  */
-const ExpenseTitleLink = ({ expense, collective, usePreviewModal, onDelete, children }) => {
+const ExpenseTitleLink = ({ expense, collective, usePreviewModal, onDelete, onProcess, children }) => {
   const [showModal, setShowModal] = React.useState(false);
   const account = expense.account || collective;
 
@@ -84,14 +84,17 @@ const ExpenseTitleLink = ({ expense, collective, usePreviewModal, onDelete, chil
   } else {
     return (
       <React.Fragment>
-        <ExpenseModal
-          collective={account}
-          expense={expense}
-          show={showModal}
-          onClose={() => setShowModal(false)}
-          permissions={expense.permissions}
-          onDelete={onDelete}
-        />
+        {showModal && (
+          <ExpenseModal
+            collective={account}
+            expense={expense}
+            show={showModal}
+            onClose={() => setShowModal(false)}
+            permissions={expense.permissions}
+            onDelete={onDelete}
+            onProcess={onProcess}
+          />
+        )}
         <Container cursor="pointer" onClick={() => setShowModal(true)}>
           {children}
         </Container>
@@ -111,6 +114,7 @@ const ExpenseBudgetItem = ({
   usePreviewModal,
   view,
   onDelete,
+  onProcess,
 }) => {
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
   const featuredProfile = isInverted ? collective : expense?.payee;
@@ -139,6 +143,7 @@ const ExpenseBudgetItem = ({
                 expense={expense}
                 usePreviewModal={usePreviewModal}
                 onDelete={onDelete}
+                onProcess={onProcess}
               >
                 <AutosizeText
                   value={expense.description}
@@ -288,6 +293,7 @@ const ExpenseBudgetItem = ({
               expense={expense}
               permissions={expense.permissions}
               buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
+              onSuccess={onProcess}
             />
           </ButtonsContainer>
         )}
@@ -311,6 +317,7 @@ ExpenseBudgetItem.propTypes = {
   usePreviewModal: PropTypes.bool,
   showAmountSign: PropTypes.bool,
   onDelete: PropTypes.func,
+  onProcess: PropTypes.func,
   showProcessActions: PropTypes.bool,
   view: PropTypes.oneOf(['public', 'admin']),
   collective: PropTypes.shape({

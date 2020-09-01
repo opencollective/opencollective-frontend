@@ -220,6 +220,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             view="admin"
             usePreviewModal
             onDelete={() => refetch()}
+            onProcess={() => hasFilters && refetch()}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

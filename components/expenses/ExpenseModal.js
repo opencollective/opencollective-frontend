@@ -25,7 +25,7 @@ const expenseModalQuery = gqlV2/* GraphQL */ `
   ${expensePageExpenseFieldsFragment}
 `;
 
-const ExpenseModal = ({ expense, onDelete, onClose, show }) => {
+const ExpenseModal = ({ expense, onDelete, onProcess, onClose, show }) => {
   const intl = useIntl();
   const [error, setError] = React.useState(null);
   const { data, loading } = useQuery(expenseModalQuery, {
@@ -92,6 +92,7 @@ const ExpenseModal = ({ expense, onDelete, onClose, show }) => {
                 buttonProps={{ buttonSize: 'small', minWidth: 130, m: 1, py: 11 }}
                 showError={false}
                 onError={setError}
+                onSuccess={onProcess}
               />
             </Flex>
           </Flex>
@@ -116,6 +117,7 @@ ExpenseModal.propTypes = {
   }),
   onClose: PropTypes.func.isRequired,
   onDelete: PropTypes.func,
+  onProcess: PropTypes.func,
   show: PropTypes.bool.isRequired,
 };
 

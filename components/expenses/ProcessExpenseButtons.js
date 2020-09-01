@@ -55,7 +55,16 @@ export const hasProcessButtons = permissions => {
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
  */
-const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps, showError, onError }) => {
+const ProcessExpenseButtons = ({
+  expense,
+  collective,
+  host,
+  permissions,
+  buttonProps,
+  showError,
+  onError,
+  onSuccess,
+}) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const mutationOptions = { context: API_V2_CONTEXT };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
@@ -64,7 +73,13 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
     setSelectedAction(action);
 
     try {
-      return await processExpense({ variables: { id: expense.id, legacyId: expense.legacyId, action, paymentParams } });
+      const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
+      const processedExpense = await processExpense({ variables });
+      if (onSuccess) {
+        onSuccess(processedExpense, action, paymentParams);
+      }
+
+      return processedExpense;
     } catch (e) {
       if (onError && selectedAction !== 'PAY') {
         onError(getErrorFromGraphqlException(error));
@@ -157,6 +172,7 @@ ProcessExpenseButtons.propTypes = {
   buttonProps: PropTypes.object,
   showError: PropTypes.bool,
   onError: PropTypes.func,
+  onSuccess: PropTypes.func,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
