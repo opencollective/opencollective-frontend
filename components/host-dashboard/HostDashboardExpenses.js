@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import EXPENSE_STATUS from '../../lib/constants/expense-status';
-import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
@@ -24,6 +23,7 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
@@ -160,7 +160,15 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           )}
         </DismissibleMessage>
       )}
-      <Box mb={4}>{loading ? <LoadingPlaceholder height={100} /> : <HostInfoCard host={data.host} />}</Box>
+      <Box mb={4}>
+        {loading ? (
+          <LoadingPlaceholder height={150} />
+        ) : error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : (
+          <HostInfoCard host={data.host} />
+        )}
+      </Box>
       <Box mb={34}>
         {data?.host ? (
           <ExpensesFilters
@@ -178,11 +186,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <LoadingPlaceholder height={70} />
         ) : null}
       </Box>
-      {error ? (
-        <MessageBox type="error" withIcon>
-          {getErrorFromGraphqlException(error).message}
-        </MessageBox>
-      ) : !loading && !data.expenses?.nodes.length ? (
+      {error ? null : !loading && !data.expenses?.nodes.length ? (
         <MessageBox type="info" withIcon data-cy="zero-expense-message">
           {hasFilters ? (
             <FormattedMessage
@@ -220,6 +224,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             view="admin"
             usePreviewModal
             onDelete={() => refetch()}
+            onProcess={() => hasFilters && refetch()}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

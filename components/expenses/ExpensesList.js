@@ -23,6 +23,7 @@ const ExpensesList = ({
   isInverted,
   view,
   onDelete,
+  onProcess,
 }) => {
   expenses = !isLoading ? expenses : [...new Array(nbPlaceholders)];
 
@@ -44,6 +45,7 @@ const ExpensesList = ({
             view={view}
             usePreviewModal={usePreviewModal}
             onDelete={onDelete}
+            onProcess={onProcess}
           />
         </ExpenseContainer>
       ))}
@@ -61,6 +63,7 @@ ExpensesList.propTypes = {
   view: PropTypes.oneOf(['public', 'admin']),
   usePreviewModal: PropTypes.bool,
   onDelete: PropTypes.func,
+  onProcess: PropTypes.func,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     parent: PropTypes.shape({

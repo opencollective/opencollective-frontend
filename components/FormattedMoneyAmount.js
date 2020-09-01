@@ -69,7 +69,7 @@ const FormattedMoneyAmount = ({
 
 FormattedMoneyAmount.propTypes = {
   /** The amount to display, in cents */
-  amount: PropTypes.number.isRequired,
+  amount: PropTypes.number,
   /** The currency (eg. `USD`, `EUR`...etc) */
   currency: PropTypes.string.isRequired,
   /** Abbreviate the name to display 100k instead of 100.000 */
