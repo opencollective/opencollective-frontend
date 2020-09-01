@@ -281,6 +281,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       id
       type
       slug
+      name
       imageUrl(height: 80)
       isAdmin
     }
