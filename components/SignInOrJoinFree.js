@@ -14,7 +14,7 @@ import CreateProfileFAQ from './faqs/CreateProfileFAQ';
 import CreateProfile from './CreateProfile';
 import { Box, Flex } from './Grid';
 import Link from './Link';
-import MessageBox from './MessageBox';
+import MessageBoxGraphqlError from './MessageBoxGraphqlError';
 import SignIn from './SignIn';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
@@ -224,11 +224,7 @@ class SignInOrJoinFree extends React.Component {
 
     return (
       <Flex flexDirection="column" width={1} alignItems="center">
-        {error && (
-          <MessageBox type="error" withIcon mb={[3, 4]}>
-            {error.replace('GraphQL error: ', 'Error: ')}
-          </MessageBox>
-        )}
+        {error && <MessageBoxGraphqlError error={error} mb={[3, 4]} />}
         {enforceTwoFactorAuthForLoggedInUser ? (
           this.renderTwoFactorAuthBox()
         ) : (
@@ -248,29 +244,31 @@ class SignInOrJoinFree extends React.Component {
               <Flex flexDirection="column" width={1} alignItems="center">
                 <Flex justifyContent="center" width={1}>
                   <Box width={[0, null, null, 1 / 5]} />
-                  <CreateProfile
-                    email={email}
-                    onEmailChange={email => this.setState({ email })}
-                    onPersonalSubmit={this.createProfile}
-                    onOrgSubmit={this.createProfile}
-                    onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
-                    submitting={submitting}
-                    mx={[2, 4]}
-                    createPersonalProfileLabel={this.props.createPersonalProfileLabel}
-                    createOrganizationProfileLabel={this.props.createOrganizationProfileLabel}
-                  />
+                  <Box maxWidth={480} mx={[2, 4]} width="100%">
+                    <CreateProfile
+                      email={email}
+                      onEmailChange={email => this.setState({ email })}
+                      onPersonalSubmit={this.createProfile}
+                      onOrgSubmit={this.createProfile}
+                      onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
+                      submitting={submitting}
+                      createPersonalProfileLabel={this.props.createPersonalProfileLabel}
+                      createOrganizationProfileLabel={this.props.createOrganizationProfileLabel}
+                    />
+                    <P mt={4} color="black.500" fontSize="12px" mb={3} data-cy="join-conditions" textAlign="center">
+                      <FormattedMessage
+                        id="SignIn.legal"
+                        defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
+                        values={{
+                          'tos-link': msg => <Link route="/tos">{msg}</Link>,
+                          'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
+                        }}
+                      />
+                    </P>
+                  </Box>
+
                   <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
                 </Flex>
-                <P mt={4} color="black.500" fontSize="12px" mb={3} data-cy="join-conditions">
-                  <FormattedMessage
-                    id="SignIn.legal"
-                    defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
-                    values={{
-                      'tos-link': msg => <Link route="/tos">{msg}</Link>,
-                      'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
-                    }}
-                  />
-                </P>
               </Flex>
             )}
           </Fragment>

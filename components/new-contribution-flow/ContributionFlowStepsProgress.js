@@ -10,6 +10,7 @@ import StepsProgress from '../StepsProgress';
 import { Span } from '../Text';
 
 import { STEPS } from './constants';
+import { getTotalAmount } from './utils';
 
 // Styles for the steps label rendered in StepsProgress
 const StepLabel = styled(Span)`
@@ -44,7 +45,7 @@ const STEP_LABELS = defineMessages({
 
 const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
   if (stepDetails.amount) {
-    const totalAmount = stepDetails.amount + (stepDetails.feesOnTop || 0);
+    const totalAmount = stepDetails.amount + (stepDetails.platformContribution || 0);
     return <FormattedMoneyAmount interval={stepDetails.interval} currency={currency} amount={totalAmount} />;
   } else if (stepDetails.amount === 0 && isFreeTier) {
     return (
@@ -57,7 +58,7 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
   }
 };
 
-const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, isFreeTier, currency }) => {
+const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency }) => {
   if (step.name === STEPS.PROFILE) {
     return get(stepProfile, 'name') || get(stepProfile, 'email', null);
   } else if (step.name === STEPS.DETAILS) {
@@ -70,7 +71,7 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, isFreeTier, cur
       );
     }
   } else if (step.name === STEPS.PAYMENT) {
-    if (isFreeTier && get(stepDetails, 'totalAmount') === 0) {
+    if (isFreeTier && getTotalAmount(stepDetails, stepSummary) === 0) {
       return <FormattedMessage id="noPaymentRequired" defaultMessage="No payment required" />;
     } else {
       return get(stepPayment, 'title', null);
@@ -84,6 +85,7 @@ const ContributionFlowStepsProgress = ({
   stepProfile,
   stepDetails,
   stepPayment,
+  stepSummary,
   isSubmitted,
   loading,
   steps,
@@ -113,6 +115,7 @@ const ContributionFlowStepsProgress = ({
                 stepProfile={stepProfile}
                 stepDetails={stepDetails}
                 stepPayment={stepPayment}
+                stepSummary={stepSummary}
                 isFreeTier={isFreeTier}
                 currency={currency}
               />
@@ -131,6 +134,7 @@ ContributionFlowStepsProgress.propTypes = {
   stepProfile: PropTypes.object,
   stepDetails: PropTypes.object,
   stepPayment: PropTypes.object,
+  stepSummary: PropTypes.object,
   isSubmitted: PropTypes.bool,
   loading: PropTypes.bool,
   lastVisitedStep: PropTypes.object,

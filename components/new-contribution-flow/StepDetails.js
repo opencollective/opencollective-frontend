@@ -131,9 +131,9 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           <FeesOnTopInput
             currency={collective.currency}
             amount={data?.amount}
-            fees={data?.feesOnTop}
+            fees={data?.platformContribution}
             interval={data?.interval}
-            onChange={feesOnTop => dispatchChange('feesOnTop', feesOnTop)}
+            onChange={value => dispatchChange('platformContribution', value)}
           />
         </Box>
       )}
@@ -181,7 +181,7 @@ StepDetails.propTypes = {
   showFeesOnTop: PropTypes.bool,
   data: PropTypes.shape({
     amount: PropTypes.number,
-    feesOnTop: PropTypes.number,
+    platformContribution: PropTypes.number,
     quantity: PropTypes.number,
     interval: PropTypes.string,
     customFieldsData: PropTypes.object,

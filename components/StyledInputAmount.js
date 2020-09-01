@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { isUndefined } from 'lodash';
 
 import { getCurrencySymbol } from '../lib/currency-utils';
+import { floatAmountToCents } from '../lib/math';
 
 import StyledInputGroup from './StyledInputGroup';
 
@@ -22,14 +23,6 @@ const parseValueFromEvent = (e, precision, ignoreComma) => {
   } else {
     const parsedNumber = parseFloat(ignoreComma ? e.target.value.replace(',', '') : e.target.value);
     return isNaN(parsedNumber) ? NaN : parsedNumber.toFixed(precision);
-  }
-};
-
-const floatAmountToCents = floatAmount => {
-  if (isNaN(floatAmount) || floatAmount === null) {
-    return floatAmount;
-  } else {
-    return Math.round(floatAmount * 100);
   }
 };
 

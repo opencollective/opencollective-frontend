@@ -23,6 +23,8 @@ const nextConfig = {
         NEW_HOST_APPLICATION_FLOW: null,
         TW_API_COLLECTIVE_SLUG: null,
         OC_ENV: null,
+        NEW_CONTRIBUTION_FLOW: false,
+        ENABLE_GUEST_CONTRIBUTIONS: false,
       }),
     );
 

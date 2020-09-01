@@ -11,6 +11,7 @@ import { CollectiveType } from '../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { floatAmountToCents } from '../lib/math';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
@@ -76,9 +77,14 @@ class NewContributionFlowPage extends React.Component {
       }
     }
 
+    const getFloatAmount = amountStr => {
+      return !amountStr ? null : floatAmountToCents(parseFloat(amountStr));
+    };
+
     return {
       collectiveSlug: query.eventSlug || query.collectiveSlug,
-      totalAmount: parseInt(query.amount) * 100 || parseInt(query.totalAmount) || null,
+      totalAmount: getFloatAmount(query.amount) || parseInt(query.totalAmount) || null,
+      platformContribution: getFloatAmount(query.platformContribution),
       step: query.step || 'details',
       tierId: parseInt(query.tierId) || null,
       quantity: parseInt(query.quantity) || 1,
@@ -211,6 +217,7 @@ class NewContributionFlowPage extends React.Component {
           defaultQuantity={this.props.quantity}
           fixedInterval={this.props.interval}
           fixedAmount={this.props.totalAmount}
+          platformContribution={this.props.platformContribution}
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
