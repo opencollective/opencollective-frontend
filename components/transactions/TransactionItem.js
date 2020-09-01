@@ -34,13 +34,13 @@ const TransactionItem = ({ displayActions, collective, ...transaction }) => {
   const {
     toAccount,
     fromAccount,
+    giftCardEmitterAccount,
     order,
     expense,
     type,
     amount,
     netAmount,
     description,
-    usingVirtualCardFromCollective,
     createdAt,
     isRefunded,
     isRefund,
@@ -110,20 +110,16 @@ const TransactionItem = ({ displayActions, collective, ...transaction }) => {
                     values={{ name: <StyledLink as={LinkCollective} collective={toAccount} colorShade={600} /> }}
                   />
                 )}
-                {usingVirtualCardFromCollective && (
+                {giftCardEmitterAccount && (
                   <React.Fragment>
-                    {INFO_SEPARATOR}
+                    &nbsp;
                     <FormattedMessage
                       id="transaction.usingGiftCardFrom"
                       defaultMessage="using a {giftCard} from {collective}"
                       values={{
                         giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
                         collective: (
-                          <StyledLink
-                            as={LinkCollective}
-                            collective={usingVirtualCardFromCollective}
-                            colorShade={600}
-                          />
+                          <StyledLink as={LinkCollective} collective={giftCardEmitterAccount} colorShade={600} />
                         ),
                       }}
                     />
@@ -232,6 +228,12 @@ TransactionItem.propTypes = {
     imageUrl: PropTypes.string,
   }).isRequired,
   toAccount: PropTypes.shape({
+    id: PropTypes.string,
+    slug: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    imageUrl: PropTypes.string,
+  }),
+  giftCardEmitterAccount: PropTypes.shape({
     id: PropTypes.string,
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
