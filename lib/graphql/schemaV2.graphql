@@ -2429,7 +2429,8 @@ enum CountryISO {
 This represents a Credit transaction
 """
 type Credit implements Transaction {
-  id: String
+  id: String!
+  legacyId: Int!
   uuid: String
   type: TransactionType
   description: String
@@ -2451,6 +2452,7 @@ type Credit implements Transaction {
   The permissions given to current logged in user for this transaction
   """
   permissions: TransactionPermissions!
+  giftCardEmitterAccount: Account
   fromAccount: Account
   toAccount: Account
 }
@@ -2609,7 +2611,8 @@ enum DateTimeField {
 This represents a Debit transaction
 """
 type Debit implements Transaction {
-  id: String
+  id: String!
+  legacyId: Int!
   uuid: String
   type: TransactionType
   description: String
@@ -2631,6 +2634,7 @@ type Debit implements Transaction {
   The permissions given to current logged in user for this transaction
   """
   permissions: TransactionPermissions!
+  giftCardEmitterAccount: Account
   fromAccount: Account
   toAccount: Account
 }
@@ -4712,7 +4716,8 @@ type Mutation {
 Order model
 """
 type Order {
-  id: String
+  id: String!
+  legacyId: Int!
   description: String
   amount: Amount!
   status: OrderStatus
@@ -4720,6 +4725,11 @@ type Order {
   tier: Tier
   fromAccount: Account
   toAccount: Account
+
+  """
+  Transactions for this order ordered by createdAt ASC
+  """
+  transactions: [Transaction]!
   createdAt: DateTime
   updatedAt: DateTime
 
@@ -5823,7 +5833,8 @@ enum TierType {
 Transaction interface shared by all kind of transactions (Debit, Credit)
 """
 interface Transaction {
-  id: String
+  id: String!
+  legacyId: Int!
   uuid: String
   type: TransactionType
   description: String
@@ -5835,6 +5846,7 @@ interface Transaction {
   host: Account
   fromAccount: Account
   toAccount: Account
+  giftCardEmitterAccount: Account
   createdAt: DateTime
   updatedAt: DateTime
   expense: Expense
