@@ -1431,6 +1431,7 @@
   "SignIn.SuccessDetails": "You’ll be redirected from the link in the email, you can safely close this tab.",
   "signin.unknownEmail": "There is no user with this email address.",
   "signin.usingEmail": "Sign in using your email address:",
+  "signinLinkSent.": "<Link>Learn more</Link> about passwordless login.",
   "SkipOnboarding": "Skip onboarding",
   "SortBy": "Sort by",
   "startDateAndTime": "start date and time",

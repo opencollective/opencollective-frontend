@@ -1431,6 +1431,7 @@
   "SignIn.SuccessDetails": "Você será redirecionado pelo link no email, pode fechar esta aba tranquilamente.",
   "signin.unknownEmail": "Não há usuário com este endereço de e-mail.",
   "signin.usingEmail": "Entre com seu endereço de e-mail:",
+  "signinLinkSent.": "<Link>Learn more</Link> about passwordless login.",
   "SkipOnboarding": "Pular integração",
   "SortBy": "Sort by",
   "startDateAndTime": "data e hora de início",

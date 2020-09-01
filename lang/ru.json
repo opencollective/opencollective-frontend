@@ -1431,6 +1431,7 @@
   "SignIn.SuccessDetails": "You’ll be redirected from the link in the email, you can safely close this tab.",
   "signin.unknownEmail": "Нет пользователя с такой почтой.",
   "signin.usingEmail": "Авторизоваться по электронной почте:",
+  "signinLinkSent.": "<Link>Learn more</Link> about passwordless login.",
   "SkipOnboarding": "Skip onboarding",
   "SortBy": "Sort by",
   "startDateAndTime": "start date and time",
