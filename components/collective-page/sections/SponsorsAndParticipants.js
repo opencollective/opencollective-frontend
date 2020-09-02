@@ -43,7 +43,7 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
 
   // Logic from old Event component, (filter away tiers with 'sponsor in the name')
   // to handle orders where there is no tier to check for TICKET:
-  const orders = event.orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const orders = [...event.orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const guestOrders = [];
   const sponsorOrders = [];
