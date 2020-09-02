@@ -2,7 +2,7 @@ import '../env';
 
 import React from 'react';
 import { pick } from 'lodash';
-import Document, { Head, Main, NextScript } from 'next/document';
+import Document, { Head, Html, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 import flush from 'styled-jsx/server';
 
@@ -106,7 +106,7 @@ export default class IntlDocument extends Document {
 
   render() {
     return (
-      <html>
+      <Html>
         <Head />
         <body>
           <Main />
@@ -120,7 +120,7 @@ export default class IntlDocument extends Document {
             <script dangerouslySetInnerHTML={{ __html: this.clientAnalyticsCode() }} />
           )}
         </body>
-      </html>
+      </Html>
     );
   }
 }
