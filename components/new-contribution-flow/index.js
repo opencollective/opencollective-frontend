@@ -17,7 +17,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
-import { getWebsiteUrl } from '../../lib/utils';
+import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import Container from '../../components/Container';
@@ -74,7 +74,7 @@ class ContributionFlow extends React.Component {
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
       platformContributionAvailable: PropTypes.bool,
-      parentCollective: PropTypes.shape({
+      parent: PropTypes.shape({
         slug: PropTypes.string,
       }),
     }).isRequired,
@@ -90,7 +90,7 @@ class ContributionFlow extends React.Component {
     skipStepDetails: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
-    verb: PropTypes.oneOf(['new-donate', 'new-contribute']),
+    verb: PropTypes.string,
     /** @ignore from withUser */
     refetchLoggedInUser: PropTypes.func,
     /** @ignore from withUser */
@@ -199,7 +199,9 @@ class ContributionFlow extends React.Component {
         url.searchParams.set('transactionIdV2', transaction.id);
       }
 
-      const fallback = `/${this.props.collective.slug}/new-donate/success?OrderId=${order.id}`;
+      const newFlowIsDefault = this.isNewFlowTheDefault();
+      const verb = newFlowIsDefault ? 'donate' : 'new-donate';
+      const fallback = `/${this.props.collective.slug}/${verb}/success?OrderId=${order.id}`;
       await Router.pushRoute('external-redirect', { url: url.href, fallback });
       return this.scrollToTop();
     } else {
@@ -228,6 +230,8 @@ class ContributionFlow extends React.Component {
       };
     } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
       return pick(stepPayment.paymentMethod, ['type', 'paypalInfo.token', 'paypalInfo.data']);
+    } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER) {
+      return pick(stepPayment.paymentMethod, ['type']);
     }
   };
 
@@ -272,13 +276,18 @@ class ContributionFlow extends React.Component {
   /** Steps component callback  */
   onStepChange = async step => this.pushStepRoute(step.name);
 
+  isNewFlowTheDefault() {
+    return parseToBoolean(getEnvVar('NEW_CONTRIBUTION_FLOW'));
+  }
+
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, routeParams = {}) => {
     const { collective, tier, LoggedInUser } = this.props;
     const { stepDetails, stepProfile } = this.state;
+    const newFlowIsDefault = this.isNewFlowTheDefault();
 
     const params = {
-      verb: this.props.verb || 'new-donate',
+      verb: this.props.verb || (newFlowIsDefault ? 'donate' : 'new-donate'),
       collectiveSlug: collective.slug,
       step: stepName === 'details' ? undefined : stepName,
       interval: this.props.fixedInterval || undefined,
@@ -286,22 +295,22 @@ class ContributionFlow extends React.Component {
       ...routeParams,
     };
 
-    let route = 'new-donate';
+    let route = newFlowIsDefault ? 'orderCollectiveNew' : 'new-donate';
     if (tier) {
       params.tierId = tier.legacyId;
       params.tierSlug = tier.slug;
-      if (tier.type === 'TICKET' && collective.parentCollective) {
-        route = 'orderEventTier';
-        params.collectiveSlug = collective.parentCollective.slug;
+      if (tier.type === 'TICKET' && collective.parent) {
+        route = newFlowIsDefault ? 'orderEventTier' : 'new-order-event-tier';
+        params.verb = newFlowIsDefault ? 'events' : 'new-events';
+        params.collectiveSlug = collective.parent.slug;
         params.eventSlug = collective.slug;
-        params.verb = 'events';
       } else {
-        route = 'new-contribute';
-        params.verb = 'new-contribute'; // Enforce "contribute" verb for ordering tiers
+        route = newFlowIsDefault ? 'orderCollectiveTierNew' : 'new-contribute';
+        params.verb = newFlowIsDefault ? 'contribute' : 'new-contribute'; // Enforce "contribute" verb for ordering tiers
       }
-    } else if (params.verb === 'contribute') {
+    } else if (params.verb === 'contribute' || params.verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
-      params.verb = 'new-donate';
+      params.verb = newFlowIsDefault ? 'donate' : 'new-donate';
     }
 
     // Reset errors if any
@@ -497,8 +506,10 @@ class ContributionFlow extends React.Component {
                   isFreeTier={this.getTierMinAmount(tier) === 0}
                 />
               </StepsProgressBox>
-              {/* main container */}{' '}
-              {currentStep.name === STEPS.PROFILE && !LoggedInUser && !getEnvVar('ENABLE_GUEST_CONTRIBUTIONS') ? (
+              {/* main container */}
+              {currentStep.name === STEPS.PROFILE &&
+              !LoggedInUser &&
+              !parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ? (
                 <SignInOrJoinFree defaultForm="create-account" redirect={this.getRedirectUrlForSignIn()} />
               ) : (
                 <Grid

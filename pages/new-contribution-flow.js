@@ -288,6 +288,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     ... on Event {
       parent {
         id
+        slug
         location {
           country
         }
@@ -296,6 +297,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     ... on Project {
       parent {
         id
+        slug
         location {
           country
         }

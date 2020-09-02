@@ -22,10 +22,11 @@ import { H5, P, Span } from '../Text';
 import ChangeTierWarningModal from './ChangeTierWarningModal';
 import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
+import { getTotalAmount } from './utils';
 
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
   const intl = useIntl();
-  const [temporaryInterval, setTemporaryInterval] = React.useState(null);
+  const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
   const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
@@ -52,7 +53,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month { monthly} year { yearly} other {}}."
             values={{
               interval: tier.interval,
-              amount: <FormattedMoneyAmount amount={tier.amount.valueInCents} currency={collective.currency} />,
+              amount: <FormattedMoneyAmount amount={getTotalAmount(data)} currency={collective.currency} />,
             }}
           />
         </Box>
@@ -160,15 +161,19 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           />
         </Box>
       )}
-      {temporaryInterval && (
+      {temporaryInterval !== undefined && (
         <ChangeTierWarningModal
           show
           tierName={tier.name}
           onClose={() => setTemporaryInterval(null)}
           onConfirm={() => {
             dispatchChange('interval', temporaryInterval);
-            setTemporaryInterval(null);
-            Router.pushRoute(`/${collective.slug}/new-donate/details`);
+            setTemporaryInterval(undefined);
+            Router.pushRoute('orderCollectiveNew', {
+              collectiveSlug: collective.slug,
+              verb: 'donate',
+              step: 'details',
+            });
           }}
         />
       )}

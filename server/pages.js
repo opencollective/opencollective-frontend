@@ -103,7 +103,7 @@ let createOrderPage = 'createOrder';
 let orderSuccessPage = 'orderSuccess';
 let contributionFlowSteps = 'contributeAs|details|payment|summary';
 
-if (process.env.NEW_CONTRIBUTION_FLOW) {
+if (process.env.NEW_CONTRIBUTION_FLOW && process.env.NEW_CONTRIBUTION_FLOW !== 'false') {
   createOrderPage = 'new-contribution-flow';
   orderSuccessPage = 'new-contribution-flow';
   contributionFlowSteps += '|profile|success';
@@ -116,6 +116,11 @@ if (process.env.NEW_CONTRIBUTION_FLOW) {
   pages.add(
     'new-contribute',
     '/:collectiveSlug/:verb(new-contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(details|profile|payment|success|summary)?',
+    'new-contribution-flow',
+  );
+  pages.add(
+    'new-order-event-tier',
+    `/:collectiveSlug/:verb(new-events|new-projects)/:eventSlug/order/:tierId/:step(details|profile|payment|success|summary)?`,
     'new-contribution-flow',
   );
 }
