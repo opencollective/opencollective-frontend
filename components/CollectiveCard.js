@@ -122,7 +122,7 @@ class CollectiveCard extends React.Component {
     if (collective.type === 'EVENT') {
       route = 'event';
       params = {
-        parentCollectiveSlug: collective.parentCollective && collective.parentCollective.slug,
+        parentCollectiveSlug: collective.parentCollective?.slug || 'collective',
         slug: collective.slug,
       };
     } else {
