@@ -67,7 +67,6 @@
     "moment-timezone": "0.5.31",
     "next": "9.5.3",
     "next-routes": "1.4.2",
-    "node-fetch": "2.6.1",
     "nprogress": "0.2.0",
     "payment": "2.4.0",
     "polished": "3.6.6",
@@ -100,7 +99,6 @@
     "styled-jsx": "3.3.0",
     "styled-system": "5.1.5",
     "trix": "1.2.4",
-    "universal-url": "^2.0.0",
     "uuid": "8.3.0",
     "validator": "13.1.1",
     "winston": "3.3.3"

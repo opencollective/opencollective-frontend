@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const url = require('url');
 
 const express = require('express');
 const proxy = require('express-http-proxy');
@@ -9,7 +8,6 @@ const { template, trim } = require('lodash');
 const intl = require('./intl');
 const pages = require('./pages');
 
-const { URL, URLSearchParams } = url;
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
 const maxAge = (maxAge = 60) => {

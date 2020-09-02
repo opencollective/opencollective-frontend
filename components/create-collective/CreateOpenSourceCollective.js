@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import themeGet from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { URLSearchParams } from 'universal-url';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { getWebsiteUrl } from '../../lib/utils';
