@@ -19,6 +19,7 @@ const CreateNewCard = styled.div`
 
   a {
     text-decoration: none;
+    display: block;
   }
 
   &:hover {

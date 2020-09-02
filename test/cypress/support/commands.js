@@ -1,4 +1,5 @@
 import 'cypress-file-upload';
+import './third-party-commands';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/queries';
@@ -237,6 +238,38 @@ Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
 Cypress.Commands.add('fillStripeInput', fillStripeInput);
 
 /**
+ * Completes a 3DSecure Stripe modal
+ *
+ * @param {boolean} approve: Set to false to reject
+ */
+Cypress.Commands.add('complete3dSecure', (approve = true) => {
+  const iframeSelector = 'iframe[name^="__privateStripeFrame"]';
+
+  return cy.waitUntil(() =>
+    cy.get(iframeSelector).then($3dSecureIframe => {
+      const $challengeIframe = $3dSecureIframe.contents().find('body iframe#challengeFrame');
+      const $acsIframe = $challengeIframe.contents().find('iframe[name="acsFrame"]');
+      const $finalContent = $acsIframe.contents().find('body');
+      const targetBtn = approve ? '#test-source-authorize-3ds' : '#test-source-fail-3ds';
+      $finalContent.find(targetBtn).click();
+    }),
+  );
+});
+
+Cypress.Commands.add('iframeLoaded', { prevSubject: 'element' }, $iframe => {
+  const contentWindow = $iframe.prop('contentWindow');
+  return new Promise(resolve => {
+    if (contentWindow && contentWindow.document.readyState === 'complete') {
+      resolve(contentWindow);
+    } else {
+      $iframe.on('load', () => {
+        resolve(contentWindow);
+      });
+    }
+  });
+});
+
+/**
  * To use on the "Payment" step in the contribution flow.
  * Use the first payment method if available or fill the
  * stripe form otherwise.
@@ -257,8 +290,8 @@ Cypress.Commands.add('useAnyPaymentMethod', () => {
  * of strings or a single string.
  */
 Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => {
-  const isEnabled = step => cy.get(`.step-${step}`).should('not.have.class', 'disabled');
-  const isDisabled = step => cy.get(`.step-${step}`).should('have.class', 'disabled');
+  const isEnabled = step => cy.get(`[data-cy="progress-step-${step}"][data-disabled=false]`);
+  const isDisabled = step => cy.get(`[data-cy="progress-step-${step}"][data-disabled=true]`);
 
   Array.isArray(enabled) ? enabled.forEach(isEnabled) : isEnabled(enabled);
   Array.isArray(disabled) ? disabled.forEach(isDisabled) : isDisabled(disabled);

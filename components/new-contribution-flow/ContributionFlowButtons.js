@@ -47,7 +47,13 @@ class NewContributionFlowButtons extends React.Component {
       <Flex justifyContent={'center'} mt={3}>
         <Fragment>
           {goBack && (
-            <StyledButton minWidth={125} onClick={goBack} color="black.600" disabled={isValidating}>
+            <StyledButton
+              minWidth={125}
+              onClick={goBack}
+              color="black.600"
+              disabled={isValidating}
+              data-cy="cf-prev-step"
+            >
               &larr; <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
             </StyledButton>
           )}
@@ -59,6 +65,7 @@ class NewContributionFlowButtons extends React.Component {
               onClick={this.goNext}
               disabled={!goNext}
               loading={isValidating || this.state.isLoadingNext}
+              data-cy="cf-next-step"
             >
               {this.getNextButtonLabel()} &rarr;
             </StyledButton>

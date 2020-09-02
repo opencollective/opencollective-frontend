@@ -183,6 +183,7 @@ class CreateOrderPage extends React.Component {
       customFields: PropTypes.arrayOf(PropTypes.object),
     }),
     verb: PropTypes.string.isRequired,
+    version: PropTypes.oneOf(['legacy']),
     step: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
@@ -336,6 +337,11 @@ class CreateOrderPage extends React.Component {
     } else if (params.verb === 'contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       params.verb = 'pay';
+    }
+
+    if (this.props.version === 'legacy') {
+      params.version = 'legacy';
+      route += 'Legacy';
     }
 
     // Reset errors if any

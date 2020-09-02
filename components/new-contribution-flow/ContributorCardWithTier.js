@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
+import { capitalize } from '../../lib/utils';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -17,7 +18,6 @@ import { withUser } from '../UserProvider';
 const ContributorCardWithTier = ({ contribution, ...props }) => {
   const collective = contribution.toAccount;
   const pendingOrder = contribution.status === ORDER_STATUS.PENDING;
-
   return (
     <StyledCollectiveCard
       {...props}
@@ -57,7 +57,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
           px={3}
         >
           <Box mb={3}>
-            <P textTransform="uppercase" fontSize="10px" fontWeight="400" color="black.500">
+            <P textTransform="uppercase" fontSize="10px" lineHeight="14px" fontWeight="400" color="black.500">
               <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
             </P>
             <Flex>
@@ -65,6 +65,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                 <FormattedMoneyAmount
                   amount={(contribution.amount.value + (contribution.platformContributionAmount?.value || 0)) * 100}
                   currency={contribution.amount.currency}
+                  frequency={contribution.frequency}
                 />
               </P>
               {contribution.platformContributionAmount?.value && (
@@ -100,7 +101,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
             </Flex>
           </Box>
           <Box mb={3}>
-            <P textTransform="uppercase" fontSize="10px" fontWeight="400" color="black.500">
+            <P textTransform="uppercase" fontSize="10px" lineHeight="14px" fontWeight="400" color="black.500">
               <FormattedMessage id="To" defaultMessage="To" />
             </P>
             <P fontSize="12px" fontWeight="bold">
@@ -109,7 +110,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                 defaultMessage="{collective} - {tier}"
                 values={{
                   collective: collective.name,
-                  tier: contribution.tier?.name || (
+                  tier: capitalize(contribution.tier?.name) || (
                     <FormattedMessage id="Member.Role.CONTRIBUTOR" defaultMessage="Contributor" />
                   ),
                 }}

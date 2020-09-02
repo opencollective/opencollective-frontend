@@ -10,7 +10,7 @@ describe.skip('Recurring contributions', () => {
       cy.contains('Next step').click();
       cy.useAnyPaymentMethod();
       cy.contains('button', 'Make contribution').click();
-      cy.get('#page-order-success');
+      cy.getByDataCy('order-success');
     });
   });
 

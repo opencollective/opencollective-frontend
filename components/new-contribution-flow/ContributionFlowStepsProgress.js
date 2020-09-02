@@ -4,6 +4,8 @@ import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { getPaymentMethodName } from '../../lib/payment_method_label';
+
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
 import StepsProgress from '../StepsProgress';
@@ -74,7 +76,7 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
     if (isFreeTier && getTotalAmount(stepDetails, stepSummary) === 0) {
       return <FormattedMessage id="noPaymentRequired" defaultMessage="No payment required" />;
     } else {
-      return get(stepPayment, 'title', null);
+      return (stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
     }
   } else {
     return null;

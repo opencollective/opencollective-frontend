@@ -87,7 +87,7 @@ class SignInOrJoinFree extends React.Component {
       return false;
     }
 
-    this.setState({ submitting: true });
+    this.setState({ submitting: true, error: null });
 
     try {
       const userExists = await checkUserExistence(email);
@@ -127,7 +127,7 @@ class SignInOrJoinFree extends React.Component {
       delete organization.orgName;
     }
 
-    this.setState({ submitting: true });
+    this.setState({ submitting: true, error: null });
 
     try {
       await this.props.createUser({

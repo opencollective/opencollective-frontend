@@ -124,12 +124,11 @@ ClickableLabel.defaultProps = {
 };
 
 /** Add missing fields to taxInfo and calculate tax amount */
-const prepareTaxInfo = (userTaxInfo, amount, taxPercentage, hasForm) => {
-  const taxAmount = Math.round(amount * (taxPercentage / 100));
+const prepareTaxInfo = (userTaxInfo, amount, quantity, taxPercentage, hasForm) => {
   return {
     ...userTaxInfo,
-    amount: taxAmount,
     percentage: taxPercentage,
+    amount: Math.round(amount * quantity * (taxPercentage / 100)),
     isReady: Boolean(!hasForm && (!amount || get(userTaxInfo, 'countryISO'))),
   };
 };
@@ -156,11 +155,11 @@ const StepSummary = ({
   const { amount, quantity } = stepDetails;
   const tierType = tier?.type;
   const hostCountry = get(collective.host, 'location.country');
-  const collectiveCountry = collective.location.country;
+  const collectiveCountry = collective.location.country || get(collective.parent, 'location.country');
 
   const [formState, setFormState] = useState({ isEnabled: false, error: false });
   const taxPercentage = getTaxPerentageForProfile(tierType, hostCountry, collectiveCountry, data);
-  const taxInfo = prepareTaxInfo(data, amount, taxPercentage, formState.isEnabled);
+  const taxInfo = prepareTaxInfo(data, amount, quantity, taxPercentage, formState.isEnabled);
 
   // Helper to prepare onChange data
   const dispatchChange = (newValues, hasFormParam) => {
@@ -169,7 +168,7 @@ const StepSummary = ({
       const percent = getTaxPerentageForProfile(tierType, hostCountry, collectiveCountry, newTaxInfo);
       const hasForm = hasFormParam === undefined ? formState.isEnabled : hasFormParam;
       return onChange({
-        stepSummary: prepareTaxInfo(newTaxInfo, amount, percent, hasForm),
+        stepSummary: prepareTaxInfo(newTaxInfo, amount, quantity, percent, hasForm),
       });
     }
   };
@@ -214,7 +213,7 @@ const StepSummary = ({
             </Label>
             <Span fontSize="16px">
               {amount ? (
-                formatCurrency(amount / quantity, collective.currency)
+                formatCurrency(amount, collective.currency)
               ) : (
                 <FormattedMessage id="Amount.Free" defaultMessage="Free" />
               )}
@@ -232,7 +231,7 @@ const StepSummary = ({
         <Label fontWeight="bold">
           <FormattedMessage id="contribution.your" defaultMessage="Your contribution" />
         </Label>
-        <Span fontSize="16px">{formatCurrency(amount, collective.currency)}</Span>
+        <Span fontSize="16px">{formatCurrency(amount * quantity, collective.currency)}</Span>
       </AmountLine>
       {applyTaxes && amount > 0 && (
         <React.Fragment>
@@ -367,7 +366,7 @@ const StepSummary = ({
           <FormattedMessage id="contribution.total" defaultMessage="TOTAL" />
         </Label>
         <Span fontWeight="bold" fontSize="16px" color={taxInfo.isReady ? 'black.800' : 'black.400'}>
-          {formatCurrency(amount + (taxInfo.isReady ? taxInfo.amount : 0), collective.currency)}
+          {formatCurrency(amount * quantity + (taxInfo.isReady ? taxInfo.amount : 0), collective.currency)}
         </Span>
       </AmountLine>
     </Box>
@@ -395,6 +394,11 @@ StepSummary.propTypes = {
     platformFeePercent: PropTypes.number,
     location: PropTypes.shape({
       country: propTypeCountry,
+    }),
+    parent: PropTypes.shape({
+      location: PropTypes.shape({
+        country: propTypeCountry,
+      }),
     }),
     host: PropTypes.shape({
       location: PropTypes.shape({
