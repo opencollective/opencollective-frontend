@@ -138,6 +138,6 @@ export const getTotalAmount = (stepDetails, stepSummary) => {
   const quantity = get(stepDetails, 'quantity') || 1;
   const amount = get(stepDetails, 'amount') || 0;
   const taxAmount = get(stepSummary, 'amount') || 0;
-  const platformFeeAmount = get(stepDetails, 'feesOnTop') || 0;
+  const platformFeeAmount = get(stepDetails, 'platformContribution') || 0;
   return quantity * (amount + platformFeeAmount) + taxAmount;
 };
