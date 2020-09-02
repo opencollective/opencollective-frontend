@@ -2452,6 +2452,7 @@ type Credit implements Transaction {
   The permissions given to current logged in user for this transaction
   """
   permissions: TransactionPermissions!
+  giftCardEmitterAccount: Account
   fromAccount: Account
   toAccount: Account
 }
@@ -2633,6 +2634,7 @@ type Debit implements Transaction {
   The permissions given to current logged in user for this transaction
   """
   permissions: TransactionPermissions!
+  giftCardEmitterAccount: Account
   fromAccount: Account
   toAccount: Account
 }
@@ -5844,6 +5846,7 @@ interface Transaction {
   host: Account
   fromAccount: Account
   toAccount: Account
+  giftCardEmitterAccount: Account
   createdAt: DateTime
   updatedAt: DateTime
   expense: Expense
