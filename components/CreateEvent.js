@@ -10,6 +10,7 @@ import { Router } from '../server/pages';
 
 import Body from './Body';
 import CollectiveNavbar from './CollectiveNavbar';
+import Container from './Container';
 import EditEventForm from './EditEventForm';
 import Footer from './Footer';
 import Header from './Header';
@@ -92,32 +93,6 @@ class CreateEvent extends React.Component {
 
     return (
       <div className="CreateEvent">
-        <style jsx>
-          {`
-            .result {
-              text-align: center;
-              margin-bottom: 5rem;
-            }
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-            .EventTemplatePicker {
-              max-width: 700px;
-              margin: 0 auto;
-            }
-            .EventTemplatePicker .field {
-              margin: 0;
-            }
-            .login {
-              margin: 0 auto;
-              text-align: center;
-            }
-          `}
-        </style>
-
         <Header title={title} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
@@ -125,7 +100,7 @@ class CreateEvent extends React.Component {
 
           <div className="content">
             {!canCreateEvent && (
-              <div className="login">
+              <Container margin="0 auto" textAlign="center">
                 <p>
                   <FormattedMessage
                     id="events.create.login"
@@ -137,7 +112,7 @@ class CreateEvent extends React.Component {
                     <FormattedMessage id="signIn" defaultMessage="Sign In" />
                   </Button>
                 </p>
-              </div>
+              </Container>
             )}
             {canCreateEvent && (
               <div>
@@ -147,10 +122,10 @@ class CreateEvent extends React.Component {
                   onChange={this.resetError}
                   loading={this.state.status === 'loading'}
                 />
-                <div className="result">
-                  <div className="success">{this.state.result.success}</div>
-                  <div className="error">{this.state.result.error}</div>
-                </div>
+                <Container textAlign="center" marginBottom="5rem">
+                  <Container style={{ color: 'green' }}>{this.state.result.success}</Container>
+                  <Container style={{ color: 'red' }}>{this.state.result.error}</Container>
+                </Container>
               </div>
             )}
           </div>
