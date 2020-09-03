@@ -9,6 +9,7 @@ import { ThemeProvider } from 'styled-components';
 
 import theme from '../lib/theme';
 import withData from '../lib/withData';
+import { debugPerformance } from '../server/debug';
 
 import StripeProviderSSR from '../components/StripeProvider';
 import UserProvider from '../components/UserProvider';
@@ -49,16 +50,21 @@ class OpenCollectiveFrontendApp extends App {
   };
 
   constructor() {
+    debugPerformance('App: constructor');
     super(...arguments);
     this.state = { hasError: false, errorEventId: undefined };
   }
 
-  static async getInitialProps({ Component, ctx }) {
+  static async getInitialProps(context) {
+    debugPerformance('App: getInitialProps');
+
+    const { client, Component, ctx } = context;
+
     try {
       let pageProps = {};
 
       if (Component.getInitialProps) {
-        pageProps = await Component.getInitialProps(ctx);
+        pageProps = await Component.getInitialProps({ ...ctx, client });
       }
 
       const scripts = {};
@@ -117,6 +123,8 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   render() {
+    debugPerformance('App: render');
+
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
 
     const intl = createIntl({ locale, messages }, cache);
@@ -127,7 +135,7 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
-                <UserProvider apiKey={process.env.STRIPE_KEY}>
+                <UserProvider>
                   <Component {...pageProps} />
                 </UserProvider>
               </RawIntlProvider>

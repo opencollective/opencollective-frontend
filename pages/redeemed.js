@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import sanitizeHtml from 'sanitize-html';
 import styled from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
-
-import withData from '../lib/withData';
 
 import Body from '../components/Body';
 import CollectivesWithData from '../components/CollectivesWithData';
@@ -330,4 +328,4 @@ const addRedeemedPageData = graphql(redeemedPageQuery, {
   skip: props => !props.collectiveSlug,
 });
 
-export default withUser(withData(addRedeemedPageData(RedeemedPage)));
+export default withUser(withApollo(addRedeemedPageData(RedeemedPage)));

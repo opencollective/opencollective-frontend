@@ -7,6 +7,7 @@ import { ServerStyleSheet } from 'styled-components';
 import flush from 'styled-jsx/server';
 
 import { parseToBoolean } from '../lib/utils';
+import { debugPerformance } from '../server/debug';
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
@@ -40,11 +41,15 @@ export default class IntlDocument extends Document {
       //   })
 
       // The old recommended way to process Styled Components
+      debugPerformance('Document: styledComponents collectStyles');
       const page = originalRenderPage(App => props => sheet.collectStyles(<App {...props} />));
 
+      debugPerformance('Document: styledJsx flush');
       const styledJsxStyles = flush();
+      debugPerformance('Document: styledComponents getStyleElement');
       const styledComponentsStyles = sheet.getStyleElement();
 
+      debugPerformance('Document: getInitialProps');
       const initialProps = await Document.getInitialProps(ctx);
 
       return {
@@ -105,6 +110,7 @@ export default class IntlDocument extends Document {
   }
 
   render() {
+    debugPerformance('Document: render');
     return (
       <Html>
         <Head />

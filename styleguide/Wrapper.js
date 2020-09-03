@@ -6,7 +6,6 @@ import { ThemeProvider } from 'styled-components';
 
 import initClient from '../lib/initClient';
 import theme from '../lib/theme';
-import { getBaseApiUrl } from '../lib/utils';
 
 import StripeProvider from '../components/StripeProvider';
 import UserProvider from '../components/UserProvider';
@@ -18,15 +17,14 @@ export default class ThemeWrapper extends Component {
     children: PropTypes.node,
   };
 
-  getGraphQLAPIURL() {
-    const baseURL = getBaseApiUrl();
+  getGraphqlApiUrl() {
     const stagingApiKey = '09u624Pc9F47zoGLlkg1TBSbOl2ydSAq';
     const devApiKey = 'dvl-1510egmf4a23d80342403fb599qd';
 
     if (process.env.NODE_ENV === 'production') {
-      return `https://staging.opencollective.com${baseURL}/graphql?api_key=${stagingApiKey}`;
+      return `https://staging.opencollective.com/api/graphql?api_key=${stagingApiKey}`;
     } else {
-      return `http://localhost:3000${baseURL}/graphql?api_key=${devApiKey}`;
+      return `http://localhost:3000/api/graphql?api_key=${devApiKey}`;
     }
   }
 
@@ -35,7 +33,7 @@ export default class ThemeWrapper extends Component {
       <ThemeProvider theme={theme}>
         <IntlProvider locale="en">
           <StripeProvider token={STRIPE_KEY} loadOnMount>
-            <ApolloProvider client={initClient(undefined, this.getGraphQLAPIURL())}>
+            <ApolloProvider client={initClient({ graphqlApiUrl: this.getGraphqlApiUrl() })}>
               <UserProvider skipRouteCheck>{this.props.children}</UserProvider>
             </ApolloProvider>
           </StripeProvider>

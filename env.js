@@ -28,6 +28,8 @@ const defaults = {
   OC_APPLICATION: 'frontend',
   OC_ENV: process.env.NODE_ENV || 'development',
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
+  APOLLO_CACHE_LEVEL: 'NEVER',
+  APOLLO_CACHE_CLEAR_INTERVAL: 60000,
 };
 
 if (process.env.NODE_ENV === 'production') {

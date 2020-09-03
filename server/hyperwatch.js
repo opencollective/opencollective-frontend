@@ -51,6 +51,21 @@ const load = async app => {
     next();
   });
 
+  app.use((req, res, next) => {
+    req.rawLog = req.rawLog || lib.util.createLog(req, res);
+    req.getAugmentedLog = async () => {
+      if (!req.augmentedLog) {
+        let log = req.rawLog;
+        for (const key of ['cloudflare', 'agent', 'hostname', 'identity']) {
+          log = await modules.get(key).augment(log);
+        }
+        req.augmentedLog = log;
+      }
+      return req.augmentedLog;
+    };
+    next();
+  });
+
   app.use(expressInput.middleware());
 
   pipeline.registerInput(expressInput);

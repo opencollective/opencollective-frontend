@@ -8,6 +8,7 @@ const { template, trim } = require('lodash');
 
 const intl = require('./intl');
 const pages = require('./pages');
+const { middleware: apolloClientMiddleware } = require('./apollo-client');
 
 const { URL, URLSearchParams } = url;
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
@@ -33,6 +34,11 @@ module.exports = (expressApp, nextApp) => {
     }
     next();
   });
+
+  // Improve performance with Apollo Client middleware
+  app.get('/:slug', apolloClientMiddleware);
+  app.get('/:slug/banner.html', apolloClientMiddleware);
+  app.get('/:slug/transactions', apolloClientMiddleware);
 
   app.use('/_next/static', (req, res, next) => {
     res.set('Cache-Control', 'public, max-age=31536000, immutable');
