@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { isValidRelativeUrl } from '../lib/utils';
 import { Router } from '../server/pages';
 
@@ -154,7 +155,8 @@ class SigninPage extends React.Component {
           routes={this.getRoutes()}
           enforceTwoFactorAuthForLoggedInUser={enforceTwoFactorAuthForLoggedInUser}
           submitTwoFactorAuthenticatorCode={(values, actions) => {
-            this.props.login(this.props.token, values.twoFactorAuthenticatorCode);
+            const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+            this.props.login(localStorage2FAToken, values.twoFactorAuthenticatorCode);
             actions.setSubmitting(false);
           }}
         />
