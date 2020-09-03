@@ -86,35 +86,6 @@ class CreateOrganization extends React.Component {
 
     return (
       <div className="CreateOrganization">
-        <style jsx>
-          {`
-            .result {
-              text-align: center;
-              margin-bottom: 5rem;
-            }
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-            .CollectiveTemplatePicker {
-              max-width: 700px;
-              margin: 0 auto;
-            }
-            .CollectiveTemplatePicker .field {
-              margin: 0;
-            }
-            .login {
-              margin: 0 auto;
-              text-align: center;
-            }
-            .signin {
-              text-align: center;
-            }
-          `}
-        </style>
-
         <Header
           title={title}
           className={this.state.status}
@@ -137,9 +108,9 @@ class CreateOrganization extends React.Component {
 
           <div className="content">
             {!LoggedInUser && (
-              <div className="signin">
+              <Container textAlign="center">
                 <SignInOrJoinFree />
-              </div>
+              </Container>
             )}
             {LoggedInUser && (
               <div>
@@ -149,10 +120,10 @@ class CreateOrganization extends React.Component {
                   onChange={this.resetError}
                 />
 
-                <div className="result">
-                  <div className="success">{this.state.result.success}</div>
-                  <div className="error">{this.state.result.error}</div>
-                </div>
+                <Container textAlign="center" marginBottom="5rem">
+                  <Container color="green.500">{this.state.result.success}</Container>
+                  <Container color="red.500">{this.state.result.error}</Container>
+                </Container>
               </div>
             )}
           </div>
