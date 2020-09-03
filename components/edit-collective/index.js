@@ -71,6 +71,7 @@ class EditCollective extends React.Component {
     this.setState({ status: 'loading' });
 
     try {
+      console.log('submit', collective);
       await this.props.editCollective(collective);
       this.setState({ status: 'saved', result: { error: null } });
       const { slug, eventSlug } = Router.router.query;

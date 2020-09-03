@@ -1,12 +1,17 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
 import Geosuggest from 'react-geosuggest';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+import { isURL } from 'validator';
 
 import Location from './Location';
 import MessageBox from './MessageBox';
+import StyledInput from './StyledInput';
+import StyledInputField from './StyledInputField';
+import { Span } from './Text';
 
 const GeoSuggestItem = styled(Geosuggest)`
   .geosuggest {
@@ -25,8 +30,15 @@ const GeoSuggestItem = styled(Geosuggest)`
     color: #555;
     background-color: #fff;
     background-image: none;
-    border: 1px solid #ccc;
+    border: 1px solid #dcdee0;
     border-radius: 4px;
+    outline: none;
+    &:hover:not(:disabled) {
+      border-color: ${themeGet('colors.primary.300')};
+    }
+    &:focus:not(:disabled) {
+      border-color: ${themeGet('colors.primary.500')};
+    }
   }
   .geosuggest__input:focus {
     border-color: #267dc0;
@@ -40,11 +52,13 @@ const GeoSuggestItem = styled(Geosuggest)`
     padding: 0;
     margin-top: -2px;
     background: #fff;
-    border: 1px solid #267dc0;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
     border-top-width: 0;
     overflow-x: hidden;
     overflow-y: auto;
     list-style: none;
+    margin-top: 1px;
     z-index: 5;
     -webkit-transition: max-height 0.2s, border 0.2s;
     transition: max-height 0.2s, border 0.2s;
@@ -59,28 +73,21 @@ const GeoSuggestItem = styled(Geosuggest)`
   * A geosuggest item
   */
   .geosuggest__item {
-    font-size: 18px;
-    font-size: 1rem;
-    padding: 0.5em 0.65em;
+    font-size: 12px;
+    padding: 1em 0.65em;
     cursor: pointer;
+    margin: 0;
   }
   .geosuggest__item:hover,
   .geosuggest__item:focus {
-    background: #f5f5f5;
-  }
-  .geosuggest__item--active {
-    background: #267dc0;
-    color: #fff;
-  }
-  .geosuggest__item--active:hover,
-  .geosuggest__item--active:focus {
-    background: #ccc;
+    background: ${themeGet('colors.primary.100')};
   }
 `;
 
 class InputTypeLocation extends React.Component {
   static propTypes = {
     value: PropTypes.object,
+    intl: PropTypes.object,
     className: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     options: PropTypes.object,
@@ -90,7 +97,13 @@ class InputTypeLocation extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.state = { value: props.value || {} };
+    this.state = { value: props.value || {}, eventUrlError: false };
+    this.messages = defineMessages({
+      online: {
+        id: 'Location.online',
+        defaultMessage: 'Online',
+      },
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -107,6 +120,10 @@ class InputTypeLocation extends React.Component {
     if (!value) {
       this.setState({ value: {} });
       return this.props.onChange({});
+    } else if (value.isOnline) {
+      const location = { name: 'Online' };
+      this.setState({ value: location });
+      return this.props.onChange(location);
     }
 
     const countryComponent = value.gmaps['address_components'].find(c => c.types.includes('country'));
@@ -150,9 +167,54 @@ class InputTypeLocation extends React.Component {
             <GeoSuggestItem
               onSuggestSelect={event => this.handleChange(event)}
               placeholder={this.props.placeholder}
+              initialValue={this.props.value?.name}
+              fixtures={[
+                {
+                  label: this.props.intl.formatMessage(this.messages.online),
+                  location: { lat: 0, lng: 0 },
+                  isOnline: true,
+                },
+              ]}
               {...options}
             />
-            <Location location={this.state.value} showTitle={false} />
+            {this.state.value?.name === 'Online' ? (
+              <StyledInputField
+                mt={3}
+                labelProps={{ fontWeight: '700', fontSize: '16px' }}
+                labelColor="#333333"
+                label="URL (public)"
+                error={this.state.eventUrlError}
+              >
+                {field => (
+                  <div>
+                    <StyledInput
+                      {...field}
+                      width="100%"
+                      placeholder="https://meet.jit.si/opencollective"
+                      defaultValue={this.state.value.address}
+                      onBlur={e => {
+                        if (e.target.value && !isURL(e.target.value)) {
+                          this.setState({ eventUrlError: true, address: null });
+                        }
+                      }}
+                      onChange={({ target: { value } }) =>
+                        this.setState(state => ({ value: { ...state.value, address: value }, eventUrlError: false }))
+                      }
+                    />
+                    {this.state.eventUrlError && (
+                      <Span display="block" color="red.500" fontSize="12px" mt={1}>
+                        <FormattedMessage
+                          id="InvalidURL"
+                          defaultMessage="Invalid URL. It must start with https:// or https://."
+                        />
+                      </Span>
+                    )}
+                  </div>
+                )}
+              </StyledInputField>
+            ) : (
+              <Location location={this.state.value} showTitle={false} />
+            )}
           </Fragment>
         )}
       </div>
@@ -160,4 +222,4 @@ class InputTypeLocation extends React.Component {
   }
 }
 
-export default InputTypeLocation;
+export default injectIntl(InputTypeLocation);

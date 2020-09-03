@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
-import { find, get, set } from 'lodash';
+import { cloneDeep, find, get, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -181,8 +181,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Commission on financial contributions to Collectives you fiscally host.',
       },
       'location.label': {
-        id: 'collective.location.label',
-        defaultMessage: 'City',
+        id: 'SectionLocation.Title',
+        defaultMessage: 'Location',
       },
       'country.label': {
         id: 'collective.country.label',
@@ -228,6 +228,14 @@ class EditCollectiveForm extends React.Component {
         id: 'EditCollective.VATNumber.Description',
         defaultMessage: 'Your European Value Added Tax (VAT) number',
       },
+      'data.eventInfo.privateInstructions.label': {
+        id: 'event.privateInstructions.label',
+        defaultMessage: 'Private instructions',
+      },
+      privateInstructionsDescription: {
+        id: 'event.privateInstructions.description',
+        defaultMessage: 'These instructions will be provided by email to the participants.',
+      },
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
@@ -253,7 +261,7 @@ class EditCollectiveForm extends React.Component {
 
   handleChange(fieldname, value) {
     this.setState(state => {
-      const collective = { ...state.collective };
+      const collective = cloneDeep(state.collective);
 
       // GraphQL schema has address embedded within location
       // mutation expects { location: { address: '' } }
@@ -282,7 +290,7 @@ class EditCollectiveForm extends React.Component {
           collective['endsAt'] = endsAtValue;
         }
       } else {
-        collective[fieldname] = value;
+        set(collective, fieldname, value);
       }
 
       return { collective, modified: true };
@@ -492,7 +500,7 @@ class EditCollectiveForm extends React.Component {
     const type = collective.type.toLowerCase();
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
-
+    console.log(collective);
     this.fields = {
       info: [
         {
@@ -589,6 +597,14 @@ class EditCollectiveForm extends React.Component {
           name: 'location',
           placeholder: '',
           type: 'location',
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'data.eventInfo.privateInstructions',
+          description: intl.formatMessage(this.messages.privateInstructionsDescription),
+          type: 'textarea',
+          maxLength: 10000,
+          defaultValue: collective.data?.eventInfo?.privateInstructions,
           when: () => collective.type === CollectiveType.EVENT,
         },
         {

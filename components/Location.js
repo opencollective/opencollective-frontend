@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isURL } from 'validator';
 
 import colors from '../lib/constants/colors';
 
 import Map from './Map';
 import StyledLink from './StyledLink';
+import { P } from './Text';
 
 class Location extends React.Component {
   static propTypes = {
@@ -18,6 +20,22 @@ class Location extends React.Component {
 
   render() {
     const { name, address, lat, long, country } = this.props.location;
+
+    if (name === 'Online') {
+      if (address && isURL(address)) {
+        return (
+          <P textAlign="center">
+            <StyledLink openInNewTabNoFollow href={address}>
+              {address}
+            </StyledLink>
+          </P>
+        );
+      } else {
+        return null;
+      }
+    } else if (!name && !address && !lat && !long && !country) {
+      return null;
+    }
 
     return (
       <section id="location" className="location">
