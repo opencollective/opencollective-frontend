@@ -251,7 +251,7 @@ class Members extends React.Component {
   }
 
   renderMember = (member, index) => {
-    const { intl, LoggedInUser, data } = this.props;
+    const { intl, LoggedInUser } = this.props;
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
     const collectiveId = get(member, 'member.id');
