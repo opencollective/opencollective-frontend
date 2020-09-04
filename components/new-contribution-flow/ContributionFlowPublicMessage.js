@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import { Check } from '@styled-icons/boxicons-regular/Check';
 import themeGet from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
 import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';
@@ -55,7 +54,6 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
   const intl = useIntl();
   const collective = order.toAccount;
   const stepProfile = order.fromAccount;
-  const [submitted, setSubmitted] = useState(null);
 
   // GraphQL & data
   const [postPublicMessage] = useMutation(postContributionPublicMessageMutation, {
@@ -76,7 +74,6 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
         message: publicMessage,
       },
     }).then(() => {
-      setSubmitted(true);
       confettiFireworks(3000);
     });
   };
@@ -121,14 +118,7 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
                 </Flex>
                 <Flex width={1 / 2} alignItems="center" justifyContent="flex-end">
                   <StyledButton buttonSize="tiny" loading={isSubmitting} type="submit" onSubmit={handleSubmit}>
-                    {submitted ? (
-                      <Flex>
-                        <FormattedMessage id="contribute.publicMessage.posted" defaultMessage="Posted" />
-                        <Check size={12} />
-                      </Flex>
-                    ) : (
-                      <FormattedMessage id="contribute.publicMessage.post" defaultMessage="Post message" />
-                    )}
+                    <FormattedMessage id="contribute.publicMessage.post" defaultMessage="Post message" />
                   </StyledButton>
                 </Flex>
               </Flex>

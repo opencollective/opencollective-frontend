@@ -14,6 +14,7 @@ import { TransactionTypes } from '../../lib/constants/transactions';
 import { getEnvVar } from '../../lib/env-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
@@ -95,6 +96,7 @@ class ContributionFlow extends React.Component {
     refetchLoggedInUser: PropTypes.func,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
+    createCollective: PropTypes.func.isRequired, // from mutation
   };
 
   constructor(props) {
@@ -248,6 +250,32 @@ class ContributionFlow extends React.Component {
     return encodeURIComponent(currentPath);
   }
 
+  /** Validate step profile, create new incognito/org if necessary */
+  /** TODO: create profile for new org */
+  validateStepProfile = async () => {
+    if (!this.state.stepProfile) {
+      return false;
+    }
+
+    // Check if we're creating a new profile
+    if (this.state.stepProfile.id === 'incognito') {
+      this.setState({ isSubmitting: true });
+
+      try {
+        const { data: result } = await this.props.createCollective(this.state.stepProfile);
+        const createdProfile = result.createCollective;
+        await this.props.refetchLoggedInUser();
+        this.setState({ stepProfile: createdProfile, isSubmitting: false });
+      } catch (error) {
+        this.setState({ error: error.message, isSubmitting: false });
+        window.scrollTo(0, 0);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   createProfileForRecurringContributions = async data => {
     if (this.state.isSubmitting) {
       return false;
@@ -370,6 +398,7 @@ class ContributionFlow extends React.Component {
         name: 'profile',
         label: intl.formatMessage(stepsLabels.contributeAs),
         isCompleted: Boolean(this.state.stepProfile),
+        validate: this.validateStepProfile,
       },
     ];
 
@@ -568,21 +597,57 @@ class ContributionFlow extends React.Component {
   }
 }
 
-const orderResponseFragment = gqlV2`
+export const orderSuccessFragment = gqlV2/* GraphQL */ `
+  fragment OrderSuccessFragment on Order {
+    id
+    status
+    amount {
+      value
+      currency
+    }
+    platformContributionAmount {
+      value
+    }
+    tier {
+      name
+    }
+    membership {
+      id
+      publicMessage
+    }
+    fromAccount {
+      id
+      name
+    }
+    toAccount {
+      id
+      name
+      slug
+      ... on AccountWithContributions {
+        contributors {
+          totalCount
+        }
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          settings
+          payoutMethods {
+            id
+            name
+            data
+            type
+          }
+        }
+      }
+    }
+  }
+`;
+
+const orderResponseFragment = gqlV2/* GraphQL */ `
   fragment OrderResponseFragment on OrderWithPayment {
     order {
-      id
-      status
-      frequency
-      legacyId
-      amount {
-        valueInCents
-      }
-      transactions {
-        id
-        legacyId
-        type
-      }
+      ...OrderSuccessFragment
     }
     stripeError {
       message
@@ -590,6 +655,7 @@ const orderResponseFragment = gqlV2`
       response
     }
   }
+  ${orderSuccessFragment}
 `;
 
 // TODO: Use a fragment to retrieve the fields from success page in there
@@ -624,5 +690,7 @@ const addConfirmOrderMutation = graphql(
 );
 
 export default injectIntl(
-  withUser(addSignupMutation(addConfirmOrderMutation(addCreateOrderMutation(ContributionFlow)))),
+  withUser(
+    addSignupMutation(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(ContributionFlow)))),
+  ),
 );

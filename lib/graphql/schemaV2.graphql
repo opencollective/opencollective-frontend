@@ -4746,6 +4746,11 @@ type Order {
   Platform contribution attached to the Order.
   """
   platformContributionAmount: Amount
+
+  """
+  This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
+  """
+  membership: MemberOf
 }
 
 """
