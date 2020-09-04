@@ -172,11 +172,33 @@ class Members extends React.Component {
     });
   };
 
-  requestToBeRemoved = index => {
-    /**
-     * TODO: Add functionality for request to be removed
-     */
-    console.log(index);
+  requestToBeRemoved = async () => {
+    const { LoggedInUser } = this.props;
+    const admins = get(this.props.data, 'Collective.members', EMPTY_MEMBERS);
+    var data = admins.filter(function (admin) {
+      return (admin.member.email != LoggedInUser.email) & (admin.role === 'ADMIN');
+    });
+    try {
+      this.setState({ isSubmitting: true, error: null });
+      await this.props.sendEmailToAdmins({
+        variables: {
+          collectiveId: this.props.collective.id,
+          members: data.map(member => ({
+            id: member.id,
+            role: member.role,
+            description: member.description,
+            since: member.since,
+            member: {
+              id: member.member.id,
+              name: member.member.name,
+              email: member.member.email,
+            },
+          })),
+        },
+      });
+    } catch (e) {
+      this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
+    }
   };
 
   confirmRemoveMember = memberEntry => {
@@ -450,10 +472,25 @@ const editCoreContributorsMutation = gql`
   ${memberFieldsFragment}
 `;
 
+const sendEmailToAdminsMutation = gql`
+  mutation sendEmailToAdmins($collectiveId: Int!, $members: [MemberInputType!]!) {
+    sendEmailToAdmins(collectiveId: $collectiveId, members: $members) {
+      id
+      members(roles: ["ADMIN", "MEMBER"]) {
+        ...MemberFields
+      }
+    }
+  }
+  ${memberFieldsFragment}
+`;
+
+const addsendEmailToAdminsMutation = graphql(sendEmailToAdminsMutation, {
+  name: 'sendEmailToAdmins',
+});
 const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
   name: 'editCoreContributors',
 });
 
-const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation);
+const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation, addsendEmailToAdminsMutation);
 
 export default injectIntl(addGraphql(Members));
