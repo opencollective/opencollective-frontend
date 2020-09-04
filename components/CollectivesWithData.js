@@ -6,6 +6,7 @@ import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 import CollectiveCard from './CollectiveCard';
+import Container from './Container';
 import Error from './Error';
 
 const COLLECTIVE_CARDS_PER_PAGE = 10;
@@ -73,52 +74,28 @@ class CollectivesWithData extends React.Component {
 
     const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
     return (
-      <div className="CollectivesContainer" ref={node => (this.node = node)}>
-        <style jsx>
-          {`
-            :global(.loadMoreBtn) {
-              margin: 1rem;
-              text-align: center;
-            }
-            .filter {
-              width: 100%;
-              max-width: 400px;
-              margin: 0 auto;
-            }
-            :global(.filterBtnGroup) {
-              width: 100%;
-            }
-            :global(.filterBtn) {
-              width: 33%;
-            }
-            .Collectives {
-              display: flex;
-              flex-wrap: wrap;
-              flex-direction: row;
-              justify-content: center;
-              overflow: hidden;
-              margin: 1rem 0;
-            }
-            .CollectivesContainer :global(.CollectiveCard) {
-              margin: 1rem;
-            }
-          `}
-        </style>
-
-        <div className="Collectives cardsList">
+      <Container ref={node => (this.node = node)}>
+        <Container
+          display="flex"
+          flexWrap="wrap"
+          flexDirection="row"
+          justifyContent="center"
+          overflow="hidden"
+          margin="1rem 0"
+        >
           {collectives.map(collective => (
             <CollectiveCard key={collective.id} collective={collective} />
           ))}
-        </div>
+        </Container>
         {collectives.length % 10 === 0 && collectives.length >= limit && (
-          <div className="loadMoreBtn">
+          <Container margin="1rem" textAlign="center">
             <Button bsStyle="default" onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
             </Button>
-          </div>
+          </Container>
         )}
-      </div>
+      </Container>
     );
   }
 }
