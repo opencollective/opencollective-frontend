@@ -1107,6 +1107,7 @@
   "members.remove": "Удалить основного участника",
   "members.remove.cantRemoveYourself": "Вы не можете удалить себя как администратора Коллектива. Если вы единственный администратор, пожалуйста, добавьте нового и попросите его удалить вас.",
   "members.remove.confirm": "Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?",
+  "members.request": "Request to be removed as Admin",
   "members.role.label": "роль",
   "Membership.ContributorSince": "{contributorType} с",
   "membership.description": "{role, select, ADMIN {Администратор} MEMBER {Основной Участник} BACKER {Вкладчик}} с {date}",

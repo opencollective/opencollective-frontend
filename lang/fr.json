@@ -1106,7 +1106,7 @@
   "members.pending.details": "Ce membre n'a pas encore accepté l'invitation à rejoindre le collectif",
   "members.remove": "Supprimer ce membre",
   "members.remove.cantRemoveYourself": "Vous ne pouvez pas vous enlever vous-même des administrateurs du Collectif. Si vous êtes le seul administrateur, ajoutez quelqu'un d'autre et demandez-lui de vous enlever.",
-  "members.remove.confirm": "Souhaitez-vous vraiment supprimer {name} @{slug} {hasEmail, select, 1 {({email})} other {}} des membres de l'équipe pour ce Collectif?",
+  "members.remove.confirm": "Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?",
   "members.request": "Request to be removed as Admin",
   "members.role.label": "rôle",
   "Membership.ContributorSince": "{contributorType} depuis le",

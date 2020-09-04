@@ -50,6 +50,7 @@ class Members extends React.Component {
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
     editCoreContributors: PropTypes.func.isRequired,
+    sendEmailToAdmins: PropTypes.func.isRequired,
     /** @ignore from Apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -133,6 +134,14 @@ class Members extends React.Component {
     }
   }
 
+  findAdmins = props => {
+    const admins = this.getMembersFromProps(props);
+    const adminMember = admins.filter(admin => {
+      return (admin.member.email != props.LoggedInUser.email) & (admin.role === 'ADMIN');
+    });
+    return adminMember;
+  };
+
   getMembersFromProps(props) {
     const pendingInvitations = get(props.data, 'memberInvitations', EMPTY_MEMBERS);
     const pendingInvitationsMembersData = pendingInvitations.map(i => omit(i, ['id']));
@@ -173,11 +182,7 @@ class Members extends React.Component {
   };
 
   requestToBeRemoved = async () => {
-    const { LoggedInUser } = this.props;
-    const admins = get(this.props.data, 'Collective.members', EMPTY_MEMBERS);
-    var data = admins.filter(function (admin) {
-      return (admin.member.email != LoggedInUser.email) & (admin.role === 'ADMIN');
-    });
+    const data = this.findAdmins(this.props);
     try {
       this.setState({ isSubmitting: true, error: null });
       await this.props.sendEmailToAdmins({
@@ -246,7 +251,7 @@ class Members extends React.Component {
   }
 
   renderMember = (member, index) => {
-    const { intl, LoggedInUser } = this.props;
+    const { intl, LoggedInUser, data } = this.props;
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
     const collectiveId = get(member, 'member.id');
@@ -285,7 +290,12 @@ class Members extends React.Component {
               )}
               {isSelf ? (
                 <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveYourself)}>
-                  <StyledButton buttonStyle="primary" my={1} onClick={() => this.requestToBeRemoved()}>
+                  <StyledButton
+                    buttonStyle="primary"
+                    my={1}
+                    onClick={() => this.requestToBeRemoved()}
+                    disabled={this.findAdmins(this.props).length === 0 ? true : false}
+                  >
                     {intl.formatMessage(this.messages.requestToBeRemoved)}
                   </StyledButton>
                 </StyledTooltip>
