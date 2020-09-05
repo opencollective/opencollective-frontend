@@ -1,18 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { H1 } from './Text';
+
 const ErrorComponent = ({ message }) => {
   return (
     <div className="Error">
-      <style jsx>
-        {`
-          h1 {
-            text-align: center;
-            padding: 8rem;
-          }
-        `}
-      </style>
-      <h1>{message || 'unknown error'}</h1>
+      <H1 textAlign="center" padding="8rem">
+        {message || 'unknown error'}
+      </H1>
     </div>
   );
 };
