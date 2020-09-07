@@ -137,7 +137,7 @@ const AddFunds = ({ host, collective, ...props }) => {
                     {({ form, field }) => (
                       <StyledInputAmount
                         id={field.id}
-                        currency={host.currency}
+                        currency={collective.currency || host.currency}
                         placeholder="0.00"
                         error={field.error}
                         value={field.value}
