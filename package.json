@@ -67,7 +67,7 @@
     "moment-timezone": "0.5.31",
     "next": "9.5.3",
     "next-routes": "1.4.2",
-    "node-fetch": "2.6.0",
+    "node-fetch": "2.6.1",
     "nprogress": "0.2.0",
     "payment": "2.4.0",
     "polished": "3.6.6",
