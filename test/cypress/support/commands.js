@@ -1,4 +1,5 @@
 import 'cypress-file-upload';
+import './third-party-commands';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/queries';
@@ -388,6 +389,21 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
 
 // ---- Private ----
 
+const waitForIframe = selector => {
+  cy.waitUntil(() =>
+    cy.window().then(win => {
+      const iframe = win.document.querySelector(selector);
+      // wait for something that should exists in the iframe before interract
+      return iframe?.contentDocument?.querySelectorAll('body > *').length;
+    }),
+  );
+};
+
+const getIframeBody = selector => {
+  waitForIframe(selector);
+  return cy.get(selector).its('0.contentDocument.body');
+};
+
 /**
  * @param {object} user - should have `email` and `id` set
  */
@@ -456,26 +472,36 @@ function getLoggedInUserFromToken(token) {
  *   - card
  */
 function fillStripeInput(params) {
-  const { container, card } = params || {};
+  const { card } = params || {};
   const stripeIframeSelector = '.__PrivateStripeElement iframe';
-  const iframePromise = container ? container.find(stripeIframeSelector) : cy.get(stripeIframeSelector);
   const cardParams = card || CreditCards.CARD_DEFAULT;
+  let isStripeInputFilled = false;
 
-  return iframePromise.then(iframe => {
+  cy.wait(5000);
+  getIframeBody(stripeIframeSelector).then($iframe => {
+    // Wait for iframe to be ready
     const { creditCardNumber, expirationDate, cvcCode, postalCode } = cardParams;
-    const body = iframe.contents().find('body');
     const fillInput = (index, value) => {
-      if (value === undefined) {
-        return;
+      if (value !== undefined) {
+        return cy
+          .wrap($iframe)
+          .find(`input:eq(${index})`, { timeout: 30000 })
+          .type(`{selectall}${value}`, { force: true });
       }
-
-      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`, { force: true });
     };
 
-    fillInput(1, creditCardNumber);
-    fillInput(2, expirationDate);
-    fillInput(3, cvcCode);
-    fillInput(4, postalCode);
+    Promise.all([
+      fillInput(1, creditCardNumber),
+      fillInput(2, expirationDate),
+      fillInput(3, cvcCode),
+      fillInput(4, postalCode),
+    ]).then(() => {
+      isStripeInputFilled = true;
+    });
+  });
+
+  cy.wrap(null).should(() => {
+    assert(isStripeInputFilled, 'Stripe should be filled');
   });
 }
 
