@@ -67,20 +67,20 @@ wait_for_service Frontend 127.0.0.1 3000
 echo ""
 wait_for_service IMAGES 127.0.0.1 3001
 
-echo ""
-echo "> Running cypress tests"
-npx cypress run ${CYPRESS_RECORD}
-RETURN_CODE=$?
-if [ $RETURN_CODE -ne 0 ]; then
-  echo "Error with cypress e2e tests, exiting"
-  exit 1;
-fi
-echo ""
+# echo ""
+# echo "> Running cypress tests"
+# npx cypress run ${CYPRESS_RECORD}
+# RETURN_CODE=$?
+# if [ $RETURN_CODE -ne 0 ]; then
+#   echo "Error with cypress e2e tests, exiting"
+#   exit 1;
+# fi
+# echo ""
 
-echo "Killing all node processes"
-kill $MAILDEV_PID;
-kill $API_PID;
-kill $FRONTEND_PID;
-kill $IMAGES_PID;
-echo "Exiting with code $RETURN_CODE"
-exit $RETURN_CODE
+# echo "Killing all node processes"
+# kill $MAILDEV_PID;
+# kill $API_PID;
+# kill $FRONTEND_PID;
+# kill $IMAGES_PID;
+# echo "Exiting with code $RETURN_CODE"
+# exit $RETURN_CODE

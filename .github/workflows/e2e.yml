@@ -55,9 +55,6 @@ jobs:
       - name: Update apt
         run: sudo apt-get update || exit 0
 
-      - name: Install Cypress dependencies
-        run: sudo apt-get install --no-install-recommends -y libgtk2.0-0 libgtk-3-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb fonts-arphic-bkai00mp fonts-arphic-bsmi00lp fonts-arphic-gbsn00lp fonts-arphic-gkai00mp fonts-arphic-ukai fonts-arphic-uming ttf-wqy-zenhei ttf-wqy-microhei xfonts-wqy libgbm-dev
-
       - name: Install postgresql-client
         run: sudo apt-get install -y postgresql-client
 
@@ -167,17 +164,6 @@ jobs:
         if: steps.node-modules.outputs.cache-hit != 'true'
         run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
 
-      - name: Restore Cypress
-        uses: actions/cache@v1
-        id: cypress
-        with:
-          path: ~/.cache/Cypress
-          key: ${{ runner.os }}-cypress-${{ hashFiles('node_modules/cypress/package.json') }}
-
-      - name: Install Cypress
-        if: steps.cypress.outputs.cache-hit != 'true'
-        run: npx cypress install
-
       - name: Restore .next build (frontend)
         uses: actions/cache@v1
         id: next-build
@@ -202,8 +188,11 @@ jobs:
       - name: Setup DB
         run: ./scripts/setup_db.sh
 
-      - name: Run E2E with Cypress
+      - name: Start services (frontend, api, images, etc)
         run: ./scripts/run_e2e_tests.sh
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
