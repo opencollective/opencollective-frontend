@@ -30,7 +30,7 @@ describe('event.create.test.js', () => {
     cy.get('.addTier').click();
     cy.get('.EditTiers .tier').last().find('.inputField.name input').type('Paid ticket');
     cy.get('.EditTiers .tier').last().find('.inputField.amount input').type(15).blur();
-    cy.get('.actions button.save').click();
+    cy.get('button.save').click();
     cy.get('#location .address').contains('Lesbroussart');
     cy.get('#location .address').contains('1050');
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 2);
