@@ -456,7 +456,6 @@
   "CopyLink": "リンクをコピー",
   "cover.bar.balance": "今日の残高",
   "cover.bar.yearlyBudget": "推定年間予算",
-  "cover.budget.text": "あなたの貢献でわたしたちは年間推定 {yearlyBudget} の予算で活動できています。",
   "CP.Contribute.Financial": "財政貢献",
   "CP.Contribute.Title": "コントリビューターになる",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
