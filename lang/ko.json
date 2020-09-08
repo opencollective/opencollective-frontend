@@ -456,7 +456,6 @@
   "CopyLink": "주소 복사",
   "cover.bar.balance": "Today's Balance",
   "cover.bar.yearlyBudget": "예상 연간 예산",
-  "cover.budget.text": "Thanks to your financial contributions, we are operating on an estimated annual budget of {yearlyBudget}",
   "CP.Contribute.Financial": "재정적 기여",
   "CP.Contribute.Title": "기여자가 되기",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",

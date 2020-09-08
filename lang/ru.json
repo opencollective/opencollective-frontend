@@ -456,7 +456,6 @@
   "CopyLink": "Скопировать ссылку",
   "cover.bar.balance": "Баланс",
   "cover.bar.yearlyBudget": "Предполагаемый Годовой Бюджет",
-  "cover.budget.text": "Благодаря вашим финансовым вкладам, мы работаем с годовым бюджетом в размере {yearlyBudget}",
   "CP.Contribute.Financial": "Финансовые вклады",
   "CP.Contribute.Title": "Стать вкладчиком",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",

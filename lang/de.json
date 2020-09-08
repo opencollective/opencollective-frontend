@@ -456,7 +456,6 @@
   "CopyLink": "Link kopieren",
   "cover.bar.balance": "Heutiger Kontostand",
   "cover.bar.yearlyBudget": "Geschätztes jährliches Budget",
-  "cover.budget.text": "Thanks to your financial contributions, we are operating on an estimated annual budget of {yearlyBudget}",
   "CP.Contribute.Financial": "Finanzielle Unterstützer",
   "CP.Contribute.Title": "Werde ein Unterstützer",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
