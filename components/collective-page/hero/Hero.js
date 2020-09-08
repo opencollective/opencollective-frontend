@@ -175,7 +175,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               lineHeight="36px"
               textAlign="left"
               data-cy="collective-title"
-              wordBreak="break-word"
+              wordBreak="normal"
             >
               {collective.name || collective.slug}
             </H1>
