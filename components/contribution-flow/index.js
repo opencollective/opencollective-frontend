@@ -7,7 +7,6 @@ import { themeGet } from '@styled-system/theme-get';
 import { debounce, findIndex, get, isNil, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
-import { URLSearchParams } from 'universal-url';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
 
