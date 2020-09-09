@@ -91,7 +91,6 @@ const editEventPageQuery = gql`
         id
         slug
         name
-        mission
         currency
         imageUrl
         backgroundImage
