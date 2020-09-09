@@ -475,7 +475,7 @@ class BannerIframe extends React.Component {
 }
 
 const collectiveBannerIframeQuery = gql`
-  query CollectiveBannerIfame($collectiveSlug: String) {
+  query CollectiveBannerIframe($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
       name
