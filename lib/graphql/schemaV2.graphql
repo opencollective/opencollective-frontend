@@ -5793,6 +5793,11 @@ type Tier {
   frequency: ContributionFrequency
   presets: [Int]
   maxQuantity: Int
+
+  """
+  Number of tickets available. Returns null if there is no limit.
+  """
+  availableQuantity: Int
   customFields: JSON
   amountType: TierAmountType!
   minimumAmount: Amount!

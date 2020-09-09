@@ -387,11 +387,19 @@ class ContributionFlow extends React.Component {
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && get(stepDetails, 'amount') === 0;
+
     const steps = [
       {
         name: 'details',
         label: intl.formatMessage(stepsLabels.details),
-        isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount),
+        isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount && stepDetails.quantity),
+        validate: () => {
+          if (isNil(tier?.availableQuantity)) {
+            return true;
+          } else {
+            return stepDetails.quantity <= tier.availableQuantity;
+          }
+        },
       },
       {
         name: 'profile',
