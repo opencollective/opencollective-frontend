@@ -101,6 +101,10 @@ class UserProvider extends React.Component {
         this.setState({ enforceTwoFactorAuthForLoggedInUser: true });
         throw new Error(error.message);
       }
+      if (error.message.includes('Cannot use this token')) {
+        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
+        throw new Error(error.message);
+      }
     }
   };
 
