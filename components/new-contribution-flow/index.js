@@ -417,7 +417,9 @@ class ContributionFlow extends React.Component {
         label: intl.formatMessage(stepsLabels.payment),
         isCompleted: true,
         validate: action => {
-          if (action !== 'prev') {
+          if (action === 'prev') {
+            return true;
+          } else {
             const isCompleted = Boolean(noPaymentRequired || stepPayment);
             if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
               return stepPayment.paymentMethod?.stripeData?.complete;
