@@ -54,6 +54,7 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
   const intl = useIntl();
   const collective = order.toAccount;
   const stepProfile = order.fromAccount;
+  const [isSubmitted, setSubmitted] = React.useState(true);
 
   // GraphQL & data
   const [postPublicMessage] = useMutation(postContributionPublicMessageMutation, {
@@ -74,6 +75,7 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
         message: publicMessage,
       },
     }).then(() => {
+      setSubmitted(true);
       confettiFireworks(3000);
     });
   };
@@ -82,7 +84,7 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
     <PublicMessageContainer width={[1, '400px']} flexShrink={1} height={112} mt={2}>
       <Formik initialValues={initialValues} onSubmit={submitPublicMessage}>
         {formik => {
-          const { values, handleSubmit, isSubmitting } = formik;
+          const { values, handleSubmit, isSubmitting, dirty } = formik;
 
           return (
             <Form>
@@ -100,6 +102,12 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
                     fontSize="14px"
                     value={values.publicMessage}
                     placeholder={intl.formatMessage(messages.publicMessagePlaceholder)}
+                    onChange={e => {
+                      formik.setFieldValue('publicMessage', e.target.value);
+                      if (isSubmitted) {
+                        setSubmitted(false);
+                      }
+                    }}
                   />
                 )}
               </StyledInputField>
@@ -117,8 +125,18 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
                   </Flex>
                 </Flex>
                 <Flex width={1 / 2} alignItems="center" justifyContent="flex-end">
-                  <StyledButton buttonSize="tiny" loading={isSubmitting} type="submit" onSubmit={handleSubmit}>
-                    <FormattedMessage id="contribute.publicMessage.post" defaultMessage="Post message" />
+                  <StyledButton
+                    buttonSize="tiny"
+                    loading={isSubmitting}
+                    type="submit"
+                    onSubmit={handleSubmit}
+                    disabled={isSubmitted}
+                  >
+                    {isSubmitted && dirty ? (
+                      <FormattedMessage id="saved" defaultMessage="Saved" />
+                    ) : (
+                      <FormattedMessage id="contribute.publicMessage.post" defaultMessage="Post message" />
+                    )}
                   </StyledButton>
                 </Flex>
               </Flex>

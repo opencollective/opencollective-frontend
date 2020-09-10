@@ -71,6 +71,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
         <StyledRadioList
           name="ContributionProfile"
           id="ContributionProfile"
+          data-cy="ContributionProfile"
           options={filteredProfiles}
           keyGetter="id"
           defaultValue={defaultSelectedProfile ? defaultSelectedProfile.id : undefined}

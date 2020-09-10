@@ -323,7 +323,13 @@ class NewContributionFlowSuccess extends React.Component {
     };
 
     return (
-      <Flex justifyContent="center" width={1} minHeight={[400, 800]} flexDirection={['column', 'row']}>
+      <Flex
+        justifyContent="center"
+        width={1}
+        minHeight={[400, 800]}
+        flexDirection={['column', 'row']}
+        data-cy="order-success"
+      >
         {data.loading ? (
           <Container display="flex" alignItems="center" justifyContent="center">
             <Loading />

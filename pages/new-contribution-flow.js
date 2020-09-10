@@ -295,6 +295,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
       parent {
         id
         slug
+        settings
         location {
           country
         }
@@ -304,6 +305,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
       parent {
         id
         slug
+        settings
         location {
           country
         }
@@ -323,10 +325,10 @@ const accountQuery = gqlV2/* GraphQL */ `
 
 const accountWithTierQuery = gqlV2/* GraphQL */ `
   query ContributionFlowAccountQuery($collectiveSlug: String!, $tier: TierReferenceInput!) {
-    account(slug: $collectiveSlug) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
       ...ContributionFlowAccountFields
     }
-    tier(tier: $tier) {
+    tier(tier: $tier, throwIfMissing: false) {
       id
       legacyId
       type

@@ -17,18 +17,17 @@ import {
 import CreditCardInactive from '../../components/icons/CreditCardInactive';
 
 /** Returns true if taxes may apply with this tier/host */
-export const taxesMayApply = (collective, host, tier) => {
+export const taxesMayApply = (collective, parent, host, tier) => {
   if (!tier) {
     return false;
   } else if (tier.amountType === AmountTypes.FIXED && !tier.amount.valueInCents) {
     return false;
   }
-
   // Don't apply VAT if not configured (default)
   const vatType = get(collective, 'settings.VAT.type') || get(collective, 'parent.settings.VAT.type');
   const hostCountry = get(host.location, 'country');
   const collectiveCountry = get(collective.location, 'country');
-  const parentCountry = get(collective, 'parent.location.country');
+  const parentCountry = get(parent, 'location.country');
   const country = collectiveCountry || parentCountry || hostCountry;
 
   if (!vatType) {
@@ -145,4 +144,14 @@ export const getTotalAmount = (stepDetails, stepSummary) => {
   const taxAmount = get(stepSummary, 'amount') || 0;
   const platformFeeAmount = get(stepDetails, 'platformContribution') || 0;
   return quantity * (amount + platformFeeAmount) + taxAmount;
+};
+
+export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
+  if (valueInCents) {
+    return { valueInCents };
+  } else if (typeof defaultValue === 'number') {
+    return { valueInCents: defaultValue };
+  } else {
+    return defaultValue;
+  }
 };

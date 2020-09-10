@@ -5672,6 +5672,11 @@ type Query {
     Identifiers to retrieve the tier
     """
     tier: TierReferenceInput!
+
+    """
+    If true, an error will be returned if the tier is missing
+    """
+    throwIfMissing: Boolean! = true
   ): Tier
   transactions(
     """

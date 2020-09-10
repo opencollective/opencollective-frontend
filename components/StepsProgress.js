@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
 import themeGet from '@styled-system/theme-get';
-import classNames from 'classnames';
 import { transparentize } from 'polished';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -241,7 +240,7 @@ const StepsProgress = ({
   const pieSize = '56';
 
   return (
-    <StepsOuter className="steps-progress">
+    <StepsOuter data-cy="steps-progress">
       {viewport === VIEWPORTS.XSMALL ? (
         <StepMobile>
           <StepsMobileLeft>
@@ -289,10 +288,11 @@ const StepsProgress = ({
           return (
             <Flex
               key={stepName}
-              className={classNames(`step-${stepName}`, { disabled })}
+              data-cy={`progress-step-${stepName}`}
               flexDirection="column"
               alignItems="center"
               css={{ flexGrow: 1, flexBasis: stepWidth }}
+              data-disabled={disabled}
             >
               <Flex alignItems="center" mb={2} css={{ width: '100%' }}>
                 <SeparatorLine active={checked || focused} transparent={idx === 0} />

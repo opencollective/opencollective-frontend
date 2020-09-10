@@ -4,6 +4,7 @@ import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CurrencyPrecision } from '../lib/constants/currency-precision';
+import { getIntervalFromContributionFrequency } from '../lib/date-utils';
 
 import Currency from './Currency';
 import { Span } from './Text';
@@ -22,6 +23,7 @@ const FormattedMoneyAmount = ({
   precision,
   amount,
   interval,
+  frequency,
   amountStyles,
   showCurrencyCode,
   currencyCodeStyles,
@@ -38,6 +40,10 @@ const FormattedMoneyAmount = ({
         {...amountStyles}
       />
     );
+
+  if (frequency) {
+    interval = getIntervalFromContributionFrequency(frequency);
+  }
 
   const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
   if (!interval) {
@@ -82,6 +88,8 @@ FormattedMoneyAmount.propTypes = {
   precision: PropTypes.number,
   /** An interval that goes with the amount */
   interval: PropTypes.oneOf(['month', 'year']),
+  /** ContributionFrequency from GQLV2 */
+  frequency: PropTypes.oneOf(['MONTHLY', 'YEARLY', 'ONETIME']),
   /** Style for the amount (eg. `$10`). Doesn't apply on interval */
   amountStyles: PropTypes.object,
 };

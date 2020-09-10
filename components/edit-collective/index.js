@@ -61,6 +61,7 @@ class EditCollective extends React.Component {
 
     collective.settings = {
       ...this.props.collective.settings,
+      ...collective.settings,
       apply: collective.application,
       tos: collective.tos,
     };

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { find, get, isNil, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -38,7 +38,7 @@ import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowMainContainer from './ContributionFlowMainContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import SafeTransactionMessage from './SafeTransactionMessage';
-import { getTotalAmount, NEW_CREDIT_CARD_KEY, taxesMayApply } from './utils';
+import { getGQLV2AmountInput, getTotalAmount, NEW_CREDIT_CARD_KEY, taxesMayApply } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -125,8 +125,6 @@ class ContributionFlow extends React.Component {
     const fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     this.setState({ error: null });
 
-    const getAmount = (valueInCents, defaultValue) => (valueInCents ? { valueInCents } : defaultValue);
-
     try {
       const response = await this.props.createOrder({
         variables: {
@@ -138,11 +136,12 @@ class ContributionFlow extends React.Component {
             toAccount: pick(this.props.collective, ['id']),
             customData: stepDetails.customData,
             paymentMethod: await this.getPaymentMethod(),
-            platformContributionAmount: getAmount(stepDetails.platformContribution, undefined),
+            platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
+            tier: this.props.tier && { legacyId: this.props.tier.legacyId },
             taxes: stepSummary && [
               {
                 type: 'VAT',
-                amount: getAmount(stepSummary.amount, 0),
+                amount: getGQLV2AmountInput(stepSummary.amount, 0),
                 country: stepSummary.countryISO,
                 idNumber: stepSummary.number,
               },
@@ -402,26 +401,31 @@ class ContributionFlow extends React.Component {
       },
     ];
 
-    // Hide step payment if using a free tier with fixed price
-    if (!(minAmount === 0 && isFixedContribution)) {
-      let isCompleted = Boolean(noPaymentRequired || stepPayment);
-      if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
-        isCompleted = stepPayment.paymentMethod?.stripeData?.complete;
-      }
-
-      steps.push({
-        name: 'payment',
-        label: intl.formatMessage(stepsLabels.payment),
-        isCompleted,
-      });
-    }
-
     // Show the summary step only if the order has tax
-    if (this.taxesMayApply(collective, host, tier)) {
+    if (this.taxesMayApply(collective, collective.parent, host, tier)) {
       steps.push({
         name: 'summary',
         label: intl.formatMessage(stepsLabels.summary),
         isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
+      });
+    }
+
+    // Hide step payment if using a free tier with fixed price
+    if (!(minAmount === 0 && isFixedContribution)) {
+      steps.push({
+        name: 'payment',
+        label: intl.formatMessage(stepsLabels.payment),
+        isCompleted: true,
+        validate: action => {
+          if (action !== 'prev') {
+            const isCompleted = Boolean(noPaymentRequired || stepPayment);
+            if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
+              return stepPayment.paymentMethod?.stripeData?.complete;
+            } else {
+              return isCompleted;
+            }
+          }
+        },
       });
     }
 
@@ -514,6 +518,7 @@ class ContributionFlow extends React.Component {
               justifyContent="center"
               py={[3, 4, 5]}
               mb={4}
+              data-cy="cf-content"
               ref={this.mainContainerRef}
             >
               <Box px={[2, 3]} mb={4}>
@@ -539,7 +544,22 @@ class ContributionFlow extends React.Component {
               {currentStep.name === STEPS.PROFILE &&
               !LoggedInUser &&
               !parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ? (
-                <SignInOrJoinFree defaultForm="create-account" redirect={this.getRedirectUrlForSignIn()} />
+                <SignInOrJoinFree
+                  defaultForm="create-account"
+                  redirect={this.getRedirectUrlForSignIn()}
+                  createPersonalProfileLabel={
+                    <FormattedMessage
+                      id="ContributionFlow.CreateUserLabel"
+                      defaultMessage="Contribute as an individual"
+                    />
+                  }
+                  createOrganizationProfileLabel={
+                    <FormattedMessage
+                      id="ContributionFlow.CreateOrganizationLabel"
+                      defaultMessage="Contribute as an organization"
+                    />
+                  }
+                />
               ) : (
                 <Grid
                   px={[2, 3]}
@@ -575,7 +595,7 @@ class ContributionFlow extends React.Component {
                         step={currentStep}
                         prevStep={prevStep}
                         nextStep={nextStep}
-                        isRecurringContributionLoggedOut={!LoggedInUser && this.state.stepDetails?.interval}
+                        isRecurringContributionLoggedOut={Boolean(!LoggedInUser && this.state.stepDetails?.interval)}
                         isValidating={isValidating || isSubmitted || isSubmitting}
                         paypalButtonProps={this.getPaypalButtonProps()}
                       />
@@ -601,6 +621,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
   fragment OrderSuccessFragment on Order {
     id
     status
+    frequency
     amount {
       value
       currency
@@ -609,6 +630,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       value
     }
     tier {
+      id
       name
     }
     membership {

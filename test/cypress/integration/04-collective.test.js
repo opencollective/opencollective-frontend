@@ -212,11 +212,11 @@ describe('Edit public message after contribution', () => {
         cy.fillStripeInput();
         cy.contains('button', 'Make contribution').click();
         cy.wait(1000); // It takes a little bit of time to create the order.
-        // Wait for the popup to appear before moving to the collective page.
-        cy.get('[data-cy=EditPublicMessagePopup]');
+        // Wait for the order to succeed
+        cy.getByDataCy('order-success', { timeout: 20000 });
 
         // SECTION: Go to the collective page and change the public message
-        cy.visit(`/${slug}`);
+        cy.visit(`/${slug}#${Sections.CONTRIBUTORS}`);
         /** Cypress can't find the public message text unless we do this.
          * Probably related to this issue: https://github.com/cypress-io/cypress/issues/695
          */

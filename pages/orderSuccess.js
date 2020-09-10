@@ -211,7 +211,7 @@ class OrderSuccessPage extends React.Component {
 
     return (
       <Page title={'Contribute'}>
-        <OrderSuccessContainer id="page-order-success" flexDirection="column" alignItems="center" mb={6}>
+        <OrderSuccessContainer data-cy="order-success" flexDirection="column" alignItems="center" mb={6}>
           {isManualDonation ? (
             <MessageBox type="warning" my={4} mx={2}>
               <FormattedMessage
