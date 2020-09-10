@@ -401,7 +401,7 @@ const ExpenseFormBody = ({
                   </Fragment>
                 )}
                 <Flex alignItems="flex-start" mt={3}>
-                  <ExpenseTypeTag type={values.type === 'FUNDING_REQUEST' ? 'grant' : values.type} mr="4px" />
+                  <ExpenseTypeTag type={values.type} mr="4px" />
                   <StyledInputTags
                     renderUpdatedTags
                     suggestedTags={expensesTags}

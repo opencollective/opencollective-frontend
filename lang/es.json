@@ -798,6 +798,7 @@
   "Expense.summary": "Resumen de gastos",
   "expense.type": "Tipo",
   "Expense.Type.Debit": "Debit",
+  "Expense.Type.FundingRequest": "Grant",
   "Expense.Type.Invoice": "Factura",
   "Expense.Type.Receipt": "Recibo",
   "expense.type.tooltip": "Selecciona 'recibo' para recibir el reembolso de una compra ya hecha. Selecciona 'factura' si estás cobrando por tu tiempo, cobrando por adelantado, o si no tienes un recibo.",
