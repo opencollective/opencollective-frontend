@@ -1141,7 +1141,6 @@
   "NewContributionFlow.bankInstructions": "Instructions will be given on the next page to make a transfer.",
   "NewContributionFlow.ChoosePaymentMethod": "Choose your payment method",
   "NewContributionFlow.CollectiveAndTier": "{collective} - {tier}",
-  "NewContributionFlow.ContributedSoFar": "Вы уже пожертвовали {amount} в {collective}. Продолжайте в том же духе!",
   "NewContributionFlow.ContributionDetailsTitle": "Contribution details",
   "NewContributionFlow.FAQ.Secure.Title": "Is my contribution secure?",
   "NewContributionFlow.InTheMeantime": "In the meantime, you can follow {collective} and see how they are spending the money <CollectiveLink>on their collective page</CollectiveLink>.",
