@@ -51,6 +51,10 @@ class CollectivePage extends React.Component {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
 
+    if (req) {
+      req.noStyledJsx = true;
+    }
+
     return { slug, status, step, mode };
   }
 
