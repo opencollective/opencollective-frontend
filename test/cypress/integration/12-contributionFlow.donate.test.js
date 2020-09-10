@@ -142,34 +142,34 @@ describe('Contribution Flow: Donate', () => {
           cy.contains('You are now supporting APEX.');
         });
       });
+
+      it('works with 3D secure', () => {
+        cy.signup({ redirect: `${newFlowRoute}/42/year`, visitParams, user: { name: 'John Doe' } });
+        cy.contains('button', 'Next step').click();
+        cy.contains('button', 'Next step').click();
+        cy.checkStepsProgress({ enabled: ['details', 'profile', 'payment'] });
+        cy.wait(3000); // Wait for stripe to be loaded
+        cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+        cy.contains('button', 'Make contribution').click();
+        cy.wait(8000); // Wait for order to be submitted and popup to appear
+
+        // Rejecting the validation should produce an error
+        cy.complete3dSecure(false);
+        cy.contains('We are unable to authenticate your payment method.');
+
+        // Refill stripe input to avoid using the same token twice
+        cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+
+        // Re-trigger the popup
+        cy.contains('button', 'Make contribution').click();
+
+        // Approving the validation should create the order
+        cy.wait(8000); // Wait for order to be submitted and popup to appear
+        cy.complete3dSecure(true);
+        cy.getByDataCy('order-success', { timeout: 20000 });
+        cy.contains('You are now supporting APEX.');
+      });
     }
-
-    it('works with 3D secure', () => {
-      cy.signup({ redirect: `${newFlowRoute}/42/year`, visitParams, user: { name: 'John Doe' } });
-      cy.contains('button', 'Next step').click();
-      cy.contains('button', 'Next step').click();
-      cy.checkStepsProgress({ enabled: ['details', 'profile', 'payment'] });
-      cy.wait(3000); // Wait for stripe to be loaded
-      cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
-      cy.contains('button', 'Make contribution').click();
-      cy.wait(8000); // Wait for order to be submitted and popup to appear
-
-      // Rejecting the validation should produce an error
-      cy.complete3dSecure(false);
-      cy.contains('We are unable to authenticate your payment method.');
-
-      // Refill stripe input to avoid using the same token twice
-      cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
-
-      // Re-trigger the popup
-      cy.contains('button', 'Make contribution').click();
-
-      // Approving the validation should create the order
-      cy.wait(8000); // Wait for order to be submitted and popup to appear
-      cy.complete3dSecure(true);
-      cy.getByDataCy('order-success', { timeout: 20000 });
-      cy.contains('You are now supporting APEX.');
-    });
   });
 
   if (!isNewContributionFlow) {

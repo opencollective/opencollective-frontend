@@ -39,7 +39,8 @@ describe('Contribution Flow: Order', () => {
     describe("check when tier doesn't exist", () => {
       it('with /apex/contribute/backer-46999999/checkout', () => {
         const visitParams = { onBeforeLoad: mockRecaptcha, failOnStatusCode: false };
-        cy.visit('/apex/contribute/backer-46999999/checkout', visitParams);
+        const routeBase = isNewContributionFlow ? '/apex/contribute' : '/apex/new-contribute';
+        cy.visit(`${routeBase}/backer-46999999/checkout`, visitParams);
         cy.contains('Next step').click();
         cy.contains("Oops! This tier doesn't exist or has been removed by the collective admins.");
         cy.contains('View all the other ways to contribute').click();
@@ -47,20 +48,24 @@ describe('Contribution Flow: Order', () => {
       });
     });
 
-    describe('route resiliance', () => {
-      it('with a multipart slug', () => {
-        cy.login({ redirect: '/apex/contribute/a-multipart-420-470/checkout' });
-        cy.contains('Contribution details');
-        cy.contains('button', 'Next').click();
-        cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/profile');
+    if (isNewContributionFlow) {
+      describe('route resiliance', () => {
+        it('with a multipart slug', () => {
+          cy.login({ redirect: '/apex/contribute/a-multipart-420-470/checkout' });
+          cy.contains('Contribution details');
+          cy.contains('button', 'Next').click();
+          cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/profile');
+        });
       });
-    });
+    }
 
     it('Can order as new user', () => {
       const userParams = { firstName: 'Order', lastName: 'Tester' };
       const visitParams = { onBeforeLoad: mockRecaptcha };
+      const routeBase = isNewContributionFlow ? '/apex/contribute' : '/apex/new-contribute';
+
       cy.waitUntil(() =>
-        cy.signup({ user: userParams, redirect: '/apex/contribute/sponsors-470/checkout', visitParams }).then(user => {
+        cy.signup({ user: userParams, redirect: `${routeBase}/sponsors-470/checkout`, visitParams }).then(user => {
           // Mock clock so we can check next contribution date in a consistent way
           cy.clock(Date.parse('2042/05/03'));
 
@@ -109,6 +114,7 @@ describe('Contribution Flow: Order', () => {
     it('Can order with an existing orgnanization', () => {
       let collectiveSlug = null;
       const visitParams = { onBeforeLoad: mockRecaptcha };
+      const routeBase = isNewContributionFlow ? '/apex/contribute' : '/apex/new-contribute';
 
       cy.login().then(() => {
         // Create a new organization
@@ -117,7 +123,7 @@ describe('Contribution Flow: Order', () => {
           // Add a paymentMethod to the organization profile
           cy.addCreditCardToCollective({ collectiveSlug });
 
-          cy.visit('/apex/contribute/sponsors-470/checkout', visitParams);
+          cy.visit(`${routeBase}/sponsors-470/checkout`, visitParams);
 
           // Details
           cy.contains('#interval button').should('not.be.disabled');
