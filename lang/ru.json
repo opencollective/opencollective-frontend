@@ -798,6 +798,7 @@
   "Expense.summary": "Сводка расходов",
   "expense.type": "Тип",
   "Expense.Type.Debit": "Debit",
+  "Expense.Type.FundingRequest": "Grant",
   "Expense.Type.Invoice": "Invoice",
   "Expense.Type.Receipt": "Receipt",
   "expense.type.tooltip": "Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt.",
