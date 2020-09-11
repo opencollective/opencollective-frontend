@@ -5672,6 +5672,11 @@ type Query {
     Identifiers to retrieve the tier
     """
     tier: TierReferenceInput!
+
+    """
+    If true, an error will be returned if the tier is missing
+    """
+    throwIfMissing: Boolean! = true
   ): Tier
   transactions(
     """
@@ -5788,6 +5793,11 @@ type Tier {
   frequency: ContributionFrequency
   presets: [Int]
   maxQuantity: Int
+
+  """
+  Number of tickets available. Returns null if there is no limit.
+  """
+  availableQuantity: Int
   customFields: JSON
   amountType: TierAmountType!
   minimumAmount: Amount!
@@ -5922,7 +5932,12 @@ type TransferWise {
     """
     accountDetails: JSON
   ): [TransferWiseRequiredField]
-  availableCurrencies: [JSONObject]
+  availableCurrencies(
+    """
+    Ignores blocklisted currencies, used to generate the bank information form for manual payments
+    """
+    ignoreBlockListedCurrencies: Boolean
+  ): [JSONObject]
 }
 
 type TransferWiseField {
