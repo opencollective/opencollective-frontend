@@ -5936,7 +5936,7 @@ type TransferWise {
     """
     Ignores blocklisted currencies, used to generate the bank information form for manual payments
     """
-    ignoreBlockListedCurrencies: Boolean
+    ignoreBlockedCurrencies: Boolean
   ): [JSONObject]
 }
 
