@@ -72,22 +72,41 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             labelFontSize="20px"
             labelColor="black.700"
             labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
+            error={Boolean(tier.availableQuantity !== null && data?.quantity > tier.availableQuantity)}
             required
           >
             {fieldProps => (
-              <StyledInput
-                {...fieldProps}
-                type="number"
-                min={1}
-                step={1}
-                max={tier.maxQuantity}
-                value={data?.quantity}
-                maxWidth={80}
-                onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
-                fontSize="20px"
-                lineHeight="26px"
-                minWidth={100}
-              />
+              <div>
+                {tier.availableQuantity !== null && (
+                  <P
+                    fontSize="11px"
+                    color="#e69900"
+                    textTransform="uppercase"
+                    fontWeight="500"
+                    letterSpacing="1px"
+                    mb={2}
+                  >
+                    <FormattedMessage
+                      id="tier.limited"
+                      defaultMessage="LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}"
+                      values={tier}
+                    />
+                  </P>
+                )}
+                <StyledInput
+                  {...fieldProps}
+                  type="number"
+                  min={1}
+                  step={1}
+                  max={tier.availableQuantity}
+                  value={data?.quantity}
+                  maxWidth={80}
+                  onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
+                  fontSize="20px"
+                  lineHeight="26px"
+                  minWidth={100}
+                />
+              </div>
             )}
           </StyledInputField>
         </Box>
@@ -202,6 +221,7 @@ StepDetails.propTypes = {
     interval: PropTypes.string,
     name: PropTypes.string,
     maxQuantity: PropTypes.number,
+    availableQuantity: PropTypes.number,
     type: PropTypes.oneOf(Object.values(TierTypes)),
     customFields: PropTypes.array,
     amount: PropTypes.shape({

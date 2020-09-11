@@ -258,7 +258,7 @@ class NewContributionFlowSuccess extends React.Component {
   };
 
   renderBankTransferInformation = () => {
-    let instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
+    const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
     const bankAccount = get(this.props.data, 'order.toAccount.host.payoutMethods[0].data', null);
     const amount =
       (get(this.props.data, 'order.amount.value') + get(this.props.data, 'order.platformContributionAmount.value', 0)) *
@@ -273,26 +273,26 @@ class NewContributionFlowSuccess extends React.Component {
       collective: get(this.props.data, 'order.toAccount.name', null),
     };
 
-    instructions = this.renderInstructions(instructions, formatValues);
-
     return (
       <Flex flexDirection="column" justifyContent="center" width={[1, 3 / 4]} px={[4, 0]} py={[2, 0]}>
-        <MessageBox type="warning" fontSize="12px">
+        <MessageBox type="warning" fontSize="12px" mb={2}>
           <FormattedMessage
             id="collective.user.orderProcessing.manual"
             defaultMessage="<strong>Your donation is pending.</strong> Please follow the instructions in the confirmation email to manually pay the host of the collective."
             values={I18nFormatters}
           />
         </MessageBox>
-        <BankTransferInfoContainer my={3} p={4}>
-          <H3>
-            <FormattedMessage id="NewContributionFlow.PaymentInstructions" defaultMessage="Payment instructions" />
-          </H3>
-          <Flex mt={2}>
-            <Flex style={{ whiteSpace: 'pre-wrap' }}>{instructions}</Flex>
-          </Flex>
-        </BankTransferInfoContainer>
-        <Flex px={3}>
+        {instructions && (
+          <BankTransferInfoContainer my={3} p={4}>
+            <H3>
+              <FormattedMessage id="NewContributionFlow.PaymentInstructions" defaultMessage="Payment instructions" />
+            </H3>
+            <Flex mt={2}>
+              <Flex style={{ whiteSpace: 'pre-wrap' }}>{this.renderInstructions(instructions, formatValues)}</Flex>
+            </Flex>
+          </BankTransferInfoContainer>
+        )}
+        <Flex px={3} mt={2}>
           <P fontSize="16px" color="black.700">
             <FormattedMessage
               id="NewContributionFlow.InTheMeantime"

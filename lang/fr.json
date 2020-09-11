@@ -1495,6 +1495,7 @@
   "tier.customContributions.label": "Activer les contributions personnalisées",
   "tier.defaultAmount.label": "montant par défaut",
   "Tier.disableCustomContirbution": "This collective requires you to select a tier to contribute.",
+  "Tier.empty": "There are no more {type, select, TICKET {tickets} other {units}} for {name}",
   "tier.endsAt.description": "Date et heure d'expiration après laquelle ce palier ne sera plus disponible",
   "tier.expiration.label": "Expiration",
   "tier.forceLongDescription": "La page de tier autonome, représentée par le lien \"Lire la suite\", sera activé automatiquement si vous écrivez une description de plus de 100 caractères ou si vous avez déjà défini une description longue sur la page. Vous pouvez utiliser ce commutateur pour forcer l'affichage de la page.",

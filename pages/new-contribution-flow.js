@@ -53,6 +53,10 @@ const messages = defineMessages({
     id: 'Tier.Past',
     defaultMessage: 'This contribution type is not active anymore.',
   },
+  emptyTier: {
+    id: 'Tier.empty',
+    defaultMessage: 'There are no more {type, select, TICKET {tickets} other {units}} for {name}',
+  },
   disableCustomContributions: {
     id: 'Tier.disableCustomContirbution',
     defaultMessage: 'This collective requires you to select a tier to contribute.',
@@ -167,7 +171,7 @@ class NewContributionFlowPage extends React.Component {
   renderMessage(type, content, showOtherWaysToContribute = false) {
     const { collectiveSlug } = this.props;
     return (
-      <Flex flexDirection="column" alignItems="center" py={5}>
+      <Flex flexDirection="column" alignItems="center" py={[5, null, 6]}>
         <MessageBox type={type} withIcon maxWidth={800}>
           {content}
         </MessageBox>
@@ -196,6 +200,9 @@ class NewContributionFlowPage extends React.Component {
       return this.renderMessage('info', intl.formatMessage(messages.missingHost));
     } else if (!account.isActive) {
       return this.renderMessage('info', intl.formatMessage(messages.inactiveCollective));
+    } else if (tier?.availableQuantity === 0) {
+      const intlParams = { type: tier.type, name: <q>{tier.name}</q> };
+      return this.renderMessage('info', intl.formatMessage(messages.emptyTier, intlParams), true);
     } else if (this.props.tierId && !tier) {
       return this.renderMessage('warning', intl.formatMessage(messages.missingTier), true);
     } else if (tier && tier.endsAt && new Date(tier.endsAt) < new Date()) {
@@ -336,6 +343,7 @@ const accountWithTierQuery = gqlV2/* GraphQL */ `
       slug
       description
       customFields
+      availableQuantity
       maxQuantity
       amount {
         valueInCents
