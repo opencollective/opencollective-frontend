@@ -121,7 +121,6 @@ class ContributionFlow extends React.Component {
 
   submitOrder = async () => {
     const { stepDetails, stepProfile, stepSummary } = this.state;
-    // TODO We're still relying on profiles from V1 (LoggedInUser)
     const fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     this.setState({ error: null });
 
@@ -250,7 +249,6 @@ class ContributionFlow extends React.Component {
   }
 
   /** Validate step profile, create new incognito/org if necessary */
-  /** TODO: create profile for new org */
   validateStepProfile = async () => {
     if (!this.state.stepProfile) {
       return false;
@@ -450,7 +448,7 @@ class ContributionFlow extends React.Component {
         host: host,
         currency: collective.currency,
         style: { size: 'responsive', height: 47 },
-        totalAmount: getTotalAmount(stepDetails, stepSummary), // TODO this.getTotalAmountWithTaxes(),
+        totalAmount: getTotalAmount(stepDetails, stepSummary),
         onClick: () => this.setState({ isSubmitting: true }),
         onCancel: () => this.setState({ isSubmitting: false }),
         onError: e => this.setState({ isSubmitting: false, error: `PayPal error: ${e.message}` }),
@@ -690,7 +688,6 @@ const orderResponseFragment = gqlV2/* GraphQL */ `
   ${orderSuccessFragment}
 `;
 
-// TODO: Use a fragment to retrieve the fields from success page in there
 const addCreateOrderMutation = graphql(
   gqlV2/* GraphQL */ `
     mutation CreateOrder($order: OrderCreateInput!) {
