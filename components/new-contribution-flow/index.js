@@ -38,7 +38,7 @@ import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowMainContainer from './ContributionFlowMainContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import SafeTransactionMessage from './SafeTransactionMessage';
-import { getGQLV2AmountInput, getTotalAmount, NEW_CREDIT_CARD_KEY, taxesMayApply } from './utils';
+import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY, taxesMayApply } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -202,8 +202,12 @@ class ContributionFlow extends React.Component {
       const newFlowIsDefault = this.isNewFlowTheDefault();
       const verb = newFlowIsDefault ? 'donate' : 'new-donate';
       const fallback = `/${this.props.collective.slug}/${verb}/success?OrderId=${order.id}`;
-      await Router.pushRoute('external-redirect', { url: url.href, fallback });
-      return this.scrollToTop();
+      if (isAllowedRedirect(url.host)) {
+        window.location.href = url.href;
+      } else {
+        await Router.pushRoute('external-redirect', { url: url.href, fallback });
+        return this.scrollToTop();
+      }
     } else {
       return this.pushStepRoute('success', { OrderId: order.id });
     }
