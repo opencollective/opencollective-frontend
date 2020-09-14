@@ -26,6 +26,7 @@ const NewContributionFlowStepProfile = ({
           onChange={onChange}
           canUseIncognito={canUseIncognito}
           collective={collective}
+          data={data}
         />
       ) : (
         <StepProfileGuestForm stepDetails={stepDetails} data={data} onChange={onChange} />
