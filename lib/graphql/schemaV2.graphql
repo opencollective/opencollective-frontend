@@ -5932,7 +5932,12 @@ type TransferWise {
     """
     accountDetails: JSON
   ): [TransferWiseRequiredField]
-  availableCurrencies: [JSONObject]
+  availableCurrencies(
+    """
+    Ignores blocklisted currencies, used to generate the bank information form for manual payments
+    """
+    ignoreBlockedCurrencies: Boolean
+  ): [JSONObject]
 }
 
 type TransferWiseField {

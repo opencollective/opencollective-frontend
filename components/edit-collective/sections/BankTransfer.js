@@ -233,6 +233,7 @@ const BankTransfer = props => {
                       host={{ slug: TW_API_COLLECTIVE_SLUG }}
                       getFieldName={string => string}
                       fixedCurrency={fixedCurrency}
+                      ignoreBlockedCurrencies
                       isNew
                     />
                   </Flex>
