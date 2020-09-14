@@ -111,17 +111,23 @@ class CollectivePage extends React.Component {
   }
 
   getPageMetaData(collective) {
+    const defaultImage = '/static/images/defaultBackgroundImage.png';
     if (collective) {
       return {
         title: collective.name,
         description: collective.description,
         twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
-        image: collective.image || get(collective, 'parentCollective.image'),
+        image:
+          collective.backgroundImageUrl ||
+          get(collective, 'parentCollective.backgroundImageUrl') ||
+          collective.image ||
+          get(collective, 'parentCollective.image') ||
+          defaultImage,
       };
     } else {
       return {
         title: 'Collective',
-        image: '/static/images/defaultBackgroundImage.png',
+        image: defaultImage,
       };
     }
   }
