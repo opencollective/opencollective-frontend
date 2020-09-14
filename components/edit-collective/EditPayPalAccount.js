@@ -106,9 +106,7 @@ const EditPayPalAccount = props => {
         <StyledInputField
           name="clientId"
           label="Client ID"
-          error={
-            (formik.touched.clientId && formik.errors.clientId) || createError?.message.replace('GraphQL error: ', '')
-          }
+          error={(formik.touched.clientId && formik.errors.clientId) || createError?.message}
           disabled={isCreating}
         >
           {inputProps => (
@@ -119,7 +117,7 @@ const EditPayPalAccount = props => {
           mt={2}
           name="token"
           label="Secret"
-          error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
+          error={(formik.touched.token && formik.errors.token) || createError?.message}
           disabled={isCreating}
         >
           {inputProps => (

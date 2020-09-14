@@ -64,7 +64,7 @@ class RefundTransactionBtn extends React.Component {
       this.setShowingState({ refunded: true });
     } catch (e) {
       this.setShowingState({ error: true });
-      this.setState({ error: (e.message || '').replace('GraphQL error: ', '') });
+      this.setState({ error: e.message });
     }
   }
 

@@ -125,7 +125,7 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective, host }) => {
                         setError(null);
                         return null;
                       } catch (e) {
-                        return finalizeWithError(e.message && e.message.replace(/GraphQL error:/, ''));
+                        return finalizeWithError(e.message);
                       }
                     }}
                   />

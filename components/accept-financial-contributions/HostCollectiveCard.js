@@ -202,7 +202,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
             )}
             {error && (
               <MessageBox type="error" withIcon my={[1, 3]}>
-                {error.includes('GraphQL error: ') ? error.replace('GraphQL error: ', 'Error: ') : error}
+                {error}
               </MessageBox>
             )}
           </Fragment>

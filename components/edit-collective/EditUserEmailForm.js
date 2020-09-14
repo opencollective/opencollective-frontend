@@ -110,7 +110,7 @@ class EditUserEmailForm extends React.Component {
                     isTouched: false,
                   });
                 } catch (e) {
-                  this.setState({ error: e.message.replace('GraphQL error: ', ''), isSubmitting: false });
+                  this.setState({ error: e.message, isSubmitting: false });
                 }
               }}
             >
@@ -128,7 +128,7 @@ class EditUserEmailForm extends React.Component {
                     await updateUserEmail({ variables: { email: newEmail } });
                     this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
                   } catch (e) {
-                    this.setState({ error: e.message.replace('GraphQL error: ', ''), isResendingConfirmation: false });
+                    this.setState({ error: e.message, isResendingConfirmation: false });
                   }
                 }}
               >
