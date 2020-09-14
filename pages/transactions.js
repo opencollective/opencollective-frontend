@@ -58,6 +58,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       maxAmount: $maxAmount
       dateFrom: $dateFrom
       searchTerm: $searchTerm
+      includeIncognitoTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
     }

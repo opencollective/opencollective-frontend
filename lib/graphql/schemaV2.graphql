@@ -112,6 +112,12 @@ interface Account {
     """
     type: TransactionType
     orderBy: ChronologicalOrderInput
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -558,7 +564,13 @@ type Bot implements Account {
     limit: Int = 100
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): TransactionCollection
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+  ): TransactionCollection!
   orders(
     limit: Int = 100
     offset: Int = 0
@@ -748,7 +760,13 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     limit: Int = 100
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): TransactionCollection
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+  ): TransactionCollection!
   orders(
     limit: Int = 100
     offset: Int = 0
@@ -2740,7 +2758,13 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     limit: Int = 100
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): TransactionCollection
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+  ): TransactionCollection!
   orders(
     limit: Int = 100
     offset: Int = 0
@@ -3503,7 +3527,13 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     limit: Int = 100
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): TransactionCollection
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+  ): TransactionCollection!
   orders(
     limit: Int = 100
     offset: Int = 0
@@ -3744,7 +3774,13 @@ type Host implements Account {
     limit: Int = 100
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): TransactionCollection
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+  ): TransactionCollection!
   orders(
     limit: Int = 100
     offset: Int = 0
@@ -4033,7 +4069,13 @@ type Individual implements Account {
     limit: Int = 100
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): TransactionCollection
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+  ): TransactionCollection!
   orders(
     limit: Int = 100
     offset: Int = 0
@@ -4982,7 +5024,13 @@ type Organization implements Account {
     limit: Int = 100
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): TransactionCollection
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+  ): TransactionCollection!
   orders(
     limit: Int = 100
     offset: Int = 0
@@ -5324,7 +5372,13 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     limit: Int = 100
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): TransactionCollection
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+  ): TransactionCollection!
   orders(
     limit: Int = 100
     offset: Int = 0
@@ -5743,6 +5797,12 @@ type Query {
     Transaction is attached to Order
     """
     hasOrder: Boolean
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
   ): TransactionCollection
   loggedInAccount: Account
 }

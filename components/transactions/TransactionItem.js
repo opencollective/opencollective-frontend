@@ -17,6 +17,7 @@ import ExpenseModal from '../expenses/ExpenseModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
 import { Box, Flex } from '../Grid';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import OrderStatusTag from '../OrderStatusTag';
 import StyledButton from '../StyledButton';
@@ -51,6 +52,7 @@ const TransactionItem = ({ displayActions, collective, ...transaction }) => {
   const hasExpense = expense !== null;
   const isCredit = type === TransactionTypes.CREDIT;
   const Item = isCredit ? CreditItem : DebitItem;
+  const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === collective.id;
 
   const avatarCollective = hasOrder ? (isCredit ? fromAccount : toAccount) : isCredit ? fromAccount : toAccount;
 
@@ -86,14 +88,25 @@ const TransactionItem = ({ displayActions, collective, ...transaction }) => {
                 fontSize="14px"
                 lineHeight="21px"
                 color={description ? 'black.900' : 'black.500'}
-                title={description}
                 cursor={!hasOrder ? 'pointer' : 'initial'}
                 onClick={() => !hasOrder && setExpanded(true)}
               >
-                {description ? (
-                  truncate(description, { length: 60 })
-                ) : (
-                  <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
+                <Span title={description}>
+                  {description ? (
+                    truncate(description, { length: 60 })
+                  ) : (
+                    <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
+                  )}
+                </Span>
+                {isOwnUserProfile && transaction.fromAccount?.isIncognito && (
+                  <Span ml={1} css={{ verticalAlign: 'text-bottom' }}>
+                    <PrivateInfoIcon color="#969BA3">
+                      <FormattedMessage
+                        id="PrivateTransaction"
+                        defaultMessage="This incognito transaction is only visible to you"
+                      />
+                    </PrivateInfoIcon>
+                  </Span>
                 )}
               </P>
               <P mt="5px" fontSize="12px" lineHeight="16px" color="black.600" data-cy="transaction-details">
@@ -219,6 +232,7 @@ TransactionItem.propTypes = {
   isRefunded: PropTypes.bool,
   isRefund: PropTypes.bool,
   collective: PropTypes.shape({
+    id: PropTypes.number,
     slug: PropTypes.string.isRequired,
   }).isRequired,
   fromAccount: PropTypes.shape({
