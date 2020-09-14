@@ -2484,6 +2484,8 @@ type Credit implements Transaction {
   Account that emitted the gift card used for this transaction (if any)
   """
   giftCardEmitterAccount: Account
+  isRejected: Boolean!
+  refundTransaction: Transaction
   fromAccount: Account
   toAccount: Account
 }
@@ -2672,6 +2674,8 @@ type Debit implements Transaction {
   Account that emitted the gift card used for this transaction (if any)
   """
   giftCardEmitterAccount: Account
+  isRejected: Boolean!
+  refundTransaction: Transaction
   fromAccount: Account
   toAccount: Account
 }
@@ -4757,6 +4761,21 @@ type Mutation {
   ): Transaction!
 
   """
+  Rejects transaction, removes member from Collective, and sends a message to the contributor
+  """
+  rejectTransaction(
+    """
+    Reference of the transaction to refund
+    """
+    transaction: TransactionReferenceInput!
+
+    """
+    Message to send to the contributor whose contribution has been rejected
+    """
+    message: String
+  ): Transaction!
+
+  """
   Edit the public message for the given Member of a Collective
   """
   editPublicMessage(
@@ -4905,6 +4924,7 @@ enum OrderStatus {
   PAID
   PENDING
   PLEDGED
+  REJECTED
   REQUIRE_CLIENT_CONFIRMATION
 }
 
@@ -5975,6 +5995,8 @@ interface Transaction {
   isRefund: Boolean
   paymentMethod: PaymentMethod
   permissions: TransactionPermissions
+  isRejected: Boolean
+  refundTransaction: Transaction
 }
 
 """
@@ -6000,6 +6022,11 @@ type TransactionPermissions {
   Whether the current user can download this transaction's invoice
   """
   canDownloadInvoice: Boolean!
+
+  """
+  Whether the current user can reject the transaction
+  """
+  canReject: Boolean!
 }
 
 input TransactionReferenceInput {

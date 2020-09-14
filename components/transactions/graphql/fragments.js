@@ -33,6 +33,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
       createdAt
       isRefunded
       isRefund
+      isRejected
       toAccount {
         id
         name
@@ -74,6 +75,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
       permissions {
         canRefund
         canDownloadInvoice
+        canReject
       }
       paymentMethod {
         type

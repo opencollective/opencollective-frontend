@@ -90,7 +90,6 @@ type Collective implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -101,7 +100,6 @@ type Collective implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -252,7 +250,7 @@ type Collective implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -322,7 +320,6 @@ input CollectiveAttributesInputType {
   startsAt: String
   endsAt: String
   timezone: String
-  maxAmount: Int
   currency: String
   settings: JSON
   isIncognito: Boolean
@@ -348,7 +345,6 @@ input CollectiveInputType {
   startsAt: String
   endsAt: String
   timezone: String
-  maxAmount: Int
   currency: String
   image: String
   backgroundImage: String
@@ -387,7 +383,6 @@ interface CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -398,7 +393,6 @@ interface CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -530,7 +524,7 @@ interface CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -1006,7 +1000,6 @@ type Event implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -1017,7 +1010,6 @@ type Event implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -1168,7 +1160,7 @@ type Event implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -1399,7 +1391,7 @@ type ExpenseType {
   PayoutMethod: PayoutMethod
   privateMessage: String
   attachment: String
-  @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
+    @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
   attachments: [ExpenseItem] @deprecated(reason: "2020-04-09 - Please use items")
   items: [ExpenseItem]
   attachedFiles: [ExpenseAttachedFile!]
@@ -1438,7 +1430,6 @@ type Fund implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -1449,7 +1440,6 @@ type Fund implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -1600,7 +1590,7 @@ type Fund implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -2405,6 +2395,7 @@ enum OrderStatus {
   PENDING
   EXPIRED
   PLEDGED
+  REJECTED
 }
 
 """
@@ -2528,7 +2519,6 @@ type Organization implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -2539,7 +2529,6 @@ type Organization implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -2690,7 +2679,7 @@ type Organization implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -2941,7 +2930,6 @@ type Project implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -2952,7 +2940,6 @@ type Project implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -3103,7 +3090,7 @@ type Project implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -3350,6 +3337,7 @@ type Query {
   ): CollectiveSearchResults
   allCollectiveTags: [String]
   member(id: Int, CollectiveId: Int, MemberCollectiveId: Int, TierId: Int): Member
+    @deprecated(reason: "2020-09-08: This endpoint does not seems to be used anymore")
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -3395,7 +3383,7 @@ type Query {
   """
   search(
     """
-    Fetch collectives related to this term based on name, description, tags, slug, mission, and location
+    Fetch collectives related to this term based on name, description, tags, slug, and location
     """
     term: String
 
@@ -3831,7 +3819,7 @@ type UpdateType {
   collective: CollectiveInterface
   tier: Tier
   comments(limit: Int, offset: Int): CommentListType
-  @deprecated(reason: "Deprecated since 2020-03-18: This field has never been active and will be removed soon.")
+    @deprecated(reason: "Deprecated since 2020-03-18: This field has never been active and will be removed soon.")
 }
 
 """
@@ -3853,7 +3841,6 @@ type User implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -3864,7 +3851,6 @@ type User implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -4015,7 +4001,7 @@ type User implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
