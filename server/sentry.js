@@ -6,11 +6,7 @@ const Sentry = require('@sentry/node');
  * Returns the Sentry environment based on env and current server.
  */
 const getSentryEnvironment = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.WEBSITE_URL === 'https://staging.opencollective.com' ? 'staging' : 'production';
-  } else {
-    return process.env.NODE_ENV;
-  }
+  return process.env.OC_ENV;
 };
 
 /**

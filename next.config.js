@@ -13,6 +13,7 @@ const nextConfig = {
       // Set extra environment variables accessible through process.env.*
       // Will be replaced by webpack by their values!
       new webpack.EnvironmentPlugin({
+        OC_ENV: null,
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
@@ -22,7 +23,6 @@ const nextConfig = {
         ONBOARDING_MODAL: true,
         NEW_HOST_APPLICATION_FLOW: null,
         TW_API_COLLECTIVE_SLUG: null,
-        OC_ENV: null,
         NEW_CONTRIBUTION_FLOW: false,
         ENABLE_GUEST_CONTRIBUTIONS: false,
       }),
@@ -120,7 +120,7 @@ const nextConfig = {
       },
     });
 
-    if (['ci', 'e2e'].includes(process.env.NODE_ENV)) {
+    if (['ci', 'e2e'].includes(process.env.OC_ENV)) {
       config.optimization.minimize = false;
     }
 

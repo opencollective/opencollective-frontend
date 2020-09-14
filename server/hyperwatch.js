@@ -82,7 +82,7 @@ const load = async app => {
 
   // Configure access Logs in dev and production
 
-  const consoleLogOutput = process.env.NODE_ENV === 'development' ? 'console' : 'text';
+  const consoleLogOutput = process.env.OC_ENV === 'development' ? 'console' : 'text';
   pipeline.getNode('main').map(log => console.log(lib.logger.defaultFormatter.format(log, consoleLogOutput)));
 
   // Start

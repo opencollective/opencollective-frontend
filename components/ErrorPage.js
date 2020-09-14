@@ -121,8 +121,8 @@ class ErrorPage extends React.Component {
   unknownError() {
     const message = get(this.props, 'data.error.message');
     const stackTrace = get(this.props, 'data.error.stack');
-    const expandError = process.env.NODE_ENV !== 'production';
-    const fontSize = ['ci', 'e2e', 'test'].includes(process.env.NODE_ENV) ? 22 : 13;
+    const expandError = process.env.OC_ENV !== 'production';
+    const fontSize = ['ci', 'e2e', 'test'].includes(process.env.OC_ENV) ? 22 : 13;
 
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={[4, 6]}>
