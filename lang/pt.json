@@ -89,7 +89,7 @@
   "Attachment.Private": "This attachment is private",
   "authorization.loginRequired": "Você precisa estar logado para continuar.",
   "Back": "Voltar",
-  "BalanceAmount": "Balance {balance}",
+  "BalanceAmount": "Saldo {balance}",
   "BankAccount": "Bank account",
   "bankaccount.instructions.account": "bank account details added above",
   "bankaccount.instructions.amount": "total amount of the order",
