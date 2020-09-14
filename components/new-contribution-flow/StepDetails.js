@@ -184,7 +184,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
         <ChangeTierWarningModal
           show
           tierName={tier.name}
-          onClose={() => setTemporaryInterval(null)}
+          onClose={() => setTemporaryInterval(undefined)}
           onConfirm={() => {
             dispatchChange('interval', temporaryInterval);
             setTemporaryInterval(undefined);
