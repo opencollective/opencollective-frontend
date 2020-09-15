@@ -1351,6 +1351,7 @@
   "PrivateCommentsMessage.AllowedDetails": "Expenses conversations are private, only you, the other admins and the expense submitter can see them.",
   "PrivateCommentsMessage.NotAllowed": "Comments are private.",
   "PrivateCommentsMessage.NotAllowedDetails": "You must be signed in as an admin or the expense submitter to read them.",
+  "PrivateTransaction": "This incognito transaction is only visible to you",
   "ProcessingWithDots": "Processing…",
   "processorFeeRefunded.checkbox.label": "Also refund payment processor fees",
   "profile.incognito": "Incognito",
