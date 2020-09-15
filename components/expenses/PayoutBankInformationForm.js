@@ -335,7 +335,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       const minAmountForSelectedCurrency =
         availableCurrencies.find(c => c.code === selectedCurrency)?.minInvoiceAmount * 100;
       if (invoiceTotalAmount < minAmountForSelectedCurrency) {
-        return `The minimum amount for ${selectedCurrency} is ${formatCurrency(
+        return `The minimum amount for transfering to ${selectedCurrency} is ${formatCurrency(
           minAmountForSelectedCurrency,
           selectedCurrency,
         )}`;
@@ -346,20 +346,12 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   return (
     <React.Fragment>
       <Field name={currencyFieldName} validate={validateCurrencyMinimumAmount}>
-        {({ field, meta }) => (
-          <StyledInputField
-            name={field.name}
-            error={meta.error}
-            label={formatMessage(msg.currency)}
-            labelFontSize="13px"
-            mt={3}
-            mb={2}
-          >
+        {({ field }) => (
+          <StyledInputField name={field.name} label={formatMessage(msg.currency)} labelFontSize="13px" mt={3} mb={2}>
             {({ id }) => (
               <StyledSelect
                 inputId={id}
                 name={field.name}
-                error={meta.error}
                 onChange={({ value }) => {
                   formik.setFieldValue(getFieldName('data'), {});
                   formik.setFieldValue(field.name, value);

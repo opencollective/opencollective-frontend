@@ -697,6 +697,11 @@ const ExpenseFormBody = ({
                   <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
                   &nbsp;→
                 </StyledButton>
+                {errors.payoutMethod?.data?.currency && (
+                  <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
+                    {errors.payoutMethod.data.currency.toString()}
+                  </Box>
+                )}
               </Flex>
             </HiddenStep>
           </StyledCard>
