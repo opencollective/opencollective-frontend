@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit, update } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -13,6 +13,7 @@ import roles from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import formatMemberRole from '../../../lib/i18n/member-role';
 import { compose } from '../../../lib/utils';
+import { gqlV2, API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
@@ -50,7 +51,6 @@ class Members extends React.Component {
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
     editCoreContributors: PropTypes.func.isRequired,
-    sendEmailToAdmins: PropTypes.func.isRequired,
     /** @ignore from Apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -185,9 +185,10 @@ class Members extends React.Component {
     const data = this.findAdmins(this.props);
     try {
       this.setState({ isSubmitting: true, error: null });
-      await this.props.sendEmailToAdmins({
+      await this.props.editCoreContributors({
         variables: {
           collectiveId: this.props.collective.id,
+          askSelfRemoval: true,
           members: data.map(member => ({
             id: member.id,
             role: member.role,
@@ -225,6 +226,7 @@ class Members extends React.Component {
       await this.props.editCoreContributors({
         variables: {
           collectiveId: this.props.collective.id,
+          askSelfRemoval: false,
           members: this.state.members.map(member => ({
             id: member.id,
             role: member.role,
@@ -288,6 +290,7 @@ class Members extends React.Component {
                   </StyledTooltip>
                 </Flex>
               )}
+              {console.log(this.findAdmins(this.props))}
               {isSelf ? (
                 <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveYourself)}>
                   <StyledButton
@@ -471,8 +474,8 @@ const addCoreContributorsData = graphql(coreContributorsQuery, {
 });
 
 const editCoreContributorsMutation = gql`
-  mutation EditCoreContributors($collectiveId: Int!, $members: [MemberInputType!]!) {
-    editCoreContributors(collectiveId: $collectiveId, members: $members) {
+  mutation EditCoreContributors($collectiveId: Int!, $members: [MemberInputType!]!, $askSelfRemoval: Boolean) {
+    editCoreContributors(collectiveId: $collectiveId, members: $members, askSelfRemoval: $askSelfRemoval) {
       id
       members(roles: ["ADMIN", "MEMBER"]) {
         ...MemberFields
@@ -482,25 +485,10 @@ const editCoreContributorsMutation = gql`
   ${memberFieldsFragment}
 `;
 
-const sendEmailToAdminsMutation = gql`
-  mutation sendEmailToAdmins($collectiveId: Int!, $members: [MemberInputType!]!) {
-    sendEmailToAdmins(collectiveId: $collectiveId, members: $members) {
-      id
-      members(roles: ["ADMIN", "MEMBER"]) {
-        ...MemberFields
-      }
-    }
-  }
-  ${memberFieldsFragment}
-`;
-
-const addsendEmailToAdminsMutation = graphql(sendEmailToAdminsMutation, {
-  name: 'sendEmailToAdmins',
-});
 const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
   name: 'editCoreContributors',
 });
 
-const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation, addsendEmailToAdminsMutation);
+const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation);
 
 export default injectIntl(addGraphql(Members));
