@@ -479,7 +479,7 @@ const ExpenseFormBody = ({
                     mr={[null, 3]}
                     mt={2}
                     whiteSpace="nowrap"
-                    data-cy="expense-summary-btn"
+                    data-cy="expense-cancel"
                     disabled={!stepOneCompleted}
                     onClick={() => {
                       onCancel?.();
@@ -495,7 +495,7 @@ const ExpenseFormBody = ({
                   mr={[null, 3]}
                   mt={2}
                   whiteSpace="nowrap"
-                  data-cy="expense-summary-btn"
+                  data-cy="expense-next"
                   buttonStyle="primary"
                   disabled={!stepOneCompleted}
                   onClick={() => setStep(STEPS.EXPENSE)}
@@ -675,8 +675,7 @@ const ExpenseFormBody = ({
                   mr={[null, 3]}
                   mt={2}
                   whiteSpace="nowrap"
-                  data-cy="expense-summary-btn"
-                  disabled={!stepOneCompleted}
+                  data-cy="expense-back"
                   onClick={() => setStep(STEPS.PAYEE)}
                 >
                   ←&nbsp;
