@@ -95,7 +95,7 @@ const EditTransferWiseAccount = props => {
         <StyledInputField
           name="token"
           label="Token"
-          error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
+          error={(formik.touched.token && formik.errors.token) || createError?.message}
           disabled={isCreating}
         >
           {inputProps => (

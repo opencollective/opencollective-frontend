@@ -113,7 +113,7 @@ class HostDashboardActionsBanner extends React.Component {
       await this.props.addFundsToCollective({ variables: { order } });
       this.setState({ showAddFunds: false, loading: false });
     } catch (e) {
-      const error = e.message && e.message.replace(/GraphQL error:/, '');
+      const error = e.message;
       this.setState({ error, loading: false });
     }
   };

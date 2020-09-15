@@ -1275,7 +1275,7 @@ class CreateOrderPage extends React.Component {
             )}
             {this.state.error && (
               <MessageBox type="error" mb={3} mx={2} withIcon>
-                {this.state.error.replace('GraphQL error: ', '')}
+                {this.state.error}
               </MessageBox>
             )}
             {loadingLoggedInUser || !isValidStep ? (

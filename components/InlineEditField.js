@@ -217,7 +217,7 @@ class InlineEditField extends Component {
                 <Box width={1}>
                   {error && (
                     <MessageBox type="error" my={2} fontSize="14px" lineHeight="20px" fontWeight="normal" withIcon>
-                      {error.message.replace('GraphQL error: ', '')}
+                      {error.message}
                     </MessageBox>
                   )}
                   <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
