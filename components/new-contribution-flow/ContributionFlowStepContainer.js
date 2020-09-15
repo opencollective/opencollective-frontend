@@ -5,19 +5,18 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
-import { Flex } from '../../components/Grid';
-import StyledHr from '../../components/StyledHr';
-import { H4 } from '../../components/Text';
-import { withUser } from '../../components/UserProvider';
-
+import { Flex } from '../Grid';
 import StyledCard from '../StyledCard';
+import StyledHr from '../StyledHr';
+import { H4 } from '../Text';
+import { withUser } from '../UserProvider';
 
 import StepDetails from './StepDetails';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
 
-class NewContributionFlowMainContainer extends React.Component {
+class ContributionFlowStepContainer extends React.Component {
   static propTypes = {
     intl: PropTypes.object,
     LoggedInUser: PropTypes.object,
@@ -194,4 +193,4 @@ class NewContributionFlowMainContainer extends React.Component {
   }
 }
 
-export default injectIntl(withUser(NewContributionFlowMainContainer));
+export default injectIntl(withUser(ContributionFlowStepContainer));

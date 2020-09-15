@@ -35,9 +35,11 @@ import { withUser } from '../UserProvider';
 import { STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
-import ContributionFlowMainContainer from './ContributionFlowMainContainer';
+import ContributionFlowStepContainer from './ContributionFlowStepContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
+import { validateNewOrg } from './CreateOrganizationForm';
 import SafeTransactionMessage from './SafeTransactionMessage';
+import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY, taxesMayApply } from './utils';
 
 const StepsProgressBox = styled(Box)`
@@ -254,16 +256,21 @@ class ContributionFlow extends React.Component {
 
   /** Validate step profile, create new incognito/org if necessary */
   validateStepProfile = async () => {
-    if (!this.state.stepProfile) {
+    const { stepProfile } = this.state;
+    if (!stepProfile) {
       return false;
     }
 
     // Check if we're creating a new profile
-    if (this.state.stepProfile.id === 'incognito') {
+    if (stepProfile.id === 'incognito' || stepProfile.id === NEW_ORGANIZATION_KEY) {
+      if (stepProfile.type === 'ORGANIZATION' && !validateNewOrg(stepProfile)) {
+        return false;
+      }
+
       this.setState({ isSubmitting: true });
 
       try {
-        const { data: result } = await this.props.createCollective(this.state.stepProfile);
+        const { data: result } = await this.props.createCollective(stepProfile);
         const createdProfile = result.createCollective;
         await this.props.refetchLoggedInUser();
         this.setState({ stepProfile: createdProfile, isSubmitting: false });
@@ -590,7 +597,7 @@ class ContributionFlow extends React.Component {
                       </MessageBox>
                     )}
 
-                    <ContributionFlowMainContainer
+                    <ContributionFlowStepContainer
                       collective={collective}
                       tier={tier}
                       mainState={this.state}
