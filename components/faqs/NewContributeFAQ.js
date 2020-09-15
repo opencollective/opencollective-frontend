@@ -2,6 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { Box } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import StyledLink from '../StyledLink';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
@@ -16,8 +17,16 @@ const ContributeAsFAQ = props => (
         <FormattedMessage id="NewContributionFlow.FAQ.Secure.Title" defaultMessage="Is my contribution secure?" />
       </Title>
       <Content>
-        Quam nemo umquam voluptatem appellavit, appellat; Sin te auctoritas commovebat, nobisne omnibus et Platoni ipsi
-        nescio quem illum anteponebas?
+        <FormattedMessage
+          id="ContributeFAQ.Safe"
+          defaultMessage="Open Collective doesn't store any credit card number, we're instead relying on our partner Stripe - a secure solution that is widely adopted by the industry. If our systems are compromised, we can't loose your credit card number because we simply don't have it. <LearnMoreLink>Learn more</LearnMoreLink> about the security of Open Collective."
+          values={{
+            LearnMoreLink: getI18nLink({
+              openInNewTab: true,
+              href: 'https://docs.opencollective.com/help/product/security#payments-security',
+            }),
+          }}
+        />
       </Content>
     </Entry>
     <Entry>
