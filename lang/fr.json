@@ -1351,6 +1351,7 @@
   "PrivateCommentsMessage.AllowedDetails": "Les conversations sur les dépenses sont privées. Seulement vous, les autres administrateurs et l'émetteur de la dépense pouvez les voir.",
   "PrivateCommentsMessage.NotAllowed": "Les commentaires sont privés.",
   "PrivateCommentsMessage.NotAllowedDetails": "Vous devez être connecté en tant qu'administrateur ou qu'émetteur de la dépense pour les lire.",
+  "PrivateTransaction": "This incognito transaction is only visible to you",
   "ProcessingWithDots": "Traitement en cours…",
   "processorFeeRefunded.checkbox.label": "Également rembourser les frais de traitement de paiement",
   "profile.incognito": "Incognito",
