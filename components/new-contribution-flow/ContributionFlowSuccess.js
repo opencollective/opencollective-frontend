@@ -6,8 +6,8 @@ import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -17,61 +17,39 @@ import { facebookShareURL, tweetURL } from '../../lib/url_helpers';
 import Container from '../../components/Container';
 import { formatAccountDetails } from '../../components/edit-collective/utils';
 import { Box, Flex } from '../../components/Grid';
-import Newsletter from '../../components/home/Newsletter';
 import I18nFormatters, { getI18nLink } from '../../components/I18nFormatters';
 import Link from '../../components/Link';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
-import { H3, P, Span } from '../../components/Text';
+import { H3, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
 import { orderSuccessFragment } from './index';
+import successIllustrationUrl from './success-illustration.jpg';
+import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
 
 // Styled components
 const ContainerWithImage = styled(Container)`
-  @media screen and (max-width: 40em) {
+  @media screen and (max-width: 52em) {
     background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png');
     background-position: top;
     background-repeat: no-repeat;
     background-size: 100% auto;
   }
 
-  @media screen and (min-width: 40em) and (max-width: 52em) {
+  @media screen and (min-width: 52em) {
     background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
     background-position: left;
     background-repeat: no-repeat;
     background-size: auto 100%;
   }
 
-  @media screen and (min-width: 52em) {
-    background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
-    background-position: left;
-    background-repeat: no-repeat;
+  @media screen and (min-width: 64em) {
     background-size: cover;
   }
-`;
-
-const CTAContainer = styled(Container)`
-  border: 1px solid ${themeGet('colors.black.400')};
-  border-radius: 10px;
-  background-color: white;
-
-  ${props =>
-    props.hoverable &&
-    css`
-      &:hover {
-        border: 1px solid ${themeGet('colors.primary.500')};
-        cursor: pointer;
-
-        h3,
-        span {
-          color: ${themeGet('colors.primary.800')};
-        }
-      }
-    `}
 `;
 
 const ShareLink = styled(StyledLink)`
@@ -98,6 +76,13 @@ const BankTransferInfoContainer = styled(Container)`
   background-color: white;
 `;
 
+const SuccessIllustration = styled.img.attrs({ src: successIllustrationUrl })`
+  max-width: 100%;
+  width: 216px;
+  margin: 0 auto;
+  margin-bottom: 16px;
+`;
+
 class NewContributionFlowSuccess extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
@@ -108,132 +93,24 @@ class NewContributionFlowSuccess extends React.Component {
     data: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.headerMessages = defineMessages({
-      join: {
-        id: 'collective.create.join',
-        defaultMessage: 'Join Open Collective',
-      },
-      read: {
-        id: 'NewContributionFlow.Success.CTA.Read.Header',
-        defaultMessage: 'Read our stories',
-      },
-      subscribe: {
-        id: 'home.joinUsSection.newsletter',
-        defaultMessage: 'Subscribe to our newsletter',
-      },
-    });
-
-    this.contentMessages = defineMessages({
-      join: {
-        id: 'NewContributionFlow.Success.CTA.Join.Content',
-        defaultMessage: 'Create an account and show all your contributions to the community.',
-      },
-      read: {
-        id: 'NewContributionFlow.Success.CTA.Read.Content',
-        defaultMessage:
-          'Open Collective aims to foster transparency and sustainability in communities around the world. See how you could participate.',
-      },
-      subscribe: {
-        id: 'home.joinUsSection.weNeedUpdate',
-        defaultMessage: 'We send updates once a month.',
-      },
-    });
-  }
-
   renderCallsToAction = () => {
-    const joinCallToAction = {
-      headerText: this.props.intl.formatMessage(this.headerMessages.join),
-      contentText: this.props.intl.formatMessage(this.contentMessages.join),
-      subscribe: false,
-      link: '/create-account',
-    };
+    const { LoggedInUser, router } = this.props;
+    const callsToAction = [SUCCESS_CTA_TYPE.NEWSLETTER];
 
-    const readCallToAction = {
-      headerText: this.props.intl.formatMessage(this.headerMessages.read),
-      contentText: this.props.intl.formatMessage(this.contentMessages.read),
-      subscribe: false,
-      link: 'https://blog.opencollective.com',
-    };
-
-    const subscribeCallToAction = {
-      headerText: this.props.intl.formatMessage(this.headerMessages.subscribe),
-      contentText: this.props.intl.formatMessage(this.contentMessages.subscribe),
-      subscribe: true,
-    };
-
-    const allCallsToAction = !this.props.LoggedInUser;
-    // this is for when we redirect from email for freshly signed up recurring contributions users
-    // const readAndSubscribeCallsToAction = !LoggedInUser && this.props.router.query.emailRedirect;
-    const readOnlyCallToAction = this.props.LoggedInUser && !this.props.router.query.emailRedirect;
-
-    const callsToAction = [];
-
-    // all guest transactions
-    if (allCallsToAction) {
-      callsToAction.push(joinCallToAction, readCallToAction, subscribeCallToAction);
+    if (!LoggedInUser) {
+      // all guest transactions
+      callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
+    } else if (LoggedInUser && !router.query.emailRedirect) {
+      // all other logged in recurring/one time contributions
+      callsToAction.unshift(SUCCESS_CTA_TYPE.BLOG);
     }
-    // all other logged in recurring/one time contributions
-    else if (readOnlyCallToAction) {
-      callsToAction.push(readCallToAction);
-    }
-    // recurring contributions who have just signed up
-    // else if (readAndSubscribeCallsToAction) {
-    //   callsToAction.push(readCallToAction, subscribeCallToAction);
-    // }
-
-    const innerCTA = cta => {
-      return (
-        <CTAContainer
-          display="flex"
-          mx={[3, 0]}
-          my={2}
-          mb={[4, 0]}
-          px={4}
-          py={2}
-          justifyContent="space-between"
-          maxWidth={600}
-          hoverable={cta.link}
-        >
-          <Flex
-            flexDirection="column"
-            alignItems="left"
-            justifyContent="center"
-            width={[cta.subscribe ? 1 : 4 / 5, 4 / 5]}
-            my={3}
-          >
-            <H3 mb={3}>{cta.headerText}</H3>
-            <P fontSize="14px" lineHeight="24px" fontWeight={300} color="black.700">
-              {cta.contentText}
-            </P>
-            {cta.subscribe && (
-              <Box mt={2}>
-                <Newsletter />
-              </Box>
-            )}
-          </Flex>
-          {!cta.subscribe && (
-            <Flex alignItems="center" justifyContent="center">
-              <Span fontSize={40}>&rarr;</Span>
-            </Flex>
-          )}
-        </CTAContainer>
-      );
-    };
 
     return (
-      <Flex flexDirection="column" justifyContent="center">
-        {callsToAction.map(cta =>
-          cta.link ? (
-            <StyledLink href={cta.link} openInNewTab key={cta.headerText} color="black.700">
-              {innerCTA(cta)}
-            </StyledLink>
-          ) : (
-            <Fragment>{innerCTA(cta)}</Fragment>
-          ),
-        )}
+      <Flex flexDirection="column" justifyContent="center" p={2}>
+        {callsToAction.length <= 2 && <SuccessIllustration />}
+        {callsToAction.map(type => (
+          <SuccessCTA key={type} type={type} />
+        ))}
       </Flex>
     );
   };
@@ -327,7 +204,7 @@ class NewContributionFlowSuccess extends React.Component {
         justifyContent="center"
         width={1}
         minHeight={[400, 800]}
-        flexDirection={['column', 'row']}
+        flexDirection={['column', null, 'row']}
         data-cy="order-success"
       >
         {data.loading ? (
@@ -340,7 +217,7 @@ class NewContributionFlowSuccess extends React.Component {
               display="flex"
               alignItems="center"
               justifyContent="center"
-              width={[1, '523px', '762px']}
+              width={['100%', null, '50%', '762px']}
               flexShrink={0}
             >
               <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
