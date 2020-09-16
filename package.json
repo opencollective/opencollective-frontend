@@ -196,7 +196,7 @@
     "mkdirp": "^1.0.4",
     "npm-run-all": "^4.1.5",
     "nyc": "^15.1.0",
-    "prettier": "2.1.1",
+    "prettier": "2.1.2",
     "raf": "^3.4.1",
     "raw-loader": "^4.0.1",
     "react-styleguidist": "11.1.0",
