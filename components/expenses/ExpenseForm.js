@@ -221,7 +221,7 @@ const refreshPayoutProfile = (formik, payoutProfiles) => {
   formik.setFieldValue('payee', payee);
 };
 
-const HiddenStep = styled.div`
+const HiddenFragment = styled.div`
   display: ${({ show }) => (show ? 'block' : 'none')};
 `;
 
@@ -242,7 +242,7 @@ const ExpenseFormBody = ({
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, handleChange, errors, setValues, dirty } = formik;
+  const { values, handleChange, errors, setValues, dirty, touched } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const stepOneCompleted = values.payoutMethod;
   const stepTwoCompleted = stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
@@ -302,7 +302,7 @@ const ExpenseFormBody = ({
       {values.type && (
         <Box width="100%">
           <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
-            <HiddenStep show={step == STEPS.PAYEE}>
+            <HiddenFragment show={step == STEPS.PAYEE}>
               <Flex alignItems="center" mb={16}>
                 <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
                   {formatMessage(msg.stepPayee)}
@@ -504,9 +504,9 @@ const ExpenseFormBody = ({
                   &nbsp;→
                 </StyledButton>
               </Flex>
-            </HiddenStep>
+            </HiddenFragment>
 
-            <HiddenStep show={step == STEPS.EXPENSE}>
+            <HiddenFragment show={step == STEPS.EXPENSE}>
               <Flex alignItems="center" mb={10}>
                 <P
                   as="label"
@@ -574,7 +574,7 @@ const ExpenseFormBody = ({
                 maxLength={255}
                 withOutline
               />
-              <Fragment>
+              <HiddenFragment show={hasBaseFormFieldsCompleted}>
                 {values.type === expenseTypes.FUNDING_REQUEST && (
                   <Fragment>
                     <Flex alignItems="center" mt={20} mb={10}>
@@ -663,46 +663,46 @@ const ExpenseFormBody = ({
                 <Box>
                   <FieldArray name="items" component={ExpenseFormItems} />
                 </Box>
-              </Fragment>
 
-              <StyledHr flex="1" mt={4} borderColor="black.300" />
+                <StyledHr flex="1" mt={4} borderColor="black.300" />
 
-              <Flex mt={3} flexWrap="wrap" alignItems="center">
-                <StyledButton
-                  type="button"
-                  width={['100%', 'auto']}
-                  mx={[2, 0]}
-                  mr={[null, 3]}
-                  mt={2}
-                  whiteSpace="nowrap"
-                  data-cy="expense-back"
-                  onClick={() => setStep(STEPS.PAYEE)}
-                >
-                  ←&nbsp;
-                  <FormattedMessage id="Back" defaultMessage="Back" />
-                </StyledButton>
-                <StyledButton
-                  type="submit"
-                  width={['100%', 'auto']}
-                  mx={[2, 0]}
-                  mr={[null, 3]}
-                  mt={2}
-                  whiteSpace="nowrap"
-                  data-cy="expense-summary-btn"
-                  buttonStyle="primary"
-                  disabled={!stepTwoCompleted || !formik.isValid}
-                  loading={formik.isSubmitting}
-                >
-                  <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
-                  &nbsp;→
-                </StyledButton>
-                {errors.payoutMethod?.data?.currency && (
-                  <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
-                    {errors.payoutMethod.data.currency.toString()}
-                  </Box>
-                )}
-              </Flex>
-            </HiddenStep>
+                <Flex mt={3} flexWrap="wrap" alignItems="center">
+                  <StyledButton
+                    type="button"
+                    width={['100%', 'auto']}
+                    mx={[2, 0]}
+                    mr={[null, 3]}
+                    mt={2}
+                    whiteSpace="nowrap"
+                    data-cy="expense-back"
+                    onClick={() => setStep(STEPS.PAYEE)}
+                  >
+                    ←&nbsp;
+                    <FormattedMessage id="Back" defaultMessage="Back" />
+                  </StyledButton>
+                  <StyledButton
+                    type="submit"
+                    width={['100%', 'auto']}
+                    mx={[2, 0]}
+                    mr={[null, 3]}
+                    mt={2}
+                    whiteSpace="nowrap"
+                    data-cy="expense-summary-btn"
+                    buttonStyle="primary"
+                    disabled={!stepTwoCompleted || !formik.isValid}
+                    loading={formik.isSubmitting}
+                  >
+                    <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+                    &nbsp;→
+                  </StyledButton>
+                  {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
+                    <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
+                      {errors.payoutMethod.data.currency.toString()}
+                    </Box>
+                  )}
+                </Flex>
+              </HiddenFragment>
+            </HiddenFragment>
           </StyledCard>
         </Box>
       )}
