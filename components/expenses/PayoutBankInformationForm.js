@@ -293,6 +293,7 @@ const availableCurrenciesQuery = gqlV2/* GraphQL */ `
   query PayoutBankInformationAvailableCurrencies($slug: String, $ignoreBlockedCurrencies: Boolean) {
     host(slug: $slug) {
       slug
+      currency
       transferwise {
         availableCurrencies(ignoreBlockedCurrencies: $ignoreBlockedCurrencies)
       }
@@ -337,7 +338,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       if (invoiceTotalAmount < minAmountForSelectedCurrency) {
         return `The minimum amount for transfering to ${selectedCurrency} is ${formatCurrency(
           minAmountForSelectedCurrency,
-          selectedCurrency,
+          host.currency,
         )}`;
       }
     }
@@ -380,6 +381,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
 PayoutBankInformationForm.propTypes = {
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
+    currency: PropTypes.string,
     transferwise: PropTypes.shape({
       availableCurrencies: PropTypes.arrayOf(PropTypes.object),
     }),
