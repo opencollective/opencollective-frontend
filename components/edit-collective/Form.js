@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
+import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { cloneDeep, find, get, set } from 'lodash';
@@ -8,7 +8,7 @@ import { withRouter } from 'next/router';
 import { Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
+import { AccountTypesWithHost, CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
 import { Currency } from '../../lib/constants/currency';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
@@ -228,6 +228,10 @@ class EditCollectiveForm extends React.Component {
         id: 'EditCollective.VATNumber.Description',
         defaultMessage: 'Your European Value Added Tax (VAT) number',
       },
+      'GST-number.label': {
+        id: 'EditCollective.GSTNumber',
+        defaultMessage: 'GST number (NZBN)',
+      },
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
@@ -263,6 +267,12 @@ class EditCollectiveForm extends React.Component {
         set(collective, 'settings.VAT.type', value);
       } else if (fieldname === 'VAT-number') {
         set(collective, 'settings.VAT.number', value);
+      } else if (fieldname === 'GST-number') {
+        if (!value) {
+          set(collective, 'settings.GST', null);
+        } else {
+          set(collective, 'settings.GST.number', value);
+        }
       } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
         collective[fieldname] = value;
         const endsAt = collective.endsAt;
@@ -473,6 +483,65 @@ class EditCollectiveForm extends React.Component {
     }
   }
 
+  getApplicableTaxesFields = () => {
+    const { intl } = this.props;
+    const { collective } = this.state;
+    const fields = [];
+    const country = get(collective, 'location.country') || get(collective.host, 'location.country');
+    const taxes = getApplicableTaxesForCountry(country);
+
+    if (taxes.includes(TaxType.VAT)) {
+      fields.concat([
+        {
+          name: 'VAT',
+          type: 'select',
+          defaultValue: get(collective, 'settings.VAT.type'),
+          when: () => {
+            return AccountTypesWithHost.includes(collective.type);
+          },
+          options: [
+            {
+              value: '',
+              label: intl.formatMessage(this.messages['VAT.None']),
+            },
+            {
+              value: VAT_OPTIONS.HOST,
+              label: intl.formatMessage(this.messages['VAT.Host']),
+            },
+            {
+              value: VAT_OPTIONS.OWN,
+              label: intl.formatMessage(this.messages['VAT.Own']),
+            },
+          ],
+        },
+        {
+          name: 'VAT-number',
+          type: 'string',
+          placeholder: 'FRXX999999999',
+          defaultValue: get(collective, 'settings.VAT.number'),
+          when: () => {
+            const { collective } = this.state;
+            if (collective.type === CollectiveType.COLLECTIVE || collective.type === CollectiveType.EVENT) {
+              // Collectives can set a VAT number if configured
+              return get(collective, 'settings.VAT.type') === VAT_OPTIONS.OWN;
+            } else {
+              return true;
+            }
+          },
+        },
+      ]);
+    } else if (taxes.includes(TaxType.GST) && collective.isHost) {
+      fields.push({
+        name: 'GST-number',
+        type: 'string',
+        placeholder: '9429037631147',
+        defaultValue: get(collective, 'settings.GST.number'),
+      });
+    }
+
+    return fields;
+  };
+
   render() {
     const { collective, status, intl, router } = this.props;
 
@@ -605,64 +674,7 @@ class EditCollectiveForm extends React.Component {
             return false;
           },
         },
-        {
-          name: 'VAT',
-          type: 'select',
-          defaultValue: get(this.state.collective, 'settings.VAT.type'),
-          when: () => {
-            if (this.state.collective.type !== 'COLLECTIVE') {
-              return false;
-            }
-
-            const collectiveCountry = get(this.state.collective, 'location.country');
-            const hostCountry = get(this.state.collective.host, 'location.country');
-            return (
-              (hostCountry && isMemberOfTheEuropeanUnion(hostCountry)) ||
-              (collectiveCountry && isMemberOfTheEuropeanUnion(collectiveCountry))
-            );
-          },
-          options: [
-            {
-              value: '',
-              label: intl.formatMessage(this.messages['VAT.None']),
-            },
-            {
-              value: VAT_OPTIONS.HOST,
-              label: intl.formatMessage(this.messages['VAT.Host']),
-            },
-            {
-              value: VAT_OPTIONS.OWN,
-              label: intl.formatMessage(this.messages['VAT.Own']),
-            },
-          ],
-        },
-        {
-          name: 'VAT-number',
-          type: 'string',
-          placeholder: 'FRXX999999999',
-          defaultValue: get(this.state.collective, 'settings.VAT.number'),
-          when: () => {
-            if (collective.type === CollectiveType.EVENT) {
-              return false;
-            }
-
-            if (this.state.collective.type === CollectiveType.COLLECTIVE) {
-              // Collectives can set a VAT number if configured
-              const collectiveCountry = get(this.state.collective, 'location.country');
-              const hostCountry = get(this.state.collective.host, 'location.country');
-              if (
-                (hostCountry && isMemberOfTheEuropeanUnion(hostCountry)) ||
-                (collectiveCountry && isMemberOfTheEuropeanUnion(collectiveCountry))
-              ) {
-                return get(this.state.collective, 'settings.VAT.type') === VAT_OPTIONS.OWN;
-              }
-            } else {
-              // Organizations and users can set a VAT number if they're located in the EU
-              const country = get(this.state.collective, 'location.country');
-              return country && isMemberOfTheEuropeanUnion(country);
-            }
-          },
-        },
+        ...this.getApplicableTaxesFields(),
         {
           name: 'tags',
           maxLength: 128,
@@ -744,7 +756,7 @@ class EditCollectiveForm extends React.Component {
               margin: 1rem;
             }
             :global(label) {
-              width: 150px;
+              min-width: 150px;
               display: inline-block;
               vertical-align: top;
             }

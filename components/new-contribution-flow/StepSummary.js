@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { checkVATNumberFormat, getVatOriginCountry, getVatPercentage } from '@opencollective/taxes';
+import {
+  checkVATNumberFormat,
+  getVatOriginCountry,
+  getVatPercentage,
+  GST_RATE_PERCENT,
+  TaxType,
+} from '@opencollective/taxes';
 import { Close } from '@styled-icons/material/Close';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -39,7 +45,7 @@ const Label = styled.span`
 
 const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMethod, currency }) => {
   const platformFee = amount * (platformFeePercent / 100);
-  const hostFee = amount * (hostFeePercent / 100);
+  const hostFee = amount * ((hostFeePercent || 0) / 100);
   const pmFeeInfo = getPaymentMethodFees(paymentMethod, amount);
   const netAmountForCollective = amount - platformFee - hostFee - pmFeeInfo.fee;
 
@@ -124,18 +130,164 @@ ClickableLabel.defaultProps = {
 };
 
 /** Add missing fields to taxInfo and calculate tax amount */
-const prepareTaxInfo = (userTaxInfo, amount, quantity, taxPercentage, hasForm) => {
+const prepareTaxInfo = (taxes, userTaxInfo, amount, quantity, taxPercentage, hasForm) => {
   return {
     ...userTaxInfo,
+    taxType: taxes[0]?.type,
     percentage: taxPercentage,
     amount: Math.round(amount * quantity * (taxPercentage / 100)),
     isReady: Boolean(!hasForm && (!amount || get(userTaxInfo, 'countryISO'))),
   };
 };
 
-const getTaxPerentageForProfile = (tierType, hostCountry, collectiveCountry, profile) => {
-  const originCountry = getVatOriginCountry(tierType, hostCountry, collectiveCountry);
-  return getVatPercentage(tierType, originCountry, get(profile, 'countryISO'), get(profile, 'number'));
+const getTaxPerentageForProfile = (taxes, tierType, hostCountry, collectiveCountry, profile) => {
+  if (taxes.some(({ type }) => type === TaxType.VAT)) {
+    const originCountry = getVatOriginCountry(tierType, hostCountry, collectiveCountry);
+    return getVatPercentage(tierType, originCountry, get(profile, 'countryISO'), get(profile, 'number'));
+  } else if (taxes.some(({ type }) => type === TaxType.GST)) {
+    return GST_RATE_PERCENT;
+  } else {
+    return 0;
+  }
+};
+
+const VATInputs = ({ collective, taxInfo, dispatchChange, setFormState, formState }) => {
+  const hasConfirmedTaxID = taxInfo.number && taxInfo.isReady;
+  return (
+    <React.Fragment>
+      <AmountLine my={3}>
+        <Flex flexDirection="column">
+          <Container display="flex" alignItems="center">
+            <Span fontSize="14px" fontWeight="bold" mr={2}>
+              <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />
+            </Span>
+            <InputTypeCountry
+              minWidth={250}
+              maxMenuHeight={100}
+              onChange={code => dispatchChange({ countryISO: code, number: null })}
+              value={taxInfo.countryISO}
+              error={!taxInfo.countryISO}
+            />
+          </Container>
+          {taxInfo.countryISO && (
+            <Box mt={3}>
+              {hasConfirmedTaxID && !formState.isEnabled ? (
+                <Flex>
+                  <Span mr={3}>{taxInfo.number}</Span>
+                  <ClickableLabel
+                    onClick={() => {
+                      setFormState({ isEnabled: true, error: false });
+                      dispatchChange(null, true);
+                    }}
+                  >
+                    <FormattedMessage
+                      id="contribute.changeTaxNumber"
+                      defaultMessage="Change {taxName} number"
+                      values={{ taxName: 'VAT' }}
+                    />
+                  </ClickableLabel>
+                </Flex>
+              ) : (
+                <ClickableLabel
+                  onClick={() => {
+                    setFormState({ isEnabled: true, error: false });
+                    dispatchChange(null, true);
+                  }}
+                >
+                  <FormattedMessage
+                    id="contribute.enterTaxNumber"
+                    defaultMessage="Enter {taxName} number (if you have one)"
+                    values={{ taxName: 'VAT' }}
+                  />
+                </ClickableLabel>
+              )}
+              {formState.isEnabled && (
+                <Flex flexDirection="column" className="cf-tax-form">
+                  <Container display="flex" ml={[-20, -26]} alignItems="center">
+                    <Close
+                      size={16}
+                      color="grey"
+                      cursor="pointer"
+                      className="close"
+                      onClick={() => {
+                        setFormState({ isEnabled: false, error: false });
+                        dispatchChange({ number: null }, false);
+                      }}
+                    />
+                    <StyledInput
+                      value={taxInfo.number || ''}
+                      name="taxIndentificationNumber"
+                      mx={[1, 2]}
+                      px={2}
+                      py={1}
+                      autoFocus
+                      maxWidth={180}
+                      onChange={e => {
+                        setFormState({ isEnabled: true, error: false });
+                        dispatchChange({ number: e.target.value });
+                      }}
+                    />
+                    <StyledButton
+                      buttonSize="small"
+                      disabled={!taxInfo.number || formState.error}
+                      onClick={() => {
+                        let error = false;
+                        let validationResult = checkVATNumberFormat(taxInfo.number);
+                        if (!validationResult.isValid) {
+                          // Try again with the country code
+                          validationResult = checkVATNumberFormat(`${taxInfo.countryISO}${taxInfo.number}`);
+                          if (!validationResult.isValid) {
+                            error = 'invalid';
+                          }
+                        } else if (get(validationResult, 'country.isoCode.short') !== taxInfo.countryISO) {
+                          error = 'bad_country';
+                        }
+
+                        const number = !error ? validationResult.value : taxInfo.number;
+                        const hasError = Boolean(error);
+                        setFormState({ isEnabled: hasError, error: error });
+                        dispatchChange({ number }, hasError);
+                      }}
+                    >
+                      <FormattedMessage id="actions.done" defaultMessage="Done" />
+                    </StyledButton>
+                  </Container>
+                  {formState.error === 'invalid' && (
+                    <Span mt={1} fontSize="12px" color="red.500">
+                      <FormattedMessage
+                        id="contribute.taxInfoInvalid"
+                        defaultMessage="Invalid {taxName} number"
+                        values={{ taxName: <FormattedMessage id="tax.vatShort" defaultMessage="VAT" /> }}
+                      />
+                    </Span>
+                  )}
+                  {formState.error === 'bad_country' && (
+                    <Span mt={1} fontSize="12px" color="red.500">
+                      <FormattedMessage
+                        id="contribute.vatBadCountry"
+                        defaultMessage="The VAT number doesn't match the country"
+                      />
+                    </Span>
+                  )}
+                </Flex>
+              )}
+            </Box>
+          )}
+        </Flex>
+        <Span fontSize="16px" pt={2}>
+          {taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, collective.currency)}`}
+        </Span>
+      </AmountLine>
+    </React.Fragment>
+  );
+};
+
+VATInputs.propTypes = {
+  formState: PropTypes.object,
+  taxInfo: PropTypes.object,
+  collective: PropTypes.object,
+  dispatchChange: PropTypes.func,
+  setFormState: PropTypes.func,
 };
 
 /**
@@ -148,6 +300,7 @@ const StepSummary = ({
   paymentMethod,
   showFees,
   applyTaxes,
+  taxes,
   data,
   onChange,
   tier,
@@ -158,17 +311,17 @@ const StepSummary = ({
   const collectiveCountry = collective.location.country || get(collective.parent, 'location.country');
 
   const [formState, setFormState] = useState({ isEnabled: false, error: false });
-  const taxPercentage = getTaxPerentageForProfile(tierType, hostCountry, collectiveCountry, data);
-  const taxInfo = prepareTaxInfo(data, amount, quantity, taxPercentage, formState.isEnabled);
+  const taxPercentage = getTaxPerentageForProfile(taxes, tierType, hostCountry, collectiveCountry, data);
+  const taxInfo = prepareTaxInfo(taxes, data, amount, quantity, taxPercentage, formState.isEnabled);
 
   // Helper to prepare onChange data
   const dispatchChange = (newValues, hasFormParam) => {
     if (onChange) {
       const newTaxInfo = { ...taxInfo, ...newValues };
-      const percent = getTaxPerentageForProfile(tierType, hostCountry, collectiveCountry, newTaxInfo);
+      const percent = getTaxPerentageForProfile(taxes, tierType, hostCountry, collectiveCountry, newTaxInfo);
       const hasForm = hasFormParam === undefined ? formState.isEnabled : hasFormParam;
       return onChange({
-        stepSummary: prepareTaxInfo(newTaxInfo, amount, quantity, percent, hasForm),
+        stepSummary: prepareTaxInfo(taxes, newTaxInfo, amount, quantity, percent, hasForm),
       });
     }
   };
@@ -193,7 +346,6 @@ const StepSummary = ({
     }
   }, []);
 
-  const hasConfirmedTaxID = taxInfo.number && taxInfo.isReady;
   return (
     <Box width="100%" px={[0, null, null, 3]}>
       {showFees && (
@@ -234,131 +386,27 @@ const StepSummary = ({
         <Span fontSize="16px">{formatCurrency(amount * quantity, collective.currency)}</Span>
       </AmountLine>
       {applyTaxes && amount > 0 && (
-        <React.Fragment>
-          <AmountLine my={3}>
-            <Flex flexDirection="column">
-              <Container display="flex" alignItems="center">
-                <Span fontSize="14px" fontWeight="bold" mr={2}>
-                  <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />
-                </Span>
-                <InputTypeCountry
-                  minWidth={250}
-                  maxMenuHeight={100}
-                  onChange={code => dispatchChange({ countryISO: code, number: null })}
-                  value={taxInfo.countryISO}
-                  error={!taxInfo.countryISO}
-                />
-              </Container>
-              {taxInfo.countryISO && (
-                <Box mt={3}>
-                  {hasConfirmedTaxID && !formState.isEnabled ? (
-                    <Flex>
-                      <Span mr={3}>{taxInfo.number}</Span>
-                      <ClickableLabel
-                        onClick={() => {
-                          setFormState({ isEnabled: true, error: false });
-                          dispatchChange(null, true);
-                        }}
-                      >
-                        <FormattedMessage
-                          id="contribute.changeTaxNumber"
-                          defaultMessage="Change {taxName} number"
-                          values={{ taxName: 'VAT' }}
-                        />
-                      </ClickableLabel>
-                    </Flex>
-                  ) : (
-                    <ClickableLabel
-                      onClick={() => {
-                        setFormState({ isEnabled: true, error: false });
-                        dispatchChange(null, true);
-                      }}
-                    >
-                      <FormattedMessage
-                        id="contribute.enterTaxNumber"
-                        defaultMessage="Enter {taxName} number (if you have one)"
-                        values={{ taxName: 'VAT' }}
-                      />
-                    </ClickableLabel>
-                  )}
-                  {formState.isEnabled && (
-                    <Flex flexDirection="column" className="cf-tax-form">
-                      <Container display="flex" ml={[-20, -26]} alignItems="center">
-                        <Close
-                          size={16}
-                          color="grey"
-                          cursor="pointer"
-                          className="close"
-                          onClick={() => {
-                            setFormState({ isEnabled: false, error: false });
-                            dispatchChange({ number: null }, false);
-                          }}
-                        />
-                        <StyledInput
-                          value={taxInfo.number || ''}
-                          name="taxIndentificationNumber"
-                          mx={[1, 2]}
-                          px={2}
-                          py={1}
-                          autoFocus
-                          maxWidth={180}
-                          onChange={e => {
-                            setFormState({ isEnabled: true, error: false });
-                            dispatchChange({ number: e.target.value });
-                          }}
-                        />
-                        <StyledButton
-                          buttonSize="small"
-                          disabled={!taxInfo.number || formState.error}
-                          onClick={() => {
-                            let error = false;
-                            let validationResult = checkVATNumberFormat(taxInfo.number);
-                            if (!validationResult.isValid) {
-                              // Try again with the country code
-                              validationResult = checkVATNumberFormat(`${taxInfo.countryISO}${taxInfo.number}`);
-                              if (!validationResult.isValid) {
-                                error = 'invalid';
-                              }
-                            } else if (get(validationResult, 'country.isoCode.short') !== taxInfo.countryISO) {
-                              error = 'bad_country';
-                            }
-
-                            const number = !error ? validationResult.value : taxInfo.number;
-                            const hasError = Boolean(error);
-                            setFormState({ isEnabled: hasError, error: error });
-                            dispatchChange({ number }, hasError);
-                          }}
-                        >
-                          <FormattedMessage id="actions.done" defaultMessage="Done" />
-                        </StyledButton>
-                      </Container>
-                      {formState.error === 'invalid' && (
-                        <Span mt={1} fontSize="12px" color="red.500">
-                          <FormattedMessage
-                            id="contribute.taxInfoInvalid"
-                            defaultMessage="Invalid {taxName} number"
-                            values={{ taxName: <FormattedMessage id="tax.vatShort" defaultMessage="VAT" /> }}
-                          />
-                        </Span>
-                      )}
-                      {formState.error === 'bad_country' && (
-                        <Span mt={1} fontSize="12px" color="red.500">
-                          <FormattedMessage
-                            id="contribute.vatBadCountry"
-                            defaultMessage="The VAT number doesn't match the country"
-                          />
-                        </Span>
-                      )}
-                    </Flex>
-                  )}
-                </Box>
-              )}
-            </Flex>
-            <Span fontSize="16px" pt={2}>
-              {taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, collective.currency)}`}
-            </Span>
-          </AmountLine>
-        </React.Fragment>
+        <div>
+          {taxes.some(({ type }) => type === TaxType.VAT) && (
+            <VATInputs
+              collective={collective}
+              dispatchChange={dispatchChange}
+              setFormState={setFormState}
+              formState={formState}
+              taxInfo={taxInfo}
+            />
+          )}
+          {taxes.some(({ type }) => type === TaxType.GST) && (
+            <AmountLine>
+              <Span fontSize="16px" pt={2}>
+                GST ({taxPercentage}%)
+              </Span>
+              <Span fontSize="16px" pt={2}>
+                {`+ ${formatCurrency(taxInfo.amount, collective.currency)}`}
+              </Span>
+            </AmountLine>
+          )}
+        </div>
       )}
       <StyledHr my={3} />
       <AmountLine>
@@ -436,6 +484,7 @@ StepSummary.propTypes = {
   showFees: PropTypes.bool,
   /** Called with the step info as `{countryCode, taxInfoNumber, isValid}`  */
   onChange: PropTypes.func.isRequired,
+  taxes: PropTypes.arrayOf(PropTypes.oneOf(Object.values(TaxType))),
 };
 
 StepSummary.defaultProps = {

@@ -1,12 +1,9 @@
 import React from 'react';
-import * as LibTaxes from '@opencollective/taxes';
 import { find, get, sortBy, uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
-import { AmountTypes } from '../../lib/constants/tiers-types';
-import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,
@@ -15,29 +12,6 @@ import {
 } from '../../lib/payment-method-utils';
 
 import CreditCardInactive from '../../components/icons/CreditCardInactive';
-
-/** Returns true if taxes may apply with this tier/host */
-export const taxesMayApply = (collective, parent, host, tier) => {
-  if (!tier) {
-    return false;
-  } else if (tier.amountType === AmountTypes.FIXED && !tier.amount.valueInCents) {
-    return false;
-  }
-  // Don't apply VAT if not configured (default)
-  const vatType = get(collective, 'settings.VAT.type') || get(collective, 'parent.settings.VAT.type');
-  const hostCountry = get(host.location, 'country');
-  const collectiveCountry = get(collective.location, 'country');
-  const parentCountry = get(parent, 'location.country');
-  const country = collectiveCountry || parentCountry || hostCountry;
-
-  if (!vatType) {
-    return false;
-  } else if (vatType === VAT_OPTIONS.OWN) {
-    return LibTaxes.getVatOriginCountry(tier.type, country, country);
-  } else {
-    return LibTaxes.getVatOriginCountry(tier.type, hostCountry, country);
-  }
-};
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 

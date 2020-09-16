@@ -26,6 +26,7 @@ class ContributionFlowStepContainer extends React.Component {
     showFeesOnTop: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
     defaultProfileSlug: PropTypes.string,
+    taxes: PropTypes.array,
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
@@ -163,6 +164,7 @@ class ContributionFlowStepContainer extends React.Component {
             stepDetails={stepDetails}
             data={stepSummary}
             onChange={this.props.onChange}
+            taxes={this.props.taxes}
             applyTaxes
           />
         );

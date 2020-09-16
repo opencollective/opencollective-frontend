@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
-import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
+import { getApplicableTaxes } from '@opencollective/taxes';
 import { cloneDeep, get, set } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getCurrencySymbol } from '../../../lib/currency-utils';
+import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { capitalize } from '../../../lib/utils';
 
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
@@ -329,13 +330,7 @@ class Tiers extends React.Component {
   renderTier(tier, index) {
     const { intl, collective } = this.props;
     const key = tier.id ? `tier-${tier.id}` : `newTier-${tier.__uuid};`;
-    const hostCountry = get(collective, 'host.location.country');
-    const collectiveCountry =
-      get(collective, 'location.country') || get(collective, 'parentCollective.location.country');
-
-    const hasVat = Boolean(get(collective, 'settings.VAT.type'));
-    const vatOriginCountry = hasVat && getVatOriginCountry(tier.type, hostCountry, collectiveCountry);
-    const vatPercentage = hasVat ? getStandardVatRate(tier.type, vatOriginCountry) : 0;
+    const taxes = getApplicableTaxes(collective, collective.host, tier.type);
     if (!tier.amountType) {
       tier.amountType = tier.presets ? FLEXIBLE : FIXED;
     }
@@ -369,7 +364,7 @@ class Tiers extends React.Component {
                   <InputField
                     className="horizontal"
                     name={field.name}
-                    label={this.renderLabel(field, Boolean(vatPercentage))}
+                    label={this.renderLabel(field, Boolean(taxes.length))}
                     component={field.component}
                     description={field.description}
                     type={field.type}
@@ -379,25 +374,23 @@ class Tiers extends React.Component {
                     placeholder={field.placeholder}
                     onChange={value => this.editTier(index, field.name, value)}
                   />
-                  {field.name === 'type' && vatPercentage > 0 && (
-                    <Flex mb={4}>
-                      <Box width={0.166} px={15} />
-                      <MessageBox type="info" withIcon css={{ flexGrow: 1 }}>
-                        <strong>
-                          <FormattedMessage id="tax.vat" defaultMessage="Value-added tax (VAT)" />
-                          {': '}
-                          {vatPercentage}%
-                        </strong>
-                        <br />
-                        <Span>
-                          <FormattedMessage
-                            id="tax.vat.description"
-                            defaultMessage="Use this tier type to conform with legislation on VAT in Europe."
-                          />
-                        </Span>
-                      </MessageBox>
-                    </Flex>
-                  )}
+                  {field.name === 'type' &&
+                    taxes.map(({ type, percentage }) => (
+                      <Flex key={`${type}-${percentage}`} mb={4}>
+                        <Box width={0.166} px={15} />
+                        <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
+                          <Span fontWeight="bold">
+                            <FormattedMessage
+                              id="withColon"
+                              defaultMessage="{item}:"
+                              values={{ item: i18nTaxType(intl, type) }}
+                            />{' '}
+                            {percentage}%
+                          </Span>
+                          <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
+                        </MessageBox>
+                      </Flex>
+                    ))}
                 </Box>
               ),
           )}
