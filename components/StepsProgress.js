@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 
 import withViewport, { VIEWPORTS } from '../lib/withViewport';
 
+import Container from './Container';
 import { Box, Flex } from './Grid';
 import StyledSpinner from './StyledSpinner';
 import { P, Span } from './Text';
@@ -241,75 +242,81 @@ const StepsProgress = ({
 
   return (
     <StepsOuter data-cy="steps-progress">
-      {viewport === VIEWPORTS.XSMALL ? (
-        <StepMobile>
-          <StepsMobileLeft>
-            <P color="black.900" fontWeight="500" fontSize="18px" lineHeight="26px" mb={1}>
-              {steps[mobileStepIdx].label || steps[mobileStepIdx].name}
-            </P>
+      {(viewport === VIEWPORTS.XSMALL || viewport === VIEWPORTS.UNKNOWN) && (
+        <Container display={['block', null, 'none']} width="100%" data-cy="progress-destkop">
+          <StepMobile>
+            <StepsMobileLeft>
+              <P color="black.900" fontWeight="500" fontSize="18px" lineHeight="26px" mb={1}>
+                {steps[mobileStepIdx].label || steps[mobileStepIdx].name}
+              </P>
 
-            {mobileNextStep && (
-              <P color="black.500">
+              {mobileNextStep && (
+                <P color="black.500">
+                  <FormattedMessage
+                    id="StepsProgress.mobile.next"
+                    defaultMessage="Next: {stepName}"
+                    values={{
+                      stepName: mobileNextStep.label || mobileNextStep.name,
+                    }}
+                  />
+                </P>
+              )}
+            </StepsMobileLeft>
+            <StepsMobileRight>
+              <PieProgressWrapper>
+                <PieProgress progress={progress} pieSize={pieSize}>
+                  <PieHalfCircleLeft progress={progress} pieSize={pieSize} />
+                  <PieHalfCircleRight progress={progress} pieSize={pieSize} />
+                </PieProgress>
+                <PieShadow pieSize={pieSize} bgColor={bgColor} />
+              </PieProgressWrapper>
+              <P color="black.500" fontSize="10px">
                 <FormattedMessage
-                  id="StepsProgress.mobile.next"
-                  defaultMessage="Next: {stepName}"
-                  values={{
-                    stepName: mobileNextStep.label || mobileNextStep.name,
-                  }}
+                  id="StepsProgress.mobile.status"
+                  defaultMessage="{from} of {to}"
+                  values={{ from: <Span fontWeight="900">{mobileStepIdx + 1}</Span>, to: steps.length }}
                 />
               </P>
-            )}
-          </StepsMobileLeft>
-          <StepsMobileRight>
-            <PieProgressWrapper>
-              <PieProgress progress={progress} pieSize={pieSize}>
-                <PieHalfCircleLeft progress={progress} pieSize={pieSize} />
-                <PieHalfCircleRight progress={progress} pieSize={pieSize} />
-              </PieProgress>
-              <PieShadow pieSize={pieSize} bgColor={bgColor} />
-            </PieProgressWrapper>
-            <P color="black.500" fontSize="10px">
-              <FormattedMessage
-                id="StepsProgress.mobile.status"
-                defaultMessage="{from} of {to}"
-                values={{ from: <Span fontWeight="900">{mobileStepIdx + 1}</Span>, to: steps.length }}
-              />
-            </P>
-          </StepsMobileRight>
-        </StepMobile>
-      ) : (
-        steps.map((step, idx) => {
-          const stepName = step.name;
-          const checked = idx < focusIdx || allCompleted;
-          const focused = idx === focusIdx;
-          const disabled = disabledStepNames.includes(stepName);
-          const loading = loadingStep && stepName === loadingStep.name;
+            </StepsMobileRight>
+          </StepMobile>
+        </Container>
+      )}
 
-          return (
-            <Flex
-              key={stepName}
-              data-cy={`progress-step-${stepName}`}
-              flexDirection="column"
-              alignItems="center"
-              css={{ flexGrow: 1, flexBasis: stepWidth }}
-              data-disabled={disabled}
-            >
-              <Flex alignItems="center" mb={2} css={{ width: '100%' }}>
-                <SeparatorLine active={checked || focused} transparent={idx === 0} />
-                <Bubble
-                  disabled={disabled}
-                  onClick={disabled ? undefined : onStepSelect && (() => onStepSelect(step))}
-                  checked={checked}
-                  focus={focused}
-                >
-                  {getBubbleContent(idx, checked, loading)}
-                </Bubble>
-                <SeparatorLine active={checked} transparent={idx === steps.length - 1} />
+      {(viewport !== VIEWPORTS.XSMALL || viewport === VIEWPORTS.UNKNOWN) && (
+        <Container display={['none', null, 'flex']} data-cy="progress-destkop">
+          {steps.map((step, idx) => {
+            const stepName = step.name;
+            const checked = idx < focusIdx || allCompleted;
+            const focused = idx === focusIdx;
+            const disabled = disabledStepNames.includes(stepName);
+            const loading = loadingStep && stepName === loadingStep.name;
+
+            return (
+              <Flex
+                key={stepName}
+                data-cy={`progress-step-${stepName}`}
+                flexDirection="column"
+                alignItems="center"
+                css={{ flexGrow: 1, flexBasis: stepWidth }}
+                data-disabled={disabled}
+              >
+                <Flex alignItems="center" mb={2} css={{ width: '100%' }}>
+                  <SeparatorLine active={checked || focused} transparent={idx === 0} />
+                  <Bubble
+                    disabled={disabled}
+                    onClick={disabled ? undefined : onStepSelect && (() => onStepSelect(step))}
+                    checked={checked}
+                    focus={focused}
+                  >
+                    {getBubbleContent(idx, checked, loading)}
+                  </Bubble>
+                  <SeparatorLine active={checked} transparent={idx === steps.length - 1} />
+                </Flex>
+                {children && children({ step, checked, focused })}
               </Flex>
-              {children && children({ step, checked, focused })}
-            </Flex>
-          );
-        })
+            );
+          })}
+        </Container>
       )}
     </StepsOuter>
   );
