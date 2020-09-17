@@ -396,7 +396,7 @@ class ContributionFlow extends React.Component {
     const { stepDetails, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
-    const noPaymentRequired = minAmount === 0 && get(stepDetails, 'amount') === 0;
+    const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
 
     const steps = [
       {
@@ -420,7 +420,7 @@ class ContributionFlow extends React.Component {
     ];
 
     // Show the summary step only if the order has tax
-    if (this.taxesMayApply(collective, collective.parent, host, tier)) {
+    if (!noPaymentRequired && this.taxesMayApply(collective, collective.parent, host, tier)) {
       steps.push({
         name: 'summary',
         label: intl.formatMessage(stepsLabels.summary),
@@ -429,7 +429,7 @@ class ContributionFlow extends React.Component {
     }
 
     // Hide step payment if using a free tier with fixed price
-    if (!(minAmount === 0 && isFixedContribution)) {
+    if (!noPaymentRequired) {
       steps.push({
         name: 'payment',
         label: intl.formatMessage(stepsLabels.payment),
