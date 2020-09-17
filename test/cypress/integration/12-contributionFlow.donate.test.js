@@ -90,23 +90,20 @@ describe('Contribution Flow: Donate', () => {
       });
     });
 
-    // TODO: Not supported yet
-    it.skip('Can donate as new organization', () => {
+    it('Can donate as new organization', () => {
       cy.signup({ redirect: newFlowRoute, visitParams }).then(() => {
         cy.get('#amount > :nth-child(3)').click();
         cy.contains('button:not([disabled])', 'Next step').click();
-
         cy.contains('[data-cy="ContributionProfile"] > label', 'A new organization').click();
 
         // Name must be shown on step
         cy.get('[data-cy="ContributionProfile"] input[name=name]').type('Evil Corp');
-        cy.getByDataCy('progress-step-contributeAs').contains('Evil Corp');
+        cy.getByDataCy('progress-step-profile').contains('Evil Corp');
 
         // Fill form
         cy.get('[data-cy="ContributionProfile"] input[name=website]').type(
           'https://www.youtube.com/watch?v=oHg5SJYRHA0',
         );
-        cy.get('[data-cy="ContributionProfile"] input[name=githubHandle]').type('test');
         cy.get('[data-cy="ContributionProfile"] input[name=twitterHandle]').type('test');
 
         // Submit form
@@ -117,7 +114,7 @@ describe('Contribution Flow: Donate', () => {
 
         // ---- Final: Success ----
         cy.getByDataCy('order-success', { timeout: 20000 }).contains('$20.00 USD');
-        cy.contains('Evil Corp is now a backer of APEX!');
+        cy.contains('You are now supporting APEX.');
       });
     });
 
