@@ -1,18 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { Calendar } from '@styled-icons/feather/Calendar';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
+import { getNextChargeDate } from '../../lib/date-utils';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 import { Router } from '../../server/pages';
 
-import { Box } from '../../components/Grid';
+import { Box, Flex } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
 import StyledInputField from '../../components/StyledInputField';
 
+import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledAmountPicker from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
@@ -156,6 +159,36 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             onChange={value => dispatchChange('platformContribution', value)}
           />
         </Box>
+      )}
+      {data.interval && (
+        <Flex width="100%" justifyContent="flex-end" mt={2}>
+          <Flex bg="#F7F8FA" p="2px 8px">
+            <Flex alignItems="center" mr={3}>
+              <Calendar size={16} color="#9D9FA3" />
+            </Flex>
+            <Container color="black.500">
+              <P fontSize="12px" lineHeight="18px" mb="4px">
+                <Span>
+                  <FormattedMessage id="contribution.subscription.first.label" defaultMessage="First charge:" />
+                </Span>{' '}
+                <Span color="primary.500" fontWeight="500">
+                  <FormattedMessage id="contribution.subscription.today" defaultMessage="Today" />
+                </Span>
+              </P>
+              <P fontSize="12px" lineHeight="18px">
+                <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />{' '}
+                <Span color="primary.500" fontWeight="500">
+                  <FormattedDate
+                    value={getNextChargeDate(new Date(), data.interval)}
+                    day="numeric"
+                    month="short"
+                    year="numeric"
+                  />
+                </Span>
+              </P>
+            </Container>
+          </Flex>
+        </Flex>
       )}
       {hostIsTaxDeductibeInTheUs(collective.host) && (
         <React.Fragment>

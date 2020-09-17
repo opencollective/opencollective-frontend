@@ -23,8 +23,20 @@ describe('Contribution Flow: Donate', () => {
         cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
         cy.contains('[data-cy="progress-step-details"]', '$1,337.00');
 
+        // Change frequency - monthly
+        cy.contains('#interval button', 'Monthly').click();
+        cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
+        cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / month');
+        cy.contains('First charge: Today');
+        // next charge in 2 months time, first day, because it was made on or after 15th.
+        cy.contains('Next charge: Jul 1, 2042');
+
+        // Change frequency - yearly
         cy.contains('#interval button', 'Yearly').click();
-        // Todo: check display next charge date (not implemented yet)
+        cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
+        cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / year');
+        cy.contains('First charge: Today');
+        cy.contains('Next charge: May 1, 2043');
 
         cy.contains('Next step').click();
 
@@ -115,6 +127,8 @@ describe('Contribution Flow: Donate', () => {
       it('Forces params if given in URL', () => {
         cy.signup({ redirect: `${newFlowRoute}/42/year`, visitParams }).then(() => {
           cy.clock(Date.parse('2042/05/25'));
+          cy.contains('First charge: Today');
+          cy.contains('Next charge: May 1, 2043');
           cy.contains('button', 'Next step').click();
           cy.checkStepsProgress({ enabled: ['details', 'profile'] });
           cy.contains('button', 'Next step').click();
@@ -124,15 +138,6 @@ describe('Contribution Flow: Donate', () => {
 
           // Should display the contribution details
           cy.contains('[data-cy="progress-step-details"]', '$42.00 USD / year');
-
-          // TODO: We don't show that right now (pending design feedback)
-          // cy.getByDataCy('contribution-details').then($container => {
-          //   const text = $container[0].innerText;
-          //   expect(text).to.contain('Contribution details:');
-          //   expect(text).to.contain('You’ll contribute with the amount of $42.00 yearly.');
-          //   expect(text).to.contain('First charge: Today');
-          //   expect(text).to.contain('Next charge: May 1, 2043');
-          // });
 
           // Submit order
           cy.contains('button', 'Make contribution').click();
