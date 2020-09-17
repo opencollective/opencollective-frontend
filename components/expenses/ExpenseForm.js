@@ -292,7 +292,10 @@ const ExpenseFormBody = ({
     <Form>
       <ExpenseTypeRadioSelect
         name="type"
-        onChange={handleChange}
+        onChange={e => {
+          setStep(STEPS.PAYEE);
+          handleChange(e);
+        }}
         value={values.type}
         options={{
           fundingRequest:
