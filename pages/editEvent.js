@@ -47,9 +47,6 @@ const editEventPageQuery = gql`
     Collective(slug: $eventSlug) {
       ...EditCollectivePageFields
       path
-      createdByUser {
-        id
-      }
       startsAt
       endsAt
       timezone
