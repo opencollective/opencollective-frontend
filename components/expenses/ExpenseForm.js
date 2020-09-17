@@ -244,7 +244,10 @@ const ExpenseFormBody = ({
   const { formatMessage } = intl;
   const { values, handleChange, errors, setValues, dirty, touched } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const stepOneCompleted = values.payoutMethod;
+  const stepOneCompleted =
+    values.type === expenseTypes.RECEIPT
+      ? values.payoutMethod
+      : values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address;
   const stepTwoCompleted = stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
@@ -302,7 +305,7 @@ const ExpenseFormBody = ({
             [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true,
         }}
       />
-      {values.type && (
+      <HiddenFragment show={!!values.type}>
         <Box width="100%">
           <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
             <HiddenFragment show={step == STEPS.PAYEE}>
@@ -708,7 +711,7 @@ const ExpenseFormBody = ({
             </HiddenFragment>
           </StyledCard>
         </Box>
-      )}
+      </HiddenFragment>
 
       {step == STEPS.EXPENSE && (
         <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
