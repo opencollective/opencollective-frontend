@@ -74,6 +74,7 @@ class CreateExpensePage extends React.Component {
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
+        isArchived: PropTypes.bool,
         expensesTags: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.string.isRequired,
@@ -226,6 +227,8 @@ class CreateExpensePage extends React.Component {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
+      } else if (data.account.isArchived) {
+        return <PageFeatureNotSupported showContactSupportLink={false} />;
       }
     }
 
@@ -370,6 +373,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       imageUrl
       twitterHandle
       currency
+      isArchived
       expensePolicy
       expensesTags {
         id
