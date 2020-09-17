@@ -127,7 +127,6 @@ class ContributionFlow extends React.Component {
     const { stepDetails, stepProfile, stepSummary } = this.state;
     const fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     this.setState({ error: null });
-
     try {
       const response = await this.props.createOrder({
         variables: {

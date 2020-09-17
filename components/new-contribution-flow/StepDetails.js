@@ -175,8 +175,8 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           </H5>
           <TierCustomFields
             fields={tier.customFields}
-            data={data?.customFieldsData}
-            onChange={customFieldsData => dispatchChange('customFieldsData', customFieldsData)}
+            data={data?.customData}
+            onChange={customData => dispatchChange('customData', customData)}
           />
         </Box>
       )}
@@ -208,7 +208,7 @@ StepDetails.propTypes = {
     platformContribution: PropTypes.number,
     quantity: PropTypes.number,
     interval: PropTypes.string,
-    customFieldsData: PropTypes.object,
+    customData: PropTypes.object,
   }),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
