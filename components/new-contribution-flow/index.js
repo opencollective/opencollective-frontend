@@ -91,9 +91,11 @@ class ContributionFlow extends React.Component {
     fixedAmount: PropTypes.number,
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
+    loadingLoggedInUser: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
     verb: PropTypes.string,
+    contributeAs: PropTypes.string,
     /** @ignore from withUser */
     refetchLoggedInUser: PropTypes.func,
     /** @ignore from withUser */
@@ -327,7 +329,7 @@ class ContributionFlow extends React.Component {
       collectiveSlug: collective.slug,
       step: stepName === 'details' ? undefined : stepName,
       interval: this.props.fixedInterval || undefined,
-      ...pick(this.props, ['interval', 'description', 'redirect']),
+      ...pick(this.props, ['interval', 'description', 'redirect', 'contributeAs']),
       ...routeParams,
     };
 
@@ -505,7 +507,7 @@ class ContributionFlow extends React.Component {
   };
 
   render() {
-    const { collective, tier, LoggedInUser, skipStepDetails } = this.props;
+    const { collective, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails } = this.props;
     const { error, isSubmitted, isSubmitting } = this.state;
     return (
       <Steps
@@ -560,9 +562,11 @@ class ContributionFlow extends React.Component {
                 />
               </StepsProgressBox>
               {/* main container */}
-              {currentStep.name === STEPS.PROFILE &&
-              !LoggedInUser &&
-              !parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ? (
+              {loadingLoggedInUser ? (
+                <Loading />
+              ) : currentStep.name === STEPS.PROFILE &&
+                !LoggedInUser &&
+                !parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ? (
                 <SignInOrJoinFree
                   defaultForm="create-account"
                   redirect={this.getRedirectUrlForSignIn()}
@@ -605,6 +609,7 @@ class ContributionFlow extends React.Component {
                       step={currentStep}
                       showFeesOnTop={this.canHaveFeesOnTop()}
                       onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+                      defaultProfileSlug={this.props.contributeAs}
                     />
 
                     <Box mt={[4, 5]}>

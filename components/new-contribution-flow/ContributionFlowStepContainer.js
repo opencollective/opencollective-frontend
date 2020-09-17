@@ -25,6 +25,7 @@ class ContributionFlowStepContainer extends React.Component {
     onChange: PropTypes.func,
     showFeesOnTop: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
+    defaultProfileSlug: PropTypes.string,
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
@@ -34,7 +35,6 @@ class ContributionFlowStepContainer extends React.Component {
       stepSummary: PropTypes.object,
       stepPayment: PropTypes.object,
     }),
-    contributeAs: PropTypes.object,
   };
 
   constructor(props) {
@@ -65,9 +65,9 @@ class ContributionFlowStepContainer extends React.Component {
   };
 
   getLoggedInUserDefaultContributeProfile() {
-    if (this.props.contributeAs) {
+    if (this.props.defaultProfileSlug) {
       const otherProfiles = this.getOtherProfiles();
-      const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.contributeAs);
+      const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.defaultProfileSlug);
       if (contributorProfile) {
         return contributorProfile;
       }
@@ -138,6 +138,7 @@ class ContributionFlowStepContainer extends React.Component {
             onChange={this.props.onChange}
             data={stepProfile}
             canUseIncognito={collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET')}
+            defaultProfileSlug={this.props.defaultProfileSlug}
           />
         );
       }
