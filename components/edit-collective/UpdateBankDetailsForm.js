@@ -71,7 +71,7 @@ class UpdateBankDetailsForm extends React.Component {
   }
 
   render() {
-    const { intl, value, error, useStructuredForm } = this.props;
+    const { intl, value, error, useStructuredForm, bankAccount } = this.props;
     return (
       <Flex flexDirection="column">
         <Container as="fieldset" border="none" width={1}>
@@ -95,7 +95,7 @@ class UpdateBankDetailsForm extends React.Component {
               </P>
 
               <List>
-                {useStructuredForm && (
+                {useStructuredForm && bankAccount?.currency && (
                   <li>
                     <code>&#123;account&#125;</code>:{' '}
                     <FormattedMessage

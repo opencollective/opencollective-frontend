@@ -303,7 +303,7 @@ const availableCurrenciesQuery = gqlV2/* GraphQL */ `
 /**
  * Form for payout bank information. Must be used with Formik.
  */
-const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies }) => {
+const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: host.slug, ignoreBlockedCurrencies },
@@ -323,6 +323,9 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
 
   const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
   const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies.map(c => c.code));
+  if (optional) {
+    currencies.unshift({ label: 'No selection', value: null });
+  }
   const currencyFieldName = getFieldName('data.currency');
   const selectedCurrency = fixedCurrency || get(formik.values, currencyFieldName);
   const validateCurrencyMinimumAmount = () => {
@@ -393,6 +396,7 @@ PayoutBankInformationForm.propTypes = {
     }),
   }).isRequired,
   isNew: PropTypes.bool,
+  optional: PropTypes.bool,
   ignoreBlockedCurrencies: PropTypes.bool,
   getFieldName: PropTypes.func.isRequired,
   /** Enforces a fixedCurrency */
