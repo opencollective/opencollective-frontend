@@ -54,7 +54,7 @@ const TrixEditorContainer = styled.div`
   trix-toolbar {
     min-height: 40px;
     background: ${props => props.toolbarBackgroundColor};
-    box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);
+    ${props => !props.withBorders && `box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);`}
     z-index: 2;
     margin-bottom: 8px;
 
