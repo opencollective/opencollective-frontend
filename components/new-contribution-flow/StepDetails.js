@@ -131,7 +131,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
               mt={[4, 0]}
               items={[null, INTERVALS.month, INTERVALS.year]}
               selected={data?.interval || null}
-              buttonProps={{ p: 2 }}
+              buttonProps={{ px: 2, py: 1 }}
               onChange={interval => {
                 if (tier) {
                   setTemporaryInterval(interval);
@@ -141,7 +141,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
               }}
             >
               {({ item, isSelected }) => (
-                <Span fontSize="18px" lineHeight="21px" fontWeight={isSelected ? 500 : 'normal'}>
+                <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
                   {i18nInterval(intl, item || INTERVALS.oneTime)}
                 </Span>
               )}
@@ -161,7 +161,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
         </Box>
       )}
       {data.interval && (
-        <Flex width="100%" justifyContent="flex-end" mt={2}>
+        <Flex width="100%" justifyContent="flex-end" mt={3}>
           <Flex bg="#F7F8FA" p="2px 8px">
             <Flex alignItems="center" mr={3}>
               <Calendar size={16} color="#9D9FA3" />
