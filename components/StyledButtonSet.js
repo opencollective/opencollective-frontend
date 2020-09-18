@@ -15,7 +15,7 @@ const StyledButtonItem = styled(StyledButton)`
   line-height: 1.5;
   flex-grow: 1;
   border-color: ${themeGet('colors.black.300')};
-  transition: color 0.2s, background 0.1s;
+  transition: color 0.2s, background 0.1s, font-size 30ms;
 
   &:active p {
     color: white;
@@ -70,7 +70,7 @@ const StyledButtonSet = ({
         type="button"
         py="8px"
         {...buttonProps}
-        {...(buttonPropsBuilder ? buttonPropsBuilder({ item, index }) : {})}
+        {...(buttonPropsBuilder ? buttonPropsBuilder({ item, index, isSelected: item === selected }) : {})}
       >
         {children({ item, isSelected: item === selected })}
       </StyledButtonItem>
