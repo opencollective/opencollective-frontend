@@ -75,7 +75,8 @@ class EditCollective extends React.Component {
       const response = await this.props.editCollective(collective);
       const updatedCollective = response.data.editCollective;
       this.setState({ status: 'saved', result: { error: null } });
-      if (Router.router.query.slug !== updatedCollective.slug) {
+      const currentSlug = Router.router.query.eventSlug ?? Router.router.query.slug;
+      if (currentSlug !== updatedCollective.slug) {
         Router.replaceRoute('editCollective', {
           ...Router.router.query,
           slug: updatedCollective.slug,
