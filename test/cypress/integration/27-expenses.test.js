@@ -50,8 +50,15 @@ describe('New expense flow', () => {
 
     it('submits new expense then edit it', () => {
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
+      // Select Payout Method
+      cy.getByDataCy('payout-method-select').click();
+      cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
+      cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
+      cy.getByDataCy('expense-next').click();
+
       cy.get('input[name="description"]').type('Brussels January team retreat');
 
+      cy.getByDataCy('expense-summary-btn').should('be.disabled');
       // Upload 2 files to the multi-files dropzone
       cy.fixture('images/receipt.jpg').then(fileContent => {
         const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
@@ -59,25 +66,18 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
       });
       cy.getByDataCy('expense-attachment-form').should('have.length', 2);
-      cy.getByDataCy('expense-summary-btn').should('be.disabled');
 
       // Fill info for first attachment
       cy.get('input[name="items[0].description"]').type('Fancy restaurant');
       cy.get('input[name="items[0].amount"]').type('{selectall}183');
-      cy.getByDataCy('expense-summary-btn').should('be.disabled');
       cy.get('input:invalid').should('have.length', 2); // Missing attachment desctiption+amount
       cy.getByDataCy('expense-items-total-amount').should('contain', '--.--'); // amount for second item is missing
 
-      // Select Payout Method
-      cy.getByDataCy('payout-method-select').click();
-      cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
-
       // Try to submit with missing data
-      cy.get('input:invalid').should('have.length', 3); // Previous incomplete fields + payout method email
+      cy.get('input:invalid').should('have.length', 2); // Previous incomplete fields + payout method email
       cy.getByDataCy('expense-summary-btn').click(); // Should not submit
 
       // Fill missing info & submit
-      cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
       cy.get('input[name="items[1].amount"]').type('{selectall}92.50');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50 USD');
@@ -115,10 +115,13 @@ describe('New expense flow', () => {
           { subjectType: 'drag-n-drop' },
         );
       });
+
       // Change payee - use a new organization
+      cy.getByDataCy('expense-back').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test-2@opencollective.com');
+      cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-summary-btn').click();
       cy.getByDataCy('save-expense-btn').click();
       cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
@@ -137,17 +140,19 @@ describe('New expense flow', () => {
 
     // This can happen if you start with an invoice then switch to receipts
     it('should prevent submitting receipts if missing items', () => {
-      // Fill the form with valid data
       cy.getByDataCy('radio-expense-type-INVOICE').click();
-      cy.get('input[name="description"]').type('March invoice');
-      cy.get('input[name="items[0].description"]').type('Peeling potatoes');
-      cy.get('input[name="items[0].amount"]').type('{selectall}4200');
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
+      cy.getByDataCy('expense-next').click();
+      // Fill the form with valid data
+      cy.get('input[name="description"]').type('March invoice');
+      cy.get('input[name="items[0].description"]').type('Peeling potatoes');
+      cy.get('input[name="items[0].amount"]').type('{selectall}4200');
 
       // Switch to receipt and acnkowledge error
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
+      cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-summary-btn').click();
       cy.getByDataCy('attachment-url-field').should('contain', 'Receipt required');
     });

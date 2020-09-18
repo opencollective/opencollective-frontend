@@ -347,6 +347,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
     type
     expensePolicy
     settings
+    currency
     location {
       address
       country
