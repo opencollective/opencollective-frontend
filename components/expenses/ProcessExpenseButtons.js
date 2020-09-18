@@ -70,6 +70,11 @@ const ProcessExpenseButtons = ({
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
 
   const triggerAction = async (action, paymentParams) => {
+    // Prevent submitting the action if another one is being submitted at the same time
+    if (loading) {
+      return;
+    }
+
     setSelectedAction(action);
 
     try {
