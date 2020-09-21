@@ -183,6 +183,11 @@ interface Account {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+
+  """
+  Categories set by Open Collective to help moderation.
+  """
+  categories: [String]!
   stats: AccountStats
 }
 
@@ -632,6 +637,7 @@ type Bot implements Account {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  categories: [String]!
   stats: AccountStats
 }
 
@@ -828,6 +834,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  categories: [String]!
   stats: AccountStats
 
   """
@@ -2453,7 +2460,9 @@ type Credit implements Transaction {
   type: TransactionType
   description: String
   amount: Amount!
+  amountInHostCurrency: Amount!
   netAmount: Amount!
+  taxAmount: Amount!
   platformFee: Amount!
   hostFee: Amount!
   paymentProcessorFee: Amount!
@@ -2470,6 +2479,10 @@ type Credit implements Transaction {
   The permissions given to current logged in user for this transaction
   """
   permissions: TransactionPermissions!
+
+  """
+  Account that emitted the gift card used for this transaction (if any)
+  """
   giftCardEmitterAccount: Account
   fromAccount: Account
   toAccount: Account
@@ -2635,7 +2648,9 @@ type Debit implements Transaction {
   type: TransactionType
   description: String
   amount: Amount!
+  amountInHostCurrency: Amount!
   netAmount: Amount!
+  taxAmount: Amount!
   platformFee: Amount!
   hostFee: Amount!
   paymentProcessorFee: Amount!
@@ -2652,6 +2667,10 @@ type Debit implements Transaction {
   The permissions given to current logged in user for this transaction
   """
   permissions: TransactionPermissions!
+
+  """
+  Account that emitted the gift card used for this transaction (if any)
+  """
   giftCardEmitterAccount: Account
   fromAccount: Account
   toAccount: Account
@@ -2826,6 +2845,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  categories: [String]!
   stats: AccountStats
 
   """
@@ -3595,6 +3615,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  categories: [String]!
   stats: AccountStats
 
   """
@@ -3842,6 +3863,7 @@ type Host implements Account {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  categories: [String]!
   stats: AccountStats
   hostFeePercent: Int
   totalHostedCollectives: Int
@@ -4139,6 +4161,7 @@ type Individual implements Account {
     - Hosts can see the address of users submitting expenses to their collectives
   """
   location: Location
+  categories: [String]!
   stats: AccountStats
   firstName: String
   lastName: String
@@ -4762,6 +4785,7 @@ type Order {
   legacyId: Int!
   description: String
   amount: Amount!
+  quantity: Int
   status: OrderStatus
   frequency: ContributionFrequency
   tier: Tier
@@ -4788,6 +4812,7 @@ type Order {
   Platform contribution attached to the Order.
   """
   platformContributionAmount: Amount
+  taxes: [OrderTax]!
 
   """
   This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
@@ -4881,6 +4906,11 @@ enum OrderStatus {
   PENDING
   PLEDGED
   REQUIRE_CLIENT_CONFIRMATION
+}
+
+type OrderTax {
+  type: OrderTaxType!
+  percentage: Int!
 }
 
 """
@@ -5094,6 +5124,7 @@ type Organization implements Account {
     - Hosts can see the address of organizations submitting expenses to their collectives
   """
   location: Location
+  categories: [String]!
   stats: AccountStats
 
   """
@@ -5440,6 +5471,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  categories: [String]!
   stats: AccountStats
 
   """
@@ -5759,6 +5791,11 @@ type Query {
     account: AccountReferenceInput
 
     """
+    Reference of the host where this expense was submitted
+    """
+    host: AccountReferenceInput
+
+    """
     Only expenses that match these tags
     """
     tags: [String]
@@ -5782,6 +5819,11 @@ type Query {
     Only return expenses that were created after this date
     """
     dateFrom: ISODateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: ISODateTime
 
     """
     The term to search
@@ -5861,6 +5903,7 @@ type Tier {
   customFields: JSON
   amountType: TierAmountType!
   minimumAmount: Amount!
+  endsAt: ISODateTime
 }
 
 enum TierAmountType {
@@ -5914,7 +5957,9 @@ interface Transaction {
   type: TransactionType
   description: String
   amount: Amount!
+  amountInHostCurrency: Amount!
   netAmount: Amount!
+  taxAmount: Amount!
   platformFee: Amount!
   hostFee: Amount
   paymentProcessorFee: Amount

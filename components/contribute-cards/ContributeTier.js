@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, getPrecisionFromAmount } from '../../lib/currency-utils';
+import { isTierExpired } from '../../lib/tier-utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -47,7 +48,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
   const minAmount = isFlexibleAmount ? tier.minimumAmount : tier.amount;
   const raised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
-  const isPassed = tier.endsAt && new Date() > new Date(tier.endsAt);
+  const isPassed = isTierExpired(tier);
   const tierType = getContributionTypeFromTier(tier, isPassed);
 
   let description;
