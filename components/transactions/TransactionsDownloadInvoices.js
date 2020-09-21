@@ -161,6 +161,7 @@ const TransactionsDownloadInvoices = ({ collective }) => {
             controlStyles={{ height: '30px', minHeight: 'auto' }}
             placeholder={interval === 'monthly' ? 'Select Month' : 'Select Year'}
             hideDropdownIndicator
+            menuPortalTarget={null}
           />
         </Box>
       </PopupMenu>
