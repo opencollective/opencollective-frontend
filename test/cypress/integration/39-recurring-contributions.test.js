@@ -1,4 +1,4 @@
-describe.skip('Recurring contributions', () => {
+describe('Recurring contributions', () => {
   let user;
 
   before(() => {
@@ -29,21 +29,13 @@ describe.skip('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-menu-payment-option').click();
       cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
       cy.getByDataCy('recurring-contribution-add-pm-button').click();
-      cy.wait(5000);
-      cy.fillStripeInput({
-        card: { creditCardNumber: 5555555555554444, expirationDate: '07/23', cvcCode: 713, postalCode: 12345 },
-      });
-      cy.server();
-      // no third argument, we don't want to stub the response, we just want to wait on it
-      cy.route('POST', '/api/graphql/v2').as('cardadded');
+      cy.wait(2000);
+      cy.fillStripeInput();
       cy.getByDataCy('recurring-contribution-submit-pm-button').click();
-      cy.wait('@cardadded', { responseTimeout: 15000 }).its('status').should('eq', 200);
-      cy.contains('[data-cy="recurring-contribution-pm-box"]', 'MASTERCARD **** 4444').within(() => {
+      cy.contains('[data-cy="recurring-contribution-pm-box"]', 'VISA **** 4242').within(() => {
         cy.getByDataCy('radio-select').check();
       });
-      cy.route('POST', '/api/graphql/v2').as('updatepm');
       cy.getByDataCy('recurring-contribution-update-pm-button').click();
-      cy.wait('@updatepm', { responseTimeout: 15000 }).its('status').should('eq', 200);
       cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been updated.');
     });
   });
@@ -56,10 +48,7 @@ describe.skip('Recurring contributions', () => {
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Backers').within(() => {
         cy.getByDataCy('radio-select').check();
       });
-      cy.server();
-      cy.route('POST', '/api/graphql/v2').as('updateorder');
       cy.getByDataCy('recurring-contribution-update-order-button').click();
-      cy.wait('@updateorder', { responseTimeout: 15000 }).its('status').should('eq', 200);
       cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been updated.');
       cy.getByDataCy('recurring-contribution-amount-contributed').contains('$2.00 USD / month');
     });
