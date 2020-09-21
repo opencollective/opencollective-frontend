@@ -25,14 +25,14 @@ describe('Archive Collective', () => {
         cy.contains('This collective has been archived');
 
         // test to confirm expenses cannot be submitted for an archived collective
-        cy.visit(`${collectiveSlug}/expenses/legacy`);
+        cy.visit(`${collectiveSlug}/expenses`);
         cy.get('[data-cy=submit-expense-btn]').should('not.exist');
 
         cy.visit(`${collectiveSlug}`);
         cy.get('[data-cy=submit-expense-btn]').should('not.exist');
 
-        cy.visit(`${collectiveSlug}/expenses/new/legacy`);
-        cy.get('.CreateExpenseForm').contains('Cannot submit expenses for an archived collective.');
+        cy.visit(`${collectiveSlug}/expenses/new`);
+        cy.contains('This feature is not activated for this collective.');
       });
     });
   });
