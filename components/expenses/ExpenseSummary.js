@@ -11,11 +11,12 @@ import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import HTMLContent from '../HTMLContent';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
-import { H4, P, Span } from '../Text';
+import { Div, H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
@@ -155,23 +156,37 @@ const ExpenseSummary = ({
                 )}
                 <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
                   <Flex flexDirection="column" justifyContent="center">
-                    <Span color="black.900" fontWeight="500">
-                      {attachment.description || (
+                    <Div color="black.900" fontWeight="500">
+                      {attachment.description ? (
+                        isFundingRequest ? (
+                          <HTMLContent
+                            content={attachment.description}
+                            fontSize="12px"
+                            data-cy="comment-body"
+                            sanitize
+                            collapsable
+                          />
+                        ) : (
+                          attachment.description
+                        )
+                      ) : (
                         <Span color="black.500" fontStyle="italic">
                           <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
                         </Span>
                       )}
-                    </Span>
-                    <Span mt={1} fontSize="12px" color="black.500">
-                      <FormattedMessage
-                        id="withColon"
-                        defaultMessage="{item}:"
-                        values={{
-                          item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
-                        }}
-                      />{' '}
-                      <FormattedDate value={attachment.incurredAt} />
-                    </Span>
+                    </Div>
+                    {!isFundingRequest && (
+                      <Span mt={1} fontSize="12px" color="black.500">
+                        <FormattedMessage
+                          id="withColon"
+                          defaultMessage="{item}:"
+                          values={{
+                            item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+                          }}
+                        />{' '}
+                        <FormattedDate value={attachment.incurredAt} />
+                      </Span>
+                    )}
                   </Flex>
                   <P fontSize={15} color="black.600" mt={2} textAlign="right" ml={3}>
                     <FormattedMoneyAmount
