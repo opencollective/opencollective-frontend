@@ -386,6 +386,7 @@ const ExpenseFormBody = ({
                               {...inputProps}
                               {...field}
                               minHeight={100}
+                              data-cy="payee-address"
                               placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
                             />
                           )}

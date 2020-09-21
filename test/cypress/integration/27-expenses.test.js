@@ -133,6 +133,9 @@ describe('New expense flow', () => {
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
+      cy.getByDataCy('payee-country').click();
+      cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
+      cy.get('textarea[data-cy="payee-address"]').type('Street Name, 123');
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
       cy.getByDataCy('expense-next').click();
       // Fill the form with valid data
