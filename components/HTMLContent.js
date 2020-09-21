@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
 import { getLuminance } from 'polished';
+import { FormattedMessage } from 'react-intl';
+import sanitizeHtml from 'sanitize-html';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
@@ -26,6 +29,20 @@ export const isEmptyValue = value => {
   }
 };
 
+const getHTMLPreview = (html, characters = 50) => html.replace(/<\/?\w+>/g, '').slice(0, characters);
+
+const ReadFullLink = styled.a`
+  cursor: pointer;
+  font-size: 12px;
+  > svg {
+    vertical-align: baseline;
+  }
+`;
+
+const DisplayBox = styled.div`
+  display: inline;
+`;
+
 /**
  * `HTMLEditor`'s associate, this component will display raw HTML with some CSS
  * resets to ensure we don't mess with the styles. Content can be omitted if you're
@@ -35,8 +52,29 @@ export const isEmptyValue = value => {
  * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
  * always ensure `content` is properly sanitized!
  */
-const HTMLContent = styled(({ content, ...props }) => {
-  return content ? <div dangerouslySetInnerHTML={{ __html: content }} {...props} /> : <div {...props} />;
+const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
+  const [isOpen, setOpen] = React.useState(false);
+  if (!content) {
+    return <div {...props} />;
+  }
+  let __html = sanitize ? sanitizeHtml(content) : content;
+
+  if (collapsable && !isOpen) {
+    __html = getHTMLPreview(__html);
+  }
+
+  return (
+    <React.Fragment>
+      <DisplayBox dangerouslySetInnerHTML={{ __html }} {...props} />
+      &nbsp;
+      {!isOpen && collapsable && (
+        <ReadFullLink onClick={() => setOpen(true)} {...props}>
+          <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
+          <CaretDown size="10px" />
+        </ReadFullLink>
+      )}
+    </React.Fragment>
+  );
 })`
   /** Override global styles to match what we have in the editor */
   width: 100%;
@@ -119,10 +157,13 @@ const HTMLContent = styled(({ content, ...props }) => {
 HTMLContent.propTypes = {
   /** The HTML string. Makes sure this is sanitized properly! */
   content: PropTypes.string,
+  sanitize: PropTypes.bool,
+  collapsable: PropTypes.bool,
 };
 
 HTMLContent.defaultProps = {
   fontSize: '14px',
+  sanitize: false,
 };
 
 export default HTMLContent;
