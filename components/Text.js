@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 import { color, display, space, typography } from 'styled-system';
 
-import { cursor, textTransform, whiteSpace, wordBreak } from '../lib/styled-system-custom-properties';
+import { cursor, letterSpacing, textTransform, whiteSpace, wordBreak } from '../lib/styled-system-custom-properties';
 
 export const P = styled.p.attrs(props => ({
   // Overrides default margin Y to avoid global styles
@@ -16,6 +16,7 @@ export const P = styled.p.attrs(props => ({
   ${whiteSpace}
   ${wordBreak}
   ${cursor}
+  ${letterSpacing}
   ${props =>
     props.truncateOverflow &&
     css`
@@ -38,6 +39,8 @@ Span.defaultProps = {
   fontSize: 'inherit',
   lineHeight: 'inherit',
 };
+
+export const Div = P.withComponent('div');
 
 export const Label = P.withComponent('label');
 
