@@ -183,12 +183,12 @@ class CollectiveGoals extends React.Component {
             <StyledInputField name={this.fields[1].name} label={this.fields[1].label}>
               <StyledSelect
                 options={this.fields[1].options}
-                onChange={obj => this.editGoal(index, this.fields[1].name, obj)}
+                onChange={obj => this.editGoal(index, this.fields[1].name, obj.value)}
                 isSearchable={false}
                 defaultValue={
-                  defaultValues[this.fields[1].name] && {
-                    value: defaultValues[this.fields[1].name],
-                    label: intl.formatMessage(this.messages[defaultValues[this.fields[1].name]]),
+                  goal.type && {
+                    value: goal.type,
+                    label: intl.formatMessage(this.messages[goal.type]),
                   }
                 }
               />
