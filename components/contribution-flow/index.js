@@ -870,8 +870,8 @@ class CreateOrderPage extends React.Component {
       ['20%', 0.2],
     ]);
     const platformFeeArray = Array.from(map, x => ({
-      label: `${formatCurrency(x[1] * amount, this.getCurrency())} (${x[0]})`,
-      value: x[1] * amount,
+      label: `${formatCurrency(Math.round(x[1] * amount), this.getCurrency())} (${x[0]})`,
+      value: Math.round(x[1] * amount),
     }));
     platformFeeArray.push(
       { label: this.props.intl.formatMessage(messages.platformFeeNoContribution), value: 0 },
@@ -1030,9 +1030,8 @@ class CreateOrderPage extends React.Component {
                                   ...state.stepDetails,
                                   platformFee: {
                                     ...state.stepDetails.platformFee,
-                                    value: value,
+                                    value: Math.round(value),
                                   },
-                                  totalAmount: state.stepDetails.amount + value,
                                 },
                               }));
                             }}
