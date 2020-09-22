@@ -640,6 +640,19 @@ class ContributionFlow extends React.Component {
   }
 }
 
+const orderSuccessHostFragment = gqlV2/* GraphQL */ `
+  fragment OrderSuccessHostFragment on Host {
+    id
+    settings
+    bankAccount {
+      id
+      name
+      data
+      type
+    }
+  }
+`;
+
 export const orderSuccessFragment = gqlV2/* GraphQL */ `
   fragment OrderSuccessFragment on Order {
     id
@@ -668,6 +681,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       id
       name
       slug
+      isHost
       ... on AccountWithContributions {
         contributors {
           totalCount
@@ -675,18 +689,22 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       }
       ... on AccountWithHost {
         host {
-          id
-          settings
-          payoutMethods {
-            id
-            name
-            data
-            type
+          ...OrderSuccessHostFragment
+        }
+      }
+      ... on Organization {
+        host {
+          ...OrderSuccessHostFragment
+          ... on AccountWithContributions {
+            contributors {
+              totalCount
+            }
           }
         }
       }
     }
   }
+  ${orderSuccessHostFragment}
 `;
 
 const orderResponseFragment = gqlV2/* GraphQL */ `

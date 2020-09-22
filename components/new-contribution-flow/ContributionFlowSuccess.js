@@ -136,7 +136,7 @@ class NewContributionFlowSuccess extends React.Component {
 
   renderBankTransferInformation = () => {
     const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
-    const bankAccount = get(this.props.data, 'order.toAccount.host.payoutMethods[0].data', null);
+    const bankAccount = get(this.props.data, 'order.toAccount.host.bankAccount.data', null);
     const amount =
       (get(this.props.data, 'order.amount.value') + get(this.props.data, 'order.platformContributionAmount.value', 0)) *
       100;
@@ -144,7 +144,7 @@ class NewContributionFlowSuccess extends React.Component {
     const formattedAmount = formatCurrency(amount, currency);
 
     const formatValues = {
-      account: formatAccountDetails(bankAccount),
+      account: bankAccount ? formatAccountDetails(bankAccount) : '',
       reference: get(this.props.data, 'order.id', null),
       amount: formattedAmount,
       collective: get(this.props.data, 'order.toAccount.name', null),
@@ -247,7 +247,7 @@ class NewContributionFlowSuccess extends React.Component {
                   <ShareLink
                     href={tweetURL({
                       url: shareURL,
-                      text: `I've just donated to {order.toAccount.name}`,
+                      text: `I've just donated to ${order.toAccount.name}`,
                     })}
                   >
                     <Twitter size="1.2em" color="#4E5052" />

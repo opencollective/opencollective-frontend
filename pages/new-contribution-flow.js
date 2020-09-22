@@ -197,7 +197,7 @@ class NewContributionFlowPage extends React.Component {
           <Loading />
         </Container>
       );
-    } else if (!account.host && !account.isHost) {
+    } else if (!account.host) {
       return this.renderMessage('info', intl.formatMessage(messages.missingHost));
     } else if (!account.isActive) {
       return this.renderMessage('info', intl.formatMessage(messages.inactiveCollective));
@@ -252,6 +252,26 @@ class NewContributionFlowPage extends React.Component {
   }
 }
 
+const hostFieldsFragment = gqlV2/* GraphQL */ `
+  fragment ContributionFlowHostFields on Host {
+    id
+    legacyId
+    slug
+    name
+    settings
+    location {
+      country
+    }
+    supportedPaymentMethods
+    payoutMethods {
+      id
+      name
+      data
+      type
+    }
+  }
+`;
+
 const accountFieldsFragment = gqlV2/* GraphQL */ `
   fragment ContributionFlowAccountFields on Account {
     id
@@ -270,6 +290,11 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     location {
       country
     }
+    ... on Organization {
+      host {
+        ...ContributionFlowHostFields
+      }
+    }
     ... on AccountWithContributions {
       platformFeePercent
       platformContributionAvailable
@@ -286,21 +311,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     ... on AccountWithHost {
       hostFeePercent
       host {
-        id
-        legacyId
-        slug
-        name
-        settings
-        location {
-          country
-        }
-        supportedPaymentMethods
-        payoutMethods {
-          id
-          name
-          data
-          type
-        }
+        ...ContributionFlowHostFields
       }
     }
     ... on Event {
@@ -324,6 +335,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
   }
+  ${hostFieldsFragment}
 `;
 
 const accountQuery = gqlV2/* GraphQL */ `

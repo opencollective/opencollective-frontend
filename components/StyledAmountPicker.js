@@ -94,7 +94,7 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
                     </ButtonText>
                   ) : (
                     <ButtonText isSelected={isSelected}>
-                      <Currency value={item} currency={currency} precision="auto" />
+                      <Currency value={item} currency={currency} abbreviate precision="auto" />
                     </ButtonText>
                   )
                 }
