@@ -179,14 +179,16 @@ class HostDashboardPage extends React.Component {
                 <ReceiptIcon size="1em" />
                 <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
               </MenuLink>
-              <MenuLink
-                route="host.dashboard"
-                params={{ hostCollectiveSlug: slug, view: 'expenses-legacy' }}
-                isActive={view === 'expenses-legacy'}
-              >
-                <FileInvoice size="1em" />
-                <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" /> (Legacy)
-              </MenuLink>
+              <Container display="none">
+                <MenuLink
+                  route="host.dashboard"
+                  params={{ hostCollectiveSlug: slug, view: 'expenses-legacy' }}
+                  isActive={view === 'expenses-legacy'}
+                >
+                  <FileInvoice size="1em" />
+                  <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" /> (Legacy)
+                </MenuLink>
+              </Container>
               <MenuLink
                 route="host.dashboard"
                 params={{ hostCollectiveSlug: slug, view: 'donations' }}
