@@ -29,7 +29,7 @@ export const isEmptyValue = value => {
   }
 };
 
-const getHTMLPreview = (html, characters = 50) => html.replace(/<\/?\w+>/g, '').slice(0, characters);
+const getFirstSentenceFromHTML = html => html.split?.(/<\/?\w+>/).filter(a => a.length)[0] || '';
 
 const ReadFullLink = styled.a`
   cursor: pointer;
@@ -60,20 +60,20 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
   let __html = sanitize ? sanitizeHtml(content) : content;
 
   if (collapsable && !isOpen) {
-    __html = getHTMLPreview(__html);
+    __html = getFirstSentenceFromHTML(__html);
   }
 
   return (
-    <React.Fragment>
-      <DisplayBox dangerouslySetInnerHTML={{ __html }} {...props} />
-      &nbsp;
+    <div>
+      <DisplayBox collapsed={collapsable && !isOpen} dangerouslySetInnerHTML={{ __html }} {...props} />
       {!isOpen && collapsable && (
         <ReadFullLink onClick={() => setOpen(true)} {...props}>
+          &nbsp;
           <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
           <CaretDown size="10px" />
         </ReadFullLink>
       )}
-    </React.Fragment>
+    </div>
   );
 })`
   /** Override global styles to match what we have in the editor */

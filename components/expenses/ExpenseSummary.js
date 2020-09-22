@@ -16,7 +16,7 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
-import { Div, H4, P, Span } from '../Text';
+import { H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
@@ -154,27 +154,29 @@ const ExpenseSummary = ({
                     />
                   </Box>
                 )}
-                <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
-                  <Flex flexDirection="column" justifyContent="center">
-                    <Div color="black.900" fontWeight="500">
-                      {attachment.description ? (
-                        isFundingRequest ? (
-                          <HTMLContent
-                            content={attachment.description}
-                            fontSize="12px"
-                            data-cy="comment-body"
-                            sanitize
-                            collapsable
-                          />
-                        ) : (
-                          attachment.description
-                        )
+                <Flex justifyContent="space-between" alignItems="baseline" flex="1">
+                  <Flex flexDirection="column" justifyContent="center" flexGrow="1">
+                    {attachment.description ? (
+                      isFundingRequest ? (
+                        <HTMLContent
+                          content={attachment.description}
+                          fontSize="12px"
+                          data-cy="comment-body"
+                          sanitize
+                          collapsable
+                          color="black.900"
+                          fontWeight="500"
+                        />
                       ) : (
-                        <Span color="black.500" fontStyle="italic">
-                          <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
+                        <Span as="div" color="black.900" fontWeight="500">
+                          {attachment.description}
                         </Span>
-                      )}
-                    </Div>
+                      )
+                    ) : (
+                      <Span color="black.500" fontStyle="italic">
+                        <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
+                      </Span>
+                    )}
                     {!isFundingRequest && (
                       <Span mt={1} fontSize="12px" color="black.500">
                         <FormattedMessage
