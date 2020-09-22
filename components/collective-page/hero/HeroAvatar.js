@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { Camera } from '@styled-icons/feather/Camera';
 import dynamic from 'next/dynamic';
@@ -10,10 +11,11 @@ import { upload } from '../../../lib/api';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
 
 import Avatar from '../../Avatar';
+import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
-import { Span } from '../../Text';
+import { P, Span } from '../../Text';
 import { editCollectiveAvatarMutation } from '../graphql/mutations';
 
 const AVATAR_SIZE = 128;
@@ -87,9 +89,12 @@ const Translations = defineMessages({
 
 const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
   const [editing, setEditing] = React.useState(false);
+  const [showRemove, setshowRemove] = React.useState(false);
+  const [showModal, setshowModal] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
+  const [editImage] = useMutation(editCollectiveAvatarMutation);
 
   const onDropImage = async ([image]) => {
     if (image) {
@@ -134,7 +139,15 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
           {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input data-cy="heroAvatarDropzone" {...getInputProps()} />
-              <EditableAvatarContainer isDragActive={isDragActive}>
+              <EditableAvatarContainer
+                isDragActive={isDragActive}
+                onMouseEnter={() => {
+                  setshowRemove(true);
+                }}
+                onMouseLeave={() => {
+                  setshowRemove(false);
+                }}
+              >
                 <EditOverlay borderRadius={borderRadius}>
                   {!isDragActive && (
                     <StyledButton buttonSize="tiny" minWidth={120}>
@@ -159,6 +172,67 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
             </div>
           )}
         </Dropzone>
+
+        <Container
+          onMouseEnter={() => {
+            setshowRemove(true);
+          }}
+          onMouseLeave={() => {
+            setshowRemove(false);
+          }}
+        >
+          {showRemove && (
+            <StyledButton
+              buttonSize="tiny"
+              minWidth={120}
+              css={{ position: 'absolute', marginTop: '-50px', marginLeft: '5px' }}
+              onClick={() => {
+                setshowModal(true);
+              }}
+            >
+              <Span ml={2} css={{ verticalAlign: 'center' }}>
+                <FormattedMessage id="HeroAvatar.Remove" defaultMessage="Remove logo" />
+              </Span>
+            </StyledButton>
+          )}
+        </Container>
+        {showModal && (
+          <ConfirmationModal
+            show={showModal}
+            width="100%"
+            maxWidth="570px"
+            onClose={() => {
+              setshowModal(false);
+            }}
+            header={<FormattedMessage id="heroavtar.remove" defaultMessage="Remove Logo?" />}
+            continueHandler={async () => {
+              setSubmitting(true); // Need this because `upload` is not a graphql function
+
+              try {
+                // console.log('imageURl is ',imgURL);
+                const imgURL = null;
+
+                // Update settings
+                await editImage({ variables: { id: collective.id, image: imgURL } });
+
+                // Reset
+                setUploadedImage(null);
+                setEditing(false);
+                setshowModal(false);
+              } finally {
+                setSubmitting(false);
+                handleHeroMessage(null);
+              }
+            }}
+          >
+            <P fontSize="14px" lineHeight="18px" mt={2}>
+              <FormattedMessage
+                id="HeroAvatar.Confirm.Remove"
+                defaultMessage="Do really want to remove your profile picture?"
+              />
+            </P>
+          </ConfirmationModal>
+        )}
       </Fragment>
     );
   } else {
