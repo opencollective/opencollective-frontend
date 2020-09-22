@@ -340,7 +340,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
 
 const accountQuery = gqlV2/* GraphQL */ `
   query ContributionFlowAccountQuery($collectiveSlug: String!) {
-    account(slug: $collectiveSlug) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
       ...ContributionFlowAccountFields
     }
   }
