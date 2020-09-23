@@ -1063,7 +1063,6 @@
   "loggingout": "se déconnecter",
   "login.askAnother": "Vous pouvez demander un nouveau lien en utilisant le formulaire ci-dessous.",
   "login.failed": "Connexion échouée : {message}.",
-  "login.warning.2fa": "Défi de sécurité : {message}.",
   "ManagedFunds": "Fonds gérés",
   "map.viewLarger": "Voir la carte plus grande",
   "Member.Role.ACCOUNTANT": "Accountant",

@@ -119,26 +119,17 @@ class SigninPage extends React.Component {
     }
 
     const error = errorLoggedInUser || this.state.error;
-    const warning = error ? error.includes('Two-factor authentication is enabled') : null;
 
     return (
       <React.Fragment>
-        {error && (
-          <MessageBox type={warning ? 'warning' : 'error'} withIcon mb={4} data-cy="signin-message-box">
+        {error && !error.includes('Two-factor authentication is enabled') && (
+          <MessageBox type="error" withIcon mb={4} data-cy="signin-message-box">
             <strong>
-              {warning ? (
-                <FormattedMessage
-                  id="login.warning.2fa"
-                  defaultMessage="Security challenge: {message}."
-                  values={{ message: error }}
-                />
-              ) : (
-                <FormattedMessage
-                  id="login.failed"
-                  defaultMessage="Sign In failed: {message}."
-                  values={{ message: error }}
-                />
-              )}
+              <FormattedMessage
+                id="login.failed"
+                defaultMessage="Sign In failed: {message}."
+                values={{ message: error }}
+              />
             </strong>
             <br />
             {!error?.includes('Two-factor authentication') && (
@@ -154,10 +145,9 @@ class SigninPage extends React.Component {
           form={form}
           routes={this.getRoutes()}
           enforceTwoFactorAuthForLoggedInUser={enforceTwoFactorAuthForLoggedInUser}
-          submitTwoFactorAuthenticatorCode={(values, actions) => {
+          submitTwoFactorAuthenticatorCode={values => {
             const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            this.props.login(localStorage2FAToken, values.twoFactorAuthenticatorCode);
-            actions.setSubmitting(false);
+            return this.props.login(localStorage2FAToken, values.twoFactorAuthenticatorCode);
           }}
         />
       </React.Fragment>
