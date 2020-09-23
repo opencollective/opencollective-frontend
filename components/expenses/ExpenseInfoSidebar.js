@@ -10,7 +10,7 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import { H5, P, Strong } from '../Text';
+import { H5, P, Span } from '../Text';
 
 import ExpandableExpensePolicies from './ExpandableExpensePolicies';
 
@@ -22,7 +22,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
   return (
     <Box width="100%">
       <Box display={['none', 'block']}>
-        <H5 mb={3}>
+        <H5 mb={3} textTransform="capitalize">
           <FormattedMessage
             id="CollectiveBalance"
             defaultMessage="{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}"
@@ -33,7 +33,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
         </H5>
         <Container
           borderLeft="1px solid"
-          borderColor="green.600"
+          borderColor="black.300"
           pl={3}
           fontSize="20px"
           color="black.500"
@@ -42,26 +42,31 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
           {isLoading && !collective?.balance ? (
             <LoadingPlaceholder height={28} width={75} />
           ) : (
-            <FormattedMoneyAmount
-              currency={collective.currency}
-              amount={collective.balance}
-              amountStyles={{ color: 'black.800' }}
-              precision={CurrencyPrecision.DEFAULT}
-            />
+            <Box>
+              <FormattedMoneyAmount
+                currency={collective.currency}
+                amount={collective.balance}
+                amountStyles={{ color: 'black.800' }}
+                precision={CurrencyPrecision.DEFAULT}
+              />
+              {host && (
+                <P fontSize="11px" color="black.600" mt={2}>
+                  <Span
+                    fontSize="9px"
+                    fontWeight="600"
+                    textTransform="uppercase"
+                    color="black.500"
+                    letterSpacing="0.06em"
+                  >
+                    <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
+                  </Span>
+                  <br />
+                  <LinkCollective collective={host}>{host.name}</LinkCollective>
+                </P>
+              )}
+            </Box>
           )}
         </Container>
-        {host && (
-          <P fontSize="11px" color="black.600" mt={2}>
-            <FormattedMessage
-              id="withColon"
-              defaultMessage="{item}:"
-              values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
-            />{' '}
-            <LinkCollective collective={host}>
-              <Strong color="black.600">{host.name}</Strong>
-            </LinkCollective>
-          </P>
-        )}
       </Box>
       {children && <Box my={50}>{children}</Box>}
       <ExpandableExpensePolicies host={host} collective={collective} mt={50} />

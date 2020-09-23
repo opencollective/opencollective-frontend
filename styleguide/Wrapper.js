@@ -10,6 +10,8 @@ import theme from '../lib/theme';
 import StripeProvider from '../components/StripeProvider';
 import UserProvider from '../components/UserProvider';
 
+import 'trix/dist/trix.css';
+
 const STRIPE_KEY = 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8';
 
 export default class ThemeWrapper extends Component {

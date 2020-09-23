@@ -38,10 +38,10 @@ CreatedByUserLink.propTypes = {
 const PrivateInfoColumn = styled(Box).attrs({ mx: [0, '8px'], flexBasis: [0, '200px'] })`
   margin-top: 42px;
   padding-top: 16px;
-  border-top: 1px solid ${themeGet('colors.black.400')};
+  border-top: 1px solid ${themeGet('colors.black.300')};
   ${({ borderless }) => (borderless ? 'border-top: none; padding-top: 0; margin-top: 0;' : '')}
   flex: 1 1;
-  min-width: 150px;
+  min-width: 200px;
 `;
 
 const PrivateInfoColumnHeader = styled(H4).attrs({
@@ -61,7 +61,11 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
   return isLoading ? (
     <LoadingPlaceholder height={150} mt={3} />
   ) : (
-    <Flex flexDirection={['column', 'row']} alignItems={['stretch', 'flex-start']}>
+    <Flex
+      flexDirection={['column', 'row']}
+      alignItems={['stretch', 'flex-start']}
+      flexWrap={['nowrap', 'wrap', null, 'nowrap']}
+    >
       <PrivateInfoColumn data-cy="expense-summary-payee" borderless={borderless}>
         <PrivateInfoColumnHeader>
           <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
