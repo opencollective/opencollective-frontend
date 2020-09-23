@@ -13,7 +13,6 @@ import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { isTierExpired } from '../../../lib/tier-utils';
 
 import { getCollectivePageQueryVariables } from '../../../pages/collective-page';
 import Container from '../../Container';
@@ -246,12 +245,7 @@ class SectionContribute extends React.PureComponent {
         waysToContribute.push({
           key: tier.id,
           Component: ContributeTier,
-          componentProps: {
-            collective,
-            tier,
-            hideContributors: hasNoContributor,
-            disableCTA: !canContribute || isTierExpired(tier),
-          },
+          componentProps: { collective, tier, hideContributors: hasNoContributor },
         });
       }
     });
