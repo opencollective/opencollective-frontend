@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import { Undo } from '@styled-icons/boxicons-regular/Undo';
+import { MinusCircle } from '@styled-icons/boxicons-regular/MinusCircle';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -13,27 +13,35 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 
-export const refundTransactionMutation = gqlV2/* GraphQL */ `
-  mutation RefundTransaction($transaction: TransactionReferenceInput!) {
-    refundTransaction(transaction: $transaction) {
+import TransactionRejectMessageForm from './TransactionRejectMessageForm';
+
+export const rejectTransactionMutation = gqlV2/* GraphQL */ `
+  mutation RejectTransaction($transaction: TransactionReferenceInput!, $message: String) {
+    rejectTransaction(transaction: $transaction, message: $message) {
       id
     }
   }
 `;
 
-const TransactionRefundButton = props => {
-  const [refundTransaction, { error: mutationError }] = useMutation(refundTransactionMutation, {
+const TransactionRejectButton = props => {
+  const [rejectTransaction, { error: mutationError }] = useMutation(rejectTransactionMutation, {
     context: API_V2_CONTEXT,
   });
   const [isEnabled, setEnabled] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [message, setMessage] = React.useState('');
 
   React.useEffect(() => {
     setError(mutationError);
   }, [mutationError]);
 
-  const handleRefundTransaction = async () => {
-    await refundTransaction({ variables: { transaction: { id: props.id } } });
+  const handleRejectTransaction = async () => {
+    await rejectTransaction({
+      variables: {
+        transaction: { id: props.id },
+        message,
+      },
+    });
     props.onMutationSuccess();
     setEnabled(false);
   };
@@ -46,16 +54,17 @@ const TransactionRefundButton = props => {
   const rejectButton = (
     <StyledButton
       buttonSize="small"
-      buttonStyle="secondary"
+      buttonStyle="dangerSecondary"
       minWidth={140}
       background="transparent"
       textTransform="capitalize"
       onClick={() => setEnabled(true)}
+      ml={props.canRefund ? 2 : 0}
       disabled={props.disabled}
     >
       <Flex alignItems="center" justifyContent="space-evenly">
-        <Undo size={16} />
-        <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
+        <MinusCircle size={16} />
+        <FormattedMessage id="actions.reject" defaultMessage="Reject" />
       </Flex>
     </StyledButton>
   );
@@ -81,37 +90,43 @@ const TransactionRefundButton = props => {
         <ConfirmationModal
           show={isEnabled}
           onClose={closeModal}
-          header={<FormattedMessage id="Refund" defaultMessage="Refund" />}
+          header={<FormattedMessage id="RejectContribution" defaultMessage="Reject and refund" />}
           body={
             <React.Fragment>
-              <Flex alignItems="center" justifyContent="center">
-                <MessageBox type="info" mx={2}>
+              <Flex flexDirection="column" alignItems="center" justifyContent="center">
+                <MessageBox type="warning" mx={2}>
                   <FormattedMessage
-                    id="transaction.refund.info"
-                    defaultMessage="This action will reimburse your contributor for the full amount of their contribution and they will still be a member of your Collective."
+                    id="transaction.reject.info"
+                    defaultMessage="Please only use this option if you do not wish for this contributor to be a part of your Collective. This will refund their transaction, remove them from your Collective, and display the contribution as 'rejected' in your ledger.{linebreak}{linebreak}If you are only trying to refund a mistaken transaction, please use the 'Refund' button instead."
+                    values={{
+                      linebreak: <br />,
+                    }}
                   />
                 </MessageBox>
                 {error && <MessageBoxGraphqlError mt="12px" error={error} />}
+                <TransactionRejectMessageForm message={message} onChange={message => setMessage(message)} />
               </Flex>
             </React.Fragment>
           }
           continueLabel={
             <Flex alignItems="center" justifyContent="space-evenly">
-              <Undo size={16} />
-              <FormattedMessage id="Refund" defaultMessage="Refund" />
+              <MinusCircle size={16} />
+              <FormattedMessage id="transaction.reject.yes.btn" defaultMessage="Yes, reject" />
             </Flex>
           }
-          continueHandler={handleRefundTransaction}
+          continueHandler={handleRejectTransaction}
+          isDanger
         />
       </Box>
     </Flex>
   );
 };
 
-TransactionRefundButton.propTypes = {
+TransactionRejectButton.propTypes = {
   id: PropTypes.string.isRequired,
+  canRefund: PropTypes.bool,
   disabled: PropTypes.bool,
   onMutationSuccess: PropTypes.func,
 };
 
-export default TransactionRefundButton;
+export default TransactionRejectButton;

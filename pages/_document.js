@@ -66,6 +66,7 @@ export default class IntlDocument extends Document {
       'ENABLE_GUEST_CONTRIBUTIONS',
       'IMAGES_URL',
       'NEW_CONTRIBUTION_FLOW',
+      'REJECT_CONTRIBUTION',
       'PAYPAL_ENVIRONMENT',
       'STRIPE_KEY',
       'SENTRY_DSN',

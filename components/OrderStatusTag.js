@@ -6,7 +6,13 @@ import { ORDER_STATUS } from '../lib/constants/order-status';
 
 import StyledTag from './StyledTag';
 
-const getExpenseStatusMsgType = (status, isRefund) => {
+const getExpenseStatusMsgType = (status, isRefund, isReject, isRejectedRefundTransaction) => {
+  if (isRejectedRefundTransaction) {
+    return 'success';
+  }
+  if (isReject) {
+    return 'error';
+  }
   if (isRefund) {
     return 'grey';
   }
@@ -63,10 +69,18 @@ const msg = defineMessages({
     id: 'Order.Status.Refunded',
     defaultMessage: 'Refunded',
   },
+  rejected: {
+    id: 'expense.rejected',
+    defaultMessage: 'Rejected',
+  },
 });
 
-const formatStatus = (intl, status, isRefund) => {
-  if (isRefund) {
+const formatStatus = (intl, status, isRefund, isReject, isRejectedRefundTransaction) => {
+  if (isRejectedRefundTransaction) {
+    return intl.formatMessage(msg.completed);
+  } else if (isReject) {
+    return intl.formatMessage(msg.rejected);
+  } else if (isRefund) {
     return intl.formatMessage(msg.refunded);
   } else if (status === ORDER_STATUS.ACTIVE || status === ORDER_STATUS.PAID) {
     return intl.formatMessage(msg.completed);
@@ -75,18 +89,18 @@ const formatStatus = (intl, status, isRefund) => {
   }
 };
 
-const OrderStatusTag = ({ status, isRefund, ...props }) => {
+const OrderStatusTag = ({ status, isRefund, isReject, isRejectedRefundTransaction, ...props }) => {
   const intl = useIntl();
   return (
     <StyledTag
-      type={getExpenseStatusMsgType(status, isRefund)}
+      type={getExpenseStatusMsgType(status, isRefund, isReject, isRejectedRefundTransaction)}
       fontWeight="600"
       letterSpacing="0.8px"
       textTransform="uppercase"
       data-cy="expense-status-msg"
       {...props}
     >
-      {formatStatus(intl, status, isRefund)}
+      {formatStatus(intl, status, isRefund, isReject, isRejectedRefundTransaction)}
     </StyledTag>
   );
 };
@@ -94,6 +108,8 @@ const OrderStatusTag = ({ status, isRefund, ...props }) => {
 OrderStatusTag.propTypes = {
   status: PropTypes.oneOf(Object.values(ORDER_STATUS)),
   isRefund: PropTypes.bool,
+  isReject: PropTypes.bool,
+  isRejectedRefundTransaction: PropTypes.bool,
 };
 
 export default OrderStatusTag;

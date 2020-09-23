@@ -31,7 +31,7 @@ import TransactionDetails from './TransactionDetails';
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
 
-const TransactionItem = ({ displayActions, collective, ...transaction }) => {
+const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
   const {
     toAccount,
     fromAccount,
@@ -45,6 +45,7 @@ const TransactionItem = ({ displayActions, collective, ...transaction }) => {
     createdAt,
     isRefunded,
     isRefund,
+    isRejected,
   } = transaction;
   const { LoggedInUser } = useUser();
   const [isExpanded, setExpanded] = React.useState(false);
@@ -142,7 +143,7 @@ const TransactionItem = ({ displayActions, collective, ...transaction }) => {
                 <span data-cy="transaction-date">
                   <FormattedDate value={createdAt} />
                 </span>
-                {hasExpense && expense.comments?.totalCount && (
+                {hasExpense && expense.comments?.totalCount > 0 && (
                   <React.Fragment>
                     {INFO_SEPARATOR}
                     <span>
@@ -174,7 +175,17 @@ const TransactionItem = ({ displayActions, collective, ...transaction }) => {
                 {displayedAmount.currency}
               </Span>
             </Container>
-            {hasOrder && <OrderStatusTag status={'PAID'} isRefund={isRefunded} fontSize="9px" px="6px" py="2px" />}{' '}
+            {hasOrder && (
+              <OrderStatusTag
+                status={order.status}
+                isRefund={isRefunded}
+                isReject={isRejected}
+                isRejectedRefundTransaction={isRefund && isRejected}
+                fontSize="9px"
+                px="6px"
+                py="2px"
+              />
+            )}{' '}
             {hasExpense && <ExpenseStatusTag status={expense.status} fontSize="9px" px="6px" py="2px" />}
           </Flex>
         </Flex>
@@ -213,7 +224,15 @@ const TransactionItem = ({ displayActions, collective, ...transaction }) => {
           </Container>
         )}
       </Box>
-      {isExpanded && !hasExpense && <TransactionDetails {...transaction} displayActions={displayActions} />}
+      {isExpanded && !hasExpense && (
+        <TransactionDetails
+          displayActions={displayActions}
+          transaction={transaction}
+          isRoot={isRoot}
+          isHostAdmin={isHostAdmin}
+          onMutationSuccess={onMutationSuccess}
+        />
+      )}
       {isExpanded && hasExpense && (
         <ExpenseModal
           expense={transaction.expense}
@@ -229,60 +248,67 @@ const TransactionItem = ({ displayActions, collective, ...transaction }) => {
 TransactionItem.propTypes = {
   /* Display Refund and Download buttons in transactions */
   displayActions: PropTypes.bool,
-  isRefunded: PropTypes.bool,
-  isRefund: PropTypes.bool,
+  transaction: PropTypes.shape({
+    isRefunded: PropTypes.bool,
+    isRefund: PropTypes.bool,
+    isRejected: PropTypes.bool,
+    fromAccount: PropTypes.shape({
+      id: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string,
+    }).isRequired,
+    toAccount: PropTypes.shape({
+      id: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string,
+    }),
+    giftCardEmitterAccount: PropTypes.shape({
+      id: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string,
+    }),
+    order: PropTypes.shape({
+      id: PropTypes.string,
+      status: PropTypes.string,
+    }),
+    expense: PropTypes.shape({
+      id: PropTypes.string,
+      status: PropTypes.string,
+      legacyId: PropTypes.number,
+      comments: PropTypes.shape({
+        totalCount: PropTypes.number,
+      }),
+    }),
+    id: PropTypes.string,
+    uuid: PropTypes.string,
+    type: PropTypes.string,
+    currency: PropTypes.string,
+    description: PropTypes.string,
+    createdAt: PropTypes.string,
+    hostFeeInHostCurrency: PropTypes.number,
+    platformFeeInHostCurrency: PropTypes.number,
+    paymentProcessorFeeInHostCurrency: PropTypes.number,
+    taxAmount: PropTypes.number,
+    amount: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }),
+    netAmount: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }),
+    netAmountInCollectiveCurrency: PropTypes.number,
+    refundTransaction: PropTypes.object,
+    usingVirtualCardFromCollective: PropTypes.object,
+  }),
   collective: PropTypes.shape({
     id: PropTypes.number,
     slug: PropTypes.string.isRequired,
   }).isRequired,
-  fromAccount: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string,
-  }).isRequired,
-  toAccount: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string,
-  }),
-  giftCardEmitterAccount: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string,
-  }),
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-  }),
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    legacyId: PropTypes.number,
-  }),
-  id: PropTypes.string,
-  uuid: PropTypes.string,
-  type: PropTypes.string,
-  currency: PropTypes.string,
-  description: PropTypes.string,
-  createdAt: PropTypes.string,
-  hostFeeInHostCurrency: PropTypes.number,
-  platformFeeInHostCurrency: PropTypes.number,
-  paymentProcessorFeeInHostCurrency: PropTypes.number,
-  taxAmount: PropTypes.number,
-  amount: PropTypes.shape({
-    valueInCents: PropTypes.number,
-    currency: PropTypes.string,
-  }),
-  netAmount: PropTypes.shape({
-    valueInCents: PropTypes.number,
-    currency: PropTypes.string,
-  }),
-  netAmountInCollectiveCurrency: PropTypes.number,
-  refundTransaction: PropTypes.object,
-  usingVirtualCardFromCollective: PropTypes.object,
+  onMutationSuccess: PropTypes.func,
 };
 
 export default TransactionItem;
