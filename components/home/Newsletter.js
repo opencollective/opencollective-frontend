@@ -42,7 +42,7 @@ const Newsletter = () => {
               defaultValue={LoggedInUser?.email}
               px={3}
               py={2}
-              minWidth={[121, 230]}
+              minWidth={[50, 200]}
               placeholder="Enter your email address"
               type="email"
               width={1}
