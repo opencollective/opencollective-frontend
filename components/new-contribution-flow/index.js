@@ -643,6 +643,7 @@ class ContributionFlow extends React.Component {
 const orderSuccessHostFragment = gqlV2/* GraphQL */ `
   fragment OrderSuccessHostFragment on Host {
     id
+    slug
     settings
     bankAccount {
       id
@@ -681,6 +682,8 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       id
       name
       slug
+      tags
+      type
       isHost
       ... on AccountWithContributions {
         contributors {

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import themeGet from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
+import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -11,7 +12,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Avatar from '../../components/Avatar';
 import Container from '../../components/Container';
-import { Flex } from '../../components/Grid';
+import { Box, Flex } from '../../components/Grid';
 import StyledButton from '../../components/StyledButton';
 import StyledInputField from '../../components/StyledInputField';
 import StyledTextarea from '../../components/StyledTextarea';
@@ -97,7 +98,6 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
                     border="none"
                     withOutline={false}
                     maxLength={PUBLIC_MESSAGE_MAX_LENGTH}
-                    minWidth={300}
                     minHeight={75}
                     fontSize="14px"
                     value={values.publicMessage}
@@ -112,19 +112,21 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
                 )}
               </StyledInputField>
 
-              <Flex flexGrow={1} mt={1} px={3}>
-                <Flex width={1 / 2} alignItems="center" justifyContent="flex-start">
+              <Flex flexGrow={1} mt={1} px={3} justifyContent="space-between">
+                <Flex alignItems="center" justifyContent="flex-start" minWidth={0} mr={1}>
                   <Avatar collective={stepProfile} radius={24} />
                   <Flex flexDirection="column" ml={2}>
                     <P fontSize="10px">
-                      <em>
-                        <FormattedMessage id="contribute.publicMessage.postingAs" defaultMessage="Posting as" />
-                      </em>
+                      <FormattedMessage id="contribute.publicMessage.postingAs" defaultMessage="Posting as" />
                     </P>
-                    <P fontSize="12px">{stepProfile.name}</P>
+                    <Box minWidth={0}>
+                      <P fontSize="12px" truncateOverflow title={stepProfile.name}>
+                        {truncate(stepProfile.name, { length: 25 })}
+                      </P>
+                    </Box>
                   </Flex>
                 </Flex>
-                <Flex width={1 / 2} alignItems="center" justifyContent="flex-end">
+                <Flex alignItems="center" justifyContent="flex-end">
                   <StyledButton
                     buttonSize="tiny"
                     loading={isSubmitting}

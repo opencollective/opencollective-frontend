@@ -6,7 +6,7 @@ import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
@@ -83,6 +83,25 @@ const SuccessIllustration = styled.img.attrs({ src: successIllustrationUrl })`
   margin-bottom: 16px;
 `;
 
+const successMsgs = defineMessages({
+  default: {
+    id: 'order.created.tweet',
+    defaultMessage: "I've just donated to {collective}. Consider donating too, every little helps!",
+  },
+  event: {
+    id: 'order.created.tweet.event',
+    defaultMessage: "I'm attending {event}. Join me!",
+  },
+});
+
+const getMainTag = collective => {
+  if (collective.host?.slug === 'opensource' || collective.tags?.includes('open source')) {
+    return 'open source';
+  } else if (collective.tags?.includes('covid-19')) {
+    return 'covid-19';
+  }
+};
+
 class NewContributionFlowSuccess extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
@@ -113,13 +132,6 @@ class NewContributionFlowSuccess extends React.Component {
         ))}
       </Flex>
     );
-  };
-
-  renderCommentForm = (LoggedInUser, publicMessage) => {
-    if (!LoggedInUser) {
-      return null;
-    }
-    return <PublicMessageForm order={this.props.data.order} publicMessage={publicMessage} />;
   };
 
   renderInstructions = (instructions, formatValues) => {
@@ -190,14 +202,20 @@ class NewContributionFlowSuccess extends React.Component {
   };
 
   render() {
-    const { LoggedInUser, collective, data } = this.props;
+    const { LoggedInUser, collective, data, intl } = this.props;
     const { order } = data;
-    const shareURL = `${process.env.WEBSITE_URL}${collective.path}`;
+    const shareURL = `${process.env.WEBSITE_URL}/${collective.slug}`;
     const pendingOrder = order && order.status === ORDER_STATUS.PENDING;
 
-    const getPublicMessage = order => {
-      return get(order, 'membership.publicMessage');
-    };
+    if (!data.loading && !order) {
+      return (
+        <Flex justifyContent="center" py={[5, 6]}>
+          <MessageBox type="warning" withIcon>
+            <FormattedMessage id="Order.NotFound" defaultMessage="This order doesn't exist" />
+          </MessageBox>
+        </Flex>
+      );
+    }
 
     return (
       <Flex
@@ -225,7 +243,7 @@ class NewContributionFlowSuccess extends React.Component {
                   <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
                 </H3>
                 <Box mb={3}>
-                  <P fontSize="20px" fontColor="black.700" fontWeight={500} textAlign="center">
+                  <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
                     <FormattedMessage
                       id="NewContributionFlow.Success.NowSupporting"
                       defaultMessage="You are now supporting {collective}."
@@ -235,30 +253,39 @@ class NewContributionFlowSuccess extends React.Component {
                 </Box>
                 <ContributorCardWithTier width={250} height={380} contribution={order} my={2} />
                 <Box my={4}>
-                  <P fontColor="black.800" fontWeight={500}>
-                    <FormattedMessage
-                      id="NewContributionFlow.Success.DiscoverMore"
-                      defaultMessage="Discover more Collectives like {collective} &rarr;"
-                      values={{ collective: order.toAccount.name }}
-                    />
-                  </P>
+                  <Link route="discover" params={{ show: getMainTag(order.toAccount) }}>
+                    <P color="black.800" fontWeight={500}>
+                      <FormattedMessage
+                        id="NewContributionFlow.Success.DiscoverMore"
+                        defaultMessage="Discover more Collectives like {collective} &rarr;"
+                        values={{ collective: order.toAccount.name }}
+                      />
+                    </P>
+                  </Link>
                 </Box>
                 <Flex justifyContent="center" mt={2}>
                   <ShareLink
                     href={tweetURL({
                       url: shareURL,
-                      text: `I've just donated to ${order.toAccount.name}`,
+                      text: intl.formatMessage(
+                        order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
+                        { collective: order.toAccount.name, event: order.toAccount.name },
+                      ),
                     })}
                   >
                     <Twitter size="1.2em" color="#4E5052" />
                     <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
                   </ShareLink>
-                  <ShareLink href={facebookShareURL({ url: shareURL })}>
+                  <ShareLink href={facebookShareURL({ u: shareURL })}>
                     <Facebook size="1.2em" color="#4E5052" />
                     <FormattedMessage id="shareIt" defaultMessage="Share it" />
                   </ShareLink>
                 </Flex>
-                {this.renderCommentForm(LoggedInUser, getPublicMessage(order))}
+                {LoggedInUser && (
+                  <Box px={1}>
+                    <PublicMessageForm order={order} publicMessage={get(order, 'membership.publicMessage')} />
+                  </Box>
+                )}
               </Flex>
             </ContainerWithImage>
             <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>

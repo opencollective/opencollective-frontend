@@ -89,7 +89,7 @@ const SuccessCTA = ({ type }) => {
   const { formatMessage } = useIntl();
   const isNewsletter = type === SUCCESS_CTA_TYPE.NEWSLETTER;
   return (
-    <Container mx={[3, 0]} my={3} maxWidth={600}>
+    <Container px={[3, 0]} my={3} maxWidth={600}>
       <SuccessCTAWrapper type={type}>
         <CTAContainer px={4} py={2} hoverable={!isNewsletter}>
           <Flex
