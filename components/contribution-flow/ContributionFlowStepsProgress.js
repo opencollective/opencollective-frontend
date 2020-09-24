@@ -83,7 +83,7 @@ const ContributionFlowStepsProgress = ({
             details = get(stepPayment, 'title', null);
           }
         } else if (step.name === 'summary') {
-          label = <FormattedMessage id="contribute.step.summary" defaultMessage="Summary" />;
+          label = <FormattedMessage id="Summary" defaultMessage="Summary" />;
         }
 
         return (

@@ -48,7 +48,7 @@ class ContributionFlowStepContainer extends React.Component {
         defaultMessage: 'Sign up to contribute recurrently',
       },
       payment: { id: 'NewContributionFlow.ChoosePaymentMethod', defaultMessage: 'Choose your payment method' },
-      summary: { id: 'contribute.step.summary', defaultMessage: 'Summary' },
+      summary: { id: 'Summary', defaultMessage: 'Summary' },
     });
   }
 

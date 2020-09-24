@@ -61,8 +61,6 @@ const TransactionDetails = ({
   onMutationSuccess,
 }) => {
   const intl = useIntl();
-  const isCredit = type === TransactionTypes.CREDIT;
-  const hasOrder = order !== null;
   const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice);
   const {
     id,
@@ -83,6 +81,8 @@ const TransactionDetails = ({
     isRejected,
     createdAt,
   } = transaction;
+  const isCredit = type === TransactionTypes.CREDIT;
+  const hasOrder = order !== null;
   // calculate 30 days ago from transaction
   const thirtyDaysInMillisecond = 1000 * 60 * 60 * 24 * 30;
   const transactionIsOlderThanThirtyDays = Date.parse(createdAt) < Date.now() - thirtyDaysInMillisecond;

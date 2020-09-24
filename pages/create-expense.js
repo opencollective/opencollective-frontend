@@ -9,6 +9,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
+import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -255,7 +256,7 @@ class CreateExpensePage extends React.Component {
                     {step === STEPS.FORM ? (
                       <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
                     ) : (
-                      <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
+                      <FormattedMessage id="Summary" defaultMessage="Summary" />
                     )}
                   </H1>
                   {data.loading || loadingLoggedInUser ? (
@@ -320,7 +321,11 @@ class CreateExpensePage extends React.Component {
                                 loading={this.state.isSubmitting}
                                 minWidth={175}
                               >
-                                <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                                {this.state.expense?.type === expenseTypes.FUNDING_REQUEST ? (
+                                  <FormattedMessage id="ExpenseForm.SubmitRequest" defaultMessage="Submit request" />
+                                ) : (
+                                  <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                                )}
                               </StyledButton>
                             </Flex>
                           </Box>
