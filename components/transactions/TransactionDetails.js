@@ -52,7 +52,14 @@ const DetailsContainer = styled(Flex)`
   }
 `;
 
-const TransactionDetails = ({ displayActions, transaction, isRoot, isHostAdmin, onMutationSuccess }) => {
+const TransactionDetails = ({
+  displayActions,
+  transaction,
+  isRoot,
+  isHostAdmin,
+  isToCollectiveAdmin,
+  onMutationSuccess,
+}) => {
   const intl = useIntl();
   const isCredit = type === TransactionTypes.CREDIT;
   const hasOrder = order !== null;
@@ -74,11 +81,21 @@ const TransactionDetails = ({ displayActions, transaction, isRoot, isHostAdmin, 
     order,
     expense,
     isRejected,
+    createdAt,
   } = transaction;
-  const userCanRejectOrRefund = isRoot || isHostAdmin;
+  // calculate 30 days ago from transaction
+  const thirtyDaysInMillisecond = 1000 * 60 * 60 * 24 * 30;
+  const transactionIsOlderThanThirtyDays = Date.parse(createdAt) < Date.now() - thirtyDaysInMillisecond;
+
+  // permissions
+  const collectiveAdminCanRefund = isToCollectiveAdmin && transactionIsOlderThanThirtyDays;
+  const userCanRejectOrRefund = isRoot || isHostAdmin || collectiveAdminCanRefund;
   const collectiveHasRejectContributionFeature = hasFeature(toAccount, FEATURES.REJECT_CONTRIBUTION);
   const showRejectContribution =
     parseToBoolean(getEnvVar('REJECT_CONTRIBUTION')) || collectiveHasRejectContributionFeature;
+  const showRefundButton = permissions?.canRefund && !isRefunded;
+  const showRejectButton = permissions?.canReject && !isRejected && showRejectContribution;
+  const showDownloadInvoiceButton = !showRefundButton && permissions?.canDownloadInvoice;
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
@@ -129,14 +146,14 @@ const TransactionDetails = ({ displayActions, transaction, isRoot, isHostAdmin, 
           {displayActions && ( // Let us overide so we can hide buttons in the collective page
             <React.Fragment>
               <Flex justifyContent="flex-end">
-                {permissions?.canRefund && !isRefunded && (
+                {showRefundButton && (
                   <TransactionRefundButton
                     id={id}
                     disabled={userCanRejectOrRefund}
                     onMutationSuccess={onMutationSuccess}
                   />
                 )}
-                {permissions?.canReject && !isRejected && showRejectContribution && (
+                {showRejectButton && (
                   <TransactionRejectButton
                     id={id}
                     canRefund={permissions?.canRefund && !isRefunded}
@@ -144,9 +161,7 @@ const TransactionDetails = ({ displayActions, transaction, isRoot, isHostAdmin, 
                     onMutationSuccess={onMutationSuccess}
                   />
                 )}
-              </Flex>
-              {!(permissions?.canRefund && !isRefunded) && // Just so we don't polute the UI, the Credit transaction will display the Download button
-                permissions?.canDownloadInvoice && (
+                {showDownloadInvoiceButton && (
                   <StyledButton
                     buttonSize="small"
                     loading={loadingInvoice}
@@ -154,11 +169,13 @@ const TransactionDetails = ({ displayActions, transaction, isRoot, isHostAdmin, 
                     minWidth={140}
                     background="transparent"
                     textTransform="capitalize"
+                    ml={showRejectButton ? 2 : 0}
                   >
                     {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
                     {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
                   </StyledButton>
                 )}
+              </Flex>
             </React.Fragment>
           )}
         </Box>
@@ -233,6 +250,7 @@ TransactionDetails.propTypes = {
   }),
   isHostAdmin: PropTypes.bool,
   isRoot: PropTypes.bool,
+  isToCollectiveAdmin: PropTypes.bool,
   onMutationSuccess: PropTypes.func,
 };
 
