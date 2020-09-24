@@ -24,7 +24,7 @@ const messages = defineMessages({
   tag: {
     id: 'Subscriptions.Status',
     defaultMessage:
-      '{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} other {}}',
+      '{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} other {}}',
   },
 });
 
@@ -40,7 +40,7 @@ const RecurringContributionsCard = ({
   const [showPopup, setShowPopup] = useState(false);
   const { formatMessage } = useIntl();
   const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
-  const isError = status === ORDER_STATUS.ERROR;
+  const isError = status === ORDER_STATUS.ERROR || status === ORDER_STATUS.REJECTED;
   const isActive = status === ORDER_STATUS.ACTIVE || isError;
 
   return (

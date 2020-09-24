@@ -21,6 +21,7 @@ const CollectiveCardContainer = styled.div`
 
 const filterContributions = (contributions, filterName) => {
   const isActive = ({ status }) => status === ORDER_STATUS.ACTIVE || status === ORDER_STATUS.ERROR;
+  const isInactive = ({ status }) => status === ORDER_STATUS.CANCELLED || status === ORDER_STATUS.REJECTED;
   switch (filterName) {
     case 'ACTIVE':
       return contributions.filter(isActive);
@@ -29,7 +30,7 @@ const filterContributions = (contributions, filterName) => {
     case 'YEARLY':
       return contributions.filter(contrib => isActive(contrib) && contrib.frequency === 'YEARLY');
     case 'CANCELLED':
-      return contributions.filter(contrib => contrib.status === ORDER_STATUS.CANCELLED);
+      return contributions.filter(isInactive);
     default:
       return [];
   }
