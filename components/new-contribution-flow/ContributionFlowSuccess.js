@@ -157,9 +157,11 @@ class NewContributionFlowSuccess extends React.Component {
 
     const formatValues = {
       account: bankAccount ? formatAccountDetails(bankAccount) : '',
-      reference: get(this.props.data, 'order.id', null),
+      reference: get(this.props.data, 'order.legacyId', null),
       amount: formattedAmount,
       collective: get(this.props.data, 'order.toAccount.name', null),
+      // Deprecated but still needed for compatibility
+      OrderId: get(this.props.data, 'order.legacyId', null),
     };
 
     return (

@@ -657,6 +657,7 @@ const orderSuccessHostFragment = gqlV2/* GraphQL */ `
 export const orderSuccessFragment = gqlV2/* GraphQL */ `
   fragment OrderSuccessFragment on Order {
     id
+    legacyId
     status
     frequency
     amount {
