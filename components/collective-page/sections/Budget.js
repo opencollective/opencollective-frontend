@@ -75,7 +75,12 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
 
         <Container flex="10" mb={3} width="100%" maxWidth={800}>
           <GraphQLContext.Provider value={budgetQueryResult}>
-            <TransactionsList collective={collective} transactions={data?.transactions?.nodes} displayActions />
+            <TransactionsList
+              collective={collective}
+              transactions={data?.transactions?.nodes}
+              displayActions
+              onMutationSuccess={() => refetch()}
+            />
           </GraphQLContext.Provider>
           <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
             <Box flex="1 1" mx={[0, 2]}>
