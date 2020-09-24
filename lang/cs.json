@@ -1064,7 +1064,6 @@
   "loggingout": "odhlašování",
   "login.askAnother": "You can ask for a new sign in link using the form below.",
   "login.failed": "Sign In failed: {message}.",
-  "login.warning.2fa": "Security challenge: {message}.",
   "ManagedFunds": "Managed funds",
   "map.viewLarger": "Zobrazit větší mapu",
   "Member.Role.ACCOUNTANT": "Accountant",

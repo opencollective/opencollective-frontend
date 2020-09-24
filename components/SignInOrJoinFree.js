@@ -158,7 +158,9 @@ class SignInOrJoinFree extends React.Component {
               twoFactorAuthenticatorCode: '',
             }}
             onSubmit={(values, actions) => {
-              this.props.submitTwoFactorAuthenticatorCode(values, actions);
+              this.props.submitTwoFactorAuthenticatorCode(values).then(() => {
+                actions.setSubmitting(false);
+              });
             }}
           >
             {formik => {
@@ -199,9 +201,9 @@ class SignInOrJoinFree extends React.Component {
                       minHeight="36px"
                       buttonStyle="primary"
                       type="submit"
-                      onSubmit={handleSubmit}
                       disabled={values.twoFactorAuthenticatorCode.length < 6}
                       loading={isSubmitting}
+                      onSubmit={handleSubmit}
                       data-cy="signin-two-factor-auth-button"
                     >
                       <FormattedMessage id="TwoFactorAuth.Setup.Form.VerifyButton" defaultMessage="Verify" />

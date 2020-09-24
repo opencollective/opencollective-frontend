@@ -87,6 +87,7 @@ class UserProvider extends React.Component {
         loadingLoggedInUser: false,
         errorLoggedInUser: null,
         LoggedInUser,
+        enforceTwoFactorAuthForLoggedInUser: false,
       });
       return LoggedInUser;
     } catch (error) {

@@ -1064,7 +1064,6 @@
   "loggingout": "desconectando",
   "login.askAnother": "Puede solicitar un nuevo enlace de inicio de sesión utilizando el siguiente formulario.",
   "login.failed": "Registro fallido: {message}.",
-  "login.warning.2fa": "Security challenge: {message}.",
   "ManagedFunds": "Fondos gestionados",
   "map.viewLarger": "View Larger Map",
   "Member.Role.ACCOUNTANT": "Accountant",

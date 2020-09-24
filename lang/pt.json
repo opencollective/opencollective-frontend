@@ -1064,7 +1064,6 @@
   "loggingout": "saindo",
   "login.askAnother": "Você pode pedir um novo link para entrar usando o formulário abaixo.",
   "login.failed": "Falha no login: {message}.",
-  "login.warning.2fa": "Security challenge: {message}.",
   "ManagedFunds": "Managed funds",
   "map.viewLarger": "Visualizar Mapa Maior",
   "Member.Role.ACCOUNTANT": "Accountant",
