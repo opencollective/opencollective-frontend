@@ -66,7 +66,7 @@ const stepsLabels = defineMessages({
     defaultMessage: 'Payment info',
   },
   summary: {
-    id: 'contribute.step.summary',
+    id: 'Summary',
     defaultMessage: 'Summary',
   },
 });

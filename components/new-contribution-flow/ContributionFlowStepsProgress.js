@@ -40,7 +40,7 @@ const STEP_LABELS = defineMessages({
     defaultMessage: 'Payment info',
   },
   summary: {
-    id: 'contribute.step.summary',
+    id: 'Summary',
     defaultMessage: 'Summary',
   },
 });

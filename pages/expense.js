@@ -380,7 +380,7 @@ class ExpensePage extends React.Component {
           </Container>
           <Box flex="1 1 650px" minWidth={300} maxWidth={792} mr={[null, 2, 3, 4, 5]} px={2} ref={this.expenseTopRef}>
             <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
-              <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
+              <FormattedMessage id="Summary" defaultMessage="Summary" />
             </H1>
             {error && (
               <MessageBox type="error" withIcon mb={4}>
