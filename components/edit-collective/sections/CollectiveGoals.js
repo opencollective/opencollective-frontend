@@ -187,8 +187,8 @@ class CollectiveGoals extends React.Component {
                 isSearchable={false}
                 defaultValue={
                   goal.type && {
-                    value: goal.type,
-                    label: intl.formatMessage(this.messages[goal.type]),
+                    value: goal.type.value || goal.type,
+                    label: intl.formatMessage(this.messages[goal.type.value || goal.type]),
                   }
                 }
               />
