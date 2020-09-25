@@ -41,6 +41,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         type
         imageUrl
         isIncognito
+        settings
         ... on Collective {
           host {
             name

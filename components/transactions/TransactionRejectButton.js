@@ -11,7 +11,6 @@ import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
-import StyledTooltip from '../StyledTooltip';
 
 import TransactionRejectMessageForm from './TransactionRejectMessageForm';
 
@@ -51,42 +50,23 @@ const TransactionRejectButton = props => {
     setError(null);
   };
 
-  const rejectButton = (
-    <StyledButton
-      buttonSize="small"
-      buttonStyle="dangerSecondary"
-      minWidth={140}
-      background="transparent"
-      textTransform="capitalize"
-      onClick={() => setEnabled(true)}
-      ml={props.canRefund ? 2 : 0}
-      disabled={props.disabled}
-    >
-      <Flex alignItems="center" justifyContent="space-evenly">
-        <MinusCircle size={16} />
-        <FormattedMessage id="actions.reject" defaultMessage="Reject" />
-      </Flex>
-    </StyledButton>
-  );
-
   return (
     <Flex flexDirection="column">
       <Box>
-        {props.disabled ? (
-          <StyledTooltip
-            type="light"
-            content={
-              <FormattedMessage
-                id="transaction.error.thirtydays"
-                defaultMessage="Collective admins cannot refund or reject contributions older than 30 days."
-              />
-            }
-          >
-            {rejectButton}
-          </StyledTooltip>
-        ) : (
-          rejectButton
-        )}
+        <StyledButton
+          buttonSize="small"
+          buttonStyle="dangerSecondary"
+          minWidth={140}
+          background="transparent"
+          textTransform="capitalize"
+          onClick={() => setEnabled(true)}
+          ml={props.canRefund ? 2 : 0}
+        >
+          <Flex alignItems="center" justifyContent="space-evenly">
+            <MinusCircle size={16} />
+            <FormattedMessage id="actions.reject" defaultMessage="Reject" />
+          </Flex>
+        </StyledButton>
         <ConfirmationModal
           show={isEnabled}
           onClose={closeModal}
@@ -125,7 +105,6 @@ const TransactionRejectButton = props => {
 TransactionRejectButton.propTypes = {
   id: PropTypes.string.isRequired,
   canRefund: PropTypes.bool,
-  disabled: PropTypes.bool,
   onMutationSuccess: PropTypes.func,
 };
 

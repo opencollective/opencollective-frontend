@@ -1541,7 +1541,6 @@
   "Transaction.by": "by {name}",
   "transaction.details": "取引の詳細",
   "transaction.downloadPDF": "ダウンロード (PDF)",
-  "transaction.error.thirtydays": "Collective admins cannot refund or reject contributions older than 30 days.",
   "Transaction.from": "from {name}",
   "transaction.fxrate": "為替レート",
   "transaction.hostFeeInHostCurrency": "手数料 {percentage}",
