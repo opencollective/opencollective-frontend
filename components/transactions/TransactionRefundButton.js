@@ -11,7 +11,6 @@ import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
-import StyledTooltip from '../StyledTooltip';
 
 export const refundTransactionMutation = gqlV2/* GraphQL */ `
   mutation RefundTransaction($transaction: TransactionReferenceInput!) {
@@ -43,41 +42,22 @@ const TransactionRefundButton = props => {
     setError(null);
   };
 
-  const rejectButton = (
-    <StyledButton
-      buttonSize="small"
-      buttonStyle="secondary"
-      minWidth={140}
-      background="transparent"
-      textTransform="capitalize"
-      onClick={() => setEnabled(true)}
-      disabled={props.disabled}
-    >
-      <Flex alignItems="center" justifyContent="space-evenly">
-        <Undo size={16} />
-        <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
-      </Flex>
-    </StyledButton>
-  );
-
   return (
     <Flex flexDirection="column">
       <Box>
-        {props.disabled ? (
-          <StyledTooltip
-            type="light"
-            content={
-              <FormattedMessage
-                id="transaction.error.thirtydays"
-                defaultMessage="Collective admins cannot refund or reject contributions older than 30 days."
-              />
-            }
-          >
-            {rejectButton}
-          </StyledTooltip>
-        ) : (
-          rejectButton
-        )}
+        <StyledButton
+          buttonSize="small"
+          buttonStyle="secondary"
+          minWidth={140}
+          background="transparent"
+          textTransform="capitalize"
+          onClick={() => setEnabled(true)}
+        >
+          <Flex alignItems="center" justifyContent="space-evenly">
+            <Undo size={16} />
+            <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
+          </Flex>
+        </StyledButton>
         <ConfirmationModal
           show={isEnabled}
           onClose={closeModal}
@@ -110,7 +90,6 @@ const TransactionRefundButton = props => {
 
 TransactionRefundButton.propTypes = {
   id: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
   onMutationSuccess: PropTypes.func,
 };
 

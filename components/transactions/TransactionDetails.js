@@ -52,14 +52,7 @@ const DetailsContainer = styled(Flex)`
   }
 `;
 
-const TransactionDetails = ({
-  displayActions,
-  transaction,
-  isRoot,
-  isHostAdmin,
-  isToCollectiveAdmin,
-  onMutationSuccess,
-}) => {
+const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) => {
   const intl = useIntl();
   const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice);
   const {
@@ -79,17 +72,11 @@ const TransactionDetails = ({
     order,
     expense,
     isRejected,
-    createdAt,
   } = transaction;
   const isCredit = type === TransactionTypes.CREDIT;
   const hasOrder = order !== null;
-  // calculate 30 days ago from transaction
-  const thirtyDaysInMillisecond = 1000 * 60 * 60 * 24 * 30;
-  const transactionIsOlderThanThirtyDays = Date.parse(createdAt) < Date.now() - thirtyDaysInMillisecond;
 
   // permissions
-  const collectiveAdminCanRefund = isToCollectiveAdmin && transactionIsOlderThanThirtyDays;
-  const userCanRejectOrRefund = isRoot || isHostAdmin || collectiveAdminCanRefund;
   const collectiveHasRejectContributionFeature = hasFeature(toAccount, FEATURES.REJECT_CONTRIBUTION);
   const showRejectContribution =
     parseToBoolean(getEnvVar('REJECT_CONTRIBUTION')) || collectiveHasRejectContributionFeature;
@@ -146,18 +133,11 @@ const TransactionDetails = ({
           {displayActions && ( // Let us overide so we can hide buttons in the collective page
             <React.Fragment>
               <Flex justifyContent="flex-end">
-                {showRefundButton && (
-                  <TransactionRefundButton
-                    id={id}
-                    disabled={userCanRejectOrRefund}
-                    onMutationSuccess={onMutationSuccess}
-                  />
-                )}
+                {showRefundButton && <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />}
                 {showRejectButton && (
                   <TransactionRejectButton
                     id={id}
                     canRefund={permissions?.canRefund && !isRefunded}
-                    disabled={userCanRejectOrRefund}
                     onMutationSuccess={onMutationSuccess}
                   />
                 )}

@@ -1541,7 +1541,6 @@
   "Transaction.by": "by {name}",
   "transaction.details": "detalhes da transação",
   "transaction.downloadPDF": "Baixar (pdf)",
-  "transaction.error.thirtydays": "Collective admins cannot refund or reject contributions older than 30 days.",
   "Transaction.from": "from {name}",
   "transaction.fxrate": "taxa de câmbio",
   "transaction.hostFeeInHostCurrency": "{percentage} taxa do organizador",

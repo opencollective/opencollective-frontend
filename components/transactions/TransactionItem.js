@@ -228,9 +228,6 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         <TransactionDetails
           displayActions={displayActions}
           transaction={transaction}
-          isRoot={isRoot}
-          isHostAdmin={isHostAdmin}
-          isToCollectiveAdmin={isToCollectiveAdmin}
           onMutationSuccess={onMutationSuccess}
         />
       )}
