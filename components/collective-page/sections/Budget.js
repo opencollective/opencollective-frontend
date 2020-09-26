@@ -23,7 +23,7 @@ import { withUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
-const budgetSectionQuery = gqlV2/* GraphQL */ `
+export const budgetSectionQuery = gqlV2/* GraphQL */ `
   query BudgetSection($slug: String!, $limit: Int!) {
     transactions(account: { slug: $slug }, limit: $limit) {
       ...TransactionsQueryCollectionFragment
@@ -32,13 +32,17 @@ const budgetSectionQuery = gqlV2/* GraphQL */ `
   ${transactionsQueryCollectionFragment}
 `;
 
+export const getBudgetSectionQueryVariables = slug => {
+  return { slug, limit: 3 };
+};
+
 /**
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
 const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
-    variables: { slug: collective.slug, limit: 3 },
+    variables: getBudgetSectionQueryVariables(collective.slug),
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;

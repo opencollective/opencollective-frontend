@@ -9,10 +9,10 @@ import { generateNotFoundError } from '../lib/errors';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
-import { collectivePageQuery } from '../components/collective-page/graphql/queries';
+import { preloadCollectivePageGraphlQueries } from '../components/collective-page/graphql/preload';
+import { collectivePageQuery, getCollectivePageQueryVariables } from '../components/collective-page/graphql/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
-import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
@@ -46,13 +46,15 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class CollectivePage extends React.Component {
-  static getInitialProps({ req, res, query: { slug, status, step, mode } }) {
+  static async getInitialProps({ client, req, res, query: { slug, status, step, mode } }) {
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
 
+    // If on server side
     if (req) {
       req.noStyledJsx = true;
+      await preloadCollectivePageGraphlQueries(slug, client);
     }
 
     return { slug, status, step, mode };
@@ -218,13 +220,6 @@ class CollectivePage extends React.Component {
     );
   }
 }
-
-export const getCollectivePageQueryVariables = collectiveSlug => {
-  return {
-    slug: collectiveSlug,
-    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
-  };
-};
 
 const addCollectivePageData = graphql(collectivePageQuery, {
   options: props => ({

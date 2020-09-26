@@ -173,9 +173,14 @@ class SectionRecurringContributions extends React.Component {
 }
 
 const getData = graphql(recurringContributionsQuery, {
-  options: {
+  options: props => ({
     context: API_V2_CONTEXT,
-  },
+    variables: getRecurringContributionsSectionQueryVariables(props.slug),
+  }),
 });
+
+export const getRecurringContributionsSectionQueryVariables = slug => {
+  return { slug };
+};
 
 export default injectIntl(getData(SectionRecurringContributions));

@@ -14,7 +14,6 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
-import { getCollectivePageQueryVariables } from '../../../pages/collective-page';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
@@ -33,7 +32,7 @@ import { H3, H4, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
-import { collectivePageQuery } from '../graphql/queries';
+import { collectivePageQuery, getCollectivePageQueryVariables } from '../graphql/queries';
 import SectionTitle from '../SectionTitle';
 import TopContributors from '../TopContributors';
 

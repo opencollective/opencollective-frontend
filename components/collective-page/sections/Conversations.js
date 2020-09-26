@@ -15,7 +15,7 @@ import { P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
-const conversationsSectionQuery = gqlV2/* GraphQL */ `
+export const conversationsSectionQuery = gqlV2/* GraphQL */ `
   query ConversationsSection($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
@@ -98,9 +98,13 @@ class SectionConversations extends React.PureComponent {
 
 const addConversationsSectionData = graphql(conversationsSectionQuery, {
   options: props => ({
-    variables: { collectiveSlug: props.collective.slug },
+    variables: getConversationsSectionQueryVariables(props.collective.slug),
     context: API_V2_CONTEXT,
   }),
 });
+
+export const getConversationsSectionQueryVariables = slug => {
+  return { collectiveSlug: slug };
+};
 
 export default addConversationsSectionData(SectionConversations);

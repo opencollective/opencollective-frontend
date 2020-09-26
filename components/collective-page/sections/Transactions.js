@@ -37,7 +37,7 @@ const I18nFilters = defineMessages({
   },
 });
 
-const transactionsSectionQuery = gqlV2/* GraphQL */ `
+export const transactionsSectionQuery = gqlV2/* GraphQL */ `
   query TransactionsSection($slug: String!, $limit: Int!, $hasOrder: Boolean, $hasExpense: Boolean) {
     transactions(account: { slug: $slug }, limit: $limit, hasOrder: $hasOrder, hasExpense: $hasExpense) {
       ...TransactionsQueryCollectionFragment
@@ -46,13 +46,17 @@ const transactionsSectionQuery = gqlV2/* GraphQL */ `
   ${transactionsQueryCollectionFragment}
 `;
 
+export const getTransactionsSectionQueryVariables = slug => {
+  return { slug, limit: NB_DISPLAYED };
+};
+
 const ResetAnchor = styled.a`
   cursor: pointer;
 `;
 
 const SectionTransactions = props => {
   const transactionsQueryResult = useQuery(transactionsSectionQuery, {
-    variables: { slug: props.collective.slug, limit: NB_DISPLAYED },
+    variables: getTransactionsSectionQueryVariables(props.collective.slug),
     context: API_V2_CONTEXT,
     // We keep notifyOnNetworkStatusChange to remove the flash of collectiveHasNoTransactions bug
     // See https://github.com/apollographql/apollo-client/blob/9c80adf65ccbbb88ea5b9313c002f85976c225e3/src/core/ObservableQuery.ts#L274-L304
