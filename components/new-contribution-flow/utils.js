@@ -82,11 +82,13 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   };
 
   uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+    const sourceProviderType = paymentMethod.sourcePaymentMethod?.providerType ?? paymentMethod.providerType;
+
     if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.GIFT_CARD && paymentMethod.limitedToHosts) {
       return matchesHostCollectiveId(paymentMethod);
-    } else if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.PREPAID_BUDGET) {
+    } else if (sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.PREPAID_BUDGET) {
       return matchesHostCollectiveIdPrepaid(paymentMethod);
-    } else if (!hostHasStripe && paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD) {
+    } else if (!hostHasStripe && sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD) {
       return false;
     } else {
       return true;

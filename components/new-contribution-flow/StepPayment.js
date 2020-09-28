@@ -52,6 +52,10 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
         type
         expiryDate
         providerType
+        sourcePaymentMethod {
+          id
+          providerType
+        }
         balance {
           valueInCents
           currency
