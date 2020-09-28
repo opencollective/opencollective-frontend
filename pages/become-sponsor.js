@@ -3,6 +3,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import GiftOfGivingSection from '../components/become-a-sponsor/GiftOfGivingSection';
 import MoreFeaturesSection from '../components/become-a-sponsor/MoreFeaturesSection';
+import TransparencySection from '../components/become-a-sponsor/TransparencySection';
 import Page from '../components/Page';
 
 const menuItems = { pricing: true, howItWorks: true };
@@ -18,6 +19,7 @@ const BecomeASponsor = () => {
   const { formatMessage } = useIntl();
   return (
     <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+      <TransparencySection />
       <MoreFeaturesSection />
       <GiftOfGivingSection />
     </Page>
