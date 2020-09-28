@@ -24,7 +24,7 @@ const ConnectPaypalButton = ({ host, paymentMethod }) => {
     <React.Fragment>
       {error && (
         <Container color="red.500" fontSize="10px">
-          {error}
+          {error.message || 'Oops, something went wrong. Please try again.'}
         </Container>
       )}
       <StyledButton
