@@ -136,7 +136,7 @@ const MoreFeatures = () => (
           alt="Sustainers Kit Illustration"
         />
         <Illustration
-          display={[null, null, null, null, 'block']}
+          display={['none', null, null, null, 'block']}
           src="/static/images/become-a-sponsor/sustainerKit-illustration-lg.png"
           alt="Sustainers Kit Illustration"
         />
