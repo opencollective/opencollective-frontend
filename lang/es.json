@@ -415,6 +415,7 @@
   "ContributionFlow.highContributionInfoMessage": "Aunque te enviaremos un recibo de donación al correo electrónico, todavía estamos obligados a mantener una dirección física para donaciones de más de $5000 USD.",
   "ContributionFlow.lowContributionInfoMessage": "Every donation must be linked to an email account for legal reasons. Please provide a valid email.",
   "ContributionFlow.lowestContributionInfoMessage": "Por favor proporcione un correo electrónico válido, necesitamos enviarle un recibo de su donación.",
+  "ContributionFlow.noSupportedPaymentMethods": "There is no payment provider available",
   "ContributionFlow.OrganizationProfile": "Perfil de la organización",
   "ContributionFlow.PersonalProfile": "Perfil personal",
   "ContributionFlow.PublicContribution": "Su nombre y contribución serán públicos.",
