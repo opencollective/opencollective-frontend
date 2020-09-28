@@ -415,6 +415,7 @@
   "ContributionFlow.highContributionInfoMessage": "Bien que nous vous enverrons un reçu de don par mail, nous devons conserver une adresse pour les dons de plus de 5000 $ USD.",
   "ContributionFlow.lowContributionInfoMessage": "Chaque don doit être lié à un compte mail pour des raisons légales. Merci de fournir un mail valide.",
   "ContributionFlow.lowestContributionInfoMessage": "Veuillez fournir une adresse e-mail valide, nous devrons vous envoyer un reçu pour votre don.",
+  "ContributionFlow.noSupportedPaymentMethods": "There is no payment provider available",
   "ContributionFlow.OrganizationProfile": "Profil de l'Organisation",
   "ContributionFlow.PersonalProfile": "Profil personnel",
   "ContributionFlow.PublicContribution": "Votre nom et votre contribution seront publics.",
