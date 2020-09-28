@@ -245,7 +245,12 @@ class CreateExpensePage extends React.Component {
           <CollectiveNavbar collective={collective} isLoading={!collective} />
           <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>
             {!loadingLoggedInUser && !LoggedInUser && (
-              <ContainerOverlay p={2} top="0" position={['fixed', null, 'absolute']}>
+              <ContainerOverlay
+                py={[2, null, 6]}
+                top="0"
+                position={['fixed', null, 'absolute']}
+                justifyContent={['center', null, 'flex-start']}
+              >
                 <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
               </ContainerOverlay>
             )}
