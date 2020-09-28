@@ -84,6 +84,20 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.loadHost();
+  }
+
+  componentDidUpdate() {
+    this.loadHost();
+  }
+
+  loadHost() {
+    if (!this.state.organization && this.props.collective.host) {
+      this.setState({ organization: this.props.collective.host });
+    }
+  }
+
   // GraphQL functions
   addHost = async (collective, host) => {
     const collectiveInput = {
