@@ -1,5 +1,3 @@
-// TODO: REMOVE eslint-disable
-/* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
@@ -105,7 +103,17 @@ class NewContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
+    verb: PropTypes.string,
+    redirect: PropTypes.string,
+    description: PropTypes.string,
+    quantity: PropTypes.number,
+    totalAmount: PropTypes.number,
+    platformContribution: PropTypes.number,
+    interval: PropTypes.string,
     tierId: PropTypes.number,
+    customData: PropTypes.object,
+    contributeAs: PropTypes.string,
+    skipStepDetails: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -113,6 +121,7 @@ class NewContributionFlowPage extends React.Component {
       tier: PropTypes.object,
     }), // from withData
     intl: PropTypes.object,
+    loadStripe: PropTypes.func,
     router: PropTypes.object,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
