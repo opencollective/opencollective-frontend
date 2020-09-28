@@ -107,7 +107,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
                 defaultMessage="Type: {type}"
                 values={{ type: upperCase(payoutMethod.data.type) }}
               />
-              {renderObject(payoutMethod.data.details)}
+              {payoutMethod.data.details && renderObject(payoutMethod.data.details)}
             </Container>
           ) : isLoading ? (
             <LoadingPlaceholder height="1.5em" />
