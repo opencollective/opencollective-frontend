@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
-import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -122,7 +121,6 @@ class NewContributionFlowPage extends React.Component {
     }), // from withData
     intl: PropTypes.object,
     loadStripe: PropTypes.func,
-    router: PropTypes.object,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     step: PropTypes.oneOf(Object.values(STEPS)),
@@ -197,7 +195,7 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { router, data = {}, intl, step, LoggedInUser } = this.props;
+    const { data = {}, intl, step, LoggedInUser } = this.props;
     const { account, tier } = data;
 
     if (data.loading) {
@@ -239,7 +237,7 @@ class NewContributionFlowPage extends React.Component {
       return this.renderMessage('warning', intl.formatMessage(messages.expiredTier), true);
     } else if (account.settings.disableCustomContributions && !tier) {
       return this.renderMessage('warning', intl.formatMessage(messages.disableCustomContributions), true);
-    } else if (router.query.step === 'success') {
+    } else if (step === 'success') {
       return <NewContributionFlowSuccess collective={account} />;
     } else {
       return (
@@ -426,4 +424,4 @@ const addAccountWithTierData = graphql(accountWithTierQuery, {
 
 const addGraphql = compose(addAccountData, addAccountWithTierData);
 
-export default addGraphql(withUser(withRouter(injectIntl(withStripeLoader(NewContributionFlowPage)))));
+export default addGraphql(withUser(injectIntl(withStripeLoader(NewContributionFlowPage))));
