@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
+import { get, has } from 'lodash';
 import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
@@ -9,6 +10,7 @@ import { ThemeProvider } from 'styled-components';
 
 import theme from '../lib/theme';
 import withData from '../lib/withData';
+import { debugPerformance } from '../server/debug';
 
 import StripeProviderSSR from '../components/StripeProvider';
 import UserProvider from '../components/UserProvider';
@@ -54,6 +56,10 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   static async getInitialProps({ Component, ctx }) {
+    if (has(ctx, 'query.slug')) {
+      debugPerformance('_app: getInitialProps', get(ctx, 'query.slug'));
+    }
+
     try {
       let pageProps = {};
 
@@ -118,6 +124,10 @@ class OpenCollectiveFrontendApp extends App {
 
   render() {
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
+
+    if (has(pageProps, 'slug')) {
+      debugPerformance('_app: render', get(pageProps, 'slug'));
+    }
 
     const intl = createIntl({ locale, messages }, cache);
 

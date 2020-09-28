@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const cloudflareIps = require('cloudflare-ip/ips.json');
 const throng = require('throng');
 
+const { debugPerformance } = require('./debug');
 const intl = require('./intl');
 const logger = require('./logger');
 const loggerMiddleware = require('./logger-middleware');
@@ -32,6 +33,21 @@ const WORKERS = process.env.WEB_CONCURRENCY || 1;
 
 const start = id =>
   nextApp.prepare().then(() => {
+    app.use((req, res, next) => {
+      if (
+        !req.url.match(/^\/_/) &&
+        !req.url.match(/^\/static/) &&
+        !req.url.match(/^\/api/) &&
+        !req.url.match(/^\/favicon\.ico/)
+      ) {
+        debugPerformance(`Request in ${req.url}`);
+        res.on('finish', () => {
+          debugPerformance(`Request out ${req.url}`);
+        });
+      }
+      next();
+    });
+
     // app.buildId is only available after app.prepare(), hence why we setup here
     app.use(Sentry.Handlers.requestHandler());
 
@@ -57,4 +73,8 @@ const start = id =>
     });
   });
 
-throng({ workers: WORKERS, lifetime: Infinity }, start);
+if (WORKERS && WORKERS > 1) {
+  throng({ workers: WORKERS, lifetime: Infinity }, start);
+} else {
+  start(1);
+}

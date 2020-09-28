@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { createGlobalStyle } from 'styled-components';
 
 import { generateNotFoundError } from '../lib/errors';
+import { debugPerformance } from '../server/debug';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
@@ -47,6 +48,8 @@ const GlobalStyles = createGlobalStyle`
  */
 class CollectivePage extends React.Component {
   static getInitialProps({ req, res, query: { slug, status, step, mode } }) {
+    debugPerformance('CollectivePage: getInitialProps', slug);
+
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
@@ -145,6 +148,8 @@ class CollectivePage extends React.Component {
     const { showOnboardingModal } = this.state;
 
     const loading = data.loading && !data.Collective;
+
+    debugPerformance('CollectivePage: render', slug);
 
     if (!loading) {
       if (!data || data.error) {

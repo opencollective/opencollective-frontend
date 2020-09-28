@@ -2,6 +2,7 @@ const hyperwatch = require('@hyperwatch/hyperwatch');
 const expressBasicAuth = require('express-basic-auth');
 const expressWs = require('express-ws');
 
+const { debugPerformance } = require('./debug');
 const { parseToBooleanDefaultFalse } = require('./utils');
 
 const {
@@ -58,10 +59,12 @@ const load = async app => {
     req.hyperwatch.rawLog = req.hyperwatch.rawLog || lib.util.createLog(req, res);
     req.getAugmentedLog = async () => {
       if (!req.hyperwatch.augmentedLog) {
+        debugPerformance(`Hyperwatch start augment ${req.url}`);
         let log = req.hyperwatch.rawLog;
         for (const key of ['cloudflare', 'agent', 'hostname', 'identity']) {
           log = await modules.get(key).augment(log);
         }
+        debugPerformance(`Hyperwatch end augment ${req.url}`);
         req.hyperwatch.augmentedLog = log;
       }
       return req.hyperwatch.augmentedLog;
