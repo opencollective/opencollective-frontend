@@ -20,7 +20,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   CONNECTED_ACCOUNTS: 'connected-accounts',
   UPDATES: 'updates',
   CONVERSATIONS: 'conversations',
-  EXPENSES: 'expenses',
+  POLICIES: 'policies',
   EXPORT: 'export',
   HOST: 'host',
   MEMBERS: 'members',
@@ -69,9 +69,9 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.export',
     defaultMessage: 'Export',
   },
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: {
-    id: 'editCollective.menu.expenses',
-    defaultMessage: 'Expenses Policy',
+  [EDIT_COLLECTIVE_SECTIONS.POLICIES]: {
+    id: 'editCollective.menu.policies',
+    defaultMessage: 'Policies',
   },
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: {
     id: 'editCollective.expensesPayouts',
@@ -167,7 +167,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || (isCollective(c) && !isFund(c)),
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: c => isFeatureAllowed(c, FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: c => isFeatureAllowed(c, FEATURES.CONVERSATIONS) && !isFund(c),
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: c => isCollective(c) || isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.POLICIES]: c => isCollective(c) || isFund(c) || isHost(c),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: c => isCollective(c) || isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c =>
