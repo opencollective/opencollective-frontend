@@ -5222,6 +5222,11 @@ type PaymentMethod {
   """
   balance: Amount!
   account: Account
+
+  """
+  For gift cards, this field will return to the source payment method
+  """
+  sourcePaymentMethod: PaymentMethod
   data: JSON
   limitedToHosts: [Host]
   expiryDate: ISODateTime
@@ -5293,6 +5298,7 @@ enum PaymentMethodType {
   ACCOUNT_BALANCE
   PAYPAL
   BANK_TRANSFER
+  ADDED_FUNDS
 }
 
 """
@@ -6038,7 +6044,7 @@ interface Transaction {
   isRefund: Boolean
   paymentMethod: PaymentMethod
   permissions: TransactionPermissions
-  isRejected: Boolean
+  isRejected: Boolean!
   refundTransaction: Transaction
 }
 

@@ -415,6 +415,7 @@
   "ContributionFlow.highContributionInfoMessage": "While we'll email you a donation receipt, we are still required to keep an address for donations over $5000 USD.",
   "ContributionFlow.lowContributionInfoMessage": "Every donation must be linked to an email account for legal reasons. Please provide a valid email.",
   "ContributionFlow.lowestContributionInfoMessage": "Please provide a valid email, we need to send you a receipt for your donation.",
+  "ContributionFlow.noSupportedPaymentMethods": "There is no payment provider available",
   "ContributionFlow.OrganizationProfile": "Organization profile",
   "ContributionFlow.PersonalProfile": "Personal profile",
   "ContributionFlow.PublicContribution": "Your name and contribution will be public.",

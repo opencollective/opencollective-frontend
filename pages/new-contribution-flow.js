@@ -188,7 +188,7 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { router, data = {}, intl, step } = this.props;
+    const { router, data = {}, intl, step, LoggedInUser } = this.props;
     const { account, tier } = data;
 
     if (data.loading) {
@@ -201,6 +201,26 @@ class NewContributionFlowPage extends React.Component {
       return this.renderMessage('info', intl.formatMessage(messages.missingHost));
     } else if (!account.isActive) {
       return this.renderMessage('info', intl.formatMessage(messages.inactiveCollective));
+    } else if (!account.host.supportedPaymentMethods.length) {
+      const content = (
+        <React.Fragment>
+          <strong>
+            <FormattedMessage
+              id="ContributionFlow.noSupportedPaymentMethods"
+              defaultMessage="There is no payment provider available"
+            />
+          </strong>
+          <br />
+          {LoggedInUser?.isHostAdmin(account) && (
+            <Link route="accept-financial-contributions" params={{ slug: account.slug, path: 'organization' }}>
+              <StyledButton buttonStyle="primary" mt={3}>
+                <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
+              </StyledButton>
+            </Link>
+          )}
+        </React.Fragment>
+      );
+      return this.renderMessage('info', content);
     } else if (tier?.availableQuantity === 0) {
       const intlParams = { type: tier.type, name: <q>{tier.name}</q> };
       return this.renderMessage('info', intl.formatMessage(messages.emptyTier, intlParams), true);
