@@ -101,6 +101,7 @@ const ExpenseItemForm = ({
   requireDate,
   isRichText,
   name,
+  isOptional,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -122,7 +123,7 @@ const ExpenseItemForm = ({
                   htmlFor={attachmentKey}
                   label={<AttachmentLabel />}
                   data-cy="attachment-url-field"
-                  required
+                  required={!isOptional}
                   error={
                     meta.error?.type === ERROR.FORM_FIELD_REQUIRED
                       ? formatMessage(msg.receiptRequired)
@@ -154,7 +155,7 @@ const ExpenseItemForm = ({
             htmlFor={`${attachmentKey}-description`}
             label={formatMessage(msg.descriptionLabel)}
             labelFontSize="13px"
-            required
+            required={!isOptional}
           >
             {inputProps =>
               isRichText ? (
@@ -171,7 +172,7 @@ const ExpenseItemForm = ({
                 error={getError('incurredAt')}
                 htmlFor={`${attachmentKey}-incurredAt`}
                 inputType="date"
-                required
+                required={!isOptional}
                 label={formatMessage(msg.dateLabel)}
                 labelFontSize="13px"
                 flex={requireFile ? '1 1 44%' : '1 1 50%'}
@@ -196,7 +197,7 @@ const ExpenseItemForm = ({
               error={getError('amount')}
               htmlFor={`${attachmentKey}-amount`}
               label={formatMessage(msg.amountLabel)}
-              required
+              required={!isOptional}
               labelFontSize="13px"
               inputType="number"
               flex="1 1 30%"
@@ -256,6 +257,9 @@ ExpenseItemForm.propTypes = {
   requireFile: PropTypes.bool,
   /** Wether a date is required for this expense type */
   requireDate: PropTypes.bool,
+  /** Wheter this whole item is optional */
+  isOptional: PropTypes.bool,
+  /** True if description is HTML */
   isRichText: PropTypes.bool,
   /** Called when an attachment upload fails */
   onUploadError: PropTypes.func.isRequired,
@@ -267,6 +271,10 @@ ExpenseItemForm.propTypes = {
     incurredAt: PropTypes.string,
     amount: PropTypes.number,
   }).isRequired,
+};
+
+ExpenseItemForm.defaultProps = {
+  isOptional: false,
 };
 
 ExpenseItemForm.whyDidYouRender = true;
