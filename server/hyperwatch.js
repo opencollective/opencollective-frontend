@@ -26,6 +26,14 @@ const load = async app => {
       status: { active: true },
       // Expose logs (HTTP and Websocket)
       logs: { active: true },
+      // Extract IP address without complex fuss
+      cloudflare: { active: true },
+      // Parse User Agent
+      agent: { active: true },
+      // Get hostname (reverse IP) and verify it
+      hostname: { active: true },
+      // Compute identity (requires agent and hostname)
+      identity: { active: true },
     },
   });
 
@@ -52,22 +60,6 @@ const load = async app => {
   });
 
   app.use(expressInput.middleware());
-
-  app.use((req, res, next) => {
-    req.hyperwatch = req.hyperwatch || {};
-    req.hyperwatch.rawLog = req.hyperwatch.rawLog || lib.util.createLog(req, res);
-    req.getAugmentedLog = async () => {
-      if (!req.hyperwatch.augmentedLog) {
-        let log = req.hyperwatch.rawLog;
-        for (const key of ['cloudflare', 'agent', 'hostname', 'identity']) {
-          log = await modules.get(key).augment(log);
-        }
-        req.hyperwatch.augmentedLog = log;
-      }
-      return req.hyperwatch.augmentedLog;
-    };
-    next();
-  });
 
   pipeline.registerInput(expressInput);
 
