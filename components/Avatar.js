@@ -16,19 +16,19 @@ const StyledAvatar = styled(Flex).attrs(props => ({
 }))`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
-  ${color}
+  color: ${themeGet('colors.black.400')};
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: ${({ type }) => getAvatarBorderRadius(type)};
   ${border}
-  color: ${themeGet('colors.black.400')};
-  font-weight: bold;
+  font-weight: 600;
   justify-content: center;
   overflow: hidden;
   width: 64px;
   height: 64px;
   flex-shrink: 0;
+  ${color}
   ${space}
   ${layout}
 `;
