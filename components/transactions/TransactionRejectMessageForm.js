@@ -6,7 +6,7 @@ import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
 import { P } from '../Text';
 
-const MESSAGE_MAX_LENGTH = 70;
+const MESSAGE_MAX_LENGTH = 500;
 
 const messages = defineMessages({
   rejectionReason: {

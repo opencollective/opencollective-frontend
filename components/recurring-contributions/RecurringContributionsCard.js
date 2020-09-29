@@ -40,7 +40,8 @@ const RecurringContributionsCard = ({
   const [showPopup, setShowPopup] = useState(false);
   const { formatMessage } = useIntl();
   const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
-  const isError = status === ORDER_STATUS.ERROR || status === ORDER_STATUS.REJECTED;
+  const isError = status === ORDER_STATUS.ERROR;
+  const isRejected = status === ORDER_STATUS.REJECTED;
   const isActive = status === ORDER_STATUS.ACTIVE || isError;
 
   return (
@@ -49,7 +50,12 @@ const RecurringContributionsCard = ({
       collective={collective}
       bodyHeight="290px"
       tag={
-        <StyledTag display="inline-block" textTransform="uppercase" my={2} type={isError ? 'error' : undefined}>
+        <StyledTag
+          display="inline-block"
+          textTransform="uppercase"
+          my={2}
+          type={isError || isRejected ? 'error' : undefined}
+        >
           {formatMessage(messages.tag, { status })}
         </StyledTag>
       }
