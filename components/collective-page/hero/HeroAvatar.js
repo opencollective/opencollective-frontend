@@ -209,15 +209,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
               setSubmitting(true); // Need this because `upload` is not a graphql function
 
               try {
-                // console.log('imageURl is ',imgURL);
-                const imgURL = null;
-
-                // Update settings
-                await editImage({ variables: { id: collective.id, image: imgURL } });
-
-                // Reset
-                setUploadedImage(null);
-                setEditing(false);
+                await editImage({ variables: { id: collective.id, image: null,  } });
                 setshowModal(false);
               } finally {
                 setSubmitting(false);
