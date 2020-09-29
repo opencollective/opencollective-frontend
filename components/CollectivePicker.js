@@ -12,6 +12,7 @@ import { CollectiveType } from '../lib/constants/collectives';
 import { mergeRefs } from '../lib/react-utils';
 
 import Avatar from './Avatar';
+import { InviteCollectiveDropdownOption, InviteCollectiveForm } from './CollectivePickerInviteMenu';
 import CollectiveTypePicker from './CollectiveTypePicker';
 import Container from './Container';
 import CreateCollectiveMiniForm from './CreateCollectiveMiniForm';
@@ -65,7 +66,7 @@ export const DefaultCollectiveLabel = ({ value: collective }) => (
         {truncate(collective.name, { length: 40 })}
       </Span>
       <Span fontSize="11px" lineHeight="13px" color="black.500">
-        @{collective.slug}
+        {collective.isInvite ? collective.email : `@${collective.slug}`}
       </Span>
     </CollectiveLabelTextContainer>
   </Flex>
@@ -84,6 +85,12 @@ DefaultCollectiveLabel.propTypes = {
 // Some flags to differentiate options in the picker
 export const FLAG_COLLECTIVE_PICKER_COLLECTIVE = '__collective_picker_collective__';
 const FLAG_NEW_COLLECTIVE = '__collective_picker_new__';
+const FLAG_INVITE_NEW = '__collective_picker_invite_new__';
+
+export const CUSTOM_OPTIONS_POSITION = {
+  TOP: 'TOP',
+  BOTTOM: 'BOTTOM',
+};
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
@@ -101,6 +108,7 @@ class CollectivePicker extends React.PureComponent {
     this.containerRef = React.createRef();
     this.state = {
       createFormCollectiveType: null,
+      displayInviteMenu: null,
       menuIsOpen: props.menuIsOpen,
       createdCollectives: [],
       searchText: '',
@@ -151,40 +159,62 @@ class CollectivePicker extends React.PureComponent {
     });
   });
 
-  getAllOptions = memoizeOne((collectivesOptions, customOptions, createdCollectives, creatable, intl) => {
-    let options = collectivesOptions;
+  getAllOptions = memoizeOne(
+    (collectivesOptions, customOptions, createdCollectives, { creatable, invitable, intl, customOptionsPosition }) => {
+      let options = collectivesOptions;
 
-    if (createdCollectives.length > 0) {
-      options = [...createdCollectives.map(this.buildCollectiveOption), ...options];
-    }
+      if (createdCollectives.length > 0) {
+        options = [...createdCollectives.map(this.buildCollectiveOption), ...options];
+      }
 
-    if (customOptions && customOptions.length > 0) {
-      options = [...customOptions, ...options];
-    }
+      if (customOptions && customOptions.length > 0) {
+        options =
+          customOptionsPosition === CUSTOM_OPTIONS_POSITION.TOP
+            ? [...customOptions, ...options]
+            : [...options, ...customOptions];
+      }
 
-    if (creatable) {
-      const isOnlyForUser = isEqual(this.props.types, [CollectiveType.USER]);
-      options = [
-        ...options,
-        {
-          label: isOnlyForUser
-            ? intl.formatMessage(Messages.inviteNew).toUpperCase()
-            : intl.formatMessage(Messages.createNew).toUpperCase(),
-          options: [
-            {
-              label: null,
-              value: null,
-              isDisabled: true,
-              [FLAG_NEW_COLLECTIVE]: true,
-              __background__: 'white',
-            },
-          ],
-        },
-      ];
-    }
+      if (invitable) {
+        options = [
+          ...options,
+          {
+            label: intl.formatMessage(Messages.inviteNew).toUpperCase(),
+            options: [
+              {
+                label: null,
+                value: null,
+                isDisabled: true,
+                [FLAG_INVITE_NEW]: true,
+                __background__: 'white',
+              },
+            ],
+          },
+        ];
+      }
+      if (creatable) {
+        const isOnlyForUser = isEqual(this.props.types, [CollectiveType.USER]);
+        options = [
+          ...options,
+          {
+            label: isOnlyForUser
+              ? intl.formatMessage(Messages.inviteNew).toUpperCase()
+              : intl.formatMessage(Messages.createNew).toUpperCase(),
+            options: [
+              {
+                label: null,
+                value: null,
+                isDisabled: true,
+                [FLAG_NEW_COLLECTIVE]: true,
+                __background__: 'white',
+              },
+            ],
+          },
+        ];
+      }
 
-    return options;
-  });
+      return options;
+    },
+  );
 
   onChange = e => {
     this.props.onChange(e);
@@ -200,6 +230,10 @@ class CollectivePicker extends React.PureComponent {
 
   setCreateFormCollectiveType = type => {
     this.setState({ createFormCollectiveType: type || null });
+  };
+
+  setDisplayInviteMenu = isOpen => {
+    this.setState({ displayInviteMenu: isOpen || null, menuIsOpen: !isOpen });
   };
 
   getMenuIsOpen(menuIsOpenFromProps) {
@@ -239,7 +273,9 @@ class CollectivePicker extends React.PureComponent {
       intl,
       collectives,
       creatable,
+      invitable,
       customOptions,
+      customOptionsPosition,
       formatOptionLabel,
       getDefaultOptions,
       groupByType,
@@ -254,9 +290,14 @@ class CollectivePicker extends React.PureComponent {
       addLoggedInUserAsAdmin,
       ...props
     } = this.props;
-    const { createFormCollectiveType, createdCollectives, searchText } = this.state;
+    const { createFormCollectiveType, createdCollectives, displayInviteMenu, searchText } = this.state;
     const collectiveOptions = this.getOptionsFromCollectives(collectives, groupByType, sortFunc, intl);
-    const allOptions = this.getAllOptions(collectiveOptions, customOptions, createdCollectives, creatable, intl);
+    const allOptions = this.getAllOptions(collectiveOptions, customOptions, createdCollectives, {
+      creatable,
+      invitable,
+      intl,
+      customOptionsPosition,
+    });
 
     const prefillValue = isEmail(searchText) ? { email: searchText } : { name: searchText };
 
@@ -275,7 +316,7 @@ class CollectivePicker extends React.PureComponent {
                 options={allOptions}
                 defaultValue={getDefaultOptions && getDefaultOptions(this.buildCollectiveOption, allOptions)}
                 menuIsOpen={this.getMenuIsOpen(menuIsOpen)}
-                isDisabled={Boolean(createFormCollectiveType) || isDisabled}
+                isDisabled={Boolean(createFormCollectiveType) || displayInviteMenu || isDisabled}
                 onMenuOpen={this.openMenu}
                 onMenuClose={this.closeMenu}
                 value={this.getValue()}
@@ -285,6 +326,15 @@ class CollectivePicker extends React.PureComponent {
                     return formatOptionLabel(option, context);
                   } else if (option[FLAG_NEW_COLLECTIVE]) {
                     return <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={types} />;
+                  } else if (option[FLAG_INVITE_NEW]) {
+                    return (
+                      <InviteCollectiveDropdownOption
+                        onClick={() => {
+                          this.setDisplayInviteMenu(true);
+                          onChange?.({ label: null, value: null });
+                        }}
+                      />
+                    );
                   } else {
                     return option.label;
                   }
@@ -295,7 +345,7 @@ class CollectivePicker extends React.PureComponent {
             </Container>
           )}
         </Reference>
-        {createFormCollectiveType &&
+        {(createFormCollectiveType || displayInviteMenu) &&
           ReactDOM.createPortal(
             <Popper placement="bottom">
               {({ placement, ref, style }) => (
@@ -314,25 +364,39 @@ class CollectivePicker extends React.PureComponent {
                     boxShadow="-2px 4px 7px 0 rgba(78, 78, 78, 14%)"
                     maxHeight={315}
                     overflowY="auto"
+                    {...this.props.styles?.menu}
                   >
-                    <CreateCollectiveMiniForm
-                      type={createFormCollectiveType}
-                      onCancel={this.setCreateFormCollectiveType}
-                      addLoggedInUserAsAdmin={addLoggedInUserAsAdmin}
-                      optionalFields={this.props.createCollectiveOptionalFields}
-                      onSuccess={collective => {
-                        if (onChange) {
-                          onChange({ label: collective.name, value: collective });
-                        }
-                        this.setState(state => ({
-                          menuIsOpen: false,
-                          createFormCollectiveType: null,
-                          createdCollectives: [...state.createdCollectives, collective],
-                          showCreatedCollective: true,
-                        }));
-                      }}
-                      {...prefillValue}
-                    />
+                    {createFormCollectiveType && (
+                      <CreateCollectiveMiniForm
+                        type={createFormCollectiveType}
+                        onCancel={this.setCreateFormCollectiveType}
+                        addLoggedInUserAsAdmin={addLoggedInUserAsAdmin}
+                        optionalFields={this.props.createCollectiveOptionalFields}
+                        onSuccess={collective => {
+                          if (onChange) {
+                            onChange({ label: collective.name, value: collective });
+                          }
+                          this.setState(state => ({
+                            menuIsOpen: false,
+                            createFormCollectiveType: null,
+                            createdCollectives: [...state.createdCollectives, collective],
+                            showCreatedCollective: true,
+                          }));
+                        }}
+                        {...prefillValue}
+                      />
+                    )}
+                    {displayInviteMenu && (
+                      <InviteCollectiveForm
+                        onSave={value => {
+                          onChange?.({ label: value.name, value });
+                          this.setState({ displayInviteMenu: false });
+                        }}
+                        onCancel={() => {
+                          this.setState({ displayInviteMenu: false });
+                        }}
+                      />
+                    )}
                   </StyledCard>
                 </div>
               )}
@@ -360,6 +424,8 @@ CollectivePicker.propTypes = {
       value: PropTypes.any,
     }),
   ),
+  /** Defines if custom options are listed in the top of the list or the bottom */
+  customOptionsPosition: PropTypes.oneOf(CUSTOM_OPTIONS_POSITION),
   /** Function to sort collectives. Default to sorty by name */
   sortFunc: PropTypes.func,
   /** Called when value changes */
@@ -376,6 +442,8 @@ CollectivePicker.propTypes = {
   groupByType: PropTypes.bool,
   /** If true, a permanent option to create a collective will be displayed in the select */
   creatable: PropTypes.bool,
+  /** If true, a permanent option to invite a new user will be displayed in the select */
+  invitable: PropTypes.bool,
   /** If true, logged in user will be added as an admin of the created account */
   addLoggedInUserAsAdmin: PropTypes.bool,
   /** Force menu to be open. Ignored during collective creation */
@@ -400,6 +468,8 @@ CollectivePicker.propTypes = {
   }),
   /** A list of optional fields to include in the form */
   createCollectiveOptionalFields: PropTypes.array,
+  /** StyledSelect pass-through property */
+  styles: PropTypes.object,
 };
 
 CollectivePicker.defaultProps = {

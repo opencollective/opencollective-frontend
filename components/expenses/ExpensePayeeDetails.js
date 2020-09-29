@@ -71,9 +71,13 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
           <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
         </PrivateInfoColumnHeader>
         <LinkCollective collective={payee}>
-          <Flex alignItems="center">
-            <Avatar collective={payee} radius={24} />
-            <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
+          <Flex alignItems="center" fontSize="12px">
+            {payee.isInvite ? (
+              <Avatar name={payee.name} radius={24} backgroundColor="blue.100" color="blue.400" />
+            ) : (
+              <Avatar collective={payee} radius={24} />
+            )}
+            <Span ml={2} color="black.900" fontWeight="bold" truncateOverflow>
               {payee.name}
             </Span>
           </Flex>
@@ -97,7 +101,9 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
         </PrivateInfoColumnHeader>
         <Container fontSize="12px" color="black.600">
           <Box mb={3} data-cy="expense-summary-payout-method-type">
-            <PayoutMethodTypeWithIcon type={expense.payoutMethod?.type} />
+            <PayoutMethodTypeWithIcon
+              type={expense.payee?.isInvite ? PayoutMethodType.INVITE : expense.payoutMethod?.type}
+            />
           </Box>
           <div data-cy="expense-summary-payout-method-data">
             <PayoutMethodData payoutMethod={expense.payoutMethod} isLoading={isLoadingLoggedInUser} />

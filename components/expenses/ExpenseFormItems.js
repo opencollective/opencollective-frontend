@@ -161,6 +161,7 @@ class ExpenseFormItems extends React.PureComponent {
             requireDate={!isFundingRequest}
             isRichText={isFundingRequest}
             onUploadError={e => this.setState({ uploadErrors: [e] })}
+            isOptional={values.payee?.isInvite}
           />
         ))}
         <Flex alignItems="center" my={3}>

@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 
+import Avatar from '../Avatar';
 import { Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { Span } from '../Text';
@@ -44,6 +45,15 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
           <OtherIcon size={iconSize} color="#9D9FA3" />
           <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
             Open Collective
+          </Span>
+        </Flex>
+      );
+    case PayoutMethodType.INVITE:
+      return (
+        <Flex alignItems="center">
+          <Avatar name="?" size={iconSize} backgroundColor="blue.100" color="blue.400" fontWeight="500" />
+          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
+            TBD
           </Span>
         </Flex>
       );
