@@ -779,7 +779,6 @@
   "Expense.RequestDetails": "Request Details",
   "Expense.SaveChanges": "Sauvegarder",
   "expense.scheduledForPayment": "Paiement programmé",
-  "Expense.ScheduleForPayment": "{payoutMethodLabel} (Programmer le paiement)",
   "expense.status": "Statut",
   "Expense.SubmittedBy": "Postée par {name}",
   "Expense.SubmittedByOnDate": "Postée par {name} le {date, date, long}",
