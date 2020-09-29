@@ -28,7 +28,7 @@ const nextApp = next({ dev, dir: path.dirname(__dirname) });
 
 const port = process.env.PORT;
 
-const WORKERS = process.env.WEB_CONCURRENCY || 1;
+const workers = process.env.WEB_CONCURRENCY || 1;
 
 const start = id =>
   nextApp.prepare().then(() => {
@@ -57,4 +57,8 @@ const start = id =>
     });
   });
 
-throng({ workers: WORKERS, lifetime: Infinity }, start);
+if (workers && workers > 1) {
+  throng({ worker: start, count: workers });
+} else {
+  start(1);
+}
