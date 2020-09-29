@@ -13,6 +13,7 @@ import { getAvatarBorderRadius } from '../../../lib/image-utils';
 import Avatar from '../../Avatar';
 import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
+import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { P, Span } from '../../Text';
@@ -89,7 +90,6 @@ const Translations = defineMessages({
 
 const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
   const [editing, setEditing] = React.useState(false);
-  const [showRemove, setshowRemove] = React.useState(false);
   const [showModal, setshowModal] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
@@ -139,23 +139,30 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
           {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input data-cy="heroAvatarDropzone" {...getInputProps()} />
-              <EditableAvatarContainer
-                isDragActive={isDragActive}
-                onMouseEnter={() => {
-                  setshowRemove(true);
-                }}
-                onMouseLeave={() => {
-                  setshowRemove(false);
-                }}
-              >
+              <EditableAvatarContainer isDragActive={isDragActive}>
                 <EditOverlay borderRadius={borderRadius}>
                   {!isDragActive && (
-                    <StyledButton buttonSize="tiny" minWidth={120}>
-                      <Camera size={12} />
-                      <Span ml={2} css={{ verticalAlign: 'center' }}>
-                        <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
-                      </Span>
-                    </StyledButton>
+                    <Box>
+                      <StyledButton buttonSize="tiny" minWidth={120}>
+                        <Camera size={12} />
+                        <Span ml={2} css={{ verticalAlign: 'center' }}>
+                          <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
+                        </Span>
+                      </StyledButton>
+                      <StyledButton
+                        buttonSize="tiny"
+                        minWidth={120}
+                        mt={2}
+                        onClick={event => {
+                          event.stopPropagation();
+                          setshowModal(true);
+                        }}
+                      >
+                        <Span ml={2} css={{ verticalAlign: 'center' }}>
+                          <FormattedMessage id="HeroAvatar.Remove" defaultMessage="Remove logo" />
+                        </Span>
+                      </StyledButton>
+                    </Box>
                   )}
                   {isDragActive &&
                     (isDragAccept ? (
@@ -172,30 +179,6 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
             </div>
           )}
         </Dropzone>
-
-        <Container
-          onMouseEnter={() => {
-            setshowRemove(true);
-          }}
-          onMouseLeave={() => {
-            setshowRemove(false);
-          }}
-        >
-          {showRemove && (
-            <StyledButton
-              buttonSize="tiny"
-              minWidth={120}
-              css={{ position: 'absolute', marginTop: '-50px', marginLeft: '5px' }}
-              onClick={() => {
-                setshowModal(true);
-              }}
-            >
-              <Span ml={2} css={{ verticalAlign: 'center' }}>
-                <FormattedMessage id="HeroAvatar.Remove" defaultMessage="Remove logo" />
-              </Span>
-            </StyledButton>
-          )}
-        </Container>
         {showModal && (
           <ConfirmationModal
             show={showModal}
@@ -209,7 +192,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
               setSubmitting(true); // Need this because `upload` is not a graphql function
 
               try {
-                await editImage({ variables: { id: collective.id, image: null,  } });
+                await editImage({ variables: { id: collective.id, image: null } });
                 setshowModal(false);
               } finally {
                 setSubmitting(false);
