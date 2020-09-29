@@ -19,11 +19,11 @@ import ExpenseTags from '../expenses/ExpenseTags';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
-import OrderStatusTag from '../OrderStatusTag';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
+import TransactionStatusTag from '../TransactionStatusTag';
 import { useUser } from '../UserProvider';
 
 import TransactionDetails from './TransactionDetails';
@@ -176,11 +176,10 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               </Span>
             </Container>
             {hasOrder && (
-              <OrderStatusTag
-                status={order.status}
-                isRefund={isRefunded}
-                isReject={isRejected}
-                isRejectedRefundTransaction={isRefund && isRejected}
+              <TransactionStatusTag
+                isRefund={isRefund}
+                isRefunded={isRefunded}
+                isOrderRejected={isRejected}
                 fontSize="9px"
                 px="6px"
                 py="2px"
