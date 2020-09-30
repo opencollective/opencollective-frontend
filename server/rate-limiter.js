@@ -28,11 +28,13 @@ const load = async app => {
 
   const lookup = async (req, res, opts, next) => {
     if (!whitelist(req)) {
-      // const log = await req.getAugmentedLog();
-      const log = req.hyperwatch.rawLog;
-      req.hyperwatch = req.hyperwatch || {};
-      req.hyperwatch.identity = log.getIn(['identity']) || log.getIn(['request', 'address']);
-      opts.lookup = 'hyperwatch.identity';
+      if (req.hyperwatch && req.hyperwatch.getAugmentedLog) {
+        const log = await req.hyperwatch.getAugmentedLog({ fast: true });
+        req.hyperwatch.identity = log.getIn(['identity']) || log.getIn(['request', 'address']);
+        opts.lookup = 'hyperwatch.identity';
+      } else {
+        opts.lookup = 'ip';
+      }
     }
     return next();
   };
