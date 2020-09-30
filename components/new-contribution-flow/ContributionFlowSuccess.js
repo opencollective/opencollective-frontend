@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { formatManualInstructions } from '../../lib/payment-method-utils';
 import { facebookShareURL, tweetURL } from '../../lib/url_helpers';
 
 import Container from '../../components/Container';
@@ -134,18 +135,6 @@ class NewContributionFlowSuccess extends React.Component {
     );
   };
 
-  renderInstructions = (instructions, formatValues) => {
-    return instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
-      if (p1) {
-        const key = p1.toLowerCase();
-        if (formatValues[key] !== undefined) {
-          return formatValues[key];
-        }
-      }
-      return match;
-    });
-  };
-
   renderBankTransferInformation = () => {
     const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
     const bankAccount = get(this.props.data, 'order.toAccount.host.bankAccount.data', null);
@@ -179,7 +168,7 @@ class NewContributionFlowSuccess extends React.Component {
               <FormattedMessage id="NewContributionFlow.PaymentInstructions" defaultMessage="Payment instructions" />
             </H3>
             <Flex mt={2}>
-              <Flex style={{ whiteSpace: 'pre-wrap' }}>{this.renderInstructions(instructions, formatValues)}</Flex>
+              <Flex style={{ whiteSpace: 'pre-wrap' }}>{formatManualInstructions(instructions, formatValues)}</Flex>
             </Flex>
           </BankTransferInfoContainer>
         )}

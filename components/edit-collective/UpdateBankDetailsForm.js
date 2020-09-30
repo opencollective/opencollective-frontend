@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { formatManualInstructions } from '../../lib/payment-method-utils';
+
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import StyledTextarea from '../StyledTextarea';
@@ -59,15 +61,8 @@ class UpdateBankDetailsForm extends React.Component {
       amount: '$30',
       collective: 'acme',
     };
-    return this.state.form.instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
-      if (p1) {
-        const key = p1.toLowerCase();
-        if (formatValues[key] !== undefined) {
-          return formatValues[key];
-        }
-      }
-      return match;
-    });
+
+    return formatManualInstructions(this.state.form.instructions, formatValues);
   }
 
   render() {
