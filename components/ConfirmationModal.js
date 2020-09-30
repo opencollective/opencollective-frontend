@@ -98,7 +98,7 @@ ConfirmationModal.propTypes = {
   /** body of the confirmation modal */
   children: PropTypes.node,
   /** Body of the confirmation modal, used in a paragraph if there's no children */
-  body: PropTypes.string,
+  body: PropTypes.node,
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
   /** handles onClick continue button */
@@ -110,9 +110,9 @@ ConfirmationModal.propTypes = {
   /** handles onClick cancel button. Defaults to `onClose` prop. */
   cancelHandler: PropTypes.func,
   /** continue button label of the confirmation modal. Defaults to `Confirm`. */
-  continueLabel: PropTypes.string,
+  continueLabel: PropTypes.node,
   /** cancel button label of the confirmation modal. Defaults to `Cancel`. */
-  cancelLabel: PropTypes.string,
+  cancelLabel: PropTypes.node,
 };
 
 ConfirmationModal.defaultProps = {

@@ -69,7 +69,7 @@ class HostDashboardPage extends React.Component {
     data: PropTypes.object, // from withData
     loadingLoggedInUser: PropTypes.bool.isRequired, // from withUser
     LoggedInUser: PropTypes.object, // from withUser
-    view: PropTypes.oneOf(['expenses', 'expenses-beta', 'hosted-collectives', 'donations', 'pending-applications'])
+    view: PropTypes.oneOf(['expenses', 'expenses-legacy', 'hosted-collectives', 'donations', 'pending-applications'])
       .isRequired,
   };
 
@@ -126,12 +126,13 @@ class HostDashboardPage extends React.Component {
     switch (view) {
       case 'pending-applications':
         return <PendingApplications hostCollectiveSlug={host.slug} />;
-      case 'expenses-beta':
-        return <HostDashboardExpenses hostSlug={host.slug} />;
+      case 'expenses-legacy':
+      case 'donations':
+        return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
       case HOST_SECTIONS.HOSTED_COLLECTIVES:
         return <HostDashboardHostedCollectives hostSlug={host.slug} />;
       default:
-        return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
+        return <HostDashboardExpenses hostSlug={host.slug} />;
     }
   }
 
@@ -142,7 +143,11 @@ class HostDashboardPage extends React.Component {
     const canEdit = LoggedInUser && host && LoggedInUser.canEditCollective(host);
 
     return (
-      <Page collective={host} title={host.name || 'Host Dashboard'} withoutGlobalStyles={view === 'expenses-beta'}>
+      <Page
+        collective={host}
+        title={host.name || 'Host Dashboard'}
+        withoutGlobalStyles={!['expenses-legacy', 'donations'].includes(view)}
+      >
         {data.Collective && (
           <Container>
             <CollectiveNavbar collective={host} isAdmin={canEdit} showEdit onlyInfos={true} />
@@ -174,14 +179,16 @@ class HostDashboardPage extends React.Component {
                 <ReceiptIcon size="1em" />
                 <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
               </MenuLink>
-              <MenuLink
-                route="host.dashboard"
-                params={{ hostCollectiveSlug: slug, view: 'expenses-beta' }}
-                isActive={view === 'expenses-beta'}
-              >
-                <FileInvoice size="1em" />
-                <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" /> (Beta)
-              </MenuLink>
+              <Container display="none">
+                <MenuLink
+                  route="host.dashboard"
+                  params={{ hostCollectiveSlug: slug, view: 'expenses-legacy' }}
+                  isActive={view === 'expenses-legacy'}
+                >
+                  <FileInvoice size="1em" />
+                  <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" /> (Legacy)
+                </MenuLink>
+              </Container>
               <MenuLink
                 route="host.dashboard"
                 params={{ hostCollectiveSlug: slug, view: 'donations' }}

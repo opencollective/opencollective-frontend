@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FastField, Field, FieldArray, Form, Formik } from 'formik';
 import { first, get, isEmpty, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveFamilyTypes, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -26,6 +27,7 @@ import { P, Span } from '../Text';
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
 import { validateExpenseItem } from './ExpenseItemForm';
+import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import ExpenseTypeTag from './ExpenseTypeTag';
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
@@ -36,9 +38,9 @@ const msg = defineMessages({
     id: `ExpenseForm.DescriptionPlaceholder`,
     defaultMessage: 'Enter expense title here...',
   },
-  subjectPlaceholder: {
-    id: `ExpenseForm.RequestSubjectPlaceholder`,
-    defaultMessage: 'Enter request subject here...',
+  grantSubjectPlaceholder: {
+    id: `ExpenseForm.GrantSubjectPlaceholder`,
+    defaultMessage: 'i.e. research, software development, etc...',
   },
   payeeLabel: {
     id: `ExpenseForm.payeeLabel`,
@@ -76,25 +78,33 @@ const msg = defineMessages({
     id: 'ExpenseForm.AddLineItem',
     defaultMessage: 'Add new item',
   },
-  step1: {
-    id: 'ExpenseForm.Step1',
+  addNewGrantItem: {
+    id: 'ExpenseForm.AddGrantItem',
+    defaultMessage: 'Add grant item',
+  },
+  stepReceipt: {
+    id: 'ExpenseForm.StepExpense',
     defaultMessage: 'Upload one or multiple receipt',
   },
-  step1Invoice: {
-    id: 'ExpenseForm.Step1Invoice',
+  stepInvoice: {
+    id: 'ExpenseForm.StepExpenseInvoice',
     defaultMessage: 'Set invoice details',
   },
-  step1FundingRequest: {
-    id: 'ExpenseForm.Step1FundingRequest',
-    defaultMessage: 'Set grant request details',
+  stepFundingRequest: {
+    id: 'ExpenseForm.StepExpenseFundingRequest',
+    defaultMessage: 'Set grant details',
   },
-  step2: {
-    id: 'ExpenseForm.Step2',
-    defaultMessage: 'Reimbursements details',
-  },
-  step2Invoice: {
-    id: 'ExpenseForm.Step2Invoice',
+  stepPayee: {
+    id: 'ExpenseForm.StepPayeeInvoice',
     defaultMessage: 'Payee information',
+  },
+  next: {
+    id: 'Pagination.Next',
+    defaultMessage: 'Next',
+  },
+  back: {
+    id: 'Back',
+    defaultMessage: 'Back',
   },
 });
 
@@ -172,9 +182,6 @@ const validate = expense => {
 
 const EMPTY_ARRAY = [];
 
-// Margin x between inline fields, not displayed on mobile
-const fieldsMarginRight = [2, 3, 4];
-
 const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.country', payee.location.country || null);
   formik.setFieldValue('payeeLocation.address', payee.location.address || '');
@@ -215,6 +222,15 @@ const refreshPayoutProfile = (formik, payoutProfiles) => {
   formik.setFieldValue('payee', payee);
 };
 
+const HiddenFragment = styled.div`
+  display: ${({ show }) => (show ? 'block' : 'none')};
+`;
+
+const STEPS = {
+  PAYEE: 'PAYEE',
+  EXPENSE: 'EXPENSE',
+};
+
 const ExpenseFormBody = ({
   formik,
   payoutProfiles,
@@ -227,15 +243,20 @@ const ExpenseFormBody = ({
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, handleChange, errors, setValues, dirty } = formik;
+  const { values, handleChange, errors, setValues, dirty, touched } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const stepOneCompleted = hasBaseFormFieldsCompleted && values.items.length > 0;
-  const stepTwoCompleted = stepOneCompleted && values.payoutMethod;
+  const stepOneCompleted =
+    values.type === expenseTypes.RECEIPT
+      ? values.payoutMethod
+      : values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address;
+  const stepTwoCompleted = stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
+  const [step, setStep] = React.useState(stepOneCompleted ? STEPS.EXPENSE : STEPS.PAYEE);
   const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee, collective), [values.payee]);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
+  const requiresAddress = [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
@@ -276,7 +297,10 @@ const ExpenseFormBody = ({
     <Form>
       <ExpenseTypeRadioSelect
         name="type"
-        onChange={handleChange}
+        onChange={e => {
+          setStep(STEPS.PAYEE);
+          handleChange(e);
+        }}
         value={values.type}
         options={{
           fundingRequest:
@@ -284,8 +308,202 @@ const ExpenseFormBody = ({
         }}
       />
       {values.type && (
-        <Box width="100%">
-          <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
+        <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
+          <HiddenFragment show={step == STEPS.PAYEE}>
+            <Flex alignItems="center" mb={16}>
+              <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
+                {formatMessage(msg.stepPayee)}
+              </Span>
+              <Box ml={2}>
+                <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
+              </Box>
+              <StyledHr flex="1" borderColor="black.300" mx={2} />
+            </Flex>
+
+            <Flex flexDirection={['column', 'row']}>
+              <Box mr={[null, 2, null, 4]} flexGrow="1" flexBasis="50%">
+                <Field name="payee">
+                  {({ field }) => (
+                    <StyledInputField
+                      name={field.name}
+                      label={formatMessage(msg.payeeLabel)}
+                      labelFontSize="13px"
+                      flex="1"
+                      mt={3}
+                    >
+                      {({ id }) => (
+                        <CollectivePicker
+                          inputId={id}
+                          collectives={payoutProfiles}
+                          getDefaultOptions={build => values.payee && build(values.payee)}
+                          data-cy="select-expense-payee"
+                          onChange={({ value }) => {
+                            formik.setFieldValue('payee', value);
+                            formik.setFieldValue('payoutMethod', null);
+                            setLocationFromPayee(formik, value);
+                          }}
+                        />
+                      )}
+                    </StyledInputField>
+                  )}
+                </Field>
+                {requiresAddress && (
+                  <Fragment>
+                    <FastField name="payeeLocation.country">
+                      {({ field }) => (
+                        <StyledInputField
+                          name={field.name}
+                          label={formatMessage(msg.country)}
+                          labelFontSize="13px"
+                          error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
+                          required
+                          mt={3}
+                        >
+                          {({ id, error }) => (
+                            <InputTypeCountry
+                              data-cy="payee-country"
+                              inputId={id}
+                              onChange={value => formik.setFieldValue(field.name, value)}
+                              value={field.value}
+                              error={error}
+                            />
+                          )}
+                        </StyledInputField>
+                      )}
+                    </FastField>
+                    <FastField name="payeeLocation.address">
+                      {({ field }) => (
+                        <StyledInputField
+                          name={field.name}
+                          label={formatMessage(msg.address)}
+                          labelFontSize="13px"
+                          error={formatFormErrorMessage(intl, errors.payeeLocation?.address)}
+                          required
+                          mt={3}
+                        >
+                          {inputProps => (
+                            <StyledTextarea
+                              {...inputProps}
+                              {...field}
+                              minHeight={100}
+                              data-cy="payee-address"
+                              placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
+                            />
+                          )}
+                        </StyledInputField>
+                      )}
+                    </FastField>
+                    <FastField name="invoiceInfo">
+                      {({ field }) => (
+                        <StyledInputField
+                          name={field.name}
+                          label={formatMessage(msg.invoiceInfo)}
+                          labelFontSize="13px"
+                          required={false}
+                          mt={3}
+                        >
+                          {inputProps => (
+                            <Field
+                              as={StyledTextarea}
+                              {...inputProps}
+                              {...field}
+                              minHeight={80}
+                              placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
+                            />
+                          )}
+                        </StyledInputField>
+                      )}
+                    </FastField>
+                  </Fragment>
+                )}
+              </Box>
+              <Box flexGrow="1" flexBasis="50%">
+                <Field name="payoutMethod">
+                  {({ field }) => (
+                    <StyledInputField
+                      name={field.name}
+                      htmlFor="payout-method"
+                      flex="1"
+                      mt={3}
+                      label={formatMessage(msg.payoutOptionLabel)}
+                      labelFontSize="13px"
+                      error={
+                        isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
+                          ? formatFormErrorMessage(intl, errors.payoutMethod)
+                          : null
+                      }
+                    >
+                      {({ id, error }) => (
+                        <PayoutMethodSelect
+                          inputId={id}
+                          error={error}
+                          onChange={setPayoutMethod}
+                          onRemove={onPayoutMethodRemove}
+                          payoutMethod={values.payoutMethod}
+                          payoutMethods={allPayoutMethods}
+                          payee={values.payee}
+                          disabled={!values.payee}
+                          collective={collective}
+                        />
+                      )}
+                    </StyledInputField>
+                  )}
+                </Field>
+
+                {values.payoutMethod && (
+                  <Field name="payoutMethod">
+                    {({ field, meta }) => (
+                      <Box mt={3} flex="1">
+                        <PayoutMethodForm
+                          fieldsPrefix="payoutMethod"
+                          payoutMethod={field.value}
+                          host={collective.host}
+                          errors={meta.error}
+                        />
+                      </Box>
+                    )}
+                  </Field>
+                )}
+              </Box>
+            </Flex>
+            <StyledHr flex="1" mt={4} borderColor="black.300" />
+            <Flex mt={3} flexWrap="wrap">
+              {onCancel && (
+                <StyledButton
+                  type="button"
+                  width={['100%', 'auto']}
+                  mx={[2, 0]}
+                  mr={[null, 3]}
+                  mt={2}
+                  whiteSpace="nowrap"
+                  data-cy="expense-cancel"
+                  disabled={!stepOneCompleted}
+                  onClick={() => {
+                    onCancel?.();
+                  }}
+                >
+                  <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                </StyledButton>
+              )}
+              <StyledButton
+                type="button"
+                width={['100%', 'auto']}
+                mx={[2, 0]}
+                mr={[null, 3]}
+                mt={2}
+                whiteSpace="nowrap"
+                data-cy="expense-next"
+                buttonStyle="primary"
+                disabled={!stepOneCompleted}
+                onClick={() => setStep(STEPS.EXPENSE)}
+              >
+                <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+                &nbsp;→
+              </StyledButton>
+            </Flex>
+          </HiddenFragment>
+
+          <HiddenFragment show={step == STEPS.EXPENSE}>
             <Flex alignItems="center" mb={10}>
               <P
                 as="label"
@@ -298,7 +516,7 @@ const ExpenseFormBody = ({
                 {values.type === expenseTypes.FUNDING_REQUEST ? (
                   <FormattedMessage
                     id="Expense.EnterRequestSubject"
-                    defaultMessage="Enter request subject <small>(Public)</small>"
+                    defaultMessage="Enter grant subject <small>(Public)</small>"
                     values={{
                       small(msg) {
                         return (
@@ -340,7 +558,7 @@ const ExpenseFormBody = ({
               name="description"
               placeholder={
                 values.type === expenseTypes.FUNDING_REQUEST
-                  ? formatMessage(msg.subjectPlaceholder)
+                  ? formatMessage(msg.grantSubjectPlaceholder)
                   : formatMessage(msg.descriptionPlaceholder)
               }
               width="100%"
@@ -353,310 +571,122 @@ const ExpenseFormBody = ({
               maxLength={255}
               withOutline
             />
-            {hasBaseFormFieldsCompleted && (
-              <Fragment>
-                {values.type === expenseTypes.FUNDING_REQUEST && (
-                  <Fragment>
-                    <Flex alignItems="center" mt={20} mb={10}>
-                      <P
-                        as="label"
-                        htmlFor="expense-longDescription"
-                        color="black.900"
-                        fontSize="16px"
-                        lineHeight="24px"
-                        fontWeight="bold"
-                      >
-                        <FormattedMessage
-                          id="Expense.EnterExpenseMessage"
-                          defaultMessage="Enter a message explaining your request"
-                          values={{
-                            small(msg) {
-                              return (
-                                <Span fontWeight="normal" color="black.600">
-                                  {msg}
-                                </Span>
-                              );
-                            },
-                          }}
-                        />
-                      </P>
-                      <StyledHr flex="1" borderColor="black.300" ml={2} />
-                    </Flex>
-                    <Field
-                      as={StyledTextarea}
-                      id="expense-longDescription"
-                      name="longDescription"
-                      placeholder=""
-                      width="100%"
-                      height={200}
-                      fontSize="P"
-                      error={errors.message}
-                      mt={3}
-                      px={2}
-                      py={1}
-                      maxLength={1000}
-                      withOutline
-                      showCount={true}
-                    />
-                  </Fragment>
-                )}
-                <Flex alignItems="flex-start" mt={3}>
-                  <ExpenseTypeTag type={values.type === 'FUNDING_REQUEST' ? 'grant' : values.type} mr="4px" />
-                  <StyledInputTags
-                    renderUpdatedTags
-                    suggestedTags={expensesTags}
-                    onChange={tags =>
-                      formik.setFieldValue(
-                        'tags',
-                        tags.map(t => t.value.toLowerCase()),
-                      )
+            <HiddenFragment show={hasBaseFormFieldsCompleted}>
+              <Flex alignItems="flex-start" mt={3}>
+                <ExpenseTypeTag type={values.type} mr="4px" />
+                <StyledInputTags
+                  renderUpdatedTags
+                  suggestedTags={expensesTags}
+                  onChange={tags =>
+                    formik.setFieldValue(
+                      'tags',
+                      tags.map(t => t.value.toLowerCase()),
+                    )
+                  }
+                  value={values.tags}
+                />
+              </Flex>
+              {values.type === expenseTypes.INVOICE && (
+                <Box my={40}>
+                  <ExpenseAttachedFilesForm
+                    title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
+                    description={
+                      <FormattedMessage
+                        id="UploadInvoiceDescription"
+                        defaultMessage="If you already have an invoice upload it here."
+                      />
                     }
-                    value={values.tags}
+                    onChange={files => formik.setFieldValue('attachedFiles', files)}
+                    defaultValue={values.attachedFiles}
                   />
-                </Flex>
-                {values.type === expenseTypes.INVOICE && (
-                  <Box my={40}>
-                    <ExpenseAttachedFilesForm
-                      onChange={files => formik.setFieldValue('attachedFiles', files)}
-                      defaultValue={values.attachedFiles}
-                    />
+                </Box>
+              )}
+
+              <Flex alignItems="center" my={24}>
+                <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
+                  {formatMessage(
+                    isReceipt ? msg.stepReceipt : isFundingRequest ? msg.stepFundingRequest : msg.stepInvoice,
+                  )}
+                </Span>
+                <StyledHr flex="1" borderColor="black.300" mx={2} />
+                <StyledButton
+                  buttonSize="tiny"
+                  type="button"
+                  onClick={() => addNewExpenseItem(formik)}
+                  minWidth={135}
+                  data-cy="expense-add-item-btn"
+                >
+                  +&nbsp;
+                  {formatMessage(
+                    isReceipt ? msg.addNewReceipt : isFundingRequest ? msg.addNewGrantItem : msg.addNewItem,
+                  )}
+                </StyledButton>
+              </Flex>
+              <Box>
+                <FieldArray name="items" component={ExpenseFormItems} />
+              </Box>
+
+              {values.type === expenseTypes.FUNDING_REQUEST && (
+                <Box my={40}>
+                  <ExpenseAttachedFilesForm
+                    title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
+                    description={
+                      <FormattedMessage
+                        id="UploadDocumentationDescription"
+                        defaultMessage="If you want to include any documentation you can upload it here."
+                      />
+                    }
+                    onChange={files => formik.setFieldValue('attachedFiles', files)}
+                    defaultValue={values.attachedFiles}
+                  />
+                </Box>
+              )}
+
+              <StyledHr flex="1" mt={4} borderColor="black.300" />
+              <Flex mt={3} flexWrap="wrap" alignItems="center">
+                <StyledButton
+                  type="button"
+                  width={['100%', 'auto']}
+                  mx={[2, 0]}
+                  mr={[null, 3]}
+                  mt={2}
+                  whiteSpace="nowrap"
+                  data-cy="expense-back"
+                  onClick={() => setStep(STEPS.PAYEE)}
+                >
+                  ←&nbsp;
+                  <FormattedMessage id="Back" defaultMessage="Back" />
+                </StyledButton>
+                <StyledButton
+                  type="submit"
+                  width={['100%', 'auto']}
+                  mx={[2, 0]}
+                  mr={[null, 3]}
+                  mt={2}
+                  whiteSpace="nowrap"
+                  data-cy="expense-summary-btn"
+                  buttonStyle="primary"
+                  disabled={!stepTwoCompleted || !formik.isValid}
+                  loading={formik.isSubmitting}
+                >
+                  <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+                  &nbsp;→
+                </StyledButton>
+                {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
+                  <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
+                    {errors.payoutMethod.data.currency.toString()}
                   </Box>
                 )}
-
-                <Flex alignItems="center" my={24}>
-                  <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-                    {formatMessage(
-                      isReceipt ? msg.step1 : isFundingRequest ? msg.step1FundingRequest : msg.step1Invoice,
-                    )}
-                  </Span>
-                  <StyledHr flex="1" borderColor="black.300" mx={2} />
-                  <StyledButton
-                    buttonSize="tiny"
-                    type="button"
-                    onClick={() => addNewExpenseItem(formik)}
-                    minWidth={135}
-                    data-cy="expense-add-item-btn"
-                  >
-                    +&nbsp;{formatMessage(isReceipt ? msg.addNewReceipt : msg.addNewItem)}
-                  </StyledButton>
-                </Flex>
-                <Box>
-                  <FieldArray name="items" component={ExpenseFormItems} />
-                </Box>
-              </Fragment>
-            )}
-            {stepOneCompleted && (
-              <Fragment>
-                <Flex alignItems="center" mt={24} mb={16}>
-                  <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-                    {formatMessage(isReceipt ? msg.step2 : msg.step2Invoice)}
-                  </Span>
-                  <Box ml={2}>
-                    <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
-                  </Box>
-                  <StyledHr flex="1" borderColor="black.300" mx={2} />
-                </Flex>
-
-                <Box>
-                  <Flex justifyContent="space-between" flexWrap="wrap">
-                    <Box minWidth={250} flex="1 1 50%">
-                      <Field name="payee">
-                        {({ field }) => (
-                          <StyledInputField
-                            name={field.name}
-                            label={formatMessage(msg.payeeLabel)}
-                            labelFontSize="13px"
-                            flex="1"
-                            mr={fieldsMarginRight}
-                            mt={3}
-                          >
-                            {({ id }) => (
-                              <CollectivePicker
-                                inputId={id}
-                                collectives={payoutProfiles}
-                                getDefaultOptions={build => values.payee && build(values.payee)}
-                                data-cy="select-expense-payee"
-                                onChange={({ value }) => {
-                                  formik.setFieldValue('payee', value);
-                                  formik.setFieldValue('payoutMethod', null);
-                                  setLocationFromPayee(formik, value);
-                                }}
-                              />
-                            )}
-                          </StyledInputField>
-                        )}
-                      </Field>
-                      {values.type === expenseTypes.INVOICE && (
-                        <Fragment>
-                          <FastField name="payeeLocation.country">
-                            {({ field }) => (
-                              <StyledInputField
-                                name={field.name}
-                                label={formatMessage(msg.country)}
-                                labelFontSize="13px"
-                                error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
-                                required
-                                minWidth={250}
-                                mr={fieldsMarginRight}
-                                mt={3}
-                              >
-                                {({ id, error }) => (
-                                  <InputTypeCountry
-                                    data-cy="payee-country"
-                                    inputId={id}
-                                    onChange={value => formik.setFieldValue(field.name, value)}
-                                    value={field.value}
-                                    error={error}
-                                  />
-                                )}
-                              </StyledInputField>
-                            )}
-                          </FastField>
-                          <FastField name="payeeLocation.address">
-                            {({ field }) => (
-                              <StyledInputField
-                                name={field.name}
-                                label={formatMessage(msg.address)}
-                                labelFontSize="13px"
-                                error={formatFormErrorMessage(intl, errors.payeeLocation?.address)}
-                                required
-                                minWidth={250}
-                                mr={fieldsMarginRight}
-                                mt={3}
-                              >
-                                {inputProps => (
-                                  <StyledTextarea
-                                    {...inputProps}
-                                    {...field}
-                                    minHeight={100}
-                                    placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
-                                  />
-                                )}
-                              </StyledInputField>
-                            )}
-                          </FastField>
-                          <FastField name="invoiceInfo">
-                            {({ field }) => (
-                              <StyledInputField
-                                name={field.name}
-                                label={formatMessage(msg.invoiceInfo)}
-                                labelFontSize="13px"
-                                required={false}
-                                minWidth={250}
-                                mr={fieldsMarginRight}
-                                mt={3}
-                              >
-                                {inputProps => (
-                                  <Field
-                                    as={StyledTextarea}
-                                    {...inputProps}
-                                    {...field}
-                                    minHeight={80}
-                                    placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
-                                  />
-                                )}
-                              </StyledInputField>
-                            )}
-                          </FastField>
-                        </Fragment>
-                      )}
-                    </Box>
-                    <Box minWidth={250} flex="1 1 50%">
-                      <Field name="payoutMethod">
-                        {({ field }) => (
-                          <StyledInputField
-                            name={field.name}
-                            htmlFor="payout-method"
-                            flex="1"
-                            mr={fieldsMarginRight}
-                            mt={3}
-                            minWidth={250}
-                            label={formatMessage(msg.payoutOptionLabel)}
-                            labelFontSize="13px"
-                            error={
-                              isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
-                                ? formatFormErrorMessage(intl, errors.payoutMethod)
-                                : null
-                            }
-                          >
-                            {({ id, error }) => (
-                              <PayoutMethodSelect
-                                inputId={id}
-                                error={error}
-                                onChange={setPayoutMethod}
-                                onRemove={onPayoutMethodRemove}
-                                payoutMethod={values.payoutMethod}
-                                payoutMethods={allPayoutMethods}
-                                payee={values.payee}
-                                disabled={!values.payee}
-                                collective={collective}
-                              />
-                            )}
-                          </StyledInputField>
-                        )}
-                      </Field>
-
-                      {values.payoutMethod && (
-                        <Field name="payoutMethod">
-                          {({ field, meta }) => (
-                            <Box mr={fieldsMarginRight} mt={3} flex="1" minWidth={258}>
-                              <PayoutMethodForm
-                                fieldsPrefix="payoutMethod"
-                                payoutMethod={field.value}
-                                host={collective.host}
-                                errors={meta.error}
-                              />
-                            </Box>
-                          )}
-                        </Field>
-                      )}
-                    </Box>
-                  </Flex>
-                </Box>
-              </Fragment>
-            )}
-          </StyledCard>
-        </Box>
+              </Flex>
+            </HiddenFragment>
+          </HiddenFragment>
+        </StyledCard>
       )}
-      {stepOneCompleted && (
-        <Flex mt={4} flexWrap="wrap">
-          {onCancel && (
-            <StyledButton
-              type="button"
-              data-cy="expense-cancel-btn"
-              disabled={formik.isSubmitting}
-              mt={2}
-              minWidth={175}
-              width={['100%', 'auto']}
-              mx={[2, 0]}
-              mr={[null, 3]}
-              whiteSpace="nowrap"
-              onClick={() => {
-                if (!formik.dirty || confirm(formatMessage(msg.leaveWithUnsavedChanges))) {
-                  onCancel();
-                }
-              }}
-            >
-              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
-          )}
-          <StyledButton
-            type="submit"
-            minWidth={175}
-            width={['100%', 'auto']}
-            mx={[2, 0]}
-            mr={[null, 3]}
-            mt={2}
-            whiteSpace="nowrap"
-            data-cy="expense-summary-btn"
-            buttonStyle="primary"
-            disabled={!stepTwoCompleted || !formik.isValid}
-            loading={formik.isSubmitting}
-          >
-            <FormattedMessage id="Expense.ReviewSummary" defaultMessage="Review expense summary" />
-            &nbsp;→
-          </StyledButton>
-        </Flex>
+
+      {step == STEPS.EXPENSE && (
+        <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
+          <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless />
+        </StyledCard>
       )}
     </Form>
   );

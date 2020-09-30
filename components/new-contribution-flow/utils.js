@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
@@ -16,16 +17,17 @@ import {
 import CreditCardInactive from '../../components/icons/CreditCardInactive';
 
 /** Returns true if taxes may apply with this tier/host */
-export const taxesMayApply = (collective, host, tier) => {
+export const taxesMayApply = (collective, parent, host, tier) => {
   if (!tier) {
     return false;
+  } else if (tier.amountType === AmountTypes.FIXED && !tier.amount.valueInCents) {
+    return false;
   }
-
   // Don't apply VAT if not configured (default)
   const vatType = get(collective, 'settings.VAT.type') || get(collective, 'parent.settings.VAT.type');
   const hostCountry = get(host.location, 'country');
   const collectiveCountry = get(collective.location, 'country');
-  const parentCountry = get(collective, 'parent.location.country');
+  const parentCountry = get(parent, 'location.country');
   const country = collectiveCountry || parentCountry || hostCountry;
 
   if (!vatType) {
@@ -80,11 +82,13 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   };
 
   uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+    const sourceProviderType = paymentMethod.sourcePaymentMethod?.providerType ?? paymentMethod.providerType;
+
     if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.GIFT_CARD && paymentMethod.limitedToHosts) {
       return matchesHostCollectiveId(paymentMethod);
-    } else if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.PREPAID_BUDGET) {
+    } else if (sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.PREPAID_BUDGET) {
       return matchesHostCollectiveIdPrepaid(paymentMethod);
-    } else if (!hostHasStripe && paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD) {
+    } else if (!hostHasStripe && sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD) {
       return false;
     } else {
       return true;
@@ -106,7 +110,7 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
     }
 
     // Paypal
-    if (hostHasPaypal) {
+    if (hostHasPaypal && !stepDetails.interval) {
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
@@ -123,7 +127,12 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || 'Bank transfer',
         paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER },
         icon: getPaymentMethodIcon({ type: 'manual' }, collective),
-        instructions: get(collective, 'host.settings.paymentMethods.manual.instructions', null),
+        instructions: (
+          <FormattedMessage
+            id="NewContributionFlow.bankInstructions"
+            defaultMessage="Instructions will be given on the next page to make a transfer."
+          />
+        ),
       });
     }
   }
@@ -135,6 +144,20 @@ export const getTotalAmount = (stepDetails, stepSummary) => {
   const quantity = get(stepDetails, 'quantity') || 1;
   const amount = get(stepDetails, 'amount') || 0;
   const taxAmount = get(stepSummary, 'amount') || 0;
-  const platformFeeAmount = get(stepDetails, 'feesOnTop') || 0;
+  const platformFeeAmount = get(stepDetails, 'platformContribution') || 0;
   return quantity * (amount + platformFeeAmount) + taxAmount;
+};
+
+export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
+  if (valueInCents) {
+    return { valueInCents };
+  } else if (typeof defaultValue === 'number') {
+    return { valueInCents: defaultValue };
+  } else {
+    return defaultValue;
+  }
+};
+
+export const isAllowedRedirect = host => {
+  return ['octobox.io', 'dotnetfoundation.org'].includes(host);
 };

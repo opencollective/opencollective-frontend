@@ -6,24 +6,18 @@ import { ORDER_STATUS } from '../lib/constants/order-status';
 
 import StyledTag from './StyledTag';
 
-const getExpenseStatusMsgType = (status, isRefund) => {
+const getTransactionStatusMsgType = (isRefund, isRefunded, isOrderRejected) => {
   if (isRefund) {
+    return 'success';
+  }
+  if (isOrderRejected && isRefunded) {
+    return 'error';
+  }
+  if (isRefunded) {
     return 'grey';
   }
 
-  switch (status) {
-    case ORDER_STATUS.CANCELLED:
-    case ORDER_STATUS.ERROR:
-      return 'error';
-    case ORDER_STATUS.EXPIRED:
-      return 'warning';
-    case ORDER_STATUS.PAID:
-    case ORDER_STATUS.ACTIVE:
-      return 'success';
-    case ORDER_STATUS.PENDING:
-    default:
-      return 'info';
-  }
+  return 'success';
 };
 
 const msg = defineMessages({
@@ -63,37 +57,44 @@ const msg = defineMessages({
     id: 'Order.Status.Refunded',
     defaultMessage: 'Refunded',
   },
+  rejected: {
+    id: 'expense.rejected',
+    defaultMessage: 'Rejected',
+  },
 });
 
-const formatStatus = (intl, status, isRefund) => {
+const formatStatus = (intl, isRefund, isRefunded, isOrderRejected) => {
   if (isRefund) {
-    return intl.formatMessage(msg.refunded);
-  } else if (status === ORDER_STATUS.ACTIVE || status === ORDER_STATUS.PAID) {
     return intl.formatMessage(msg.completed);
-  } else if (msg[status]) {
-    return intl.formatMessage(msg[status]);
+  } else if (isOrderRejected && isRefunded) {
+    return intl.formatMessage(msg.rejected);
+  } else if (isRefunded) {
+    return intl.formatMessage(msg.refunded);
+  } else {
+    return intl.formatMessage(msg.completed);
   }
 };
 
-const OrderStatusTag = ({ status, isRefund, ...props }) => {
+const TransactionStatusTag = ({ isRefund, isRefunded, isOrderRejected, ...props }) => {
   const intl = useIntl();
   return (
     <StyledTag
-      type={getExpenseStatusMsgType(status, isRefund)}
+      type={getTransactionStatusMsgType(isRefund, isRefunded, isOrderRejected)}
       fontWeight="600"
       letterSpacing="0.8px"
       textTransform="uppercase"
       data-cy="expense-status-msg"
       {...props}
     >
-      {formatStatus(intl, status, isRefund)}
+      {formatStatus(intl, isRefund, isRefunded, isOrderRejected)}
     </StyledTag>
   );
 };
 
-OrderStatusTag.propTypes = {
-  status: PropTypes.oneOf(Object.values(ORDER_STATUS)),
+TransactionStatusTag.propTypes = {
   isRefund: PropTypes.bool,
+  isRefunded: PropTypes.bool,
+  isOrderRejected: PropTypes.bool,
 };
 
-export default OrderStatusTag;
+export default TransactionStatusTag;

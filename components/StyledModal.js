@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
 import themeGet from '@styled-system/theme-get';
 import { createPortal } from 'react-dom';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { background, margin, overflow, space } from 'styled-system';
 
 import Avatar from './Avatar';
@@ -96,6 +96,12 @@ const Divider = styled.div`
   width: 100%;
   height: 1px;
   background-color: #e1e4e6;
+  ${props =>
+    props.isFullWidth &&
+    css`
+      margin-left: -20px;
+      width: calc(100% + 40px);
+    `}
 `;
 
 const CloseIcon = styled(Times)`
@@ -144,9 +150,9 @@ CollectiveModalHeader.propTypes = {
 
 CollectiveModalHeader.displayName = 'Header';
 
-export const ModalFooter = ({ children, dividerMargin, ...props }) => (
+export const ModalFooter = ({ children, isFullWidth, dividerMargin, ...props }) => (
   <Container {...props}>
-    <Divider margin={dividerMargin} />
+    <Divider margin={dividerMargin} isFullWidth={isFullWidth} />
     {children}
   </Container>
 );

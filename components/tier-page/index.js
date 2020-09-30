@@ -6,6 +6,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { isTierExpired } from '../../lib/tier-utils';
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
 
@@ -160,7 +161,7 @@ class TierPage extends Component {
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
     const shareBlock = this.renderShareBlock();
-    const isPassed = tier.endsAt && new Date(tier.endsAt) < new Date();
+    const isPassed = isTierExpired(tier);
 
     return (
       <Container pb={4}>

@@ -106,6 +106,7 @@ class ExpensePage extends React.Component {
       account: PropTypes.shape({
         id: PropTypes.string.isRequired,
         currency: PropTypes.string.isRequired,
+        isArchived: PropTypes.bool,
       }),
       expenses: PropTypes.shape({
         nodes: PropTypes.array,
@@ -180,7 +181,7 @@ class ExpensePage extends React.Component {
           collective={data.account}
           isLoading={!data.account}
           selected={Sections.BUDGET}
-          callsToAction={{ hasSubmitExpense: true }}
+          callsToAction={{ hasSubmitExpense: data.account && !data.account.isArchived }}
         />
         <Container position="relative" minHeight={[null, 800]}>
           <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
@@ -310,6 +311,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       imageUrl
       name
       currency
+      isArchived
       expensesTags {
         id
         tag
@@ -326,6 +328,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
           slug
           type
           supportedPayoutMethods
+          settings
           plan {
             transferwisePayouts
             transferwisePayoutsLimit

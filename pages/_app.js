@@ -127,7 +127,7 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
-                <UserProvider apiKey={process.env.STRIPE_KEY}>
+                <UserProvider>
                   <Component {...pageProps} />
                 </UserProvider>
               </RawIntlProvider>

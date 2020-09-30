@@ -168,7 +168,7 @@ const BankTransfer = props => {
           initialValues={initialValues}
           onSubmit={async (values, { setSubmitting }) => {
             const { data, instructions } = values;
-            if (data) {
+            if (data?.currency) {
               await createPayoutMethod({
                 variables: {
                   payoutMethod: { data: { ...data, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
@@ -233,7 +233,9 @@ const BankTransfer = props => {
                       host={{ slug: TW_API_COLLECTIVE_SLUG }}
                       getFieldName={string => string}
                       fixedCurrency={fixedCurrency}
+                      ignoreBlockedCurrencies={false}
                       isNew
+                      optional
                     />
                   </Flex>
                 </React.Fragment>

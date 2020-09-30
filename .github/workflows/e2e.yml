@@ -6,7 +6,8 @@ env:
   CI: true
   TZ: UTC
   E2E_TEST: 1
-  NODE_ENV: ci
+  OC_ENV: ci
+  NODE_ENV: ci # TODO: should be ideally development, test or production
   PGHOST: localhost
   PGUSER: postgres
   WEBSITE_URL: http://localhost:3000
@@ -24,6 +25,7 @@ env:
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
   TERM: xterm
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  NEW_CONTRIBUTION_FLOW: ${{ contains(github.ref, 'new-cf') }}
 
 jobs:
   e2e:

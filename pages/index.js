@@ -38,4 +38,11 @@ const HomePage = () => {
   );
 };
 
+HomePage.getInitialProps = ({ req }) => {
+  if (req) {
+    req.noStyledJsx = true;
+  }
+  return {};
+};
+
 export default HomePage;

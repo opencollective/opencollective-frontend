@@ -195,6 +195,7 @@ const StepProfile = ({
       )}
       <StyledRadioList
         {...fieldProps}
+        data-cy="ContributionProfile"
         options={options}
         keyGetter="id"
         defaultValue={defaultSelectedProfile ? defaultSelectedProfile.id : undefined}

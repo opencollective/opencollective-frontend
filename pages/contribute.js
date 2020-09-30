@@ -205,11 +205,13 @@ const contributePageQuery = gql`
         button
         amountType
         endsAt
+        maxQuantity
         type
         stats {
           id
           totalDonated
           totalRecurringDonations
+          availableQuantity
           contributors {
             id
             all
@@ -235,6 +237,10 @@ const contributePageQuery = gql`
         startsAt
         endsAt
         backgroundImageUrl(height: 208)
+        tiers {
+          id
+          type
+        }
         contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
           id
           image

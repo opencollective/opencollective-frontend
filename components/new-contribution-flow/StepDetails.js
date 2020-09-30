@@ -1,44 +1,73 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { Calendar } from '@styled-icons/feather/Calendar';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
-import { TierTypes } from '../../lib/constants/tiers-types';
+import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
+import { getNextChargeDate } from '../../lib/date-utils';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
+import { Router } from '../../server/pages';
 
-import { Box } from '../../components/Grid';
+import { Box, Flex } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
 import StyledInputField from '../../components/StyledInputField';
 
+import Container from '../Container';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledAmountPicker from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
 
+import ChangeTierWarningModal from './ChangeTierWarningModal';
 import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
+import { getTotalAmount } from './utils';
 
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
   const intl = useIntl();
+  const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
   const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
+  const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
+  const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
   return (
     <Box width={1}>
-      <Box mb={3}>
-        <StyledAmountPicker
-          currency={collective.currency}
-          presets={presets}
-          min={getTierMinAmount(tier)}
-          value={data?.amount}
-          onChange={amount => dispatchChange('amount', amount)}
+      {!isFixedContribution ? (
+        <Box mb={3}>
+          <StyledAmountPicker
+            currency={collective.currency}
+            presets={presets}
+            min={getTierMinAmount(tier)}
+            value={data?.amount}
+            onChange={amount => dispatchChange('amount', amount)}
+          />
+        </Box>
+      ) : tier.amount.valueInCents ? (
+        <Box mb={3}>
+          <FormattedMessage
+            id="contribute.tierDetails"
+            defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month { monthly} year { yearly} other {}}."
+            values={{
+              interval: tier.interval,
+              amount: <FormattedMoneyAmount amount={getTotalAmount(data)} currency={collective.currency} />,
+            }}
+          />
+        </Box>
+      ) : !hasQuantity ? (
+        <FormattedMessage
+          id="contribute.freeTier"
+          defaultMessage="This is a free tier, you can submit your order directly."
         />
-      </Box>
-      {tier?.type === TierTypes.TICKET && (
+      ) : null}
+
+      {hasQuantity && (
         <Box mb={3}>
           <StyledInputField
             htmlFor="quantity"
@@ -46,26 +75,46 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             labelFontSize="20px"
             labelColor="black.700"
             labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
+            error={Boolean(tier.availableQuantity !== null && data?.quantity > tier.availableQuantity)}
             required
           >
             {fieldProps => (
-              <StyledInput
-                {...fieldProps}
-                type="number"
-                min={1}
-                step={1}
-                max={tier.maxQuantity}
-                value={data?.quantity}
-                maxWidth={80}
-                onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
-                fontSize="20px"
-                lineHeight="26px"
-              />
+              <div>
+                {tier.availableQuantity !== null && (
+                  <P
+                    fontSize="11px"
+                    color="#e69900"
+                    textTransform="uppercase"
+                    fontWeight="500"
+                    letterSpacing="1px"
+                    mb={2}
+                  >
+                    <FormattedMessage
+                      id="tier.limited"
+                      defaultMessage="LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}"
+                      values={tier}
+                    />
+                  </P>
+                )}
+                <StyledInput
+                  {...fieldProps}
+                  type="number"
+                  min={1}
+                  step={1}
+                  max={tier.availableQuantity}
+                  value={data?.quantity}
+                  maxWidth={80}
+                  onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
+                  fontSize="20px"
+                  lineHeight="26px"
+                  minWidth={100}
+                />
+              </div>
             )}
           </StyledInputField>
         </Box>
       )}
-      {(!tier || tier.amountType === 'FLEXIBLE') && (
+      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && (
         <StyledInputField
           label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
           htmlFor="interval"
@@ -82,11 +131,17 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
               mt={[4, 0]}
               items={[null, INTERVALS.month, INTERVALS.year]}
               selected={data?.interval || null}
-              buttonProps={{ p: 2 }}
-              onChange={interval => dispatchChange('interval', interval)}
+              buttonProps={{ px: 2, py: 1 }}
+              onChange={interval => {
+                if (tier) {
+                  setTemporaryInterval(interval);
+                } else {
+                  dispatchChange('interval', interval);
+                }
+              }}
             >
               {({ item, isSelected }) => (
-                <Span fontSize="18px" lineHeight="21px" fontWeight={isSelected ? 500 : 'normal'}>
+                <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
                   {i18nInterval(intl, item || INTERVALS.oneTime)}
                 </Span>
               )}
@@ -99,11 +154,41 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           <FeesOnTopInput
             currency={collective.currency}
             amount={data?.amount}
-            fees={data?.feesOnTop}
+            fees={data?.platformContribution}
             interval={data?.interval}
-            onChange={feesOnTop => dispatchChange('feesOnTop', feesOnTop)}
+            onChange={value => dispatchChange('platformContribution', value)}
           />
         </Box>
+      )}
+      {data.interval && (
+        <Flex width="100%" justifyContent="flex-end" mt={3}>
+          <Flex bg="#F7F8FA" p="2px 8px">
+            <Flex alignItems="center" mr={3}>
+              <Calendar size={16} color="#9D9FA3" />
+            </Flex>
+            <Container color="black.500">
+              <P fontSize="12px" lineHeight="18px" mb="4px">
+                <Span>
+                  <FormattedMessage id="contribution.subscription.first.label" defaultMessage="First charge:" />
+                </Span>{' '}
+                <Span color="primary.500" fontWeight="500">
+                  <FormattedMessage id="contribution.subscription.today" defaultMessage="Today" />
+                </Span>
+              </P>
+              <P fontSize="12px" lineHeight="18px">
+                <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />{' '}
+                <Span color="primary.500" fontWeight="500">
+                  <FormattedDate
+                    value={getNextChargeDate(new Date(), data.interval)}
+                    day="numeric"
+                    month="short"
+                    year="numeric"
+                  />
+                </Span>
+              </P>
+            </Container>
+          </Flex>
+        </Flex>
       )}
       {hostIsTaxDeductibeInTheUs(collective.host) && (
         <React.Fragment>
@@ -123,10 +208,26 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           </H5>
           <TierCustomFields
             fields={tier.customFields}
-            data={data?.customFieldsData}
-            onChange={customFieldsData => dispatchChange('customFieldsData', customFieldsData)}
+            data={data?.customData}
+            onChange={customData => dispatchChange('customData', customData)}
           />
         </Box>
+      )}
+      {temporaryInterval !== undefined && (
+        <ChangeTierWarningModal
+          show
+          tierName={tier.name}
+          onClose={() => setTemporaryInterval(undefined)}
+          onConfirm={() => {
+            dispatchChange('interval', temporaryInterval);
+            setTemporaryInterval(undefined);
+            Router.pushRoute('orderCollectiveNew', {
+              collectiveSlug: collective.slug,
+              verb: 'donate',
+              step: 'details',
+            });
+          }}
+        />
       )}
     </Box>
   );
@@ -137,21 +238,28 @@ StepDetails.propTypes = {
   showFeesOnTop: PropTypes.bool,
   data: PropTypes.shape({
     amount: PropTypes.number,
-    feesOnTop: PropTypes.number,
+    platformContribution: PropTypes.number,
     quantity: PropTypes.number,
     interval: PropTypes.string,
-    customFieldsData: PropTypes.object,
+    customData: PropTypes.object,
   }),
   collective: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     type: PropTypes.string,
     host: PropTypes.object,
   }).isRequired,
   tier: PropTypes.shape({
     amountType: PropTypes.string,
+    interval: PropTypes.string,
+    name: PropTypes.string,
     maxQuantity: PropTypes.number,
+    availableQuantity: PropTypes.number,
     type: PropTypes.oneOf(Object.values(TierTypes)),
     customFields: PropTypes.array,
+    amount: PropTypes.shape({
+      valueInCents: PropTypes.number,
+    }),
     minAmount: PropTypes.shape({
       valueInCents: PropTypes.number,
     }),

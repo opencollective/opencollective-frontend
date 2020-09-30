@@ -432,6 +432,7 @@ class BannerIframe extends React.Component {
               type="ORGANIZATION,COLLECTIVE"
               role="BACKER"
               limit={100}
+              orderBy="totalDonations"
             />
           </section>
         )}
@@ -475,10 +476,11 @@ class BannerIframe extends React.Component {
 }
 
 const collectiveBannerIframeQuery = gql`
-  query CollectiveBannerIfame($collectiveSlug: String) {
+  query CollectiveBannerIframe($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
       name
+      slug
       currency
       stats {
         id

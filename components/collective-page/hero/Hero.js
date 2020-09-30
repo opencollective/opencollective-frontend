@@ -18,7 +18,7 @@ import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url_helpers';
 import CollectiveCallsToAction from '../../CollectiveCallsToAction';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
-import { Flex } from '../../Grid';
+import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
@@ -168,10 +168,18 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               </StyledButton>
             </Link>
           )}
-          <H1 color="black.800" fontSize="32px" lineHeight="36px" textAlign="left" data-cy="collective-title">
-            {collective.name || collective.slug}
-          </H1>
-
+          <Box maxWidth={['70%', '60%', null, '40%', '45%']}>
+            <H1
+              color="black.800"
+              fontSize="32px"
+              lineHeight="36px"
+              textAlign="left"
+              data-cy="collective-title"
+              wordBreak="normal"
+            >
+              {collective.name || collective.slug}
+            </H1>
+          </Box>
           {collective.company && (
             <StyledLink as={UserCompany} fontSize="20px" fontWeight={600} company={collective.company} />
           )}

@@ -58,6 +58,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       maxAmount: $maxAmount
       dateFrom: $dateFrom
       searchTerm: $searchTerm
+      includeIncognitoTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
     }
@@ -153,7 +154,7 @@ class TransactionsPage extends React.Component {
   render() {
     const { LoggedInUser, query, transactionsData, data, slug } = this.props;
     const collective = get(this.props, 'data.Collective') || this.state.Collective;
-    const { transactions, error, loading, variables } = transactionsData;
+    const { transactions, error, loading, variables, refetch } = transactionsData;
     const hasFilters = Object.entries(query).some(([key, value]) => {
       return !['view', 'offset', 'limit', 'slug'].includes(key) && value;
     });
@@ -266,9 +267,11 @@ class TransactionsPage extends React.Component {
                 <React.Fragment>
                   <TransactionsList
                     isLoading={loading}
+                    collective={collective}
                     nbPlaceholders={variables.limit}
                     transactions={transactions?.nodes}
                     displayActions
+                    onMutationSuccess={() => refetch()}
                   />
                   <Flex mt={5} justifyContent="center">
                     <Pagination

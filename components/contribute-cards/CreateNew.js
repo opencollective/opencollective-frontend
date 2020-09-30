@@ -19,6 +19,7 @@ const CreateNewCard = styled.div`
 
   a {
     text-decoration: none;
+    display: block;
   }
 
   &:hover {
@@ -32,16 +33,18 @@ const CreateNewCard = styled.div`
 const CreateNew = ({ route, children, ...props }) => {
   return (
     <CreateNewCard {...props}>
-      <Link route={route}>
-        <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
-          <StyledRoundButton buttonStyle="dark" fontSize={25}>
-            +
-          </StyledRoundButton>
-          <P mt={3} color="black.700">
-            {children}
-          </P>
-        </Flex>
-      </Link>
+      <Flex alignItems="center" justifyContent="center" height="100%">
+        <Link route={route}>
+          <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
+            <StyledRoundButton buttonStyle="dark" fontSize={25}>
+              +
+            </StyledRoundButton>
+            <P mt={3} color="black.700">
+              {children}
+            </P>
+          </Flex>
+        </Link>
+      </Flex>
     </CreateNewCard>
   );
 };

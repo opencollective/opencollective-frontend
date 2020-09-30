@@ -211,7 +211,6 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
                     <Fragment>
                       <StyledSelect
                         data-cy="tier-amount-select"
-                        menuPortalTarget={document.body}
                         onChange={setSelectedAmountOption}
                         value={selectedAmountOption}
                         options={amountOptions}

@@ -5,19 +5,18 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
-import { Flex } from '../../components/Grid';
-import StyledHr from '../../components/StyledHr';
-import { H4 } from '../../components/Text';
-import { withUser } from '../../components/UserProvider';
-
+import { Flex } from '../Grid';
 import StyledCard from '../StyledCard';
+import StyledHr from '../StyledHr';
+import { H4 } from '../Text';
+import { withUser } from '../UserProvider';
 
 import StepDetails from './StepDetails';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
 
-class NewContributionFlowMainContainer extends React.Component {
+class ContributionFlowStepContainer extends React.Component {
   static propTypes = {
     intl: PropTypes.object,
     LoggedInUser: PropTypes.object,
@@ -26,6 +25,7 @@ class NewContributionFlowMainContainer extends React.Component {
     onChange: PropTypes.func,
     showFeesOnTop: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
+    defaultProfileSlug: PropTypes.string,
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
@@ -35,7 +35,6 @@ class NewContributionFlowMainContainer extends React.Component {
       stepSummary: PropTypes.object,
       stepPayment: PropTypes.object,
     }),
-    contributeAs: PropTypes.object,
   };
 
   constructor(props) {
@@ -49,7 +48,7 @@ class NewContributionFlowMainContainer extends React.Component {
         defaultMessage: 'Sign up to contribute recurrently',
       },
       payment: { id: 'NewContributionFlow.ChoosePaymentMethod', defaultMessage: 'Choose your payment method' },
-      summary: { id: 'contribute.step.summary', defaultMessage: 'Summary' },
+      summary: { id: 'Summary', defaultMessage: 'Summary' },
     });
   }
 
@@ -66,9 +65,9 @@ class NewContributionFlowMainContainer extends React.Component {
   };
 
   getLoggedInUserDefaultContributeProfile() {
-    if (this.props.contributeAs) {
+    if (this.props.defaultProfileSlug) {
       const otherProfiles = this.getOtherProfiles();
-      const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.contributeAs);
+      const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.defaultProfileSlug);
       if (contributorProfile) {
         return contributorProfile;
       }
@@ -139,6 +138,7 @@ class NewContributionFlowMainContainer extends React.Component {
             onChange={this.props.onChange}
             data={stepProfile}
             canUseIncognito={collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET')}
+            defaultProfileSlug={this.props.defaultProfileSlug}
           />
         );
       }
@@ -194,4 +194,4 @@ class NewContributionFlowMainContainer extends React.Component {
   }
 }
 
-export default injectIntl(withUser(NewContributionFlowMainContainer));
+export default injectIntl(withUser(ContributionFlowStepContainer));

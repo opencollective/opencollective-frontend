@@ -17,7 +17,7 @@ describe('host dashboard', () => {
     cy.get('[data-cy="custom-checkbox"]').click();
     cy.wait(300);
     cy.get('button[type="submit"]').click();
-    cy.wait(1000);
+    cy.contains('The Cavies United Collective has been created!');
     cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
     cy.get('[data-cy="host-dashboard-menu-bar"]').contains('Pending applications').click();
     cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
@@ -32,40 +32,42 @@ describe('host dashboard', () => {
     cy.wait(1000);
   });
 
-  it('approve expense and reject expense', () => {
-    cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses' });
-    cy.get('[data-cy="expense-paid"]').as('currentExpense');
-    cy.get('[data-cy="expense-actions"]').contains('button', 'Unapprove').click();
-    cy.get('[data-cy="confirmation-modal-continue"]').click();
-    cy.wait(500);
-    cy.get('[data-cy="reject-expense-btn"]').within(() => {
-      cy.get('button').click();
+  describe('legacy expense tab', () => {
+    it('approve expense and reject expense', () => {
+      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses-legacy' });
+      cy.get('[data-cy="expense-paid"]').as('currentExpense');
+      cy.get('[data-cy="expense-actions"]').contains('button', 'Unapprove').click();
+      cy.get('[data-cy="confirmation-modal-continue"]').click();
+      cy.wait(500);
+      cy.get('[data-cy="reject-expense-btn"]').within(() => {
+        cy.get('button').click();
+      });
+      cy.get('[data-cy="approve-expense-btn"]').within(() => {
+        cy.get('button').click();
+      });
     });
-    cy.get('[data-cy="approve-expense-btn"]').within(() => {
-      cy.get('button').click();
+
+    it('record expense as paid', () => {
+      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses-legacy' });
+      cy.get('[data-cy="expense-approved"]').as('currentExpense');
+      cy.get('[data-cy="expense-actions"]').contains('button', 'Record as paid').click();
+      cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-paid');
     });
-  });
 
-  it('record expense as paid', () => {
-    cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
-    cy.get('[data-cy="expense-approved"]').as('currentExpense');
-    cy.get('[data-cy="expense-actions"]').contains('button', 'Record as paid').click();
-    cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-paid');
-  });
+    it('mark expense as unpaid', () => {
+      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses-legacy' });
+      cy.get('[data-cy="expense-paid"]').as('currentExpense');
+      cy.get('[data-cy="expense-actions"]').as('currentExpenseActions').contains('button', 'Mark as unpaid').click();
+      cy.get('@currentExpenseActions').contains('button', 'Continue').click();
+      cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-approved');
+    });
 
-  it('mark expense as unpaid', () => {
-    cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
-    cy.get('[data-cy="expense-paid"]').as('currentExpense');
-    cy.get('[data-cy="expense-actions"]').as('currentExpenseActions').contains('button', 'Mark as unpaid').click();
-    cy.get('@currentExpenseActions').contains('button', 'Continue').click();
-    cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-approved');
-  });
-
-  it('delete rejected expense', () => {
-    cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
-    cy.get('[data-cy="expense-rejected"]').as('currentExpense');
-    cy.get('[data-cy="expense-actions"]').contains('button', 'Delete').click();
-    cy.get('[data-cy="confirmation-modal-continue"]').click();
-    cy.get('[data-cy="errorMessage"]').should('not.exist');
+    it('delete rejected expense', () => {
+      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses-legacy' });
+      cy.get('[data-cy="expense-rejected"]').as('currentExpense');
+      cy.get('[data-cy="expense-actions"]').contains('button', 'Delete').click();
+      cy.get('[data-cy="confirmation-modal-continue"]').click();
+      cy.get('[data-cy="errorMessage"]').should('not.exist');
+    });
   });
 });

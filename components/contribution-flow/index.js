@@ -7,7 +7,6 @@ import { themeGet } from '@styled-system/theme-get';
 import { debounce, findIndex, get, isNil, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
-import { URLSearchParams } from 'universal-url';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
 
@@ -134,7 +133,7 @@ const stepsLabels = defineMessages({
     defaultMessage: 'Payment info',
   },
   summary: {
-    id: 'contribute.step.summary',
+    id: 'Summary',
     defaultMessage: 'Summary',
   },
 });
@@ -183,6 +182,7 @@ class CreateOrderPage extends React.Component {
       customFields: PropTypes.arrayOf(PropTypes.object),
     }),
     verb: PropTypes.string.isRequired,
+    version: PropTypes.oneOf(['legacy']),
     step: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
@@ -336,6 +336,11 @@ class CreateOrderPage extends React.Component {
     } else if (params.verb === 'contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       params.verb = 'pay';
+    }
+
+    if (this.props.version === 'legacy') {
+      params.version = 'legacy';
+      route += 'Legacy';
     }
 
     // Reset errors if any
@@ -558,7 +563,7 @@ class CreateOrderPage extends React.Component {
   };
 
   isValidRedirect(url) {
-    const validationParams = process.env.NODE_ENV === 'production' ? {} : { require_tld: false };
+    const validationParams = process.env.OC_ENV === 'production' ? {} : { require_tld: false };
 
     return isURL(url, validationParams);
   }
@@ -865,8 +870,8 @@ class CreateOrderPage extends React.Component {
       ['20%', 0.2],
     ]);
     const platformFeeArray = Array.from(map, x => ({
-      label: `${formatCurrency(x[1] * amount, this.getCurrency())} (${x[0]})`,
-      value: x[1] * amount,
+      label: `${formatCurrency(Math.round(x[1] * amount), this.getCurrency())} (${x[0]})`,
+      value: Math.round(x[1] * amount),
     }));
     platformFeeArray.push(
       { label: this.props.intl.formatMessage(messages.platformFeeNoContribution), value: 0 },
@@ -1025,9 +1030,8 @@ class CreateOrderPage extends React.Component {
                                   ...state.stepDetails,
                                   platformFee: {
                                     ...state.stepDetails.platformFee,
-                                    value: value,
+                                    value: Math.round(value),
                                   },
-                                  totalAmount: state.stepDetails.amount + value,
                                 },
                               }));
                             }}
@@ -1270,7 +1274,7 @@ class CreateOrderPage extends React.Component {
             )}
             {this.state.error && (
               <MessageBox type="error" mb={3} mx={2} withIcon>
-                {this.state.error.replace('GraphQL error: ', '')}
+                {this.state.error}
               </MessageBox>
             )}
             {loadingLoggedInUser || !isValidStep ? (

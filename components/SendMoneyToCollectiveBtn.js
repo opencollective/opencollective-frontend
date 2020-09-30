@@ -61,7 +61,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
       await this.props.sendMoneyToCollective({ variables: { order } });
       this.setState({ loading: false });
     } catch (e) {
-      const error = e.message && e.message.replace(/GraphQL error:/, '');
+      const error = e.message;
       this.setState({ error, loading: false });
     }
   }

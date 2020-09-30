@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 export default async function handle(req, res) {
   const graphqlUrl = `${process.env.API_URL}/users/update-token?api_key=${process.env.API_KEY}`;
 

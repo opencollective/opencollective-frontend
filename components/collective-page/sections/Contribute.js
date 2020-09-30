@@ -245,12 +245,7 @@ class SectionContribute extends React.PureComponent {
         waysToContribute.push({
           key: tier.id,
           Component: ContributeTier,
-          componentProps: {
-            collective,
-            tier,
-            hideContributors: hasNoContributor,
-            disableCTA: !canContribute,
-          },
+          componentProps: { collective, tier, hideContributors: hasNoContributor },
         });
       }
     });

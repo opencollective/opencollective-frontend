@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { TransactionTypes } from '../../lib/constants/transactions';
+import { getEnvVar } from '../../lib/env-utils';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
+import { parseToBoolean } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
@@ -14,6 +17,7 @@ import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 
 import TransactionRefundButton from './TransactionRefundButton';
+import TransactionRejectButton from './TransactionRejectButton';
 
 const DetailTitle = styled.p`
   margin: 8px 8px 4px 8px;
@@ -48,28 +52,37 @@ const DetailsContainer = styled(Flex)`
   }
 `;
 
-const TransactionDetails = ({
-  displayActions,
-  id,
-  type,
-  isRefunded,
-  toAccount,
-  fromAccount,
-  uuid,
-  platformFee,
-  hostFee,
-  paymentMethod,
-  paymentProcessorFee,
-  amount,
-  netAmount,
-  permissions,
-  order,
-  expense,
-}) => {
+const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) => {
   const intl = useIntl();
+  const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice);
+  const {
+    id,
+    type,
+    isRefunded,
+    toAccount,
+    fromAccount,
+    uuid,
+    platformFee,
+    hostFee,
+    paymentMethod,
+    paymentProcessorFee,
+    amount,
+    netAmount,
+    permissions,
+    order,
+    expense,
+    isRejected,
+  } = transaction;
   const isCredit = type === TransactionTypes.CREDIT;
   const hasOrder = order !== null;
-  const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice);
+
+  // permissions
+  const collectiveHasRejectContributionFeature = hasFeature(toAccount, FEATURES.REJECT_CONTRIBUTION);
+  const showRejectContribution =
+    parseToBoolean(getEnvVar('REJECT_CONTRIBUTION')) || collectiveHasRejectContributionFeature;
+  const showRefundButton = permissions?.canRefund && !isRefunded;
+  const showRejectButton = permissions?.canReject && !isRejected && showRejectContribution;
+  const showDownloadInvoiceButton = !showRefundButton && permissions?.canDownloadInvoice;
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
@@ -119,9 +132,16 @@ const TransactionDetails = ({
           </DetailDescription>
           {displayActions && ( // Let us overide so we can hide buttons in the collective page
             <React.Fragment>
-              {permissions?.canRefund && !isRefunded && <TransactionRefundButton id={id} />}
-              {!(permissions?.canRefund && !isRefunded) && // Just so we don't polute the UI, the Credit transaction will display the Download button
-                permissions?.canDownloadInvoice && (
+              <Flex justifyContent="flex-end">
+                {showRefundButton && <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />}
+                {showRejectButton && (
+                  <TransactionRejectButton
+                    id={id}
+                    canRefund={permissions?.canRefund && !isRefunded}
+                    onMutationSuccess={onMutationSuccess}
+                  />
+                )}
+                {showDownloadInvoiceButton && (
                   <StyledButton
                     buttonSize="small"
                     loading={loadingInvoice}
@@ -129,11 +149,13 @@ const TransactionDetails = ({
                     minWidth={140}
                     background="transparent"
                     textTransform="capitalize"
+                    ml={showRejectButton ? 2 : 0}
                   >
                     {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
                     {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
                   </StyledButton>
                 )}
+              </Flex>
             </React.Fragment>
           )}
         </Box>
@@ -144,64 +166,72 @@ const TransactionDetails = ({
 
 TransactionDetails.propTypes = {
   displayActions: PropTypes.bool,
-  isRefunded: PropTypes.bool,
-  fromAccount: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string,
-  }).isRequired,
-  toAccount: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string,
-    host: PropTypes.shape({
+  transaction: PropTypes.shape({
+    isRefunded: PropTypes.bool,
+    isRejected: PropTypes.bool,
+    fromAccount: PropTypes.shape({
+      id: PropTypes.string,
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       imageUrl: PropTypes.string,
+    }).isRequired,
+    toAccount: PropTypes.shape({
+      id: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string,
+      host: PropTypes.shape({
+        slug: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        imageUrl: PropTypes.string,
+      }),
     }),
-  }),
-  order: PropTypes.shape({
+    order: PropTypes.shape({
+      id: PropTypes.string,
+      status: PropTypes.string,
+    }),
+    expense: PropTypes.object,
     id: PropTypes.string,
-    status: PropTypes.string,
-  }),
-  expense: PropTypes.object,
-  id: PropTypes.string,
-  uuid: PropTypes.string,
-  type: PropTypes.string,
-  currency: PropTypes.string,
-  description: PropTypes.string,
-  createdAt: PropTypes.string,
-  taxAmount: PropTypes.number,
-  paymentMethod: PropTypes.shape({
+    uuid: PropTypes.string,
     type: PropTypes.string,
-  }),
-  amount: PropTypes.shape({
-    valueInCents: PropTypes.number,
     currency: PropTypes.string,
+    description: PropTypes.string,
+    createdAt: PropTypes.string,
+    taxAmount: PropTypes.number,
+    paymentMethod: PropTypes.shape({
+      type: PropTypes.string,
+    }),
+    amount: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }),
+    netAmount: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }),
+    platformFee: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }),
+    paymentProcessorFee: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }),
+    hostFee: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }),
+    permissions: PropTypes.shape({
+      canRefund: PropTypes.bool,
+      canDownloadInvoice: PropTypes.bool,
+      canReject: PropTypes.bool,
+    }),
+    usingVirtualCardFromCollective: PropTypes.object,
   }),
-  netAmount: PropTypes.shape({
-    valueInCents: PropTypes.number,
-    currency: PropTypes.string,
-  }),
-  platformFee: PropTypes.shape({
-    valueInCents: PropTypes.number,
-    currency: PropTypes.string,
-  }),
-  paymentProcessorFee: PropTypes.shape({
-    valueInCents: PropTypes.number,
-    currency: PropTypes.string,
-  }),
-  hostFee: PropTypes.shape({
-    valueInCents: PropTypes.number,
-    currency: PropTypes.string,
-  }),
-  permissions: PropTypes.shape({
-    canRefund: PropTypes.bool,
-    canDownloadInvoice: PropTypes.bool,
-  }),
-  usingVirtualCardFromCollective: PropTypes.object,
+  isHostAdmin: PropTypes.bool,
+  isRoot: PropTypes.bool,
+  isToCollectiveAdmin: PropTypes.bool,
+  onMutationSuccess: PropTypes.func,
 };
 
 export default TransactionDetails;

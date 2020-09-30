@@ -50,13 +50,13 @@ class ExpensePage extends React.Component {
         {data.Collective.host ? (
           <FormattedMessage
             id="expense.created"
-            defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense."
+            defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the admins of the Collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense."
             values={{ host: data.Collective.host.name }}
           />
         ) : (
           <FormattedMessage
             id="expense.created.noHost"
-            defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved."
+            defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the admins of the Collective. You will be notified by email once it has been approved."
           />
         )}
       </MessageBox>

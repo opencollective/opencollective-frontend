@@ -1,15 +1,5 @@
 import 'cypress-file-upload';
 
-const random = Math.round(Math.random() * 100000);
-const expenseDescription = `New expense ${random}`;
-
-const uploadReceipt = (dropzoneElement = '.InputTypeDropzone input') => {
-  cy.fixture('./images/receipt.jpg').then(picture => {
-    cy.get(dropzoneElement).upload({ fileContent: picture, fileName: 'receipt.jpg', mimeType: 'image/jpeg' });
-  });
-  cy.wait(900);
-};
-
 describe('New expense flow', () => {
   describe('new expense when logged out', () => {
     it('shows the login screen', () => {
@@ -50,8 +40,15 @@ describe('New expense flow', () => {
 
     it('submits new expense then edit it', () => {
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
+      // Select Payout Method
+      cy.getByDataCy('payout-method-select').click();
+      cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
+      cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
+      cy.getByDataCy('expense-next').click();
+
       cy.get('input[name="description"]').type('Brussels January team retreat');
 
+      cy.getByDataCy('expense-summary-btn').should('be.disabled');
       // Upload 2 files to the multi-files dropzone
       cy.fixture('images/receipt.jpg').then(fileContent => {
         const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
@@ -59,25 +56,18 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
       });
       cy.getByDataCy('expense-attachment-form').should('have.length', 2);
-      cy.getByDataCy('expense-summary-btn').should('be.disabled');
 
       // Fill info for first attachment
       cy.get('input[name="items[0].description"]').type('Fancy restaurant');
       cy.get('input[name="items[0].amount"]').type('{selectall}183');
-      cy.getByDataCy('expense-summary-btn').should('be.disabled');
       cy.get('input:invalid').should('have.length', 2); // Missing attachment desctiption+amount
       cy.getByDataCy('expense-items-total-amount').should('contain', '--.--'); // amount for second item is missing
 
-      // Select Payout Method
-      cy.getByDataCy('payout-method-select').click();
-      cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
-
       // Try to submit with missing data
-      cy.get('input:invalid').should('have.length', 3); // Previous incomplete fields + payout method email
+      cy.get('input:invalid').should('have.length', 2); // Previous incomplete fields + payout method email
       cy.getByDataCy('expense-summary-btn').click(); // Should not submit
 
       // Fill missing info & submit
-      cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
       cy.get('input[name="items[1].amount"]').type('{selectall}92.50');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50 USD');
@@ -115,10 +105,13 @@ describe('New expense flow', () => {
           { subjectType: 'drag-n-drop' },
         );
       });
+
       // Change payee - use a new organization
+      cy.getByDataCy('expense-back').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test-2@opencollective.com');
+      cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-summary-btn').click();
       cy.getByDataCy('save-expense-btn').click();
       cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
@@ -137,17 +130,22 @@ describe('New expense flow', () => {
 
     // This can happen if you start with an invoice then switch to receipts
     it('should prevent submitting receipts if missing items', () => {
-      // Fill the form with valid data
       cy.getByDataCy('radio-expense-type-INVOICE').click();
+      cy.getByDataCy('payout-method-select').click();
+      cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
+      cy.getByDataCy('payee-country').click();
+      cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
+      cy.get('textarea[data-cy="payee-address"]').type('Street Name, 123');
+      cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
+      cy.getByDataCy('expense-next').click();
+      // Fill the form with valid data
       cy.get('input[name="description"]').type('March invoice');
       cy.get('input[name="items[0].description"]').type('Peeling potatoes');
       cy.get('input[name="items[0].amount"]').type('{selectall}4200');
-      cy.getByDataCy('payout-method-select').click();
-      cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
-      cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
 
       // Switch to receipt and acnkowledge error
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
+      cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-summary-btn').click();
       cy.getByDataCy('attachment-url-field').should('contain', 'Receipt required');
     });
@@ -200,85 +198,6 @@ describe('New expense flow', () => {
       cy.url().should('eq', `${Cypress.config().baseUrl}/${collective.slug}/expenses`);
       cy.visit(expenseUrl);
       cy.getByDataCy('error-page').contains('Not found');
-    });
-  });
-});
-
-describe('Legacy expense flow', () => {
-  describe('new expense when logged out', () => {
-    it('requires to login to submit an expense', () => {
-      cy.visit('/testcollective/expenses/new/legacy');
-      cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
-      cy.get('#email').type('testuser+admin@opencollective.com');
-      cy.get('[data-cy="signin-btn"]').click();
-      cy.wait(2000);
-      cy.get('.inputField.description', { timeout: 5000 });
-    });
-  });
-
-  describe('new expense when logged in', () => {
-    beforeEach(() => {
-      cy.login({ redirect: '/testcollective/expenses/new/legacy' });
-    });
-
-    it('submits new expense paypal', () => {
-      cy.get('.descriptionField input').type(expenseDescription);
-      cy.get('.error').should('have.text', 'Amount must be greater than 0');
-      cy.get('.amountField input').type(12);
-      cy.get('.categoryField select').select('Team');
-      cy.get('.error').should('have.text', 'Missing attachment');
-      uploadReceipt();
-      cy.get('.error').should('have.text', 'Please pick the type of this expense');
-      cy.get('.expenseField select').select('RECEIPT');
-      cy.get('.inputField.paypalEmail input').type('{selectall}{del}');
-      cy.get('.error').should('have.text', 'Please provide your PayPal email address (or change the payout method)');
-      cy.get('.inputField.paypalEmail input').type('paypal@test.com');
-      cy.get('[data-cy="ExpenseNotesEditor"] trix-editor').type('Some private note for the host');
-      cy.get('button[type=submit]').click();
-      cy.get('[data-cy="expenseCreated"]').contains('success');
-      cy.visit('/testcollective/expenses/legacy');
-      cy.get('.itemsList .expense', { timeout: 10000 });
-      cy.get('.Expenses .expense:first .description').contains(expenseDescription);
-      cy.get('.Expenses .expense:first .status').contains('Pending');
-      cy.get('.Expenses .expense:first .meta').contains('Team');
-    });
-
-    it('submits a new expense other, edit it and approve it', () => {
-      cy.get('.descriptionField input').type(expenseDescription);
-      cy.wait(300);
-      cy.get('.amountField input', { timeout: 5000 }).type(12);
-      cy.get('.payoutMethod.inputField select').select('other');
-      uploadReceipt();
-      cy.get('.expenseField select').select('RECEIPT');
-      cy.wait(300);
-      cy.get('.LoginTopBarProfileButton').contains('testuseradmin', {
-        timeout: 15000,
-      });
-      cy.get('[data-cy="ExpenseNotesEditor"] trix-editor').type('Some private note for the host');
-      cy.get('button[type=submit]').click();
-      cy.get('[data-cy="expenseCreated"]').contains('success');
-      cy.visit('/testcollective/expenses/legacy');
-      cy.get('.itemsList .expense', { timeout: 10000 });
-      cy.get('.Expenses .expense:first .description').contains(expenseDescription);
-      cy.get('.Expenses .expense:first .status').contains('Pending');
-      cy.get('.Expenses .expense:first .privateMessage').contains('Some private note for the host');
-      cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
-      cy.get('.Expenses .expense:first .status').contains('Approved');
-      cy.get('.Expenses .expense:first .toggleEditExpense').click();
-      cy.get('.Expenses .expense:first .inputField.description input').type(' edited');
-      cy.get('.Expenses .expense:first .inputField.amount input').type('{selectall}13');
-      cy.get('.Expenses .expense:first .inputField.category select').select('Team');
-      cy.get('[data-cy="ExpenseNotesEditor"] trix-editor').type('{selectall}Another private note (edited)');
-      cy.get('.Expenses .expense:first .inputField.description input').focus();
-      cy.wait(300);
-      cy.getByDataCy('expense-edit-save-btn').click();
-      cy.get('.Expenses .expense:first .status').contains('Pending'); // editing an expense should switch status back to pending
-      cy.get('.Expenses .expense:first .description').contains('edited');
-      cy.get('.Expenses .expense:first .privateMessage').contains('edited');
-      cy.get('.Expenses .expense:first .amount').contains('$13.00');
-      cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
-      cy.wait(300);
-      cy.get('.Expenses .expense:first .status', { timeout: 5000 }).contains('Approved');
     });
   });
 });

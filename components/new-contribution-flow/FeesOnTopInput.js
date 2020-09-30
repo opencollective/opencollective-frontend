@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -54,10 +55,22 @@ const getOptions = (amount, currency) => {
 const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
   const options = React.useMemo(() => getOptions(amount, currency), [amount, currency]);
   const [selectedOption, setSelectedOption] = React.useState(options[1]);
+  const [isReady, setReady] = React.useState(false);
+
+  // Load initial value on mount
+  React.useEffect(() => {
+    if (!isNil(fees)) {
+      const option = options.find(({ value }) => value === fees) || options.find(({ value }) => value === 'CUSTOM');
+      setSelectedOption(option);
+    }
+    setReady(true);
+  }, []);
 
   // Dispatch new fees on top when amount changes
   React.useEffect(() => {
-    if (selectedOption.value === 0 && fees) {
+    if (!isReady) {
+      return;
+    } else if (selectedOption.value === 0 && fees) {
       onChange(0);
     } else if (selectedOption.percentage) {
       const newOption = getOptionFromPercentage(amount, currency, selectedOption.percentage);
@@ -66,7 +79,7 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
         setSelectedOption(newOption);
       }
     }
-  }, [selectedOption, amount]);
+  }, [selectedOption, amount, isReady]);
 
   return (
     <div>
@@ -95,12 +108,11 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
           options={options}
           onChange={setSelectedOption}
           value={selectedOption}
-          menuPortalTarget={typeof document === 'undefined' ? undefined : document.body}
         />
       </Flex>
       {selectedOption.value === 'CUSTOM' && (
         <Flex justifyContent="flex-end" mt={2}>
-          <StyledInputAmount id="feesOnTop" currency={currency} onChange={onChange} />
+          <StyledInputAmount id="feesOnTop" currency={currency} onChange={onChange} value={fees} />
         </Flex>
       )}
       <P fontSize="12px" lineHeight="18px" color="black.500" fontWeight="500" mt={2} textAlign={['left', 'right']}>

@@ -61,6 +61,7 @@ class EditCollective extends React.Component {
 
     collective.settings = {
       ...this.props.collective.settings,
+      ...collective.settings,
       apply: collective.application,
       tos: collective.tos,
     };
@@ -71,11 +72,16 @@ class EditCollective extends React.Component {
     this.setState({ status: 'loading' });
 
     try {
-      await this.props.editCollective(collective);
+      const response = await this.props.editCollective(collective);
+      const updatedCollective = response.data.editCollective;
       this.setState({ status: 'saved', result: { error: null } });
-      const { slug, eventSlug } = Router.router.query;
-      if ((eventSlug || slug) !== collective.slug) {
-        Router.replaceRoute('editCollective', { ...Router.router.query });
+      const currentSlug = Router.router.query.eventSlug ?? Router.router.query.slug;
+      if (currentSlug !== updatedCollective.slug) {
+        Router.replaceRoute('editCollective', {
+          ...Router.router.query,
+          slug: updatedCollective.slug,
+        });
+
         await this.props.refetchLoggedInUser();
       } else {
         setTimeout(() => {

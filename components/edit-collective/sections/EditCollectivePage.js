@@ -145,7 +145,6 @@ const CollectiveSectionEntry = ({
           const restrictedTo = value === 'ADMIN' ? ['ADMIN'] : [];
           onSectionToggle(section, isEnabled, restrictedTo);
         }}
-        menuPortalTarget={document.body}
         formatOptionLabel={option => <Span fontSize="11px">{option.label}</Span>}
       />
       {/**

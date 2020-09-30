@@ -45,12 +45,7 @@ class UpdatesPage extends React.Component {
           />
 
           <div className="content">
-            <UpdatesWithData
-              collective={collective}
-              includeHostedCollectives={collective.isHost}
-              defaultAction={action}
-              LoggedInUser={LoggedInUser}
-            />
+            <UpdatesWithData collective={collective} defaultAction={action} LoggedInUser={LoggedInUser} />
           </div>
         </Body>
 

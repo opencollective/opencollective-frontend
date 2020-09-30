@@ -39,7 +39,10 @@ const SafeTransactionMessage = () => {
               id="NewContributionFlow.ProtectTransactionDetails"
               defaultMessage="In Open Collective, your transaction is safe. <link>Know more</link>."
               values={{
-                link: getI18nLink({ href: 'https://docs.opencollective.com', openInNewTab: true }),
+                link: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/product/security#payments-security',
+                  openInNewTab: true,
+                }),
               }}
             />
           </P>

@@ -52,6 +52,10 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
         type
         expiryDate
         providerType
+        sourcePaymentMethod {
+          id
+          providerType
+        }
         balance {
           valueInCents
           currency
@@ -104,7 +108,7 @@ const StepPayment = ({
   // Set default payment method
   useEffect(() => {
     if (!loading && !stepPayment && !isEmpty(paymentOptions)) {
-      const firstOption = find(paymentOptions, pm => !pm.disabled);
+      const firstOption = paymentOptions.find(pm => !pm.disabled);
       if (firstOption) {
         setNewPaymentMethod(firstOption.key, firstOption.paymentMethod);
       }
@@ -162,6 +166,7 @@ const StepPayment = ({
                     onReady={onNewCardFormReady}
                     useLegacyCallback={false}
                     onChange={paymentMethod => setNewPaymentMethod(NEW_CREDIT_CARD_KEY, paymentMethod)}
+                    error={get(stepPayment, 'paymentMethod.stripeData.error.message')}
                   />
                 </Box>
               )}

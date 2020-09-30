@@ -19,6 +19,7 @@ import StyledCard from '../../StyledCard';
 import { P, Span } from '../../Text';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionsList from '../../transactions/TransactionsList';
+import { withUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
@@ -35,16 +36,19 @@ const budgetSectionQuery = gqlV2/* GraphQL */ `
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats }) => {
+const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
     variables: { slug: collective.slug, limit: 3 },
     context: API_V2_CONTEXT,
   });
-  const { data } = budgetQueryResult;
+  const { data, refetch } = budgetQueryResult;
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
   const isProject = collective.type === CollectiveType.PROJECT;
+  React.useEffect(() => {
+    refetch();
+  }, [LoggedInUser]);
 
   return (
     <ContainerSectionContent pt={[4, 5]} pb={3}>
@@ -71,7 +75,12 @@ const SectionBudget = ({ collective, stats }) => {
 
         <Container flex="10" mb={3} width="100%" maxWidth={800}>
           <GraphQLContext.Provider value={budgetQueryResult}>
-            <TransactionsList transactions={data?.transactions?.nodes} displayActions />
+            <TransactionsList
+              collective={collective}
+              transactions={data?.transactions?.nodes}
+              displayActions
+              onMutationSuccess={() => refetch()}
+            />
           </GraphQLContext.Provider>
           <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
             <Box flex="1 1" mx={[0, 2]}>
@@ -180,8 +189,10 @@ SectionBudget.propTypes = {
     totalAmountReceived: PropTypes.number,
   }),
 
+  LoggedInUser: PropTypes.object,
+
   /** @ignore from injectIntl */
   intl: PropTypes.object,
 };
 
-export default React.memo(injectIntl(SectionBudget));
+export default React.memo(withUser(injectIntl(SectionBudget)));

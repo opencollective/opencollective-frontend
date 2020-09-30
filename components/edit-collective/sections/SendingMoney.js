@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
-import { parseToBoolean } from '../../../lib/utils';
 
 import { H3, H4, P } from '../../Text';
 
@@ -15,10 +14,7 @@ class SendingMoney extends React.Component {
   };
 
   render() {
-    const services = [];
-    if (hasFeature(this.props.collective, FEATURES.TRANSFERWISE) || parseToBoolean(process.env.TRANSFERWISE_ENABLED)) {
-      services.push('transferwise');
-    }
+    const services = ['transferwise'];
     if (hasFeature(this.props.collective, FEATURES.PAYPAL_PAYOUTS)) {
       services.push('paypal');
     }

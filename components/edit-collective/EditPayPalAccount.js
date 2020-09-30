@@ -79,9 +79,6 @@ const EditPayPalAccount = props => {
       if (!values.clientId) {
         errors.clientId = 'Required';
       }
-      if (!values.webhookId) {
-        errors.webhookId = 'Required';
-      }
       return errors;
     },
   });
@@ -109,9 +106,7 @@ const EditPayPalAccount = props => {
         <StyledInputField
           name="clientId"
           label="Client ID"
-          error={
-            (formik.touched.clientId && formik.errors.clientId) || createError?.message.replace('GraphQL error: ', '')
-          }
+          error={(formik.touched.clientId && formik.errors.clientId) || createError?.message}
           disabled={isCreating}
         >
           {inputProps => (
@@ -122,20 +117,14 @@ const EditPayPalAccount = props => {
           mt={2}
           name="token"
           label="Secret"
-          error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
+          error={(formik.touched.token && formik.errors.token) || createError?.message}
           disabled={isCreating}
         >
           {inputProps => (
             <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.token} />
           )}
         </StyledInputField>
-        <StyledInputField
-          mt={2}
-          name="webhookId"
-          label="Webhook ID"
-          error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
-          disabled={isCreating}
-        >
+        <StyledInputField mt={2} name="webhookId" label="Webhook ID" disabled={isCreating}>
           {inputProps => (
             <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.webhookId} />
           )}

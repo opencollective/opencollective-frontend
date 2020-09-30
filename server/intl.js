@@ -47,7 +47,7 @@ function middleware() {
     }
 
     // No auto-detection in test environments
-    if (['test', 'e2e', 'ci'].includes(process.env.NODE_ENV)) {
+    if (['test', 'e2e', 'ci'].includes(process.env.OC_ENV)) {
       req.locale = req.language || 'en';
     } else {
       req.locale = req.language || accepts(req).language(supportedLanguages) || 'en';

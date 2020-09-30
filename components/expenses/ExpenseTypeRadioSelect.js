@@ -13,6 +13,7 @@ import invoiceIllustrationStatic from '../../public/static/images/invoice-animat
 import invoiceIllustration from '../../public/static/images/invoice-animation.gif';
 import receiptIllustrationStatic from '../../public/static/images/receipt-animation-static.jpg';
 import receiptIllustration from '../../public/static/images/receipt-animation.gif';
+import grantIllustration from '../../public/static/images/grant.png';
 
 const ExpenseTypeLabels = defineMessages({
   [expenseTypes.INVOICE]: {
@@ -45,27 +46,24 @@ const ExpenseTypeDescription = defineMessages({
 });
 
 const TypeIllustration = styled.img.attrs({ alt: '' })`
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
 `;
 
-const StaticTypeIllustration = styled(TypeIllustration).attrs(props => ({
-  src: props.expenseType === expenseTypes.INVOICE ? invoiceIllustrationStatic : receiptIllustrationStatic,
-}))`
+const StaticTypeIllustration = styled(TypeIllustration)`
   position: absolute;
   background: white;
 `;
 
 const ExpenseTypeOptionContainer = styled.label`
   display: flex;
-  align-items: center;
+  align-items: baseline;
   padding: 15px 16px;
   margin-bottom: 0;
   cursor: pointer;
   background: white;
   justify-content: flex-start;
-  flex: 1 1 45%;
-  min-width: 250px;
+  flex: 1;
 
   // The following adds a border on top and left to separate items. Because parent has overflow=hidden,
   // only the required one will actually be displayed
@@ -86,22 +84,44 @@ const ExpenseTypeOptionContainer = styled.label`
   }
 `;
 
+const illustrations = {
+  [expenseTypes.INVOICE]: invoiceIllustration,
+  [expenseTypes.RECEIPT]: receiptIllustration,
+  [expenseTypes.FUNDING_REQUEST]: grantIllustration,
+};
+
+const staticIllustrations = {
+  [expenseTypes.INVOICE]: invoiceIllustrationStatic,
+  [expenseTypes.RECEIPT]: receiptIllustrationStatic,
+  [expenseTypes.FUNDING_REQUEST]: grantIllustration,
+};
+
 const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
   const { formatMessage } = useIntl();
+  const illustrationSrc = illustrations[type] || receiptIllustration;
+  const staticIllustrationSrc = staticIllustrations[type] || receiptIllustrationStatic;
   return (
     <ExpenseTypeOptionContainer data-cy={`radio-expense-type-${type}`}>
-      <input type="radio" name={name} value={type} checked={isChecked} onChange={onChange} />
-      <Box mr={3} size={64}>
-        <StaticTypeIllustration expenseType={type} />
-        <TypeIllustration src={type === expenseTypes.INVOICE ? invoiceIllustration : receiptIllustration} />
+      <Box alignSelf={['center', 'baseline', null, 'center']}>
+        <input type="radio" name={name} value={type} checked={isChecked} onChange={onChange} />
       </Box>
-      <Box maxWidth={250}>
+      <Box mx={2} size={48} alignSelf="center" display={['block', 'none', null, 'block']}>
+        <StaticTypeIllustration src={staticIllustrationSrc} />
+        <TypeIllustration src={illustrationSrc} />
+      </Box>
+      <Box>
         <P fontSize="16px" fontWeight="bold" mb={2}>
           {formatMessage(ExpenseTypeLabels[type])}
         </P>
-        <P fontSize="12px" color="black.600" fontWeight="normal">
-          {formatMessage(ExpenseTypeDescription[type])}
-        </P>
+        <Flex alignItems="center">
+          <Box mr={1} size={48} alignSelf="center" display={['none', 'block', null, 'none']}>
+            <StaticTypeIllustration src={staticIllustrationSrc} />
+            <TypeIllustration src={illustrationSrc} />
+          </Box>
+          <P fontSize="12px" color="black.600" fontWeight="normal">
+            {formatMessage(ExpenseTypeDescription[type])}
+          </P>
+        </Flex>
       </Box>
     </ExpenseTypeOptionContainer>
   );
@@ -131,7 +151,7 @@ const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
   return (
     <StyledCard>
       <Fieldset onChange={onChange}>
-        <Flex flexWrap="wrap" overflow="hidden">
+        <Flex flexDirection={['column', 'row']} overflow="hidden">
           <ExpenseTypeOption
             name={name}
             type={expenseTypes.RECEIPT}

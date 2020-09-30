@@ -26,7 +26,7 @@ const directories = [
 ];
 
 for (const directory of directories) {
-  imagemin([`${baseDirectory}/${directory}/original/joinus*.png`], {
+  imagemin([`${baseDirectory}/${directory}/original/*.png`], {
     ...options,
     destination: `${baseDirectory}/${directory}`,
   }).then(files => {

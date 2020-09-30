@@ -87,6 +87,7 @@ class UserProvider extends React.Component {
         loadingLoggedInUser: false,
         errorLoggedInUser: null,
         LoggedInUser,
+        enforceTwoFactorAuthForLoggedInUser: false,
       });
       return LoggedInUser;
     } catch (error) {
@@ -99,6 +100,10 @@ class UserProvider extends React.Component {
       this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       if (error.message.includes('Two-factor authentication is enabled')) {
         this.setState({ enforceTwoFactorAuthForLoggedInUser: true });
+        throw new Error(error.message);
+      }
+      if (error.message.includes('Cannot use this token')) {
+        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
         throw new Error(error.message);
       }
     }

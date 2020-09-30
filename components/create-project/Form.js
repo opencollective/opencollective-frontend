@@ -125,7 +125,7 @@ class CreateProjectForm extends React.Component {
         {error && (
           <Flex alignItems="center" justifyContent="center">
             <MessageBox type="error" withIcon mb={[1, 3]} data-cy="ccf-error-message">
-              {error.replace('GraphQL error: ', 'Error: ')}
+              {error}
             </MessageBox>
           </Flex>
         )}

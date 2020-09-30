@@ -380,7 +380,7 @@ class ExpensePage extends React.Component {
           </Container>
           <Box flex="1 1 650px" minWidth={300} maxWidth={792} mr={[null, 2, 3, 4, 5]} px={2} ref={this.expenseTopRef}>
             <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
-              <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
+              <FormattedMessage id="Summary" defaultMessage="Summary" />
             </H1>
             {error && (
               <MessageBox type="error" withIcon mb={4}>
@@ -391,7 +391,7 @@ class ExpensePage extends React.Component {
               <MessageBox type="warning" withIcon={true} mb={4}>
                 <FormattedMessage
                   id="expenseNeedsTaxFormMessage.msg"
-                  defaultMessage="We need your tax information before we can pay you. You will receive an email from HelloWorks saying Open Collective is requesting you fill out a form. This is required by the IRS (US tax agency) for everyone who invoices $600 or more per year. If you have not received the email within 24 hours, or you have any questions, please contact <I18nSupportLink></I18nSupportLink>. For more info, see our <Link>help docs about taxes</Link>."
+                  defaultMessage="We need your tax information before we can pay you. You will receive an email from HelloWorks saying Open Collective is requesting you fill out a form. This is required by the IRS (US tax agency) for everyone who invoices $600 or more per year. We also require one for grant recipients for our records. If you have not received the email within 24 hours, or you have any questions, please contact <I18nSupportLink></I18nSupportLink>. For more info, see our <Link>help docs about taxes</Link>."
                   values={{
                     I18nSupportLink,
                     Link: getI18nLink({

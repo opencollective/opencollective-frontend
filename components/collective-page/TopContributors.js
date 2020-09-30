@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { size, truncate } from 'lodash';
+import { size } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -41,6 +41,7 @@ const ContributorItem = styled.div`
 
 const AvatarWithRank = styled.div`
   width: 63px;
+  min-width: 63px;
   height: 32px;
   margin-right: 8px;
   background: white;
@@ -50,6 +51,18 @@ const AvatarWithRank = styled.div`
   padding-left: 14px;
   font-size: 10px;
   border-radius: 32px;
+`;
+
+const ContributorName = styled.div`
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: bold;
+  color: #4e5052;
+  letter-spacing: -0.4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
 `;
 
 /**
@@ -87,15 +100,15 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                 <ContributorAvatar contributor={contributor} radius={32} />
               </LinkContributor>
             </AvatarWithRank>
-            <div>
+            <Box flex="1 1" maxWidth="calc(100% - 63px)">
               <LinkContributor contributor={contributor}>
-                <P fontSize="12px" lineHeight="18px" fontWeight="bold" color="black.700">
+                <ContributorName>
                   {contributor.isIncognito ? (
                     <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />
                   ) : (
-                    truncate(contributor.name, { length: 20 })
+                    contributor.name
                   )}
-                </P>
+                </ContributorName>
               </LinkContributor>
               <P color="black.500" fontSize="10px" lineHeight="14px">
                 {contributor.totalAmountDonated ? (
@@ -124,7 +137,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                   formatMemberRole(intl, contributor.roles[0])
                 )}
               </P>
-            </div>
+            </Box>
           </ContributorItem>
         ))}
       </ContributorsList>

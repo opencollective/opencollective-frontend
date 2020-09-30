@@ -115,11 +115,11 @@ export default class Steps extends React.Component {
     return this.buildStep(steps[lastValidStepIdx], lastValidStepIdx);
   }
 
-  getLastVisitedStep(maxStep) {
+  getLastVisitedStep(lastVisitedStep) {
     const lastVisitedStepIdx = findLastIndex(
       this.props.steps,
       s => this.state.visited.has(s.name),
-      maxStep ? maxStep.index : this.props.steps.length - 1,
+      lastVisitedStep && !lastVisitedStep.isLastStep ? lastVisitedStep.index + 1 : this.props.steps.length - 1,
     );
 
     const returnedStepIdx = lastVisitedStepIdx === -1 ? 0 : lastVisitedStepIdx;
@@ -187,7 +187,7 @@ export default class Steps extends React.Component {
    */
   goToStep = async (step, opts = {}) => {
     const currentStep = this.getStepByName(this.props.currentStepName);
-    if (step.index < currentStep.index) {
+    if (step.index < currentStep?.index) {
       opts.action = 'prev';
     }
 

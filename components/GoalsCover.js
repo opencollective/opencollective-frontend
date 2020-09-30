@@ -8,7 +8,6 @@ import { v4 as uuid } from 'uuid';
 import { formatCurrency } from '../lib/currency-utils';
 
 import { fadeIn } from './StyledKeyframes';
-import { P, Span } from './Text';
 
 const getProgressColor = theme => theme.colors.primary[600];
 const getEmptyProgressColor = () => '#e2e2e2';
@@ -513,21 +512,6 @@ class GoalsCover extends React.Component {
           `}
         </style>
         <div>
-          {get(collective, 'stats.backers.all') > 0 && (
-            <P textAlign="center" color="black.700" mx={2}>
-              <FormattedMessage
-                id="cover.budget.text"
-                defaultMessage="Thanks to your financial contributions, we are operating on an estimated annual budget of {yearlyBudget}"
-                values={{
-                  yearlyBudget: (
-                    <Span fontWeight="bold">
-                      {formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}
-                    </Span>
-                  ),
-                }}
-              />
-            </P>
-          )}
           <div
             className={`barContainer max-level-above-${this.state.maxLevelAbove} ${
               this.state.hasCustomGoals ? 'withGoals' : ''

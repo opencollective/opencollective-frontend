@@ -80,6 +80,7 @@ const StyledRadioList = ({
   containerProps,
   labelProps,
   radioSize,
+  'data-cy': dataCy,
   ...props
 }) => {
   const [localStateSelected, setSelected] = useState(props.defaultValue);
@@ -89,7 +90,7 @@ const StyledRadioList = ({
   const checkedItem = !isUndefined(props.value) ? props.value : localStateSelected;
 
   return (
-    <RadioListContainer id={id} as="fieldset" border="none" m={0} p={0} {...containerProps}>
+    <RadioListContainer id={id} as="fieldset" border="none" m={0} p={0} data-cy={dataCy} {...containerProps}>
       {items.map(({ value, key }, index) => {
         const isDisabled = disabled || (value && value.disabled); // disable a specific option or entire options
         return (
@@ -170,6 +171,7 @@ StyledRadioList.propTypes = {
   /** If true, user won't be able to interact with the element */
   disabled: PropTypes.bool,
   radioSize: PropTypes.number,
+  'data-cy': PropTypes.string,
 };
 
 const defaultChild = ({ value, radio }) => (

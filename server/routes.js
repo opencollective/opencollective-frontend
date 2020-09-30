@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const url = require('url');
 
 const express = require('express');
 const proxy = require('express-http-proxy');
@@ -9,7 +8,6 @@ const { template, trim } = require('lodash');
 const intl = require('./intl');
 const pages = require('./pages');
 
-const { URL, URLSearchParams } = url;
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
 const maxAge = (maxAge = 60) => {
@@ -92,7 +90,7 @@ module.exports = (expressApp, nextApp) => {
    */
   app.get('/robots.txt', (req, res) => {
     res.setHeader('Content-Type', 'text/plain');
-    if (process.env.NODE_ENV !== 'production' || process.env.ROBOTS_DISALLOW) {
+    if (process.env.OC_ENV !== 'production' || process.env.ROBOTS_DISALLOW) {
       res.send('User-agent: *\nDisallow: /');
     } else {
       res.send('User-agent: *\nAllow: /');
@@ -100,7 +98,7 @@ module.exports = (expressApp, nextApp) => {
   });
 
   // This is used by Cypress to collect server side coverage
-  if (process.env.NODE_ENV === 'e2e' || process.env.E2E_TEST) {
+  if (process.env.OC_ENV === 'e2e' || process.env.E2E_TEST) {
     app.get('/__coverage__', (req, res) => {
       res.json({
         coverage: global.__coverage__ || null,

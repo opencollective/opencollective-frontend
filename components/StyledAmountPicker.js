@@ -14,10 +14,13 @@ import StyledButtonSet from './StyledButtonSet';
 import StyledInputAmount from './StyledInputAmount';
 import StyledInputField from './StyledInputField';
 
-const getButtonDisplay = (index, presets) => {
-  if (index === 0 || index === presets.length - 1 || index < 2) {
-    // Ensure first and last values are always displayed
+const getButtonDisplay = (index, presets, isSelected) => {
+  if (index === 0 || index === presets.length - 1 || isSelected) {
+    // Ensure first, last and selected values are always displayed
     return 'block';
+  } else if (index < 2) {
+    // Limit to 4 on medium screens
+    return ['none', 'block'];
   } else if (index < 4) {
     // Limit to 3 on small screens
     return ['none', null, 'block'];
@@ -28,13 +31,13 @@ const getButtonDisplay = (index, presets) => {
 };
 
 const FONT_SIZES = ['15px', null, '20px'];
-const LINE_HEIGHTS = ['23px', null, '26px'];
+const LINE_HEIGHTS = ['23px', null, '28px'];
 
 const ButtonText = styled.span(props =>
   css({
-    fontSize: FONT_SIZES,
     lineHeight: LINE_HEIGHTS,
-    fontWeight: props.isSelected ? ['normal', null, 'bold'] : ['normal', null, '300'],
+    fontSize: props.isSelected ? FONT_SIZES : ['15px', null, '18px'],
+    fontWeight: props.isSelected ? 500 : 400,
   }),
 );
 
@@ -58,9 +61,9 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
           <StyledInputField
             htmlFor="amount"
             css={{ flexGrow: 1 }}
-            labelFontSize={['17px', '20px']}
+            labelFontSize="20px"
             labelColor="black.700"
-            labelProps={{ fontWeight: 500, lineHeight: '24px', mb: 1, whiteSpace: 'nowrap' }}
+            labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1, whiteSpace: 'nowrap' }}
             label={
               <FormattedMessage
                 id="contribution.amount.currency.label"
@@ -74,9 +77,11 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
                 {...fieldProps}
                 justifyContent="center"
                 items={presets}
-                buttonProps={{ p: 2 }}
+                buttonProps={{ px: 2, py: '7px' }}
                 selected={isOtherSelected ? null : value}
-                buttonPropsBuilder={({ index }) => ({ display: getButtonDisplay(index, presets) })}
+                buttonPropsBuilder={({ index, isSelected }) => ({
+                  display: getButtonDisplay(index, presets, isSelected),
+                })}
                 onChange={value => {
                   onChange(value);
                   setOtherSelected(false);
@@ -89,7 +94,7 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
                     </ButtonText>
                   ) : (
                     <ButtonText isSelected={isSelected}>
-                      <Currency value={item} currency={currency} precision="auto" />
+                      <Currency value={item} currency={currency} abbreviate precision="auto" />
                     </ButtonText>
                   )
                 }
@@ -102,7 +107,7 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
             htmlFor="custom-amount"
             labelColor="black.600"
             labelFontSize="14px"
-            labelProps={{ mb: 1, pt: '6px', lineHeight: '18px' }}
+            labelProps={{ mb: 1, pt: '10px', lineHeight: '18px' }}
             label={
               hasPresets ? (
                 <FormattedMessage id="contribution.amount.other.label" defaultMessage="Other" />
@@ -125,7 +130,7 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
                 placeholder="---"
                 width={1}
                 fontSize={FONT_SIZES}
-                lineHeight={LINE_HEIGHTS}
+                lineHeight={['21px', null, '26px']}
                 px="2px"
                 min={min}
                 containerProps={{
@@ -135,7 +140,7 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
                   pr: 1,
                   bg: '#FFFFFF',
                   fontSize: FONT_SIZES,
-                  lineHeight: LINE_HEIGHTS,
+                  lineHeight: ['21px', null, '26px'],
                   color: isOtherSelected ? 'black.800' : 'black.400',
                 }}
                 onChange={value => {

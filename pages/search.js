@@ -217,6 +217,10 @@ export const searchPageQuery = gql`
             all
           }
         }
+        parentCollective {
+          id
+          slug
+        }
         memberOf(role: "BACKER") {
           id
         }

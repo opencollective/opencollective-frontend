@@ -14,7 +14,7 @@ describe('New organization profile', () => {
       cy.getByDataCy('filters').should('not.exist');
       cy.getByDataCy('section-contributors').click();
       cy.hash().should('eq', '#section-contributors');
-      cy.getByDataCy('section-contributors-title').contains('Core contributors');
+      cy.getByDataCy('section-contributors-title').contains('Team');
       cy.getByDataCy('ContributorsGrid_ContributorCard').contains('Admin');
     });
   });

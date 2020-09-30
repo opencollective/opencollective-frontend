@@ -32,7 +32,7 @@ class MarkOrderAsPaidBtn extends React.Component {
       await this.props.markOrderAsPaid({ variables: { id: order.id } });
       this.setState({ loading: false });
     } catch (e) {
-      const error = e.message && e.message.replace(/GraphQL error:/, '');
+      const error = e.message;
       this.setState({ error, loading: false });
     }
   }

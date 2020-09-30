@@ -1,6 +1,6 @@
 const mergeWith = require('lodash/mergeWith');
 const { kebabCase, omit } = require('lodash');
-const env = process.env.NODE_ENV;
+const env = process.env.OC_ENV;
 
 const SELF = "'self'";
 const UNSAFE_INLINE = "'unsafe-inline'";
@@ -31,6 +31,7 @@ const COMMON_DIRECTIVES = {
     'wtfismyip.com',
     '*.paypal.com',
     '*.paypalobjects.com',
+    'sentry.io',
     '*.sentry.io',
   ],
   scriptSrc: [
@@ -94,7 +95,7 @@ const getHeaderValueFromDirectives = directives => {
 };
 
 const getContentSecurityPolicyConfig = () => {
-  if (env === 'development') {
+  if (env === 'development' || env === 'e2e') {
     return {
       reportOnly: true,
       directives: generateDirectives({
@@ -102,44 +103,38 @@ const getContentSecurityPolicyConfig = () => {
         scriptSrc: [UNSAFE_INLINE, UNSAFE_EVAL], // For NextJS scripts
       }),
     };
+  } else if (env === 'staging') {
+    return {
+      reportOnly: false,
+      directives: generateDirectives({
+        imgSrc: [
+          'opencollective-staging.s3.us-west-1.amazonaws.com',
+          'opencollective-staging.s3-us-west-1.amazonaws.com',
+        ],
+      }),
+      reportUri: ['https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625'],
+    };
   } else if (env === 'production') {
-    if (process.env.WEBSITE_URL === 'https://staging.opencollective.com') {
-      return {
-        reportOnly: false,
-        directives: generateDirectives({
-          imgSrc: [
-            'opencollective-staging.s3.us-west-1.amazonaws.com',
-            'opencollective-staging.s3-us-west-1.amazonaws.com',
-          ],
-        }),
-        reportUri: [
-          'https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625',
+    return {
+      reportOnly: true,
+      directives: generateDirectives({
+        imgSrc: [
+          'opencollective-production.s3.us-west-1.amazonaws.com',
+          'opencollective-production.s3-us-west-1.amazonaws.com',
         ],
-      };
-    } else if (process.env.WEBSITE_URL === 'https://opencollective.com') {
-      return {
-        reportOnly: true,
-        directives: generateDirectives({
-          imgSrc: [
-            'opencollective-production.s3.us-west-1.amazonaws.com',
-            'opencollective-production.s3-us-west-1.amazonaws.com',
-          ],
-        }),
-        reportUri: [
-          'https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625',
-        ],
-      };
-    } else {
-      // Third party deploy, or Zeit deploy preview
-      return {
-        reportOnly: true,
-        directives: generateDirectives(),
-      };
-    }
+      }),
+      reportUri: ['https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625'],
+    };
+  } else if (env === 'test' || env === 'ci') {
+    // Disabled
+    return false;
+  } else {
+    // Third party deploy, or Zeit deploy preview
+    return {
+      reportOnly: true,
+      directives: generateDirectives(),
+    };
   }
-
-  // Disabled in other environments
-  return false;
 };
 
 module.exports = {

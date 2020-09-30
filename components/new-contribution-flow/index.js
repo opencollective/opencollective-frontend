@@ -1,38 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get, pick } from 'lodash';
+import { find, get, isNil, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
+import { TransactionTypes } from '../../lib/constants/transactions';
+import { getEnvVar } from '../../lib/env-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
+import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
-import { getWebsiteUrl } from '../../lib/utils';
+import { objectToQueryString } from '../../lib/url_helpers';
+import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import Container from '../../components/Container';
 import NewContributeFAQ from '../../components/faqs/NewContributeFAQ';
 import { Box, Grid } from '../../components/Grid';
-import { addSignupMutation } from '../../components/SignInOrJoinFree';
+import SignInOrJoinFree, { addSignupMutation } from '../../components/SignInOrJoinFree';
 
+import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import Steps from '../Steps';
 import { withUser } from '../UserProvider';
 
+import { STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
-import ContributionFlowMainContainer from './ContributionFlowMainContainer';
+import ContributionFlowStepContainer from './ContributionFlowStepContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
+import { validateNewOrg } from './CreateOrganizationForm';
 import SafeTransactionMessage from './SafeTransactionMessage';
-import { getTotalAmount, NEW_CREDIT_CARD_KEY, taxesMayApply } from './utils';
+import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
+import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY, taxesMayApply } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -58,7 +66,7 @@ const stepsLabels = defineMessages({
     defaultMessage: 'Payment info',
   },
   summary: {
-    id: 'contribute.step.summary',
+    id: 'Summary',
     defaultMessage: 'Summary',
   },
 });
@@ -69,7 +77,7 @@ class ContributionFlow extends React.Component {
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
       platformContributionAvailable: PropTypes.bool,
-      parentCollective: PropTypes.shape({
+      parent: PropTypes.shape({
         slug: PropTypes.string,
       }),
     }).isRequired,
@@ -78,15 +86,21 @@ class ContributionFlow extends React.Component {
     intl: PropTypes.object,
     createUser: PropTypes.func,
     createOrder: PropTypes.func.isRequired,
+    confirmOrder: PropTypes.func.isRequired,
     fixedInterval: PropTypes.string,
     fixedAmount: PropTypes.number,
+    platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
+    loadingLoggedInUser: PropTypes.bool,
     step: PropTypes.string,
-    verb: PropTypes.oneOf(['new-donate', 'new-contribute']),
+    redirect: PropTypes.string,
+    verb: PropTypes.string,
+    contributeAs: PropTypes.string,
     /** @ignore from withUser */
     refetchLoggedInUser: PropTypes.func,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
+    createCollective: PropTypes.func.isRequired, // from mutation
   };
 
   constructor(props) {
@@ -104,18 +118,17 @@ class ContributionFlow extends React.Component {
         quantity: 1,
         interval: props.fixedInterval || props.tier?.interval,
         amount: props.fixedAmount || getDefaultTierAmount(props.tier),
+        platformContribution: props.platformContribution,
       },
     };
   }
 
   submitOrder = async () => {
     const { stepDetails, stepProfile, stepSummary } = this.state;
-    // TODO We're still relying on profiles from V1 (LoggedInUser)
     const fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     this.setState({ error: null });
-
     try {
-      const order = await this.props.createOrder({
+      const response = await this.props.createOrder({
         variables: {
           order: {
             quantity: stepDetails.quantity,
@@ -125,11 +138,12 @@ class ContributionFlow extends React.Component {
             toAccount: pick(this.props.collective, ['id']),
             customData: stepDetails.customData,
             paymentMethod: await this.getPaymentMethod(),
-            platformContributionAmount: stepDetails.feesOnTop && { valueInCents: stepDetails.feesOnTop },
+            platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
+            tier: this.props.tier && { legacyId: this.props.tier.legacyId },
             taxes: stepSummary && [
               {
                 type: 'VAT',
-                amount: stepSummary.amount || 0,
+                amount: getGQLV2AmountInput(stepSummary.amount, 0),
                 country: stepSummary.countryISO,
                 idNumber: stepSummary.number,
               },
@@ -138,17 +152,68 @@ class ContributionFlow extends React.Component {
         },
       });
 
-      // TODO: Handle Stripe errors (3D secure)
-      return this.handleSuccess(order);
+      return this.handleOrderResponse(response.data.createOrder);
     } catch (e) {
       this.showError(getErrorFromGraphqlException(e));
     }
   };
 
-  handleSuccess = order => {
+  handleOrderResponse = async ({ order, stripeError }) => {
+    if (stripeError) {
+      return this.handleStripeError(order, stripeError);
+    } else {
+      return this.handleSuccess(order);
+    }
+  };
+
+  handleStripeError = async (order, stripeError) => {
+    const { message, account, response } = stripeError;
+    if (!response) {
+      this.setState({ isSubmitting: false, error: message });
+    } else if (response.paymentIntent) {
+      const stripe = await getStripe(null, account);
+      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
+      if (result.error) {
+        this.setState({ isSubmitting: false, error: result.error.message });
+      } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
+        this.setState({ isSubmitting: true, error: null });
+        try {
+          const response = await this.props.confirmOrder({ variables: { order: { id: order.id } } });
+          return this.handleOrderResponse(response.data.confirmOrder);
+        } catch (e) {
+          this.setState({ isSubmitting: false, error: e.message });
+        }
+      }
+    }
+  };
+
+  handleSuccess = async order => {
     this.setState({ isSubmitted: true });
     this.props.refetchLoggedInUser(); // to update memberships
-    return this.pushStepRoute('success', { OrderId: order.id });
+
+    if (isValidExternalRedirect(this.props.redirect)) {
+      const url = new URL(this.props.redirect);
+      url.searchParams.set('orderId', order.legacyId);
+      url.searchParams.set('orderIdV2', order.id);
+      url.searchParams.set('status', order.status);
+      const transaction = find(order.transactions, { type: TransactionTypes.CREDIT });
+      if (transaction) {
+        url.searchParams.set('transactionid', transaction.legacyId);
+        url.searchParams.set('transactionIdV2', transaction.id);
+      }
+
+      const newFlowIsDefault = this.isNewFlowTheDefault();
+      const verb = newFlowIsDefault ? 'donate' : 'new-donate';
+      const fallback = `/${this.props.collective.slug}/${verb}/success?OrderId=${order.id}`;
+      if (isAllowedRedirect(url.host)) {
+        window.location.href = url.href;
+      } else {
+        await Router.pushRoute('external-redirect', { url: url.href, fallback });
+        return this.scrollToTop();
+      }
+    } else {
+      return this.pushStepRoute('success', { OrderId: order.id });
+    }
   };
 
   showError = error => {
@@ -172,6 +237,8 @@ class ContributionFlow extends React.Component {
       };
     } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
       return pick(stepPayment.paymentMethod, ['type', 'paypalInfo.token', 'paypalInfo.data']);
+    } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER) {
+      return pick(stepPayment.paymentMethod, ['type']);
     }
   };
 
@@ -187,6 +254,36 @@ class ContributionFlow extends React.Component {
     currentPath = `${currentPath.replace('profile', 'payment')}&emailRedirect=true`;
     return encodeURIComponent(currentPath);
   }
+
+  /** Validate step profile, create new incognito/org if necessary */
+  validateStepProfile = async () => {
+    const { stepProfile } = this.state;
+    if (!stepProfile) {
+      return false;
+    }
+
+    // Check if we're creating a new profile
+    if (stepProfile.id === 'incognito' || stepProfile.id === NEW_ORGANIZATION_KEY) {
+      if (stepProfile.type === 'ORGANIZATION' && !validateNewOrg(stepProfile)) {
+        return false;
+      }
+
+      this.setState({ isSubmitting: true });
+
+      try {
+        const { data: result } = await this.props.createCollective(stepProfile);
+        const createdProfile = result.createCollective;
+        await this.props.refetchLoggedInUser();
+        this.setState({ stepProfile: createdProfile, isSubmitting: false });
+      } catch (error) {
+        this.setState({ error: error.message, isSubmitting: false });
+        window.scrollTo(0, 0);
+        return false;
+      }
+    }
+
+    return true;
+  };
 
   createProfileForRecurringContributions = async data => {
     if (this.state.isSubmitting) {
@@ -216,37 +313,41 @@ class ContributionFlow extends React.Component {
   /** Steps component callback  */
   onStepChange = async step => this.pushStepRoute(step.name);
 
+  isNewFlowTheDefault() {
+    return parseToBoolean(getEnvVar('NEW_CONTRIBUTION_FLOW'));
+  }
+
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, routeParams = {}) => {
     const { collective, tier, LoggedInUser } = this.props;
     const { stepDetails, stepProfile } = this.state;
+    const newFlowIsDefault = this.isNewFlowTheDefault();
 
     const params = {
-      verb: this.props.verb || 'new-donate',
+      verb: this.props.verb || (newFlowIsDefault ? 'donate' : 'new-donate'),
       collectiveSlug: collective.slug,
       step: stepName === 'details' ? undefined : stepName,
-      totalAmount: this.props.fixedAmount ? this.props.fixedAmount.toString() : undefined,
       interval: this.props.fixedInterval || undefined,
-      ...pick(this.props, ['interval', 'description', 'redirect']),
+      ...pick(this.props, ['interval', 'description', 'redirect', 'contributeAs']),
       ...routeParams,
     };
 
-    let route = 'new-donate';
+    let route = newFlowIsDefault ? 'orderCollectiveNew' : 'new-donate';
     if (tier) {
       params.tierId = tier.legacyId;
       params.tierSlug = tier.slug;
-      if (tier.type === 'TICKET' && collective.parentCollective) {
-        route = 'orderEventTier';
-        params.collectiveSlug = collective.parentCollective.slug;
+      if (tier.type === 'TICKET' && collective.parent) {
+        route = newFlowIsDefault ? 'orderEventTier' : 'new-order-event-tier';
+        params.verb = newFlowIsDefault ? 'events' : 'new-events';
+        params.collectiveSlug = collective.parent.slug;
         params.eventSlug = collective.slug;
-        params.verb = 'events';
       } else {
-        route = 'new-contribute';
-        params.verb = 'new-contribute'; // Enforce "contribute" verb for ordering tiers
+        route = newFlowIsDefault ? 'orderCollectiveTierNew' : 'new-contribute';
+        params.verb = newFlowIsDefault ? 'contribute' : 'new-contribute'; // Enforce "contribute" verb for ordering tiers
       }
-    } else if (params.verb === 'contribute') {
+    } else if (params.verb === 'contribute' || params.verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
-      params.verb = 'new-donate';
+      params.verb = newFlowIsDefault ? 'donate' : 'new-donate';
     }
 
     // Reset errors if any
@@ -295,40 +396,56 @@ class ContributionFlow extends React.Component {
     const { stepDetails, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
-    const noPaymentRequired = minAmount === 0 && get(stepDetails, 'amount') === 0;
+    const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
+
     const steps = [
       {
         name: 'details',
         label: intl.formatMessage(stepsLabels.details),
-        isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount),
+        isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount && stepDetails.quantity),
+        validate: () => {
+          if (isNil(tier?.availableQuantity)) {
+            return true;
+          } else {
+            return stepDetails.quantity <= tier.availableQuantity;
+          }
+        },
       },
       {
         name: 'profile',
         label: intl.formatMessage(stepsLabels.contributeAs),
         isCompleted: Boolean(this.state.stepProfile),
+        validate: this.validateStepProfile,
       },
     ];
 
-    // Hide step payment if using a free tier with fixed price
-    if (!(minAmount === 0 && isFixedContribution)) {
-      let isCompleted = Boolean(noPaymentRequired || stepPayment);
-      if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
-        isCompleted = stepPayment.paymentMethod?.stripeData?.complete;
-      }
-
-      steps.push({
-        name: 'payment',
-        label: intl.formatMessage(stepsLabels.payment),
-        isCompleted,
-      });
-    }
-
     // Show the summary step only if the order has tax
-    if (this.taxesMayApply(collective, host, tier)) {
+    if (!noPaymentRequired && this.taxesMayApply(collective, collective.parent, host, tier)) {
       steps.push({
         name: 'summary',
         label: intl.formatMessage(stepsLabels.summary),
         isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
+      });
+    }
+
+    // Hide step payment if using a free tier with fixed price
+    if (!noPaymentRequired) {
+      steps.push({
+        name: 'payment',
+        label: intl.formatMessage(stepsLabels.payment),
+        isCompleted: true,
+        validate: action => {
+          if (action === 'prev') {
+            return true;
+          } else {
+            const isCompleted = Boolean(noPaymentRequired || stepPayment);
+            if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
+              return stepPayment.paymentMethod?.stripeData?.complete;
+            } else {
+              return isCompleted;
+            }
+          }
+        },
       });
     }
 
@@ -343,7 +460,7 @@ class ContributionFlow extends React.Component {
         host: host,
         currency: collective.currency,
         style: { size: 'responsive', height: 47 },
-        totalAmount: getTotalAmount(stepDetails, stepSummary), // TODO this.getTotalAmountWithTaxes(),
+        totalAmount: getTotalAmount(stepDetails, stepSummary),
         onClick: () => this.setState({ isSubmitting: true }),
         onCancel: () => this.setState({ isSubmitting: false }),
         onError: e => this.setState({ isSubmitting: false, error: `PayPal error: ${e.message}` }),
@@ -365,8 +482,31 @@ class ContributionFlow extends React.Component {
     }
   }
 
+  getRedirectUrlForSignIn = () => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const { stepDetails } = this.state;
+    const stepDetailsParams = objectToQueryString({
+      amount: stepDetails.amount / 100,
+      interval: stepDetails.interval || undefined,
+      quantity: stepDetails.quantity !== 1 ? stepDetails.quantity : undefined,
+      platformContribution: !isNil(stepDetails.platformContribution)
+        ? stepDetails.platformContribution / 100
+        : undefined,
+    });
+
+    const path = window.location.pathname;
+    if (window.location.search) {
+      return `${path}${window.location.search}&${stepDetailsParams.slice(1)}`;
+    } else {
+      return `${path}${stepDetailsParams}`;
+    }
+  };
+
   render() {
-    const { collective, tier, LoggedInUser, skipStepDetails } = this.props;
+    const { collective, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails } = this.props;
     const { error, isSubmitted, isSubmitting } = this.state;
     return (
       <Steps
@@ -398,6 +538,7 @@ class ContributionFlow extends React.Component {
               justifyContent="center"
               py={[3, 4, 5]}
               mb={4}
+              data-cy="cf-content"
               ref={this.mainContainerRef}
             >
               <Box px={[2, 3]} mb={4}>
@@ -412,6 +553,7 @@ class ContributionFlow extends React.Component {
                   stepProfile={this.state.stepProfile}
                   stepDetails={this.state.stepDetails}
                   stepPayment={this.state.stepPayment}
+                  stepSummary={this.state.stepSummary}
                   isSubmitted={this.state.isSubmitted}
                   loading={isValidating || isSubmitted || isSubmitting}
                   currency={collective.currency}
@@ -419,51 +561,77 @@ class ContributionFlow extends React.Component {
                 />
               </StepsProgressBox>
               {/* main container */}
-              <Grid
-                px={[2, 3]}
-                gridTemplateColumns={[
-                  'minmax(200px, 600px)',
-                  null,
-                  '0fr minmax(300px, 600px) 1fr',
-                  '1fr minmax(300px, 600px) 1fr',
-                ]}
-              >
-                <Box />
-                <Box as="form" onSubmit={e => e.preventDefault()} maxWidth="100%">
-                  {error && (
-                    <MessageBox type="error" withIcon mb={3}>
-                      {formatErrorMessage(this.props.intl, error)}
-                    </MessageBox>
-                  )}
-                  <ContributionFlowMainContainer
-                    collective={collective}
-                    tier={tier}
-                    mainState={this.state}
-                    onChange={data => this.setState(data)}
-                    step={currentStep}
-                    showFeesOnTop={this.canHaveFeesOnTop()}
-                    onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
-                  />
-                  <Box mt={[4, 5]}>
-                    <ContributionFlowButtons
-                      goNext={goNext}
-                      goBack={goBack}
-                      step={currentStep}
-                      prevStep={prevStep}
-                      nextStep={nextStep}
-                      isRecurringContributionLoggedOut={!LoggedInUser && this.state.stepDetails?.interval}
-                      isValidating={isValidating || isSubmitted || isSubmitting}
-                      paypalButtonProps={this.getPaypalButtonProps()}
+              {loadingLoggedInUser ? (
+                <Loading />
+              ) : currentStep.name === STEPS.PROFILE &&
+                !LoggedInUser &&
+                !parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ? (
+                <SignInOrJoinFree
+                  defaultForm="create-account"
+                  redirect={this.getRedirectUrlForSignIn()}
+                  createPersonalProfileLabel={
+                    <FormattedMessage
+                      id="ContributionFlow.CreateUserLabel"
+                      defaultMessage="Contribute as an individual"
                     />
+                  }
+                  createOrganizationProfileLabel={
+                    <FormattedMessage
+                      id="ContributionFlow.CreateOrganizationLabel"
+                      defaultMessage="Contribute as an organization"
+                    />
+                  }
+                />
+              ) : (
+                <Grid
+                  px={[2, 3]}
+                  gridTemplateColumns={[
+                    'minmax(200px, 600px)',
+                    null,
+                    '0fr minmax(300px, 600px) 1fr',
+                    '1fr minmax(300px, 600px) 1fr',
+                  ]}
+                >
+                  <Box />
+                  <Box as="form" onSubmit={e => e.preventDefault()} maxWidth="100%">
+                    {error && (
+                      <MessageBox type="error" withIcon mb={3}>
+                        {formatErrorMessage(this.props.intl, error)}
+                      </MessageBox>
+                    )}
+
+                    <ContributionFlowStepContainer
+                      collective={collective}
+                      tier={tier}
+                      mainState={this.state}
+                      onChange={data => this.setState(data)}
+                      step={currentStep}
+                      showFeesOnTop={this.canHaveFeesOnTop()}
+                      onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+                      defaultProfileSlug={this.props.contributeAs}
+                    />
+
+                    <Box mt={[4, 5]}>
+                      <ContributionFlowButtons
+                        goNext={goNext}
+                        goBack={goBack}
+                        step={currentStep}
+                        prevStep={prevStep}
+                        nextStep={nextStep}
+                        isRecurringContributionLoggedOut={Boolean(!LoggedInUser && this.state.stepDetails?.interval)}
+                        isValidating={isValidating || isSubmitted || isSubmitting}
+                        paypalButtonProps={this.getPaypalButtonProps()}
+                      />
+                    </Box>
                   </Box>
-                </Box>
-                <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
-                  <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
-                    <SafeTransactionMessage />
-                    <NewContributeFAQ mt={4} titleProps={{ mb: 2 }} />
+                  <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
+                    <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
+                      <SafeTransactionMessage />
+                      <NewContributeFAQ mt={4} titleProps={{ mb: 2 }} />
+                    </Box>
                   </Box>
-                </Box>
-              </Grid>
+                </Grid>
+              )}
             </Container>
           )
         }
@@ -472,26 +640,123 @@ class ContributionFlow extends React.Component {
   }
 }
 
-// TODO: Use a fragment to retrieve the fields from success page in there
+const orderSuccessHostFragment = gqlV2/* GraphQL */ `
+  fragment OrderSuccessHostFragment on Host {
+    id
+    slug
+    settings
+    bankAccount {
+      id
+      name
+      data
+      type
+    }
+  }
+`;
+
+export const orderSuccessFragment = gqlV2/* GraphQL */ `
+  fragment OrderSuccessFragment on Order {
+    id
+    legacyId
+    status
+    frequency
+    amount {
+      value
+      currency
+    }
+    platformContributionAmount {
+      value
+    }
+    tier {
+      id
+      name
+    }
+    membership {
+      id
+      publicMessage
+    }
+    fromAccount {
+      id
+      name
+    }
+    toAccount {
+      id
+      name
+      slug
+      tags
+      type
+      isHost
+      ... on AccountWithContributions {
+        contributors {
+          totalCount
+        }
+      }
+      ... on AccountWithHost {
+        host {
+          ...OrderSuccessHostFragment
+        }
+      }
+      ... on Organization {
+        host {
+          ...OrderSuccessHostFragment
+          ... on AccountWithContributions {
+            contributors {
+              totalCount
+            }
+          }
+        }
+      }
+    }
+  }
+  ${orderSuccessHostFragment}
+`;
+
+const orderResponseFragment = gqlV2/* GraphQL */ `
+  fragment OrderResponseFragment on OrderWithPayment {
+    order {
+      ...OrderSuccessFragment
+    }
+    stripeError {
+      message
+      account
+      response
+    }
+  }
+  ${orderSuccessFragment}
+`;
+
 const addCreateOrderMutation = graphql(
   gqlV2/* GraphQL */ `
     mutation CreateOrder($order: OrderCreateInput!) {
       createOrder(order: $order) {
-        id
-        status
-        frequency
-        amount {
-          valueInCents
-        }
+        ...OrderResponseFragment
       }
     }
+    ${orderResponseFragment}
   `,
   {
     name: 'createOrder',
-    options: {
-      context: API_V2_CONTEXT,
-    },
+    options: { context: API_V2_CONTEXT },
   },
 );
 
-export default injectIntl(withUser(addSignupMutation(addCreateOrderMutation(ContributionFlow))));
+const addConfirmOrderMutation = graphql(
+  gqlV2/* GraphQL */ `
+    mutation CreateOrder($order: OrderReferenceInput!) {
+      confirmOrder(order: $order) {
+        ...OrderResponseFragment
+      }
+    }
+    ${orderResponseFragment}
+  `,
+  {
+    name: 'confirmOrder',
+    options: { context: API_V2_CONTEXT },
+  },
+);
+
+export default injectIntl(
+  withUser(
+    addSignupMutation(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(ContributionFlow)))),
+  ),
+);

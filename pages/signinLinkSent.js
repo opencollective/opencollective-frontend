@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 import Container from '../components/Container';
 import { Box, Flex } from '../components/Grid';
+import { getI18nLink } from '../components/I18nFormatters';
 import OpenEmailProviderButton from '../components/OpenEmailProviderButton';
 import Page from '../components/Page';
 import { H3, P } from '../components/Text';
@@ -36,11 +37,11 @@ class SignInLinkSent extends Component {
 
     return (
       <Page title="Login Link Sent">
-        <Container pt={[4, 5]} pb={6} px={2} background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" textAlign="center">
+        <Container pt={[4, 5]} pb={6} px={3} background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" textAlign="center">
           <Flex justifyContent="center" mb={4}>
             <Icon size="60" />
           </Flex>
-          <H3 as="h1" fontWeight="800">
+          <H3 as="h1" fontWeight="bold">
             <FormattedMessage id="SignIn.LinkSent" defaultMessage="Your magic link is on its way!" />
           </H3>
           <P fontSize="16px" lineHeight="24px" color="black.900" mt={4}>
@@ -50,10 +51,21 @@ class SignInLinkSent extends Component {
               values={{ email: <strong>{email}</strong> }}
             />
           </P>
-          <P color="black.700" mt={3}>
+          <P color="black.700" fontSize="14px" lineHeight="18px" my={4}>
             <FormattedMessage
               id="SignIn.SuccessDetails"
               defaultMessage="You’ll be redirected from the link in the email, you can safely close this tab."
+            />
+            <br />
+            <FormattedMessage
+              id="signinLinkSent."
+              defaultMessage="<Link>Learn more</Link> about passwordless login."
+              values={{
+                Link: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/product/log-in-system',
+                  openInNewTab: true,
+                }),
+              }}
             />
           </P>
           <OpenEmailProviderButton email={email}>{button => <Box mt={3}>{button}</Box>}</OpenEmailProviderButton>

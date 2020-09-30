@@ -9,8 +9,8 @@ const redisServerUrl = process.env.REDIS_URL;
 const enabled = parseToBooleanDefaultFalse(process.env.RATE_LIMITING_ENABLED);
 const simulate = parseToBooleanDefaultFalse(process.env.RATE_LIMITING_SIMULATE);
 
-// Default: 12 requests / 60 seconds
-const total = Number(process.env.RATE_LIMITING_TOTAL) || 12;
+// Default: 20 requests / 60 seconds
+const total = Number(process.env.RATE_LIMITING_TOTAL) || 20;
 const expire = Number(process.env.RATE_LIMITING_EXPIRE) || 60;
 
 const load = async app => {
@@ -26,22 +26,35 @@ const load = async app => {
       ? true
       : false;
 
+  const lookup = async (req, res, opts, next) => {
+    if (!whitelist(req)) {
+      // const log = await req.getAugmentedLog();
+      const log = req.hyperwatch.rawLog;
+      req.hyperwatch = req.hyperwatch || {};
+      req.hyperwatch.identity = log.getIn(['identity']) || log.getIn(['request', 'address']);
+      opts.lookup = 'hyperwatch.identity';
+    }
+    return next();
+  };
+
+  const onRateLimited = (req, res, next) => {
+    logger.info(`Rate limit exceeded for '${req.ip}' '${req.headers['user-agent']}'`);
+    if (simulate) {
+      next();
+      return;
+    }
+    const message = `Rate limit exceeded. Try again in a few seconds. Please contact support@opencollective.com if you think this is an error.`;
+    res.status(429).send(message);
+  };
+
   rateLimiter({
     path: '*',
     method: 'all',
-    lookup: 'ip',
     total: total,
     expire: expire * 1000,
     whitelist,
-    onRateLimited: function (req, res, next) {
-      logger.info(`Rate limit exceeded for '${req.ip}' '${req.headers['user-agent']}'`);
-      if (simulate) {
-        next();
-        return;
-      }
-      const message = `Rate limit exceeded. Try again in a few seconds. Please contact support@opencollective.com if you think this is an error.`;
-      res.status(429).send(message);
-    },
+    lookup,
+    onRateLimited,
   });
 };
 

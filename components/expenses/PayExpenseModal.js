@@ -62,7 +62,7 @@ const generatePayoutOptions = (intl, payoutMethodType, host) => {
     if (
       hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
       payoutMethodType === PayoutMethodType.PAYPAL &&
-      host.connectedAccounts?.find(ca => ca?.service === 'paypal')
+      host.supportedPayoutMethods?.includes('PAYPAL')
     ) {
       defaultTypes.unshift({
         label: intl.formatMessage(PAYOUT_ACTION_TYPE.schedule, { payoutMethodLabel }),

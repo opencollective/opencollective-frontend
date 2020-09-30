@@ -72,6 +72,13 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     expensePolicy
     website
     settings
+    paypalPreApproval {
+      id
+      balance {
+        currency
+        valueInCents
+      }
+    }
     location {
       address
       country
@@ -231,6 +238,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       id
       type
       createdAt
+      data
       individual {
         id
         type
@@ -273,6 +281,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       id
       type
       slug
+      name
       imageUrl(height: 80)
       isAdmin
     }

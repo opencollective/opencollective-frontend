@@ -8,7 +8,7 @@ import colors from '../../lib/constants/colors';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { capitalize } from '../../lib/utils';
 
-import Avatar from '..//Avatar';
+import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -53,6 +53,12 @@ class Order extends React.Component {
       active: { id: 'order.active', defaultMessage: 'active' },
       cancelled: { id: 'order.cancelled', defaultMessage: 'cancelled' },
       expired: { id: 'order.expired', defaultMessage: 'expired' },
+      new: { id: 'order.new', defaultMessage: 'new' },
+      pledged: { id: 'order.pledged', defaultMessage: 'pledged' },
+      require_client_confirmation: {
+        id: 'order.require_client_confirmation',
+        defaultMessage: 'require client confirmation',
+      },
       'cancelOrder.modal.header': {
         id: 'cancelOrder.modal.header',
         defaultMessage: 'Cancel Order',
@@ -285,7 +291,9 @@ class Order extends React.Component {
                   {' | '}
                 </span>
               )}
-              <span className="status">{intl.formatMessage(this.messages[status])}</span>
+              <span className="status">
+                {this.messages[status] ? intl.formatMessage(this.messages[status]) : status}
+              </span>
               {transactions && transactions.length === 1 && (
                 <span>
                   {' | '}

@@ -163,7 +163,10 @@ const ThreadActivity = ({ activity }) => {
         </Flex>
       )}
       {MESSAGES[activity.type] && (
-        <ActivityMessage color={activityColor}>{formatMessage(MESSAGES[activity.type])}</ActivityMessage>
+        <ActivityMessage color={activityColor}>
+          {formatMessage(MESSAGES[activity.type])}
+          {activity.data?.error?.message ? `: ${activity.data.error.message}` : ''}
+        </ActivityMessage>
       )}
     </div>
   );
@@ -174,6 +177,11 @@ ThreadActivity.propTypes = {
     id: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.keys(ACTIVITIES_INFO)).isRequired,
     createdAt: PropTypes.string.isRequired,
+    data: PropTypes.shape({
+      error: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+    }),
     individual: PropTypes.shape({
       id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,

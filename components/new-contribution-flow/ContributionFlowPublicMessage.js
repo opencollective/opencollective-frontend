@@ -3,20 +3,22 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import themeGet from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
+import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { confettiFireworks } from '../../lib/confettis';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Avatar from '../../components/Avatar';
 import Container from '../../components/Container';
-import { Flex } from '../../components/Grid';
+import { Box, Flex } from '../../components/Grid';
 import StyledButton from '../../components/StyledButton';
 import StyledInputField from '../../components/StyledInputField';
 import StyledTextarea from '../../components/StyledTextarea';
 import { P } from '../../components/Text';
 
-const PUBLIC_MESSAGE_MAX_LENGTH = 20;
+const PUBLIC_MESSAGE_MAX_LENGTH = 140;
 
 // Styled components
 const PublicMessageContainer = styled(Container)`
@@ -49,8 +51,11 @@ const messages = defineMessages({
   },
 });
 
-const ContributionFlowPublicMessage = ({ collective, stepProfile, publicMessage }) => {
+const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
   const intl = useIntl();
+  const collective = order.toAccount;
+  const stepProfile = order.fromAccount;
+  const [isSubmitted, setSubmitted] = React.useState(true);
 
   // GraphQL & data
   const [postPublicMessage] = useMutation(postContributionPublicMessageMutation, {
@@ -64,12 +69,15 @@ const ContributionFlowPublicMessage = ({ collective, stepProfile, publicMessage 
 
   const submitPublicMessage = async values => {
     const { publicMessage } = values;
-    return postPublicMessage({
+    await postPublicMessage({
       variables: {
-        fromAccount: { legacyId: stepProfile.id },
+        fromAccount: { id: stepProfile.id },
         toAccount: { id: collective.id },
         message: publicMessage,
       },
+    }).then(() => {
+      setSubmitted(true);
+      confettiFireworks(3000);
     });
   };
 
@@ -77,7 +85,7 @@ const ContributionFlowPublicMessage = ({ collective, stepProfile, publicMessage 
     <PublicMessageContainer width={[1, '400px']} flexShrink={1} height={112} mt={2}>
       <Formik initialValues={initialValues} onSubmit={submitPublicMessage}>
         {formik => {
-          const { values, handleSubmit, isSubmitting } = formik;
+          const { values, handleSubmit, isSubmitting, dirty } = formik;
 
           return (
             <Form>
@@ -90,30 +98,47 @@ const ContributionFlowPublicMessage = ({ collective, stepProfile, publicMessage 
                     border="none"
                     withOutline={false}
                     maxLength={PUBLIC_MESSAGE_MAX_LENGTH}
-                    minWidth={300}
                     minHeight={75}
                     fontSize="14px"
                     value={values.publicMessage}
                     placeholder={intl.formatMessage(messages.publicMessagePlaceholder)}
+                    onChange={e => {
+                      formik.setFieldValue('publicMessage', e.target.value);
+                      if (isSubmitted) {
+                        setSubmitted(false);
+                      }
+                    }}
                   />
                 )}
               </StyledInputField>
 
-              <Flex flexGrow={1} mt={1} px={3}>
-                <Flex width={1 / 2} alignItems="center" justifyContent="flex-start">
+              <Flex flexGrow={1} mt={1} px={3} justifyContent="space-between">
+                <Flex alignItems="center" justifyContent="flex-start" minWidth={0} mr={1}>
                   <Avatar collective={stepProfile} radius={24} />
                   <Flex flexDirection="column" ml={2}>
                     <P fontSize="10px">
-                      <em>
-                        <FormattedMessage id="contribute.publicMessage.postingAs" defaultMessage="Posting as" />
-                      </em>
+                      <FormattedMessage id="contribute.publicMessage.postingAs" defaultMessage="Posting as" />
                     </P>
-                    <P fontSize="12px">{stepProfile.name}</P>
+                    <Box minWidth={0}>
+                      <P fontSize="12px" truncateOverflow title={stepProfile.name}>
+                        {truncate(stepProfile.name, { length: 25 })}
+                      </P>
+                    </Box>
                   </Flex>
                 </Flex>
-                <Flex width={1 / 2} alignItems="center" justifyContent="flex-end">
-                  <StyledButton buttonSize="tiny" loading={isSubmitting} type="submit" onSubmit={handleSubmit}>
-                    <FormattedMessage id="contribute.publicMessage.post" defaultMessage="Post message" />
+                <Flex alignItems="center" justifyContent="flex-end">
+                  <StyledButton
+                    buttonSize="tiny"
+                    loading={isSubmitting}
+                    type="submit"
+                    onSubmit={handleSubmit}
+                    disabled={isSubmitted}
+                  >
+                    {isSubmitted && dirty ? (
+                      <FormattedMessage id="saved" defaultMessage="Saved" />
+                    ) : (
+                      <FormattedMessage id="contribute.publicMessage.post" defaultMessage="Post message" />
+                    )}
                   </StyledButton>
                 </Flex>
               </Flex>
@@ -126,8 +151,7 @@ const ContributionFlowPublicMessage = ({ collective, stepProfile, publicMessage 
 };
 
 ContributionFlowPublicMessage.propTypes = {
-  collective: PropTypes.object,
-  stepProfile: PropTypes.object,
+  order: PropTypes.object.isRequired,
   publicMessage: PropTypes.string,
   intl: PropTypes.object,
 };

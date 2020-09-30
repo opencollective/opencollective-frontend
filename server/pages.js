@@ -35,15 +35,14 @@ const pages = routes()
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add(
     'host.dashboard',
-    '/:hostCollectiveSlug/dashboard/:view(expenses|expenses-beta|pending-applications|hosted-collectives|donations)?',
+    '/:hostCollectiveSlug/dashboard/:view(expenses|expenses-legacy|pending-applications|hosted-collectives|donations)?',
     'host.dashboard',
   )
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions')
   .add('createUpdate', '/:collectiveSlug/updates/new')
   .add('updates', '/:collectiveSlug/updates')
   .add('update', '/:collectiveSlug/updates/:updateSlug')
-  .add('createExpense', '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new/legacy')
-  .add('create-expense', '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new/:version(v2)?')
+  .add('create-expense', '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new')
   .add(
     'expense-v2',
     '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
@@ -72,6 +71,8 @@ const pages = routes()
 
 pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?');
 
+pages.add('external-redirect', '/redirect');
+
 // New Create Collective Flow
 pages.add(
   'create-collective',
@@ -97,64 +98,113 @@ pages.add('conversation', '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)'
 // Contribute Flow
 // ---------------
 
+let createOrderPage = 'createOrder';
+let orderSuccessPage = 'orderSuccess';
+let contributionFlowSteps = 'contributeAs|details|payment|summary';
+
+if (process.env.NEW_CONTRIBUTION_FLOW && process.env.NEW_CONTRIBUTION_FLOW !== 'false') {
+  createOrderPage = 'new-contribution-flow';
+  orderSuccessPage = 'new-contribution-flow';
+  contributionFlowSteps += '|profile|success';
+
+  // Add legacy pages
+  pages
+    .add(
+      'orderCollectiveNewLegacy',
+      `/:collectiveSlug/:version(legacy)/:verb(donate|pay|order|events)/:step(${contributionFlowSteps})?`,
+      'createOrder',
+    )
+    .add(
+      'orderCollectiveTierNewLegacy',
+      `/:collectiveSlug/:version(legacy)/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
+      'createOrder',
+    )
+    .add(
+      'orderCollectiveNewLegacySuccess',
+      '/:collectiveSlug/:version(legacy)/:verb(donate|pay|order|events)/:step(success)',
+      'orderSuccess',
+    )
+    .add(
+      'orderCollectiveTierNewLegacySuccess',
+      '/:collectiveSlug/:version(legacy)/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(success)',
+      'orderSuccess',
+    );
+} else {
+  pages.add(
+    'new-donate',
+    '/:collectiveSlug/:verb(new-donate)/:step(details|profile|payment|success)?',
+    'new-contribution-flow',
+  );
+  pages.add(
+    'new-contribute',
+    '/:collectiveSlug/:verb(new-contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(details|profile|payment|success|summary)?',
+    'new-contribution-flow',
+  );
+  pages.add(
+    'new-order-event-tier',
+    `/:collectiveSlug/:verb(new-events|new-projects)/:eventSlug/order/:tierId/:step(details|profile|payment|success|summary)?`,
+    'new-contribution-flow',
+  );
+}
+
 // Legacy create order route. Deprectated on 2019-02-12
 pages.add(
   'orderCollectiveTier',
   '/:collectiveSlug/:verb(order)/:tierId/:amount(\\d+)?/:interval(month|monthly|year|yearly)?',
-  'createOrder',
+  createOrderPage,
 );
 
 // Legacy tier route. Deprectated on 2019-06-07
 pages
   .add(
     'orderCollectiveTierLegacy',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment|summary)?',
-    'createOrder',
+    `/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/:step(${contributionFlowSteps})?`,
+    createOrderPage,
   )
   .add(
     'orderCollectiveTierLegacySuccess',
     '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/:step(success)',
-    'orderSuccess',
+    orderSuccessPage,
   );
 
 // New Routes -> New flow
 pages
   .add(
     'orderCollectiveNew',
-    '/:collectiveSlug/:verb(donate|pay|order|events)/:step(contributeAs|details|payment|summary)?',
-    'createOrder',
+    `/:collectiveSlug/:verb(donate|pay|order|events)/:step(${contributionFlowSteps})?`,
+    createOrderPage,
   )
   .add(
     'orderCollectiveTierNew',
-    '/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(contributeAs|details|payment|summary)?',
-    'createOrder',
+    `/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
+    createOrderPage,
   )
-  .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|order|events)/:step(success)', 'orderSuccess')
+  .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|order|events)/:step(success)', orderSuccessPage)
   .add(
     'orderCollectiveTierNewSuccess',
     '/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(success)',
-    'orderSuccess',
+    orderSuccessPage,
   );
 
 // Generic Route
 pages.add(
   'orderCollective',
   '/:collectiveSlug/:verb(donate|pay|order|events)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
-  'createOrder',
+  createOrderPage,
 );
 
 // Events
 pages.add(
   'orderEventTier',
-  '/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(contributeAs|details|payment|summary)?',
-  'createOrder',
+  `/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(${contributionFlowSteps})?`,
+  createOrderPage,
 );
 
 // Events
 pages.add(
   'orderEventTierSuccess',
   '/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(success)',
-  'orderSuccess',
+  orderSuccessPage,
 );
 
 // Pledges
@@ -197,17 +247,5 @@ pages.add(
 // New recurring contributions page
 pages.add('recurring-contributions', '/:slug/recurring-contributions');
 pages.add('subscriptions', '/:slug/subscriptions', 'recurring-contributions');
-
-// new contribution flow
-pages.add(
-  'new-donate',
-  '/:collectiveSlug/:verb(new-donate)/:step(details|profile|payment|success)?',
-  'new-contribution-flow',
-);
-pages.add(
-  'new-contribute',
-  '/:collectiveSlug/:verb(new-contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(details|profile|payment|success|summary)?',
-  'new-contribution-flow',
-);
 
 module.exports = pages;

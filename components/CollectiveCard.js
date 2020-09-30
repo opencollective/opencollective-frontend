@@ -32,6 +32,69 @@ const CardWrapper = styled(Container)`
   ${width}
 `;
 
+const NameWrapper = styled(Container)`
+  min-height: 20px;
+  font-size: 14px;
+  margin: 5px;
+  font-weight: 700;
+  text-align: center;
+  color: #303233;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const MembershipWrapper = styled(Container)`
+  border-top: 1px solid #f2f2f2;
+  padding: 1rem;
+  color: #303233;
+`;
+
+const StatsWrapper = styled(MembershipWrapper)`
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: space-around;
+`;
+
+const ValueWrapper = styled(Container)`
+  font-weight: normal;
+  text-align: center;
+  color: #303233;
+  font-size: 1.4rem;
+  margin: 3px 2px 0px;
+  text-align: center;
+  margin: auto;
+`;
+
+const LabelWrapper = styled(Container)`
+  font-size: 9px;
+  text-align: center;
+  font-weight: 300;
+  color: #a8afb3;
+  text-transform: uppercase;
+  text-align: center;
+  margin: auto;
+`;
+
+const CommaList = styled.ul`
+  display: inline;
+  list-style: none;
+  padding: 0px;
+
+  li {
+    display: inline;
+  }
+
+  li::after {
+    content: ', ';
+  }
+
+  li:last-child::after {
+    content: '';
+  }
+`;
+
 class CollectiveCard extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
@@ -122,7 +185,7 @@ class CollectiveCard extends React.Component {
     if (collective.type === 'EVENT') {
       route = 'event';
       params = {
-        parentCollectiveSlug: collective.parentCollective && collective.parentCollective.slug,
+        parentCollectiveSlug: collective.parentCollective?.slug || 'collective',
         slug: collective.slug,
       };
     } else {
@@ -133,216 +196,96 @@ class CollectiveCard extends React.Component {
     return (
       <Link route={route} target="_top" params={params}>
         <CardWrapper className={`CollectiveCard ${collective.type}`} {...this.props}>
-          <style jsx>
-            {`
-              .head {
-                position: relative;
-                overflow: hidden;
-                width: 100%;
-                height: 14rem;
-                border-bottom: 5px solid #46b0ed;
-              }
-
-              .background {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-size: cover;
-                background-position: center;
-              }
-
-              .logo {
-                display: flex;
-                height: 100%;
-                align-items: center;
-                justify-content: center;
-                position: absolute;
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-              }
-
-              .body {
-                padding: 1rem;
-                min-height: 11rem;
-              }
-
-              .name,
-              .description {
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
-
-              .name {
-                min-height: 20px;
-                font-size: 14px;
-                margin: 5px;
-                font-weight: 700;
-                text-align: center;
-                color: #303233;
-                white-space: nowrap;
-              }
-
-              .description {
-                font-weight: normal;
-                text-align: center;
-                color: #787d80;
-                font-size: 1.2rem;
-                line-height: 1.3;
-                margin: 0 5px;
-                min-height: 50px;
-              }
-
-              .footer {
-                font-size: 1.1rem;
-                width: 100%;
-                min-height: 6rem;
-                text-align: center;
-              }
-
-              .membership,
-              .stats,
-              .totalDonations {
-                border-top: 1px solid #f2f2f2;
-                padding: 1rem;
-                color: #303233;
-              }
-
-              .stats {
-                display: flex;
-                width: 100%;
-                box-sizing: border-box;
-                justify-content: space-around;
-              }
-
-              .totalDonationsAmount {
-                font-size: 2rem;
-              }
-
-              .role {
-                min-height: 13px;
-                font-weight: 700;
-                letter-spacing: 3px;
-                color: #75cc1f;
-                text-transform: uppercase;
-              }
-
-              .comma-list {
-                display: inline;
-                list-style: none;
-                padding: 0px;
-              }
-
-              .comma-list li {
-                display: inline;
-              }
-
-              .comma-list li::after {
-                content: ', ';
-              }
-
-              .comma-list li:last-child::after {
-                content: '';
-              }
-
-              .value,
-              .label {
-                text-align: center;
-                margin: auto;
-              }
-
-              .value {
-                font-weight: normal;
-                text-align: center;
-                color: #303233;
-                font-size: 1.4rem;
-                margin: 3px 2px 0px;
-              }
-
-              .label {
-                font-size: 9px;
-                text-align: center;
-                font-weight: 300;
-                color: #a8afb3;
-                text-transform: uppercase;
-              }
-
-              .since {
-                min-height: 18px;
-                font-size: 12px;
-                font-weight: 500;
-                line-height: 1.5;
-                text-align: center;
-                color: #aab0b3;
-                text-transform: capitalize;
-              }
-            `}
-          </style>
-          <div className="head">
-            <div className="background" style={coverStyle} />
-            <div className="logo">
+          <Container position="relative" overflow="hidden" width="100%" height="14rem" borderBottom="5px solid #46b0ed">
+            <Container
+              position="absolute"
+              top="0"
+              left="0"
+              width="100%"
+              height="100%"
+              backgroundSize="cover"
+              backgroundPosition="center"
+              style={coverStyle}
+            />
+            <Container
+              display="flex"
+              height="100%"
+              alignItems="center"
+              justifyContent="center"
+              position="absolute"
+              left="0"
+              right="0"
+              top="0"
+              bottom="0"
+            >
               <Avatar collective={collective} radius={65} />
-            </div>
-          </div>
-          <div className="body">
-            <div className="name">{collective.name}</div>
-            <div className="description" title={description}>
+            </Container>
+          </Container>
+          <Container padding="1rem" minHeight="11rem">
+            <NameWrapper>{collective.name}</NameWrapper>
+            <Container
+              fontWeight="normal"
+              textAlign="center"
+              color="#787d80"
+              fontSize="1.2rem"
+              lineHeight="1.3"
+              margin="0 5px"
+              minHeight="50px"
+              title={description}
+            >
               {truncatedDescription}
-            </div>
-          </div>
-          <div className="footer">
+            </Container>
+          </Container>
+          <Container fontSize="1.1rem" width="100%" minHeight="6rem" textAlign="center">
             {collective.type === 'COLLECTIVE' && get(collective, 'stats.backers.all') > 0 && (
-              <div className="stats">
+              <StatsWrapper>
                 <div className="backers">
-                  <div className="value">{collective.stats.backers.all}</div>
-                  <div className="label">
+                  <ValueWrapper>{collective.stats.backers.all}</ValueWrapper>
+                  <LabelWrapper>
                     <FormattedMessage
                       id="collective.card.stats.backers"
                       defaultMessage="{n, plural, one {backer} other {backers}}"
                       values={{ n: collective.stats.backers.all }}
                     />
-                  </div>
+                  </LabelWrapper>
                 </div>
                 <div className="yearlyBudget">
-                  <div className="value">
+                  <ValueWrapper>
                     <Currency value={collective.stats.yearlyBudget} currency={collective.currency} />
-                  </div>
-                  <div className="label">
+                  </ValueWrapper>
+                  <LabelWrapper>
                     <FormattedMessage id="collective.card.stats.yearlyBudget" defaultMessage={'yearly budget'} />
-                  </div>
+                  </LabelWrapper>
                 </div>
-              </div>
+              </StatsWrapper>
             )}
             {collective.stats && collective.memberOf && collective.type === 'ORGANIZATION' && (
-              <div className="stats">
+              <StatsWrapper>
                 <div className="backers">
-                  <div className="value">{collective.memberOf.length}</div>
-                  <div className="label">
+                  <ValueWrapper>{collective.memberOf.length}</ValueWrapper>
+                  <LabelWrapper>
                     <FormattedMessage
                       id="collective.card.memberOf.count"
                       defaultMessage="{n, plural, one {collective} other {collectives}} backed"
                       values={{ n: collective.memberOf.length }}
                     />
-                  </div>
+                  </LabelWrapper>
                 </div>
                 <div className="yearlyBudget">
-                  <div className="value">
+                  <ValueWrapper>
                     <Currency value={collective.stats.totalAmountSpent} currency={collective.currency} />
-                  </div>
-                  <div className="label">
+                  </ValueWrapper>
+                  <LabelWrapper>
                     <FormattedMessage id="AmountContributed" defaultMessage="Contributed" />
-                  </div>
+                  </LabelWrapper>
                 </div>
-              </div>
+              </StatsWrapper>
             )}
             {collective.stats && collective.stats.collectives && (
-              <div className="stats">
+              <StatsWrapper>
                 <div className="backers">
-                  <div className="value">{get(collective, 'stats.collectives.hosted')}</div>
-                  <div className="label">
+                  <ValueWrapper>{get(collective, 'stats.collectives.hosted')}</ValueWrapper>
+                  <LabelWrapper>
                     <FormattedMessage
                       id="collective.card.collectives.count"
                       defaultMessage="{n, plural, one {collective} other {collectives}} hosted"
@@ -350,27 +293,41 @@ class CollectiveCard extends React.Component {
                         n: get(collective, 'stats.collectives.hosted'),
                       }}
                     />
-                  </div>
+                  </LabelWrapper>
                 </div>
                 <div className="currency">
-                  <div className="value">{collective.currency}</div>
-                  <div className="label">
+                  <ValueWrapper>{collective.currency}</ValueWrapper>
+                  <LabelWrapper>
                     <FormattedMessage id="currency" defaultMessage="currency" />
-                  </div>
+                  </LabelWrapper>
                 </div>
-              </div>
+              </StatsWrapper>
             )}
             {roles && roles.size > 0 && (
-              <div className="membership">
-                <div className="role">
-                  <ul className="comma-list">
+              <MembershipWrapper>
+                <Container
+                  minHeight="13px"
+                  fontWeight="700"
+                  letterSpacing="3px"
+                  color="#75cc1f"
+                  textTransform="uppercase"
+                >
+                  <CommaList>
                     {Array.from(roles).map(role => (
                       <li key={role}>{role}</li>
                     ))}
-                  </ul>
-                </div>
+                  </CommaList>
+                </Container>
                 {oldestMembershipDate && (
-                  <div className="since">
+                  <Container
+                    minHeight="18px"
+                    fontSize="12px"
+                    fontWeight="500"
+                    lineHeight="1.5"
+                    textAlign="center"
+                    color="#aab0b3"
+                    textTransform="capitalize"
+                  >
                     <FormattedMessage
                       id="membership.since"
                       defaultMessage={'since {date}'}
@@ -378,26 +335,26 @@ class CollectiveCard extends React.Component {
                         date: <FormattedDate value={oldestMembershipDate} month="long" year="numeric" />,
                       }}
                     />
-                  </div>
+                  </Container>
                 )}
-              </div>
+              </MembershipWrapper>
             )}
             {memberships.map(
               membership =>
                 membership.role === 'BACKER' &&
                 get(membership, 'stats.totalDonations') > 0 && (
-                  <div className="totalDonations" key={membership.id}>
-                    <div className="totalDonationsAmount">
+                  <MembershipWrapper key={membership.id}>
+                    <Container fontSize="2rem">
                       <Currency
                         value={get(membership, 'stats.totalDonations')}
                         currency={get(membership, 'collective.currency')}
                       />
-                    </div>
+                    </Container>
                     <FormattedMessage id="membership.totalDonations.title" defaultMessage={'Amount contributed'} />
-                  </div>
+                  </MembershipWrapper>
                 ),
             )}
-          </div>
+          </Container>
         </CardWrapper>
       </Link>
     );

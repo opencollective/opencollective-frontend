@@ -41,12 +41,15 @@ class CollectiveGoals extends React.Component {
     const { intl, collective } = props;
 
     this.state = {
-      goals: sortBy(get(collective.settings, 'goals', []), 'amount'),
       collectivePage: get(collective.settings, 'collectivePage', {}),
       isTouched: false,
       error: null,
       submitting: false,
       submitted: false,
+      goals: sortBy(get(collective.settings, 'goals', []), 'amount').map(goal => ({
+        ...goal,
+        key: goal.key || uuid(),
+      })),
     };
     this.defaultType = 'yearlyBudget';
     this.messages = defineMessages({
@@ -162,8 +165,6 @@ class CollectiveGoals extends React.Component {
       type: goal.type || this.defaultType,
     };
 
-    goal.key = goal.key || uuid();
-
     return (
       <Container mt={4} pb={4} borderBottom={BORDER} key={`goal-${index}-${goal.key}`}>
         <Form>
@@ -182,8 +183,14 @@ class CollectiveGoals extends React.Component {
             <StyledInputField name={this.fields[1].name} label={this.fields[1].label}>
               <StyledSelect
                 options={this.fields[1].options}
-                onChange={obj => this.editGoal(index, this.fields[1].name, obj)}
-                defaultValue={defaultValues[this.fields[1].name] || {}}
+                onChange={obj => this.editGoal(index, this.fields[1].name, obj.value)}
+                isSearchable={false}
+                defaultValue={
+                  goal.type && {
+                    value: goal.type,
+                    label: intl.formatMessage(this.messages[goal.type]),
+                  }
+                }
               />
             </StyledInputField>
           </Box>

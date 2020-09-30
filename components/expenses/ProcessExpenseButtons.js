@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import MessageBox from '../MessageBox';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
@@ -55,19 +55,39 @@ export const hasProcessButtons = permissions => {
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
  */
-const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps, showError, onError }) => {
+const ProcessExpenseButtons = ({
+  expense,
+  collective,
+  host,
+  permissions,
+  buttonProps,
+  showError,
+  onError,
+  onSuccess,
+}) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const mutationOptions = { context: API_V2_CONTEXT };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
 
   const triggerAction = async (action, paymentParams) => {
+    // Prevent submitting the action if another one is being submitted at the same time
+    if (loading) {
+      return;
+    }
+
     setSelectedAction(action);
 
     try {
-      return await processExpense({ variables: { id: expense.id, legacyId: expense.legacyId, action, paymentParams } });
+      const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
+      const processedExpense = await processExpense({ variables });
+      if (onSuccess) {
+        await onSuccess(processedExpense, action, paymentParams);
+      }
+
+      return processedExpense;
     } catch (e) {
       if (onError && selectedAction !== 'PAY') {
-        onError(getErrorFromGraphqlException(error));
+        onError(getErrorFromGraphqlException(e));
       }
     }
   };
@@ -85,9 +105,7 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
   return (
     <React.Fragment>
       {!loading && showError && error && selectedAction !== 'PAY' && (
-        <MessageBox flex="1 0 100%" type="error" withIcon>
-          {getErrorFromGraphqlException(error).message}
-        </MessageBox>
+        <MessageBoxGraphqlError flex="1 0 100%" error={error} />
       )}
       {permissions.canApprove && (
         <StyledButton {...getButtonProps('APPROVE')} buttonStyle="secondary" data-cy="approve-button">
@@ -157,6 +175,7 @@ ProcessExpenseButtons.propTypes = {
   buttonProps: PropTypes.object,
   showError: PropTypes.bool,
   onError: PropTypes.func,
+  onSuccess: PropTypes.func,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {

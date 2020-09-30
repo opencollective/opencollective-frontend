@@ -25,7 +25,7 @@ import HostDashboardActionsBanner from './HostDashboardActionsBanner';
 class HostDashboard extends React.Component {
   static propTypes = {
     hostCollectiveSlug: PropTypes.string, // for addData
-    view: PropTypes.oneOf(['expenses', 'expenses-beta', 'donations']).isRequired,
+    view: PropTypes.oneOf(['expenses', 'expenses-legacy', 'donations']).isRequired,
     LoggedInUser: PropTypes.object,
     data: PropTypes.object, // from addData
   };
@@ -197,7 +197,7 @@ class HostDashboard extends React.Component {
           />
         )}
         <div className="content">
-          {view === 'expenses' && this.renderExpenses(selectedCollective, includeHostedCollectives)}
+          {view === 'expenses-legacy' && this.renderExpenses(selectedCollective, includeHostedCollectives)}
           {view === 'donations' && this.renderDonations(selectedCollective, includeHostedCollectives)}
         </div>
       </div>

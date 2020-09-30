@@ -9,8 +9,8 @@ import { Box } from '../../Grid';
 import { P } from '../../Text';
 
 const totalCollectiveContributionsQuery = gql`
-  query HeroTotalCollectiveContributions($id: Int) {
-    Collective(id: $id) {
+  query HeroTotalCollectiveContributions($slug: String!) {
+    Collective(slug: $slug) {
       id
       currency
       stats {
@@ -29,7 +29,7 @@ const amountStyles = { fontSize: '20px', fontWeight: 'bold' };
  */
 const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
   const { data, loading, error } = useQuery(totalCollectiveContributionsQuery, {
-    variables: { id: collective.id },
+    variables: { slug: collective.slug },
   });
 
   if (error || loading || !get(data, 'Collective.stats.totalAmountSpent')) {
@@ -49,7 +49,7 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
 
 HeroTotalCollectiveContributionsWithData.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.number,
+    slug: PropTypes.string,
   }),
 };
 

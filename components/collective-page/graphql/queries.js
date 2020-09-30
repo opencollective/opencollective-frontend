@@ -66,6 +66,7 @@ export const collectivePageQuery = gql`
         name
         slug
         image
+        backgroundImageUrl
         twitterHandle
         type
       }

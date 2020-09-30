@@ -13,7 +13,7 @@ const messages = defineMessages({
   },
   description: {
     id: 'CollectivePage.Contribute.Custom.Description',
-    defaultMessage: 'Make a custom one time or recurring contribution to support this collective.',
+    defaultMessage: 'Make a custom one time or recurring contribution.',
   },
 });
 

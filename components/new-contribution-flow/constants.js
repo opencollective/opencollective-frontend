@@ -3,4 +3,5 @@ export const STEPS = {
   DETAILS: 'details',
   PAYMENT: 'payment',
   SUMMARY: 'summary',
+  SUCCESS: 'success',
 };

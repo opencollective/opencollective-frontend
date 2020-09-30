@@ -6,6 +6,8 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, getPrecisionFromAmount } from '../../lib/currency-utils';
+import { isPastEvent } from '../../lib/events';
+import { isTierExpired } from '../../lib/tier-utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -47,8 +49,11 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
   const minAmount = isFlexibleAmount ? tier.minimumAmount : tier.amount;
   const raised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
-  const isPassed = tier.endsAt && new Date() > new Date(tier.endsAt);
-  const tierType = getContributionTypeFromTier(tier, isPassed);
+  const tierIsExpired = isTierExpired(tier);
+  const tierType = getContributionTypeFromTier(tier, tierIsExpired);
+  const hasNoneLeft = tier.stats.availableQuantity === 0;
+  const canContributeToCollective = collective.isActive && !isPastEvent(collective);
+  const isDisabled = !canContributeToCollective || tierIsExpired || hasNoneLeft;
 
   let description;
   let isTruncated = false;
@@ -90,7 +95,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
       contributors={tier.contributors}
       stats={tier.stats.contributors}
       data-cy="contribute-card-tier"
-      disableCTA={isPassed}
+      disableCTA={isDisabled}
       {...props}
     >
       <Flex flexDirection="column" justifyContent="space-between" height="100%">
@@ -168,7 +173,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
             )}
           </P>
         </div>
-        {!isPassed && minAmount > 0 && (
+        {!isDisabled && minAmount > 0 && (
           <div>
             {isFlexibleAmount && (
               <P fontSize="10px" color="black.600" textTransform="uppercase" mb={1}>
@@ -195,6 +200,7 @@ ContributeTier.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+    isActive: PropTypes.bool,
     parentCollective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),

@@ -14,7 +14,7 @@ const Container = styled.div`
     `}
 `;
 
-const TransactionsList = ({ transactions, displayActions }) => {
+const TransactionsList = ({ transactions, collective, displayActions, onMutationSuccess }) => {
   if (!transactions?.length) {
     return null;
   }
@@ -24,7 +24,12 @@ const TransactionsList = ({ transactions, displayActions }) => {
       {transactions.map((transaction, idx) => {
         return (
           <Container key={transaction?.id || idx} isFirst={!idx} data-cy="single-transaction">
-            <TransactionItem {...transaction} displayActions={displayActions} />
+            <TransactionItem
+              transaction={transaction}
+              collective={collective}
+              displayActions={displayActions}
+              onMutationSuccess={onMutationSuccess}
+            />
           </Container>
         );
       })}
@@ -46,6 +51,7 @@ TransactionsList.propTypes = {
       id: PropTypes.string.isRequired,
     }),
   ),
+  onMutationSuccess: PropTypes.func,
 };
 
 TransactionsList.defaultProps = {

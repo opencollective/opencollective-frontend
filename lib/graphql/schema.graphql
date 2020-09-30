@@ -90,7 +90,6 @@ type Collective implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -101,7 +100,6 @@ type Collective implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -322,7 +320,6 @@ input CollectiveAttributesInputType {
   startsAt: String
   endsAt: String
   timezone: String
-  maxAmount: Int
   currency: String
   settings: JSON
   isIncognito: Boolean
@@ -348,7 +345,6 @@ input CollectiveInputType {
   startsAt: String
   endsAt: String
   timezone: String
-  maxAmount: Int
   currency: String
   image: String
   backgroundImage: String
@@ -387,7 +383,6 @@ interface CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -398,7 +393,6 @@ interface CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -1006,7 +1000,6 @@ type Event implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -1017,7 +1010,6 @@ type Event implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -1438,7 +1430,6 @@ type Fund implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -1449,7 +1440,6 @@ type Fund implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -2405,6 +2395,7 @@ enum OrderStatus {
   PENDING
   EXPIRED
   PLEDGED
+  REJECTED
 }
 
 """
@@ -2528,7 +2519,6 @@ type Organization implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -2539,7 +2529,6 @@ type Organization implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -2941,7 +2930,6 @@ type Project implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -2952,7 +2940,6 @@ type Project implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -3350,6 +3337,7 @@ type Query {
   ): CollectiveSearchResults
   allCollectiveTags: [String]
   member(id: Int, CollectiveId: Int, MemberCollectiveId: Int, TierId: Int): Member
+    @deprecated(reason: "2020-09-08: This endpoint does not seems to be used anymore")
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -3395,7 +3383,7 @@ type Query {
   """
   search(
     """
-    Fetch collectives related to this term based on name, description, tags, slug, mission, and location
+    Fetch collectives related to this term based on name, description, tags, slug, and location
     """
     term: String
 
@@ -3853,7 +3841,6 @@ type User implements CollectiveInterface {
   """
   hasLongDescription: Boolean
   expensePolicy: String
-  mission: String
   tags: [String]
 
   """
@@ -3864,7 +3851,6 @@ type User implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  maxAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
   currency: String
@@ -4115,4 +4101,5 @@ input UserInputType {
   website: String
   paypalEmail: String
   newsletterOptIn: Boolean
+  location: LocationInputType
 }

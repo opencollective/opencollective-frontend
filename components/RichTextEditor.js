@@ -54,9 +54,10 @@ const TrixEditorContainer = styled.div`
   trix-toolbar {
     min-height: 40px;
     background: ${props => props.toolbarBackgroundColor};
-    box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);
+    ${props => !props.withBorders && `box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);`}
     z-index: 2;
     margin-bottom: 8px;
+    ${props => props.withBorders && `min-height: 0px; margin-bottom: 0;`}
 
     .trix-button-group {
       border-radius: 6px;
@@ -148,6 +149,7 @@ export default class RichTextEditor extends React.Component {
     /** If not provided, an id will be automatically generated which will require a component update */
     id: PropTypes.string,
     defaultValue: PropTypes.string,
+    value: PropTypes.string,
     placeholder: PropTypes.string,
     toolbarBackgroundColor: PropTypes.string.isRequired,
     /** Font size for the text */
@@ -391,6 +393,7 @@ export default class RichTextEditor extends React.Component {
       disabled,
       error,
       fontSize,
+      value,
       version,
     } = this.props;
 
@@ -414,7 +417,7 @@ export default class RichTextEditor extends React.Component {
             {this.state.error.toString()}
           </MessageBox>
         )}
-        <input id={this.state.id} value={defaultValue} type="hidden" name={inputName} />
+        <input id={this.state.id} value={value || defaultValue} type="hidden" name={inputName} />
         <HTMLContent fontSize={fontSize}>
           <trix-editor
             ref={this.editorRef}

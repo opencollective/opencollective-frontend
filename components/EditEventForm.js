@@ -4,6 +4,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import Tickets from './edit-collective/sections/Tickets';
 import Button from './Button';
+import Container from './Container';
 import InputField from './InputField';
 import TimezonePicker from './TimezonePicker';
 
@@ -173,44 +174,7 @@ class EditEventForm extends React.Component {
 
     return (
       <div className="EditEventForm">
-        <style jsx>
-          {`
-            :global(.field) {
-              margin: 1rem;
-            }
-            :global(label) {
-              width: 150px;
-              display: inline-block;
-              vertical-align: top;
-            }
-            :global(input),
-            select,
-            :global(textarea) {
-              width: 300px;
-              font-size: 1.5rem;
-            }
-
-            .FormInputs {
-              max-width: 700px;
-              margin: 0 auto;
-            }
-
-            :global(textarea[name='longDescription']) {
-              height: 50rem;
-            }
-
-            .actions {
-              margin: 5rem auto 1rem;
-              text-align: center;
-            }
-
-            :global(section#location) {
-              margin-top: 0;
-            }
-          `}
-        </style>
-
-        <div className="FormInputs">
+        <Container maxWidth="700px" margin="0 auto">
           <div className="inputs">
             {this.fields.map(field =>
               field.name === 'timezone' ? (
@@ -251,15 +215,15 @@ class EditEventForm extends React.Component {
               defaultType="TICKET"
             />
           )}
-        </div>
-        <div className="actions">
+        </Container>
+        <Container margin="5rem auto 1rem" textAlign="center">
           <Button
             className="blue save"
             label={submitBtnLabel}
             onClick={this.handleSubmit}
             disabled={this.state.disabled ? true : loading}
           />
-        </div>
+        </Container>
       </div>
     );
   }

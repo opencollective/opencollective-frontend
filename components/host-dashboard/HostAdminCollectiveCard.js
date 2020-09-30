@@ -8,7 +8,6 @@ import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
 import { getCurrencySymbol } from '../../lib/currency-utils';
 import { formatHostFeeStructure } from '../../lib/i18n/host-fee-structure';
 
-import AddFundsModal from '../AddFundsModal';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -17,6 +16,7 @@ import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
 import { P, Span } from '../Text';
 
+import AddFunds from './AddFundsModal';
 import CollectiveFeesStructureModal from './CollectiveFeesStructureModal';
 
 const msg = defineMessages({
@@ -132,7 +132,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
         </Container>
       </Box>
       {currentModal === 'addFunds' && (
-        <AddFundsModal show collective={collective} host={host} setShow={show => !show && setCurrentModal(null)} />
+        <AddFunds show collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
       {currentModal === 'feesStructure' && (
         <CollectiveFeesStructureModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />

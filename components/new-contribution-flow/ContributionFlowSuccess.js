@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
@@ -8,47 +7,50 @@ import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
+import { ORDER_STATUS } from '../../lib/constants/order-status';
+import { formatCurrency } from '../../lib/currency-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { formatManualInstructions } from '../../lib/payment-method-utils';
 import { facebookShareURL, tweetURL } from '../../lib/url_helpers';
 
 import Container from '../../components/Container';
+import { formatAccountDetails } from '../../components/edit-collective/utils';
 import { Box, Flex } from '../../components/Grid';
-import Newsletter from '../../components/home/Newsletter';
+import I18nFormatters, { getI18nLink } from '../../components/I18nFormatters';
+import Link from '../../components/Link';
 import Loading from '../../components/Loading';
+import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
-import { H3, P, Span } from '../../components/Text';
+import { H3, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
+import { orderSuccessFragment } from './index';
+import successIllustrationUrl from './success-illustration.jpg';
+import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
 
 // Styled components
 const ContainerWithImage = styled(Container)`
-  background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: left;
-`;
+  @media screen and (max-width: 52em) {
+    background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png');
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+  }
 
-const CTAContainer = styled(Container)`
-  border: 1px solid ${themeGet('colors.black.400')};
-  border-radius: 10px;
-  background-color: white;
+  @media screen and (min-width: 52em) {
+    background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
+    background-position: left;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+  }
 
-  ${props =>
-    props.hoverable &&
-    css`
-      &:hover {
-        border: 1px solid ${themeGet('colors.primary.500')};
-        cursor: pointer;
-
-        h3,
-        span {
-          color: ${themeGet('colors.primary.800')};
-        }
-      }
-    `}
+  @media screen and (min-width: 64em) {
+    background-size: cover;
+  }
 `;
 
 const ShareLink = styled(StyledLink)`
@@ -69,15 +71,37 @@ ShareLink.defaultProps = {
   target: '_blank',
 };
 
-// GraphQL
-const orderSuccessMemberQuery = gql`
-  query OrderSuccessMember($collectiveId: Int!, $memberCollectiveId: Int!, $tierId: Int) {
-    member(CollectiveId: $collectiveId, MemberCollectiveId: $memberCollectiveId, TierId: $tierId) {
-      id
-      publicMessage
-    }
-  }
+const BankTransferInfoContainer = styled(Container)`
+  border: 1px solid ${themeGet('colors.black.400')};
+  border-radius: 12px;
+  background-color: white;
 `;
+
+const SuccessIllustration = styled.img.attrs({ src: successIllustrationUrl })`
+  max-width: 100%;
+  width: 216px;
+  margin: 0 auto;
+  margin-bottom: 16px;
+`;
+
+const successMsgs = defineMessages({
+  default: {
+    id: 'order.created.tweet',
+    defaultMessage: "I've just donated to {collective}. Consider donating too, every little helps!",
+  },
+  event: {
+    id: 'order.created.tweet.event',
+    defaultMessage: "I'm attending {event}. Join me!",
+  },
+});
+
+const getMainTag = collective => {
+  if (collective.host?.slug === 'opensource' || collective.tags?.includes('open source')) {
+    return 'open source';
+  } else if (collective.tags?.includes('covid-19')) {
+    return 'covid-19';
+  }
+};
 
 class NewContributionFlowSuccess extends React.Component {
   static propTypes = {
@@ -87,218 +111,199 @@ class NewContributionFlowSuccess extends React.Component {
     router: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     data: PropTypes.object,
-    stepProfile: PropTypes.object,
-    contribution: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.headerMessages = defineMessages({
-      join: {
-        id: 'collective.create.join',
-        defaultMessage: 'Join Open Collective',
-      },
-      read: {
-        id: 'NewContributionFlow.Success.CTA.Read.Header',
-        defaultMessage: 'Read our stories',
-      },
-      subscribe: {
-        id: 'home.joinUsSection.newsletter',
-        defaultMessage: 'Subscribe to our newsletter',
-      },
-    });
-
-    this.contentMessages = defineMessages({
-      join: {
-        id: 'NewContributionFlow.Success.CTA.Join.Content',
-        defaultMessage: 'Create an account and show all your contributions to the community.',
-      },
-      read: {
-        id: 'NewContributionFlow.Success.CTA.Read.Content',
-        defaultMessage:
-          'Open Collective aims to foster transparency and sustainability in communities around the world. See how you could participate.',
-      },
-      subscribe: {
-        id: 'home.joinUsSection.weNeedUpdate',
-        defaultMessage: 'We send updates once a month.',
-      },
-    });
-  }
-
   renderCallsToAction = () => {
-    const joinCallToAction = {
-      headerText: this.props.intl.formatMessage(this.headerMessages.join),
-      contentText: this.props.intl.formatMessage(this.contentMessages.join),
-      subscribe: false,
-      link: '/create-account',
-    };
+    const { LoggedInUser, router } = this.props;
+    const callsToAction = [SUCCESS_CTA_TYPE.NEWSLETTER];
 
-    const readCallToAction = {
-      headerText: this.props.intl.formatMessage(this.headerMessages.read),
-      contentText: this.props.intl.formatMessage(this.contentMessages.read),
-      subscribe: false,
-      link: 'https://blog.opencollective.com',
-    };
-
-    const subscribeCallToAction = {
-      headerText: this.props.intl.formatMessage(this.headerMessages.subscribe),
-      contentText: this.props.intl.formatMessage(this.contentMessages.subscribe),
-      subscribe: true,
-    };
-
-    const allCallsToAction = !this.props.LoggedInUser;
-    // this is for when we redirect from email for freshly signed up recurring contributions users
-    // const readAndSubscribeCallsToAction = !LoggedInUser && this.props.router.query.emailRedirect;
-    const readOnlyCallToAction = this.props.LoggedInUser && !this.props.router.query.emailRedirect;
-
-    const callsToAction = [];
-
-    // all guest transactions
-    if (allCallsToAction) {
-      callsToAction.push(joinCallToAction, readCallToAction, subscribeCallToAction);
+    if (!LoggedInUser) {
+      // all guest transactions
+      callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
+    } else if (LoggedInUser && !router.query.emailRedirect) {
+      // all other logged in recurring/one time contributions
+      callsToAction.unshift(SUCCESS_CTA_TYPE.BLOG);
     }
-    // all other logged in recurring/one time contributions
-    else if (readOnlyCallToAction) {
-      callsToAction.push(readCallToAction);
-    }
-    // recurring contributions who have just signed up
-    // else if (readAndSubscribeCallsToAction) {
-    //   callsToAction.push(readCallToAction, subscribeCallToAction);
-    // }
-
-    const innerCTA = cta => {
-      return (
-        <CTAContainer
-          display="flex"
-          mx={[3, 0]}
-          my={2}
-          mb={[4, 0]}
-          px={4}
-          py={2}
-          justifyContent="space-between"
-          maxWidth={600}
-          hoverable={cta.link}
-        >
-          <Flex
-            flexDirection="column"
-            alignItems="left"
-            justifyContent="center"
-            width={[cta.subscribe ? 1 : 4 / 5, 4 / 5]}
-            my={3}
-          >
-            <H3 mb={3}>{cta.headerText}</H3>
-            <P fontSize="14px" lineHeight="24px" fontWeight={300} color="black.700">
-              {cta.contentText}
-            </P>
-            {cta.subscribe && (
-              <Box mt={2}>
-                <Newsletter />
-              </Box>
-            )}
-          </Flex>
-          {!cta.subscribe && (
-            <Flex alignItems="center" justifyContent="center">
-              <Span fontSize={40}>&rarr;</Span>
-            </Flex>
-          )}
-        </CTAContainer>
-      );
-    };
 
     return (
-      <Flex flexDirection="column" justifyContent="center">
-        {callsToAction.map(cta =>
-          cta.link ? (
-            <StyledLink href={cta.link} openInNewTab key={cta.headerText} color="black.700">
-              {innerCTA(cta)}
-            </StyledLink>
-          ) : (
-            <Fragment>{innerCTA(cta)}</Fragment>
-          ),
-        )}
+      <Flex flexDirection="column" justifyContent="center" p={2}>
+        {callsToAction.length <= 2 && <SuccessIllustration />}
+        {callsToAction.map(type => (
+          <SuccessCTA key={type} type={type} />
+        ))}
       </Flex>
     );
   };
 
-  renderCommentForm = (LoggedInUser, publicMessage) => {
-    if (!LoggedInUser) {
-      return null;
-    }
+  renderBankTransferInformation = () => {
+    const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
+    const bankAccount = get(this.props.data, 'order.toAccount.host.bankAccount.data', null);
+    const amount =
+      (get(this.props.data, 'order.amount.value') + get(this.props.data, 'order.platformContributionAmount.value', 0)) *
+      100;
+    const currency = get(this.props.data, 'order.amount.currency');
+    const formattedAmount = formatCurrency(amount, currency);
+
+    const formatValues = {
+      account: bankAccount ? formatAccountDetails(bankAccount) : '',
+      reference: get(this.props.data, 'order.legacyId', null),
+      amount: formattedAmount,
+      collective: get(this.props.data, 'order.toAccount.name', null),
+      // Deprecated but still needed for compatibility
+      OrderId: get(this.props.data, 'order.legacyId', null),
+    };
+
     return (
-      <PublicMessageForm
-        stepProfile={this.props.stepProfile}
-        publicMessage={publicMessage}
-        collective={this.props.collective}
-      />
+      <Flex flexDirection="column" justifyContent="center" width={[1, 3 / 4]} px={[4, 0]} py={[2, 0]}>
+        <MessageBox type="warning" fontSize="12px" mb={2}>
+          <FormattedMessage
+            id="collective.user.orderProcessing.manual"
+            defaultMessage="<strong>Your donation is pending.</strong> Please follow the instructions in the confirmation email to manually pay the host of the collective."
+            values={I18nFormatters}
+          />
+        </MessageBox>
+        {instructions && (
+          <BankTransferInfoContainer my={3} p={4}>
+            <H3>
+              <FormattedMessage id="NewContributionFlow.PaymentInstructions" defaultMessage="Payment instructions" />
+            </H3>
+            <Flex mt={2}>
+              <Flex style={{ whiteSpace: 'pre-wrap' }}>{formatManualInstructions(instructions, formatValues)}</Flex>
+            </Flex>
+          </BankTransferInfoContainer>
+        )}
+        <Flex px={3} mt={2}>
+          <P fontSize="16px" color="black.700">
+            <FormattedMessage
+              id="NewContributionFlow.InTheMeantime"
+              defaultMessage="In the meantime, you can follow {collective} and see how they are spending the money <CollectiveLink>on their collective page</CollectiveLink>."
+              values={{
+                collective: this.props.data.order.toAccount.name,
+                CollectiveLink: getI18nLink({
+                  as: Link,
+                  route: 'collective',
+                  params: { slug: this.props.data.order.toAccount.slug },
+                }),
+              }}
+            />
+          </P>
+        </Flex>
+      </Flex>
     );
   };
 
   render() {
-    const { loadingLoggedInUser, LoggedInUser, data, collective, contribution } = this.props;
-    const shareURL = `${process.env.WEBSITE_URL}${collective.path}`;
-    const publicMessage = data && get(data, 'member.publicMessage', null);
+    const { LoggedInUser, collective, data, intl } = this.props;
+    const { order } = data;
+    const shareURL = `${process.env.WEBSITE_URL}/${collective.slug}`;
+    const pendingOrder = order && order.status === ORDER_STATUS.PENDING;
 
-    return loadingLoggedInUser || data.loading ? (
-      <Loading />
-    ) : (
-      <Flex justifyContent="center" width={1} minHeight={[400, 800]} flexDirection={['column', 'row']}>
-        <ContainerWithImage display="flex" alignItems="center" justifyContent="center" width={[1, 1 / 2]}>
-          <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
-            <H3 mb={3}>
-              <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
-            </H3>
-            <Box mb={3}>
-              <P fontSize="20px" fontColor="black.700" fontWeight={500}>
-                <FormattedMessage
-                  id="NewContributionFlow.Success.NowSupporting"
-                  defaultMessage="You are now supporting {collective}."
-                  values={{ collective: collective.name }}
-                />
-              </P>
-            </Box>
-            <ContributorCardWithTier
-              width={250}
-              height={380}
-              collective={collective}
-              contribution={contribution}
-              my={2}
-            />
-            <Box my={4}>
-              <P fontColor="black.800" fontWeight={500}>
-                <FormattedMessage
-                  id="NewContributionFlow.Success.DiscoverMore"
-                  defaultMessage="Discover more Collectives like {collective} &rarr;"
-                  values={{ collective: collective.name }}
-                />
-              </P>
-            </Box>
-            <Flex justifyContent="center" mt={2}>
-              <ShareLink href={tweetURL({ url: shareURL, text: `I've just donated to {collective.name}` })}>
-                <Twitter size="1.2em" color="#4E5052" />
-                <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
-              </ShareLink>
-              <ShareLink href={facebookShareURL({ url: shareURL })}>
-                <Facebook size="1.2em" color="#4E5052" />
-                <FormattedMessage id="shareIt" defaultMessage="Share it" />
-              </ShareLink>
-            </Flex>
-            {this.renderCommentForm(LoggedInUser, publicMessage)}
-          </Flex>
-        </ContainerWithImage>
-        <Flex flexDirection="column" alignItems="center" justifyContent="center" width={[1, 1 / 2]}>
-          {this.renderCallsToAction()}
+    if (!data.loading && !order) {
+      return (
+        <Flex justifyContent="center" py={[5, 6]}>
+          <MessageBox type="warning" withIcon>
+            <FormattedMessage id="Order.NotFound" defaultMessage="This order doesn't exist" />
+          </MessageBox>
         </Flex>
+      );
+    }
+
+    return (
+      <Flex
+        justifyContent="center"
+        width={1}
+        minHeight={[400, 800]}
+        flexDirection={['column', null, 'row']}
+        data-cy="order-success"
+      >
+        {data.loading ? (
+          <Container display="flex" alignItems="center" justifyContent="center">
+            <Loading />
+          </Container>
+        ) : (
+          <Fragment>
+            <ContainerWithImage
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              width={['100%', null, '50%', '762px']}
+              flexShrink={0}
+            >
+              <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
+                <H3 mb={3}>
+                  <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
+                </H3>
+                <Box mb={3}>
+                  <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
+                    <FormattedMessage
+                      id="NewContributionFlow.Success.NowSupporting"
+                      defaultMessage="You are now supporting {collective}."
+                      values={{ collective: order.toAccount.name }}
+                    />
+                  </P>
+                </Box>
+                <ContributorCardWithTier width={250} height={380} contribution={order} my={2} />
+                <Box my={4}>
+                  <Link route="discover" params={{ show: getMainTag(order.toAccount) }}>
+                    <P color="black.800" fontWeight={500}>
+                      <FormattedMessage
+                        id="NewContributionFlow.Success.DiscoverMore"
+                        defaultMessage="Discover more Collectives like {collective} &rarr;"
+                        values={{ collective: order.toAccount.name }}
+                      />
+                    </P>
+                  </Link>
+                </Box>
+                <Flex justifyContent="center" mt={2}>
+                  <ShareLink
+                    href={tweetURL({
+                      url: shareURL,
+                      text: intl.formatMessage(
+                        order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
+                        { collective: order.toAccount.name, event: order.toAccount.name },
+                      ),
+                    })}
+                  >
+                    <Twitter size="1.2em" color="#4E5052" />
+                    <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
+                  </ShareLink>
+                  <ShareLink href={facebookShareURL({ u: shareURL })}>
+                    <Facebook size="1.2em" color="#4E5052" />
+                    <FormattedMessage id="shareIt" defaultMessage="Share it" />
+                  </ShareLink>
+                </Flex>
+                {LoggedInUser && (
+                  <Box px={1}>
+                    <PublicMessageForm order={order} publicMessage={get(order, 'membership.publicMessage')} />
+                  </Box>
+                )}
+              </Flex>
+            </ContainerWithImage>
+            <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
+              {pendingOrder ? this.renderBankTransferInformation() : this.renderCallsToAction()}
+            </Flex>
+          </Fragment>
+        )}
       </Flex>
     );
   }
 }
 
-const addOrderSuccessMemberData = graphql(orderSuccessMemberQuery, {
-  options: () => {
-    const variables = { collectiveId: this.props.collective.legacyId, memberCollectiveId: this.props.stepProfile.id };
-    return { variables };
-  },
+// GraphQL
+const orderSuccessQuery = gqlV2/* GraphQL */ `
+  query NewContributionFlowOrderSuccess($order: OrderReferenceInput!) {
+    order(order: $order) {
+      ...OrderSuccessFragment
+    }
+  }
+  ${orderSuccessFragment}
+`;
+
+const addOrderSuccessQuery = graphql(orderSuccessQuery, {
+  options: props => ({
+    context: API_V2_CONTEXT,
+    variables: { order: { id: props.router.query.OrderId } },
+  }),
 });
 
-export default injectIntl(withUser(withRouter(addOrderSuccessMemberData(NewContributionFlowSuccess))));
+export default injectIntl(withUser(withRouter(addOrderSuccessQuery(NewContributionFlowSuccess))));

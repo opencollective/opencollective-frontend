@@ -65,7 +65,11 @@ class ConnectPaypal extends React.Component {
         <MessageBox type="warning" withIcon my={3}>
           <FormattedMessage
             id="ConnectPaypal.expireSoon"
-            defaultMessage="Your PayPal pre-approval will expire soon. Renew it by clicking on 'Refill Balance'."
+            defaultMessage="Your PayPal pre-approval for {paypalEmail} will expire on {expiryDate, date, short}. Renew it now by clicking on 'Refill Balance'."
+            values={{
+              paypalEmail: paymentMethod.name,
+              expiryDate: new Date(paymentMethod.expiryDate),
+            }}
           />
         </MessageBox>
       );
@@ -76,9 +80,9 @@ class ConnectPaypal extends React.Component {
             id="collective.paymentMethod.paypal.connected"
             defaultMessage="Paypal account {paypalEmail} connected on {createdAt, date, short}, token will expire on {expiryDate, date, short}"
             values={{
+              paypalEmail: paymentMethod.name,
               createdAt: new Date(paymentMethod.createdAt),
               expiryDate: new Date(paymentMethod.expiryDate),
-              paypalEmail: paymentMethod.name,
             }}
           />
         </P>

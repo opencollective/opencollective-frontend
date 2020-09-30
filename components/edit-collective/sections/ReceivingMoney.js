@@ -2,6 +2,8 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import hasFeature, { FEATURES } from '../../../lib/allowed-features';
+
 import { H3 } from '../../Text';
 
 import BankTransfer from './BankTransfer';
@@ -22,6 +24,11 @@ class ReceivingMoney extends React.Component {
 
   render() {
     const services = ['stripe'];
+
+    if (hasFeature(this.props.collective, FEATURES.PAYPAL_DONATIONS)) {
+      services.push('paypal');
+    }
+
     return (
       <Fragment>
         {!this.state.hideTopsection && (

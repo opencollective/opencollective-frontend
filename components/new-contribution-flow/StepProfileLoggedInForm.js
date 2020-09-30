@@ -8,12 +8,14 @@ import { Box, Flex } from '../../components/Grid';
 import StyledRadioList from '../../components/StyledRadioList';
 import { P } from '../../components/Text';
 
+import CreateOrganizationForm from './CreateOrganizationForm';
+
 const msg = defineMessages({
-  incognito: {
-    id: 'profile.incognito',
-    defaultMessage: 'Incognito',
-  },
+  incognito: { id: 'profile.incognito', defaultMessage: 'Incognito' },
+  newOrg: { id: 'contributeAs.org.new', defaultMessage: 'A new organization' },
 });
+
+export const NEW_ORGANIZATION_KEY = 'newOrg';
 
 const prepareProfiles = (intl, profiles, collective, canUseIncognito) => {
   const filteredProfiles = profiles.filter(p => {
@@ -41,8 +43,15 @@ const prepareProfiles = (intl, profiles, collective, canUseIncognito) => {
     }
   }
 
+  filteredProfiles.push({
+    id: NEW_ORGANIZATION_KEY,
+    isNew: true,
+    type: 'ORGANIZATION',
+    label: intl.formatMessage(msg.newOrg),
+  });
+
   // Will put first: User / Not incognito
-  return orderBy(filteredProfiles, ['type', 'isIncognito', 'name'], ['desc', 'desc', 'asc']);
+  return orderBy(filteredProfiles, ['type', 'isNew', 'isIncognito', 'name'], ['desc', 'desc', 'desc', 'asc']);
 };
 
 const NewContributionFlowStepProfileLoggedInForm = ({
@@ -51,6 +60,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
   onChange,
   canUseIncognito,
   collective,
+  data,
 }) => {
   const intl = useIntl();
 
@@ -71,6 +81,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
         <StyledRadioList
           name="ContributionProfile"
           id="ContributionProfile"
+          data-cy="ContributionProfile"
           options={filteredProfiles}
           keyGetter="id"
           defaultValue={defaultSelectedProfile ? defaultSelectedProfile.id : undefined}
@@ -79,18 +90,22 @@ const NewContributionFlowStepProfileLoggedInForm = ({
             onChange({ stepProfile: selected.value });
           }}
         >
-          {({ radio, value }) => (
+          {({ radio, value, checked }) => (
             <Box minHeight={70} py={2} bg="white.full" px={[0, 3]}>
               <Flex alignItems="center" width={1}>
                 <Box as="span" mr={3} flexWrap="wrap">
                   {radio}
                 </Box>
                 <Flex mr={3} css={{ flexBasis: '26px' }}>
-                  <Avatar collective={value} size="3.6rem" />
+                  {value.id === NEW_ORGANIZATION_KEY ? (
+                    <Avatar type="ORGANIZATION" src="/static/images/default-organization-logo.svg" size="3.6rem" />
+                  ) : (
+                    <Avatar collective={value} size="3.6rem" />
+                  )}
                 </Flex>
                 <Flex flexDirection="column" flexGrow={1} maxWidth="75%">
                   <P fontSize="14px" lineHeight="21px" fontWeight={500} color="black.900" truncateOverflow>
-                    {value.name}
+                    {value.label || value.name}
                   </P>
                   {value.type === 'USER' &&
                     (value.isIncognito ? (
@@ -121,6 +136,9 @@ const NewContributionFlowStepProfileLoggedInForm = ({
                   )}
                 </Flex>
               </Flex>
+              {value.id === NEW_ORGANIZATION_KEY && checked && (
+                <CreateOrganizationForm values={data} onChange={values => onChange({ stepProfile: values })} />
+              )}
             </Box>
           )}
         </StyledRadioList>

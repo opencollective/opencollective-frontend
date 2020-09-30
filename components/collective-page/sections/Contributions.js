@@ -346,8 +346,8 @@ class SectionContributions extends React.PureComponent {
 }
 
 const contributionsSectionQuery = gql`
-  query ContributionsSection($id: Int!) {
-    Collective(id: $id) {
+  query ContributionsSection($slug: String!) {
+    Collective(slug: $slug) {
       id
       settings
       stats {
@@ -431,7 +431,7 @@ const contributionsSectionQuery = gql`
 
 const addContributionsSectionData = graphql(contributionsSectionQuery, {
   options: props => ({
-    variables: { id: props.collective.id },
+    variables: { slug: props.collective.slug },
   }),
 });
 

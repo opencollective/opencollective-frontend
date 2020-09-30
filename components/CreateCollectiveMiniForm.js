@@ -12,10 +12,13 @@ import { isValidEmail } from '../lib/utils';
 
 import Container from './Container';
 import { Box } from './Grid';
+import InputTypeCountry from './InputTypeCountry';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
+import StyledInputFormikField from './StyledInputFormikField';
+import StyledTextarea from './StyledTextarea';
 import { H5 } from './Text';
 import { withUser } from './UserProvider';
 
@@ -93,15 +96,29 @@ const msg = defineMessages({
   },
 });
 
+const labels = defineMessages({
+  'location.address': {
+    id: 'collective.address.label',
+    defaultMessage: 'Address',
+  },
+  'location.country': {
+    id: 'collective.country.label',
+    defaultMessage: 'Country',
+  },
+});
+
 /** Prepare mutation variables based on collective type */
 const prepareMutationVariables = collective => {
+  const includeLocation = collective.location?.address || collective.location?.country;
+  const locationFields = includeLocation ? ['location.address', 'location.country'] : [];
+
   if (collective.type === CollectiveType.USER) {
-    return { user: pick(collective, ['name', 'email']) };
+    return { user: pick(collective, ['name', 'email', ...locationFields]) };
   } else if (collective.type === CollectiveType.ORGANIZATION) {
     collective.members.forEach(member => (member.role = roles.ADMIN));
-    return { collective: pick(collective, ['name', 'type', 'website', 'members']) };
+    return { collective: pick(collective, ['name', 'type', 'website', 'members', ...locationFields]) };
   } else {
-    return { collective: pick(collective, ['name', 'type', 'website']) };
+    return { collective: pick(collective, ['name', 'type', 'website', ...locationFields]) };
   }
 };
 
@@ -113,6 +130,10 @@ const createCollectiveMutation = gql`
       slug
       type
       imageUrl(height: 64)
+      location {
+        address
+        country
+      }
       members {
         id
         role
@@ -136,6 +157,10 @@ const createUserMutation = gql`
           name
           slug
           type
+          location {
+            address
+            country
+          }
           imageUrl(height: 64)
           ... on User {
             email
@@ -157,6 +182,7 @@ const CreateCollectiveMiniForm = ({
   addLoggedInUserAsAdmin,
   LoggedInUser,
   excludeAdminFields,
+  optionalFields,
   email = '',
   name = '',
 }) => {
@@ -309,6 +335,33 @@ const CreateCollectiveMiniForm = ({
                   )}
                 </StyledInputField>
               )}
+              {optionalFields?.map(name => (
+                <StyledInputFormikField
+                  key={name}
+                  name={name}
+                  htmlFor={`createCollectiveMiniForm-${name}`}
+                  label={formatMessage(labels[name])}
+                  required={false}
+                  mt={3}
+                >
+                  {({ field, form }) => {
+                    switch (field.name) {
+                      case 'location.address':
+                        return <StyledTextarea {...field} />;
+                      case 'location.country':
+                        return (
+                          <InputTypeCountry
+                            {...field}
+                            onChange={country => form.setFieldValue(name, country)}
+                            maxMenuHeight={95}
+                          />
+                        );
+                      default:
+                        return null;
+                    }
+                  }}
+                </StyledInputFormikField>
+              ))}
             </Box>
             {submitError && (
               <MessageBox type="error" withIcon mt={2}>
@@ -361,6 +414,8 @@ CreateCollectiveMiniForm.propTypes = {
   email: PropTypes.string,
   /** The collective name */
   name: PropTypes.string,
+  /** A list of optional fields to include in the form */
+  optionalFields: PropTypes.arrayOf(PropTypes.oneOf(['location.address', 'location.country'])),
 };
 
 export default withUser(CreateCollectiveMiniForm);

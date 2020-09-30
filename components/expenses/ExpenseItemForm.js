@@ -5,12 +5,14 @@ import { get, isEmpty } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
+import expenseTypes from '../../lib/constants/expenseTypes';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
 
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
@@ -52,7 +54,11 @@ export const msg = defineMessages({
 
 /** Validates a single expense item, one field at a time (doesn't return multiple errors) */
 export const validateExpenseItem = (expense, item) => {
-  const errors = requireFields(item, ['description', 'incurredAt', 'amount']);
+  const requiredFields = ['description', 'amount'];
+  if (expense.type !== expenseTypes.FUNDING_REQUEST) {
+    requiredFields.push('incurredAt');
+  }
+  const errors = requireFields(item, requiredFields);
 
   if (isNaN(item.amount)) {
     errors.amount = createError(ERROR.FORM_FIELD_PATTERN);
@@ -85,7 +91,17 @@ const AttachmentLabel = () => (
 /**
  * Form for a single attachment. Must be used with Formik.
  */
-const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency, requireFile, name }) => {
+const ExpenseItemForm = ({
+  attachment,
+  errors,
+  onRemove,
+  onUploadError,
+  currency,
+  requireFile,
+  requireDate,
+  isRichText,
+  name,
+}) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
@@ -140,33 +156,41 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency
             labelFontSize="13px"
             required
           >
-            {inputProps => <Field as={StyledInput} {...inputProps} />}
+            {inputProps =>
+              isRichText ? (
+                <Field as={RichTextEditor} {...inputProps} inputName={inputProps.name} withBorders />
+              ) : (
+                <Field as={StyledInput} {...inputProps} />
+              )
+            }
           </StyledInputField>
-          <Flex flexWrap="wrap" justifyContent="space-between">
-            <StyledInputField
-              name={getFieldName('incurredAt')}
-              error={getError('incurredAt')}
-              htmlFor={`${attachmentKey}-incurredAt`}
-              inputType="date"
-              required
-              label={formatMessage(msg.dateLabel)}
-              labelFontSize="13px"
-              flex={requireFile ? '1 1 44%' : '1 1 50%'}
-              mt={3}
-            >
-              {inputProps => (
-                <Field maxHeight={39} {...inputProps}>
-                  {({ field }) => (
-                    <StyledInput
-                      {...inputProps}
-                      {...field}
-                      value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
-                    />
-                  )}
-                </Field>
-              )}
-            </StyledInputField>
-            <Box flex="0 1 8px" width={[0, 8]} />
+          <Flex justifyContent="flex-end" flexDirection={['column', 'row']}>
+            {requireDate && (
+              <StyledInputField
+                name={getFieldName('incurredAt')}
+                error={getError('incurredAt')}
+                htmlFor={`${attachmentKey}-incurredAt`}
+                inputType="date"
+                required
+                label={formatMessage(msg.dateLabel)}
+                labelFontSize="13px"
+                flex={requireFile ? '1 1 44%' : '1 1 50%'}
+                mt={3}
+                mr={[0, '8px']}
+              >
+                {inputProps => (
+                  <Field maxHeight={39} {...inputProps}>
+                    {({ field }) => (
+                      <StyledInput
+                        {...inputProps}
+                        {...field}
+                        value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
+                      />
+                    )}
+                  </Field>
+                )}
+              </StyledInputField>
+            )}
             <StyledInputField
               name={getFieldName('amount')}
               error={getError('amount')}
@@ -177,7 +201,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency
               inputType="number"
               flex="1 1 30%"
               minWidth={150}
-              maxWidth="100%"
+              maxWidth={['100%', '40%']}
               mt={3}
             >
               {inputProps => (
@@ -230,6 +254,9 @@ ExpenseItemForm.propTypes = {
   errors: PropTypes.object,
   /** Wether a file is required for this attachment type */
   requireFile: PropTypes.bool,
+  /** Wether a date is required for this expense type */
+  requireDate: PropTypes.bool,
+  isRichText: PropTypes.bool,
   /** Called when an attachment upload fails */
   onUploadError: PropTypes.func.isRequired,
   /** the attachment data */

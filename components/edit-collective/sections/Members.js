@@ -85,7 +85,7 @@ class Members extends React.Component {
       },
       removeConfirm: {
         id: 'members.remove.confirm',
-        defaultMessage: `Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}} from the core contributors of the collective?`,
+        defaultMessage: `Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?`,
       },
     });
 
@@ -305,7 +305,7 @@ class Members extends React.Component {
         <div className="EditMembers">
           <div className="members">
             <H3>
-              <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Core Contributors" />
+              <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Team" />
             </H3>
             {collective.type === 'COLLECTIVE' && (
               <P>

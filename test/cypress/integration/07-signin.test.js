@@ -195,9 +195,7 @@ describe('signin with 2FA', () => {
 
   it('can signin with 2fa enabled', () => {
     // now login with 2FA enabled
-    cy.log('secret', secret);
     cy.login({ email: user.email, redirect: '/apex' });
-    cy.getByDataCy('signin-message-box').contains('Two-factor authentication is enabled on this account');
     cy.getByDataCy('signin-two-factor-auth-input').type('123456');
     cy.getByDataCy('signin-two-factor-auth-button').click();
     cy.getByDataCy('signin-message-box').contains(

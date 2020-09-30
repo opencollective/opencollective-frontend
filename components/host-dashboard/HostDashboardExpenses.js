@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { mapValues } from 'lodash';
+import { mapValues, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
+import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
 import { parseAmountRange } from '../expenses/filters/ExpensesAmountFilter';
@@ -19,14 +20,16 @@ import {
   expensesListFieldsFragment,
 } from '../expenses/graphql/fragments';
 import { Box, Flex } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
+
+import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 
 const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   query HostDashboardExpenses(
@@ -44,6 +47,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   ) {
     host(slug: $hostSlug) {
       ...ExpenseHostFields
+      ...HostInfoCardFields
     }
     expenses(
       host: { slug: $hostSlug }
@@ -84,9 +88,14 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
   ${expenseHostFields}
+  ${hostInfoCardFields}
 `;
 
 const EXPENSES_PER_PAGE = 15;
+
+const isValidStatus = status => {
+  return Boolean(status === 'READY_TO_PAY' || EXPENSE_STATUS[status]);
+};
 
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
@@ -94,8 +103,8 @@ const getVariablesFromQuery = query => {
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
+    status: isValidStatus(query.status) ? query.status : null,
     type: query.type,
-    status: query.status,
     tags: query.tag ? [query.tag] : undefined,
     minAmount: amountRange[0] && amountRange[0] * 100,
     maxAmount: amountRange[1] && amountRange[1] * 100,
@@ -107,6 +116,7 @@ const getVariablesFromQuery = query => {
 
 const HostDashboardExpenses = ({ hostSlug }) => {
   const { query } = useRouter() || {};
+  const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const { data, error, loading, variables, refetch } = useQuery(hostDashboardExpensesQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     context: API_V2_CONTEXT,
@@ -114,10 +124,17 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   const hasFilters = React.useMemo(
     () =>
       Object.entries(query).some(([key, value]) => {
-        return !['view', 'offset', 'limit', 'hostCollectiveSlug'].includes(key) && value;
+        return !['view', 'offset', 'limit', 'hostCollectiveSlug', 'paypalApprovalError'].includes(key) && value;
       }),
     [query],
   );
+
+  React.useEffect(() => {
+    if (query.paypalApprovalError && !paypalPreApprovalError) {
+      setPaypalPreApprovalError(query.paypalApprovalError);
+      Router.replaceRoute('host.dashboard', omit(query, 'paypalApprovalError'), { shallow: true });
+    }
+  }, [query.paypalApprovalError]);
 
   return (
     <Box maxWidth={1000} m="0 auto" py={5} px={2}>
@@ -133,7 +150,25 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           />
         </Box>
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" />
+      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+      {paypalPreApprovalError && (
+        <DismissibleMessage>
+          {({ dismiss }) => (
+            <MessageBox type="warning" mb={3} withIcon onClose={dismiss}>
+              {paypalPreApprovalError}
+            </MessageBox>
+          )}
+        </DismissibleMessage>
+      )}
+      <Box mb={4}>
+        {loading ? (
+          <LoadingPlaceholder height={150} />
+        ) : error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : (
+          <HostInfoCard host={data.host} />
+        )}
+      </Box>
       <Box mb={34}>
         {data?.host ? (
           <ExpensesFilters
@@ -151,24 +186,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <LoadingPlaceholder height={70} />
         ) : null}
       </Box>
-      <MessageBox type="info" fontSize="14px" mb={4}>
-        📢&nbsp;&nbsp;
-        <FormattedMessage
-          id="HostDashboardExpenses.Beta"
-          defaultMessage="We are working on a new version of the expenses page for the host dashboard. It's still in progress, but we'd love to hear your thoughts on this! You can provide feedback on the <IssueLink>dedicated Github issue</IssueLink>."
-          values={{
-            IssueLink: getI18nLink({
-              href: 'https://github.com/opencollective/opencollective/issues/3288',
-              openInNewTab: true,
-            }),
-          }}
-        />
-      </MessageBox>
-      {error ? (
-        <MessageBox type="error" withIcon>
-          {getErrorFromGraphqlException(error).message}
-        </MessageBox>
-      ) : !loading && !data.expenses?.nodes.length ? (
+      {error ? null : !loading && !data.expenses?.nodes.length ? (
         <MessageBox type="info" withIcon data-cy="zero-expense-message">
           {hasFilters ? (
             <FormattedMessage
@@ -183,7 +201,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                       params={{
                         ...mapValues(query, () => null),
                         hostCollectiveSlug: data.host.slug,
-                        view: 'expenses-beta',
+                        view: 'expenses-legacy',
                       }}
                     >
                       {text}
@@ -206,6 +224,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             view="admin"
             usePreviewModal
             onDelete={() => refetch()}
+            onProcess={() => hasFilters && refetch()}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

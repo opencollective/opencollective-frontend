@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
-import { find, get, set } from 'lodash';
+import { cloneDeep, find, get, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -253,12 +253,11 @@ class EditCollectiveForm extends React.Component {
 
   handleChange(fieldname, value) {
     this.setState(state => {
-      const collective = { ...state.collective };
+      const collective = cloneDeep(state.collective);
 
       // GraphQL schema has address embedded within location
       // mutation expects { location: { address: '' } }
       if (['address', 'country'].includes(fieldname)) {
-        collective.location = collective.location || {};
         collective.location[fieldname] = value;
       } else if (fieldname === 'VAT') {
         set(collective, 'settings.VAT.type', value);

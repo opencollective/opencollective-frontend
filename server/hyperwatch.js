@@ -53,6 +53,22 @@ const load = async app => {
 
   app.use(expressInput.middleware());
 
+  app.use((req, res, next) => {
+    req.hyperwatch = req.hyperwatch || {};
+    req.hyperwatch.rawLog = req.hyperwatch.rawLog || lib.util.createLog(req, res);
+    req.getAugmentedLog = async () => {
+      if (!req.hyperwatch.augmentedLog) {
+        let log = req.hyperwatch.rawLog;
+        for (const key of ['cloudflare', 'agent', 'hostname', 'identity']) {
+          log = await modules.get(key).augment(log);
+        }
+        req.hyperwatch.augmentedLog = log;
+      }
+      return req.hyperwatch.augmentedLog;
+    };
+    next();
+  });
+
   pipeline.registerInput(expressInput);
 
   // Filter 'main' node
@@ -66,7 +82,7 @@ const load = async app => {
 
   // Configure access Logs in dev and production
 
-  const consoleLogOutput = process.env.NODE_ENV === 'development' ? 'console' : 'text';
+  const consoleLogOutput = process.env.OC_ENV === 'development' ? 'console' : 'text';
   pipeline.getNode('main').map(log => console.log(lib.logger.defaultFormatter.format(log, consoleLogOutput)));
 
   // Start

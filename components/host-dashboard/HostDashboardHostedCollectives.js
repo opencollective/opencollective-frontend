@@ -111,7 +111,6 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
   const { data, error, loading, variables } = useQuery(hostedCollectivesQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
   });
 
   const hostedMemberships = data?.host?.memberOf;

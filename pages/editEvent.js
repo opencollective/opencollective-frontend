@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 
 import { addEditCollectiveMutation } from '../lib/graphql/mutations';
+import { editCollectivePageFieldsFragment } from '../lib/graphql/queries';
 import { compose } from '../lib/utils';
 
 import EditCollective from '../components/edit-collective';
@@ -32,8 +33,8 @@ class EditEventPage extends React.Component {
   render() {
     const { data, loadingLoggedInUser, editCollective } = this.props;
 
-    if (loadingLoggedInUser || !data.Collective) {
-      return <ErrorPage loading={loadingLoggedInUser} data={data} />;
+    if (loadingLoggedInUser || !data?.Collective) {
+      return <ErrorPage loading={loadingLoggedInUser || data?.loading} data={data} />;
     }
 
     const event = data.Collective;
@@ -44,44 +45,15 @@ class EditEventPage extends React.Component {
 const editEventPageQuery = gql`
   query EditEventPage($eventSlug: String) {
     Collective(slug: $eventSlug) {
-      id
-      type
-      slug
+      ...EditCollectivePageFields
       path
       createdByUser {
         id
       }
-      name
-      imageUrl
-      backgroundImage
-      description
-      longDescription
       startsAt
       endsAt
       timezone
-      currency
-      settings
-      isDeletable
-      isArchived
-      location {
-        name
-        address
-        country
-        lat
-        long
-      }
       tiers {
-        id
-        slug
-        type
-        name
-        description
-        amount
-        amountType
-        minimumAmount
-        presets
-        currency
-        maxQuantity
         stats {
           id
           availableQuantity
@@ -91,7 +63,6 @@ const editEventPageQuery = gql`
         id
         slug
         name
-        mission
         currency
         imageUrl
         backgroundImage
@@ -109,47 +80,18 @@ const editEventPageQuery = gql`
           all
         }
       }
-      members {
-        id
-        createdAt
-        role
-        member {
-          id
-          name
-          imageUrl
-          slug
-          twitterHandle
-          description
-        }
-      }
-      orders {
-        id
-        createdAt
-        quantity
-        publicMessage
-        fromCollective {
-          id
-          name
-          company
-          image # For Event Sponsors
-          imageUrl
-          slug
-          twitterHandle
-          description
-          ... on User {
-            email
-          }
-        }
-        tier {
-          id
-          name
-        }
-      }
     }
   }
+  ${editCollectivePageFieldsFragment}
 `;
 
-const addEditEventPageData = graphql(editEventPageQuery);
+const addEditEventPageData = graphql(editEventPageQuery, {
+  skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
+  // The fetchPolicy is important for an edge case.
+  // Same component, different collective (moving from edit to another edit through the menu)
+  // Reloading data make sure we get the loading state and we re-initialize Form and sub-components
+  options: { fetchPolicy: 'network-only' },
+});
 
 const addGraphql = compose(addEditEventPageData, addEditCollectiveMutation);
 
