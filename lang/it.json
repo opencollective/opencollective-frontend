@@ -1451,7 +1451,7 @@
   "Subscriptions.FeesOnTopTooltip": "Contribution to collective plus contribution to the platform",
   "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} other {}}",
   "Subscriptions.Title": "Recurring contributions",
-  "Summary": "Riepilogo",
+  "Summary": "Summary",
   "table.head.large": "Large",
   "table.head.medium": "Medium",
   "table.head.network": "Network",
