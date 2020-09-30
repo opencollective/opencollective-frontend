@@ -53,12 +53,12 @@ class OpenCollectiveFrontendApp extends App {
     this.state = { hasError: false, errorEventId: undefined };
   }
 
-  static async getInitialProps({ Component, ctx }) {
+  static async getInitialProps({ Component, ctx, client }) {
     try {
       let pageProps = {};
 
       if (Component.getInitialProps) {
-        pageProps = await Component.getInitialProps(ctx);
+        pageProps = await Component.getInitialProps({ ...ctx, client });
       }
 
       const scripts = {};

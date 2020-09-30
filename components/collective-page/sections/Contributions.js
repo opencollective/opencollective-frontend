@@ -345,7 +345,7 @@ class SectionContributions extends React.PureComponent {
   }
 }
 
-const contributionsSectionQuery = gql`
+export const contributionsSectionQuery = gql`
   query ContributionsSection($slug: String!) {
     Collective(slug: $slug) {
       id
@@ -429,9 +429,13 @@ const contributionsSectionQuery = gql`
   }
 `;
 
+export const getContributionsSectionQueryVariables = slug => {
+  return { slug };
+};
+
 const addContributionsSectionData = graphql(contributionsSectionQuery, {
   options: props => ({
-    variables: { slug: props.collective.slug },
+    variables: getContributionsSectionQueryVariables(props.collective.slug),
   }),
 });
 

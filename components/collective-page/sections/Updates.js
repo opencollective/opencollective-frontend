@@ -26,7 +26,7 @@ import { updatesFieldsFragment } from '../graphql/fragments';
 import SectionTitle from '../SectionTitle';
 
 /** Query to re-fetch updates */
-const updatesSectionQuery = gql`
+export const updatesSectionQuery = gql`
   query UpdatesSection($slug: String!, $onlyPublishedUpdates: Boolean) {
     Collective(slug: $slug) {
       id
@@ -255,11 +255,12 @@ class SectionUpdates extends React.PureComponent {
 
 const addUpdatesSectionData = graphql(updatesSectionQuery, {
   options: props => ({
-    variables: {
-      slug: props.collective.slug,
-      onlyPublishedUpdates: !props.isAdmin,
-    },
+    variables: getUpdatesSectionQueryVariables(props.collective.slug, props.isAdmin),
   }),
 });
+
+export const getUpdatesSectionQueryVariables = (slug, isAdmin = false) => {
+  return { slug, onlyPublishedUpdates: !isAdmin };
+};
 
 export default injectIntl(addUpdatesSectionData(SectionUpdates));

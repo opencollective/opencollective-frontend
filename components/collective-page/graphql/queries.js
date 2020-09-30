@@ -1,5 +1,7 @@
 import { gql } from '@apollo/client';
 
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/Contribute';
+
 import * as fragments from './fragments';
 
 export const collectivePageQuery = gql`
@@ -250,3 +252,10 @@ export const collectivePageQuery = gql`
   ${fragments.updatesFieldsFragment}
   ${fragments.contributorsFieldsFragment}
 `;
+
+export const getCollectivePageQueryVariables = slug => {
+  return {
+    slug: slug,
+    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+  };
+};
