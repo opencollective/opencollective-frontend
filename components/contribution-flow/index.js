@@ -2,13 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
-import { find, get, isNil, pick } from 'lodash';
+import { find, get, intersection, isEmpty, isNil, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
+import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { TransactionTypes } from '../../lib/constants/transactions';
@@ -265,7 +266,37 @@ class ContributionFlow extends React.Component {
       }
     }
 
+    // Check that the contributor is not blocked from contributing to the collective
+    const containsRejectedCategories = this.getContributorRejectedCategories(stepProfile);
+    if (!isEmpty(containsRejectedCategories)) {
+      this.setState({
+        stepProfile: { ...this.state.stepProfile, contributorRejectedCategories: containsRejectedCategories },
+      });
+    }
+
     return true;
+  };
+
+  getContributorRejectedCategories = account => {
+    const rejectedCategories = get(this.props.collective, 'settings.moderation.rejectedCategories', []);
+    const contributorCategories = get(account, 'categories', []);
+
+    if (rejectedCategories.length === 0 || contributorCategories.length === 0) {
+      return [];
+    }
+
+    // Example:
+    // MODERATION_CATEGORIES_ALIASES = ['CASINO_GAMBLING': ['casino', 'gambling'], 'VPN_PROXY': ['vpn', 'proxy']]
+    // - when contributorCategories = ['CASINO_GAMBLING'], returns ['CASINO_GAMBLING']
+    // - when contributorCategories = ['vpn'] or ['proxy'], returns ['VPN_PROXY']
+    const contributorRejectedCategories = Object.keys(MODERATION_CATEGORIES_ALIASES).filter(key => {
+      return (
+        contributorCategories.includes(key) ||
+        intersection(MODERATION_CATEGORIES_ALIASES[key], contributorCategories).length !== 0
+      );
+    });
+
+    return intersection(rejectedCategories, contributorRejectedCategories);
   };
 
   createProfileForRecurringContributions = async data => {
@@ -371,7 +402,7 @@ class ContributionFlow extends React.Component {
   /** Returns the steps list */
   getSteps() {
     const { fixedInterval, fixedAmount, collective, host, tier } = this.props;
-    const { stepDetails, stepPayment, stepSummary } = this.state;
+    const { stepDetails, stepProfile, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
@@ -407,7 +438,7 @@ class ContributionFlow extends React.Component {
     if (!noPaymentRequired) {
       steps.push({
         name: 'payment',
-        isCompleted: true,
+        isCompleted: stepProfile?.contributorRejectedCategories ? false : true,
         validate: action => {
           if (action === 'prev') {
             return true;
@@ -482,6 +513,7 @@ class ContributionFlow extends React.Component {
   render() {
     const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails } = this.props;
     const { error, isSubmitted, isSubmitting } = this.state;
+
     return (
       <Steps
         steps={this.getSteps()}

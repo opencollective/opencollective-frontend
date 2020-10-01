@@ -323,6 +323,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     ... on AccountWithContributions {
+      contributionPolicy
       platformFeePercent
       platformContributionAvailable
       contributors(limit: 6) {

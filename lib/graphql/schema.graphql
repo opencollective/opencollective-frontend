@@ -297,6 +297,7 @@ type Collective implements CollectiveInterface {
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
+  categories: [String]!
 }
 
 """
@@ -581,6 +582,11 @@ interface CollectiveInterface {
   connectedAccounts: [ConnectedAccountType]
   plan: PlanType
   contributionPolicy: String
+
+  """
+  Categories set by Open Collective to help moderation.
+  """
+  categories: [String]!
 }
 
 """
@@ -1211,6 +1217,7 @@ type Event implements CollectiveInterface {
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
+  categories: [String]!
 }
 
 """
@@ -1642,6 +1649,7 @@ type Fund implements CollectiveInterface {
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
+  categories: [String]!
 }
 
 """
@@ -2732,6 +2740,7 @@ type Organization implements CollectiveInterface {
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
+  categories: [String]!
   email: String
 }
 
@@ -3144,6 +3153,7 @@ type Project implements CollectiveInterface {
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
+  categories: [String]!
 }
 
 """
@@ -4056,6 +4066,7 @@ type User implements CollectiveInterface {
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
+  categories: [String]!
   firstName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   lastName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   email: String
