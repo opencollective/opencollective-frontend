@@ -55,10 +55,10 @@ const Transparency = () => (
         />
       </P>
     </Box>
-    <Box width={[null, '552px']} height={[null, '341px']}>
+    <Box width={['304px', '552px']} height={[null, '341px']} maxHeight={['187px', '341px']} overflowY="auto">
       <Illustration
         display={[null, 'none']}
-        src="/static/images/become-a-sponsor/transactionScreenshot-xs.png"
+        src="/static/images/become-a-sponsor/transactionScreenshot-scrollable-xs.png"
         alt="Transaction Screenshot"
       />
       <Illustration
