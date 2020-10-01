@@ -263,7 +263,6 @@
   "CollectivePage.SectionBudget.TotalAmountReceived": "Total recibido en los últimos 12 meses: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "Ver todas las transacciones",
   "CollectivePage.SectionBudget.ViewAllExpenses": "Ver todos los gastos",
-  "CollectivePage.SectionContributions.Empty": "¡{collectiveName} parece estar hibernando en una cueva en el Polo Norte ❄️☃️!",
   "CollectivePage.SectionProjects.Title": "Proyectos",
   "CollectivePage.SectionRecurringContributions.Title": "Contribuciones Recurrentes",
   "CollectivePage.SectionUpdates.CreateBtn": "Crear una nueva actualización",

@@ -263,7 +263,6 @@
   "CollectivePage.SectionBudget.TotalAmountReceived": "Total received in the last 12 months: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "Zobrazit všechny transakce",
   "CollectivePage.SectionBudget.ViewAllExpenses": "Zobrazit všechny výdaje",
-  "CollectivePage.SectionContributions.Empty": "{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!",
   "CollectivePage.SectionProjects.Title": "Projects",
   "CollectivePage.SectionRecurringContributions.Title": "Recurring Contributions",
   "CollectivePage.SectionUpdates.CreateBtn": "Vytvořit novou aktualizaci",

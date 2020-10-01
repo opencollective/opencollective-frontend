@@ -263,7 +263,6 @@
   "CollectivePage.SectionBudget.TotalAmountReceived": "Total received in the last 12 months: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "Mostra totes les transaccions",
   "CollectivePage.SectionBudget.ViewAllExpenses": "Mostra totes les despeses",
-  "CollectivePage.SectionContributions.Empty": "{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!",
   "CollectivePage.SectionProjects.Title": "Projects",
   "CollectivePage.SectionRecurringContributions.Title": "Recurring Contributions",
   "CollectivePage.SectionUpdates.CreateBtn": "Crea una actualització nova",

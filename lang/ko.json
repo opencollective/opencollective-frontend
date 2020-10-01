@@ -263,7 +263,6 @@
   "CollectivePage.SectionBudget.TotalAmountReceived": "Total received in the last 12 months: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "모든 거래내역 보기",
   "CollectivePage.SectionBudget.ViewAllExpenses": "모든 비용 보기",
-  "CollectivePage.SectionContributions.Empty": "{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!",
   "CollectivePage.SectionProjects.Title": "Projects",
   "CollectivePage.SectionRecurringContributions.Title": "Recurring Contributions",
   "CollectivePage.SectionUpdates.CreateBtn": "새로운 업데이트 생성",
