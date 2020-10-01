@@ -403,6 +403,7 @@
   "contribution.hostFeePercent": "財政ホスト手数料",
   "contribution.interval.label": "頻度",
   "contribution.itemPrice": "料金",
+  "contribution.minimumAmount": "The minimum amount is: {minAmount} {currency}",
   "contribution.netAmountForCollective": "コレクティブの実際の残高",
   "contribution.paymentFee": "支払い処理手数料",
   "contribution.quantity": "量",

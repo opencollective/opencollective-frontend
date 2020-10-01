@@ -403,6 +403,7 @@
   "contribution.hostFeePercent": "Tarifa de anfitrión fiscal",
   "contribution.interval.label": "Frecuencia",
   "contribution.itemPrice": "Precio del articulo",
+  "contribution.minimumAmount": "The minimum amount is: {minAmount} {currency}",
   "contribution.netAmountForCollective": "Importe neto por colectivo",
   "contribution.paymentFee": "Comisión del procesador de pagos",
   "contribution.quantity": "Cantidad",

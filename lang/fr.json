@@ -403,6 +403,7 @@
   "contribution.hostFeePercent": "Commission de l'hôte",
   "contribution.interval.label": "Fréquence",
   "contribution.itemPrice": "Prix de l’article",
+  "contribution.minimumAmount": "The minimum amount is: {minAmount} {currency}",
   "contribution.netAmountForCollective": "Montant net pour {collective}",
   "contribution.paymentFee": "Frais du processeur de paiement",
   "contribution.quantity": "Quantité",

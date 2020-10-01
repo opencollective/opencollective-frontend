@@ -403,6 +403,7 @@
   "contribution.hostFeePercent": "Steuerliche Träger-Gebühr",
   "contribution.interval.label": "Häufigkeit",
   "contribution.itemPrice": "Artikelpreis",
+  "contribution.minimumAmount": "The minimum amount is: {minAmount} {currency}",
   "contribution.netAmountForCollective": "Nettobetrag für Kollektiv",
   "contribution.paymentFee": "Zahlungsbearbeitungs Gebühr",
   "contribution.quantity": "Menge",

@@ -19,6 +19,7 @@ describe('Contribution Flow: Donate', () => {
         cy.get('#amount button.selected').should('exist');
 
         // Change amount
+        cy.getByDataCy('amount-picker-btn-other').click();
         cy.get('input[type=number][name=custom-amount]').type('{selectall}1337');
         cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
         cy.contains('[data-cy="progress-step-details"]', '$1,337.00');
@@ -200,6 +201,7 @@ describe('Contribution Flow: Donate', () => {
           cy.get('#amount button.selected').should('exist');
 
           // Change amount
+          cy.getByDataCy('amount-picker-btn-other').click();
           cy.get('input[type=number][name=custom-amount]').type('{selectall}1337');
           cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
           cy.contains('[data-cy="progress-step-details"]', '$1,337.00');

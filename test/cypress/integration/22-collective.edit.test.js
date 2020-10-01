@@ -130,7 +130,7 @@ describe('edit collective', () => {
 
     // Ensure the new tiers are properly displayed on order form
     cy.get('#interval').contains('Monthly');
-    cy.get('#amount > button').should('have.length', 3);
+    cy.get('#amount > button').should('have.length', 4); // 3 presets + "Other"
 
     cy.visit(`/${collectiveSlug}/edit/tiers`);
     cy.get('.EditTiers .tier').first().find('.amountType select').select('FIXED');

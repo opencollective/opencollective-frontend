@@ -403,6 +403,7 @@
   "contribution.hostFeePercent": "Комиссия фискального представителя",
   "contribution.interval.label": "Частота",
   "contribution.itemPrice": "Цена",
+  "contribution.minimumAmount": "The minimum amount is: {minAmount} {currency}",
   "contribution.netAmountForCollective": "Сумма после вычета налогов",
   "contribution.paymentFee": "Комиссия обработки платежа",
   "contribution.quantity": "Количество",

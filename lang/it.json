@@ -403,6 +403,7 @@
   "contribution.hostFeePercent": "Fiscal host fee",
   "contribution.interval.label": "Frequenza",
   "contribution.itemPrice": "Prezzo articolo",
+  "contribution.minimumAmount": "The minimum amount is: {minAmount} {currency}",
   "contribution.netAmountForCollective": "Net amount for collective",
   "contribution.paymentFee": "Payment processor fee",
   "contribution.quantity": "Quantity",

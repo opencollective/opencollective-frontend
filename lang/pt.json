@@ -403,6 +403,7 @@
   "contribution.hostFeePercent": "Taxa do administrador fiscal",
   "contribution.interval.label": "Frequência",
   "contribution.itemPrice": "Preço do item",
+  "contribution.minimumAmount": "The minimum amount is: {minAmount} {currency}",
   "contribution.netAmountForCollective": "Saldo líquido do coletivo",
   "contribution.paymentFee": "Taxa de processamento de pagamento",
   "contribution.quantity": "Quantidade",

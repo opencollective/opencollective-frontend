@@ -403,6 +403,7 @@
   "contribution.hostFeePercent": "재정 호스트 수수료",
   "contribution.interval.label": "빈도",
   "contribution.itemPrice": "가격",
+  "contribution.minimumAmount": "The minimum amount is: {minAmount} {currency}",
   "contribution.netAmountForCollective": "Net amount for collective",
   "contribution.paymentFee": "결제 처리 수수료",
   "contribution.quantity": "수량",
