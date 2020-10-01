@@ -263,7 +263,6 @@
   "CollectivePage.SectionBudget.TotalAmountReceived": "Total reçu dans les 12 derniers mois : {amount}",
   "CollectivePage.SectionBudget.ViewAll": "Voir toutes les transactions",
   "CollectivePage.SectionBudget.ViewAllExpenses": "Voir toutes les dépenses",
-  "CollectivePage.SectionContributions.Empty": "{collectiveName} semble endormi·e dans une cave au pôle nord ❄️☃️ !",
   "CollectivePage.SectionProjects.Title": "Projets",
   "CollectivePage.SectionRecurringContributions.Title": "Contributions Récurrentes",
   "CollectivePage.SectionUpdates.CreateBtn": "Créer une actualité",

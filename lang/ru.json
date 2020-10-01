@@ -263,7 +263,6 @@
   "CollectivePage.SectionBudget.TotalAmountReceived": "Total received in the last 12 months: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "Посмотреть все транзакции",
   "CollectivePage.SectionBudget.ViewAllExpenses": "Посмотреть все расходы",
-  "CollectivePage.SectionContributions.Empty": "{collectiveName} кажется уснул в пещере на Северном полюсе❄️☃️!",
   "CollectivePage.SectionProjects.Title": "Проекты",
   "CollectivePage.SectionRecurringContributions.Title": "Периодические Вклады",
   "CollectivePage.SectionUpdates.CreateBtn": "Создать обновление",
