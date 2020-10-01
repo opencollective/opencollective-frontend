@@ -38,7 +38,11 @@ const HomePage = () => {
   );
 };
 
-HomePage.getInitialProps = ({ req }) => {
+HomePage.getInitialProps = ({ req, res }) => {
+  if (res && req && (req.language || req.locale === 'en')) {
+    res.set('Cache-Control', 'public, s-maxage=3600');
+  }
+
   if (req) {
     req.noStyledJsx = true;
   }
