@@ -443,20 +443,18 @@ class CreatePledgePage extends React.Component {
                       <FormattedMessage id="createPledge.pledgeAs" defaultMessage="Pledge as:" />
                     </H5>
 
-                    {LoggedInUser && (
-                      <Flex flexDirection="column" my={3}>
-                        <P {...labelStyles} htmlFor="fromCollective">
-                          <FormattedMessage id="createPledge.profile" defaultMessage="Choose a profile" />
-                        </P>
-                        <select id="fromCollective" name="fromCollective" defaultValue={LoggedInUser.CollectiveId}>
-                          {profiles.map(({ collective }) => (
-                            <option key={collective.slug + collective.id} value={collective.id}>
-                              {collective.name}
-                            </option>
-                          ))}
-                        </select>
-                      </Flex>
-                    )}
+                    <Flex flexDirection="column" my={3}>
+                      <P {...labelStyles} htmlFor="fromCollective">
+                        <FormattedMessage id="createPledge.profile" defaultMessage="Choose a profile" />
+                      </P>
+                      <select id="fromCollective" name="fromCollective" defaultValue={LoggedInUser.CollectiveId}>
+                        {profiles.map(({ collective }) => (
+                          <option key={collective.slug + collective.id} value={collective.id}>
+                            {collective.name}
+                          </option>
+                        ))}
+                      </select>
+                    </Flex>
                   </Box>
 
                   <Box mb={5}>
