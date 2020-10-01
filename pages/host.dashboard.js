@@ -91,7 +91,7 @@ class HostDashboardPage extends React.Component {
           <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />
         </MessageBox>
       );
-    } else if (LoggedInUser && !LoggedInUser.canEditCollective(data.Collective)) {
+    } else if (!LoggedInUser.canEditCollective(data.Collective)) {
       return (
         <MessageBox m={5} type="error" withIcon>
           <FormattedMessage

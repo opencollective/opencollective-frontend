@@ -80,7 +80,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
         </LinkCollective>
         {payeeLocation && isInvoice && (
           <Container whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
-            <LocationAddress location={payeeLocation} isLoading={isLoading || isLoadingLoggedInUser} />
+            <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
           </Container>
         )}
         {payee.website && (
@@ -100,7 +100,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             <PayoutMethodTypeWithIcon type={expense.payoutMethod?.type} />
           </Box>
           <div data-cy="expense-summary-payout-method-data">
-            <PayoutMethodData payoutMethod={expense.payoutMethod} isLoading={isLoading || isLoadingLoggedInUser} />
+            <PayoutMethodData payoutMethod={expense.payoutMethod} isLoading={isLoadingLoggedInUser} />
           </div>
           {expense.invoiceInfo && (
             <Box mt={3} data-cy="expense-summary-invoice-info">

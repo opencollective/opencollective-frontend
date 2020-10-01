@@ -73,11 +73,7 @@ class SectionProjects extends React.PureComponent {
                 <ContributeCardsContainer ref={ref}>
                   {projects.map(project => (
                     <Box key={project.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeProject
-                        collective={collective}
-                        project={project}
-                        disableCTA={!project.isActive || !project.isActive}
-                      />
+                      <ContributeProject collective={collective} project={project} disableCTA={!project.isActive} />
                     </Box>
                   ))}
                   {isAdmin && (
