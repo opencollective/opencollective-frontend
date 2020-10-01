@@ -39,6 +39,7 @@ import HostPlan from './sections/HostPlan';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
+import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
 import SendingMoney from './sections/SendingMoney';
 import SetupTwoFactorAuth from './sections/SetupTwoFactorAuth';
@@ -123,20 +124,6 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.description.label',
         defaultMessage: 'Short description',
       },
-      'expensePolicy.label': {
-        id: 'editCollective.menu.expenses',
-        defaultMessage: 'Expenses Policy',
-      },
-      'expensePolicy.description': {
-        id: 'collective.expensePolicy.description',
-        defaultMessage:
-          "It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters.",
-      },
-      'expensePolicy.placeholder': {
-        id: 'collective.expensePolicy.placeholder',
-        defaultMessage:
-          'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
-      },
       'startsAt.label': {
         id: 'startDateAndTime',
         defaultMessage: 'start date and time',
@@ -162,16 +149,6 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.application.description',
         defaultMessage: 'Enable new Collectives to apply to join your Fiscal Host',
       },
-      /*
-      'isActive.label': {
-        id: 'collective.isActive.label',
-        defaultMessage: 'Direct Contributions',
-      },
-      'isActive.description': {
-        id: 'collective.isActive.description',
-        defaultMessage: 'Allow host to directly receive financial contributions and pay expenses',
-      },
-      */
       'hostFeePercent.label': {
         id: 'HostFee',
         defaultMessage: 'Host fee',
@@ -464,9 +441,13 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
 
-      // 2FA
+      // 2FAs
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
         return <SetupTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
+
+      // Policies and moderation
+      case EDIT_COLLECTIVE_SECTIONS.POLICIES:
+        return <Policies collective={collective} />;
 
       default:
         return null;
@@ -671,12 +652,6 @@ class EditCollectiveForm extends React.Component {
           when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type),
         },
       ],
-      expenses: [
-        {
-          name: 'expensePolicy',
-          type: 'textarea',
-        },
-      ],
       'expenses-payouts': [
         {
           name: 'expensePolicy',
@@ -753,10 +728,6 @@ class EditCollectiveForm extends React.Component {
             :global(textarea) {
               width: 300px;
               font-size: 1.5rem;
-            }
-
-            .EditCollectiveForm :global(textarea[name='expensePolicy']) {
-              height: 30rem;
             }
 
             .actions {

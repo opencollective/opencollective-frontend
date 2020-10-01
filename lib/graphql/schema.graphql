@@ -296,6 +296,7 @@ type Collective implements CollectiveInterface {
   connectedAccounts: [ConnectedAccountType]
   plan: PlanType
   stats: CollectiveStatsType
+  contributionPolicy: String
 }
 
 """
@@ -324,6 +325,7 @@ input CollectiveAttributesInputType {
   settings: JSON
   isIncognito: Boolean
   tags: [String]
+  contributionPolicy: String
 }
 
 """
@@ -362,6 +364,7 @@ input CollectiveInputType {
   lastName: String
   isIncognito: Boolean
   isActive: Boolean
+  contributionPolicy: String
 }
 
 """
@@ -577,6 +580,7 @@ interface CollectiveInterface {
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
   plan: PlanType
+  contributionPolicy: String
 }
 
 """
@@ -1206,6 +1210,7 @@ type Event implements CollectiveInterface {
   connectedAccounts: [ConnectedAccountType]
   plan: PlanType
   stats: CollectiveStatsType
+  contributionPolicy: String
 }
 
 """
@@ -1636,6 +1641,7 @@ type Fund implements CollectiveInterface {
   connectedAccounts: [ConnectedAccountType]
   plan: PlanType
   stats: CollectiveStatsType
+  contributionPolicy: String
 }
 
 """
@@ -1944,7 +1950,7 @@ type Mutation {
   ): ExpenseType
   markOrderAsPaid(id: Int!): OrderType
   markPendingOrderAsExpired(id: Int!): OrderType
-  createExpense(expense: ExpenseInputType!): ExpenseType
+  createExpense(expense: ExpenseInputType!): ExpenseType @deprecated(reason: "2020-09-17: Now using GQLV2 for that")
   editExpense(expense: ExpenseInputType!): ExpenseType
   deleteExpense(id: Int!): ExpenseType
   markExpenseAsUnpaid(id: Int!, processorFeeRefunded: Boolean!): ExpenseType
@@ -2725,6 +2731,7 @@ type Organization implements CollectiveInterface {
   connectedAccounts: [ConnectedAccountType]
   plan: PlanType
   stats: CollectiveStatsType
+  contributionPolicy: String
   email: String
 }
 
@@ -2834,7 +2841,7 @@ type PaymentMethodType {
   To group multiple payment methods. Used for Gift Cards
   """
   batch: String
-  SourcePaymentMethodId: Int
+  SourcePaymentMethodId: Int @deprecated(reason: "2020-09-28: Not used")
   type: String
   data: JSON
   name: String
@@ -3136,6 +3143,7 @@ type Project implements CollectiveInterface {
   connectedAccounts: [ConnectedAccountType]
   plan: PlanType
   stats: CollectiveStatsType
+  contributionPolicy: String
 }
 
 """
@@ -3167,7 +3175,7 @@ type Query {
     + dateTo for getting an invoice over a date range.
     """
     invoiceInputType: InvoiceInputType!
-  ): InvoiceType
+  ): InvoiceType @deprecated(reason: "2020-09-17: PDF service is now using the GQLV2 transactions endpoint")
   TransactionInvoice(
     """
     Slug of the transaction.
@@ -4047,6 +4055,7 @@ type User implements CollectiveInterface {
   connectedAccounts: [ConnectedAccountType]
   plan: PlanType
   stats: CollectiveStatsType
+  contributionPolicy: String
   firstName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   lastName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   email: String

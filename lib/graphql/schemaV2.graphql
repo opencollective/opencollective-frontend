@@ -318,6 +318,7 @@ interface AccountWithContributions {
   Amount of money in cents in the currency of the account currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
 }
 
 """
@@ -903,6 +904,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Amount of money in cents in the currency of the account currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
 }
 
 input CollectiveCreateInput {
@@ -2918,6 +2920,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   Amount of money in cents in the currency of the account currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
 
   """
   The Collective hosting this Event
@@ -3688,6 +3691,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Amount of money in cents in the currency of the account currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
 }
 
 input FundCreateInput {
@@ -3911,6 +3915,7 @@ type Host implements Account & AccountWithContributions {
   Amount of money in cents in the currency of the account currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
   hostFeePercent: Int
   totalHostedCollectives: Int
   isOpenToApplications: Boolean
@@ -5609,6 +5614,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   Amount of money in cents in the currency of the account currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
 
   """
   The Fund hosting this Project
