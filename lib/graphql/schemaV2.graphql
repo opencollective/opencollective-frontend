@@ -417,6 +417,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_PROCESSING
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED
   COLLECTIVE_MEMBER_CREATED
   COLLECTIVE_TRANSACTION_CREATED
   COLLECTIVE_UPDATE_CREATED
@@ -3070,6 +3071,11 @@ type Expense {
   Returns the list of legal documents required from the payee before the expense can be payed. Must be logged in.
   """
   requiredLegalDocuments: [LegalDocumentType]
+
+  """
+  Drafted field values that were still not persisted
+  """
+  draft: JSON
 }
 
 """
@@ -3166,6 +3172,71 @@ input ExpenseCreateInput {
   The address of the payee
   """
   payeeLocation: LocationInput
+}
+
+input ExpenseInviteDraftInput {
+  """
+  Main title of the expense
+  """
+  description: String
+
+  """
+  Longer text to attach to the expense
+  """
+  longDescription: String
+
+  """
+  Tags associated to the expense (ie. Food, Engineering...)
+  """
+  tags: [String]
+
+  """
+  The type of the expense
+  """
+  type: ExpenseType!
+
+  """
+  A private note that will be attached to your invoice, as HTML
+  """
+  privateMessage: String
+
+  """
+  Tax ID, VAT number...etc This information will be printed on your invoice.
+  """
+  invoiceInfo: String
+
+  """
+  Note to be sent to the invited user through email.
+  """
+  recipientNote: String
+
+  """
+  The list of items for this expense. Total amount will be computed from them.
+  """
+  items: [JSON]
+
+  """
+  (Optional) A list of files that you want to attach to this expense
+  """
+  attachedFiles: [JSON]
+
+  """
+  Account to reimburse
+  """
+  payee: ExpenseInvitee!
+
+  """
+  The address of the payee
+  """
+  payeeLocation: LocationInput
+}
+
+input ExpenseInvitee {
+  id: Int
+  slug: String
+  name: String
+  email: String
+  isInvite: Boolean
 }
 
 """
@@ -3351,6 +3422,8 @@ input ExpenseReferenceInput {
 }
 
 enum ExpenseStatus {
+  DRAFT
+  UNVERIFIED
   PENDING
   APPROVED
   REJECTED
@@ -3364,6 +3437,8 @@ enum ExpenseStatus {
 Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
 """
 enum ExpenseStatusFilter {
+  DRAFT
+  UNVERIFIED
   PENDING
   APPROVED
   REJECTED
@@ -3463,7 +3538,7 @@ input ExpenseUpdateInput {
   """
   Account to reimburse
   """
-  payee: AccountReferenceInput
+  payee: NewAccountOrReferenceInput
 
   """
   The address of the payee
@@ -4609,6 +4684,11 @@ type Mutation {
     Expense data
     """
     expense: ExpenseUpdateInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
   ): Expense!
 
   """
@@ -4639,6 +4719,46 @@ type Mutation {
     If action is related to a payment, this object used for the payment parameters
     """
     paymentParams: ProcessExpensePaymentParams
+  ): Expense!
+
+  """
+  Persist an Expense as a draft and invite someone to edit and submit it.
+  """
+  draftExpenseAndInviteUser(
+    """
+    Expense data
+    """
+    expense: ExpenseInviteDraftInput!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountReferenceInput!
+  ): Expense!
+
+  """
+  To verify an unverified expense.
+  """
+  resendDraftExpenseInvite(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+  ): Expense!
+
+  """
+  To verify and unverified expense.
+  """
+  verifyExpense(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
   ): Expense!
 
   """
@@ -4868,6 +4988,34 @@ type Mutation {
     """
     message: String
   ): Member!
+}
+
+input NewAccountOrganizationInput {
+  name: String
+  slug: String
+  description: String
+  website: String
+}
+
+input NewAccountOrReferenceInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
+  name: String
+  email: String
+  organization: NewAccountOrganizationInput
+  newsletterOptIn: Boolean
 }
 
 """
@@ -5846,6 +5994,11 @@ type Query {
     Identifiers to retrieve the expense.
     """
     expense: ExpenseReferenceInput
+
+    """
+    Submit-on-behalf key to access drafted Expenses
+    """
+    draftKey: String
   ): Expense
   hosts(
     """

@@ -1377,6 +1377,8 @@ type ExpensesStatsType {
 Possible statuses for an Expense
 """
 enum ExpenseStatus {
+  DRAFT
+  UNVERIFIED
   PENDING
   APPROVED
   REJECTED
