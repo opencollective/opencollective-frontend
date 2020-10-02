@@ -101,7 +101,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
           value: {
             ...value,
             type: GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD,
-            isSavedForLater: isUndefined(value?.save) || value.save ? true : false,
+            isSavedForLater: isUndefined(value?.isSavedForLater) || value.isSavedForLater ? true : false,
             stripeData: e,
           },
         }),
