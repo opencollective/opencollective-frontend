@@ -491,7 +491,7 @@ class EditCollectiveForm extends React.Component {
     const taxes = getApplicableTaxesForCountry(country);
 
     if (taxes.includes(TaxType.VAT)) {
-      fields.concat([
+      fields.push(
         {
           name: 'VAT',
           type: 'select',
@@ -529,7 +529,7 @@ class EditCollectiveForm extends React.Component {
             }
           },
         },
-      ]);
+      );
     } else if (taxes.includes(TaxType.GST) && collective.isHost) {
       fields.push({
         name: 'GST-number',
