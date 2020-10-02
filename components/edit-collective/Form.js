@@ -124,6 +124,20 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.description.label',
         defaultMessage: 'Short description',
       },
+      'expensePolicy.label': {
+        id: 'editCollective.menu.expenses',
+        defaultMessage: 'Expenses Policy',
+      },
+      'expensePolicy.description': {
+        id: 'collective.expensePolicy.description',
+        defaultMessage:
+          "It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters.",
+      },
+      'expensePolicy.placeholder': {
+        id: 'collective.expensePolicy.placeholder',
+        defaultMessage:
+          'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
+      },
       'startsAt.label': {
         id: 'startDateAndTime',
         defaultMessage: 'start date and time',
@@ -441,7 +455,7 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
 
-      // 2FAs
+      // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
         return <SetupTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
 
@@ -666,15 +680,6 @@ class EditCollectiveForm extends React.Component {
           defaultValue: get(this.state.collective, 'settings.apply'),
           when: () => collective.isHost,
         },
-        /*
-        {
-          name: 'isActive',
-          className: 'horizontal',
-          type: 'switch',
-          defaultValue: get(this.state.collective, 'isActive'),
-          when: () => collective.isHost,
-        },
-        */
         {
           name: 'hostFeePercent',
           type: 'number',
@@ -728,6 +733,10 @@ class EditCollectiveForm extends React.Component {
             :global(textarea) {
               width: 300px;
               font-size: 1.5rem;
+            }
+
+            .EditCollectiveForm :global(textarea[name='expensePolicy']) {
+              height: 30rem;
             }
 
             .actions {
