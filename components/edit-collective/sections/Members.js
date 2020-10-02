@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit, update } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -13,7 +13,6 @@ import roles from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import formatMemberRole from '../../../lib/i18n/member-role';
 import { compose } from '../../../lib/utils';
-import { gqlV2, API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
