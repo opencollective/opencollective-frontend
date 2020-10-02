@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Calendar } from '@styled-icons/feather/Calendar';
 import { isNil } from 'lodash';
-import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
-import { getNextChargeDate } from '../../lib/date-utils';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 import { Router } from '../../server/pages';
@@ -18,7 +16,6 @@ import StyledButtonSet from '../../components/StyledButtonSet';
 import StyledInputAmount from '../../components/StyledInputAmount';
 import StyledInputField from '../../components/StyledInputField';
 
-import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledAmountPicker, { OTHER_AMOUNT_KEY } from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
@@ -33,10 +30,10 @@ import { getTotalAmount } from './utils';
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
   const intl = useIntl();
   const amount = data?.amount;
-  const checkDefaultAmount = () => !isNil(amount) && !presets?.includes(amount);
-  const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
-  const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(checkDefaultAmount);
+  const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
   const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
+  const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
+  const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
   const minAmount = getTierMinAmount(tier);
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
@@ -51,7 +48,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           id="interval"
           justifyContent="center"
           mt={[4, 0]}
-          mb={3}
+          mb="30px"
           items={[null, INTERVALS.month, INTERVALS.year]}
           selected={data?.interval || null}
           buttonProps={{ px: 2, py: '5px' }}
@@ -72,13 +69,14 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
       )}
 
       {!isFixedContribution ? (
-        <Box mb={3}>
+        <Box mb="30px">
           <StyledAmountPicker
             currency={collective.currency}
             presets={presets}
             otherAmountDisplay="button"
             value={isOtherAmountSelected ? OTHER_AMOUNT_KEY : data?.amount}
             onChange={value => {
+              console.log('CHANGE');
               if (value === OTHER_AMOUNT_KEY) {
                 setOtherAmountSelected(true);
               } else {
@@ -138,12 +136,12 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
       ) : null}
 
       {hasQuantity && (
-        <Box mb={3}>
+        <Box mb="30px">
           <StyledInputField
             htmlFor="quantity"
             label={<FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />}
-            labelFontSize="20px"
-            labelColor="black.700"
+            labelFontSize="16px"
+            labelColor="black.800"
             labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
             error={Boolean(tier.availableQuantity !== null && data?.quantity > tier.availableQuantity)}
             required
@@ -175,8 +173,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
                   value={data?.quantity}
                   maxWidth={80}
                   onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
-                  fontSize="20px"
-                  lineHeight="26px"
+                  fontSize="15px"
                   minWidth={100}
                 />
               </div>
@@ -195,36 +192,6 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             onChange={value => dispatchChange('platformContribution', value)}
           />
         </Box>
-      )}
-      {data.interval && (
-        <Flex width="100%" justifyContent="flex-end" mt={3}>
-          <Flex bg="#F7F8FA" p="2px 8px">
-            <Flex alignItems="center" mr={3}>
-              <Calendar size={16} color="#9D9FA3" />
-            </Flex>
-            <Container color="black.500">
-              <P fontSize="12px" lineHeight="18px" mb="4px">
-                <Span>
-                  <FormattedMessage id="contribution.subscription.first.label" defaultMessage="First charge:" />
-                </Span>{' '}
-                <Span color="primary.500" fontWeight="500">
-                  <FormattedMessage id="contribution.subscription.today" defaultMessage="Today" />
-                </Span>
-              </P>
-              <P fontSize="12px" lineHeight="18px">
-                <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />{' '}
-                <Span color="primary.500" fontWeight="500">
-                  <FormattedDate
-                    value={getNextChargeDate(new Date(), data.interval)}
-                    day="numeric"
-                    month="short"
-                    year="numeric"
-                  />
-                </Span>
-              </P>
-            </Container>
-          </Flex>
-        </Flex>
       )}
       {hostIsTaxDeductibeInTheUs(collective.host) && (
         <React.Fragment>
