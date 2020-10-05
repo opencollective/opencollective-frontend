@@ -11,19 +11,6 @@ import { H1, P } from './Text';
 const NotFound = ({ searchTerm }) => {
   return (
     <Flex data-cy="not-found" flexDirection="column" alignItems="center">
-      <style jsx>
-        {`
-          .shrug {
-            font-size: 3.6rem;
-            text-align: center;
-            color: #3385ff;
-          }
-          p {
-            margin: 4rem 0;
-            text-align: center;
-          }
-        `}
-      </style>
       <H1 textAlign="center">
         <FormattedMessage id="notFound" defaultMessage="Not found" />
       </H1>
