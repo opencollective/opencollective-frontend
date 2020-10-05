@@ -150,7 +150,7 @@ class NewContributionFlowPage extends React.Component {
     if (!tier) {
       return `/${collective.slug}/donate`;
     } else if (collective.type === CollectiveType.EVENT) {
-      return `/${get(collective.parentCollective, 'slug', collective.slug)}/events/${collective.slug}/order/${tier.id}`;
+      return `/${get(collective.parent, 'slug', collective.slug)}/events/${collective.slug}/order/${tier.id}`;
     } else {
       return `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
     }
