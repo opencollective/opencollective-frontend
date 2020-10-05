@@ -21,12 +21,6 @@ import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outp
 import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../public/sponsor-page/javascripts/scripts.js'; // eslint-disable-line
 
 const PAGES = {
-  'become-a-sponsor': {
-    pageContents: importAll(require.context('../public/sponsor-page', false, /\.(html)$/)),
-    css: sponsorPageStyle,
-    js: sponsorPageScript,
-    className: 'sponsorPage',
-  },
   'how-it-works': {
     pageContents: importAll(require.context('../public/how-it-works-page', false, /\.(html)$/)),
     css: howItWorksPageStyle,

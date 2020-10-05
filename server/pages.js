@@ -8,7 +8,7 @@ const routes = require('next-routes');
 
 const pages = routes()
   .add('home', '/', 'index')
-  .add('become-sponsor', '/become-sponsor', 'become-sponsor')
+  .add('become-a-sponsor', '/become-a-sponsor', 'become-a-sponsor')
   .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
   .add('pricing', '/pricing', 'pricing')
   .add('redeem', '/:collectiveSlug?/redeem/:code?')
@@ -158,7 +158,7 @@ pages.add('applications', '/applications');
 
 pages.add(
   'marketing',
-  '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving|gift-cards|pricing|become-a-fiscal-host)',
+  '/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|become-a-fiscal-host)',
   'marketingPage',
 );
 
