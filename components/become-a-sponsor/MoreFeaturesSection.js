@@ -57,7 +57,7 @@ const MoreFeatures = () => (
       >
         <Box width={['160px']} height={['160px']} mb="24px">
           <Illustration
-            src="/static/images/become-a-sponsor/bulkPayment-illustration2.png"
+            src="/static/images/become-a-sponsor/bulkPayment-illustration.png"
             alt="Bulk Payments Illustration"
           />
         </Box>
@@ -131,13 +131,18 @@ const MoreFeatures = () => (
         height={['163px', '256px', '274px', null, '404px']}
       >
         <Illustration
-          display={[null, null, null, null, 'none']}
-          src="/static/images/become-a-sponsor/sustainerKit-illustration.png"
+          display={[null, 'none']}
+          src="/static/images/become-a-sponsor/sustainerKit-illustration-xs.png"
+          alt="Sustainers Kit Illustration"
+        />
+        <Illustration
+          display={['none', 'block', null, null, 'none']}
+          src="/static/images/become-a-sponsor/sustainerKit-illustration-md.png"
           alt="Sustainers Kit Illustration"
         />
         <Illustration
           display={['none', null, null, null, 'block']}
-          src="/static/images/become-a-sponsor/sustainerKit-illustration-lg.png"
+          src="/static/images/become-a-sponsor/sustainersKit-illustration-lg.png"
           alt="Sustainers Kit Illustration"
         />
       </Box>
