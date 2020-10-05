@@ -16,7 +16,9 @@ const routes = require('./routes');
 const { Sentry } = require('./sentry');
 const hyperwatch = require('./hyperwatch');
 const rateLimiter = require('./rate-limiter');
+const duplicateHandler = require('./duplicate-handler');
 const { getContentSecurityPolicyConfig } = require('./content-security-policy');
+const { parseToBooleanDefaultFalse } = require('./utils');
 
 const app = express();
 
@@ -44,6 +46,18 @@ const start = id =>
     app.use(cookieParser());
 
     app.use(intl.middleware());
+
+    if (parseToBooleanDefaultFalse(process.env.DUPLICATE_HANDLER)) {
+      app.use(
+        duplicateHandler({
+          skip: req =>
+            req.url.match(/^\/_/) ||
+            req.url.match(/^\/static/) ||
+            req.url.match(/^\/api/) ||
+            req.url.match(/^\/favicon\.ico/),
+        }),
+      );
+    }
 
     app.use(routes(app, nextApp));
     app.use(Sentry.Handlers.errorHandler());
