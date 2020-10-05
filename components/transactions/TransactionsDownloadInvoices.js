@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { groupBy, sumBy, truncate, uniq } from 'lodash';
 import moment from 'moment';
 import { FormattedMessage } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
+import { invoicesQuery } from '../../lib/graphql/queries';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { saveInvoice } from '../../lib/transactions';
 
@@ -22,25 +23,6 @@ const FREQUENCIES = {
   monthly: <FormattedMessage id="Frequency.Monthly" defaultMessage="Monthly" />,
   yearly: <FormattedMessage id="Frequency.Yearly" defaultMessage="Yearly" />,
 };
-
-const invoicesQuery = gql`
-  query TransactionsDownloadInvoices($fromCollectiveSlug: String!) {
-    allInvoices(fromCollectiveSlug: $fromCollectiveSlug) {
-      slug
-      year
-      month
-      totalAmount
-      currency
-      fromCollective {
-        slug
-      }
-      host {
-        slug
-        name
-      }
-    }
-  }
-`;
 
 // eslint-disable-next-line react/prop-types
 const InvoiceLabel = ({ value: invoice }) => (

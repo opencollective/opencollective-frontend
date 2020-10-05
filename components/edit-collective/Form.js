@@ -39,6 +39,7 @@ import HostPlan from './sections/HostPlan';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
+import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
 import SendingMoney from './sections/SendingMoney';
@@ -468,11 +469,15 @@ class EditCollectiveForm extends React.Component {
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
         return <SetupTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
+      
+         // Payment Receipts
+      case EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS:
+        return <PaymentReceipts collective={collective} />;
 
       // Policies and moderation
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
         return <Policies collective={collective} />;
-
+     
       default:
         return null;
     }
