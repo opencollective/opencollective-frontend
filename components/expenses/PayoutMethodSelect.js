@@ -6,7 +6,7 @@ import { get, groupBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { CollectiveFamilyTypes } from '../../lib/constants/collectives';
+import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
@@ -197,7 +197,7 @@ class PayoutMethodSelect extends React.Component {
     const groupedPms = groupBy(payoutMethods, 'type');
     const payeeIsCollectiveFamilyType =
       this.props.payee &&
-      CollectiveFamilyTypes.includes(this.props.payee.type) &&
+      AccountTypesWithHost.includes(this.props.payee.type) &&
       this.props.collective.host?.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE);
 
     // If the Account is of the "Collective" family, account balance should be the only option

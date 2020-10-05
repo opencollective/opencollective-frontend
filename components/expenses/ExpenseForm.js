@@ -5,7 +5,7 @@ import { first, get, isEmpty, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveFamilyTypes, CollectiveType } from '../../lib/constants/collectives';
+import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
@@ -207,7 +207,7 @@ const getPayoutMethodsFromPayee = payee => {
 
   // If the Payee is in the "Collective" family (Collective, Fund, Event, Project)
   // Then the Account Balance should be its only option
-  if (payee && CollectiveFamilyTypes.includes(payee.type)) {
+  if (payee && AccountTypesWithHost.includes(payee.type)) {
     filteredPms = filteredPms.filter(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE);
   }
 

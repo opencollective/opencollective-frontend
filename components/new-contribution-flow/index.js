@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
+import { getApplicableTaxes } from '@opencollective/taxes';
 import { find, get, isNil, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -40,7 +41,7 @@ import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import { validateNewOrg } from './CreateOrganizationForm';
 import SafeTransactionMessage from './SafeTransactionMessage';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
-import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY, taxesMayApply } from './utils';
+import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -142,7 +143,7 @@ class ContributionFlow extends React.Component {
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
             taxes: stepSummary && [
               {
-                type: 'VAT',
+                type: stepSummary.taxType,
                 amount: getGQLV2AmountInput(stepSummary.amount, 0),
                 country: stepSummary.countryISO,
                 idNumber: stepSummary.number,
@@ -376,7 +377,7 @@ class ContributionFlow extends React.Component {
   // Memoized helpers
   isFixedContribution = memoizeOne(isFixedContribution);
   getTierMinAmount = memoizeOne(getTierMinAmount);
-  taxesMayApply = memoizeOne(taxesMayApply);
+  getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
   canHaveFeesOnTop() {
     if (!this.props.collective.platformContributionAvailable) {
@@ -420,7 +421,7 @@ class ContributionFlow extends React.Component {
     ];
 
     // Show the summary step only if the order has tax
-    if (!noPaymentRequired && this.taxesMayApply(collective, collective.parent, host, tier)) {
+    if (!noPaymentRequired && this.getApplicableTaxes(collective, host, tier?.type).length) {
       steps.push({
         name: 'summary',
         label: intl.formatMessage(stepsLabels.summary),
@@ -506,7 +507,7 @@ class ContributionFlow extends React.Component {
   };
 
   render() {
-    const { collective, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails } = this.props;
+    const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails } = this.props;
     const { error, isSubmitted, isSubmitting } = this.state;
     return (
       <Steps
@@ -609,6 +610,7 @@ class ContributionFlow extends React.Component {
                       showFeesOnTop={this.canHaveFeesOnTop()}
                       onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
                       defaultProfileSlug={this.props.contributeAs}
+                      taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     />
 
                     <Box mt={[4, 5]}>
