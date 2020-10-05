@@ -48,30 +48,16 @@ class UpdatesWithData extends React.Component {
     const updates = data.allUpdates;
     return (
       <div className="UpdatesContainer">
-        <style jsx>
-          {`
-            .FullPage .adminActions {
-              text-transform: uppercase;
-              font-size: 1.3rem;
-              font-weight: 600;
-              letter-spacing: 0.05rem;
-              margin-bottom: 3rem;
-            }
-          `}
-        </style>
-
         {!compact && (
-          <div className="FullPage">
-            <SectionTitle
-              title={<FormattedMessage id="updates" defaultMessage="Updates" />}
-              subtitle={
-                <FormattedMessage
-                  id="section.updates.subtitle"
-                  defaultMessage="Stay up to dates with our latest activities and progress."
-                />
-              }
-            />
-          </div>
+          <SectionTitle
+            title={<FormattedMessage id="updates" defaultMessage="Updates" />}
+            subtitle={
+              <FormattedMessage
+                id="section.updates.subtitle"
+                defaultMessage="Stay up to dates with our latest activities and progress."
+              />
+            }
+          />
         )}
         {LoggedInUser?.canEditCollective(collective) && (
           <Flex justifyContent="center">
