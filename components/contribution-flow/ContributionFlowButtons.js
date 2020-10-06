@@ -2,10 +2,9 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { Box, Flex } from '../../components/Grid';
-import StyledButton from '../../components/StyledButton';
-
+import { Box, Flex } from '../Grid';
 import PayWithPaypalButton from '../PayWithPaypalButton';
+import StyledButton from '../StyledButton';
 
 class NewContributionFlowButtons extends React.Component {
   static propTypes = {

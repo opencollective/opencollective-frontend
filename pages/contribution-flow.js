@@ -13,14 +13,14 @@ import { isTierExpired } from '../lib/tier-utils';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
+import { STEPS } from '../components/contribution-flow/constants';
+import NewContributionFlowSuccess from '../components/contribution-flow/ContributionFlowSuccess';
+import NewContributionFlowContainer from '../components/contribution-flow/index';
 import ErrorPage from '../components/ErrorPage';
 import { Flex } from '../components/Grid';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
-import { STEPS } from '../components/new-contribution-flow/constants';
-import NewContributionFlowSuccess from '../components/new-contribution-flow/ContributionFlowSuccess';
-import NewContributionFlowContainer from '../components/new-contribution-flow/index';
 import Page from '../components/Page';
 import { withStripeLoader } from '../components/StripeProvider';
 import StyledButton from '../components/StyledButton';

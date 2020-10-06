@@ -1,13 +1,34 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { Box } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
+import StyledLink from '../StyledLink';
+
 import FAQ, { Content, Entry, Title } from './FAQ';
 
 /**
- * FAQ associated to the `SelectProfile` component.
+ * FAQ associated to the new contribution flow.
  */
-const ContributeAsFAQ = props => (
-  <FAQ {...props}>
+const ContributeFAQ = props => (
+  <FAQ withBorderLeft withNewButtons {...props}>
+    <Entry>
+      <Title>
+        <FormattedMessage id="NewContributionFlow.FAQ.Secure.Title" defaultMessage="Is my contribution secure?" />
+      </Title>
+      <Content>
+        <FormattedMessage
+          id="ContributeFAQ.Safe"
+          defaultMessage="Open Collective doesn't store any credit card number, we're instead relying on our partner Stripe - a secure solution that is widely adopted by the industry. If our systems are compromised, we can't loose your credit card number because we simply don't have it. <LearnMoreLink>Learn more</LearnMoreLink> about the security of Open Collective."
+          values={{
+            LearnMoreLink: getI18nLink({
+              openInNewTab: true,
+              href: 'https://docs.opencollective.com/help/product/security#payments-security',
+            }),
+          }}
+        />
+      </Content>
+    </Entry>
     <Entry>
       <Title>
         <FormattedMessage
@@ -38,7 +59,13 @@ const ContributeAsFAQ = props => (
         />
       </Content>
     </Entry>
+    <Box mt={2}>
+      <StyledLink as={StyledLink} href="https://www.opencollective.com" openInNewTab fontSize="12px" color="black.700">
+        <FormattedMessage id="moreInfo" defaultMessage="More info" />
+        &nbsp;&rarr;
+      </StyledLink>
+    </Box>
   </FAQ>
 );
 
-export default ContributeAsFAQ;
+export default ContributeFAQ;

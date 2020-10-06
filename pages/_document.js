@@ -65,7 +65,6 @@ export default class IntlDocument extends Document {
     props.__NEXT_DATA__.env = pick(process.env, [
       'ENABLE_GUEST_CONTRIBUTIONS',
       'IMAGES_URL',
-      'NEW_CONTRIBUTION_FLOW',
       'REJECT_CONTRIBUTION',
       'PAYPAL_ENVIRONMENT',
       'STRIPE_KEY',

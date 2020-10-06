@@ -1,315 +1,200 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/client';
 import themeGet from '@styled-system/theme-get';
-import { get, uniqBy } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-import { getPaymentMethodName } from '../../lib/payment_method_label';
-import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import CreditCardInactive from '../icons/CreditCardInactive';
-import Link from '../Link';
+import Loading from '../Loading';
 import MessageBox from '../MessageBox';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import NewCreditCardForm from '../NewCreditCardForm';
-import { withStripeLoader } from '../StripeProvider';
-import StyledCard from '../StyledCard';
 import StyledRadioList from '../StyledRadioList';
 import { P } from '../Text';
 
-const PaymentEntryContainer = styled(Container)`
+import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
+
+const PaymentMethodBox = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${themeGet('colors.white.full')};
-  &:hover {
-    background: ${themeGet('colors.black.50')};
+  background: #ffffff;
+  padding: 16px;
+
+  ${props =>
+    props.index &&
+    css`
+      border-top: 1px solid ${themeGet('colors.black.200')};
+    `}
+
+  ${props =>
+    !props.disabled &&
+    css`
+      &:hover {
+        background: ${themeGet('colors.black.50')};
+      }
+    `}
+`;
+
+const paymentMethodsQuery = gqlV2/* GraphQL */ `
+  query ContributionFlowPaymentMethods($slug: String) {
+    account(slug: $slug) {
+      id
+      paymentMethods(types: ["creditcard", "virtualcard", "prepaid", "collective"], includeExpired: true) {
+        id
+        name
+        data
+        type
+        expiryDate
+        providerType
+        sourcePaymentMethod {
+          id
+          providerType
+        }
+        balance {
+          valueInCents
+          currency
+        }
+        account {
+          id
+          slug
+          type
+          name
+        }
+        limitedToHosts {
+          id
+          legacyId
+          slug
+        }
+      }
+    }
   }
 `;
 
-const minBalance = 50; // Minimum usable balance for virtual card
+const StepPayment = ({
+  stepDetails,
+  stepProfile,
+  stepPayment,
+  stepSummary,
+  collective,
+  onChange,
+  hideCreditCardPostalCode,
+  onNewCardFormReady,
+}) => {
+  // GraphQL mutations and queries
+  const { loading, data, error } = useQuery(paymentMethodsQuery, {
+    variables: { slug: stepProfile.slug },
+    context: API_V2_CONTEXT,
+    skip: !stepProfile.id,
+    fetchPolicy: 'cache-and-network',
+  });
 
-/**
- * A radio list to select a payment method.
- */
-class StepPayment extends React.Component {
-  constructor(props) {
-    super(props);
-    this.onChange = this.onChange.bind(this);
-    const paymentMethodsOptions = this.generatePaymentsOptions();
-    this.state = {
-      paymentMethodsOptions: paymentMethodsOptions,
-      selectedOption: props.defaultValue || paymentMethodsOptions[0],
-      newCreditCardInfo: null,
-      save: true,
-      errors: {},
-    };
-  }
+  // data handling
+  const paymentMethods = get(data, 'account.paymentMethods', null) || [];
+  const paymentOptions = React.useMemo(
+    () => generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective),
+    [paymentMethods, stepProfile, stepDetails, collective],
+  );
 
-  componentDidMount() {
-    // We load stripe script as soon as the component mount
-    this.props.loadStripe();
+  const setNewPaymentMethod = (key, paymentMethod) => {
+    onChange({ stepPayment: { key, paymentMethod } });
+  };
 
-    // Generate an onChange event with default value on first mount if no default provided
-    if (!this.props.defaultValue) {
-      this.dispatchChangeEvent(this.state.selectedOption);
-    }
-  }
-
-  dispatchChangeEvent(selectedOption, newCreditCardInfo, save) {
-    if (this.props.onChange && selectedOption) {
-      const isNew = selectedOption.key === 'newCreditCard';
-      this.props.onChange({
-        paymentMethod: selectedOption.paymentMethod,
-        data: newCreditCardInfo,
-        title: selectedOption.title,
-        subtitle: selectedOption.subtitle,
-        isNew,
-        save,
-        key: selectedOption.key,
-        error: isNew && get(newCreditCardInfo, 'error'),
-      });
-    }
-  }
-
-  onChange(event) {
-    const { name, value, checked } = event;
-    this.setState(state => {
-      const errors = state.errors;
-      let selectedOption = state.selectedOption;
-      let save = state.save;
-      let newCreditCardInfo = state.newCreditCardInfo;
-
-      if (name === 'PaymentMethod') {
-        selectedOption = value;
-      } else if (name === 'newCreditCardInfo') {
-        newCreditCardInfo = value;
-        if (value.error) {
-          errors['newCreditCardInfo'] = value.error.message;
-        } else {
-          delete errors['newCreditCardInfo'];
-        }
-      } else if (name === 'save') {
-        save = checked;
-      }
-
-      if (this.props.onChange) {
-        this.dispatchChangeEvent(selectedOption, newCreditCardInfo, save);
-      }
-
-      return { selectedOption, save, errors };
-    });
-  }
-
-  generatePaymentsOptions() {
-    const { collective, defaultValue, withPaypal, manual } = this.props;
-    // Add collective payment methods
-    const paymentMethodsOptions = (collective.paymentMethods || [])
-      // Adaptive paymentMethods are for internal use and should never be returned
-      .filter(pm => !(pm.service === 'paypal' && pm.type === 'adaptive'))
-      .map(pm => ({
-        key: `pm-${pm.id}`,
-        title: getPaymentMethodName(pm),
-        subtitle: getPaymentMethodMetadata(pm),
-        icon: getPaymentMethodIcon(pm, collective),
-        paymentMethod: pm,
-        disabled: pm.balance < minBalance,
-      }));
-
-    // Add other PMs types (new credit card, bank transfer...etc) if collective is not a `COLLECTIVE`
-    if (collective.type !== CollectiveType.COLLECTIVE) {
-      // New credit card
-      paymentMethodsOptions.push({
-        key: 'newCreditCard',
-        title: <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />,
-        icon: <CreditCardInactive />,
-        paymentMethod: { type: 'creditcard', service: 'stripe' },
-      });
-
-      // Paypal
-      if (withPaypal) {
-        paymentMethodsOptions.push({
-          key: 'paypal',
-          title: 'PayPal',
-          paymentMethod: { service: 'paypal', type: 'payment' },
-          icon: getPaymentMethodIcon({ service: 'paypal', type: 'payment' }, collective),
-        });
-      }
-
-      // Manual (bank transfer)
-      if (manual) {
-        paymentMethodsOptions.push({
-          key: 'manual',
-          title: this.props.manual.title || 'Bank transfer',
-          paymentMethod: { type: 'manual' },
-          icon: getPaymentMethodIcon({ type: 'manual' }, collective),
-          data: this.props.manual,
-          disabled: this.props.manual.disabled,
-          subtitle: this.props.manual.subtitle,
-        });
+  // Set default payment method
+  useEffect(() => {
+    if (!loading && !stepPayment && !isEmpty(paymentOptions)) {
+      const firstOption = paymentOptions.find(pm => !pm.disabled);
+      if (firstOption) {
+        setNewPaymentMethod(firstOption.key, firstOption.paymentMethod);
       }
     }
+  }, [paymentOptions, stepPayment, loading]);
 
-    // If we got a validated card then switched steps to come back here,
-    // this will display the newly added card on the top.
-    if (defaultValue && defaultValue.isNew && defaultValue.key !== 'newCreditCard') {
-      paymentMethodsOptions.unshift({
-        ...defaultValue,
-        title: (
-          <FormattedMessage
-            id="contribute.newCard"
-            defaultMessage="New: {name}"
-            values={{ name: getPaymentMethodName(defaultValue.paymentMethod) }}
-          />
-        ),
-        subtitle: getPaymentMethodMetadata(defaultValue.paymentMethod),
-        icon: getPaymentMethodIcon(defaultValue.paymentMethod, collective),
-      });
-    }
-
-    return uniqBy(paymentMethodsOptions, 'key');
-  }
-
-  getCursor(isDisabled, isSelected) {
-    if (isDisabled) {
-      return 'not-allowed';
-    } else if (!isSelected) {
-      return 'pointer';
-    } else {
-      return 'auto';
-    }
-  }
-
-  render() {
-    const { paymentMethodsOptions, errors, selectedOption } = this.state;
-
-    // If there's no option selected, it means that there's no payment method for this
-    // profile/collective. This can happens when trying to donate from a collective
-    // that have a balance = 0.
-    if (!selectedOption) {
-      const { name, slug } = this.props.collective;
-      return (
+  return (
+    <Container width={1} border={['1px solid #DCDEE0', 'none']} borderRadius={15}>
+      {loading && !paymentMethods.length ? (
+        <Loading />
+      ) : error ? (
+        <MessageBoxGraphqlError error={error} />
+      ) : !paymentOptions.length ? (
         <MessageBox type="warning" withIcon>
           <FormattedMessage
-            id="contribute.noPaymentMethod"
-            defaultMessage="The balance of this collective is too low to make orders from it. Add funds to {collectiveName} by making a donation to it first."
-            values={{
-              collectiveName: (
-                <Link route="orderCollectiveNew" params={{ collectiveSlug: slug, verb: 'donate' }}>
-                  {name}
-                </Link>
-              ),
-            }}
+            id="NewContribute.noPaymentMethodsAvailable"
+            defaultMessage="There are no payment methods available."
           />
         </MessageBox>
-      );
-    }
-
-    return (
-      <StyledCard width={1} maxWidth={500} mx="auto">
+      ) : (
         <StyledRadioList
           id="PaymentMethod"
           name="PaymentMethod"
           keyGetter="key"
-          options={paymentMethodsOptions}
-          onChange={this.onChange}
-          defaultValue={selectedOption.key}
-          disabled={this.props.disabled}
+          options={paymentOptions}
+          onChange={option => setNewPaymentMethod(option.key, option.value.paymentMethod)}
+          value={stepPayment?.key || null}
         >
-          {({ radio, checked, index, value: { key, title, subtitle, icon, data, disabled } }) => (
-            <PaymentEntryContainer
-              px={[3, 24]}
-              py={3}
-              borderBottom={index !== paymentMethodsOptions.length - 1 ? '1px solid' : 'none'}
-              bg="white.full"
-              borderColor="black.200"
-              css={disabled ? 'filter: grayscale(1);' : undefined}
-              cursor={this.getCursor(disabled || this.props.disabled, checked)}
-            >
-              <Flex alignItems="center">
-                <Box as="span" mr={[2, 21]} flexWrap="wrap">
+          {({ radio, checked, index, value }) => (
+            <PaymentMethodBox index={index} disabled={value.disabled}>
+              <Flex alignItems="center" css={value.disabled ? 'filter: grayscale(1) opacity(50%);' : undefined}>
+                <Box as="span" mr={3} flexWrap="wrap">
                   {radio}
                 </Box>
                 <Flex mr={3} css={{ flexBasis: '26px' }}>
-                  {icon}
+                  {value.icon}
                 </Flex>
                 <Flex flexDirection="column">
-                  <P fontWeight={subtitle ? 600 : 400} color="black.900">
-                    {title}
+                  <P fontSize="15px" lineHeight="20px" fontWeight={400} color="black.900">
+                    {value.title}
                   </P>
-                  {subtitle && (
+                  {value.subtitle && (
                     <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500">
-                      {subtitle}
+                      {value.subtitle}
                     </P>
                   )}
                 </Flex>
               </Flex>
-              {key === 'newCreditCard' && checked && (
+              {value.key === NEW_CREDIT_CARD_KEY && checked && (
                 <Box my={3}>
                   <NewCreditCardForm
-                    name="newCreditCardInfo"
-                    profileType={get(this.props.collective, 'type')}
-                    error={errors.newCreditCardInfo}
-                    onChange={this.onChange}
-                    onReady={this.props.onNewCardFormReady}
-                    hidePostalCode={this.props.hideCreditCardPostalCode}
+                    name={NEW_CREDIT_CARD_KEY}
+                    profileType={get(stepProfile, 'type')}
+                    hidePostalCode={hideCreditCardPostalCode}
+                    onReady={onNewCardFormReady}
+                    useLegacyCallback={false}
+                    onChange={paymentMethod => setNewPaymentMethod(NEW_CREDIT_CARD_KEY, paymentMethod)}
+                    error={get(stepPayment, 'paymentMethod.stripeData.error.message')}
                   />
                 </Box>
               )}
-              {key === 'manual' && checked && data.instructions && (
+              {value.key === 'manual' && checked && value.instructions && (
                 <Box my={3} color="black.600" fontSize="14px">
-                  {data.instructions}
+                  {value.instructions}
                 </Box>
               )}
-            </PaymentEntryContainer>
+            </PaymentMethodBox>
           )}
         </StyledRadioList>
-      </StyledCard>
-    );
-  }
-}
+      )}
+    </Container>
+  );
+};
 
 StepPayment.propTypes = {
-  /** A collective to get payment methods from */
-  collective: PropTypes.shape({
-    type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    paymentMethods: PropTypes.arrayOf(PropTypes.object),
-  }).isRequired,
-  /** Called when the payment method changes */
+  collective: PropTypes.object,
+  stepDetails: PropTypes.object,
+  stepPayment: PropTypes.object,
+  stepProfile: PropTypes.object,
+  stepSummary: PropTypes.object,
   onChange: PropTypes.func,
-  /**
-   * Wether PayPal should be enabled. Note that this component does not render
-   * PayPal button - this is up to parent component to do it.
-   */
-  withPaypal: PropTypes.bool,
-  /** Manual payment method instruction. Should be null if an interval is set */
-  manual: PropTypes.shape({
-    title: PropTypes.string,
-    instructions: PropTypes.string,
-    disabled: PropTypes.bool,
-    subtitle: PropTypes.string,
-  }),
-  /** Default value */
-  defaultValue: PropTypes.object,
-  /** Called with an object like {stripe} when new card form is mounted */
   onNewCardFormReady: PropTypes.func,
-  /** From withStripeLoader */
-  loadStripe: PropTypes.func.isRequired,
-  /**
-   * Wether we should ask for postal code in Credit Card form
-   */
   hideCreditCardPostalCode: PropTypes.bool,
-  /** If true, user won't be able to interact with the element */
-  disabled: PropTypes.bool,
 };
 
 StepPayment.defaultProps = {
-  withPaypal: false,
   hideCreditCardPostalCode: false,
 };
 
-export default withStripeLoader(StepPayment);
+export default StepPayment;

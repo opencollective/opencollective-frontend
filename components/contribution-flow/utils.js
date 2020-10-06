@@ -11,7 +11,7 @@ import {
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
 
-import CreditCardInactive from '../../components/icons/CreditCardInactive';
+import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 
