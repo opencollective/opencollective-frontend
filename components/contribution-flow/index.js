@@ -1,62 +1,51 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import * as LibTaxes from '@opencollective/taxes';
-import { themeGet } from '@styled-system/theme-get';
-import { debounce, findIndex, get, isNil, omit, pick } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { getApplicableTaxes } from '@opencollective/taxes';
+import { find, get, isNil, pick } from 'lodash';
+import memoizeOne from 'memoize-one';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
-import { v4 as uuid } from 'uuid';
-import { isURL } from 'validator';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { AmountTypes } from '../../lib/constants/tiers-types';
-import { VAT_OPTIONS } from '../../lib/constants/vat';
-import { formatCurrency } from '../../lib/currency-utils';
+import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
+import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { TierTypes } from '../../lib/constants/tiers-types';
+import { TransactionTypes } from '../../lib/constants/transactions';
 import { getEnvVar } from '../../lib/env-utils';
+import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
-import { getPaypal } from '../../lib/paypal';
-import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../../lib/recaptcha';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { compose, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
+import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
+import { objectToQueryString } from '../../lib/url_helpers';
+import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
+import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Container from '../Container';
-import EventDetails from '../EventDetails';
-import ContributeAsFAQ from '../faqs/ContributeAsFAQ';
-import ContributeDetailsFAQ from '../faqs/ContributeDetailsFAQ';
-import ContributePaymentFAQ from '../faqs/ContributePaymentFAQ';
-import { Box, Flex } from '../Grid';
+import ContributeFAQ from '../faqs/ContributeFAQ';
+import { Box, Grid } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
-import PayWithPaypalButton from '../PayWithPaypalButton';
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import SignInOrJoinFree, { addSignupMutation } from '../SignInOrJoinFree';
 import Steps from '../Steps';
-import { withStripeLoader } from '../StripeProvider';
-import StyledButton from '../StyledButton';
-import StyledInputAmount from '../StyledInputAmount';
-import StyledInputField from '../StyledInputField';
-import { fadeIn } from '../StyledKeyframes';
-import StyledSelect from '../StyledSelect';
-import { H5, P } from '../Text';
 import { withUser } from '../UserProvider';
 
-import ContributionDetails from './ContributionDetails';
+import { STEPS } from './constants';
+import ContributionFlowButtons from './ContributionFlowButtons';
+import ContributionFlowHeader from './ContributionFlowHeader';
+import ContributionFlowStepContainer from './ContributionFlowStepContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
-import StepBreakdown from './StepBreakdown';
-import StepDetails from './StepDetails';
-import StepPayment from './StepPayment';
-import StepProfile from './StepProfile';
-
-// Styles for the previous, next and submit buttons
-const PrevNextButton = styled(StyledButton)`
-  animation: ${fadeIn} 0.3s;
-`;
+import ContributionSummary from './ContributionSummary';
+import { validateNewOrg } from './CreateOrganizationForm';
+import SafeTransactionMessage from './SafeTransactionMessage';
+import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
+import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
 
 const StepsProgressBox = styled(Box)`
-  min-height: 95px;
-  max-width: 365px;
+  min-height: 120px;
+  max-width: 450px;
 
   @media screen and (max-width: 640px) {
     width: 100%;
@@ -64,375 +53,211 @@ const StepsProgressBox = styled(Box)`
   }
 `;
 
-PrevNextButton.defaultProps = {
-  buttonSize: 'large',
-  fontWeight: 'bold',
-  minWidth: '255px',
-  m: 2,
-};
-
-// Styles for Paypal button
-const PaypalButtonContainer = styled(Box)`
-  animation: ${fadeIn} 0.3s;
-`;
-PaypalButtonContainer.defaultProps = {
-  width: PrevNextButton.defaultProps.minWidth,
-  m: PrevNextButton.defaultProps.m,
-};
-
-// Styles for Fees on Top container
-
-const FeesOnTopContainer = styled(Container)`
-  border-radius: 15px;
-  border: 1px ${themeGet('colors.black.300')} solid;
-  width: 100%;
-`;
-
-const recaptchaEnabled = parseToBoolean(getEnvVar('RECAPTCHA_ENABLED'));
-
-const messages = defineMessages({
-  manualPm: {
-    id: 'host.paymentMethod.manual.instructions',
-    defaultMessage:
-      'Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).',
-  },
-  manualPaymentLimitWarning: {
-    id: 'host.paymentMethod.manual.limitWarning',
-    defaultMessage:
-      "{host} can't receive Bank Transfers right now via Open Collective because they've reached their free plan limit. Once they upgrade to a paid plan, Bank Transfers will be available again.",
-  },
-  createUserLabel: {
-    id: 'ContributionFlow.CreateUserLabel',
-    defaultMessage: 'Contribute as an individual',
-  },
-  createOrgLabel: {
-    id: 'ContributionFlow.CreateOrganizationLabel',
-    defaultMessage: 'Contribute as an organization',
-  },
-  platformFeeOther: {
-    id: 'platformFee.Other',
-    defaultMessage: 'Other',
-  },
-  platformFeeNoContribution: {
-    id: 'platformFee.noContribution',
-    defaultMessage: "I don't want to contribute",
-  },
-});
-
-const stepsLabels = defineMessages({
-  contributeAs: {
-    id: 'contribute.step.contributeAs',
-    defaultMessage: 'Contribute as',
-  },
-  details: {
-    id: 'contribute.step.details',
-    defaultMessage: 'Details',
-  },
-  payment: {
-    id: 'contribute.step.payment',
-    defaultMessage: 'Payment info',
-  },
-  summary: {
-    id: 'Summary',
-    defaultMessage: 'Summary',
-  },
-});
-
-/**
- * Main contribution flow entrypoint. Render all the steps from contributeAs
- * to payment.
- */
-class CreateOrderPage extends React.Component {
+class ContributionFlow extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      type: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
-      hostFeePercent: PropTypes.number.isRequired,
-      location: PropTypes.shape({ country: PropTypes.string }),
-      settings: PropTypes.object,
-      parentCollective: PropTypes.shape({
+      platformContributionAvailable: PropTypes.bool,
+      parent: PropTypes.shape({
         slug: PropTypes.string,
-        settings: PropTypes.object,
-        location: PropTypes.shape({
-          country: PropTypes.string,
-        }),
       }),
     }).isRequired,
-    host: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      location: PropTypes.shape({ country: PropTypes.string }),
-      settings: PropTypes.object,
-      plan: PropTypes.object,
-      connectedAccounts: PropTypes.arrayOf(PropTypes.object),
-    }).isRequired,
+    host: PropTypes.object.isRequired,
+    tier: PropTypes.object,
+    intl: PropTypes.object,
+    createUser: PropTypes.func,
+    createOrder: PropTypes.func.isRequired,
+    confirmOrder: PropTypes.func.isRequired,
+    fixedInterval: PropTypes.string,
+    fixedAmount: PropTypes.number,
+    platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
-    tier: PropTypes.shape({
-      id: PropTypes.number,
-      slug: PropTypes.string,
-      type: PropTypes.string,
-      amount: PropTypes.number,
-      name: PropTypes.string,
-      minimumAmount: PropTypes.number,
-      amountType: PropTypes.string,
-      presets: PropTypes.arrayOf(PropTypes.number),
-      customFields: PropTypes.arrayOf(PropTypes.object),
-    }),
-    verb: PropTypes.string.isRequired,
-    version: PropTypes.oneOf(['legacy']),
+    loadingLoggedInUser: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
-    description: PropTypes.string,
-    /** An interval that users will **not** be able to change */
-    fixedInterval: PropTypes.string,
-    /** An amount that users will **not** be able to change */
-    fixedAmount: PropTypes.number,
-    customData: PropTypes.object,
-    defaultQuantity: PropTypes.number,
-    onSuccess: PropTypes.func,
-    LoggedInUser: PropTypes.object, // from withUser
-    loadingLoggedInUser: PropTypes.bool, // from withUser
-    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
-    createOrder: PropTypes.func.isRequired, // from mutation
-    confirmOrder: PropTypes.func.isRequired, // from mutation
-    createCollective: PropTypes.func.isRequired, // from mutation
-    loadStripe: PropTypes.func.isRequired, // from withStripe
-    intl: PropTypes.object.isRequired, // from injectIntl
+    verb: PropTypes.string,
     contributeAs: PropTypes.string,
-    feesOnTopAvailable: PropTypes.bool,
-    taxDeductible: PropTypes.bool,
-  };
-
-  static defaultProps = {
-    defaultQuantity: 1,
-    verb: 'contribute',
+    /** @ignore from withUser */
+    refetchLoggedInUser: PropTypes.func,
+    /** @ignore from withUser */
+    LoggedInUser: PropTypes.object,
+    createCollective: PropTypes.func.isRequired, // from mutation
   };
 
   constructor(props) {
     super(props);
-    this.recaptcha = null;
-    this.recaptchaToken = null;
-    this.activeFormRef = React.createRef();
+    this.mainContainerRef = React.createRef();
     this.state = {
-      loading: false,
-      submitting: false,
-      submitted: false,
-      stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
-      stepDetails: null,
-      stepPayment: null,
-      stepSummary: null,
       error: null,
       stripe: null,
-      customData: {},
-      feesOnTop: {},
-      feesOnTopOptions: [],
+      isSubmitted: false,
+      isSubmitting: false,
+      stepProfile: null,
+      stepPayment: null,
+      stepSummary: null,
+      stepDetails: {
+        quantity: 1,
+        interval: props.fixedInterval || props.tier?.interval,
+        amount: props.fixedAmount || getDefaultTierAmount(props.tier),
+        platformContribution: props.platformContribution,
+      },
     };
   }
 
-  async componentDidMount() {
-    this.loadInitialData();
-    // Load payment providers scripts in the background
-    this.props.loadStripe();
-    if (this.hasPaypal()) {
-      getPaypal();
-    }
-
-    if (recaptchaEnabled) {
-      try {
-        this.recaptcha = await getRecaptcha();
-      } catch {
-        this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
-      }
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    // Set user as default profile when loggin in
-    if (!prevProps.LoggedInUser && this.props.LoggedInUser && !this.state.stepProfile) {
-      this.setState({ stepProfile: this.getLoggedInUserDefaultContibuteProfile() });
-    }
-
-    // Skip contributeAs step if contributeAs param matches the current stepProfile
-    if (this.props.contributeAs && this.props.contributeAs === get(this.state, 'stepProfile.slug')) {
-      const steps = this.getSteps();
-      const nextStepIndex = findIndex(steps, { name: 'contributeAs' }) + 1;
-      this.pushStepRoute(steps[nextStepIndex].name);
-    }
-
-    // Collective was loaded
-    if (prevProps.collective !== this.props.collective) {
-      this.loadInitialData();
-      if (this.hasPaypal()) {
-        getPaypal();
-      }
-    }
-
-    // sets the total amount & fee options correctly when we change the base amount (if fees on top is available)
-    const hasProfileChanged = prevState.stepProfile?.id !== this.state.stepProfile?.id;
-    const hasAmountChanged =
-      this.state.stepDetails?.amount && prevState.stepDetails?.amount !== this.state.stepDetails?.amount;
-    if ((hasProfileChanged || hasAmountChanged) && this.canHaveFeesOnTop()) {
-      const platformFeeOptions = this.createplatformFeeOptions(this.state.stepDetails.amount);
-      this.setState(state => ({
-        platformFeeOptions: platformFeeOptions,
-        stepDetails: { ...state.stepDetails, platformFee: platformFeeOptions[1] },
-      }));
-    }
-  }
-
-  componentWillUnmount() {
-    if (recaptchaEnabled) {
-      unloadRecaptcha();
-    }
-  }
-
-  static errorRecaptchaConnect = "Can't connect to ReCaptcha. Try to reload the page, or disable your Ad Blocker.";
-
-  loadInitialData() {
-    this.setState(state => ({
-      stepProfile: state.stepProfile || this.getLoggedInUserDefaultContibuteProfile(),
-      stepDetails: get(state.stepDetails, 'totalAmount')
-        ? state.stepDetails
-        : this.getDefaultStepDetails(this.props.tier),
-      customData: this.props.customData,
-    }));
-  }
-
-  /** Steps component callback  */
-  onStepChange = async step => {
-    this.pushStepRoute(step.name);
-  };
-
-  /** Navigate to another step, ensuring all route params are preserved */
-  pushStepRoute = async (stepName, routeParams = {}) => {
-    const { collective, tier } = this.props;
-
-    const params = {
-      verb: this.props.verb || 'donate',
-      collectiveSlug: collective.slug,
-      step: stepName === 'contributeAs' ? undefined : stepName,
-      totalAmount: this.props.fixedAmount ? this.props.fixedAmount.toString() : undefined,
-      interval: this.props.fixedInterval || undefined,
-      ...pick(this.props, ['interval', 'description', 'redirect']),
-      ...routeParams,
-    };
-
-    let route = 'orderCollectiveNew';
-    if (tier) {
-      params.tierId = tier.id;
-      params.tierSlug = tier.slug;
-      if (tier.type === 'TICKET' && collective.parentCollective) {
-        route = 'orderEventTier';
-        params.collectiveSlug = collective.parentCollective.slug;
-        params.eventSlug = collective.slug;
-        params.verb = 'events';
-      } else {
-        route = 'orderCollectiveTierNew';
-        params.verb = 'contribute'; // Enforce "contribute" verb for ordering tiers
-      }
-    } else if (params.verb === 'contribute') {
-      // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
-      params.verb = 'pay';
-    }
-
-    if (this.props.version === 'legacy') {
-      params.version = 'legacy';
-      route += 'Legacy';
-    }
-
-    // Reset errors if any
-    if (this.state.error) {
-      this.setState({ error: null });
-    }
-
-    // Navigate to the new route
-    await Router.pushRoute(stepName === 'success' ? `${route}Success` : route, params);
-    window.scrollTo(0, 0);
-  };
-
-  fetchRecaptchaToken = () => {
-    if (this.recaptchaToken) {
-      return Promise.resolve(this.recaptchaToken);
-    }
-
-    return new Promise(resolve =>
-      this.recaptcha.ready(() =>
-        this.recaptcha.execute(getRecaptchaSiteKey(), { action: 'OrderForm' }).then(recaptchaToken => {
-          this.recaptchaToken = recaptchaToken;
-          resolve(recaptchaToken);
-        }),
-      ),
-    );
-  };
-
-  /** Validate step payment, loading data from stripe for new credit cards */
-  validateStepPayment = async action => {
-    const { stepPayment } = this.state;
-    const isFixedContribution = this.isFixedContribution();
-
-    if (action === 'prev') {
-      // Don't validate when going back
-      return true;
-    } else if (this.getOrderMinAmount() === 0 && (isFixedContribution || !stepPayment)) {
-      // Always ignore payment method for free tiers
-      return true;
-    } else if (!stepPayment) {
-      this.setState({ error: 'Please set a payment method' });
-      return false;
-    } else if (!stepPayment.isNew) {
-      // No need to validate existing payment methods
-      return true;
-    } else if (!stepPayment.data && get(stepPayment, 'paymentMethod.token')) {
-      // New credit card - if no data, stripe token has already been exchanged
-      return true;
-    } else {
-      // New credit card - load info from stripe
-      if (!this.state.stripe) {
-        this.setState({
-          error: 'There was a problem initializing the payment form. Please reload the page and try again',
-        });
-        return false;
-      }
-      const { token, error } = await this.state.stripe.createToken();
-
-      if (error) {
-        this.setState({ error: error.message });
-        return false;
-      }
-      this.setState(state => ({
-        stepPayment: {
-          ...state.stepPayment,
-          data: null,
-          key: `newCreditCard-${uuid()}`,
-          paymentMethod: { ...stripeTokenToPaymentMethod(token), save: this.state.stepPayment.save },
+  submitOrder = async () => {
+    const { stepDetails, stepProfile, stepSummary } = this.state;
+    const fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
+    this.setState({ error: null });
+    try {
+      const response = await this.props.createOrder({
+        variables: {
+          order: {
+            quantity: stepDetails.quantity,
+            amount: { valueInCents: stepDetails.amount },
+            frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
+            fromAccount,
+            toAccount: pick(this.props.collective, ['id']),
+            customData: stepDetails.customData,
+            paymentMethod: await this.getPaymentMethod(),
+            platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
+            tier: this.props.tier && { legacyId: this.props.tier.legacyId },
+            taxes: stepSummary && [
+              {
+                type: stepSummary.taxType,
+                amount: getGQLV2AmountInput(stepSummary.amount, 0),
+                country: stepSummary.countryISO,
+                idNumber: stepSummary.number,
+              },
+            ],
+          },
         },
-      }));
-    }
+      });
 
-    return true;
+      return this.handleOrderResponse(response.data.createOrder);
+    } catch (e) {
+      this.showError(getErrorFromGraphqlException(e));
+    }
   };
 
-  /** Validate step profile, create new org if necessary */
+  handleOrderResponse = async ({ order, stripeError }) => {
+    if (stripeError) {
+      return this.handleStripeError(order, stripeError);
+    } else {
+      return this.handleSuccess(order);
+    }
+  };
+
+  handleStripeError = async (order, stripeError) => {
+    const { message, account, response } = stripeError;
+    if (!response) {
+      this.setState({ isSubmitting: false, error: message });
+    } else if (response.paymentIntent) {
+      const stripe = await getStripe(null, account);
+      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
+      if (result.error) {
+        this.setState({ isSubmitting: false, error: result.error.message });
+      } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
+        this.setState({ isSubmitting: true, error: null });
+        try {
+          const response = await this.props.confirmOrder({ variables: { order: { id: order.id } } });
+          return this.handleOrderResponse(response.data.confirmOrder);
+        } catch (e) {
+          this.setState({ isSubmitting: false, error: e.message });
+        }
+      }
+    }
+  };
+
+  handleSuccess = async order => {
+    this.setState({ isSubmitted: true });
+    this.props.refetchLoggedInUser(); // to update memberships
+
+    if (isValidExternalRedirect(this.props.redirect)) {
+      const url = new URL(this.props.redirect);
+      url.searchParams.set('orderId', order.legacyId);
+      url.searchParams.set('orderIdV2', order.id);
+      url.searchParams.set('status', order.status);
+      const transaction = find(order.transactions, { type: TransactionTypes.CREDIT });
+      if (transaction) {
+        url.searchParams.set('transactionid', transaction.legacyId);
+        url.searchParams.set('transactionIdV2', transaction.id);
+      }
+
+      const verb = 'donate';
+      const fallback = `/${this.props.collective.slug}/${verb}/success?OrderId=${order.id}`;
+      if (isAllowedRedirect(url.host)) {
+        window.location.href = url.href;
+      } else {
+        await Router.pushRoute('external-redirect', { url: url.href, fallback });
+        return this.scrollToTop();
+      }
+    } else {
+      return this.pushStepRoute('success', { OrderId: order.id });
+    }
+  };
+
+  showError = error => {
+    this.setState({ error });
+    this.scrollToTop();
+  };
+
+  getPaymentMethod = async () => {
+    const { stepPayment, stripe } = this.state;
+    if (!stepPayment?.paymentMethod) {
+      return null;
+    } else if (stepPayment.paymentMethod.id) {
+      return pick(stepPayment.paymentMethod, ['id']);
+    } else if (stepPayment.key === NEW_CREDIT_CARD_KEY) {
+      const { token } = await stripe.createToken();
+      const pm = stripeTokenToPaymentMethod(token);
+      return {
+        name: pm.name,
+        isSavedForLater: stepPayment.paymentMethod.isSavedForLater,
+        creditCardInfo: { token: pm.token, ...pm.data },
+      };
+    } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
+      return pick(stepPayment.paymentMethod, ['type', 'paypalInfo.token', 'paypalInfo.data']);
+    } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER) {
+      return pick(stepPayment.paymentMethod, ['type']);
+    }
+  };
+
+  getEmailRedirectURL() {
+    let currentPath = window.location.pathname;
+    if (window.location.search) {
+      currentPath = currentPath + window.location.search;
+    } else {
+      currentPath = `${currentPath}?`;
+    }
+    // add 'emailRedirect' to the query so we can load the Payment step when
+    // the user comes back from signing up to make a recurring contribution
+    currentPath = `${currentPath.replace('profile', 'payment')}&emailRedirect=true`;
+    return encodeURIComponent(currentPath);
+  }
+
+  /** Validate step profile, create new incognito/org if necessary */
   validateStepProfile = async () => {
-    if (!this.state.stepProfile || !reportValidityHTML5(this.activeFormRef.current)) {
+    const { stepProfile } = this.state;
+    if (!stepProfile) {
       return false;
     }
 
     // Check if we're creating a new profile
-    if (!this.state.stepProfile.id) {
-      this.setState({ submitting: true });
-      this.state.stepProfile.type = this.state.stepProfile.type || 'ORGANIZATION';
+    if (stepProfile.id === 'incognito' || stepProfile.id === NEW_ORGANIZATION_KEY) {
+      if (stepProfile.type === 'ORGANIZATION' && !validateNewOrg(stepProfile)) {
+        return false;
+      }
+
+      this.setState({ isSubmitting: true });
 
       try {
-        const { data: result } = await this.props.createCollective(this.state.stepProfile);
+        const { data: result } = await this.props.createCollective(stepProfile);
         const createdProfile = result.createCollective;
         await this.props.refetchLoggedInUser();
-        this.setState({ stepProfile: createdProfile, submitting: false });
+        this.setState({ stepProfile: createdProfile, isSubmitting: false });
       } catch (error) {
-        this.setState({ error: error.message, submitting: false });
+        this.setState({ error: error.message, isSubmitting: false });
         window.scrollTo(0, 0);
         return false;
       }
@@ -441,821 +266,257 @@ class CreateOrderPage extends React.Component {
     return true;
   };
 
-  submitOrder = async (paymentMethodOverride = null) => {
-    this.setState({ submitting: true, error: null });
-
-    const { stepProfile, stepDetails, stepPayment, stepSummary, customData } = this.state;
-
-    // Prepare payment method
-    let paymentMethod = paymentMethodOverride;
-    if (!paymentMethod && stepPayment) {
-      paymentMethod = stepPayment.paymentMethod;
-      if (!stepPayment.isNew) {
-        paymentMethod = pick(paymentMethod, ['service', 'type', 'uuid']);
-      }
+  createProfileForRecurringContributions = async data => {
+    if (this.state.isSubmitting) {
+      return false;
     }
 
-    // Load recaptcha token
-    let recaptchaToken;
-    if (recaptchaEnabled) {
-      recaptchaToken = await this.fetchRecaptchaToken();
-      if (!recaptchaToken) {
-        this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
-      }
-    }
+    const user = pick(data, ['email', 'name']);
 
-    const { collective, tier, description, createOrder } = this.props;
-    const isFeesOnTop = this.canHaveFeesOnTop();
-    const order = {
-      paymentMethod,
-      recaptchaToken,
-      totalAmount: this.getTotalAmountWithTaxes(),
-      platformFee: get(stepDetails, 'platformFee.value'),
-      isFeesOnTop,
-      taxAmount: get(stepSummary, 'amount', 0),
-      countryISO: get(stepSummary, 'countryISO'),
-      taxIDNumber: get(stepSummary, 'number'),
-      quantity: get(stepDetails, 'quantity', 1),
-      currency: this.getCurrency(),
-      interval: stepDetails.interval,
-      fromCollective: pick(stepProfile, ['id', 'type', 'name']),
-      collective: pick(collective, ['id']),
-      tier: tier ? pick(tier, ['id', 'amount']) : undefined,
-      description: description || '',
-      customData,
+    this.setState({ isSubmitting: true });
+
+    try {
+      await this.props.createUser({
+        variables: {
+          user,
+          redirect: this.getEmailRedirectURL(),
+          websiteUrl: getWebsiteUrl(),
+        },
+      });
+      await Router.pushRoute('signinLinkSent', { email: user.email });
+    } catch (error) {
+      this.setState({ error: error.message, isSubmitting: false });
+    } finally {
+      this.scrollToTop();
+    }
+  };
+
+  /** Steps component callback  */
+  onStepChange = async step => this.pushStepRoute(step.name);
+
+  /** Navigate to another step, ensuring all route params are preserved */
+  pushStepRoute = async (stepName, routeParams = {}) => {
+    const { collective, tier, LoggedInUser } = this.props;
+    const { stepDetails, stepProfile } = this.state;
+
+    const params = {
+      verb: this.props.verb || 'donate',
+      collectiveSlug: collective.slug,
+      step: stepName === 'details' ? undefined : stepName,
+      interval: this.props.fixedInterval || undefined,
+      ...pick(this.props, ['interval', 'description', 'redirect', 'contributeAs']),
+      ...routeParams,
     };
 
-    try {
-      const res = await createOrder({ variables: { order } });
-      const orderCreated = res.data.createOrder;
-      if (orderCreated.stripeError) {
-        this.handleStripeError(orderCreated);
+    let route = 'orderCollectiveNew';
+    if (tier) {
+      params.tierId = tier.legacyId;
+      params.tierSlug = tier.slug;
+      if (tier.type === 'TICKET' && collective.parent) {
+        route = 'orderEventTier';
+        params.verb = 'events';
+        params.collectiveSlug = collective.parent.slug;
+        params.eventSlug = collective.slug;
       } else {
-        this.handleSuccess(orderCreated);
+        route = 'orderCollectiveTierNew';
+        params.verb = 'contribute'; // Enforce "contribute" verb for ordering tiers
       }
-    } catch (e) {
-      this.setState(state => {
-        const stepPayment = {
-          ...state.stepPayment,
-          paymentMethod: {
-            ...state.stepPayment?.paymentMethod,
-            token: null,
-          },
-        };
-        return { submitting: false, error: e.message, stepPayment };
-      });
+    } else if (params.verb === 'contribute' || params.verb === 'new-contribute') {
+      // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
+      params.verb = 'donate';
     }
-  };
 
-  confirmOrder = async order => {
-    this.setState({ submitting: true, error: null });
-
-    try {
-      const res = await this.props.confirmOrder({ variables: { order } });
-      const orderConfirmed = res.data.confirmOrder;
-      if (orderConfirmed.stripeError) {
-        this.handleStripeError(orderConfirmed);
-      } else {
-        this.handleSuccess(orderConfirmed);
-      }
-    } catch (e) {
-      this.setState({ submitting: false, error: e.message });
+    // Reset errors if any
+    if (this.state.error) {
+      this.setState({ error: null });
     }
-  };
 
-  handleSuccess = orderCreated => {
-    this.setState({ submitting: false, submitted: true, error: null });
-    this.props.refetchLoggedInUser();
-    if (this.props.onSuccess) {
-      this.props.onSuccess();
-    }
-    if (this.props.redirect && this.isValidRedirect(this.props.redirect)) {
-      const urlParams = new URLSearchParams({
-        orderId: get(orderCreated, 'id', null),
-        orderIdV2: get(orderCreated, 'idV2', null),
-        transactionid: get(orderCreated, 'transactions[0].id', null),
-        transactionIdV2: get(orderCreated, 'transactions[0].idV2', null),
-        status: orderCreated.status,
-      });
-      const redirectTo = `${this.props.redirect}?${urlParams.toString()}`;
-      window.location.href = redirectTo;
+    // Navigate to the new route
+    if (stepName === 'payment' && !LoggedInUser && stepDetails?.interval) {
+      await this.createProfileForRecurringContributions(stepProfile);
     } else {
-      this.pushStepRoute('success', { OrderId: orderCreated.id });
+      await Router.pushRoute(route, params);
+    }
+
+    this.scrollToTop();
+  };
+
+  scrollToTop = () => {
+    if (this.mainContainerRef.current) {
+      this.mainContainerRef.current.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo(0, 0);
     }
   };
 
-  handleStripeError = async ({ id, stripeError: { message, account, response } }) => {
-    if (!response) {
-      this.setState({ submitting: false, error: message });
-      return;
-    }
+  // Memoized helpers
+  isFixedContribution = memoizeOne(isFixedContribution);
+  getTierMinAmount = memoizeOne(getTierMinAmount);
+  getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
-    if (response.paymentIntent) {
-      const stripe = await getStripe(null, account);
-      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
-      if (result.error) {
-        this.setState({ submitting: false, error: result.error.message });
-      }
-      if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
-        this.confirmOrder({ id });
-      }
-    }
-  };
-
-  isValidRedirect(url) {
-    const validationParams = process.env.OC_ENV === 'production' ? {} : { require_tld: false };
-
-    return isURL(url, validationParams);
-  }
-
-  getLoggedInUserDefaultContibuteProfile() {
-    if (this.props.contributeAs) {
-      const otherProfiles = this.getOtherProfiles();
-      const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.contributeAs);
-      if (contributorProfile) {
-        return contributorProfile;
-      }
-    }
-    if (get(this.state, 'stepProfile')) {
-      return this.state.stepProfile;
-    }
-    if (this.props.LoggedInUser) {
-      return this.getPersonalProfile();
-    }
-  }
-
-  /** Returns logged-in user profile */
-  getPersonalProfile() {
-    const { LoggedInUser } = this.props;
-    if (!LoggedInUser) {
-      return {};
-    }
-
-    return { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
-  }
-
-  /** Return an array of any other associated profile the user might control */
-  getOtherProfiles() {
-    const { LoggedInUser, collective } = this.props;
-    if (!LoggedInUser) {
-      return [];
-    }
-
-    return LoggedInUser.memberOf
-      .filter(
-        m =>
-          m.role === 'ADMIN' &&
-          m.collective.id !== collective.id &&
-          m.collective.type !== 'EVENT' &&
-          m.collective.type !== 'PROJECT',
-      )
-      .map(({ collective }) => collective);
-  }
-
-  /** Guess the country, from the more pricise method (settings) to the less */
-  getContributingProfileCountry() {
-    return (
-      get(this.state.stepSummary, 'countryISO') ||
-      get(this.state.stepProfile, 'location.country') ||
-      get(this.props.LoggedInUser, 'collective.location.country')
-    );
-  }
-
-  /** If not a fixed amount, returns tier presets or defaults presets */
-  getAmountsPresets() {
-    const tier = this.props.tier || {};
-    if (tier.amountType !== AmountTypes.FIXED) {
-      // Funds MVP, to refactor
-      if (this.props.collective.type === CollectiveType.FUND || this.props.collective?.settings?.fund === true) {
-        return tier.presets || [100000, 200000, 500000, 1000000];
-      }
-
-      return tier.presets || [500, 1000, 2000, 5000];
-    } else {
-      return null;
-    }
-  }
-
-  /** Get the min authorized amount for order, in cents */
-  getOrderMinAmount() {
-    const tier = this.props.tier;
-
-    if (!tier) {
-      // When making a donation, min amount is $1
-      return 100;
-    } else if (tier.amountType === AmountTypes.FIXED) {
-      return tier.amount || 0;
-    } else {
-      return tier.minimumAmount || 0;
-    }
-  }
-
-  getDefaultAmount() {
-    const { tier } = this.props;
-    const stateAmount = get(this.state.stepDetails, 'totalAmount');
-
-    if (!isNil(stateAmount)) {
-      return stateAmount;
-    } else if (!isNil(this.props.fixedAmount)) {
-      return this.props.fixedAmount;
-    } else if (tier && !isNil(tier.amount)) {
-      return tier.amount;
-    } else if (this.getOrderMinAmount() === 0) {
-      // Free tiers are free per default, even when user can make a donation
-      return 0;
-    }
-
-    const presets = this.getAmountsPresets();
-    return presets && presets.length > 0 ? presets[Math.floor(presets.length / 2)] : 500;
-  }
-
-  /** Get default total amount, or undefined if we don't have any info on this */
-  getDefaultStepDetails(tier) {
-    const { stepDetails } = this.state;
-    const { fixedInterval } = this.props;
-    const amount = this.getDefaultAmount();
-    const quantity = get(stepDetails, 'quantity') || this.props.defaultQuantity || 1;
-    const interval = get(stepDetails, 'interval') || get(tier, 'interval') || fixedInterval;
-    const totalAmount = amount * quantity;
-
-    return { amount, quantity, interval, totalAmount };
-  }
-
-  canHaveFeesOnTop(props = this.props, state = this.state) {
-    return (
-      props.feesOnTopAvailable &&
-      props.tier?.type !== 'TICKET' &&
-      (state.stepProfile?.type !== 'COLLECTIVE' ||
-        (state.stepProfile?.host?.id && state.stepProfile?.host?.id === props.host?.id))
-    );
-  }
-
-  /** Get total amount based on stepDetails with taxes from step summary applied */
-  getTotalAmountWithTaxes() {
-    const quantity = get(this.state, 'stepDetails.quantity', 1);
-    const amount = get(this.state, 'stepDetails.amount', 0);
-    const taxAmount = get(this.state, 'stepSummary.amount', 0);
-    const platformFeeAmount = this.canHaveFeesOnTop() ? get(this.state, 'stepDetails.platformFee.value', 0) : 0;
-    return quantity * (amount + platformFeeAmount) + taxAmount;
-  }
-
-  /** Returns true if the price and interval of the current contribution cannot be changed */
-  isFixedContribution() {
-    const tier = this.props.tier;
-    const forceInterval = Boolean(tier) || Boolean(this.props.fixedInterval);
-    const forceAmount = (tier && tier.amountType === AmountTypes.FIXED) || this.props.fixedAmount;
-    const isFlexible = tier && tier.amountType === AmountTypes.FLEXIBLE;
-    return !isFlexible && forceInterval && forceAmount;
-  }
-
-  /** Returns true if taxes may apply with this tier/host */
-  taxesMayApply() {
-    const { tier, collective, host } = this.props;
-
-    if (!tier) {
+  canHaveFeesOnTop() {
+    if (!this.props.collective.platformContributionAvailable) {
       return false;
-    }
-
-    // Don't apply VAT if not configured (default)
-    const vatType = get(collective, 'settings.VAT.type') || get(collective, 'parentCollective.settings.VAT.type');
-    const hostCountry = get(host.location, 'country');
-    const collectiveCountry = get(collective.location, 'country');
-    const parentCountry = get(collective, 'parentCollective.location.country');
-    const country = collectiveCountry || parentCountry || hostCountry;
-
-    if (!vatType) {
+    } else if (this.props.tier?.type === TierTypes.TICKET) {
       return false;
-    } else if (vatType === VAT_OPTIONS.OWN) {
-      return LibTaxes.getVatOriginCountry(tier.type, country, country);
+    } else if (this.state.stepProfile?.type === CollectiveType.COLLECTIVE) {
+      return this.state.stepProfile.host?.id && this.state.stepProfile.host.id === this.props.host?.id;
     } else {
-      return LibTaxes.getVatOriginCountry(tier.type, hostCountry, country);
+      return true;
     }
   }
 
   /** Returns the steps list */
   getSteps() {
-    const { skipStepDetails, intl } = this.props;
+    const { fixedInterval, fixedAmount, collective, host, tier } = this.props;
     const { stepDetails, stepPayment, stepSummary } = this.state;
-    const tier = this.props.tier;
-    const isFixedContribution = this.isFixedContribution();
-    const minAmount = this.getOrderMinAmount();
-    const noPaymentRequired = minAmount === 0 && get(stepDetails, 'amount') === 0;
+    const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
+    const minAmount = this.getTierMinAmount(tier);
+    const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
 
     const steps = [
       {
-        name: 'contributeAs',
-        label: intl.formatMessage(stepsLabels.contributeAs),
+        name: 'details',
+        isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount && stepDetails.quantity),
+        validate: () => {
+          if (isNil(tier?.availableQuantity)) {
+            return true;
+          } else {
+            return stepDetails.quantity <= tier.availableQuantity;
+          }
+        },
+      },
+      {
+        name: 'profile',
         isCompleted: Boolean(this.state.stepProfile),
         validate: this.validateStepProfile,
       },
     ];
 
-    // If amount and interval are forced by a tier or by params, skip StepDetails (except for events)
-    if (!skipStepDetails && (!isFixedContribution || tier?.type === 'TICKET' || this.canHaveFeesOnTop())) {
+    // Show the summary step only if the order has tax
+    if (!noPaymentRequired && this.getApplicableTaxes(collective, host, tier?.type).length) {
       steps.push({
-        name: 'details',
-        label: intl.formatMessage(stepsLabels.details),
-        isCompleted: Boolean(stepDetails && stepDetails.totalAmount >= minAmount),
-        validate: () => {
-          return stepDetails && reportValidityHTML5(this.activeFormRef.current);
-        },
+        name: 'summary',
+        isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
       });
     }
 
     // Hide step payment if using a free tier with fixed price
-    if (!(minAmount === 0 && isFixedContribution)) {
+    if (!noPaymentRequired) {
       steps.push({
         name: 'payment',
-        label: intl.formatMessage(stepsLabels.payment),
-        isCompleted: Boolean(noPaymentRequired || stepPayment),
-        validate: this.validateStepPayment,
-      });
-    }
-
-    // Show the summary step only if the order has tax
-    if (this.taxesMayApply()) {
-      steps.push({
-        name: 'summary',
-        label: intl.formatMessage(stepsLabels.summary),
-        isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
+        isCompleted: true,
+        validate: action => {
+          if (action === 'prev') {
+            return true;
+          } else {
+            const isCompleted = Boolean(noPaymentRequired || stepPayment);
+            if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
+              return stepPayment.paymentMethod?.stripeData?.complete;
+            } else {
+              return isCompleted;
+            }
+          }
+        },
       });
     }
 
     return steps;
   }
 
-  /** Get currency from the current tier, or fallback on collective currency */
-  getCurrency() {
-    return get(this.props.tier, 'currency', this.props.collective.currency);
+  getPaypalButtonProps() {
+    const { stepPayment, stepDetails, stepSummary } = this.state;
+    if (stepPayment?.paymentMethod?.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
+      const { collective, host } = this.props;
+      return {
+        host: host,
+        currency: collective.currency,
+        style: { size: 'responsive', height: 47 },
+        totalAmount: getTotalAmount(stepDetails, stepSummary),
+        onClick: () => this.setState({ isSubmitting: true }),
+        onCancel: () => this.setState({ isSubmitting: false }),
+        onError: e => this.setState({ isSubmitting: false, error: `PayPal error: ${e.message}` }),
+        onAuthorize: pm => {
+          this.setState(
+            state => ({
+              stepPayment: {
+                ...state.stepPayment,
+                paymentMethod: {
+                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
+                  paypalInfo: pm,
+                },
+              },
+            }),
+            this.submitOrder,
+          );
+        },
+      };
+    }
   }
 
-  /** Returns manual payment method if supported by the host and not using an interval, null otherwise */
-  getManualPaymentMethod() {
-    const pm = get(this.props.host.settings, 'paymentMethods.manual');
-    const interval = get(this.state, 'stepDetails.interval');
-    const totalAmount = get(this.state, 'stepDetails.totalAmount');
-    const platformFeeValue = get(this.state, 'stepDetails.platformFee.value', 0);
-    const amount = totalAmount + platformFeeValue;
-
-    if (interval || (!pm && !this.props.LoggedInUser.isRoot())) {
-      return null;
+  getRedirectUrlForSignIn = () => {
+    if (typeof window === 'undefined') {
+      return undefined;
     }
 
-    const plan = this.props.host.plan;
-    const disabled = plan && plan.bankTransfersLimit !== null && plan.bankTransfers > plan.bankTransfersLimit;
-    const subtitle = disabled
-      ? this.props.intl.formatMessage(messages.manualPaymentLimitWarning, {
-          host: this.props.host.name,
-        })
-      : null;
-
-    return {
-      ...pm,
-      disabled,
-      subtitle,
-      instructions: this.props.intl.formatMessage(messages.manualPm, {
-        amount: formatCurrency(amount, this.getCurrency()),
-        email: get(this.props, 'LoggedInUser.email', ''),
-        host: this.props.host.name,
-      }),
-    };
-  }
-
-  // Debounce state update functions that may be called successively
-  updateProfile = debounce(
-    stepProfile =>
-      this.setState(state => {
-        const stepDetails = omit(state.stepDetails, ['platformFee']);
-        stepDetails.totalAmount = stepDetails.amount;
-        return {
-          stepProfile,
-          stepDetails,
-          stepPayment: null,
-        };
-      }),
-    300,
-  );
-
-  updateDetails = stepDetails => this.setState({ stepDetails });
-
-  handleCustomFieldsChange = (name, value) => {
-    const { customData } = this.state;
-
-    this.setState({
-      customData: {
-        ...customData,
-        [name]: value,
-      },
+    const { stepDetails } = this.state;
+    const stepDetailsParams = objectToQueryString({
+      amount: stepDetails.amount / 100,
+      interval: stepDetails.interval || undefined,
+      quantity: stepDetails.quantity !== 1 ? stepDetails.quantity : undefined,
+      platformContribution: !isNil(stepDetails.platformContribution)
+        ? stepDetails.platformContribution / 100
+        : undefined,
     });
-  };
 
-  /* We only support paypal for one time donations to the open source collective for now. */
-  hasPaypal() {
-    return (
-      !get(this.state, 'stepDetails.interval') &&
-      this.props.host.connectedAccounts &&
-      Boolean(this.props.host.connectedAccounts.find(ca => ca.service === 'paypal'))
-    );
-  }
-
-  /* We might have problems with postal code and this should be disablable */
-  shouldHideCreditCardPostalCode() {
-    return get(this.state, 'stepProfile.settings.hideCreditCardPostalCode', false);
-  }
-
-  createplatformFeeOptions = amount => {
-    const map = new Map([
-      ['10%', 0.1],
-      ['15%', 0.15],
-      ['20%', 0.2],
-    ]);
-    const platformFeeArray = Array.from(map, x => ({
-      label: `${formatCurrency(Math.round(x[1] * amount), this.getCurrency())} (${x[0]})`,
-      value: Math.round(x[1] * amount),
-    }));
-    platformFeeArray.push(
-      { label: this.props.intl.formatMessage(messages.platformFeeNoContribution), value: 0 },
-      { label: this.props.intl.formatMessage(messages.platformFeeOther), value: 100, isCustomAmount: true },
-    );
-    return platformFeeArray;
-  };
-
-  renderStep(step) {
-    const { collective, tier, host, taxDeductible } = this.props;
-    const { stepProfile, stepDetails, stepPayment, customData, platformFeeOptions } = this.state;
-    const personalProfile = this.getPersonalProfile();
-    const otherProfiles = this.getOtherProfiles();
-    const customFields = tier && tier.customFields ? tier.customFields : [];
-    const defaultStepDetails = this.getDefaultStepDetails(tier);
-    const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
-    const isIncognito = get(stepProfile, 'isIncognito');
-    const showFeesOnTop = this.canHaveFeesOnTop();
-
-    if (step.name === 'contributeAs') {
-      return (
-        <Flex justifyContent="center" width={1}>
-          <Box width={[0, null, null, '24em']} />
-          <Container minWidth={260}>
-            <StyledInputField
-              htmlFor="contributeAs"
-              label={
-                <H5 textAlign="left" mb={3}>
-                  <FormattedMessage id="contribute.profile.label" defaultMessage="Contribute As:" />
-                </H5>
-              }
-            >
-              {fieldProps => (
-                <Container as="form" onSubmit={e => e.preventDefault()} ref={this.activeFormRef}>
-                  <StepProfile
-                    {...fieldProps}
-                    onProfileChange={this.updateProfile}
-                    otherProfiles={otherProfiles}
-                    personalProfile={personalProfile}
-                    defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
-                    canUseIncognito={collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET')}
-                  />
-                </Container>
-              )}
-            </StyledInputField>
-          </Container>
-          <ContributeAsFAQ mt={4} ml={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
-        </Flex>
-      );
-    } else if (step.name === 'details') {
-      return (
-        <Flex justifyContent="center" width={1}>
-          <Box width={[0, null, null, 1 / 5]} />
-          <Container
-            as="form"
-            onSubmit={e => e.preventDefault()}
-            ref={this.activeFormRef}
-            mx={5}
-            width={[0.95, null, 3 / 5]}
-            maxWidth="465px"
-          >
-            <H5 textAlign="left" mb={3}>
-              <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
-            </H5>
-            <StepDetails
-              amountOptions={this.props.fixedAmount ? null : this.getAmountsPresets()}
-              currency={this.getCurrency()}
-              onChange={this.updateDetails}
-              tierName={tier ? tier.name : ''}
-              collectiveSlug={collective.slug}
-              platformFee={get(stepDetails, 'platformFee')}
-              interval={interval}
-              amount={typeof stepDetails?.amount !== 'undefined' ? stepDetails.amount : defaultStepDetails.amount}
-              quantity={get(stepDetails, 'quantity') || defaultStepDetails.quantity}
-              changeIntervalWarning={Boolean(tier)}
-              disabledInterval={Boolean(this.props.fixedInterval)}
-              disabledAmount={this.isFixedContribution()}
-              minAmount={this.getOrderMinAmount()}
-              maxQuantity={get(tier, 'stats.availableQuantity') || get(tier, 'maxQuantity')}
-              showQuantity={tier && tier.type === 'TICKET'}
-              showInterval={tier && tier.type !== 'TICKET'}
-              customFields={customFields}
-              customData={customData}
-              onCustomFieldsChange={this.handleCustomFieldsChange}
-            />
-            {showFeesOnTop && (
-              <Fragment>
-                <FeesOnTopContainer p={3} mt={3}>
-                  <Box maxWidth={['100%', '75%']}>
-                    <P fontSize="12px" my={2}>
-                      <FormattedMessage
-                        defaultMessage="Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to keep this possible!"
-                        id="platformFee.info"
-                      />
-                    </P>
-                  </Box>
-                  <Flex mt={3} flexDirection={['column', 'row']}>
-                    <Box maxWidth="50%">
-                      <P fontSize="12px" fontWeight="600" my={2}>
-                        <FormattedMessage
-                          defaultMessage="Thank you for supporting us with a contribution:"
-                          id="platformFee.support"
-                        />
-                      </P>
-                    </Box>
-                    <Flex flexGrow={1} flexDirection="column">
-                      <StyledSelect
-                        onChange={value => {
-                          this.setState(state => ({
-                            stepDetails: {
-                              ...state.stepDetails,
-                              platformFee: value,
-                            },
-                          }));
-                        }}
-                        value={stepDetails.platformFee}
-                        options={platformFeeOptions}
-                        my={2}
-                        width="100%"
-                      />
-                      <P fontSize="12px" color="colors.black.300" mt={1} textAlign="right">
-                        <FormattedMessage
-                          defaultMessage="Total contribution: {amount} {frequency}"
-                          id="platformFee.totalContribution"
-                          values={{
-                            amount: formatCurrency(
-                              get(this.state, 'stepDetails.amount') +
-                                get(this.state, 'stepDetails.platformFee.value') || 0, // Prevent displaying "Total contribution: €NaN"
-                              this.getCurrency(),
-                            ),
-                            frequency: stepDetails.interval ? `per ${stepDetails.interval}` : '',
-                          }}
-                        />
-                      </P>
-                    </Flex>
-                  </Flex>
-                  {stepDetails.platformFee?.isCustomAmount && (
-                    <Box>
-                      <StyledInputField
-                        label={this.props.intl.formatMessage(messages.platformFeeOther)}
-                        htmlFor="feesOnTopOtherAmount"
-                        name="feesOnTopOtherAmount"
-                        required
-                      >
-                        {fieldProps => (
-                          <StyledInputAmount
-                            {...fieldProps}
-                            type="number"
-                            currency={this.getCurrency()}
-                            min={100}
-                            value={stepDetails.platformFee.value}
-                            width={1}
-                            onChange={value => {
-                              this.setState(state => ({
-                                stepDetails: {
-                                  ...state.stepDetails,
-                                  platformFee: {
-                                    ...state.stepDetails.platformFee,
-                                    value: Math.round(value),
-                                  },
-                                },
-                              }));
-                            }}
-                            px="2px"
-                          />
-                        )}
-                      </StyledInputField>
-                    </Box>
-                  )}
-                </FeesOnTopContainer>
-                {taxDeductible && (
-                  <Box p={1} mt={2}>
-                    <P fontSize="13px" color="colors.black.300">
-                      <FormattedMessage
-                        defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contribution will be tax-deductible to the extent allowed by the law."
-                        id="platformFee.taxDeductible"
-                      />
-                    </P>
-                  </Box>
-                )}
-              </Fragment>
-            )}
-            {tier && tier.type === 'TICKET' && <EventDetails event={collective} tier={tier} />}
-          </Container>
-          {interval || isIncognito ? (
-            <ContributeDetailsFAQ
-              isIncognito={isIncognito}
-              hasInterval={!!interval}
-              mt={4}
-              display={['none', null, 'block']}
-              width={1 / 5}
-              minWidth="335px"
-            />
-          ) : (
-            <Box width={[0, null, null, 1 / 5]} />
-          )}
-        </Flex>
-      );
-    } else if (step.name === 'payment') {
-      if (get(stepDetails, 'totalAmount') === 0) {
-        return (
-          <MessageBox type="success" withIcon>
-            {tier.type === 'TICKET' ? (
-              <FormattedMessage
-                id="contribute.freeTicket"
-                defaultMessage="This is a free ticket, you can submit your order directly."
-              />
-            ) : (
-              <FormattedMessage
-                id="contribute.freeTier"
-                defaultMessage="This is a free tier, you can submit your order directly."
-              />
-            )}
-          </MessageBox>
-        );
-      } else {
-        return (
-          <Flex
-            flexDirection={['column', null, 'row']}
-            alignItems={['center', null, 'flex-start']}
-            justifyContent="center"
-            width={1}
-          >
-            <Box width={[0, null, null, 1 / 5]} />
-            <Flex flexDirection="column" width={[1, null, 3 / 5]} mx={[1, 3, 5]} css={{ maxWidth: 480 }}>
-              <H5 textAlign="left" mb={3}>
-                <FormattedMessage id="contribute.payment.label" defaultMessage="Choose a payment method:" />
-              </H5>
-              <StepPayment
-                onChange={stepPayment => this.setState({ stepPayment })}
-                collective={stepProfile}
-                defaultValue={stepPayment}
-                onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
-                withPaypal={this.hasPaypal()}
-                manual={this.getManualPaymentMethod()}
-                hideCreditCardPostalCode={this.shouldHideCreditCardPostalCode()}
-                margins="0 auto"
-                disabled={this.state.submitting || this.state.submitted}
-              />
-            </Flex>
-            <Container width={[0, null, null, 1 / 5]}>
-              {this.isFixedContribution() && (
-                <ContributionDetails
-                  totalAmount={get(stepDetails, 'totalAmount')}
-                  interval={interval}
-                  currency={this.getCurrency()}
-                  tax={this.state.stepSummary}
-                />
-              )}
-              {isIncognito && (
-                <ContributePaymentFAQ
-                  mt={4}
-                  display={['none', null, 'block']}
-                  width={1 / 5}
-                  minWidth="300px"
-                  maxWidth="370px"
-                  marginLeft="8px"
-                />
-              )}
-            </Container>
-          </Flex>
-        );
-      }
-    } else if (step.name === 'summary') {
-      return (
-        <Flex
-          flexDirection={['column', null, 'row']}
-          alignItems={['center', null, 'flex-start']}
-          justifyContent="center"
-          width={1}
-        >
-          <Container width={[0, null, null, 1 / 5]} />
-          <Container width={[1, null, 3 / 5]} mx={[1, 3, 5]} maxWidth={480}>
-            <H5 textAlign="left" mb={3}>
-              <FormattedMessage id="contribute.summary.breakdown" defaultMessage="Contribution breakdown:" />
-            </H5>
-            <StepBreakdown
-              amount={get(stepDetails, 'totalAmount')}
-              quantity={get(stepDetails, 'quantity')}
-              currency={this.getCurrency()}
-              hostFeePercent={collective.hostFeePercent}
-              paymentMethod={get(stepPayment, 'paymentMethod')}
-              onChange={stepSummary => this.setState({ stepSummary })}
-              showFees={false}
-              tierType={get(tier, 'type')}
-              hostCountry={get(host, 'location.country')}
-              applyTaxes={true}
-              collectiveCountry={
-                get(collective.location, 'country') || get(collective, 'parentCollective.location.country')
-              }
-              userTaxInfo={
-                this.state.stepSummary || {
-                  countryISO: this.getContributingProfileCountry(),
-                  number: get(stepProfile, 'settings.VAT.number'),
-                }
-              }
-            />
-          </Container>
-          <ContributionDetails
-            totalAmount={get(stepDetails, 'totalAmount')}
-            interval={interval}
-            currency={this.getCurrency()}
-            tax={this.state.stepSummary}
-          />
-        </Flex>
-      );
+    const path = window.location.pathname;
+    if (window.location.search) {
+      return `${path}${window.location.search}&${stepDetailsParams.slice(1)}`;
+    } else {
+      return `${path}${stepDetailsParams}`;
     }
-
-    return null;
-  }
-
-  renderContent(step, goNext, goBack, isValidating) {
-    const { LoggedInUser, intl } = this.props;
-
-    if (!LoggedInUser) {
-      return (
-        <SignInOrJoinFree
-          defaultForm="create-account"
-          createPersonalProfileLabel={intl.formatMessage(messages.createUserLabel)}
-          createOrganizationProfileLabel={intl.formatMessage(messages.createOrgLabel)}
-        />
-      );
-    }
-
-    const isPaypal = get(this.state, 'stepPayment.paymentMethod.service') === 'paypal';
-    const canGoPrev = !this.state.submitting && !this.state.submitted && !isValidating;
-    return (
-      <Flex flexDirection="column" alignItems="center" mx={3} width={0.95} px={2}>
-        {this.renderStep(step)}
-        <Flex mt={[4, null, 5]} justifyContent="center" flexWrap="wrap">
-          {goBack && (
-            <PrevNextButton buttonStyle="standard" disabled={!canGoPrev} onClick={goBack}>
-              &larr; <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
-            </PrevNextButton>
-          )}
-          {isPaypal && step.isLastStep ? (
-            <PaypalButtonContainer>
-              <PayWithPaypalButton
-                host={this.props.host}
-                totalAmount={this.getTotalAmountWithTaxes()}
-                currency={this.getCurrency()}
-                style={{ size: 'responsive', height: 55 }}
-                onClick={() => this.setState({ submitting: true })}
-                onAuthorize={pm => this.submitOrder(pm)}
-                onCancel={() => this.setState({ submitting: false })}
-                onError={e => this.setState({ submitting: false, error: `PayPal error: ${e.message}` })}
-              />
-            </PaypalButtonContainer>
-          ) : (
-            <PrevNextButton
-              buttonStyle="primary"
-              onClick={goNext}
-              disabled={!goNext}
-              loading={this.state.submitting || this.state.submitted || isValidating}
-            >
-              {step.isLastStep ? (
-                <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />
-              ) : (
-                <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
-              )}{' '}
-              &rarr;
-            </PrevNextButton>
-          )}
-        </Flex>
-      </Flex>
-    );
-  }
+  };
 
   render() {
-    const { loadingLoggedInUser, LoggedInUser } = this.props;
-    const showFeesOnTop = this.canHaveFeesOnTop();
-
+    const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails } = this.props;
+    const { error, isSubmitted, isSubmitting } = this.state;
     return (
       <Steps
         steps={this.getSteps()}
         currentStepName={this.props.step}
         onStepChange={this.onStepChange}
-        onInvalidStep={this.onInvalidStep}
         onComplete={this.submitOrder}
+        skip={skipStepDetails ? ['details'] : null}
       >
-        {({ steps, currentStep, lastVisitedStep, goNext, goBack, goToStep, isValidating, isValidStep }) => (
-          <Flex data-cy="cf-content" flexDirection="column" alignItems="center" pt={2} pb={[4, 5]} px={0}>
-            {(loadingLoggedInUser || LoggedInUser) && (
-              <StepsProgressBox mb={[3, null, 4]} width={0.8}>
+        {({
+          steps,
+          currentStep,
+          lastVisitedStep,
+          goNext,
+          goBack,
+          goToStep,
+          prevStep,
+          nextStep,
+          isValidating,
+          isValidStep,
+        }) =>
+          !isValidStep ? (
+            <Loading />
+          ) : (
+            <Container
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              py={[3, 4, 5]}
+              mb={4}
+              data-cy="cf-content"
+              ref={this.mainContainerRef}
+            >
+              <Box px={[2, 3]} mb={4}>
+                <ContributionFlowHeader collective={collective} />
+              </Box>
+              <StepsProgressBox mb={3} width={[1.0, 0.8]}>
                 <ContributionFlowStepsProgress
                   steps={steps}
                   currentStep={currentStep}
@@ -1264,74 +525,214 @@ class CreateOrderPage extends React.Component {
                   stepProfile={this.state.stepProfile}
                   stepDetails={this.state.stepDetails}
                   stepPayment={this.state.stepPayment}
-                  submitted={this.state.submitted}
-                  loading={loadingLoggedInUser || this.state.loading || this.state.submitting}
-                  currency={this.getCurrency()}
-                  isFreeTier={this.getOrderMinAmount() === 0}
-                  showFeesOnTop={showFeesOnTop}
+                  stepSummary={this.state.stepSummary}
+                  isSubmitted={this.state.isSubmitted}
+                  loading={isValidating || isSubmitted || isSubmitting}
+                  currency={collective.currency}
+                  isFreeTier={this.getTierMinAmount(tier) === 0}
                 />
               </StepsProgressBox>
-            )}
-            {this.state.error && (
-              <MessageBox type="error" mb={3} mx={2} withIcon>
-                {this.state.error}
-              </MessageBox>
-            )}
-            {loadingLoggedInUser || !isValidStep ? (
-              <Loading />
-            ) : (
-              this.renderContent(currentStep, goNext, goBack, isValidating)
-            )}
-          </Flex>
-        )}
+              {/* main container */}
+              {loadingLoggedInUser ? (
+                <Loading />
+              ) : currentStep.name === STEPS.PROFILE &&
+                !LoggedInUser &&
+                !parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ? (
+                <SignInOrJoinFree
+                  defaultForm="create-account"
+                  redirect={this.getRedirectUrlForSignIn()}
+                  createPersonalProfileLabel={
+                    <FormattedMessage
+                      id="ContributionFlow.CreateUserLabel"
+                      defaultMessage="Contribute as an individual"
+                    />
+                  }
+                  createOrganizationProfileLabel={
+                    <FormattedMessage
+                      id="ContributionFlow.CreateOrganizationLabel"
+                      defaultMessage="Contribute as an organization"
+                    />
+                  }
+                />
+              ) : (
+                <Grid
+                  px={[2, 3]}
+                  gridTemplateColumns={[
+                    'minmax(200px, 600px)',
+                    null,
+                    '0fr minmax(300px, 600px) 1fr',
+                    '1fr minmax(300px, 600px) 1fr',
+                  ]}
+                >
+                  <Box />
+                  <Box as="form" onSubmit={e => e.preventDefault()} maxWidth="100%">
+                    {error && (
+                      <MessageBox type="error" withIcon mb={3}>
+                        {formatErrorMessage(this.props.intl, error)}
+                      </MessageBox>
+                    )}
+
+                    <ContributionFlowStepContainer
+                      collective={collective}
+                      tier={tier}
+                      mainState={this.state}
+                      onChange={data => this.setState(data)}
+                      step={currentStep}
+                      showFeesOnTop={this.canHaveFeesOnTop()}
+                      onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+                      defaultProfileSlug={this.props.contributeAs}
+                      taxes={this.getApplicableTaxes(collective, host, tier?.type)}
+                    />
+
+                    <Box mt={[4, 5]}>
+                      <ContributionFlowButtons
+                        goNext={goNext}
+                        goBack={goBack}
+                        step={currentStep}
+                        prevStep={prevStep}
+                        nextStep={nextStep}
+                        isRecurringContributionLoggedOut={Boolean(!LoggedInUser && this.state.stepDetails?.interval)}
+                        isValidating={isValidating || isSubmitted || isSubmitting}
+                        paypalButtonProps={this.getPaypalButtonProps()}
+                      />
+                    </Box>
+                  </Box>
+                  <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
+                    <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
+                      <SafeTransactionMessage />
+                      <Box mt={4}>
+                        <ContributionSummary collective={collective} stepDetails={this.state.stepDetails} />
+                      </Box>
+                      <ContributeFAQ mt={4} titleProps={{ mb: 2 }} />
+                    </Box>
+                  </Box>
+                </Grid>
+              )}
+            </Container>
+          )
+        }
       </Steps>
     );
   }
 }
 
-const submitOrderFieldsFragment = gql`
-  fragment SubmitOrderFields on OrderType {
+const orderSuccessHostFragment = gqlV2/* GraphQL */ `
+  fragment OrderSuccessHostFragment on Host {
     id
-    idV2
+    slug
+    settings
+    bankAccount {
+      id
+      name
+      data
+      type
+    }
+  }
+`;
+
+export const orderSuccessFragment = gqlV2/* GraphQL */ `
+  fragment OrderSuccessFragment on Order {
+    id
+    legacyId
     status
+    frequency
+    amount {
+      value
+      currency
+    }
+    platformContributionAmount {
+      value
+    }
+    tier {
+      id
+      name
+    }
+    membership {
+      id
+      publicMessage
+    }
+    fromAccount {
+      id
+      name
+    }
+    toAccount {
+      id
+      name
+      slug
+      tags
+      type
+      isHost
+      ... on AccountWithContributions {
+        contributors {
+          totalCount
+        }
+      }
+      ... on AccountWithHost {
+        host {
+          ...OrderSuccessHostFragment
+        }
+      }
+      ... on Organization {
+        host {
+          ...OrderSuccessHostFragment
+          ... on AccountWithContributions {
+            contributors {
+              totalCount
+            }
+          }
+        }
+      }
+    }
+  }
+  ${orderSuccessHostFragment}
+`;
+
+const orderResponseFragment = gqlV2/* GraphQL */ `
+  fragment OrderResponseFragment on OrderWithPayment {
+    order {
+      ...OrderSuccessFragment
+    }
     stripeError {
       message
       account
       response
     }
-    transactions {
-      id
-      idV2
-    }
   }
+  ${orderSuccessFragment}
 `;
 
-const createOrderMutation = gql`
-  mutation CreateOrder($order: OrderInputType!) {
-    createOrder(order: $order) {
-      ...SubmitOrderFields
+const addCreateOrderMutation = graphql(
+  gqlV2/* GraphQL */ `
+    mutation CreateOrder($order: OrderCreateInput!) {
+      createOrder(order: $order) {
+        ...OrderResponseFragment
+      }
     }
-  }
-  ${submitOrderFieldsFragment}
-`;
+    ${orderResponseFragment}
+  `,
+  {
+    name: 'createOrder',
+    options: { context: API_V2_CONTEXT },
+  },
+);
 
-const addCreateOrderMutation = graphql(createOrderMutation, {
-  name: 'createOrder',
-});
-
-const confirmOrderMutation = gql`
-  mutation ConfirmOrder($order: ConfirmOrderInputType!) {
-    confirmOrder(order: $order) {
-      ...SubmitOrderFields
+const addConfirmOrderMutation = graphql(
+  gqlV2/* GraphQL */ `
+    mutation CreateOrder($order: OrderReferenceInput!) {
+      confirmOrder(order: $order) {
+        ...OrderResponseFragment
+      }
     }
-  }
-  ${submitOrderFieldsFragment}
-`;
+    ${orderResponseFragment}
+  `,
+  {
+    name: 'confirmOrder',
+    options: { context: API_V2_CONTEXT },
+  },
+);
 
-const addConfirmOrderMutation = graphql(confirmOrderMutation, {
-  name: 'confirmOrder',
-});
-
-const addGraphql = compose(addCreateCollectiveMutation, addCreateOrderMutation, addConfirmOrderMutation);
-
-export default injectIntl(addGraphql(withUser(withStripeLoader(CreateOrderPage))));
+export default injectIntl(
+  withUser(
+    addSignupMutation(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(ContributionFlow)))),
+  ),
+);

@@ -2,8 +2,6 @@ import speakeasy from 'speakeasy';
 
 import { randomEmail } from '../support/faker';
 
-const isNewContributionFlow = Cypress.env('NEW_CONTRIBUTION_FLOW');
-
 const addTier = tier => {
   cy.get('.addTier').click();
 
@@ -122,11 +120,6 @@ describe('edit collective', () => {
     cy.get(tierCardSelector).first().contains('$5 USD / month');
     cy.get(tierCardSelector).should('have.length', 4).last().should('contain', 'Priority Support');
     cy.get(tierCardSelector).first().find('[data-cy="contribute-btn"]').click();
-
-    if (!isNewContributionFlow) {
-      // Skip the step profile on the old contribution flow
-      cy.contains('button', 'Next step', { timeout: 20000 }).click();
-    }
 
     // Ensure the new tiers are properly displayed on order form
     cy.get('#interval').contains('Monthly');

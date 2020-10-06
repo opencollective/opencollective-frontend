@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import MessageBox from '../../components/MessageBox';
+import MessageBox from '../MessageBox';
 
 const NewContributionFlowStepProfileInfoMessage = ({ amount }) => {
   const renderInfoMessage = amount => {

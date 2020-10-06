@@ -69,7 +69,7 @@ wait_for_service IMAGES 127.0.0.1 3001
 
 echo ""
 echo "> Running cypress tests"
-npx cypress run ${CYPRESS_RECORD} --env NEW_CONTRIBUTION_FLOW=$NEW_CONTRIBUTION_FLOW
+npx cypress run ${CYPRESS_RECORD}
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then
   echo "Error with cypress e2e tests, exiting"

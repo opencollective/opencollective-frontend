@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { orderBy } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import Avatar from '../../components/Avatar';
-import { Box, Flex } from '../../components/Grid';
-import StyledRadioList from '../../components/StyledRadioList';
-import { P } from '../../components/Text';
+import Avatar from '../Avatar';
+import { Box, Flex } from '../Grid';
+import StyledRadioList from '../StyledRadioList';
+import { P } from '../Text';
 
 import CreateOrganizationForm from './CreateOrganizationForm';
 

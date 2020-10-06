@@ -25,7 +25,6 @@ env:
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
   TERM: xterm
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  NEW_CONTRIBUTION_FLOW: ${{ contains(github.ref, 'new-cf') }}
 
 jobs:
   e2e:

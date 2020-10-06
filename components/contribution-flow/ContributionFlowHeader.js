@@ -2,11 +2,11 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import Avatar, { ContributorAvatar } from '../../components/Avatar';
-import Container from '../../components/Container';
-import { Box, Flex } from '../../components/Grid';
-import { H1, P } from '../../components/Text';
-import { withUser } from '../../components/UserProvider';
+import Avatar, { ContributorAvatar } from '../Avatar';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import { H1, P } from '../Text';
+import { withUser } from '../UserProvider';
 
 class NewContributionFlowHeader extends React.Component {
   static propTypes = {

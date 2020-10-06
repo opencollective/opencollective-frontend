@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import Container from '../../components/Container';
-import { Box, Flex } from '../../components/Grid';
-import { getI18nLink } from '../../components/I18nFormatters';
-import InputTypeCountry from '../../components/InputTypeCountry';
-import Link from '../../components/Link';
-import StyledHr from '../../components/StyledHr';
-import StyledInput from '../../components/StyledInput';
-import StyledInputField from '../../components/StyledInputField';
-import StyledLink from '../../components/StyledLink';
-import StyledTextarea from '../../components/StyledTextarea';
-import { P } from '../../components/Text';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
+import InputTypeCountry from '../InputTypeCountry';
+import Link from '../Link';
+import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
+import StyledLink from '../StyledLink';
+import StyledTextarea from '../StyledTextarea';
+import { P } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
 

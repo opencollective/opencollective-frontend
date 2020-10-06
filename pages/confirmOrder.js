@@ -12,10 +12,6 @@ import Container from '../components/Container';
 import MessageBox from '../components/MessageBox';
 import { withUser } from '../components/UserProvider';
 
-/**
- * Main contribution flow entrypoint. Render all the steps from contributeAs
- * to payment.
- */
 class ConfirmOrderPage extends React.Component {
   static getInitialProps({ query }) {
     return { id: parseInt(query.id) };
