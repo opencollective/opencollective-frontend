@@ -149,19 +149,24 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
                           <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
                         </Span>
                       </StyledButton>
-                      <StyledButton
-                        buttonSize="tiny"
-                        minWidth={120}
-                        mt={2}
-                        onClick={event => {
-                          event.stopPropagation();
-                          setshowModal(true);
-                        }}
-                      >
-                        <Span ml={2} css={{ verticalAlign: 'center' }}>
-                          <FormattedMessage id="HeroAvatar.Remove" defaultMessage="Remove logo" />
-                        </Span>
-                      </StyledButton>
+                      {!(
+                        collective.imageUrl.includes(`/${collective.slug}/logo`) ||
+                        collective.imageUrl.includes(`/${collective.slug}/avatar`)
+                      ) && (
+                        <StyledButton
+                          buttonSize="tiny"
+                          minWidth={120}
+                          mt={2}
+                          onClick={event => {
+                            event.stopPropagation();
+                            setshowModal(true);
+                          }}
+                        >
+                          <Span ml={2} css={{ verticalAlign: 'center' }}>
+                            <FormattedMessage id="HeroAvatar.Remove" defaultMessage="Remove logo" />
+                          </Span>
+                        </StyledButton>
+                      )}
                     </Box>
                   )}
                   {isDragActive &&
@@ -187,7 +192,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
             onClose={() => {
               setshowModal(false);
             }}
-            header={<FormattedMessage id="heroavtar.remove" defaultMessage="Remove Logo?" />}
+            header={<FormattedMessage id="HeroAvatar.Remove" defaultMessage="Remove logo" />}
             continueHandler={async () => {
               setSubmitting(true); // Need this because `upload` is not a graphql function
 
