@@ -361,6 +361,12 @@ const StepSummary = ({
         <React.Fragment>
           <AmountLine my={3}>
             <Label fontWeight="bold">
+              <FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />
+            </Label>
+            <Span fontSize="16px">{quantity}</Span>
+          </AmountLine>
+          <AmountLine my={3}>
+            <Label fontWeight="bold">
               <FormattedMessage id="contribution.itemPrice" defaultMessage="Item price" />
             </Label>
             <Span fontSize="16px">
@@ -370,12 +376,6 @@ const StepSummary = ({
                 <FormattedMessage id="Amount.Free" defaultMessage="Free" />
               )}
             </Span>
-          </AmountLine>
-          <AmountLine my={3}>
-            <Label fontWeight="bold">
-              <FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />
-            </Label>
-            <Span fontSize="16px">{quantity}</Span>
           </AmountLine>
         </React.Fragment>
       )}

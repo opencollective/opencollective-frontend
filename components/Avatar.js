@@ -67,7 +67,7 @@ Avatar.propTypes = {
   /** Collective type */
   type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   /** Avatar size */
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** Duration to transition size. Disabled if 0, null or undefined */
   animationDuration: PropTypes.number,
 };
@@ -92,7 +92,7 @@ ContributorAvatar.propTypes = {
     isIncognito: PropTypes.bool,
     type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   }).isRequired,
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 };
 
 /** A simple avatar for incognito users */

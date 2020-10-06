@@ -181,7 +181,18 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           </StyledInputField>
         </Box>
       )}
-
+      {hostIsTaxDeductibeInTheUs(collective.host) && (
+        <React.Fragment>
+          <StyledHr borderColor="black.300" mb={16} mt={32} />
+          <P fontSize="14px" lineHeight="20px" fontStyle="italic" color="black.500" letterSpacing="0em">
+            <FormattedMessage
+              id="platformFee.taxDeductible"
+              defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contribution will be tax-deductible to the extent allowed by the law."
+            />
+          </P>
+          <StyledHr borderColor="black.300" mt={16} mb={32} />
+        </React.Fragment>
+      )}
       {showFeesOnTop && (
         <Box mt={28}>
           <FeesOnTopInput
@@ -192,17 +203,6 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             onChange={value => dispatchChange('platformContribution', value)}
           />
         </Box>
-      )}
-      {hostIsTaxDeductibeInTheUs(collective.host) && (
-        <React.Fragment>
-          <StyledHr borderColor="black.300" mb={2} mt={24} />
-          <P fontSize="11px" lineHeight="16px" fontStyle="italic" color="black.600">
-            <FormattedMessage
-              id="platformFee.taxDeductible"
-              defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contribution will be tax-deductible to the extent allowed by the law."
-            />
-          </P>
-        </React.Fragment>
       )}
       {tier?.customFields && (
         <Box mt={28}>

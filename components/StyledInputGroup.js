@@ -156,7 +156,7 @@ const StyledInputGroup = ({
           </Container>
         )}
       </InputContainer>
-      {error && typeof error !== 'boolean' && (
+      {Boolean(error) && typeof error !== 'boolean' && (
         <Span display="block" color="red.500" pt={2} fontSize="10px">
           {error}
         </Span>
