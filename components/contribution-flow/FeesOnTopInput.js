@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import INTERVALS from '../../lib/constants/intervals';
 import { formatCurrency } from '../../lib/currency-utils';
 
-import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledSelect from '../StyledSelect';
@@ -42,7 +41,7 @@ const getOptions = (amount, currency) => {
       return getOptionFromPercentage(amount, currency, percentage);
     }),
     {
-      label: <FormattedMessage id="platformFee.noContribution" defaultMessage="I don't want to contribute" />,
+      label: <FormattedMessage id="NoThankYou" defaultMessage="No, thank you" />,
       value: 0,
     },
     {
@@ -52,7 +51,7 @@ const getOptions = (amount, currency) => {
   ];
 };
 
-const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
+const FeesOnTopInput = ({ currency, amount, fees, onChange }) => {
   const options = React.useMemo(() => getOptions(amount, currency), [amount, currency]);
   const [selectedOption, setSelectedOption] = React.useState(options[1]);
   const [isReady, setReady] = React.useState(false);
@@ -83,7 +82,7 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
 
   return (
     <div>
-      <P fontSize="14px" lineHeight="21px" color="black.900" my={32}>
+      <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
         <FormattedMessage
           id="platformFee.info"
           defaultMessage="Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to keep this possible!"
@@ -93,10 +92,7 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
         <Flex alignItems="center">
           <Illustration />
           <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
-            <FormattedMessage
-              id="platformFee.support"
-              defaultMessage="Thank you for supporting us with a contribution:"
-            />
+            <FormattedMessage id="platformFee.thankYou" defaultMessage="Thank you for your contribution:" />
           </P>
         </Flex>
         <StyledSelect
@@ -115,22 +111,6 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
           <StyledInputAmount id="feesOnTop" currency={currency} onChange={onChange} value={fees} />
         </Flex>
       )}
-      <P fontSize="12px" lineHeight="18px" color="black.500" fontWeight="500" mt={2} textAlign={['left', 'right']}>
-        <FormattedMessage
-          defaultMessage="Total contribution: {amount}"
-          id="TotalContribution"
-          values={{
-            amount: (
-              <FormattedMoneyAmount
-                amount={amount + fees}
-                currency={currency}
-                interval={interval}
-                amountStyles={null}
-              />
-            ),
-          }}
-        />
-      </P>
     </div>
   );
 };

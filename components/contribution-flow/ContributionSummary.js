@@ -11,6 +11,8 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
+import { getTotalAmount } from './utils';
+
 const AmountLine = styled.div`
   display: flex;
   justify-content: space-between;
@@ -29,7 +31,7 @@ const Label = styled.span`
   color: inherit;
 `;
 
-const ContributionSummary = ({ collective, stepDetails }) => {
+const ContributionSummary = ({ collective, stepDetails, stepSummary }) => {
   return (
     <Container fontSize="12px">
       <P fontWeight="500" fontSize="inherit" mb={3}>
@@ -51,7 +53,7 @@ const ContributionSummary = ({ collective, stepDetails }) => {
           />
         </span>
       </AmountLine>
-      {stepDetails?.platformContribution && (
+      {Boolean(stepDetails?.platformContribution) && (
         <AmountLine color="black.700">
           <Label>
             <FormattedMessage
@@ -75,7 +77,11 @@ const ContributionSummary = ({ collective, stepDetails }) => {
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Span fontWeight="700">
-          <FormattedMoneyAmount amount={stepDetails?.amount} currency={collective.currency} amountStyles={null} />
+          <FormattedMoneyAmount
+            amount={getTotalAmount(stepDetails, stepSummary)}
+            currency={collective.currency}
+            amountStyles={null}
+          />
         </Span>
       </AmountLine>
       <StyledHr borderColor="black.500" my={1} />
@@ -104,6 +110,7 @@ const ContributionSummary = ({ collective, stepDetails }) => {
 ContributionSummary.propTypes = {
   collective: PropTypes.object,
   stepDetails: PropTypes.object,
+  stepSummary: PropTypes.object,
 };
 
 export default ContributionSummary;

@@ -237,10 +237,12 @@ class ContributionFlow extends React.Component {
   }
 
   /** Validate step profile, create new incognito/org if necessary */
-  validateStepProfile = async () => {
+  validateStepProfile = async action => {
     const { stepProfile } = this.state;
+
+    // Can only ignore validation if going back
     if (!stepProfile) {
-      return false;
+      return action === 'prev';
     }
 
     // Check if we're creating a new profile
@@ -601,7 +603,11 @@ class ContributionFlow extends React.Component {
                     <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
                       <SafeTransactionMessage />
                       <Box mt={4}>
-                        <ContributionSummary collective={collective} stepDetails={this.state.stepDetails} />
+                        <ContributionSummary
+                          collective={collective}
+                          stepDetails={this.state.stepDetails}
+                          stepSummary={this.state.stepSummary}
+                        />
                       </Box>
                       <ContributeFAQ mt={4} titleProps={{ mb: 2 }} />
                     </Box>
