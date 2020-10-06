@@ -89,11 +89,7 @@ const Policies = ({ collective }) => {
   const error = categoriesError || policiesError;
 
   // Data and data handling
-  const collectiveContributionFilteringCategories = get(
-    data,
-    'account.settings.moderation.rejectedContributionCategories',
-    null,
-  );
+  const collectiveContributionFilteringCategories = get(data, 'account.settings.moderation.rejectedCategories', null);
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
   const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
 
@@ -139,7 +135,7 @@ const Policies = ({ collective }) => {
             legacyId: collective.id,
           },
           key: 'moderation',
-          value: { rejectedContributionCategories: selectedRejectCategories },
+          value: { rejectedCategories: selectedRejectCategories },
         },
       });
     },
