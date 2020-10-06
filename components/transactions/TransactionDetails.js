@@ -71,7 +71,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     permissions,
     order,
     expense,
-    isRejected,
+    isOrderRejected,
   } = transaction;
   const isCredit = type === TransactionTypes.CREDIT;
   const hasOrder = order !== null;
@@ -81,7 +81,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
   const showRejectContribution =
     parseToBoolean(getEnvVar('REJECT_CONTRIBUTION')) || collectiveHasRejectContributionFeature;
   const showRefundButton = permissions?.canRefund && !isRefunded;
-  const showRejectButton = permissions?.canReject && !isRejected && showRejectContribution;
+  const showRejectButton = permissions?.canReject && !isOrderRejected && showRejectContribution;
   const showDownloadInvoiceButton = !showRefundButton && permissions?.canDownloadInvoice;
 
   return (
@@ -168,7 +168,7 @@ TransactionDetails.propTypes = {
   displayActions: PropTypes.bool,
   transaction: PropTypes.shape({
     isRefunded: PropTypes.bool,
-    isRejected: PropTypes.bool,
+    isOrderRejected: PropTypes.bool,
     fromAccount: PropTypes.shape({
       id: PropTypes.string,
       slug: PropTypes.string.isRequired,

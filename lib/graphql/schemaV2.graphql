@@ -2486,7 +2486,7 @@ type Credit implements Transaction {
   Account that emitted the gift card used for this transaction (if any)
   """
   giftCardEmitterAccount: Account
-  isRejected: Boolean!
+  isOrderRejected: Boolean!
   refundTransaction: Transaction
   fromAccount: Account
   toAccount: Account
@@ -2676,7 +2676,7 @@ type Debit implements Transaction {
   Account that emitted the gift card used for this transaction (if any)
   """
   giftCardEmitterAccount: Account
-  isRejected: Boolean!
+  isOrderRejected: Boolean!
   refundTransaction: Transaction
   fromAccount: Account
   toAccount: Account
@@ -5007,6 +5007,11 @@ enum OrderTaxType {
   European Value Added Tax
   """
   VAT
+
+  """
+  New Zealand Good and Services Tax
+  """
+  GST
 }
 
 type OrderWithPayment {
@@ -6050,7 +6055,7 @@ interface Transaction {
   isRefund: Boolean
   paymentMethod: PaymentMethod
   permissions: TransactionPermissions
-  isRejected: Boolean!
+  isOrderRejected: Boolean!
   refundTransaction: Transaction
 }
 
