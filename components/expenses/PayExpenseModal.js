@@ -34,10 +34,6 @@ const PAYOUT_ACTION_TYPE = defineMessages({
     id: 'Expense.PayAuto',
     defaultMessage: '{payoutMethodLabel} (Automatic)',
   },
-  schedule: {
-    id: 'Expense.ScheduleForPayment',
-    defaultMessage: '{payoutMethodLabel} (Schedule for Payout)',
-  },
 });
 
 const getPayoutLabel = (intl, type) => {
@@ -49,27 +45,23 @@ const generatePayoutOptions = (intl, payoutMethodType, host) => {
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return [{ label: payoutMethodLabel, value: { forceManual: true, action: 'PAY' } }];
   } else {
-    const defaultTypes = [
+    const automaticAction =
+      hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
+      payoutMethodType === PayoutMethodType.PAYPAL &&
+      host.supportedPayoutMethods?.includes('PAYPAL')
+        ? 'SCHEDULE_FOR_PAYMENT'
+        : 'PAY';
+
+    return [
       {
         label: intl.formatMessage(PAYOUT_ACTION_TYPE.auto, { payoutMethodLabel }),
-        value: { forceManual: false, action: 'PAY' },
+        value: { forceManual: false, action: automaticAction },
       },
       {
         label: intl.formatMessage(PAYOUT_ACTION_TYPE.manual, { payoutMethodLabel }),
         value: { forceManual: true, action: 'PAY' },
       },
     ];
-    if (
-      hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
-      payoutMethodType === PayoutMethodType.PAYPAL &&
-      host.supportedPayoutMethods?.includes('PAYPAL')
-    ) {
-      defaultTypes.unshift({
-        label: intl.formatMessage(PAYOUT_ACTION_TYPE.schedule, { payoutMethodLabel }),
-        value: { action: 'SCHEDULE_FOR_PAYMENT' },
-      });
-    }
-    return defaultTypes;
   }
 };
 

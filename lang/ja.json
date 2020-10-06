@@ -772,7 +772,6 @@
   "Expense.RequestDetails": "Request Details",
   "Expense.SaveChanges": "変更を保存",
   "expense.scheduledForPayment": "Scheduled for payment",
-  "Expense.ScheduleForPayment": "{payoutMethodLabel} (Schedule for Payout)",
   "expense.status": "Status",
   "Expense.SubmittedBy": "Submitted by {name}",
   "Expense.SubmittedByOnDate": "Submitted by {name} on {date, date, long}",

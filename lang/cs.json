@@ -772,7 +772,6 @@
   "Expense.RequestDetails": "Request Details",
   "Expense.SaveChanges": "Uložit změny",
   "expense.scheduledForPayment": "Scheduled for payment",
-  "Expense.ScheduleForPayment": "{payoutMethodLabel} (Schedule for Payout)",
   "expense.status": "Status",
   "Expense.SubmittedBy": "Odeslal/a {name}",
   "Expense.SubmittedByOnDate": "Odeslal/a {name} {date, date, long}",
