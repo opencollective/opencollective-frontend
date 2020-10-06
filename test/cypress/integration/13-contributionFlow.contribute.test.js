@@ -81,7 +81,7 @@ describe('Contribution Flow: Order', () => {
 
           // Frequency must not be disabled
           cy.contains('#interval button').should('not.be.disabled');
-          cy.contains('Next charge: Jun 1, 2042');
+          cy.contains('Next charge on June 1, 2042');
           cy.contains('Next step').click();
 
           // ---- Step Profile ----
@@ -130,7 +130,7 @@ describe('Contribution Flow: Order', () => {
 
           // Details
           cy.contains('#interval button').should('not.be.disabled');
-          cy.contains('Next charge: Jun 1, 2042');
+          cy.contains('Next charge on June 1, 2042');
           cy.get('#amount > :nth-child(1)').click();
           cy.getByDataCy('cf-next-step').click();
 
@@ -239,7 +239,7 @@ describe('Contribution Flow: Order', () => {
 
           // Frequency must not be disabled
           cy.get('#interval input').should('exist');
-          cy.contains('Next charge: Jun 1, 2042');
+          cy.contains('Next charge on June 1, 2042');
           cy.contains('Next step').click();
 
           // ---- Step 3: Payment ----
@@ -278,7 +278,7 @@ describe('Contribution Flow: Order', () => {
 
             cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
             cy.get('#interval input').should('exist');
-            cy.contains('Next charge: Jun 1, 2042');
+            cy.contains('Next charge on June 1, 2042');
             cy.get('#amount > :nth-child(1)').click();
             cy.contains('Next step').click();
             cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });

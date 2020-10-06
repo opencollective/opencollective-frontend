@@ -83,7 +83,7 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
 
   return (
     <div>
-      <P fontSize="14px" lineHeight="21px" color="black.900" mb={3}>
+      <P fontSize="14px" lineHeight="21px" color="black.900" my={32}>
         <FormattedMessage
           id="platformFee.info"
           defaultMessage="Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to keep this possible!"

@@ -110,6 +110,7 @@ const StyledInputGroup = ({
             px={2}
             color={getColor({ error, success })}
             maxHeight="100%"
+            whiteSpace="nowrap"
             {...prependProps}
             bg={(disabled && 'black.50') || get(prependProps, 'bg') || getBgColor({ error, focused, success })}
           >

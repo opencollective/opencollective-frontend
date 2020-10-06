@@ -5,7 +5,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import Avatar, { ContributorAvatar } from '../../components/Avatar';
 import Container from '../../components/Container';
 import { Box, Flex } from '../../components/Grid';
-import { H3, P } from '../../components/Text';
+import { H1, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
 class NewContributionFlowHeader extends React.Component {
@@ -32,38 +32,42 @@ class NewContributionFlowHeader extends React.Component {
     const contributors = collective.contributors?.nodes;
 
     return (
-      <Flex flexDirection="column" alignItems="center" maxWidth={500}>
-        <Avatar collective={collective} radius={65} />
-        <H3 textAlign="center" fontWeight={500} py={2}>
-          <FormattedMessage
-            id="CreateOrder.Title"
-            defaultMessage="Contribute to {collective}"
-            values={{ collective: collective.name }}
-          />
-        </H3>
-        {contributors?.length > 0 && (
-          <Fragment>
-            <P fontSize="16px" lineHeight="24px" fontWeight={400} color="black.500" py={2}>
-              <FormattedMessage
-                id="NewContributionFlow.Join"
-                defaultMessage="Join {numberOfContributors} other fellow contributors"
-                values={{ numberOfContributors: collective.contributors.totalCount }}
-              />
-            </P>
-            <Flex py={2} alignItems="center">
-              {contributors.map(contributor => (
-                <Box key={contributor.id} mx={1}>
-                  <ContributorAvatar contributor={contributor} radius={24} />
-                </Box>
-              ))}
-              {collective.contributors.totalCount > contributors.length && (
-                <Container fontSize="12px" color="black.600">
-                  + {collective.contributors.totalCount - contributors.length}
-                </Container>
-              )}
-            </Flex>
-          </Fragment>
-        )}
+      <Flex flexDirection={['column', null, 'row']} alignItems="center" maxWidth={500}>
+        <Box mx={3}>
+          <Avatar collective={collective} radius={[65, null, 96]} />
+        </Box>
+        <div>
+          <H1 textAlign="center" fontSize={['28px', null, '32px']} lineHeight="40px" fontWeight={500}>
+            <FormattedMessage
+              id="CreateOrder.Title"
+              defaultMessage="Contribute to {collective}"
+              values={{ collective: collective.name }}
+            />
+          </H1>
+          {contributors?.length > 0 && (
+            <Fragment>
+              <P fontSize="16px" lineHeight="24px" fontWeight={400} color="black.500" py={2}>
+                <FormattedMessage
+                  id="NewContributionFlow.Join"
+                  defaultMessage="Join {numberOfContributors} other fellow contributors"
+                  values={{ numberOfContributors: collective.contributors.totalCount }}
+                />
+              </P>
+              <Flex alignItems="center">
+                {contributors.map(contributor => (
+                  <Box key={contributor.id} mx={1}>
+                    <ContributorAvatar contributor={contributor} radius={24} />
+                  </Box>
+                ))}
+                {collective.contributors.totalCount > contributors.length && (
+                  <Container fontSize="12px" color="black.600">
+                    + {collective.contributors.totalCount - contributors.length}
+                  </Container>
+                )}
+              </Flex>
+            </Fragment>
+          )}
+        </div>
       </Flex>
     );
   }

@@ -1,23 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Calendar } from '@styled-icons/feather/Calendar';
-import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { isNil } from 'lodash';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
-import { getNextChargeDate } from '../../lib/date-utils';
+import { formatCurrency } from '../../lib/currency-utils';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 import { Router } from '../../server/pages';
 
 import { Box, Flex } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
+import StyledInputAmount from '../../components/StyledInputAmount';
 import StyledInputField from '../../components/StyledInputField';
 
-import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import StyledAmountPicker from '../StyledAmountPicker';
+import StyledAmountPicker, { OTHER_AMOUNT_KEY } from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
@@ -29,8 +29,12 @@ import { getTotalAmount } from './utils';
 
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
   const intl = useIntl();
-  const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
+  const amount = data?.amount;
+  const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
   const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
+  const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
+  const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
+  const minAmount = getTierMinAmount(tier);
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
   const dispatchChange = (field, value) => {
@@ -39,15 +43,79 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
 
   return (
     <Box width={1}>
+      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && (
+        <StyledButtonSet
+          id="interval"
+          justifyContent="center"
+          mt={[4, 0]}
+          mb="30px"
+          items={[null, INTERVALS.month, INTERVALS.year]}
+          selected={data?.interval || null}
+          buttonProps={{ px: 2, py: '5px' }}
+          onChange={interval => {
+            if (tier) {
+              setTemporaryInterval(interval);
+            } else {
+              dispatchChange('interval', interval);
+            }
+          }}
+        >
+          {({ item, isSelected }) => (
+            <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
+              {i18nInterval(intl, item || INTERVALS.oneTime)}
+            </Span>
+          )}
+        </StyledButtonSet>
+      )}
+
       {!isFixedContribution ? (
-        <Box mb={3}>
+        <Box mb="30px">
           <StyledAmountPicker
             currency={collective.currency}
             presets={presets}
-            min={getTierMinAmount(tier)}
-            value={data?.amount}
-            onChange={amount => dispatchChange('amount', amount)}
+            otherAmountDisplay="button"
+            value={isOtherAmountSelected ? OTHER_AMOUNT_KEY : data?.amount}
+            onChange={value => {
+              console.log('CHANGE');
+              if (value === OTHER_AMOUNT_KEY) {
+                setOtherAmountSelected(true);
+              } else {
+                setOtherAmountSelected(false);
+                dispatchChange('amount', value);
+              }
+            }}
           />
+          {isOtherAmountSelected && (
+            <Flex justifyContent="space-between" alignItems="center" mt={2}>
+              <StyledInputAmount
+                name="custom-amount"
+                type="number"
+                currency={collective.currency}
+                value={data?.amount || null}
+                placeholder="---"
+                width={1}
+                min={minAmount}
+                currencyDisplay="full"
+                prependProps={{ color: 'black.500' }}
+                required
+                onChange={value => {
+                  dispatchChange('amount', value);
+                }}
+              />
+              {Boolean(minAmount) && (
+                <Flex fontSize="14px" color="black.800" flexDirection="column" alignItems="flex-end" mt={1}>
+                  <FormattedMessage
+                    id="contribution.minimumAmount"
+                    defaultMessage="The minimum amount is: {minAmount} {currency}"
+                    values={{
+                      minAmount: formatCurrency(minAmount, collective.currency),
+                      currency: collective.currency,
+                    }}
+                  />
+                </Flex>
+              )}
+            </Flex>
+          )}
         </Box>
       ) : tier.amount.valueInCents ? (
         <Box mb={3}>
@@ -68,12 +136,12 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
       ) : null}
 
       {hasQuantity && (
-        <Box mb={3}>
+        <Box mb="30px">
           <StyledInputField
             htmlFor="quantity"
             label={<FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />}
-            labelFontSize="20px"
-            labelColor="black.700"
+            labelFontSize="16px"
+            labelColor="black.800"
             labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
             error={Boolean(tier.availableQuantity !== null && data?.quantity > tier.availableQuantity)}
             required
@@ -105,8 +173,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
                   value={data?.quantity}
                   maxWidth={80}
                   onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
-                  fontSize="20px"
-                  lineHeight="26px"
+                  fontSize="15px"
                   minWidth={100}
                 />
               </div>
@@ -114,41 +181,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           </StyledInputField>
         </Box>
       )}
-      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && (
-        <StyledInputField
-          label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
-          htmlFor="interval"
-          css={{ flexGrow: 1 }}
-          labelFontSize="20px"
-          labelColor="black.700"
-          labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
-          mb={3}
-        >
-          {fieldProps => (
-            <StyledButtonSet
-              {...fieldProps}
-              justifyContent="center"
-              mt={[4, 0]}
-              items={[null, INTERVALS.month, INTERVALS.year]}
-              selected={data?.interval || null}
-              buttonProps={{ px: 2, py: 1 }}
-              onChange={interval => {
-                if (tier) {
-                  setTemporaryInterval(interval);
-                } else {
-                  dispatchChange('interval', interval);
-                }
-              }}
-            >
-              {({ item, isSelected }) => (
-                <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
-                  {i18nInterval(intl, item || INTERVALS.oneTime)}
-                </Span>
-              )}
-            </StyledButtonSet>
-          )}
-        </StyledInputField>
-      )}
+
       {showFeesOnTop && (
         <Box mt={28}>
           <FeesOnTopInput
@@ -159,36 +192,6 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             onChange={value => dispatchChange('platformContribution', value)}
           />
         </Box>
-      )}
-      {data.interval && (
-        <Flex width="100%" justifyContent="flex-end" mt={3}>
-          <Flex bg="#F7F8FA" p="2px 8px">
-            <Flex alignItems="center" mr={3}>
-              <Calendar size={16} color="#9D9FA3" />
-            </Flex>
-            <Container color="black.500">
-              <P fontSize="12px" lineHeight="18px" mb="4px">
-                <Span>
-                  <FormattedMessage id="contribution.subscription.first.label" defaultMessage="First charge:" />
-                </Span>{' '}
-                <Span color="primary.500" fontWeight="500">
-                  <FormattedMessage id="contribution.subscription.today" defaultMessage="Today" />
-                </Span>
-              </P>
-              <P fontSize="12px" lineHeight="18px">
-                <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />{' '}
-                <Span color="primary.500" fontWeight="500">
-                  <FormattedDate
-                    value={getNextChargeDate(new Date(), data.interval)}
-                    day="numeric"
-                    month="short"
-                    year="numeric"
-                  />
-                </Span>
-              </P>
-            </Container>
-          </Flex>
-        </Flex>
       )}
       {hostIsTaxDeductibeInTheUs(collective.host) && (
         <React.Fragment>

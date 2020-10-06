@@ -38,6 +38,7 @@ import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowStepContainer from './ContributionFlowStepContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
+import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
 import SafeTransactionMessage from './SafeTransactionMessage';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
@@ -629,6 +630,9 @@ class ContributionFlow extends React.Component {
                   <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
                     <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
                       <SafeTransactionMessage />
+                      <Box mt={4}>
+                        <ContributionSummary collective={collective} stepDetails={this.state.stepDetails} />
+                      </Box>
                       <NewContributeFAQ mt={4} titleProps={{ mb: 2 }} />
                     </Box>
                   </Box>
