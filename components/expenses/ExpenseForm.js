@@ -243,20 +243,21 @@ const ExpenseFormBody = ({
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, handleChange, errors, setValues, dirty, touched } = formik;
+  const { values, handleChange, errors, setValues, dirty, touched, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const stepOneCompleted =
-    values.type === expenseTypes.RECEIPT
-      ? values.payoutMethod
-      : values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address;
-  const stepTwoCompleted = stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
+  const stepOneCompleted =
+    values.payoutMethod &&
+    isEmpty(errors.payoutMethod) &&
+    (isReceipt ? true : values.payeeLocation?.country && values.payeeLocation?.address);
+  const stepTwoCompleted = stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
+  const requiresAddress = [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
+
   const [step, setStep] = React.useState(stepOneCompleted ? STEPS.EXPENSE : STEPS.PAYEE);
   const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee, collective), [values.payee]);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
-  const requiresAddress = [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
@@ -495,7 +496,14 @@ const ExpenseFormBody = ({
                 data-cy="expense-next"
                 buttonStyle="primary"
                 disabled={!stepOneCompleted}
-                onClick={() => setStep(STEPS.EXPENSE)}
+                onClick={() => {
+                  const validation = validatePayoutMethod(values.payoutMethod);
+                  if (isEmpty(validation)) {
+                    setStep(STEPS.EXPENSE);
+                  } else {
+                    setErrors({ payoutMethod: validation });
+                  }
+                }}
               >
                 <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
                 &nbsp;→
