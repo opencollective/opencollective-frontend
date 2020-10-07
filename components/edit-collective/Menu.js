@@ -178,7 +178,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c =>
     isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.FUND, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, CollectiveType.ORGANIZATION, CollectiveType.USER),
-  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: c => isType(c, CollectiveType.USER),
+  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: c => isOneOfTypes(c, CollectiveType.ORGANIZATION, CollectiveType.USER),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
     isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.FUND, CollectiveType.EVENT, CollectiveType.PROJECT) ||

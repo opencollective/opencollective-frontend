@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import utc from 'dayjs/plugin/utc';
@@ -8,7 +8,6 @@ import { groupBy, uniq } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { invoicesQuery } from '../../../lib/graphql/queries';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { saveInvoice } from '../../../lib/transactions';
 
@@ -32,6 +31,29 @@ const HostName = styled(P)`
 
 dayjs.extend(utc);
 dayjs.extend(isSameOrAfter);
+
+export const invoicesQuery = gql`
+  query TransactionsDownloadInvoices($fromCollectiveSlug: String!) {
+    allInvoices(fromCollectiveSlug: $fromCollectiveSlug) {
+      slug
+      year
+      month
+      totalAmount
+      transactions {
+        id
+      }
+      currency
+      fromCollective {
+        slug
+      }
+      host {
+        slug
+        name
+        imageUrl
+      }
+    }
+  }
+`;
 
 const filterInvoices = (allInvoices, filterBy) => {
   if (filterBy === 'past_12_months') {
@@ -105,7 +127,7 @@ const renderReceiptCard = (invoice, index) => (
           fontWeight="400"
           mt={0}
         >
-          {`${invoice.month}/${invoice.year}`} - {invoice.totalTransactions}{' '}
+          {`${invoice.month}/${invoice.year}`} - {invoice.transactions.length}{' '}
           <FormattedMessage
             id="paymentReceipt.transaction"
             values={{
@@ -142,34 +164,31 @@ const Receipts = ({ invoices }) => {
   const { loading: loadingInvoice, call: downloadInvoice } = useAsyncCall(saveInvoice);
   const byMonth = groupBy(invoices, 'month');
 
-  return Object.keys(byMonth)
-    .map(month => {
-      const dateMonth = dayjs.utc(`${byMonth[month][0].year}-${month}`, 'YYYY-M');
-      const dateFrom = dateMonth.toISOString();
-      const dateTo = dateMonth.endOf('month').toISOString();
+  return Object.keys(byMonth).map(month => {
+    const dateMonth = dayjs.utc(`${byMonth[month][0].year}-${month}`, 'YYYY-M');
+    const dateFrom = dateMonth.toISOString();
+    const dateTo = dateMonth.endOf('month').toISOString();
 
-      return (
-        <Flex key={month} flexDirection="column">
-          <Flex alignItems="center" justifyContent="space-between">
-            <H3 fontSize="16px" lineHeight="24px" color="black.900">{`${dateMonth.format('MMMM')} ${dateMonth.format(
-              'YYYY',
-            )}`}</H3>
-            <Divider width={['60%', '80%']} borderBottom="1px solid #C4C7CC" />
-          </Flex>
-          {byMonth[month]
-            .map(invoice => ({
-              ...invoice,
-              totalTransactions: byMonth[month].length,
-              loadingInvoice,
-              downloadInvoice,
-              dateFrom,
-              dateTo,
-            }))
-            .map(renderReceiptCard)}
+    return (
+      <Flex key={month} flexDirection="column">
+        <Flex alignItems="center" justifyContent="space-between">
+          <H3 fontSize="16px" lineHeight="24px" color="black.900">{`${dateMonth.format('MMMM')} ${dateMonth.format(
+            'YYYY',
+          )}`}</H3>
+          <Divider width={['60%', '80%']} borderBottom="1px solid #C4C7CC" />
         </Flex>
-      );
-    })
-    .reverse();
+        {byMonth[month]
+          .map(invoice => ({
+            ...invoice,
+            loadingInvoice,
+            downloadInvoice,
+            dateFrom,
+            dateTo,
+          }))
+          .map(renderReceiptCard)}
+      </Flex>
+    );
+  });
 };
 
 const renderContent = (invoices, loading) => {
