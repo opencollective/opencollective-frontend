@@ -310,7 +310,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     settings
     twitterHandle
     description
-    imageUrl
+    imageUrl(height: 192)
     isHost
     isActive
     settings
