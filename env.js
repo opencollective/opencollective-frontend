@@ -24,6 +24,7 @@ const defaults = {
   NEW_HOST_APPLICATION_FLOW: false,
   ENABLE_GUEST_CONTRIBUTIONS: false,
   REJECT_CONTRIBUTION: false,
+  REJECTED_CATEGORIES: false,
   TW_API_COLLECTIVE_SLUG: 'opencollective-host',
   OC_APPLICATION: 'frontend',
   OC_ENV: process.env.NODE_ENV || 'development',
