@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { truncate } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import Avatar, { ContributorAvatar } from '../Avatar';
@@ -36,12 +37,18 @@ class NewContributionFlowHeader extends React.Component {
         <Box mx={3}>
           <Avatar collective={collective} radius={[65, null, 96]} />
         </Box>
-        <div>
-          <H1 textAlign="center" fontSize={['28px', null, '32px']} lineHeight="40px" fontWeight={500}>
+        <Flex flexDirection="column" alignItems="center">
+          <H1
+            textAlign="center"
+            fontSize={['28px', null, '32px']}
+            lineHeight="40px"
+            fontWeight={500}
+            title={collective.name}
+          >
             <FormattedMessage
               id="CreateOrder.Title"
               defaultMessage="Contribute to {collective}"
-              values={{ collective: collective.name }}
+              values={{ collective: truncate(collective.name, { length: 30 }) }}
             />
           </H1>
           {contributors?.length > 0 && (
@@ -67,7 +74,7 @@ class NewContributionFlowHeader extends React.Component {
               </Flex>
             </Fragment>
           )}
-        </div>
+        </Flex>
       </Flex>
     );
   }
