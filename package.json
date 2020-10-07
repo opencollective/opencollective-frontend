@@ -20,7 +20,7 @@
     "@material-ui/core": "4.11.0",
     "@opencollective/taxes": "3.1.0",
     "@popperjs/core": "2.5.3",
-    "@sentry/browser": "5.24.2",
+    "@sentry/browser": "5.25.0",
     "@sentry/node": "5.25.0",
     "@styled-icons/boxicons-regular": "10.18.0",
     "@styled-icons/fa-brands": "10.22.0",
