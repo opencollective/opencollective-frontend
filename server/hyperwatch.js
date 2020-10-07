@@ -61,6 +61,17 @@ const load = async app => {
 
   app.use(expressInput.middleware());
 
+  app.use((req, res, next) => {
+    req.hyperwatch.getIdentity = async () => {
+      let log = req.hyperwatch.augmentedLog;
+      if (!log) {
+        log = req.hyperwatch.augmentedLog = await req.hyperwatch.getAugmentedLog({ fast: true });
+      }
+      return log.getIn(['identity']) || log.getIn(['request', 'address']);
+    };
+    next();
+  });
+
   pipeline.registerInput(expressInput);
 
   // Filter 'main' node
