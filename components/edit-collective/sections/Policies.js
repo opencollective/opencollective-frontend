@@ -7,7 +7,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
+import { getEnvVar } from '../../../lib/env-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { parseToBoolean } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -72,7 +74,8 @@ const messages = defineMessages({
 const Policies = ({ collective }) => {
   const { formatMessage } = useIntl();
   const [selected, setSelected] = React.useState([]);
-  const hasRejectCategoriesFeature = hasFeature(collective, FEATURES.MODERATION);
+  const hasRejectCategoriesFeature =
+    hasFeature(collective, FEATURES.MODERATION) || parseToBoolean(getEnvVar('REJECTED_CATEGORIES'));
 
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
