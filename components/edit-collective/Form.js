@@ -221,7 +221,7 @@ class EditCollectiveForm extends React.Component {
       },
       'GST-number.label': {
         id: 'EditCollective.GSTNumber',
-        defaultMessage: 'GST number (NZBN)',
+        defaultMessage: 'GST number',
       },
     });
 
