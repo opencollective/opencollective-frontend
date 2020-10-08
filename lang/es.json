@@ -601,7 +601,7 @@
   "EditCollective.Conversations.description": "Las conversaciones son una manera de que la gente publique mensajes a los que cualquiera puede responder. Una vez activado, se añadirá una nueva sección \"Conversaciones\" a tu página de Colectivo y se creará una página dedicada en {conversationsLink}.",
   "editCollective.expensesPayouts": "Gastos y pagos",
   "editCollective.fiscalHosting": "Fiscal Hosting",
-  "EditCollective.GSTNumber": "GST number (NZBN)",
+  "EditCollective.GSTNumber": "GST number",
   "editCollective.host.balance": "It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund}}.",
   "editCollective.host.cancelApplicationBtn": "Retirar aplicación",
   "editCollective.host.change.balanceNotEmpty": "If you would like to change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}}. You can do this by submitting expenses, making financial contributions (select  {type, select, COLLECTIVE {your Collective} FUND {your Fund}} as 'Contribute As') or by donating to your Fiscal Host using the {emptyBalanceLink} feature.",
