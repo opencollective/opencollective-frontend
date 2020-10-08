@@ -51,13 +51,16 @@ class CollectivePage extends React.Component {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
 
+    let skipDataFromTree = false;
+
     // If on server side
     if (req) {
       req.noStyledJsx = true;
       await preloadCollectivePageGraphlQueries(slug, client);
+      skipDataFromTree = true;
     }
 
-    return { slug, status, step, mode };
+    return { slug, status, step, mode, skipDataFromTree };
   }
 
   static propTypes = {
