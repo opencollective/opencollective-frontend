@@ -331,7 +331,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   const selectedCurrency = fixedCurrency || get(formik.values, currencyFieldName);
   const validateCurrencyMinimumAmount = () => {
     // Only validate minimum amount if the form has items
-    if (formik?.values?.items) {
+    if (formik?.values?.items?.length > 0) {
       const invoiceTotalAmount = formik.values.items.reduce(
         (amount, attachment) => amount + (attachment.amount || 0),
         0,
