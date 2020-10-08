@@ -113,7 +113,8 @@ type Collective implements CollectiveInterface {
   Defines if a collective is pledged
   """
   isPledged: Boolean
-  data: JSON
+  data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+  githubContributors: JSON!
   slug: String
   path: String
 
@@ -410,7 +411,8 @@ interface CollectiveInterface {
   Defines if a collective is pledged
   """
   isPledged: Boolean
-  data: JSON
+  data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+  githubContributors: JSON!
   slug: String
   path: String
   isHost: Boolean
@@ -1033,7 +1035,8 @@ type Event implements CollectiveInterface {
   Defines if a collective is pledged
   """
   isPledged: Boolean
-  data: JSON
+  data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+  githubContributors: JSON!
   slug: String
   path: String
 
@@ -1465,7 +1468,8 @@ type Fund implements CollectiveInterface {
   Defines if a collective is pledged
   """
   isPledged: Boolean
-  data: JSON
+  data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+  githubContributors: JSON!
   slug: String
   path: String
 
@@ -2556,7 +2560,8 @@ type Organization implements CollectiveInterface {
   Defines if a collective is pledged
   """
   isPledged: Boolean
-  data: JSON
+  data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+  githubContributors: JSON!
   slug: String
   path: String
 
@@ -2969,7 +2974,8 @@ type Project implements CollectiveInterface {
   Defines if a collective is pledged
   """
   isPledged: Boolean
-  data: JSON
+  data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+  githubContributors: JSON!
   slug: String
   path: String
 
@@ -3882,7 +3888,8 @@ type User implements CollectiveInterface {
   Defines if a collective is pledged
   """
   isPledged: Boolean
-  data: JSON
+  data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+  githubContributors: JSON!
   slug: String
   path: String
 
