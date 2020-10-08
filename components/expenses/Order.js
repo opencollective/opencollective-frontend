@@ -19,7 +19,6 @@ import StyledButton from '../StyledButton';
 
 import AmountCurrency from './AmountCurrency';
 import MarkOrderAsPaidBtn from './MarkOrderAsPaidBtn';
-import OrderDetails from './OrderDetails';
 import TransactionDetails from './TransactionDetails';
 
 class Order extends React.Component {
@@ -308,14 +307,15 @@ class Order extends React.Component {
               )}
             </div>
           </div>
-          <OrderDetails order={order} mode={mode} />
           {this.state.view === 'details' && transactions && transactions.length === 1 && (
             <TransactionDetails {...transactions[0]} mode="open" canRefund={isRoot || isHostAdmin} /> // Rendering credit transaction details
           )}
           {canMarkOrderAsPaid && (
-            <Flex>
+            <Flex mt={1}>
               <MarkOrderAsPaidBtn order={order} collective={order.collective} />
               <StyledButton
+                ml={2}
+                buttonSize="small"
                 buttonStyle="danger"
                 data-cy="cancelOrder"
                 onClick={() => this.setState({ showCancelOrderModal: true })}
