@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field, FieldArray, Form, Formik } from 'formik';
-import { first, get, isEmpty, pick } from 'lodash';
+import { first, get, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -10,6 +10,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
+import { flattenObjectDeep } from '../../lib/utils';
 
 import CollectivePicker from '../CollectivePicker';
 import { Box, Flex } from '../Grid';
@@ -249,7 +250,7 @@ const ExpenseFormBody = ({
   const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
   const stepOneCompleted =
     values.payoutMethod &&
-    isEmpty(errors.payoutMethod) &&
+    isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
     (isReceipt ? true : values.payeeLocation?.country && values.payeeLocation?.address);
   const stepTwoCompleted = stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
   const requiresAddress = [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
