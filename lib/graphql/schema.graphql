@@ -1742,6 +1742,7 @@ type InvoiceType {
   """
   day: Int
   totalAmount: Int
+  totalTransactions: Int
   currency: String
   host: CollectiveInterface
   fromCollective: CollectiveInterface

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import utc from 'dayjs/plugin/utc';
 import { groupBy, uniq } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -30,7 +29,6 @@ const HostName = styled(P)`
 `;
 
 dayjs.extend(utc);
-dayjs.extend(isSameOrAfter);
 
 export const invoicesQuery = gql`
   query TransactionsDownloadInvoices($fromCollectiveSlug: String!) {
@@ -39,9 +37,7 @@ export const invoicesQuery = gql`
       year
       month
       totalAmount
-      transactions {
-        id
-      }
+      totalTransactions
       currency
       fromCollective {
         slug
@@ -60,7 +56,7 @@ const filterInvoices = (allInvoices, filterBy) => {
     const twelveMonthsAgo = dayjs().subtract(11, 'month');
     return allInvoices.filter(i => {
       const dateMonth = dayjs.utc(`${i.year}-${i.month}`, 'YYYY-M');
-      return dateMonth.isSameOrAfter(twelveMonthsAgo);
+      return dateMonth.isAfter(twelveMonthsAgo);
     });
   }
 
@@ -127,7 +123,7 @@ const renderReceiptCard = (invoice, index) => (
           fontWeight="400"
           mt={0}
         >
-          {`${invoice.month}/${invoice.year}`} - {invoice.transactions.length}{' '}
+          {`${invoice.month}/${invoice.year}`} - {invoice.totalTransactions}{' '}
           <FormattedMessage
             id="paymentReceipt.transaction"
             values={{
@@ -162,22 +158,22 @@ const renderReceiptCard = (invoice, index) => (
 
 const Receipts = ({ invoices }) => {
   const { loading: loadingInvoice, call: downloadInvoice } = useAsyncCall(saveInvoice);
-  const byMonth = groupBy(invoices, 'month');
+  const byMonthYear = groupBy(invoices, invoice => `${invoice.month}-${invoice.year}`);
 
-  return Object.keys(byMonth).map(month => {
-    const dateMonth = dayjs.utc(`${byMonth[month][0].year}-${month}`, 'YYYY-M');
+  return Object.keys(byMonthYear).map(monthYear => {
+    const dateMonth = dayjs.utc(`${byMonthYear[monthYear][0].year}-${byMonthYear[monthYear][0].month}`, 'YYYY-M');
     const dateFrom = dateMonth.toISOString();
     const dateTo = dateMonth.endOf('month').toISOString();
 
     return (
-      <Flex key={month} flexDirection="column">
+      <Flex key={monthYear} flexDirection="column">
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontSize="16px" lineHeight="24px" color="black.900">{`${dateMonth.format('MMMM')} ${dateMonth.format(
             'YYYY',
           )}`}</H3>
           <Divider width={['60%', '80%']} borderBottom="1px solid #C4C7CC" />
         </Flex>
-        {byMonth[month]
+        {byMonthYear[monthYear]
           .map(invoice => ({
             ...invoice,
             loadingInvoice,
