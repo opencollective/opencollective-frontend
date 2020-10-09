@@ -97,6 +97,8 @@ class EditConnectedAccount extends React.Component {
       }
 
       window.location.href = `${redirectUrl}?${redirectUrlParams.toString()}`;
+
+      return;
     }
 
     connectAccount(collective.id, service, options)
