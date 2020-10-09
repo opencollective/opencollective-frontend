@@ -5,7 +5,6 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
 import { borders } from 'styled-system';
 
@@ -22,6 +21,7 @@ import MessageBox from './MessageBox';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import StyledHr from './StyledHr';
 import StyledTag from './StyledTag';
+import StyledTooltip from './StyledTooltip';
 import { H3 } from './Text';
 import UpdateTextWithData from './UpdateTextWithData';
 
@@ -135,10 +135,12 @@ class StyledUpdate extends Component {
       <Container display="flex" alignItems="Baseline" color="#969BA3" data-cy="meta" flexWrap="wrap">
         {update.isPrivate && (
           <Box mr={2}>
-            <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
-            <ReactTooltip id="privateLockText">
-              <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
-            </ReactTooltip>
+            <StyledTooltip
+              id="privateLockText"
+              content={() => <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />}
+            >
+              <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
+            </StyledTooltip>
           </Box>
         )}
 
