@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { getPaymentMethodName } from '../../lib/payment_method_label';
@@ -25,25 +25,6 @@ StepLabel.defaultProps = {
   fontSize: '10px',
   mt: 1,
 };
-
-const STEP_LABELS = defineMessages({
-  profile: {
-    id: 'contribute.step.profile',
-    defaultMessage: 'Profile',
-  },
-  details: {
-    id: 'contribute.step.details',
-    defaultMessage: 'Details',
-  },
-  payment: {
-    id: 'contribute.step.payment',
-    defaultMessage: 'Payment info',
-  },
-  summary: {
-    id: 'Summary',
-    defaultMessage: 'Summary',
-  },
-});
 
 const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
   if (stepDetails.amount) {
@@ -97,7 +78,6 @@ const ContributionFlowStepsProgress = ({
   currency,
   isFreeTier,
 }) => {
-  const { formatMessage } = useIntl();
   return (
     <StepsProgress
       steps={steps}
@@ -109,7 +89,7 @@ const ContributionFlowStepsProgress = ({
     >
       {({ step }) => (
         <Flex flexDirection="column" alignItems="center">
-          <StepLabel>{STEP_LABELS[step.name] ? formatMessage(STEP_LABELS[step.name]) : step.name}</StepLabel>
+          <StepLabel>{step.label || step.name}</StepLabel>
           <Span fontSize="12px" textAlign="center">
             {step.isVisited && (
               <StepInfo

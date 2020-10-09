@@ -76,7 +76,6 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             otherAmountDisplay="button"
             value={isOtherAmountSelected ? OTHER_AMOUNT_KEY : data?.amount}
             onChange={value => {
-              console.log('CHANGE');
               if (value === OTHER_AMOUNT_KEY) {
                 setOtherAmountSelected(true);
               } else {
