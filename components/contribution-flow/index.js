@@ -4,7 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { find, get, intersection, isEmpty, isNil, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -53,6 +53,25 @@ const StepsProgressBox = styled(Box)`
     max-width: 100%;
   }
 `;
+
+const STEP_LABELS = defineMessages({
+  profile: {
+    id: 'contribute.step.profile',
+    defaultMessage: 'Profile',
+  },
+  details: {
+    id: 'contribute.step.details',
+    defaultMessage: 'Details',
+  },
+  payment: {
+    id: 'contribute.step.payment',
+    defaultMessage: 'Payment info',
+  },
+  summary: {
+    id: 'Summary',
+    defaultMessage: 'Summary',
+  },
+});
 
 class ContributionFlow extends React.Component {
   static propTypes = {
@@ -401,7 +420,7 @@ class ContributionFlow extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
-    const { fixedInterval, fixedAmount, collective, host, tier } = this.props;
+    const { intl, fixedInterval, fixedAmount, collective, host, tier } = this.props;
     const { stepDetails, stepProfile, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
@@ -410,6 +429,7 @@ class ContributionFlow extends React.Component {
     const steps = [
       {
         name: 'details',
+        label: intl.formatMessage(STEP_LABELS.details),
         isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount && stepDetails.quantity),
         validate: () => {
           if (isNil(tier?.availableQuantity)) {
@@ -421,6 +441,7 @@ class ContributionFlow extends React.Component {
       },
       {
         name: 'profile',
+        label: intl.formatMessage(STEP_LABELS.profile),
         isCompleted: Boolean(this.state.stepProfile),
         validate: this.validateStepProfile,
       },
@@ -430,6 +451,7 @@ class ContributionFlow extends React.Component {
     if (!noPaymentRequired && this.getApplicableTaxes(collective, host, tier?.type).length) {
       steps.push({
         name: 'summary',
+        label: intl.formatMessage(STEP_LABELS.summary),
         isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
       });
     }
@@ -438,6 +460,7 @@ class ContributionFlow extends React.Component {
     if (!noPaymentRequired) {
       steps.push({
         name: 'payment',
+        label: intl.formatMessage(STEP_LABELS.payment),
         isCompleted: stepProfile?.contributorRejectedCategories ? false : true,
         validate: action => {
           if (action === 'prev') {
