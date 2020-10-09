@@ -135,7 +135,7 @@ const UpdatePaymentMethodPopUp = ({
       return null;
     }
     const paymentMethodsOptions = paymentMethods.map(pm => ({
-      key: `pm-${pm.id}`,
+      key: `${contribution.id}-pm-${pm.id}`,
       title: getPaymentMethodName(pm),
       subtitle: getPaymentMethodMetadata(pm),
       icon: getPaymentMethodIcon(pm),
@@ -202,7 +202,7 @@ const UpdatePaymentMethodPopUp = ({
       ) : (
         <StyledRadioList
           id="PaymentMethod"
-          name="PaymentMethod"
+          name={`${contribution.id}-PaymentMethod`}
           keyGetter="key"
           options={paymentOptions}
           onChange={setSelectedPaymentMethod}

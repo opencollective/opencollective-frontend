@@ -100,12 +100,12 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
 
   const getDefaultTier = tiers => {
     if (contribution.tier === null) {
-      return tiers.find(option => option.key === 'custom-tier');
+      return tiers.find(option => option.key === `${contribution.id}-custom-tier`);
     } else {
       // for some collectives if a tier has been deleted it won't have moved the contribution
       // to the custom 'null' tier so we have to check for that
       const matchedTier = tiers.find(option => option.id === contribution.tier.id);
-      return !matchedTier ? tiers.find(option => option.key === 'custom-tier') : matchedTier;
+      return !matchedTier ? tiers.find(option => option.key === `${contribution.id}-custom-tier`) : matchedTier;
     }
   };
 
@@ -116,7 +116,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
       return null;
     }
     const customTierOption = {
-      key: 'custom-tier',
+      key: `${contribution.id}-custom-tier`,
       title: intl.formatMessage(messages.customTier),
       flexible: true,
       amount: 100,
@@ -129,7 +129,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
     const tierOptions = tiers
       .filter(tier => tier.interval !== null)
       .map(tier => ({
-        key: `tier-${tier.id}`,
+        key: `${contribution.id}-tier-${tier.id}`,
         title: tier.name,
         flexible: tier.amountType === 'FLEXIBLE' ? true : false,
         amount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.value * 100 : tier.amount.value * 100,
@@ -153,12 +153,22 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
   }, [mappedTierOptions]);
 
   const getTierOptions = () => {
+    let optionObject;
+    const objectArray = [];
+    const flexible = selectedTier.flexible || selectedTier.value?.flexible;
+    if (!flexible) {
+      optionObject = {
+        label: formatCurrency(selectedTier.amount || selectedTier.value?.amount, contribution.amount.currency),
+        value: selectedTier.amount || selectedTier.value?.amount,
+      };
+      objectArray.push(optionObject);
+      return objectArray;
+    }
     // selectedTier.presets if it's the default tier, but selectedTier.value.preset afterwards if it's a radio list selection
     const presets = selectedTier.presets || selectedTier.value?.presets || [500, 1000, 2000, 5000];
-    const objectArray = [];
 
     presets.map(preset => {
-      const optionObject = {
+      optionObject = {
         label: formatCurrency(preset, contribution.amount.currency),
         value: preset,
       };
@@ -191,7 +201,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
       ) : (
         <StyledRadioList
           id="ContributionTier"
-          name="ContributionTier"
+          name={`${contribution.id}-ContributionTier`}
           keyGetter="key"
           options={mappedTierOptions}
           onChange={setSelectedTier}
