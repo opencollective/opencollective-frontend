@@ -149,10 +149,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
                           <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
                         </Span>
                       </StyledButton>
-                      {!(
-                        collective.imageUrl.includes(`/${collective.slug}/logo`) ||
-                        collective.imageUrl.includes(`/${collective.slug}/avatar`)
-                      ) && (
+                      {collective.image && (
                         <StyledButton
                           buttonSize="tiny"
                           minWidth={120}
