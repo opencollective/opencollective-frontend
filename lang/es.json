@@ -1072,6 +1072,7 @@
   "Invitation.Declined": "Denegado",
   "InviteUser": "Invitar a un nuevo usuario",
   "join": "Join",
+  "join.becomeASponsor": "Become a sponsor",
   "join.createACollective": "Create a Collective",
   "join.discover": "Discover",
   "join.findAFiscalHost": "Find a fiscal host",
