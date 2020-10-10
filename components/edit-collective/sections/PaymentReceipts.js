@@ -13,6 +13,7 @@ import { saveInvoice } from '../../../lib/transactions';
 import Avatar from '../../Avatar';
 import { Box, Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import StyledSelect from '../../StyledSelect';
@@ -203,7 +204,7 @@ const PaymentReceipts = ({ collective }) => {
     value: 'past_12_months',
   };
   const [activeFilter, setActiveFilter] = React.useState(defaultFilter);
-  const { data, loading } = useQuery(invoicesQuery, {
+  const { data, loading, error } = useQuery(invoicesQuery, {
     variables: {
       fromCollectiveSlug: collective.slug,
     },
@@ -252,7 +253,7 @@ const PaymentReceipts = ({ collective }) => {
           mb="24px"
           onChange={setActiveFilter}
         />
-        {renderContent(invoices, loading)}
+        {error ? <MessageBoxGraphqlError error={error} /> : renderContent(invoices, loading)}
       </Box>
     </Flex>
   );
