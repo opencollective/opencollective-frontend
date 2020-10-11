@@ -18,7 +18,7 @@
   "acceptContributions.organization.subtitle": "我们的组织",
   "acceptContributions.picker.header": "接受财政捐助",
   "acceptContributions.picker.host": "一个财务主持人",
-  "acceptContributions.picker.hostInfo": "Outsource fundholding to an entity who offers this service ({moreInfo})",
+  "acceptContributions.picker.hostInfo": "外包资金由提供此服务的实体 ({moreInfo}) 所有",
   "acceptContributions.picker.myself": "我自己",
   "acceptContributions.picker.myselfInfo": "使用我的个人银行账户",
   "acceptContributions.picker.organizationInfo": "使用我的公司或组织的银行账户",
