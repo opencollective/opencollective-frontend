@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
-import SmallButton from '../SmallButton';
+import StyledButton from '../StyledButton';
 
 class MarkOrderAsPaidBtn extends React.Component {
   static propTypes = {
@@ -44,52 +44,14 @@ class MarkOrderAsPaidBtn extends React.Component {
 
     return (
       <div className="MarkOrderAsPaidBtn">
-        <style jsx>
-          {`
-            .MarkOrderAsPaidBtn {
-              align-items: flex-end;
-              display: flex;
-              flex-wrap: wrap;
-            }
-            .error {
-              display: flex;
-              align-items: center;
-              color: red;
-              font-size: 1.3rem;
-              padding-left: 1rem;
-            }
-
-            .processorFee {
-              margin-right: 1rem;
-              max-width: 16rem;
-            }
-
-            .processorFee label {
-              margin: 0;
-            }
-          `}
-        </style>
-        <style global jsx>
-          {`
-            .processorFee .inputField,
-            .processorFee .form-group {
-              margin: 0;
-            }
-
-            .processorFee .inputField {
-              margin-top: 0.5rem;
-            }
-          `}
-        </style>
-
-        <SmallButton
-          className="MarkOrderAsPaidSmallBtn pay"
+        <StyledButton
+          buttonStyle="success"
           onClick={this.onClick}
           disabled={this.props.disabled || disabled}
           title={title}
         >
           <FormattedMessage id="order.markAsPaid.btn" defaultMessage="Mark as paid" />
-        </SmallButton>
+        </StyledButton>
         <div className="error">{error}</div>
       </div>
     );
