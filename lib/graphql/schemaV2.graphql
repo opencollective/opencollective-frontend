@@ -2503,6 +2503,18 @@ input CreditCardCreateInput {
   zip: String
 }
 
+type CreditCardWithStripeError {
+  """
+  The payment method created
+  """
+  paymentMethod: PaymentMethod!
+
+  """
+  This field will be set if there was an error with Stripe during strong customer authentication
+  """
+  stripeError: StripeError
+}
+
 """
 All supported currencies
 """
@@ -4703,16 +4715,6 @@ type Mutation {
   ): Order
 
   """
-  Reactivate a cancelled order
-  """
-  activateOrder(
-    """
-    Object matching the OrderReferenceInput (id)
-    """
-    order: OrderReferenceInput!
-  ): Order
-
-  """
   Update an Order's amount, tier, or payment method
   """
   updateOrder(
@@ -4743,30 +4745,25 @@ type Mutation {
   """
   addCreditCard(
     """
-    A Payment Method to add to an Account
-    """
-    paymentMethod: PaymentMethodCreateInput
-
-    """
     The credit card info
     """
-    creditCardInfo: CreditCardCreateInput
+    creditCardInfo: CreditCardCreateInput!
 
     """
     Name associated to this credit card
     """
-    name: String
+    name: String!
 
     """
-    Wether this payment method should be saved for future payments
+    Whether this credit card should be saved for future payments
     """
     isSavedForLater: Boolean = true
 
     """
-    Account to add Payment Method to
+    Account to add the credit card to
     """
     account: AccountReferenceInput!
-  ): PaymentMethod!
+  ): CreditCardWithStripeError!
 
   """
   Add a new payment method to be used with an Order
@@ -4778,25 +4775,15 @@ type Mutation {
     paymentMethod: PaymentMethodCreateInput
 
     """
-    The credit card info
-    """
-    creditCardInfo: CreditCardCreateInput
-
-    """
-    Name associated to this credit card
-    """
-    name: String
-
-    """
-    Wether this payment method should be saved for future payments
-    """
-    isSavedForLater: Boolean = true
-
-    """
     Account to add Payment Method to
     """
-    account: AccountReferenceInput!
-  ): PaymentMethod! @deprecated(reason: "2020-08-24: Use addCreditCard")
+    account: AccountReferenceInput
+  ): PaymentMethod
+
+  """
+  Confirm a credit card is ready for use after strong customer authentication
+  """
+  confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
 
   """
   Refunds transaction
@@ -5376,7 +5363,7 @@ input ProcessExpensePaymentParams {
   forceManual: Boolean
 
   """
-  2FA code for if the host account has it turned on and the transaction is large.
+  2FA code for if the host account has 2FA for payouts turned on.
   """
   twoFactorAuthenticatorCode: String
 }
