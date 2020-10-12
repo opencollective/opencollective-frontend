@@ -101,6 +101,7 @@ class Expense extends React.Component {
       rejected: { id: 'expense.rejected', defaultMessage: 'Rejected' },
       processing: { id: 'expense.processing', defaultMessage: 'Processing' },
       error: { id: 'expense.error', defaultMessage: 'Error' },
+      // eslint-disable-next-line camelcase
       scheduled_for_payment: {
         id: 'expense.scheduledForPayment',
         defaultMessage: 'Scheduled for payment',

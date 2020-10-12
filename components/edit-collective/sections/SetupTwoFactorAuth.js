@@ -95,8 +95,8 @@ class SetupTwoFactorAuth extends React.Component {
       length: 64,
     };
     const secret = speakeasy.generateSecret(options);
-    const fullOTPUrl = secret.otpauth_url + issuer;
-    this.setState({ secret, base32: secret.base32, otpauth_url: fullOTPUrl });
+    const fullOtpauthUrl = secret.otpauth_url + issuer; // eslint-disable-line camelcase
+    this.setState({ secret, base32: secret.base32, otpauthUrl: fullOtpauthUrl });
   }
 
   async submit(values) {
@@ -141,7 +141,7 @@ class SetupTwoFactorAuth extends React.Component {
 
   render() {
     const { intl, data } = this.props;
-    const { error, tokenAdded, secret, base32, otpauth_url } = this.state;
+    const { error, tokenAdded, secret, base32, otpauthUrl } = this.state;
 
     const { loading } = data;
 
@@ -209,7 +209,7 @@ class SetupTwoFactorAuth extends React.Component {
                   </Flex>
                   {secret ? (
                     <Flex flexDirection="column">
-                      <QRCode value={otpauth_url} renderAs="svg" size={256} level="L" includeMargin data-cy="qr-code" />
+                      <QRCode value={otpauthUrl} renderAs="svg" size={256} level="L" includeMargin data-cy="qr-code" />
                       <TokenBox maxWidth={350} data-cy="manual-entry-2fa-token">
                         <P>
                           <FormattedMessage

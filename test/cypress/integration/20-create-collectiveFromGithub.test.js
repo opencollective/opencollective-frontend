@@ -1,6 +1,7 @@
 describe('Create collective from Github', () => {
   it('Should submit create github page', () => {
     cy.server();
+    /* eslint-disable camelcase */
     cy.route({
       method: 'GET',
       url: '/api/github-repositories?*',
@@ -24,6 +25,7 @@ describe('Create collective from Github', () => {
         },
       ],
     });
+    /* eslint-enable camelcase */
     cy.login({ email: 'testuser@opencollective.com', redirect: '/create/opensource?token=foofoo' });
     cy.contains('[data-cy=connect-github-header]', 'Pick a repository');
     cy.get('[data-cy=radio-select]').first().check();

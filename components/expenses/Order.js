@@ -55,6 +55,7 @@ class Order extends React.Component {
       expired: { id: 'order.expired', defaultMessage: 'expired' },
       new: { id: 'order.new', defaultMessage: 'new' },
       pledged: { id: 'order.pledged', defaultMessage: 'pledged' },
+      // eslint-disable-next-line camelcase
       require_client_confirmation: {
         id: 'order.require_client_confirmation',
         defaultMessage: 'require client confirmation',

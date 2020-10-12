@@ -117,14 +117,14 @@ describe('signin', () => {
 
   it('can signup a user with gmail and show Open Gmail button ', () => {
     // Submit the form using the email providers--gmail)
-    const gmail_email = randomGmailEmail(false);
+    const gmailEmail = randomGmailEmail(false);
     cy.visit('/signin');
     cy.contains('a', 'Join Free').click();
     cy.get('input[name=name]').type('Dummy Name');
-    cy.get('input[name=email]').type(`{selectall}${gmail_email}`);
+    cy.get('input[name=email]').type(`{selectall}${gmailEmail}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${gmail_email}.`);
+    cy.contains(`We've sent it to ${gmailEmail}.`);
     cy.getByDataCy('open-inbox-link').should(
       'have.prop',
       'href',

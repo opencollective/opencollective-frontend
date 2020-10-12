@@ -41,10 +41,12 @@ const Messages = defineMessages({
     id: 'SearchFor',
     defaultMessage: 'Search for {entity}',
   },
+  // eslint-disable-next-line camelcase
   searchForType_2: {
     id: 'SearchFor2',
     defaultMessage: 'Search for {entity1} or {entity2}',
   },
+  // eslint-disable-next-line camelcase
   searchForType_3: {
     id: 'SearchFor3',
     defaultMessage: 'Search for {entity1}, {entity2} or {entity3}',
