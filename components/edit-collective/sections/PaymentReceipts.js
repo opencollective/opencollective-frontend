@@ -16,14 +16,9 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
+import StyledHr from '../../StyledHr';
 import StyledSelect from '../../StyledSelect';
 import { H2, H3, P, Span } from '../../Text';
-
-const Divider = styled(Box)`
-  border-bottom-width: 1px;
-  border-bottom-style: ${props => props.borderStyle || 'solid'};
-  border-bottom-color: ${props => props.borderColor || '#C4C7CC'};
-`;
 
 const HostName = styled(P)`
   margin: 0 !important;
@@ -53,7 +48,7 @@ export const invoicesQuery = gql`
 `;
 
 const filterInvoices = (allInvoices, filterBy) => {
-  if (filterBy === 'past_12_months') {
+  if (filterBy === 'PAST_12_MONTHS') {
     const twelveMonthsAgo = dayjs().subtract(11, 'month');
     return allInvoices.filter(i => {
       const dateMonth = dayjs.utc(`${i.year}-${i.month}`, 'YYYY-M');
@@ -68,13 +63,13 @@ const ReceiptsLoadingPlaceholder = () => (
   <Flex flexDirection="column">
     <Flex alignItems="center" justifyContent="space-between">
       <LoadingPlaceholder mr={3} width="104px" height="24px" />
-      <Divider width="80%" borderBottom="1px solid #C4C7CC" />
+      <StyledHr width="80%" borderStyle="solid" borderColor="#C4C7CC" />
     </Flex>
     {Array.from({ length: 3 }, (_, index) => (
       <StyledCard my={3} key={index} display="flex" alignItems="center" py={3} px="24px">
         <LoadingPlaceholder borderRadius="16px" width="48px" height="48px" mr={3} />
         <Box>
-          <LoadingPlaceholder mb={2} width={['164px', '361px']} height={['40px', '24px']} />
+          <LoadingPlaceholder mb={2} width={['164px', '361px']} height="24px" />
           <LoadingPlaceholder width="115px" height="14px" />
         </Box>
       </StyledCard>
@@ -92,10 +87,9 @@ const NoReceipts = () => (
   </Flex>
 );
 
-const renderReceiptCard = (invoice, index) => (
+const ReceiptCard = ({ ...props }) => (
   <StyledCard
     my={3}
-    key={index.toString()}
     alignItems="center"
     display="flex"
     flexDirection={['column', 'row']}
@@ -104,7 +98,7 @@ const renderReceiptCard = (invoice, index) => (
     px="24px"
   >
     <Flex alignItems="center">
-      <Avatar collective={invoice.host} borderRadius="16px" mr={3} size="48px" />
+      <Avatar collective={props.host} borderRadius="16px" mr={3} size="48px" />
       <Box>
         <HostName
           fontSize={['13px', '17px']}
@@ -114,7 +108,7 @@ const renderReceiptCard = (invoice, index) => (
           fontWeight="500"
           my={0}
         >
-          <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />:{invoice.host.name}
+          <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />: {props.host.name}
         </HostName>
         <Span
           fontSize={['10px', '15px']}
@@ -124,11 +118,11 @@ const renderReceiptCard = (invoice, index) => (
           fontWeight="400"
           mt={0}
         >
-          {`${invoice.month}/${invoice.year}`} - {invoice.totalTransactions}{' '}
+          {`${props.month}/${props.year}`} - {props.totalTransactions}{' '}
           <FormattedMessage
             id="paymentReceipt.transaction"
             values={{
-              n: invoice.totalTransactions,
+              n: props.totalTransactions,
             }}
             defaultMessage="{n, plural, one {Transaction} other {Transactions}}"
           />
@@ -140,15 +134,15 @@ const renderReceiptCard = (invoice, index) => (
       fontSize="13px"
       width="142px"
       padding="4px 16px"
-      disabled={invoice.loadingInvoice}
+      disabled={props.loadingInvoice}
       mt={3}
       borderColor="#C4C7CC"
       onClick={() => {
-        invoice.downloadInvoice({
-          fromCollectiveSlug: invoice.fromCollective.slug,
-          toCollectiveSlug: invoice.host.slug,
-          dateFrom: invoice.dateFrom,
-          dateTo: invoice.dateTo,
+        props.downloadInvoice({
+          fromCollectiveSlug: props.fromCollective.slug,
+          toCollectiveSlug: props.host.slug,
+          dateFrom: props.dateFrom,
+          dateTo: props.dateTo,
         });
       }}
     >
@@ -156,6 +150,24 @@ const renderReceiptCard = (invoice, index) => (
     </StyledButton>
   </StyledCard>
 );
+
+ReceiptCard.propTypes = {
+  host: PropTypes.shape({
+    name: PropTypes.string,
+    imageUrl: PropTypes.string,
+    slug: PropTypes.string,
+  }),
+  loadingInvoice: PropTypes.bool,
+  fromCollective: PropTypes.shape({
+    slug: PropTypes.string,
+  }),
+  downloadInvoice: PropTypes.func,
+  dateFrom: PropTypes.string,
+  dateTo: PropTypes.string,
+  totalTransactions: PropTypes.number,
+  month: PropTypes.number,
+  year: PropTypes.number,
+};
 
 const Receipts = ({ invoices }) => {
   const { loading: loadingInvoice, call: downloadInvoice } = useAsyncCall(saveInvoice);
@@ -172,36 +184,20 @@ const Receipts = ({ invoices }) => {
           <H3 fontSize="16px" lineHeight="24px" color="black.900">{`${dateMonth.format('MMMM')} ${dateMonth.format(
             'YYYY',
           )}`}</H3>
-          <Divider width={['60%', '80%']} borderBottom="1px solid #C4C7CC" />
+          <StyledHr width={['60%', '80%']} borderStyle="solid" borderColor="#C4C7CC" />
         </Flex>
-        {byMonthYear[monthYear]
-          .map(invoice => ({
-            ...invoice,
-            loadingInvoice,
-            downloadInvoice,
-            dateFrom,
-            dateTo,
-          }))
-          .map(renderReceiptCard)}
+        {byMonthYear[monthYear].map((invoice, index) => (
+          <ReceiptCard key={index.toString()} {...{ ...invoice, loadingInvoice, downloadInvoice, dateFrom, dateTo }} />
+        ))}
       </Flex>
     );
   });
 };
 
-const renderContent = (invoices, loading) => {
-  if (loading) {
-    return <ReceiptsLoadingPlaceholder />;
-  } else if (invoices.length === 0) {
-    return <NoReceipts />;
-  }
-
-  return <Receipts invoices={invoices} />;
-};
-
 const PaymentReceipts = ({ collective }) => {
   const defaultFilter = {
     label: 'Past 12 months',
-    value: 'past_12_months',
+    value: 'PAST_12_MONTHS',
   };
   const [activeFilter, setActiveFilter] = React.useState(defaultFilter);
   const { data, loading, error } = useQuery(invoicesQuery, {
@@ -212,6 +208,17 @@ const PaymentReceipts = ({ collective }) => {
 
   const yearsFilter = uniq(data?.allInvoices.map(i => i.year)).map(year => ({ value: year, label: year }));
   const invoices = data ? filterInvoices(data.allInvoices, activeFilter.value) : [];
+  let content = null;
+
+  if (loading) {
+    content = <ReceiptsLoadingPlaceholder />;
+  } else if (invoices.length === 0) {
+    content = <NoReceipts />;
+  } else if (error) {
+    content = <MessageBoxGraphqlError error={error} />;
+  } else {
+    content = <Receipts invoices={invoices} />;
+  }
 
   return (
     <Flex flexDirection="column">
@@ -222,14 +229,14 @@ const PaymentReceipts = ({ collective }) => {
             defaultMessage="Monthly payment receipts per fiscal host"
           />
         </H2>
-        <P fontSize={['14px']} lineHeight={['21px']} fontWeight="400" letterSpacing="-0.1px" color="black.700">
+        <P fontSize="14px" lineHeight="21px" fontWeight="400" letterSpacing="-0.1px" color="black.700">
           <FormattedMessage
             id="paymentReceipts.section.description"
             defaultMessage="Check the consolidated invoices for your contributions here."
           />
         </P>
       </Box>
-      <Divider mb="24px" borderColor="#4E5052" borderStyle="dashed" width={1} />
+      <StyledHr mb="24px" borderStyle="dashed" borderColor="#4E5052" width={1} />
       <Box>
         <P
           fontSize="9px"
@@ -253,7 +260,7 @@ const PaymentReceipts = ({ collective }) => {
           mb="24px"
           onChange={setActiveFilter}
         />
-        {error ? <MessageBoxGraphqlError error={error} /> : renderContent(invoices, loading)}
+        {content}
       </Box>
     </Flex>
   );
