@@ -152,7 +152,7 @@ const renderReceiptCard = (invoice, index) => (
         });
       }}
     >
-      <FormattedMessage id="downloadReceipt" defaultMessage="Download receipt" />
+      <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />
     </StyledButton>
   </StyledCard>
 );
