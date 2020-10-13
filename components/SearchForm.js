@@ -47,7 +47,7 @@ const handleSubmit = event => {
 const SearchForm = ({
   fontSize,
   onSubmit = handleSubmit,
-  placeholder = 'Search Open Collective...',
+  placeholder = 'Search...',
   width = 1,
   defaultValue,
   value,
