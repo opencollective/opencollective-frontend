@@ -91,6 +91,10 @@ const messages = defineMessages({
     id: 'join.findAFiscalHost',
     defaultMessage: 'Find a fiscal host',
   },
+  'join.becomeASponsor': {
+    id: 'join.becomeASponsor',
+    defaultMessage: 'Become a sponsor',
+  },
   community: {
     id: 'community',
     defaultMessage: 'Community',
@@ -145,6 +149,7 @@ const navigation = {
     createACollective: '/create',
     discover: '/discover',
     findAFiscalHost: '/hosts',
+    becomeASponsor: '/become-a-sponsor',
   },
   community: {
     openSource: 'https://github.com/opencollective/opencollective/issues',
