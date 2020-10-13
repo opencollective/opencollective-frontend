@@ -23,7 +23,7 @@ const FREQUENCIES = {
   yearly: <FormattedMessage id="Frequency.Yearly" defaultMessage="Yearly" />,
 };
 
-const invoicesQuery = gql`
+export const invoicesQuery = gql`
   query TransactionsDownloadInvoices($fromCollectiveSlug: String!) {
     allInvoices(fromCollectiveSlug: $fromCollectiveSlug) {
       slug
