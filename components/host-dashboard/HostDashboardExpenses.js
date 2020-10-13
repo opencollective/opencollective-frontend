@@ -155,7 +155,15 @@ const HostDashboardExpenses = ({ hostSlug }) => {
         <DismissibleMessage>
           {({ dismiss }) => (
             <MessageBox type="warning" mb={3} withIcon onClose={dismiss}>
-              {paypalPreApprovalError}
+              {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
+                <FormattedMessage
+                  id="paypal.preApproval.emailWarning"
+                  defaultMessage="Warning: the PayPal email for this account just changed from {oldEmail} to {newEmail}. If it's not the change you inteded to do, you can click on Refill balance and choose a different one"
+                  values={{ oldEmail: query.oldPaypalEmail, newEmail: query.newPaypalEmail }}
+                />
+              ) : (
+                paypalPreApprovalError
+              )}
             </MessageBox>
           )}
         </DismissibleMessage>
