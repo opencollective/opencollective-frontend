@@ -154,7 +154,7 @@
   "collective.connectedAccounts.twitter.description": "Connectez un compte Twitter pour remercier automatiquement les nouveaux contributeurs",
   "collective.contributionPolicy.description": "All categorized Financial Contributors are manually classified by the Open Collective team. Only contributors that are thought to be abusing are classified with these categories. Financial Contributors with a good reputation should normally not be affected by this setting.",
   "collective.contributionPolicy.label": "Contribution Policy",
-  "collective.contributionPolicy.placeholder": "For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.",
+  "collective.contributionPolicy.placeholder": "Par exemple: quelles sont les catégories de contributeurs (comme les casinos) dont vous ne voulez pas recevoir de dons ou à quelles conditions accepteriez-vous certaines donations, etc... .",
   "collective.country.label": "Pays",
   "collective.create": "Créer le Collectif",
   "collective.create.button": "Créer le Collectif",
