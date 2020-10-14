@@ -223,7 +223,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             </AmountLine>
           )}
           <AmountLine borderTop="1px solid #4E5052" pt={11}>
-            <Label color="black.900">
+            <Label color="black.900" fontWeight="500">
               {formik.values.paymentProcessorFee !== null ? (
                 <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
               ) : (
@@ -298,12 +298,12 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
           </StyledInputField>
         )}
         {!error && formik.values.forceManual && (
-          <MessageBox type="warning" withIcon my={3}>
+          <MessageBox type="warning" withIcon my={3} fontSize="12px">
             <strong>
               <FormattedMessage id="Warning.Important" defaultMessage="Important" />
             </strong>
             <br />
-            <P mt={2}>
+            <P mt={2} fontSize="12px" lineHeight="18px">
               <FormattedMessage
                 id="PayExpenseModal.ManualPayoutWarning"
                 defaultMessage="By clicking below you are acknowledging that you have already paid this expense via the {payoutMethod} dashboard directly."
@@ -315,7 +315,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
         <Flex flexWrap="wrap" justifyContent="space-evenly">
           <StyledButton
             buttonStyle="success"
-            minWidth={100}
+            width="100%"
             m={1}
             type="submit"
             loading={formik.isSubmitting}
