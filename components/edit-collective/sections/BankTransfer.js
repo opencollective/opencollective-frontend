@@ -14,6 +14,7 @@ import PayoutBankInformationForm from '../../expenses/PayoutBankInformationForm'
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import Loading from '../../Loading';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledButton from '../../StyledButton';
 import { H3, H4, P } from '../../Text';
 import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
@@ -81,6 +82,8 @@ const BankTransfer = props => {
     context: API_V2_CONTEXT,
     variables: { slug: props.collectiveSlug },
   });
+
+  const [error, setError] = React.useState(null);
   const [createPayoutMethod] = useMutation(createPayoutMethodMutation, { context: API_V2_CONTEXT });
   const [editBankTransfer] = useMutation(editBankTransferMutation, { context: API_V2_CONTEXT });
   const [showForm, setShowForm] = React.useState(false);
@@ -168,25 +171,33 @@ const BankTransfer = props => {
           initialValues={initialValues}
           onSubmit={async (values, { setSubmitting }) => {
             const { data, instructions } = values;
-            if (data?.currency) {
-              await createPayoutMethod({
+            setError(null);
+
+            try {
+              if (data?.currency) {
+                await createPayoutMethod({
+                  variables: {
+                    payoutMethod: { data: { ...data, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
+                    account: { slug: props.collectiveSlug },
+                  },
+                });
+              }
+              await editBankTransfer({
                 variables: {
-                  payoutMethod: { data: { ...data, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
+                  key: 'paymentMethods.manual.instructions',
+                  value: instructions,
                   account: { slug: props.collectiveSlug },
                 },
               });
+
+              props.hideTopsection(false);
+              refetchHostData();
+              setShowForm(false);
+            } catch (e) {
+              setError(e);
+            } finally {
+              setSubmitting(false);
             }
-            await editBankTransfer({
-              variables: {
-                key: 'paymentMethods.manual.instructions',
-                value: instructions,
-                account: { slug: props.collectiveSlug },
-              },
-            });
-            setSubmitting(false);
-            setShowForm(false);
-            props.hideTopsection(false);
-            refetchHostData();
           }}
         >
           {({ handleSubmit, isSubmitting, setFieldValue, values }) => (
@@ -255,6 +266,7 @@ const BankTransfer = props => {
                   bankAccount={values.data}
                 />
               </Box>
+              {error && <MessageBoxGraphqlError my={3} error={error} />}
               <Box my={3} textAlign={['center', 'left']}>
                 <StyledButton
                   mr={2}
