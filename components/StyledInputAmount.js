@@ -36,7 +36,7 @@ const getValue = (value, rawValue, isEmpty) => {
 };
 
 const getError = (curVal, minAmount, required) => {
-  return (required && isNil(curVal)) || (minAmount && curVal < minAmount);
+  return Boolean((required && isNil(curVal)) || (minAmount && curVal < minAmount));
 };
 
 /**

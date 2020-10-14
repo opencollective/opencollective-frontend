@@ -78,7 +78,7 @@ const validate = values => {
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
-const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedInUser, error }) => {
+const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedInUser, error, resetError }) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const payoutOptions = generatePayoutOptions(intl, payoutMethodType, host);
@@ -126,7 +126,12 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
               disabled={payoutOptions.length < 2}
               options={payoutOptions}
               value={selectedOption}
-              onChange={({ value }) => formik.setValues({ ...value, paymentProcessorFee: null })}
+              onChange={({ value }) => {
+                formik.setValues({ ...value, paymentProcessorFee: null });
+                if (resetError) {
+                  resetError();
+                }
+              }}
             />
           )}
         </StyledInputField>
@@ -145,6 +150,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
               <StyledInputAmount
                 {...inputProps}
                 currency={collective.currency}
+                currencyDisplay="FULL"
                 value={formik.values.paymentProcessorFee}
                 placeholder="0.00"
                 min={0}
@@ -301,6 +307,7 @@ PayExpenseModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   /** If set, will be displayed in the pay modal */
   error: PropTypes.string,
+  resetError: PropTypes.func,
   /** From withUser */
   LoggedInUser: PropTypes.object,
 };
