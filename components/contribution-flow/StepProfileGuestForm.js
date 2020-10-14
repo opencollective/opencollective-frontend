@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { isEmail } from 'validator';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -16,9 +17,19 @@ import { P } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
 
+// TODO validate
+export const validateGuestProfile = stepProfile => {
+  if (!stepProfile.email || !isEmail(stepProfile.email)) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
 const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }) => {
-  const [locale, setLocale] = useState('en');
+  const [locale, setLocale] = useState('en'); // TODO We need the country, not the locale. Also auto-detects from IP
   const { amount, interval } = stepDetails;
+  const dispatchChange = (field, value) => onChange({ stepProfile: { ...data, isGuest: true, [field]: value } });
 
   return (
     <Container as="fieldset" border="none" width={1} py={3}>
@@ -35,7 +46,8 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
                 {...inputProps}
                 defaultValue={data?.name}
                 placeholder="i.e. Thomas Anderson"
-                onChange={e => onChange({ stepProfile: { ...data, [e.target.name]: e.target.value } })}
+                onChange={e => dispatchChange(e.target.name, e.target.value)}
+                maxLength="255"
               />
             )}
           </StyledInputField>
@@ -44,6 +56,7 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
           <StyledInputField
             label={<FormattedMessage id="Email" defaultMessage="Email" />}
             htmlFor="email"
+            maxLength="254"
             required
             showLabelRequired
           >
@@ -53,7 +66,7 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
                 defaultValue={data?.email}
                 placeholder="i.e. tanderson@thematrix.com"
                 type="email"
-                onChange={e => onChange({ stepProfile: { ...data, [e.target.name]: e.target.value } })}
+                onChange={e => dispatchChange(e.target.name, e.target.value)}
               />
             )}
           </StyledInputField>
@@ -77,7 +90,7 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
                   height="150px"
                   maxWidth={350}
                   fontSize="13px"
-                  onChange={e => onChange({ stepProfile: { ...data, [e.target.name]: e.target.value } })}
+                  onChange={e => dispatchChange(e.target.name, e.target.value)}
                 />
               )}
             </StyledInputField>
@@ -96,7 +109,7 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
                   locale={locale}
                   onChange={value => {
                     setLocale(value);
-                    onChange({ stepProfile: { ...data, country: value } });
+                    dispatchChange(e.target.name, e.target.value);
                   }}
                   value={data?.country}
                 />
