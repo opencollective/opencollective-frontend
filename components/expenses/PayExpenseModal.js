@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
+import { border, color, space, typography } from 'styled-system';
 
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
-import { CurrencyPrecision } from '../../lib/constants/currency-precision';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
-import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { Flex } from '../Grid';
+import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
@@ -75,6 +76,43 @@ const validate = values => {
   return errors;
 };
 
+const AmountLine = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-weight: 400;
+  padding: 9px 0;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0em;
+
+  ${border}
+  ${space}
+`;
+
+const Label = styled(Span)`
+  margin-right: 4px;
+  flex: 0 1 70%;
+  margin-right: 8px;
+  line-height: 18px;
+  word-break: break-word;
+  color: #4e5052;
+  ${color}
+  ${typography}
+  font-size: 12px;
+`;
+
+const Amount = styled.span`
+  flex: 1 1 30%;
+  text-align: right;
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: row-reverse;
+  & > * {
+    margin-left: 4px;
+  }
+`;
+
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
@@ -89,17 +127,6 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
     po => po.value?.action === formik.values.action && po.value.forceManual === formik.values.forceManual,
   );
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
-  const formattedAmount = isNaN(formik.values.paymentProcessorFee) ? (
-    <Span color="black.500" mr={2}>
-      --.--
-    </Span>
-  ) : (
-    <FormattedMoneyAmount
-      amount={expense.amount + (formik.values.paymentProcessorFee || 0)}
-      currency={collective.currency}
-      precision={CurrencyPrecision.DEFAULT}
-    />
-  );
 
   return (
     <StyledModal show onClose={onClose} width="100%" minWidth={280} maxWidth={334}>
@@ -126,6 +153,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
               disabled={payoutOptions.length < 2}
               options={payoutOptions}
               value={selectedOption}
+              isSearchable={false}
               onChange={({ value }) => {
                 formik.setValues({ ...value, paymentProcessorFee: null });
                 if (resetError) {
@@ -141,10 +169,9 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             htmlFor="payExpensePaymentProcessorFee"
             inputType="number"
             error={formik.errors.paymentProcessorFee}
+            required={false}
             mt={24}
-            label={
-              <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees (if apply)" />
-            }
+            label={<FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />}
           >
             {inputProps => (
               <StyledInputAmount
@@ -160,39 +187,58 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             )}
           </StyledInputField>
         )}
-        <Container mt={24} mb={16} py={3} borderTop="1px solid #DCDEE0" borderBottom="1px solid #DCDEE0">
-          {formik.values.paymentProcessorFee !== null ? (
-            <FormattedMessage
-              id="TotalAmountWithFees"
-              defaultMessage="Total amount with fees: {amount}"
-              values={{ amount: formattedAmount }}
-            >
-              {(label, amount) => (
-                <Flex justifyContent="space-between" alignItems="center">
-                  <Span fontSize="12px" ml={3}>
-                    {label}
-                  </Span>
-                  <Span fontSize="16px">{amount}</Span>
-                </Flex>
-              )}
-            </FormattedMessage>
-          ) : (
-            <FormattedMessage
-              id="TotalAmountWithoutFees"
-              defaultMessage="Total amount without fees: {amount}"
-              values={{ amount: formattedAmount }}
-            >
-              {(label, amount) => (
-                <Flex justifyContent="space-between" alignItems="center">
-                  <Span fontSize="12px" ml={3}>
-                    {label}
-                  </Span>
-                  <Span fontSize="16px">{amount}</Span>
-                </Flex>
-              )}
-            </FormattedMessage>
+        <Box mt={19}>
+          <P textTransform="uppercase" fontSize="9px" color="black.400" fontWeight="500" mb="5px">
+            <FormattedMessage id="PaymentBreakdown" defaultMessage="Payment breakdown" />
+          </P>
+          <AmountLine>
+            <Label>
+              <FormattedMessage id="ExpenseAmount" defaultMessage="Expense amount" />
+            </Label>
+            <Amount>
+              <FormattedMoneyAmount
+                amountStyles={{ fontWeight: 500 }}
+                showCurrencyCode={false}
+                amount={expense.amount}
+                currency={expense.currency}
+              />
+            </Amount>
+          </AmountLine>
+          {formik.values.paymentProcessorFee !== null && (
+            <AmountLine borderTop="0.8px dashed #9D9FA3">
+              <Label>
+                <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
+              </Label>
+              <Amount>
+                <FormattedMoneyAmount
+                  showCurrencyCode={false}
+                  amount={formik.values.paymentProcessorFee}
+                  currency={expense.currency}
+                  amountStyles={{
+                    fontWeight: formik.values.paymentProcessorFee ? 500 : 400,
+                    color: formik.values.paymentProcessorFee ? 'black.900' : 'black.400',
+                  }}
+                />
+              </Amount>
+            </AmountLine>
           )}
-        </Container>
+          <AmountLine borderTop="1px solid #4E5052" pt={11}>
+            <Label color="black.900">
+              {formik.values.paymentProcessorFee !== null ? (
+                <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
+              ) : (
+                <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
+              )}
+            </Label>
+            <Amount>
+              <FormattedMoneyAmount
+                amount={expense.amount + (formik.values.paymentProcessorFee || 0)}
+                currency={expense.currency}
+                currencyCodeStyles={{ color: 'black.400' }}
+              />
+            </Amount>
+          </AmountLine>
+        </Box>
         {error && (
           <MessageBox type="error" withIcon my={3}>
             {error}
@@ -253,11 +299,17 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
         )}
         {!error && formik.values.forceManual && (
           <MessageBox type="warning" withIcon my={3}>
-            <FormattedMessage
-              id="PayExpenseModal.ManualPayoutWarning"
-              defaultMessage="Important: By clicking below you are acknowledging that you have already paid this expense via the {payoutMethod} dashboard directly."
-              values={{ payoutMethod: payoutMethodLabel }}
-            />
+            <strong>
+              <FormattedMessage id="Warning.Important" defaultMessage="Important" />
+            </strong>
+            <br />
+            <P mt={2}>
+              <FormattedMessage
+                id="PayExpenseModal.ManualPayoutWarning"
+                defaultMessage="By clicking below you are acknowledging that you have already paid this expense via the {payoutMethod} dashboard directly."
+                values={{ payoutMethod: payoutMethodLabel }}
+              />
+            </P>
           </MessageBox>
         )}
         <Flex flexWrap="wrap" justifyContent="space-evenly">
@@ -270,7 +322,12 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             data-cy="mark-as-paid-button"
           >
             {hasManualPayment ? (
-              <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
+              <React.Fragment>
+                <Check size="1.5em" />
+                <Span css={{ verticalAlign: 'middle' }} ml={1}>
+                  <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
+                </Span>
+              </React.Fragment>
             ) : (
               <FormattedMessage
                 id="expense.pay.btn"
@@ -290,6 +347,7 @@ PayExpenseModal.propTypes = {
     id: PropTypes.string,
     legacyId: PropTypes.number,
     amount: PropTypes.number,
+    currency: PropTypes.string,
     payoutMethod: PropTypes.shape({
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     }),
