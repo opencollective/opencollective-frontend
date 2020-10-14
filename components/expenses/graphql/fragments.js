@@ -296,6 +296,11 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
 export const expensesListAdminFieldsFragment = gqlV2/* GraphQL */ `
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
+    payoutMethod {
+      id
+      type
+      data
+    }
     items {
       id
       description

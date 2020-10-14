@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
 
@@ -17,52 +17,37 @@ import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
+import StyledButtonSet from '../StyledButtonSet';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
-import StyledSelect from '../StyledSelect';
 import { H4, P, Span } from '../Text';
 import { withUser } from '../UserProvider';
 
-const PAYOUT_ACTION_TYPE = defineMessages({
-  manual: {
-    id: 'Expense.PayManual',
-    defaultMessage: '{payoutMethodLabel} (Manual)',
-  },
-  auto: {
-    id: 'Expense.PayAuto',
-    defaultMessage: '{payoutMethodLabel} (Automatic)',
-  },
-});
+import PayoutMethodData from './PayoutMethodData';
+import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
 const getPayoutLabel = (intl, type) => {
   return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
 };
 
-const generatePayoutOptions = (intl, payoutMethodType, host) => {
-  const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
+const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
   if (payoutMethodType === PayoutMethodType.OTHER) {
-    return [{ label: payoutMethodLabel, value: { forceManual: true, action: 'PAY' } }];
+    return { forceManual: true, action: 'PAY' };
+  } else if (!isAuto) {
+    return { forceManual: true, action: 'PAY' };
   } else {
-    const automaticAction =
-      hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
-      payoutMethodType === PayoutMethodType.PAYPAL &&
-      host.supportedPayoutMethods?.includes('PAYPAL')
-        ? 'SCHEDULE_FOR_PAYMENT'
-        : 'PAY';
-
-    return [
-      {
-        label: intl.formatMessage(PAYOUT_ACTION_TYPE.auto, { payoutMethodLabel }),
-        value: { forceManual: false, action: automaticAction },
-      },
-      {
-        label: intl.formatMessage(PAYOUT_ACTION_TYPE.manual, { payoutMethodLabel }),
-        value: { forceManual: true, action: 'PAY' },
-      },
-    ];
+    return {
+      forceManual: false,
+      action:
+        hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
+        payoutMethodType === PayoutMethodType.PAYPAL &&
+        host.supportedPayoutMethods?.includes('PAYPAL')
+          ? 'SCHEDULE_FOR_PAYMENT'
+          : 'PAY',
+    };
   }
 };
 
@@ -113,56 +98,66 @@ const Amount = styled.span`
   }
 `;
 
+const SectionLabel = styled.p`
+  font-size: 9px;
+  font-weight: 500;
+  color: #9d9fa3;
+  margin: 5px 0;
+  text-transform: uppercase;
+`;
+
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
 const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedInUser, error, resetError }) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
-  const payoutOptions = generatePayoutOptions(intl, payoutMethodType, host);
-
-  const formik = useFormik({ initialValues: { ...DEFAULT_VALUES, ...payoutOptions[0]?.value }, validate, onSubmit });
+  const initialValues = { ...DEFAULT_VALUES, ...getPayoutOptionValue(payoutMethodType, true, host) };
+  const formik = useFormik({ initialValues: () => initialValues, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
-  const selectedOption = payoutOptions.find(
-    po => po.value?.action === formik.values.action && po.value.forceManual === formik.values.forceManual,
-  );
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
 
   return (
     <StyledModal show onClose={onClose} width="100%" minWidth={280} maxWidth={334}>
-      <ModalHeader />
-      <ModalBody as="form" mb={0} onSubmit={formik.handleSubmit}>
-        <H4 fontSize="20px" fontWeight="bold" mb={3}>
-          <FormattedMessage id="Expense.PayoutAndFees" defaultMessage="Payout method and fees" />
+      <ModalHeader>
+        <H4 fontSize="20px" fontWeight="700">
+          <FormattedMessage id="PayExpenseTitle" defaultMessage="Pay expense" />
         </H4>
-        {formik.values.forceManual && (
-          <P fontSize="13px" lineHeight="19px" mb={3}>
-            <FormattedMessage
-              id="Expense.PayoutAndFeesDetails"
-              defaultMessage="Please add the corresponding fees according to the payout option selected."
-            />
-          </P>
+      </ModalHeader>
+      <ModalBody as="form" mb={0} onSubmit={formik.handleSubmit}>
+        <SectionLabel>
+          <FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />
+        </SectionLabel>
+        <Box mb={2}>
+          <PayoutMethodTypeWithIcon type={payoutMethodType} />
+        </Box>
+        <PayoutMethodData payoutMethod={expense.payoutMethod} showLabel={false} />
+        {payoutMethodType !== PayoutMethodType.OTHER && (
+          <StyledButtonSet
+            items={['AUTO', 'MANUAL']}
+            buttonProps={{ width: '50%' }}
+            mt={3}
+            selected={formik.values.forceManual ? 'MANUAL' : 'AUTO'}
+            customBorderRadius="6px"
+            onChange={item => {
+              formik.setValues({
+                ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
+                paymentProcessorFee: null,
+              });
+              if (resetError) {
+                resetError();
+              }
+            }}
+          >
+            {({ item }) =>
+              item === 'AUTO' ? (
+                <FormattedMessage id="Payout.Automatic" defaultMessage="Automatic" />
+              ) : (
+                <FormattedMessage id="Payout.Manual" defaultMessage="Manual" />
+              )
+            }
+          </StyledButtonSet>
         )}
-        <StyledInputField
-          htmlFor="payExpenseModalPayoutMethod"
-          label={<FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />}
-        >
-          {({ id }) => (
-            <StyledSelect
-              inputId={id}
-              disabled={payoutOptions.length < 2}
-              options={payoutOptions}
-              value={selectedOption}
-              isSearchable={false}
-              onChange={({ value }) => {
-                formik.setValues({ ...value, paymentProcessorFee: null });
-                if (resetError) {
-                  resetError();
-                }
-              }}
-            />
-          )}
-        </StyledInputField>
         {hasManualPayment && (
           <StyledInputField
             name="paymentProcessorFee"
@@ -187,10 +182,10 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             )}
           </StyledInputField>
         )}
-        <Box mt={19}>
-          <P textTransform="uppercase" fontSize="9px" color="black.400" fontWeight="500" mb="5px">
+        <Box mt={19} mb={3}>
+          <SectionLabel>
             <FormattedMessage id="PaymentBreakdown" defaultMessage="Payment breakdown" />
-          </P>
+          </SectionLabel>
           <AmountLine>
             <Label>
               <FormattedMessage id="ExpenseAmount" defaultMessage="Expense amount" />
@@ -224,7 +219,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
           )}
           <AmountLine borderTop="1px solid #4E5052" pt={11}>
             <Label color="black.900" fontWeight="500">
-              {formik.values.paymentProcessorFee !== null ? (
+              {formik.values.paymentProcessorFee !== null && !formik.values.forceManual ? (
                 <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
               ) : (
                 <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
