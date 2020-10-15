@@ -113,7 +113,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const initialValues = { ...DEFAULT_VALUES, ...getPayoutOptionValue(payoutMethodType, true, host) };
-  const formik = useFormik({ initialValues: () => initialValues, validate, onSubmit });
+  const formik = useFormik({ initialValues, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
 
