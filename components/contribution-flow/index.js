@@ -188,13 +188,13 @@ class ContributionFlow extends React.Component {
     }
 
     if (stripeError) {
-      return this.handleStripeError(order, stripeError);
+      return this.handleStripeError(order, stripeError, guestToken);
     } else {
       return this.handleSuccess(order);
     }
   };
 
-  handleStripeError = async (order, stripeError) => {
+  handleStripeError = async (order, stripeError, guestToken) => {
     const { message, account, response } = stripeError;
     if (!response) {
       this.setState({ isSubmitting: false, error: message });
@@ -206,7 +206,7 @@ class ContributionFlow extends React.Component {
       } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
         this.setState({ isSubmitting: true, error: null });
         try {
-          const response = await this.props.confirmOrder({ variables: { order: { id: order.id } } });
+          const response = await this.props.confirmOrder({ variables: { order: { id: order.id }, guestToken } });
           return this.handleOrderResponse(response.data.confirmOrder);
         } catch (e) {
           this.setState({ isSubmitting: false, error: e.message });
@@ -809,8 +809,8 @@ const addCreateOrderMutation = graphql(
 
 const addConfirmOrderMutation = graphql(
   gqlV2/* GraphQL */ `
-    mutation CreateOrder($order: OrderReferenceInput!) {
-      confirmOrder(order: $order) {
+    mutation ConfirmOrder($order: OrderReferenceInput!, $guestToken: String) {
+      confirmOrder(order: $order, guestToken: $guestToken) {
         ...OrderResponseFragment
       }
     }

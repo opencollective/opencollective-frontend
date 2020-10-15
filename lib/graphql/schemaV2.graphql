@@ -4763,7 +4763,14 @@ type Mutation {
     """
     amount: AmountInput
   ): Order
-  confirmOrder(order: OrderReferenceInput!): OrderWithPayment!
+  confirmOrder(
+    order: OrderReferenceInput!
+
+    """
+    If the order was made as a guest, you can use this field to authenticate
+    """
+    guestToken: String
+  ): OrderWithPayment!
 
   """
   Add a new payment method to be used with an Order
@@ -5051,6 +5058,11 @@ type OrderWithPayment {
   The order created
   """
   order: Order!
+
+  """
+  If donating as a guest, this will contain your guest token to contribute again in the future
+  """
+  guestToken: String
 
   """
   This field will be set if the order was created but there was an error with Stripe during the payment
