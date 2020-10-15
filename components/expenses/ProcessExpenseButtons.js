@@ -67,7 +67,8 @@ const ProcessExpenseButtons = ({
 }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const mutationOptions = { context: API_V2_CONTEXT };
-  const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
+  const [processExpense, { loading }] = useMutation(processExpenseMutation, mutationOptions);
+  const [error, setError] = React.useState(null);
 
   const triggerAction = async (action, paymentParams) => {
     // Prevent submitting the action if another one is being submitted at the same time
@@ -86,6 +87,7 @@ const ProcessExpenseButtons = ({
 
       return processedExpense;
     } catch (e) {
+      setError(e);
       if (onError && selectedAction !== 'PAY') {
         onError(getErrorFromGraphqlException(e));
       }
@@ -131,6 +133,7 @@ const ProcessExpenseButtons = ({
           collective={collective}
           host={host}
           error={error && getErrorFromGraphqlException(error).message}
+          resetError={() => setError(null)}
         />
       )}
       {permissions.canUnapprove && (

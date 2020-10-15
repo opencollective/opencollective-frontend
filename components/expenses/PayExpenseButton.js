@@ -84,7 +84,7 @@ PayoutMethodTypeIcon.propTypes = {
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
-const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, ...props }) => {
+const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, resetError, ...props }) => {
   const [hasModal, showModal] = React.useState(false);
   const disabledMessage = getDisabledMessage(expense, collective, host, expense.payoutMethod);
   const isDisabled = Boolean(disabled || disabledMessage);
@@ -116,6 +116,7 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
           host={host}
           onClose={() => showModal(false)}
           error={error}
+          resetError={resetError}
           onSubmit={async values => {
             const { action, ...data } = values;
             await onSubmit(action, data);
@@ -154,6 +155,7 @@ PayExpenseButton.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   /** If set, will be displayed in the pay modal */
   error: PropTypes.string,
+  resetError: PropTypes.func,
 };
 
 export default PayExpenseButton;

@@ -59,7 +59,7 @@ const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
         </Span>
       )}
       {icon && !isLoading && (
-        <Span mr={2} css={{ display: 'inline-block' }}>
+        <Span mr={2} css={{ display: 'inline-block', verticalAlign: 'text-bottom' }}>
           {icon}
         </Span>
       )}
