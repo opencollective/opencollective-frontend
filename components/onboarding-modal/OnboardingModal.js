@@ -138,7 +138,7 @@ class OnboardingModal extends React.Component {
 
     this.messages = defineMessages({
       twitterError: { id: 'onboarding.error.twitter', defaultMessage: 'Please enter a valid Twitter handle.' },
-      githubError: { id: 'onboarding.error.github', defaultMessage: 'Please enter a valid GitHub handle.' },
+      githubError: { id: 'onboarding.error.github', defaultMessage: 'Please enter a valid GitHub URL.' },
       websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
     });
   }
@@ -241,7 +241,7 @@ class OnboardingModal extends React.Component {
     // https://github.com/shinnn/github-username-regex
     if (
       values.githubHandle !== '' &&
-      matches(values.githubHandle, /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i) === false
+      matches(values.githubHandle, /^[a-z\d](?:[a-z\d/.]|-(?=[a-z\d])){0,58}$/i) === false
     ) {
       errors.githubHandle = this.props.intl.formatMessage(this.messages['githubError']);
     }

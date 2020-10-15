@@ -1190,7 +1190,7 @@
   "onboarding.contact.placeholder": "Write the name of who you want to invite",
   "onboarding.contact.social": "Tell your contributors how to reach your Collective through social media.",
   "onboarding.contact.website": "Do you have a website?",
-  "onboarding.error.github": "Please enter a valid GitHub handle.",
+  "onboarding.error.github": "Please enter a valid GitHub URL.",
   "onboarding.error.twitter": "Please enter a valid Twitter handle.",
   "onboarding.error.website": "Please enter a valid URL.",
   "onboarding.success.header": "새로운 단체에 오신 것을 환영합니다!",
