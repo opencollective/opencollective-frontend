@@ -61,24 +61,19 @@ const RecurringContributionsCard = ({
       }
     >
       <Container p={3}>
-        {contribution.platformContributionAmount ? (
-          <Box mb={3}>
-            <P fontSize="14px" lineHeight="20px" fontWeight="400">
-              <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
+        <Box mb={3}>
+          <P fontSize="14px" lineHeight="20px" fontWeight="400">
+            <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
+          </P>
+          <div>
+            <P fontSize="14px" lineHeight="20px" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
+              <FormattedMoneyAmount
+                amount={contribution.amount.valueInCents}
+                interval={contribution.frequency.toLowerCase().slice(0, -2)}
+                currency={contribution.amount.currency}
+              />
             </P>
-            <div>
-              <P
-                fontSize="14px"
-                lineHeight="20px"
-                fontWeight="bold"
-                data-cy="recurring-contribution-amount-contributed"
-              >
-                <FormattedMoneyAmount
-                  amount={(contribution.amount.value + contribution.platformContributionAmount.value) * 100}
-                  interval={contribution.frequency.toLowerCase().slice(0, -2)}
-                  currency={contribution.amount.currency}
-                />
-              </P>
+            {contribution.platformContributionAmount && (
               <StyledTooltip
                 content={() => (
                   <FormattedMessage
@@ -90,46 +85,33 @@ const RecurringContributionsCard = ({
                 <P fontSize="12px" lineHeight="20px" color="black.700">
                   (
                   <FormattedMoneyAmount
-                    amount={contribution.amount.value * 100}
+                    amount={contribution.amount.valueInCents - contribution.platformContributionAmount.valueInCents}
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
-                    precision={0}
+                    precision="auto"
                     amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
-                  />{' '}
-                  +{' '}
+                  />
+                  {' + '}
                   <FormattedMoneyAmount
-                    amount={contribution.platformContributionAmount.value * 100}
+                    amount={contribution.platformContributionAmount.valueInCents}
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
-                    precision={0}
+                    precision="auto"
                     amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
                   />
                   )
                 </P>
               </StyledTooltip>
-            </div>
-          </Box>
-        ) : (
-          <Box mb={3}>
-            <P fontSize="14px" lineHeight="20px" fontWeight="400">
-              <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
-            </P>
-            <P fontSize="14px" lineHeight="20px" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
-              <FormattedMoneyAmount
-                amount={contribution.amount.value * 100}
-                interval={contribution.frequency.toLowerCase().slice(0, -2)}
-                currency={contribution.amount.currency}
-              />
-            </P>
-          </Box>
-        )}
+            )}
+          </div>
+        </Box>
         <Box mb={3}>
           <P fontSize="14px" lineHeight="20px" fontWeight="400">
             <FormattedMessage id="Subscriptions.ContributedToDate" defaultMessage="Contributed to date" />
           </P>
           <P fontSize="14px" lineHeight="20px">
             <FormattedMoneyAmount
-              amount={contribution.totalDonations.value * 100}
+              amount={contribution.totalDonations.valueInCents}
               currency={contribution.totalDonations.currency}
             />
           </P>

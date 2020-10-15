@@ -18,6 +18,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
           }
           amount {
             value
+            valueInCents
             currency
           }
           status
@@ -28,6 +29,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
           }
           totalDonations {
             value
+            valueInCents
             currency
           }
           toAccount {
@@ -42,6 +44,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
           }
           platformContributionAmount {
             value
+            valueInCents
           }
         }
       }
