@@ -3726,6 +3726,11 @@ input GuestInfoInput {
   The unique guest token
   """
   token: String
+
+  """
+  Address of the user, mandatory when amount is above $5000.
+  """
+  location: LocationInput
 }
 
 """

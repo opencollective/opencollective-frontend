@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
@@ -17,8 +18,17 @@ import { P } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
 
-// TODO validate
-export const validateGuestProfile = stepProfile => {
+const shouldRequireAllInfo = amount => {
+  return amount && amount >= 500000;
+};
+
+export const validateGuestProfile = (stepProfile, stepDetails) => {
+  if (shouldRequireAllInfo(stepDetails.amount)) {
+    if (!stepProfile.name || !stepProfile.location?.address || !stepProfile.location?.country) {
+      return false;
+    }
+  }
+
   if (!stepProfile.email || !isEmail(stepProfile.email)) {
     return false;
   } else {
@@ -26,10 +36,13 @@ export const validateGuestProfile = stepProfile => {
   }
 };
 
-const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }) => {
-  const [locale, setLocale] = useState('en'); // TODO We need the country, not the locale. Also auto-detects from IP
+const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
   const { amount, interval } = stepDetails;
-  const dispatchChange = (field, value) => onChange({ stepProfile: { ...data, isGuest: true, [field]: value } });
+
+  const dispatchChange = (field, value) => {
+    const newData = set({ ...data, isGuest: true }, field, value);
+    onChange({ stepProfile: newData });
+  };
 
   return (
     <Container as="fieldset" border="none" width={1} py={3}>
@@ -72,22 +85,21 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
           </StyledInputField>
         </Box>
       </Flex>
-      {amount && amount >= 500000 && (
+      {amount && shouldRequireAllInfo(amount) && (
         <Flex justifyContent="space-between">
           <Box width={1 / 2} mb={3} mr={1}>
             <StyledInputField
               label={<FormattedMessage id="ExpenseForm.AddressLabel" defaultMessage="Physical address" />}
-              htmlFor="address"
+              htmlFor="location.address"
               required
-              showLabelRequired
             >
               {inputProps => (
                 <StyledTextarea
                   {...inputProps}
-                  defaultValue={data?.address}
+                  value={data?.location?.address ?? ''}
                   placeholder="160 Zion Ln.&#13;&#10;Temecula, CA&#13;&#10;90210"
                   width="100%"
-                  height="150px"
+                  minHeight="80px"
                   maxWidth={350}
                   fontSize="13px"
                   onChange={e => dispatchChange(e.target.name, e.target.value)}
@@ -101,16 +113,11 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
               label={<FormattedMessage id="ExpenseForm.ChooseCountry" defaultMessage="Choose country" />}
               htmlFor="country"
               required
-              showLabelRequired
             >
               {inputProps => (
                 <InputTypeCountry
                   {...inputProps}
-                  locale={locale}
-                  onChange={value => {
-                    setLocale(value);
-                    dispatchChange(e.target.name, e.target.value);
-                  }}
+                  onChange={value => dispatchChange('location.country', value)}
                   value={data?.country}
                 />
               )}
@@ -153,7 +160,7 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
   );
 };
 
-NewContributionFlowStepProfileGuestForm.propTypes = {
+StepProfileGuestForm.propTypes = {
   stepDetails: PropTypes.shape({
     amount: PropTypes.number,
     interval: PropTypes.string,
@@ -162,4 +169,4 @@ NewContributionFlowStepProfileGuestForm.propTypes = {
   onChange: PropTypes.func,
 };
 
-export default NewContributionFlowStepProfileGuestForm;
+export default StepProfileGuestForm;
