@@ -17,7 +17,7 @@ import { getEnvVar } from '../../lib/env-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../../lib/local-storage';
+import { getGuestToken, setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
@@ -144,7 +144,7 @@ class ContributionFlow extends React.Component {
     if (stepProfile.isGuest) {
       guestInfo = {
         ...pick(stepProfile, ['email', 'name', 'location']),
-        token: getFromLocalStorage(LOCAL_STORAGE_KEYS.GUEST_TOKEN),
+        token: getGuestToken(stepProfile.email),
       };
     } else {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
@@ -176,25 +176,25 @@ class ContributionFlow extends React.Component {
         },
       });
 
-      return this.handleOrderResponse(response.data.createOrder);
+      return this.handleOrderResponse(response.data.createOrder, stepProfile.email);
     } catch (e) {
       this.showError(getErrorFromGraphqlException(e));
     }
   };
 
-  handleOrderResponse = async ({ order, stripeError, guestToken }) => {
+  handleOrderResponse = async ({ order, stripeError, guestToken }, email) => {
     if (guestToken) {
-      setLocalStorage(LOCAL_STORAGE_KEYS.GUEST_TOKEN, guestToken);
+      setGuestToken(email, guestToken);
     }
 
     if (stripeError) {
-      return this.handleStripeError(order, stripeError, guestToken);
+      return this.handleStripeError(order, stripeError, email, guestToken);
     } else {
       return this.handleSuccess(order);
     }
   };
 
-  handleStripeError = async (order, stripeError, guestToken) => {
+  handleStripeError = async (order, stripeError, email, guestToken) => {
     const { message, account, response } = stripeError;
     if (!response) {
       this.setState({ isSubmitting: false, error: message });
@@ -207,7 +207,7 @@ class ContributionFlow extends React.Component {
         this.setState({ isSubmitting: true, error: null });
         try {
           const response = await this.props.confirmOrder({ variables: { order: { id: order.id }, guestToken } });
-          return this.handleOrderResponse(response.data.confirmOrder);
+          return this.handleOrderResponse(response.data.confirmOrder, email);
         } catch (e) {
           this.setState({ isSubmitting: false, error: e.message });
         }
