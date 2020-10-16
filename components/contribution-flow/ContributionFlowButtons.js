@@ -83,14 +83,16 @@ class NewContributionFlowButtons extends React.Component {
             >
               {nextStep ? (
                 <React.Fragment>{this.getNextButtonLabel()} &rarr;</React.Fragment>
-              ) : (
+              ) : totalAmount ? (
                 <FormattedMessage
                   id="contribute.amount"
                   defaultMessage="Contribute {amount}"
                   values={{
-                    amount: <Currency value={totalAmount} currency={currency} precision="auto" abbreviate />,
+                    amount: <Currency value={totalAmount} currency={currency} precision="auto" />,
                   }}
                 />
+              ) : (
+                <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />
               )}
             </StyledButton>
           ) : (
