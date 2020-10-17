@@ -76,7 +76,7 @@
   "api.error.unreachable": "لا يمكن الوصول إلى API. الرجاء المحاولة مرة أخرى بعد قليل.",
   "applications.ApiKeys": "مفاتيح API",
   "applications.ApiKeys.code": "مفتاح API: {code}",
-  "applications.ApiKeys.description": "Use API Keys to interact with the Open Collective GraphQL API with your own account.",
+  "applications.ApiKeys.description": "Gebruik API Sleutels om de Open Collective GraphQL API te gebruiken met je eigen account.",
   "applications.ApiKeys.new": "New API Key",
   "applications.ApiKeys.none": "العربية",
   "apply.host.tos.modal.header": "Apply to {name}",
