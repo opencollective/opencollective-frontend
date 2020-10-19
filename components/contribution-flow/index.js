@@ -54,6 +54,8 @@ const StepsProgressBox = styled(Box)`
   }
 `;
 
+const HAS_GUEST_CONTRIBUTIONS = parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS'));
+
 const STEP_LABELS = defineMessages({
   profile: {
     id: 'contribute.step.profile',
@@ -123,6 +125,13 @@ class ContributionFlow extends React.Component {
         platformContribution: props.platformContribution,
       },
     };
+  }
+
+  componentDidUpdate(oldProps) {
+    if (oldProps.LoggedInUser && !this.props.LoggedInUser) {
+      this.setState({ stepProfile: null, stepSummary: null, stepPayment: null });
+      this.pushStepRoute(STEPS.PROFILE);
+    }
   }
 
   submitOrder = async () => {
@@ -420,11 +429,14 @@ class ContributionFlow extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
-    const { intl, fixedInterval, fixedAmount, collective, host, tier } = this.props;
+    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser } = this.props;
     const { stepDetails, stepProfile, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
+    const isStepProfileCompleted = Boolean(
+      (stepProfile && LoggedInUser) || (HAS_GUEST_CONTRIBUTIONS && stepProfile?.isGuest),
+    );
 
     const steps = [
       {
@@ -442,7 +454,7 @@ class ContributionFlow extends React.Component {
       {
         name: 'profile',
         label: intl.formatMessage(STEP_LABELS.profile),
-        isCompleted: Boolean(this.state.stepProfile),
+        isCompleted: isStepProfileCompleted,
         validate: this.validateStepProfile,
       },
     ];
@@ -556,122 +568,118 @@ class ContributionFlow extends React.Component {
           nextStep,
           isValidating,
           isValidStep,
-        }) =>
-          !isValidStep ? (
-            <Loading />
-          ) : (
-            <Container
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              py={[3, 4, 5]}
-              mb={4}
-              data-cy="cf-content"
-              ref={this.mainContainerRef}
-            >
-              <Box px={[2, 3]} mb={4}>
-                <ContributionFlowHeader collective={collective} />
-              </Box>
-              <StepsProgressBox mb={3} width={[1.0, 0.8]}>
-                <ContributionFlowStepsProgress
-                  steps={steps}
-                  currentStep={currentStep}
-                  lastVisitedStep={lastVisitedStep}
-                  goToStep={goToStep}
-                  stepProfile={this.state.stepProfile}
-                  stepDetails={this.state.stepDetails}
-                  stepPayment={this.state.stepPayment}
-                  stepSummary={this.state.stepSummary}
-                  isSubmitted={this.state.isSubmitted}
-                  loading={isValidating || isSubmitted || isSubmitting}
-                  currency={collective.currency}
-                  isFreeTier={this.getTierMinAmount(tier) === 0}
-                />
-              </StepsProgressBox>
-              {/* main container */}
-              {loadingLoggedInUser ? (
+        }) => (
+          <Container
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            py={[3, 4, 5]}
+            mb={4}
+            data-cy="cf-content"
+            ref={this.mainContainerRef}
+          >
+            <Box px={[2, 3]} mb={4}>
+              <ContributionFlowHeader collective={collective} />
+            </Box>
+            <StepsProgressBox mb={3} width={[1.0, 0.8]}>
+              <ContributionFlowStepsProgress
+                steps={steps}
+                currentStep={currentStep}
+                lastVisitedStep={lastVisitedStep}
+                goToStep={goToStep}
+                stepProfile={this.state.stepProfile}
+                stepDetails={this.state.stepDetails}
+                stepPayment={this.state.stepPayment}
+                stepSummary={this.state.stepSummary}
+                isSubmitted={this.state.isSubmitted}
+                loading={isValidating || isSubmitted || isSubmitting}
+                currency={collective.currency}
+                isFreeTier={this.getTierMinAmount(tier) === 0}
+              />
+            </StepsProgressBox>
+            {/* main container */}
+            {(currentStep.name !== STEPS.DETAILS && loadingLoggedInUser) || !isValidStep ? (
+              <Box py={[4, 5]}>
                 <Loading />
-              ) : currentStep.name === STEPS.PROFILE &&
-                !LoggedInUser &&
-                !parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ? (
-                <SignInOrJoinFree
-                  defaultForm="create-account"
-                  redirect={this.getRedirectUrlForSignIn()}
-                  createPersonalProfileLabel={
-                    <FormattedMessage
-                      id="ContributionFlow.CreateUserLabel"
-                      defaultMessage="Contribute as an individual"
-                    />
-                  }
-                  createOrganizationProfileLabel={
-                    <FormattedMessage
-                      id="ContributionFlow.CreateOrganizationLabel"
-                      defaultMessage="Contribute as an organization"
-                    />
-                  }
-                />
-              ) : (
-                <Grid
-                  px={[2, 3]}
-                  gridTemplateColumns={[
-                    'minmax(200px, 600px)',
-                    null,
-                    '0fr minmax(300px, 600px) 1fr',
-                    '1fr minmax(300px, 600px) 1fr',
-                  ]}
-                >
-                  <Box />
-                  <Box as="form" onSubmit={e => e.preventDefault()} maxWidth="100%">
-                    {error && (
-                      <MessageBox type="error" withIcon mb={3}>
-                        {formatErrorMessage(this.props.intl, error)}
-                      </MessageBox>
-                    )}
+              </Box>
+            ) : currentStep.name === STEPS.PROFILE && !LoggedInUser && !HAS_GUEST_CONTRIBUTIONS ? (
+              <SignInOrJoinFree
+                defaultForm="create-account"
+                redirect={this.getRedirectUrlForSignIn()}
+                createPersonalProfileLabel={
+                  <FormattedMessage
+                    id="ContributionFlow.CreateUserLabel"
+                    defaultMessage="Contribute as an individual"
+                  />
+                }
+                createOrganizationProfileLabel={
+                  <FormattedMessage
+                    id="ContributionFlow.CreateOrganizationLabel"
+                    defaultMessage="Contribute as an organization"
+                  />
+                }
+              />
+            ) : (
+              <Grid
+                px={[2, 3]}
+                gridTemplateColumns={[
+                  'minmax(200px, 600px)',
+                  null,
+                  '0fr minmax(300px, 600px) 1fr',
+                  '1fr minmax(300px, 600px) 1fr',
+                ]}
+              >
+                <Box />
+                <Box as="form" onSubmit={e => e.preventDefault()} maxWidth="100%">
+                  {error && (
+                    <MessageBox type="error" withIcon mb={3}>
+                      {formatErrorMessage(this.props.intl, error)}
+                    </MessageBox>
+                  )}
 
-                    <ContributionFlowStepContainer
-                      collective={collective}
-                      tier={tier}
-                      mainState={this.state}
-                      onChange={data => this.setState(data)}
+                  <ContributionFlowStepContainer
+                    collective={collective}
+                    tier={tier}
+                    mainState={this.state}
+                    onChange={data => this.setState(data)}
+                    step={currentStep}
+                    showFeesOnTop={this.canHaveFeesOnTop()}
+                    onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+                    defaultProfileSlug={this.props.contributeAs}
+                    taxes={this.getApplicableTaxes(collective, host, tier?.type)}
+                  />
+
+                  <Box mt={[4, 5]}>
+                    <ContributionFlowButtons
+                      goNext={goNext}
+                      goBack={goBack}
                       step={currentStep}
-                      showFeesOnTop={this.canHaveFeesOnTop()}
-                      onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
-                      defaultProfileSlug={this.props.contributeAs}
-                      taxes={this.getApplicableTaxes(collective, host, tier?.type)}
+                      prevStep={prevStep}
+                      nextStep={nextStep}
+                      isRecurringContributionLoggedOut={Boolean(!LoggedInUser && this.state.stepDetails?.interval)}
+                      isValidating={isValidating || isSubmitted || isSubmitting}
+                      paypalButtonProps={this.getPaypalButtonProps()}
                     />
-
-                    <Box mt={[4, 5]}>
-                      <ContributionFlowButtons
-                        goNext={goNext}
-                        goBack={goBack}
-                        step={currentStep}
-                        prevStep={prevStep}
-                        nextStep={nextStep}
-                        isRecurringContributionLoggedOut={Boolean(!LoggedInUser && this.state.stepDetails?.interval)}
-                        isValidating={isValidating || isSubmitted || isSubmitting}
-                        paypalButtonProps={this.getPaypalButtonProps()}
+                  </Box>
+                </Box>
+                <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
+                  <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
+                    <SafeTransactionMessage />
+                    <Box mt={4}>
+                      <ContributionSummary
+                        collective={collective}
+                        stepDetails={this.state.stepDetails}
+                        stepSummary={this.state.stepSummary}
                       />
                     </Box>
+                    <ContributeFAQ mt={4} titleProps={{ mb: 2 }} />
                   </Box>
-                  <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
-                    <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
-                      <SafeTransactionMessage />
-                      <Box mt={4}>
-                        <ContributionSummary
-                          collective={collective}
-                          stepDetails={this.state.stepDetails}
-                          stepSummary={this.state.stepSummary}
-                        />
-                      </Box>
-                      <ContributeFAQ mt={4} titleProps={{ mb: 2 }} />
-                    </Box>
-                  </Box>
-                </Grid>
-              )}
-            </Container>
-          )
-        }
+                </Box>
+              </Grid>
+            )}
+          </Container>
+        )}
       </Steps>
     );
   }
