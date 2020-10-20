@@ -138,7 +138,19 @@ class StyledCheckbox extends React.Component {
   }
 
   render() {
-    const { name, checked, label, disabled, size, inputId, width, alignItems, isLoading, fontSize } = this.props;
+    const {
+      name,
+      checked,
+      label,
+      disabled,
+      size,
+      inputId,
+      width,
+      alignItems,
+      isLoading,
+      fontSize,
+      ...props
+    } = this.props;
     const realChecked = checked === undefined ? this.state.checked : checked;
 
     return (
@@ -148,6 +160,7 @@ class StyledCheckbox extends React.Component {
         size={size}
         width={width}
         alignItems={alignItems}
+        {...props}
       >
         <input id={inputId} name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
         <CustomCheckbox data-cy="custom-checkbox">

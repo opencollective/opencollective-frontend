@@ -114,7 +114,7 @@ class NewContributionFlowSuccess extends React.Component {
   };
 
   renderCallsToAction = () => {
-    const { LoggedInUser, router } = this.props;
+    const { LoggedInUser, router, data } = this.props;
     const callsToAction = [SUCCESS_CTA_TYPE.NEWSLETTER];
 
     if (!LoggedInUser) {
@@ -129,7 +129,7 @@ class NewContributionFlowSuccess extends React.Component {
       <Flex flexDirection="column" justifyContent="center" p={2}>
         {callsToAction.length <= 2 && <SuccessIllustration />}
         {callsToAction.map(type => (
-          <SuccessCTA key={type} type={type} />
+          <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} />
         ))}
       </Flex>
     );
