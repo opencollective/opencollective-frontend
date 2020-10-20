@@ -192,7 +192,7 @@ const ExpenseBudgetItem = ({
                       values={{
                         balance: (
                           <FormattedMoneyAmount
-                            amount={collective.balance}
+                            amount={collective.stats?.balance?.valueInCents}
                             currency={collective.currency}
                             amountStyles={{ color: 'black.700' }}
                           />
@@ -327,8 +327,12 @@ ExpenseBudgetItem.propTypes = {
   view: PropTypes.oneOf(['public', 'admin']),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    balance: PropTypes.number,
     currency: PropTypes.string,
+    stats: PropTypes.shape({
+      balance: PropTypes.shape({
+        valueInCents: PropTypes.number,
+      }),
+    }),
     parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
