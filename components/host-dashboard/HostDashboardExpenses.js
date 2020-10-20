@@ -74,11 +74,10 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
           slug
           currency
           type
-          ... on Collective {
-            balance
-          }
-          ... on Event {
-            balance
+          stats {
+            balance {
+              valueInCents
+            }
           }
         }
       }
