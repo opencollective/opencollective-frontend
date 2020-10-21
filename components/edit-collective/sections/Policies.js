@@ -164,6 +164,7 @@ const Policies = ({ collective }) => {
                 {...inputProps}
                 resize="none"
                 maxLength={POLICY_MAX_LENGTH}
+                showCount
                 height={'20rem'}
                 width={1}
                 fontSize="14px"
@@ -192,6 +193,7 @@ const Policies = ({ collective }) => {
                 {...inputProps}
                 resize="none"
                 maxLength={POLICY_MAX_LENGTH}
+                showCount
                 height={'20rem'}
                 width={1}
                 fontSize="14px"
