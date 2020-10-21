@@ -289,7 +289,6 @@ class Members extends React.Component {
                   </StyledTooltip>
                 </Flex>
               )}
-              {console.log(this.findAdmins(this.props))}
               {isSelf ? (
                 <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveYourself)}>
                   <StyledButton

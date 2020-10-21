@@ -1982,7 +1982,7 @@ type Mutation {
   """
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
-  editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
+  editCoreContributors(collectiveId: Int!, askSelfRemoval: Boolean, members: [MemberInputType!]!): CollectiveInterface
 
   """
   A mutation to edit the public message of all matching members.
@@ -2000,7 +2000,6 @@ type Mutation {
   editComment(comment: CommentAttributesInputType!): CommentType
   deleteComment(id: Int!): CommentType
   cancelSubscription(id: Int!): OrderType
-  updateSubscription(id: Int!, paymentMethod: PaymentMethodInputType, amount: Int): OrderType
   refundTransaction(id: Int!): Transaction
   addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
   createApplication(application: ApplicationInput!): Application

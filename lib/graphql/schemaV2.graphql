@@ -4703,16 +4703,6 @@ type Mutation {
   ): Order
 
   """
-  Reactivate a cancelled order
-  """
-  activateOrder(
-    """
-    Object matching the OrderReferenceInput (id)
-    """
-    order: OrderReferenceInput!
-  ): Order
-
-  """
   Update an Order's amount, tier, or payment method
   """
   updateOrder(
