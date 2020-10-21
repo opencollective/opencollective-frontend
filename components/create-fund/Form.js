@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { Field, Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import slugify from 'slugify';
 import styled from 'styled-components';
+
+import { suggestSlug } from '../../lib/collective.lib';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -154,19 +155,9 @@ class CreateFundForm extends React.Component {
               {formik => {
                 const { values, handleSubmit, errors, touched, setFieldValue } = formik;
 
-                const suggestedSlug = value => {
-                  const slugOptions = {
-                    replacement: '-',
-                    lower: true,
-                    strict: true,
-                  };
-
-                  return slugify(value, slugOptions);
-                };
-
                 const handleSlugChange = e => {
                   if (!touched.slug) {
-                    setFieldValue('slug', suggestedSlug(e.target.value));
+                    setFieldValue('slug', suggestSlug(e.target.value));
                   }
                 };
 
