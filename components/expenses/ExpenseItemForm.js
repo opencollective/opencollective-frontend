@@ -213,7 +213,7 @@ const ExpenseItemForm = ({
                       {...inputProps}
                       currency={currency}
                       currencyDisplay="CODE"
-                      min={1}
+                      min={isOptional ? undefined : 1}
                       maxWidth="100%"
                       placeholder="0.00"
                       onChange={(value, e) => setFieldValue(e.target.name, value)}

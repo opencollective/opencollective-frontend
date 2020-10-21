@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
+import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -22,6 +23,7 @@ import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
 import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
+import ExpenseInviteNotificationBanner from '../components/expenses/ExpenseInviteNotificationBanner';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import {
@@ -38,6 +40,8 @@ import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
+import StyledCheckbox from '../components/StyledCheckbox';
+import StyledLink from '../components/StyledLink';
 import TemporaryNotification from '../components/TemporaryNotification';
 import { H1, H5, Span } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -50,8 +54,8 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2/* GraphQL */ `
-  query ExpensePage($legacyExpenseId: Int!) {
-    expense(expense: { legacyId: $legacyExpenseId }) {
+  query ExpensePage($legacyExpenseId: Int!, $draftKey: String) {
+    expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       ...ExpensePageExpenseFields
     }
 
@@ -65,8 +69,18 @@ const expensePageQuery = gqlV2/* GraphQL */ `
 `;
 
 const editExpenseMutation = gqlV2/* GraphQL */ `
-  mutation EditExpense($expense: ExpenseUpdateInput!) {
-    editExpense(expense: $expense) {
+  mutation EditExpense($expense: ExpenseUpdateInput!, $draftKey: String) {
+    editExpense(expense: $expense, draftKey: $draftKey) {
+      ...ExpensePageExpenseFields
+    }
+  }
+
+  ${expensePageExpenseFieldsFragment}
+`;
+
+const verifyExpenseMutation = gqlV2/* GraphQL */ `
+  mutation VerifyExpense($expense: ExpenseReferenceInput!, $draftKey: String) {
+    verifyExpense(expense: $expense, draftKey: $draftKey) {
       ...ExpensePageExpenseFields
     }
   }
@@ -90,10 +104,11 @@ const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
 const { USER, ORGANIZATION } = CollectiveType;
 
 class ExpensePage extends React.Component {
-  static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, createSuccess } }) {
+  static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, createSuccess, key } }) {
     return {
       parentCollectiveSlug,
       collectiveSlug,
+      draftKey: key,
       legacyExpenseId: parseInt(ExpenseId),
       createSuccess: Boolean(createSuccess),
     };
@@ -103,6 +118,7 @@ class ExpensePage extends React.Component {
     collectiveSlug: PropTypes.string,
     parentCollectiveSlug: PropTypes.string,
     legacyExpenseId: PropTypes.number,
+    draftKey: PropTypes.string,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     createSuccess: PropTypes.bool,
@@ -113,6 +129,7 @@ class ExpensePage extends React.Component {
     data: PropTypes.object.isRequired,
     /** from addEditExpenseMutation */
     editExpense: PropTypes.func.isRequired,
+    verifyExpense: PropTypes.func.isRequired,
     /** from injectIntl */
     intl: PropTypes.object,
     expensesTags: PropTypes.arrayOf(
@@ -133,6 +150,10 @@ class ExpensePage extends React.Component {
       editedExpense: null,
       isSubmitting: false,
       successMessageDismissed: false,
+      isPoolingEnabled: true,
+      tos: false,
+      newsletterOptIn: false,
+      createdUser: null,
     };
 
     this.pollingInterval = 60;
@@ -143,6 +164,21 @@ class ExpensePage extends React.Component {
   }
 
   componentDidMount() {
+    if (this.props.data.expense?.status === 'DRAFT' && this.props.draftKey) {
+      this.setState(() => ({
+        status: PAGE_STATUS.EDIT,
+        editedExpense: this.props.data.expense,
+        isPoolingEnabled: false,
+      }));
+    }
+
+    const expense = this.props.data?.expense;
+    if (this.props.draftKey && expense?.status == expenseStatus.UNVERIFIED && expense?.permissions?.canEdit) {
+      this.props.verifyExpense({
+        variables: { expense: { id: expense.id }, draftKey: this.props.draftKey },
+      });
+    }
+
     this.handlePolling();
     document.addEventListener('mousemove', this.handlePolling);
   }
@@ -168,29 +204,31 @@ class ExpensePage extends React.Component {
   }
 
   handlePolling() {
-    if (!this.pollingStarted) {
-      if (this.pollingPaused) {
-        // The polling was paused, so we immediately refetch
-        if (this.props.data?.refetch) {
-          this.props.data.refetch();
+    if (this.state.isPoolingEnabled) {
+      if (!this.pollingStarted) {
+        if (this.pollingPaused) {
+          // The polling was paused, so we immediately refetch
+          if (this.props.data?.refetch) {
+            this.props.data.refetch();
+          }
+          this.pollingPaused = false;
         }
-        this.pollingPaused = false;
+        if (this.props.data?.startPolling(this.pollingInterval * 1000)) {
+          this.props.data.stopPolling();
+        }
+        this.pollingStarted = true;
       }
-      if (this.props.data?.startPolling(this.pollingInterval * 1000)) {
-        this.props.data.stopPolling();
-      }
-      this.pollingStarted = true;
-    }
 
-    clearTimeout(this.pollingTimeout);
-    this.pollingTimeout = setTimeout(() => {
-      // No mouse movement was detected since 60sec, we stop polling
-      if (this.props.data?.stopPolling) {
-        this.props.data.stopPolling();
-      }
-      this.pollingStarted = false;
-      this.pollingPaused = true;
-    }, this.pollingInterval * 1000);
+      clearTimeout(this.pollingTimeout);
+      this.pollingTimeout = setTimeout(() => {
+        // No mouse movement was detected since 60sec, we stop polling
+        if (this.props.data?.stopPolling) {
+          this.props.data.stopPolling();
+        }
+        this.pollingStarted = false;
+        this.pollingPaused = true;
+      }, this.pollingInterval * 1000);
+    }
   }
 
   async refetchDataForUser() {
@@ -206,9 +244,22 @@ class ExpensePage extends React.Component {
     try {
       this.setState({ isSubmitting: true, error: null });
       const { editedExpense } = this.state;
-      await this.props.editExpense({ variables: { expense: prepareExpenseForSubmit(editedExpense) } });
-      this.setState({ status: PAGE_STATUS.VIEW, isSubmitting: false, editedExpense: undefined, error: null });
+      if (!editedExpense.payee.id && this.state.newsletterOptIn) {
+        editedExpense.payee.newsletterOptIn = this.state.newsletterOptIn;
+      }
+      await this.props.editExpense({
+        variables: { expense: prepareExpenseForSubmit(editedExpense), draftKey: this.props.draftKey },
+      });
+      const createdUser = editedExpense?.payee;
+      this.setState({
+        status: PAGE_STATUS.VIEW,
+        isSubmitting: false,
+        editedExpense: undefined,
+        error: null,
+        createdUser,
+      });
     } catch (e) {
+      console.log(e);
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
       this.scrollToExpenseTop();
     }
@@ -334,6 +385,7 @@ class ExpensePage extends React.Component {
     const host = collective?.host;
     const canSeeInvoiceInfo = expense?.permissions.canSeeInvoiceInfo;
     const isInvoice = expense?.type === expenseTypes.INVOICE;
+    const isDraft = expense?.status === expenseStatus.DRAFT;
     const hasAttachedFiles = (isInvoice && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
@@ -357,7 +409,7 @@ class ExpensePage extends React.Component {
           selected={Sections.BUDGET}
           callsToAction={{ hasSubmitExpense: status === PAGE_STATUS.VIEW }}
         />
-        <Flex flexWrap="wrap" my={[4, 5]} data-cy="expense-page-content">
+        <Flex flexDirection={['column', 'row']} my={[4, 5]} data-cy="expense-page-content">
           <Container
             display={['none', null, null, 'flex']}
             justifyContent="flex-end"
@@ -378,7 +430,14 @@ class ExpensePage extends React.Component {
               )}
             </Flex>
           </Container>
-          <Box flex="1 1 650px" minWidth={300} maxWidth={792} mr={[null, 2, 3, 4, 5]} px={2} ref={this.expenseTopRef}>
+          <Box
+            flex="1 1 650px"
+            minWidth={300}
+            maxWidth={[null, null, null, 792]}
+            mr={[null, 2, 3, 4]}
+            px={2}
+            ref={this.expenseTopRef}
+          >
             <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
               <FormattedMessage id="Summary" defaultMessage="Summary" />
             </H1>
@@ -401,6 +460,9 @@ class ExpensePage extends React.Component {
                   }}
                 />
               </MessageBox>
+            )}
+            {status === PAGE_STATUS.VIEW && (expense?.status === expenseStatus.UNVERIFIED || isDraft) && (
+              <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
             )}
             {status !== PAGE_STATUS.EDIT && (
               <Box mb={3}>
@@ -441,7 +503,65 @@ class ExpensePage extends React.Component {
                 )}
                 {status === PAGE_STATUS.EDIT_SUMMARY && (
                   <Box mt={24}>
-                    <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
+                    {isDraft && !loggedInAccount && (
+                      <Fragment>
+                        <MessageBox type="info" fontSize="12px">
+                          <FormattedMessage
+                            id="Expense.SignUpInfoBox"
+                            defaultMessage="You need to create an account to receive a payment from {collectiveName}, by clicking 'Next' you agree to create an account on Open Collective."
+                            values={{ collectiveName: collective.name }}
+                          />
+                        </MessageBox>
+                        <Box mt={3}>
+                          <StyledCheckbox
+                            name="tos"
+                            label={
+                              <FormattedMessage
+                                id="TOSAndPrivacyPolicyAgreement"
+                                defaultMessage="I agree with the {toslink} and {privacylink} of Open Collective."
+                                values={{
+                                  toslink: (
+                                    <StyledLink href="/tos" openInNewTab>
+                                      <FormattedMessage id="tos" defaultMessage="terms of service" />
+                                    </StyledLink>
+                                  ),
+                                  privacylink: (
+                                    <StyledLink href="/privacypolicy" openInNewTab>
+                                      <FormattedMessage id="privacypolicy" defaultMessage="privacy policy" />
+                                    </StyledLink>
+                                  ),
+                                }}
+                              />
+                            }
+                            required
+                            onChange={({ checked }) => {
+                              this.setState({ tos: checked });
+                            }}
+                          />
+                        </Box>
+                        <Box mt={3}>
+                          <StyledCheckbox
+                            name="newsletterOptIn"
+                            label={
+                              <span>
+                                <FormattedMessage
+                                  id="newsletter.label"
+                                  defaultMessage="Receive our monthly newsletter"
+                                />
+                                .
+                              </span>
+                            }
+                            required
+                            onChange={({ checked }) => {
+                              this.setState({ newsletterOptIn: checked });
+                            }}
+                          />
+                        </Box>
+                      </Fragment>
+                    )}
+                    {!isDraft && (
+                      <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
+                    )}
                     <Flex flexWrap="wrap" mt={4}>
                       <StyledButton
                         mt={2}
@@ -467,8 +587,13 @@ class ExpensePage extends React.Component {
                         data-cy="save-expense-btn"
                         onClick={this.onSummarySubmit}
                         loading={this.state.isSubmitting}
+                        disabled={isDraft ? !loggedInAccount && !this.state.tos : false}
                       >
-                        <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
+                        {isDraft && !loggedInAccount ? (
+                          <FormattedMessage id="Expense.JoinAndSave" defaultMessage="Join and Save" />
+                        ) : (
+                          <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
+                        )}
                       </StyledButton>
                     </Flex>
                   </Box>
@@ -483,15 +608,16 @@ class ExpensePage extends React.Component {
                   expense={editedExpense}
                   expensesTags={this.getSuggestedTags(collective)}
                   payoutProfiles={payoutProfiles}
+                  loggedInAccount={loggedInAccount}
                   onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
-                  validateOnChange
-                  disableSubmitIfUntouched
                   onSubmit={editedExpense =>
                     this.setState({
                       editedExpense,
                       status: PAGE_STATUS.EDIT_SUMMARY,
                     })
                   }
+                  validateOnChange
+                  disableSubmitIfUntouched
                 />
               </Box>
             )}
@@ -548,4 +674,11 @@ const addEditExpenseMutation = graphql(editExpenseMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-export default injectIntl(addExpensePageData(withApollo(withUser(addEditExpenseMutation(ExpensePage)))));
+const addVerifyExpenseMutation = graphql(verifyExpenseMutation, {
+  name: 'verifyExpense',
+  options: { context: API_V2_CONTEXT },
+});
+
+export default injectIntl(
+  addVerifyExpenseMutation(addExpensePageData(withApollo(withUser(addEditExpenseMutation(ExpensePage))))),
+);

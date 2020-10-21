@@ -106,8 +106,7 @@ const StyledInputGroup = ({
           <Container
             fontSize="14px"
             borderRadius="4px 0 0 4px"
-            py={2}
-            px={2}
+            p={2}
             color={getColor({ error, success })}
             maxHeight="100%"
             whiteSpace="nowrap"

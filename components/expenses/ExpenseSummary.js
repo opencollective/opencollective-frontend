@@ -57,6 +57,7 @@ const ExpenseSummary = ({
   const { createdByAccount } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
+  const isRequestedByOtherUser = createdByAccount?.id !== expense?.payee?.id;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
 
@@ -67,7 +68,7 @@ const ExpenseSummary = ({
         alignItems={['flex-start', 'center']}
         justifyContent="space-between"
       >
-        <H4 my={2} mr={2} fontWeight="500">
+        <H4 mb={2} mr={2} fontWeight="500">
           {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
         </H4>
         {expense?.status && (
@@ -92,7 +93,13 @@ const ExpenseSummary = ({
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
             <P ml={2} fontSize="12px" color="black.600">
-              {expense.createdAt ? (
+              {isRequestedByOtherUser ? (
+                <FormattedMessage
+                  id="Expense.RequestedByOnDate"
+                  defaultMessage="Requested by {name} on {date, date, long}"
+                  values={{ name: <CreatedByUserLink account={createdByAccount} />, date: new Date(expense.createdAt) }}
+                />
+              ) : expense.createdAt ? (
                 <FormattedMessage
                   id="Expense.SubmittedByOnDate"
                   defaultMessage="Submitted by {name} on {date, date, long}"
@@ -140,7 +147,7 @@ const ExpenseSummary = ({
         <LoadingPlaceholder height={68} mb={3} />
       ) : (
         <div data-cy="expense-summary-items">
-          {expense.items.map(attachment => (
+          {(expense.items.length > 0 ? expense.items : expense.draft.items || []).map(attachment => (
             <React.Fragment key={attachment.id}>
               <Flex my={24} flexWrap="wrap">
                 {(isReceipt || attachment.url) && (
@@ -288,6 +295,17 @@ ExpenseSummary.propTypes = {
       id: PropTypes.string,
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
       data: PropTypes.object,
+    }),
+    draft: PropTypes.shape({
+      items: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string,
+          incurredAt: PropTypes.string,
+          description: PropTypes.string,
+          amount: PropTypes.number.isRequired,
+          url: PropTypes.string,
+        }),
+      ),
     }),
   }),
   /** Wether process actions (pay, approve, etc.) should be displayed */

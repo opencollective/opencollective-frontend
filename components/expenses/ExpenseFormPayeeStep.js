@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
-import { first, get, partition } from 'lodash';
+import { first, get, partition, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
@@ -12,7 +12,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 
-import { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
+import CollectivePicker, { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -115,12 +115,66 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
     values.payee &&
     !values.payee.isInvite &&
     [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
+  const canInvite =
+    values.type === expenseTypes.INVOICE &&
+    hasFeature(collective, FEATURES.SUBMIT_EXPENSE_ON_BEHALF) &&
+    values?.status !== expenseStatus.DRAFT;
   const profileOptions = payoutProfiles.map(value => ({
     value,
     label: value.name,
     [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
   }));
   const [myself, myorganizations] = partition(profileOptions, p => p.value.type == 'INDIVIDUAL');
+
+  const collectivePick = canInvite
+    ? ({ id }) => (
+        <CollectivePickerAsync
+          inputId={id}
+          data-cy="select-expense-payee"
+          collective={values.payee}
+          onChange={({ value }) => {
+            if (value) {
+              const payee =
+                value.slug && payoutProfiles.some(p => p.slug === value.slug)
+                  ? value
+                  : { ...pick(value, ['id', 'name', 'slug', 'email']), isInvite: true };
+
+              formik.setFieldValue('payee', payee);
+              formik.setFieldValue('payoutMethod', null);
+              setLocationFromPayee(formik, payee);
+            }
+          }}
+          limit={5}
+          styles={{
+            menu: {
+              borderRadius: '16px',
+            },
+            menuList: {
+              padding: '8px',
+            },
+          }}
+          emptyCustomOptions={[
+            { options: myself, label: 'Myself' },
+            { options: myorganizations, label: 'My Organizations' },
+          ]}
+          customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
+          getDefaultOptions={build => values.payee && build(values.payee)}
+          invitable
+        />
+      )
+    : ({ id }) => (
+        <CollectivePicker
+          inputId={id}
+          collectives={payoutProfiles}
+          getDefaultOptions={build => values.payee && build(values.payee)}
+          data-cy="select-expense-payee"
+          onChange={({ value }) => {
+            formik.setFieldValue('payee', value);
+            formik.setFieldValue('payoutMethod', null);
+            setLocationFromPayee(formik, value);
+          }}
+        />
+      );
 
   return (
     <Fragment>
@@ -145,37 +199,7 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
                 flex="1"
                 mt={3}
               >
-                {({ id }) => (
-                  <CollectivePickerAsync
-                    inputId={id}
-                    data-cy="select-expense-payee"
-                    collective={values.payee}
-                    onChange={({ value }) => {
-                      formik.setFieldValue('payee', value);
-                      formik.setFieldValue('payoutMethod', null);
-                      setLocationFromPayee(formik, value);
-                    }}
-                    limit={5}
-                    styles={{
-                      menu: {
-                        borderRadius: '16px',
-                      },
-                      menuList: {
-                        padding: '8px',
-                      },
-                    }}
-                    emptyCustomOptions={[
-                      { options: myself, label: 'Myself' },
-                      { options: myorganizations, label: 'My Organizations' },
-                    ]}
-                    customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
-                    invitable={
-                      values.type === expenseTypes.INVOICE &&
-                      hasFeature(collective, FEATURES.SUBMIT_EXPENSE_ON_BEHALF) &&
-                      values?.status !== expenseStatus.DRAFT
-                    }
-                  />
-                )}
+                {collectivePick}
               </StyledInputField>
             )}
           </Field>

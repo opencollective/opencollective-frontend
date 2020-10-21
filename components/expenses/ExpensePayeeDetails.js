@@ -55,7 +55,8 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
 })``;
 
 const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, collective }) => {
-  const { payee, payeeLocation } = expense || {};
+  const { payeeLocation } = expense || {};
+  const payee = expense?.payee?.isNewUser ? expense?.payee : expense?.draft?.payee || expense?.payee;
   const isInvoice = expense?.type === expenseTypes.INVOICE;
 
   return isLoading ? (
@@ -72,13 +73,18 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
         </PrivateInfoColumnHeader>
         <LinkCollective collective={payee}>
           <Flex alignItems="center" fontSize="12px">
-            {payee.isInvite ? (
-              <Avatar name={payee.name} radius={24} backgroundColor="blue.100" color="blue.400" />
+            {payee.isInvite || payee.isNewUser ? (
+              <Avatar
+                name={payee.organization?.name || payee.name}
+                radius={24}
+                backgroundColor="blue.100"
+                color="blue.400"
+              />
             ) : (
               <Avatar collective={payee} radius={24} />
             )}
             <Span ml={2} color="black.900" fontWeight="bold" truncateOverflow>
-              {payee.name}
+              {payee.organization?.name || payee.name}
             </Span>
           </Flex>
         </LinkCollective>
@@ -102,7 +108,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
         <Container fontSize="12px" color="black.600">
           <Box mb={3} data-cy="expense-summary-payout-method-type">
             <PayoutMethodTypeWithIcon
-              type={expense.payee?.isInvite ? PayoutMethodType.INVITE : expense.payoutMethod?.type}
+              type={!expense.payoutMethod?.type && expense.draft ? PayoutMethodType.INVITE : expense.payoutMethod?.type}
             />
           </Box>
           <div data-cy="expense-summary-payout-method-data">
@@ -192,6 +198,9 @@ ExpensePayeeDetails.propTypes = {
     type: PropTypes.oneOf(Object.values(expenseTypes)),
     tags: PropTypes.arrayOf(PropTypes.string),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
+    draft: PropTypes.shape({
+      payee: PropTypes.object,
+    }),
     payee: PropTypes.shape({
       id: PropTypes.string,
       name: PropTypes.string,
