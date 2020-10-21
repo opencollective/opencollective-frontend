@@ -4,7 +4,9 @@ import { FastField, Field } from 'formik';
 import { first, get, partition } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { AccountTypesWithHost } from '../../lib/constants/collectives';
+import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
@@ -167,7 +169,11 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
                       { options: myorganizations, label: 'My Organizations' },
                     ]}
                     customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
-                    invitable={values.type === expenseTypes.INVOICE}
+                    invitable={
+                      values.type === expenseTypes.INVOICE &&
+                      hasFeature(collective, FEATURES.SUBMIT_EXPENSE_ON_BEHALF) &&
+                      values?.status !== expenseStatus.DRAFT
+                    }
                   />
                 )}
               </StyledInputField>
