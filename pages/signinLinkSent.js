@@ -36,7 +36,7 @@ class SignInLinkSent extends Component {
     const { email } = this.props;
 
     return (
-      <Page title="Login Link Sent">
+      <Page title="Login Link Sent" noRobots>
         <Container pt={[4, 5]} pb={6} px={3} background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" textAlign="center">
           <Flex justifyContent="center" mb={4}>
             <Icon size="60" />
