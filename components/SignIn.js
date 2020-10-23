@@ -111,8 +111,9 @@ export default class SignIn extends React.Component {
               minWidth={100}
               ml={3}
               type="submit"
+              whiteSpace="nowrap"
             >
-              Sign In
+              <FormattedMessage id="signIn" defaultMessage="Sign In" />
             </StyledButton>
           </Flex>
           {error && showError && (
