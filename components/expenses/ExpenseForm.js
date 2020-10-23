@@ -24,7 +24,7 @@ import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
-import ExepnseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
+import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
 import { validateExpenseItem } from './ExpenseItemForm';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
@@ -264,7 +264,7 @@ const ExpenseFormBody = ({
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
           <HiddenFragment show={step == STEPS.PAYEE}>
             {isDraft && !loggedInAccount ? (
-              <ExepnseFormPayeeSignUpStep
+              <ExpenseFormPayeeSignUpStep
                 collective={collective}
                 formik={formik}
                 onCancel={onCancel}

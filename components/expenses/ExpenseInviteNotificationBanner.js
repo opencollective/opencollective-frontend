@@ -136,7 +136,7 @@ const ExpenseInviteNotificationBanner = props => {
               <ResendDraftInviteButton expense={props.expense} />
             )}
             <StyledLink href="mailto:support@opencollective.com" buttonStyle="standard" buttonSize="tiny">
-              <FormattedMessage id="ContactSupport" defaultMessage="Contact Support" />
+              <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
             </StyledLink>
           </Box>
         </Flex>
@@ -146,7 +146,7 @@ const ExpenseInviteNotificationBanner = props => {
 };
 
 ExpenseInviteNotificationBanner.propTypes = {
-  createdUser: PropTypes.object.isRequired,
+  createdUser: PropTypes.object,
   expense: PropTypes.object.isRequired,
 };
 

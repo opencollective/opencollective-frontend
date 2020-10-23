@@ -259,7 +259,6 @@ class ExpensePage extends React.Component {
         createdUser,
       });
     } catch (e) {
-      console.log(e);
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
       this.scrollToExpenseTop();
     }

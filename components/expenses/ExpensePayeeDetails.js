@@ -108,7 +108,11 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
         <Container fontSize="12px" color="black.600">
           <Box mb={3} data-cy="expense-summary-payout-method-type">
             <PayoutMethodTypeWithIcon
-              type={!expense.payoutMethod?.type && expense.draft ? PayoutMethodType.INVITE : expense.payoutMethod?.type}
+              type={
+                !expense.payoutMethod?.type && (expense.draft || expense.payee.isInvite)
+                  ? PayoutMethodType.INVITE
+                  : expense.payoutMethod?.type
+              }
             />
           </Box>
           <div data-cy="expense-summary-payout-method-data">
@@ -207,6 +211,7 @@ ExpensePayeeDetails.propTypes = {
       slug: PropTypes.string,
       type: PropTypes.string,
       isAdmin: PropTypes.bool,
+      isInvite: PropTypes.bool,
     }),
     payeeLocation: PropTypes.shape({
       address: PropTypes.string,

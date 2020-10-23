@@ -53,7 +53,7 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
         <Flex alignItems="center">
           <Avatar name="?" size={iconSize} backgroundColor="blue.100" color="blue.400" fontWeight="500" />
           <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            TBD
+            <FormattedMessage id="PayoutMethod.Type.ToBeDefined" defaultMessage="To be Defined" />
           </Span>
         </Flex>
       );

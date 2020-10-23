@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
+import { FormattedMessage } from 'react-intl';
 
 import { isValidEmail } from '../lib/utils';
 
@@ -16,7 +17,10 @@ export const InviteCollectiveDropdownOption = ({ onClick }) => (
       <img width="48px" height="48px" src="/static/images/magnifier.png" />
       <Box ml="16px">
         <Span fontSize="12px" fontWeight="700" color="black.800">
-          The person or organization you are looking for is not on Open Collective yet.
+          <FormattedMessage
+            id="CollectivePicker.InviteMenu.Description"
+            defaultMessage="The person or organization you are looking for is not on Open Collective yet."
+          />
         </Span>
       </Box>
     </Flex>
@@ -24,7 +28,10 @@ export const InviteCollectiveDropdownOption = ({ onClick }) => (
       <Flex alignItems="center">
         <PlusCircle size={24} />
         <Box ml="16px" fontSize="11px">
-          Invite someone to submit an expense
+          <FormattedMessage
+            id="CollectivePicker.InviteMenu.ButtonLabel"
+            defaultMessage="Invite someone to submit an expense"
+          />
         </Box>
       </Flex>
     </StyledButton>
@@ -52,13 +59,15 @@ export const InviteCollectiveForm = ({ onCancel, onSave }) => {
         }}
       >
         <StyledInputField
+          name="name"
           label="What's the name of who you want to invite?"
           labelFontSize="13px"
           labelColor="black.700"
           labelProps={{ fontWeight: 600 }}
         >
-          {() => (
+          {props => (
             <StyledInput
+              {...props}
               type="text"
               placeholder="i.e. John Smith"
               value={value.name}
@@ -68,13 +77,15 @@ export const InviteCollectiveForm = ({ onCancel, onSave }) => {
           )}
         </StyledInputField>
         <StyledInputField
+          name="email"
           label="What's their email?"
           labelFontSize="13px"
           labelColor="black.700"
           labelProps={{ fontWeight: 600 }}
         >
-          {() => (
+          {props => (
             <StyledInput
+              {...props}
               type="email"
               placeholder="i.e. johnsmitgh@gmail.com"
               value={value.email}
@@ -91,10 +102,10 @@ export const InviteCollectiveForm = ({ onCancel, onSave }) => {
             mr={2}
             type="submit"
           >
-            Save
+            <FormattedMessage id="save" defaultMessage="Save" />
           </StyledButton>
           <StyledButton buttonSize="small" onClick={() => onCancel()}>
-            Cancel
+            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
         </Box>
       </form>

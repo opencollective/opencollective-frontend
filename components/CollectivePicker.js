@@ -159,62 +159,61 @@ class CollectivePicker extends React.PureComponent {
     });
   });
 
-  getAllOptions = memoizeOne(
-    (collectivesOptions, customOptions, createdCollectives, { creatable, invitable, intl, customOptionsPosition }) => {
-      let options = collectivesOptions;
+  getAllOptions = memoizeOne((collectivesOptions, customOptions, createdCollectives) => {
+    const { creatable, invitable, intl, customOptionsPosition } = this.props;
+    let options = collectivesOptions;
 
-      if (createdCollectives.length > 0) {
-        options = [...createdCollectives.map(this.buildCollectiveOption), ...options];
-      }
+    if (createdCollectives.length > 0) {
+      options = [...createdCollectives.map(this.buildCollectiveOption), ...options];
+    }
 
-      if (customOptions && customOptions.length > 0) {
-        options =
-          customOptionsPosition === CUSTOM_OPTIONS_POSITION.TOP
-            ? [...customOptions, ...options]
-            : [...options, ...customOptions];
-      }
+    if (customOptions && customOptions.length > 0) {
+      options =
+        customOptionsPosition === CUSTOM_OPTIONS_POSITION.TOP
+          ? [...customOptions, ...options]
+          : [...options, ...customOptions];
+    }
 
-      if (invitable) {
-        options = [
-          ...options,
-          {
-            label: intl.formatMessage(Messages.inviteNew).toUpperCase(),
-            options: [
-              {
-                label: null,
-                value: null,
-                isDisabled: true,
-                [FLAG_INVITE_NEW]: true,
-                __background__: 'white',
-              },
-            ],
-          },
-        ];
-      }
-      if (creatable) {
-        const isOnlyForUser = isEqual(this.props.types, [CollectiveType.USER]);
-        options = [
-          ...options,
-          {
-            label: isOnlyForUser
-              ? intl.formatMessage(Messages.inviteNew).toUpperCase()
-              : intl.formatMessage(Messages.createNew).toUpperCase(),
-            options: [
-              {
-                label: null,
-                value: null,
-                isDisabled: true,
-                [FLAG_NEW_COLLECTIVE]: true,
-                __background__: 'white',
-              },
-            ],
-          },
-        ];
-      }
+    if (invitable) {
+      options = [
+        ...options,
+        {
+          label: intl.formatMessage(Messages.inviteNew).toUpperCase(),
+          options: [
+            {
+              label: null,
+              value: null,
+              isDisabled: true,
+              [FLAG_INVITE_NEW]: true,
+              __background__: 'white',
+            },
+          ],
+        },
+      ];
+    }
+    if (creatable) {
+      const isOnlyForUser = isEqual(this.props.types, [CollectiveType.USER]);
+      options = [
+        ...options,
+        {
+          label: isOnlyForUser
+            ? intl.formatMessage(Messages.inviteNew).toUpperCase()
+            : intl.formatMessage(Messages.createNew).toUpperCase(),
+          options: [
+            {
+              label: null,
+              value: null,
+              isDisabled: true,
+              [FLAG_NEW_COLLECTIVE]: true,
+              __background__: 'white',
+            },
+          ],
+        },
+      ];
+    }
 
-      return options;
-    },
-  );
+    return options;
+  });
 
   onChange = e => {
     this.props.onChange(e);
@@ -272,10 +271,7 @@ class CollectivePicker extends React.PureComponent {
     const {
       intl,
       collectives,
-      creatable,
-      invitable,
       customOptions,
-      customOptionsPosition,
       formatOptionLabel,
       getDefaultOptions,
       groupByType,
@@ -292,12 +288,7 @@ class CollectivePicker extends React.PureComponent {
     } = this.props;
     const { createFormCollectiveType, createdCollectives, displayInviteMenu, searchText } = this.state;
     const collectiveOptions = this.getOptionsFromCollectives(collectives, groupByType, sortFunc, intl);
-    const allOptions = this.getAllOptions(collectiveOptions, customOptions, createdCollectives, {
-      creatable,
-      invitable,
-      intl,
-      customOptionsPosition,
-    });
+    const allOptions = this.getAllOptions(collectiveOptions, customOptions, createdCollectives);
 
     const prefillValue = isEmail(searchText) ? { email: searchText } : { name: searchText };
 
