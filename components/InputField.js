@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { filter, get, map } from 'lodash';
+import { filter, get, isNil, map } from 'lodash';
 import dynamic from 'next/dynamic';
 import { Checkbox, Col, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'react-bootstrap';
 
@@ -575,7 +575,7 @@ class InputField extends React.Component {
             placeholder={field.placeholder}
             className={field.className}
             value={field.value}
-            defaultValue={field.defaultValue || ''}
+            defaultValue={!isNil(field.defaultValue) ? field.defaultValue : ''}
             validationState={this.state.validationState}
             step={field.step}
             min={field.min}
