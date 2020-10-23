@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import themeGet from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
 import { first, get, omit } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -98,7 +99,7 @@ const Fieldset = styled.fieldset`
 const RadioOptionContainer = styled.label`
   align-items: center;
   display: flex;
-  flex-grow: 1;
+  flex: 1 1 50%;
   font-size: 14px;
   font-weight: normal;
   line-height: 20px;
@@ -106,7 +107,12 @@ const RadioOptionContainer = styled.label`
   padding: 6px 16px;
 
   :not(:last-child) {
-    border-right: 1px solid #dcdee0;
+    @media (max-width: ${themeGet('breakpoints.0')}) {
+      border-bottom: 1px solid #dcdee0;
+    }
+    @media (min-width: ${themeGet('breakpoints.0')}) {
+      border-right: 1px solid #dcdee0;
+    }
   }
 `;
 
