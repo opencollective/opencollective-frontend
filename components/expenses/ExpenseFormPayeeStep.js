@@ -168,6 +168,7 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
           collectives={payoutProfiles}
           getDefaultOptions={build => values.payee && build(values.payee)}
           data-cy="select-expense-payee"
+          collective={values.payee}
           onChange={({ value }) => {
             formik.setFieldValue('payee', value);
             formik.setFieldValue('payoutMethod', null);

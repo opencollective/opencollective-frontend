@@ -197,10 +197,16 @@ const ExpenseFormBody = ({
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
-    if (loggedInAccount && !values.payee && !isEmpty(payoutProfiles)) {
+    if (loggedInAccount && !isEmpty(payoutProfiles)) {
       formik.setFieldValue('payee', first(payoutProfiles));
+    } else if (formik.values?.draft?.payee) {
+      formik.setFieldValue('payee', {
+        ...formik.values.draft.payee,
+        isInvite: false,
+        isNewUser: true,
+      });
     }
-  }, [payoutProfiles]);
+  }, [payoutProfiles, loggedInAccount]);
 
   // Pre-fill address based on the payout profile
   React.useEffect(() => {
@@ -542,13 +548,6 @@ const ExpenseForm = ({
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
   const initialValues = { ...getDefaultExpense(collective), ...expense };
   if (isDraft) {
-    if (!loggedInAccount) {
-      initialValues.payee = {
-        ...expense.draft.payee,
-        isInvite: false,
-        isNewUser: true,
-      };
-    }
     initialValues.items = expense.draft.items;
   }
 
