@@ -36,6 +36,7 @@ import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
 import Host from './sections/Host';
 import HostPlan from './sections/HostPlan';
+import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
@@ -465,6 +466,9 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH:
+        return <HostTwoFactorAuth collective={collective} />;
 
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
