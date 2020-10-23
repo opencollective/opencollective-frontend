@@ -702,7 +702,7 @@ class EditCollectiveForm extends React.Component {
           type: 'number',
           className: 'horizontal',
           post: '%',
-          defaultValue: get(this.state.collective, 'settings.hostFeePercent'),
+          defaultValue: get(this.state.collective, 'hostFeePercent'),
           when: () => collective.isHost,
         },
         {
