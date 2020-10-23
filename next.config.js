@@ -73,7 +73,7 @@ const nextConfig = {
     // Inspired by https://github.com/rohanray/next-fonts
     // Load Bootstrap and Font-Awesome fonts
     config.module.rules.push({
-      test: /fonts[\\/].*\.(woff|woff2|eot|ttf|otf|svg)$/,
+      test: /node_modules[\\/].*[\\/]fonts[\\/].*\.(woff|woff2|eot|ttf|otf|svg)$/,
       use: [
         {
           loader: 'url-loader',
