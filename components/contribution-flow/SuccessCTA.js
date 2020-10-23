@@ -121,7 +121,7 @@ const SuccessCTA = ({ type }) => {
 };
 
 SuccessCTA.propTypes = {
-  type: PropTypes.oneOf(['join', 'read', 'subscribe']),
+  type: PropTypes.oneOf(Object.values(SUCCESS_CTA_TYPE)),
 };
 
 export default SuccessCTA;

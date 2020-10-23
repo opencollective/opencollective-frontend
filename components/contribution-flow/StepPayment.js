@@ -169,6 +169,8 @@ const StepPayment = ({
                     useLegacyCallback={false}
                     onChange={paymentMethod => setNewPaymentMethod(NEW_CREDIT_CARD_KEY, paymentMethod)}
                     error={get(stepPayment, 'paymentMethod.stripeData.error.message')}
+                    defaultIsSaved={!stepProfile.isGuest}
+                    hasSaveCheckBox={!stepProfile.isGuest}
                   />
                 </Box>
               )}

@@ -7,7 +7,7 @@ import { withUser } from '../UserProvider';
 import StepProfileGuestForm from './StepProfileGuestForm';
 import StepProfileLoggedInForm from './StepProfileLoggedInForm';
 
-const NewContributionFlowStepProfile = ({
+const StepProfile = ({
   LoggedInUser,
   collective,
   stepDetails,
@@ -35,7 +35,7 @@ const NewContributionFlowStepProfile = ({
   );
 };
 
-NewContributionFlowStepProfile.propTypes = {
+StepProfile.propTypes = {
   LoggedInUser: PropTypes.object,
   collective: PropTypes.object,
   stepDetails: PropTypes.shape({
@@ -49,4 +49,4 @@ NewContributionFlowStepProfile.propTypes = {
   canUseIncognito: PropTypes.bool,
 };
 
-export default withUser(NewContributionFlowStepProfile);
+export default withUser(StepProfile);

@@ -1657,6 +1657,26 @@ type Fund implements CollectiveInterface {
 }
 
 """
+Input type for guest contributions
+"""
+input GuestInfoInput {
+  """
+  Contributor's email
+  """
+  email: String
+
+  """
+  Full name of the user
+  """
+  name: String
+
+  """
+  The unique guest token
+  """
+  token: String
+}
+
+"""
 Properties by which hosts can be ordered.
 """
 enum HostCollectiveOrderFieldType {
@@ -1989,6 +2009,7 @@ type Mutation {
   """
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
   createOrder(order: OrderInputType!): OrderType
+    @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
   confirmOrder(order: ConfirmOrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
@@ -2384,6 +2405,11 @@ input OrderInputType {
   tier: TierInputType
   customData: JSON
   recaptchaToken: String
+
+  """
+  Use this when fromAccount is null to pass the guest info
+  """
+  guestInfo: GuestInfoInput
 
   """
   The amount of taxes that were included in totalAmount

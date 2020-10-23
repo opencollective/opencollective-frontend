@@ -53,22 +53,22 @@ describe('event.createOrder page', () => {
       cy.contains('[data-cy="select-option"]', 'Algeria').click();
       cy.contains(breakdownLineSelector, 'VAT').contains('+ $0.00');
       cy.contains(breakdownLineSelector, 'TOTAL').contains('$80.00');
-      cy.contains('button', 'Next step').should('not.be.disabled');
+      cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
 
       // French should have taxes
       cy.get('[data-cy="country-select"]').click();
       cy.contains('[data-cy="select-option"]', 'France - FR').click();
       cy.contains(breakdownLineSelector, 'VAT').contains('+ $16.80');
       cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');
-      cy.contains('button', 'Next step').should('not.be.disabled');
+      cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
 
       // ...except if they can provide a valid VAT number
       cy.contains('div', 'Enter VAT number (if you have one)').click();
 
       // Submit is disabled while form is active
-      cy.contains('button', 'Next step').should('be.disabled');
+      cy.get('button[data-cy="cf-next-step"]').should('be.disabled');
       cy.get('.cf-tax-form .close').click();
-      cy.contains('button', 'Next step').should('not.be.disabled');
+      cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
 
       // Must provide a valid VAT number
       cy.contains('div', 'Enter VAT number (if you have one)').click();
@@ -80,7 +80,7 @@ describe('event.createOrder page', () => {
       cy.contains('.cf-tax-form button', 'Done').click();
 
       // Values should be updated
-      cy.contains('button', 'Next step').should('not.be.disabled');
+      cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
       cy.contains('FRXX999999999'); // Number is properly formatted
       cy.contains(breakdownLineSelector, 'VAT').contains('+ $0.00');
       cy.contains(breakdownLineSelector, 'TOTAL').contains('$80.00');
@@ -113,7 +113,7 @@ describe('event.createOrder page', () => {
       cy.getByDataCy('cf-next-step').click();
       cy.useAnyPaymentMethod();
       cy.wait(500);
-      cy.contains('button', 'Make contribution').click();
+      cy.contains('button', 'Contribute $96.80').click();
       cy.wait(500);
       cy.getByDataCy('order-success', { timeout: 20000 });
     });
@@ -139,7 +139,7 @@ describe('event.createOrder page', () => {
         expect(location.search).to.eq('?quantity=2');
       });
 
-      cy.contains('Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
 
       // Free per default
       cy.get('input[type=number][name=custom-amount]').should('have.value', '0');
@@ -152,10 +152,10 @@ describe('event.createOrder page', () => {
       cy.contains('Show more');
 
       // Can submit freely
-      cy.contains('Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('This is a free ticket, you can submit your order directly.');
 
-      cy.contains('Make contribution').click();
+      cy.contains('button', 'Make contribution').click();
       cy.contains(
         'Test User Admin has registered for the event Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding (Free)',
       );
@@ -172,18 +172,18 @@ describe('event.createOrder page', () => {
         expect(location.search).to.eq('?quantity=2');
       });
 
-      cy.contains('Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
 
       cy.get('input[type=number][name=custom-amount]').should('have.value', '250');
       cy.get('input[type=number][name=quantity]').should('have.value', '2');
       cy.contains('[data-cy="progress-step-details"]', '$250.00 x 2');
 
       // Submit
-      cy.contains('Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('You’ll contribute with the amount of $500.00.');
       cy.wait(1000); // Wait for stripe to be loaded
       cy.fillStripeInput();
-      cy.contains('button', 'Make contribution').click();
+      cy.contains('button', 'Contribute').click();
 
       cy.getByDataCy('order-success', { timeout: 20000 }).contains('$500.00');
       cy.contains(

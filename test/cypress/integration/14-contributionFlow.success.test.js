@@ -14,13 +14,13 @@ describe('Contribution Flow: Order success', () => {
       const visitParams = { onBeforeLoad: mockRecaptcha };
       cy.signup({ user: userParams, redirect: newFlowRoute, visitParams }).then(() => {
         cy.waitForLoggedIn();
-        cy.contains('button', 'Next step').click();
+        cy.get('button[data-cy="cf-next-step"]').click();
         cy.wait(50);
-        cy.contains('button', 'Next step').click();
+        cy.get('button[data-cy="cf-next-step"]').click();
         cy.wait(4000); // Wait for stripe to be loaded
         cy.useAnyPaymentMethod();
         cy.wait(1000);
-        cy.contains('button', 'Make contribution').click();
+        cy.contains('button', 'Contribute').click();
         cy.wait(4000);
       });
     });

@@ -43,11 +43,13 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     onReady: PropTypes.func,
     stripe: PropTypes.object,
     useLegacyCallback: PropTypes.bool,
+    defaultIsSaved: PropTypes.bool,
   };
 
   static defaultProps = {
     hasSaveCheckBox: true,
     hidePostalCode: false,
+    defaultIsSaved: true,
   };
 
   state = { value: null };
@@ -87,25 +89,26 @@ class NewCreditCardFormWithoutStripe extends React.Component {
   };
 
   onCardChange = e => {
-    if (this.props.useLegacyCallback) {
-      this.props.onChange({ name, type: 'StripeCreditCard', value: e });
+    const { useLegacyCallback, onChange, defaultIsSaved } = this.props;
+    if (useLegacyCallback) {
+      onChange({ name, type: 'StripeCreditCard', value: e });
     } else {
       this.setState(
         ({ value }) => ({
           value: {
             ...value,
             type: GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD,
-            isSavedForLater: isUndefined(value?.isSavedForLater) || value.isSavedForLater ? true : false,
+            isSavedForLater: isUndefined(value?.isSavedForLater) || value.isSavedForLater ? defaultIsSaved : false,
             stripeData: e,
           },
         }),
-        () => this.props.onChange(this.state.value),
+        () => onChange(this.state.value),
       );
     }
   };
 
   render() {
-    const { error, hasSaveCheckBox, hidePostalCode } = this.props;
+    const { error, hasSaveCheckBox, hidePostalCode, defaultIsSaved } = this.props;
     return (
       <Flex flexDirection="column">
         <StyledCardElement
@@ -121,7 +124,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
         {hasSaveCheckBox && (
           <Flex mt={3} alignItems="center" color="black.700">
             <StyledCheckbox
-              defaultChecked
+              defaultChecked={defaultIsSaved}
               name="save"
               onChange={this.onCheckboxChange}
               label={<FormattedMessage id="paymentMethod.save" defaultMessage="Remember this payment method" />}

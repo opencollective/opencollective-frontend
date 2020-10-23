@@ -2683,6 +2683,12 @@ type Debit implements Transaction {
 }
 
 """
+A field whose value conforms to the standard internet email address format as
+specified in RFC822: https://www.w3.org/Protocols/rfc822/.
+"""
+scalar EmailAddress
+
+"""
 This represents an Event account
 """
 type Event implements Account & AccountWithHost & AccountWithContributions {
@@ -3703,6 +3709,31 @@ input FundCreateInput {
 }
 
 """
+Input type for guest contributions
+"""
+input GuestInfoInput {
+  """
+  Contributor's email
+  """
+  email: EmailAddress!
+
+  """
+  Full name of the user
+  """
+  name: String
+
+  """
+  The unique guest token
+  """
+  token: String
+
+  """
+  Address of the user, mandatory when amount is above $5000.
+  """
+  location: LocationInput
+}
+
+"""
 This represents an Host account
 """
 type Host implements Account & AccountWithContributions {
@@ -4215,9 +4246,10 @@ type Individual implements Account {
   location: Location
   categories: [String]!
   stats: AccountStats
-  firstName: String
-  lastName: String
+  firstName: String @deprecated(reason: "2020-10-12: Use the name field")
+  lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
+  isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
 }
@@ -4736,7 +4768,14 @@ type Mutation {
     """
     amount: AmountInput
   ): Order
-  confirmOrder(order: OrderReferenceInput!): OrderWithPayment!
+  confirmOrder(
+    order: OrderReferenceInput!
+
+    """
+    If the order was made as a guest, you can use this field to authenticate
+    """
+    guestToken: String
+  ): OrderWithPayment!
 
   """
   Add a new payment method to be used with an Order
@@ -4910,14 +4949,19 @@ input OrderCreateInput {
   frequency: ContributionFrequency!
 
   """
-  The profile making the order
+  The profile making the order. Can be null for guest contributions.
   """
-  fromAccount: AccountReferenceInput!
+  fromAccount: AccountReferenceInput
 
   """
   The profile you want to contribute to
   """
   toAccount: AccountReferenceInput!
+
+  """
+  Use this when fromAccount is null to pass the guest info
+  """
+  guestInfo: GuestInfoInput
 
   """
   The payment method used for this order
@@ -5019,6 +5063,11 @@ type OrderWithPayment {
   The order created
   """
   order: Order!
+
+  """
+  If donating as a guest, this will contain your guest token to contribute again in the future
+  """
+  guestToken: String
 
   """
   This field will be set if the order was created but there was an error with Stripe during the payment

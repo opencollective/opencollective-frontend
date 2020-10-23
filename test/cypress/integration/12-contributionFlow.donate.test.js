@@ -36,7 +36,7 @@ describe('Contribution Flow: Donate', () => {
       cy.contains("Today's charge");
       cy.contains('Next charge on May 1, 2043');
 
-      cy.contains('Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
 
       // ---- Step profile ----
       cy.checkStepsProgress({ enabled: ['profile', 'details'], disabled: 'payment' });
@@ -48,7 +48,7 @@ describe('Contribution Flow: Donate', () => {
 
       // User profile is shown on step, all other steps must be disabled
       cy.getByDataCy(`progress-step-profile`).contains(`${user.firstName} ${user.lastName}`);
-      cy.contains('Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
 
       // ---- Step Payment ----
       cy.checkStepsProgress({ enabled: ['profile', 'details', 'payment'] });
@@ -59,12 +59,12 @@ describe('Contribution Flow: Donate', () => {
 
       // Ensure we display errors
       cy.fillStripeInput({ card: { creditCardNumber: 123 } });
-      cy.contains('button', 'Make contribution').click();
+      cy.contains('button', 'Contribute $1,337').click();
       cy.contains('Your card number is incomplete.');
 
       // Submit with valid credit card
       cy.fillStripeInput();
-      cy.contains('button', 'Make contribution').click();
+      cy.contains('button', 'Contribute $1,337').click();
 
       // ---- Final: Success ----
       cy.getByDataCy('order-success', { timeout: 20000 }).contains('$1,337.00 USD / year');
@@ -77,13 +77,13 @@ describe('Contribution Flow: Donate', () => {
       cy.checkStepsProgress({ enabled: 'details', disabled: ['profile', 'payment'] });
 
       // Previous credit card should be added to the account
-      cy.contains('Next step').click();
-      cy.contains('Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('#PaymentMethod label:first', 'VISA ****');
       cy.get('#PaymentMethod label:first input[type=radio]').should('be.checked');
 
       // Submit a new order with existing card
-      cy.contains('button', 'Make contribution').click();
+      cy.contains('button', 'Contribute $20').click();
       cy.getByDataCy('order-success', { timeout: 20000 }).contains('Thank you!');
     });
   });
@@ -91,7 +91,7 @@ describe('Contribution Flow: Donate', () => {
   it('Can donate as new organization', () => {
     cy.signup({ redirect: donateRoute, visitParams }).then(() => {
       cy.get('#amount > :nth-child(3)').click();
-      cy.contains('button:not([disabled])', 'Next step').click();
+      cy.get('button[data-cy="cf-next-step"]:not([disabled])').click();
       cy.contains('[data-cy="ContributionProfile"] > label', 'A new organization').click();
 
       // Name must be shown on step
@@ -103,10 +103,10 @@ describe('Contribution Flow: Donate', () => {
       cy.get('[data-cy="ContributionProfile"] input[name=twitterHandle]').type('test');
 
       // Submit form
-      cy.contains('button:not([disabled])', 'Next step').click();
+      cy.get('button[data-cy="cf-next-step"]:not([disabled])').click();
       cy.wait(2000);
       cy.fillStripeInput();
-      cy.contains('button', 'Make contribution').click();
+      cy.contains('button', 'Contribute $20').click();
 
       // ---- Final: Success ----
       cy.getByDataCy('order-success', { timeout: 20000 }).contains('$20.00 USD');
@@ -118,18 +118,17 @@ describe('Contribution Flow: Donate', () => {
     cy.signup({ redirect: `${donateRoute}/42/year`, visitParams }).then(() => {
       cy.clock(Date.parse('2042/05/25'));
       cy.contains('Next charge on May 1, 2043');
-      cy.contains('button', 'Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       cy.checkStepsProgress({ enabled: ['details', 'profile'] });
-      cy.contains('button', 'Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       cy.wait(1000); // Wait for stripe to be loaded
       cy.fillStripeInput();
-      cy.contains('Next step').click();
 
       // Should display the contribution details
       cy.contains('[data-cy="progress-step-details"]', '$42.00 USD / year');
 
       // Submit order
-      cy.contains('button', 'Make contribution').click();
+      cy.contains('button', 'Contribute $42').click();
 
       // Check success page
       cy.getByDataCy('order-success', { timeout: 20000 }).contains('$42.00 USD / year');
@@ -139,12 +138,12 @@ describe('Contribution Flow: Donate', () => {
 
   it('works with 3D secure', () => {
     cy.signup({ redirect: `${donateRoute}/42/year`, visitParams, user: { name: 'John Doe' } });
-    cy.contains('button', 'Next step').click();
-    cy.contains('button', 'Next step').click();
+    cy.get('button[data-cy="cf-next-step"]').click();
+    cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile', 'payment'] });
     cy.wait(3000); // Wait for stripe to be loaded
     cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
-    cy.contains('button', 'Make contribution').click();
+    cy.contains('button', 'Contribute $42').click();
     cy.wait(8000); // Wait for order to be submitted and popup to appear
 
     // Rejecting the validation should produce an error
@@ -155,7 +154,7 @@ describe('Contribution Flow: Donate', () => {
     cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
 
     // Re-trigger the popup
-    cy.contains('button', 'Make contribution').click();
+    cy.contains('button', 'Contribute $42').click();
 
     // Approving the validation should create the order
     cy.wait(8000); // Wait for order to be submitted and popup to appear

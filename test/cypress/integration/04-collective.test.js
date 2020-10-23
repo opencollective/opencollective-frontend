@@ -205,12 +205,12 @@ describe('Edit public message after contribution', () => {
       /** Make a donation by a new user */
       cy.signup({ redirect: `/${slug}/donate`, visitParams: { onBeforeLoad: mockRecaptcha } }).then(() => {
         // SECTION: Make a donation to the collective
-        cy.contains('button', 'Next step').click();
+        cy.get('button[data-cy="cf-next-step"]').click();
         cy.wait(50);
-        cy.contains('button', 'Next step').click();
+        cy.get('button[data-cy="cf-next-step"]').click();
         cy.wait(1000); // Wait for stripe to be loaded
         cy.fillStripeInput();
-        cy.contains('button', 'Make contribution').click();
+        cy.contains('button', 'Contribute').click();
         cy.wait(1000); // It takes a little bit of time to create the order.
         // Wait for the order to succeed
         cy.getByDataCy('order-success', { timeout: 20000 });

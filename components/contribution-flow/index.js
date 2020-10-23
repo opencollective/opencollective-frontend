@@ -17,6 +17,7 @@ import { getEnvVar } from '../../lib/env-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
+import { getGuestToken, setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
@@ -41,6 +42,7 @@ import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
 import SafeTransactionMessage from './SafeTransactionMessage';
+import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
 
@@ -136,8 +138,18 @@ class ContributionFlow extends React.Component {
 
   submitOrder = async () => {
     const { stepDetails, stepProfile, stepSummary } = this.state;
-    const fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     this.setState({ error: null });
+
+    let fromAccount, guestInfo;
+    if (stepProfile.isGuest) {
+      guestInfo = {
+        ...pick(stepProfile, ['email', 'name', 'location']),
+        token: getGuestToken(stepProfile.email),
+      };
+    } else {
+      fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
+    }
+
     try {
       const response = await this.props.createOrder({
         variables: {
@@ -145,6 +157,7 @@ class ContributionFlow extends React.Component {
             quantity: stepDetails.quantity,
             amount: { valueInCents: stepDetails.amount },
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
+            guestInfo,
             fromAccount,
             toAccount: pick(this.props.collective, ['id']),
             customData: stepDetails.customData,
@@ -163,21 +176,25 @@ class ContributionFlow extends React.Component {
         },
       });
 
-      return this.handleOrderResponse(response.data.createOrder);
+      return this.handleOrderResponse(response.data.createOrder, stepProfile.email);
     } catch (e) {
       this.showError(getErrorFromGraphqlException(e));
     }
   };
 
-  handleOrderResponse = async ({ order, stripeError }) => {
+  handleOrderResponse = async ({ order, stripeError, guestToken }, email) => {
+    if (guestToken) {
+      setGuestToken(email, guestToken);
+    }
+
     if (stripeError) {
-      return this.handleStripeError(order, stripeError);
+      return this.handleStripeError(order, stripeError, email, guestToken);
     } else {
       return this.handleSuccess(order);
     }
   };
 
-  handleStripeError = async (order, stripeError) => {
+  handleStripeError = async (order, stripeError, email, guestToken) => {
     const { message, account, response } = stripeError;
     if (!response) {
       this.setState({ isSubmitting: false, error: message });
@@ -189,8 +206,8 @@ class ContributionFlow extends React.Component {
       } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
         this.setState({ isSubmitting: true, error: null });
         try {
-          const response = await this.props.confirmOrder({ variables: { order: { id: order.id } } });
-          return this.handleOrderResponse(response.data.confirmOrder);
+          const response = await this.props.confirmOrder({ variables: { order: { id: order.id }, guestToken } });
+          return this.handleOrderResponse(response.data.confirmOrder, email);
         } catch (e) {
           this.setState({ isSubmitting: false, error: e.message });
         }
@@ -267,11 +284,13 @@ class ContributionFlow extends React.Component {
 
   /** Validate step profile, create new incognito/org if necessary */
   validateStepProfile = async action => {
-    const { stepProfile } = this.state;
+    const { stepProfile, stepDetails } = this.state;
 
     // Can only ignore validation if going back
     if (!stepProfile) {
       return action === 'prev';
+    } else if (stepProfile.isGuest) {
+      return validateGuestProfile(stepProfile, stepDetails);
     }
 
     // Check if we're creating a new profile
@@ -547,7 +566,7 @@ class ContributionFlow extends React.Component {
 
   render() {
     const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails } = this.props;
-    const { error, isSubmitted, isSubmitting } = this.state;
+    const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
 
     return (
       <Steps
@@ -588,10 +607,10 @@ class ContributionFlow extends React.Component {
                 currentStep={currentStep}
                 lastVisitedStep={lastVisitedStep}
                 goToStep={goToStep}
-                stepProfile={this.state.stepProfile}
-                stepDetails={this.state.stepDetails}
-                stepPayment={this.state.stepPayment}
-                stepSummary={this.state.stepSummary}
+                stepProfile={stepProfile}
+                stepDetails={stepDetails}
+                stepPayment={stepPayment}
+                stepSummary={stepSummary}
                 isSubmitted={this.state.isSubmitted}
                 loading={isValidating || isSubmitted || isSubmitting}
                 currency={collective.currency}
@@ -657,9 +676,11 @@ class ContributionFlow extends React.Component {
                       step={currentStep}
                       prevStep={prevStep}
                       nextStep={nextStep}
-                      isRecurringContributionLoggedOut={Boolean(!LoggedInUser && this.state.stepDetails?.interval)}
+                      isRecurringContributionLoggedOut={Boolean(!LoggedInUser && stepDetails?.interval)}
                       isValidating={isValidating || isSubmitted || isSubmitting}
                       paypalButtonProps={this.getPaypalButtonProps()}
+                      totalAmount={getTotalAmount(stepDetails, stepSummary)}
+                      currency={collective.currency}
                     />
                   </Box>
                 </Box>
@@ -669,8 +690,8 @@ class ContributionFlow extends React.Component {
                     <Box mt={4}>
                       <ContributionSummary
                         collective={collective}
-                        stepDetails={this.state.stepDetails}
-                        stepSummary={this.state.stepSummary}
+                        stepDetails={stepDetails}
+                        stepSummary={stepSummary}
                       />
                     </Box>
                     <ContributeFAQ mt={4} titleProps={{ mb: 2 }} />
@@ -758,6 +779,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
 
 const orderResponseFragment = gqlV2/* GraphQL */ `
   fragment OrderResponseFragment on OrderWithPayment {
+    guestToken
     order {
       ...OrderSuccessFragment
     }
@@ -787,8 +809,8 @@ const addCreateOrderMutation = graphql(
 
 const addConfirmOrderMutation = graphql(
   gqlV2/* GraphQL */ `
-    mutation CreateOrder($order: OrderReferenceInput!) {
-      confirmOrder(order: $order) {
+    mutation ConfirmOrder($order: OrderReferenceInput!, $guestToken: String) {
+      confirmOrder(order: $order, guestToken: $guestToken) {
         ...OrderResponseFragment
       }
     }
