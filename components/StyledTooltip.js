@@ -10,20 +10,20 @@ const StyledTooltipContainer = styled(`div`)`
   max-width: 320px;
   z-index: 1000000;
   opacity: 0.96 !important;
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: 0px 3px 6px 1px rgba(20, 20, 20, 0.08);
-  padding: 16px;
+  padding: 12px 16px;
   font-size: 12px;
   text-transform: initial;
   white-space: normal;
   color: white;
-  border: 1px solid #f3f3f3;
-  background: black;
+  background: #141414;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
 `;
 
 const Arrow = styled('div')`
   position: absolute;
+  font-size: 8px;
   width: 3em;
   height: 3em;
   &[data-placement*='bottom'] {
@@ -34,7 +34,7 @@ const Arrow = styled('div')`
     height: 1em;
     &::before {
       border-width: 0 1.5em 1em 1.5em;
-      border-color: transparent transparent #00000f transparent;
+      border-color: transparent transparent #141414 transparent;
       filter: drop-shadow(0px -3px 3px rgba(20, 20, 20, 0.1));
     }
   }
@@ -46,7 +46,7 @@ const Arrow = styled('div')`
     height: 1em;
     &::before {
       border-width: 1em 1.5em 0 1.5em;
-      border-color: #00000f transparent transparent transparent;
+      border-color: #141414 transparent transparent transparent;
       filter: drop-shadow(0px 3px 3px rgba(20, 20, 20, 0.1));
     }
   }
@@ -57,7 +57,7 @@ const Arrow = styled('div')`
     width: 1em;
     &::before {
       border-width: 1.5em 1em 1.5em 0;
-      border-color: transparent #00000f transparent transparent;
+      border-color: transparent #141414 transparent transparent;
       filter: drop-shadow(-4px 3px 3px rgba(20, 20, 20, 0.1));
     }
   }
@@ -68,7 +68,7 @@ const Arrow = styled('div')`
     width: 1em;
     &::before {
       border-width: 1.5em 0 1.5em 1em;
-      border-color: transparent transparent transparent #00000f;
+      border-color: transparent transparent transparent #141414;
       filter: drop-shadow(4px 3px 3px rgba(20, 20, 20, 0.1));
     }
   }
@@ -93,6 +93,20 @@ const REACT_POPPER_MODIFIERS = [
     options: {
       fallbackPlacements: ['right', 'bottom', 'top'],
       padding: { right: 100 },
+    },
+  },
+  {
+    name: 'offset',
+    options: {
+      offset: ({ placement }) => {
+        switch (placement) {
+          case 'top':
+          case 'bottom':
+            return [0, 3];
+          default:
+            return [];
+        }
+      },
     },
   },
 ];
@@ -128,31 +142,24 @@ class StyledTooltip extends React.Component {
     display: 'inline-block',
   };
 
-  state = { id: null, popperOpen: false, popperDeepOpen: false }; // We only set `id` on the client to avoid mismatches with SSR
+  state = { id: null, isHovered: false, showPopup: false }; // We only set `id` on the client to avoid mismatches with SSR
 
   componentDidMount() {
     this.setState({ id: `tooltip-${uuid()}` });
   }
 
-  handlePopperOpen = () => {
-    this.setState({ popperOpen: true });
-  };
+  componentDidUpdate(_, oldState) {
+    if (!oldState.isHovered && this.state.isHovered) {
+      if (this.closeTimeout) {
+        clearTimeout(this.closeTimeout);
+        this.closeTimeout = null;
+      }
 
-  handlePopperClose = () => {
-    if (!this.state.popperDeepOpen) {
-      setTimeout(() => this.setState({ popperOpen: false }), this.props.delayHide);
+      this.setState({ showPopup: true });
+    } else if (oldState.isHovered && !this.state.isHovered) {
+      this.closeTimeout = setTimeout(() => this.setState({ showPopup: false }), this.props.delayHide);
     }
-  };
-
-  handledeepPopperOpen = () => {
-    this.setState({ popperDeepOpen: true, popperOpen: true });
-  };
-
-  handledeepPopperClose = () => {
-    this.setState({ popperDeepOpen: false }, () => {
-      this.handlePopperClose();
-    });
-  };
+  }
 
   render() {
     const isMounted = Boolean(this.state.id);
@@ -163,10 +170,9 @@ class StyledTooltip extends React.Component {
             {({ ref }) => (
               <Box
                 ref={ref}
-                css={{ display: 'inline' }}
-                onMouseEnter={this.handlePopperOpen}
-                onMouseOver={this.handlePopperOpen}
-                onMouseLeave={this.handlePopperClose}
+                css={{ display: 'inline-block' }}
+                onMouseEnter={() => this.setState({ isHovered: true })}
+                onMouseLeave={() => this.setState({ isHovered: false })}
               >
                 {typeof this.props.children === 'function' ? (
                   this.props.children()
@@ -179,14 +185,14 @@ class StyledTooltip extends React.Component {
             )}
           </Reference>
 
-          {isMounted && (this.state.popperOpen || this.state.popperDeepOpen) && (
+          {isMounted && this.state.showPopup && (
             <Popper placement={this.props.place} modifiers={REACT_POPPER_MODIFIERS}>
               {({ ref, style, placement, arrowProps }) => (
                 <StyledTooltipContainer
                   ref={ref}
                   style={style}
-                  onMouseEnter={this.handledeepPopperOpen}
-                  onMouseLeave={this.handledeepPopperClose}
+                  onMouseEnter={() => this.setState({ isHovered: true })}
+                  onMouseLeave={() => this.setState({ isHovered: false })}
                 >
                   {typeof this.props.content === 'function' ? this.props.content() : this.props.content}
 
