@@ -694,7 +694,7 @@ const ExpenseFormBody = ({
 
       {step == STEPS.EXPENSE && (
         <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
-          <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless />
+          <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless collective={collective} />
         </StyledCard>
       )}
     </Form>

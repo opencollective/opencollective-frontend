@@ -290,6 +290,7 @@ class CreateExpensePage extends React.Component {
                               ...this.state.expense,
                               createdByAccount: this.props.data.loggedInAccount,
                             }}
+                            collective={collective}
                           />
                           <Box mt={24}>
                             <ExpenseNotesForm
