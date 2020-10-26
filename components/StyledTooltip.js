@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReactDOM from 'react-dom';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
-
-import { Box } from './Grid';
 
 const StyledTooltipContainer = styled(`div`)`
   max-width: 320px;
@@ -111,6 +110,20 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
+const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave }) => {
+  return ReactDOM.createPortal(
+    <Popper placement={place} modifiers={REACT_POPPER_MODIFIERS}>
+      {({ ref, style, placement, arrowProps }) => (
+        <StyledTooltipContainer ref={ref} style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+          {typeof content === 'function' ? content() : content}
+          <Arrow ref={arrowProps.ref} data-placement={placement} style={arrowProps.style} />
+        </StyledTooltipContainer>
+      )}
+    </Popper>,
+    document.body,
+  );
+};
+
 /**
  * A tooltip to show overlays on hover.
  *
@@ -161,45 +174,49 @@ class StyledTooltip extends React.Component {
     }
   }
 
+  onMouseEnter = () => {
+    this.setState({ isHovered: true });
+  };
+
+  onMouseLeave = () => {
+    this.setState({ isHovered: false });
+  };
+
   render() {
     const isMounted = Boolean(this.state.id);
+
     return (
       <React.Fragment>
         <Manager>
           <Reference>
-            {({ ref }) => (
-              <Box
-                ref={ref}
-                css={{ display: 'inline-block' }}
-                onMouseEnter={() => this.setState({ isHovered: true })}
-                onMouseLeave={() => this.setState({ isHovered: false })}
-              >
-                {typeof this.props.children === 'function' ? (
-                  this.props.children()
-                ) : (
-                  <ChildrenContainer as={this.props.childrenContainer} display={this.props.display}>
-                    {this.props.children}
-                  </ChildrenContainer>
-                )}
-              </Box>
-            )}
+            {({ ref }) =>
+              typeof this.props.children === 'function' ? (
+                this.props.children({
+                  ref: ref,
+                  onMouseEnter: this.onMouseEnter,
+                  onMouseLeave: this.onMouseLeave,
+                })
+              ) : (
+                <ChildrenContainer
+                  ref={ref}
+                  as={this.props.childrenContainer}
+                  display={this.props.display}
+                  onMouseEnter={this.onMouseEnter}
+                  onMouseLeave={this.onMouseLeave}
+                >
+                  {this.props.children}
+                </ChildrenContainer>
+              )
+            }
           </Reference>
 
           {isMounted && this.state.showPopup && (
-            <Popper placement={this.props.place} modifiers={REACT_POPPER_MODIFIERS}>
-              {({ ref, style, placement, arrowProps }) => (
-                <StyledTooltipContainer
-                  ref={ref}
-                  style={style}
-                  onMouseEnter={() => this.setState({ isHovered: true })}
-                  onMouseLeave={() => this.setState({ isHovered: false })}
-                >
-                  {typeof this.props.content === 'function' ? this.props.content() : this.props.content}
-
-                  <Arrow ref={arrowProps.ref} data-placement={placement} style={arrowProps.style} />
-                </StyledTooltipContainer>
-              )}
-            </Popper>
+            <TooltipContent
+              place={this.props.place}
+              content={this.props.content}
+              onMouseEnter={this.onMouseEnter}
+              onMouseLeave={this.onMouseLeave}
+            />
           )}
         </Manager>
       </React.Fragment>
