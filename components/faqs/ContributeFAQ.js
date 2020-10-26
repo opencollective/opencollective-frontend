@@ -60,7 +60,13 @@ const ContributeFAQ = props => (
       </Content>
     </Entry>
     <Box mt={2}>
-      <StyledLink as={StyledLink} href="https://www.opencollective.com" openInNewTab fontSize="12px" color="black.700">
+      <StyledLink
+        as={StyledLink}
+        href="https://docs.opencollective.com/help/financial-contributors/payments#financial-contribution-flow"
+        openInNewTab
+        fontSize="12px"
+        color="black.700"
+      >
         <FormattedMessage id="moreInfo" defaultMessage="More info" />
         &nbsp;&rarr;
       </StyledLink>
