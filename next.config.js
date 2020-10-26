@@ -70,24 +70,6 @@ const nextConfig = {
       use: ['babel-loader', 'raw-loader', 'markdown-loader'],
     });
 
-    // Inspired by https://github.com/rohanray/next-fonts
-    // Load Bootstrap and Font-Awesome fonts
-    config.module.rules.push({
-      test: /node_modules[\\/].*[\\/]fonts[\\/].*\.(woff|woff2|eot|ttf|otf|svg)$/,
-      use: [
-        {
-          loader: 'url-loader',
-          options: {
-            limit: 8192,
-            fallback: 'file-loader',
-            publicPath: '/_next/static/fonts/',
-            outputPath: 'static/fonts/',
-            name: '[name]-[hash].[ext]',
-          },
-        },
-      ],
-    });
-
     // Configuration for images
     config.module.rules.unshift({
       test: /public\/.*\/images[\\/].*\.(jpg|gif|png|svg)$/,
