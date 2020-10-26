@@ -1403,7 +1403,6 @@
   "RejectContribution": "Rejeter et rembourser",
   "RejectionReason": "Type your rejection reason here if you want.",
   "Remove": "Supprimer",
-  "RequiredFieldLabel": "{field} (requis)",
   "Reset": "Réinitialiser",
   "response.status.interested": "{name} est intéressé",
   "response.status.yes": "{name} est confirmé",

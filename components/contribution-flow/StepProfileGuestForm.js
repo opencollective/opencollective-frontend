@@ -52,7 +52,6 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
             label={<FormattedMessage id="Fields.FullName" defaultMessage="Full name" />}
             htmlFor="name"
             required={amount < 25000 ? false : true}
-            showLabelRequired
           >
             {inputProps => (
               <StyledInput
@@ -71,7 +70,6 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
             htmlFor="email"
             maxLength="254"
             required
-            showLabelRequired
           >
             {inputProps => (
               <StyledInput
