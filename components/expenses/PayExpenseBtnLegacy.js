@@ -124,7 +124,7 @@ class PayExpenseBtnLegacy extends React.Component {
       ) {
         disabled = true;
         disabledMessage = intl.formatMessage(this.messages['transferwisePlanLimitMessage'], {
-          Link: (...chunks) => <Link route={`/${host.slug}/edit/host-plan`}>{chunks}</Link>,
+          Link: chunks => <Link route={`/${host.slug}/edit/host-plan`}>{chunks}</Link>,
         });
       }
     } else if (selectedPayoutMethod === 'other') {

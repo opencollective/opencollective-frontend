@@ -133,7 +133,7 @@ const CollectiveCallsToAction = ({
                   values={{
                     collectiveName: collective.name,
                     // eslint-disable-next-line react/display-name
-                    a: (...chunks) => <Link route={`/${collective.slug}/contact`}>{chunks}</Link>,
+                    a: chunks => <Link route={`/${collective.slug}/contact`}>{chunks}</Link>,
                   }}
                 />
               }
