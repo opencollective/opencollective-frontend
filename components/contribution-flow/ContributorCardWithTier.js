@@ -64,7 +64,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
             <Flex>
               <P fontSize="14px" lineHeight="20px" fontWeight="bold">
                 <FormattedMoneyAmount
-                  amount={(contribution.amount.value + (contribution.platformContributionAmount?.value || 0)) * 100}
+                  amount={contribution.amount.value * 100}
                   currency={contribution.amount.currency}
                   frequency={contribution.frequency}
                 />
@@ -81,10 +81,10 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                   <P fontSize="12px" lineHeight="20px" color="primary.600" ml={1}>
                     (
                     <FormattedMoneyAmount
-                      amount={contribution.amount.value * 100}
+                      amount={(contribution.amount.value - contribution.platformContributionAmount?.value) * 100}
                       currency={contribution.amount.currency}
                       showCurrencyCode={false}
-                      precision={0}
+                      precision={2}
                       amountStyles={{ fontWeight: 'normal', color: 'primary.600' }}
                     />{' '}
                     +{' '}
@@ -92,7 +92,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                       amount={contribution.platformContributionAmount?.value * 100}
                       currency={contribution.amount.currency}
                       showCurrencyCode={false}
-                      precision={0}
+                      precision={2}
                       amountStyles={{ fontWeight: 'normal', color: 'primary.600' }}
                     />
                     )
