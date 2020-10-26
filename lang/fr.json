@@ -1464,6 +1464,7 @@
   "signinLinkSent.": "<Link>En savoir plus</Link> sur la connexion sans mot de passe.",
   "SkipOnboarding": "Ignorer l'introduction",
   "SortBy": "Trier par",
+  "SpteProfile.EmailNoSpam": "We wont send any spam or advertising, pinky promise.",
   "startDateAndTime": "date et heure de début",
   "StepsProgress.mobile.next": "Suivant : {stepName}",
   "StepsProgress.mobile.status": "{from} sur {to}",

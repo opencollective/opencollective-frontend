@@ -1464,6 +1464,7 @@
   "signinLinkSent.": "<Link>Learn more</Link> about passwordless login.",
   "SkipOnboarding": "Skip onboarding",
   "SortBy": "Sort by",
+  "SpteProfile.EmailNoSpam": "We wont send any spam or advertising, pinky promise.",
   "startDateAndTime": "start date and time",
   "StepsProgress.mobile.next": "Next: {stepName}",
   "StepsProgress.mobile.status": "{from} of {to}",
