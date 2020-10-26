@@ -394,6 +394,7 @@
   "ContributeDetails.faq.frequency.title": "Quando serei cobrado novamente?",
   "ContributeDetails.faq.isIncognito.content": "Se você optou por contribuir como \"anônimo\", sua contribuição financeira será exibida publicamente como uma doação anônima e não será vinculada ao seu perfil público. No entanto, no esforço de ser transparente e compatível com os regulamentos da KYC (\"Conheça o seu cliente\"), o administrador fiscal e os administradores do coletivo podem exportar uma lista de todos os colaboradores financeiros com suas informações pessoais.",
   "ContributeDetails.faq.isIncognito.title": "O que é uma contribuição anônima?",
+  "ContributeFAQ.Policy.Title": "Does {name} has a contribution policy?",
   "ContributeFAQ.Safe": "Open Collective doesn't store any credit card number, we're instead relying on our partner Stripe - a secure solution that is widely adopted by the industry. If our systems are compromised, we can't loose your credit card number because we simply don't have it. <LearnMoreLink>Learn more</LearnMoreLink> about the security of Open Collective.",
   "contributeFlow.contributedTotal": "Contribuiu um total de:",
   "contributeFlow.successMessage": "{fromCollectiveName, select, incognito {Você é} other {{fromCollectiveName} é}} agora um membro do coletivo {collectiveName} no nível \"{tierName}\"!",

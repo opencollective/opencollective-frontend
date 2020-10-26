@@ -394,6 +394,7 @@
   "ContributeDetails.faq.frequency.title": "下次支付是什么时候呢？",
   "ContributeDetails.faq.isIncognito.content": "如果您选择以“匿名”身份捐款， 您的捐款将不会指向您的个人资料。 但是，OpenCollective 为了做到公正透明并遵守客户条例（了解您的客户）， 财务主持人和组织管理员可以导出附有个人资料的捐助名单。",
   "ContributeDetails.faq.isIncognito.title": "What is an incognito contribution?",
+  "ContributeFAQ.Policy.Title": "Does {name} has a contribution policy?",
   "ContributeFAQ.Safe": "Open Collective doesn't store any credit card number, we're instead relying on our partner Stripe - a secure solution that is widely adopted by the industry. If our systems are compromised, we can't loose your credit card number because we simply don't have it. <LearnMoreLink>Learn more</LearnMoreLink> about the security of Open Collective.",
   "contributeFlow.contributedTotal": "Contributed a total of:",
   "contributeFlow.successMessage": "{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s \"{tierName}\" tier!",

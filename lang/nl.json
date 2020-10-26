@@ -394,6 +394,7 @@
   "ContributeDetails.faq.frequency.title": "Wanneer ontvang ik de volgende rekening?",
   "ContributeDetails.faq.isIncognito.content": "Als je kiest om \"incognito\" bij te dragen, je financiële bijdrage zal publiekelijk verschijnen als een incognito donatie en het zal niet verwijzen naar je publiek profiel. Niettemin, in de poging om transparant en conform met de KYC regelgeving (Know Your Customer), de fiscaal beheerder en de administrators van het collectief kunnen een lijst oproepen van alle financiële bijdragers met hun persoonlijke informatie.",
   "ContributeDetails.faq.isIncognito.title": "Wat is een incognito bijdrage?",
+  "ContributeFAQ.Policy.Title": "Does {name} has a contribution policy?",
   "ContributeFAQ.Safe": "Open Collective doesn't store any credit card number, we're instead relying on our partner Stripe - a secure solution that is widely adopted by the industry. If our systems are compromised, we can't loose your credit card number because we simply don't have it. <LearnMoreLink>Learn more</LearnMoreLink> about the security of Open Collective.",
   "contributeFlow.contributedTotal": "In totaal bijgedragen:",
   "contributeFlow.successMessage": "{fromCollectiveName, select, incognito {U bent} other {{fromCollectiveName} is}} nu lid van de {collectiveName}'s \"{tierName}\" rang!",

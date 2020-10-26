@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import Markdown from 'react-markdown';
 
 import { Box } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -10,7 +12,7 @@ import FAQ, { Content, Entry, Title } from './FAQ';
 /**
  * FAQ associated to the new contribution flow.
  */
-const ContributeFAQ = props => (
+const ContributeFAQ = ({ collective, ...props }) => (
   <FAQ withBorderLeft withNewButtons {...props}>
     <Entry>
       <Title>
@@ -29,6 +31,20 @@ const ContributeFAQ = props => (
         />
       </Content>
     </Entry>
+    {collective.contributionPolicy && (
+      <Entry>
+        <Title>
+          <FormattedMessage
+            id="ContributeFAQ.Policy.Title"
+            defaultMessage="Does {name} has a contribution policy?"
+            values={{ name: collective.name }}
+          />
+        </Title>
+        <Content>
+          <Markdown source={collective.contributionPolicy} />
+        </Content>
+      </Entry>
+    )}
     <Entry>
       <Title>
         <FormattedMessage
@@ -73,5 +89,12 @@ const ContributeFAQ = props => (
     </Box>
   </FAQ>
 );
+
+ContributeFAQ.propTypes = {
+  collective: PropTypes.shape({
+    name: PropTypes.string,
+    contributionPolicy: PropTypes.string,
+  }),
+};
 
 export default ContributeFAQ;
