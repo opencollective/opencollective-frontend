@@ -898,6 +898,7 @@
   "fiscalHost.apply.info": "With this option, you don't need to set up a legal entity and bank account for your project. The fiscal host will hold funds on your behalf, and take care of accounting, invoices, tax, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the host's page before confirming).",
   "Fiscalhost.definition": "Um administrador fiscal é uma entidade legal que detém o dinheiro e é responsável pelos formulários de administração/impostos do coletivo.",
   "fiscalHost.interestedInHosting": "Are you interested in fiscally hosting Collectives?",
+  "Fiscalhost.pending": "{host} (pending)",
   "fiscalHost.seeMoreHosts": "See more hosts",
   "FiscalHosting.budget.activate": "Activate Host Budget",
   "FiscalHosting.budget.activate.description": "By activating the Host budget, you will be able to receive financial contributions and manage expenses directly with this Organization.",

@@ -217,7 +217,7 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
-      <ExpensePayeeDetails isLoading={isLoading} host={host} expense={expense} />
+      <ExpensePayeeDetails isLoading={isLoading} host={host} expense={expense} collective={collective} />
       {showProcessButtons && (
         <Container borderTop="1px solid #DCDEE0" mt={4} pt={12}>
           <Flex flexWrap="wrap" justifyContent="flex-end">

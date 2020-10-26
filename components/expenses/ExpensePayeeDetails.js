@@ -54,7 +54,7 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
   lineHeight: '15px',
 })``;
 
-const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser }) => {
+const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, collective }) => {
   const { payee, payeeLocation } = expense || {};
   const isInvoice = expense?.type === expenseTypes.INVOICE;
 
@@ -125,7 +125,17 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             <Flex alignItems="center">
               <Avatar collective={host} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {host.name}
+                {collective.isApproved ? (
+                  host.name
+                ) : (
+                  <FormattedMessage
+                    id="Fiscalhost.pending"
+                    defaultMessage="{host} (pending)"
+                    values={{
+                      host: host.name,
+                    }}
+                  />
+                )}
               </Span>
             </Flex>
           </LinkCollective>
@@ -201,6 +211,9 @@ ExpensePayeeDetails.propTypes = {
   }),
   /** Disable border and paiding in styled card, usefull for modals */
   borderless: PropTypes.bool,
+  collective: PropTypes.shape({
+    isApproved: PropTypes.bool,
+  }),
 };
 
 export default ExpensePayeeDetails;
