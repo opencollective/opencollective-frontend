@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Add } from '@styled-icons/material/Add';
-import { get, sortBy } from 'lodash';
+import { get, merge, pick, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../../lib/stripe';
@@ -18,6 +19,10 @@ import Link from '../../Link';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
 import NewCreditCardForm from '../../NewCreditCardForm';
+import {
+  addCreditCardMutation,
+  confirmCreditCardMutation,
+} from '../../recurring-contributions/UpdatePaymentMethodPopUp';
 import { withStripeLoader } from '../../StripeProvider';
 import StyledButton from '../../StyledButton';
 import { H3, Span } from '../../Text';
@@ -31,7 +36,9 @@ class EditPaymentMethods extends React.Component {
     /** From intl */
     intl: PropTypes.object.isRequired,
     /** From graphql query */
-    addCreditCard: PropTypes.func.isRequired,
+    createCreditCardEditCollective: PropTypes.func.isRequired,
+    /** From graphql query */
+    confirmCreditCardEditCollective: PropTypes.func.isRequired,
     /** From graphql query */
     removePaymentMethod: PropTypes.func.isRequired,
     /** From graphql query */
@@ -80,14 +87,20 @@ class EditPaymentMethods extends React.Component {
         if (error) {
           throw error;
         }
-        const paymentMethod = stripeTokenToPaymentMethod(token);
-        const res = await this.props.addCreditCard({
-          variables: { CollectiveId: this.props.data.Collective.id, ...paymentMethod },
+        const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
+        const newCreditCardInfo = merge(newStripePaymentMethod.data, pick(newStripePaymentMethod, ['token']));
+        const res = await this.props.createCreditCardEditCollective({
+          variables: {
+            creditCardInfo: newCreditCardInfo,
+            name: get(newStripePaymentMethod, 'name'),
+            account: { legacyId: this.props.data.Collective.id },
+          },
         });
-        const createdCreditCard = res.data.createCreditCard;
 
-        if (createdCreditCard.stripeError) {
-          this.handleStripeError(createdCreditCard.stripeError);
+        const { paymentMethod, stripeError } = res.data.addCreditCard;
+
+        if (stripeError) {
+          this.handleStripeError(paymentMethod, stripeError);
         } else {
           this.handleSuccess();
         }
@@ -107,7 +120,9 @@ class EditPaymentMethods extends React.Component {
     });
   };
 
-  handleStripeError = async ({ message, response }) => {
+  handleStripeError = async (paymentMethod, stripeError) => {
+    const { message, response } = stripeError;
+
     if (!response) {
       this.setState({ error: message, submitting: false });
       return;
@@ -118,9 +133,15 @@ class EditPaymentMethods extends React.Component {
       const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
       if (result.error) {
         this.setState({ submitting: false, error: result.error.message });
-      }
-      if (result.setupIntent && result.setupIntent.status === 'succeeded') {
-        this.handleSuccess();
+      } else {
+        try {
+          await this.props.confirmCreditCardEditCollective({
+            variables: { paymentMethod: { id: paymentMethod.id } },
+          });
+          this.handleSuccess();
+        } catch (error) {
+          this.setState({ submitting: false, error: result.error.message });
+        }
       }
     }
   };
@@ -343,32 +364,14 @@ const paymentMethodsQuery = gql`
 
 const addPaymentMethodsData = graphql(paymentMethodsQuery);
 
-const createCreditCardMutation = gql`
-  mutation EditCollectiveCreateCreditCard(
-    $CollectiveId: Int!
-    $name: String!
-    $token: String!
-    $data: StripeCreditCardDataInputType!
-    $monthlyLimitPerMember: Int
-  ) {
-    createCreditCard(
-      CollectiveId: $CollectiveId
-      name: $name
-      token: $token
-      data: $data
-      monthlyLimitPerMember: $monthlyLimitPerMember
-    ) {
-      id
-      stripeError {
-        message
-        response
-      }
-    }
-  }
-`;
+const addCreateCreditCardMutation = graphql(addCreditCardMutation, {
+  name: 'createCreditCardEditCollective',
+  options: { context: API_V2_CONTEXT },
+});
 
-const addCreateCreditCardMutation = graphql(createCreditCardMutation, {
-  name: 'addCreditCard',
+const addConfirmCreditCardMutation = graphql(confirmCreditCardMutation, {
+  name: 'confirmCreditCardEditCollective',
+  options: { context: API_V2_CONTEXT },
 });
 
 const removePaymentMethodMutation = gql`
@@ -401,6 +404,7 @@ const addGraphql = compose(
   addUpdatePaymentMethodMutation,
   addEditCollectiveMutation,
   addCreateCreditCardMutation,
+  addConfirmCreditCardMutation,
 );
 
 export default injectIntl(withStripeLoader(addGraphql(EditPaymentMethods)));
