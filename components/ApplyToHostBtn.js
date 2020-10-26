@@ -88,7 +88,6 @@ class ApplyToHostBtn extends React.Component {
             />
             &nbsp;
             <StyledTooltip
-              type="light"
               content={
                 <FormattedMessage
                   id="host.hostFee.help"

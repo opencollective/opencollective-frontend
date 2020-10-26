@@ -124,7 +124,6 @@ const CollectiveCallsToAction = ({
             <ApplyToHostBtn />
           ) : (
             <StyledTooltip
-              type="light"
               place="left"
               content={
                 <FormattedMessage
