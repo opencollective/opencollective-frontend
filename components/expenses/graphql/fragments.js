@@ -106,6 +106,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     createdAt
     invoiceInfo
     requiredLegalDocuments
+    draft
     items {
       id
       incurredAt

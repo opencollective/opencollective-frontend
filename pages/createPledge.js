@@ -5,9 +5,9 @@ import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import slugify from 'slugify';
 import styled from 'styled-components';
 
+import { suggestSlug } from '../lib/collective.lib';
 import { defaultImage } from '../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { legacyCollectiveQuery } from '../lib/graphql/queries';
@@ -413,7 +413,7 @@ class CreatePledgePage extends React.Component {
                             prepend="https://opencollective.com/"
                             id="slug"
                             name="slug"
-                            defaultValue={slugify(name || '').toLowerCase()}
+                            defaultValue={suggestSlug(name || '').toLowerCase()}
                             data-cy="slugInput"
                           />
                         </Flex>

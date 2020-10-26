@@ -113,7 +113,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     hideDropdownIndicator,
     hideMenu,
     error,
-    controlStyles,
+    styles,
     isSearchable,
     menuPortalTarget,
   }) => ({
@@ -145,7 +145,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           customStyles.cursor = 'pointer';
         }
 
-        return { ...baseStyles, ...customStyles, ...controlStyles };
+        return { ...baseStyles, ...customStyles, ...styles?.control };
       },
       option: (baseStyles, state) => {
         const customStyles = { cursor: 'pointer' };
@@ -173,12 +173,14 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           ? STYLES_DISPLAY_NONE
           : {
               ...baseStyles,
+              ...styles?.menu,
               overflow: 'hidden', // for children border-radius to apply
               zIndex: 10,
             };
       },
       menuList: baseStyles => ({
         ...baseStyles,
+        ...styles?.menuList,
         paddingTop: 0,
         paddingBottom: 0,
       }),
@@ -228,7 +230,7 @@ StyledSelect.propTypes = {
   intl: PropTypes.object,
   /** Default option */
   defaultValue: PropTypes.object,
-  controlStyles: PropTypes.object,
+  styles: PropTypes.object,
   /** To render menu in a portal */
   menuPortalTarget: PropTypes.any,
   // Styled-system
@@ -239,7 +241,7 @@ StyledSelect.propTypes = {
 
 StyledSelect.defaultProps = {
   fontSize: '14px',
-  controlStyles: {},
+  styles: {},
 };
 
 /** @component */

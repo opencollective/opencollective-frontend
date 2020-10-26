@@ -139,7 +139,7 @@ const TransactionsDownloadInvoices = ({ collective }) => {
               isLoading={loading}
               mt="12px"
               fontSize="11px"
-              controlStyles={{ height: '30px', minHeight: 'auto' }}
+              styles={{ control: { height: '30px', minHeight: 'auto' } }}
               hideDropdownIndicator
               placeholder="Select Year"
             />
@@ -158,7 +158,7 @@ const TransactionsDownloadInvoices = ({ collective }) => {
             formatOptionLabel={InvoiceLabel}
             fontSize="11px"
             mt="12px"
-            controlStyles={{ height: '30px', minHeight: 'auto' }}
+            styles={{ control: { height: '30px', minHeight: 'auto' } }}
             placeholder={interval === 'monthly' ? 'Select Month' : 'Select Year'}
             hideDropdownIndicator
             menuPortalTarget={null}

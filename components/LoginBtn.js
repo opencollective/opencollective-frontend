@@ -19,6 +19,7 @@ class LoginBtn extends React.Component {
      */
     children: PropTypes.node,
     loadingLoggedInUser: PropTypes.bool,
+    asLink: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -45,19 +46,20 @@ class LoginBtn extends React.Component {
   }
 
   render() {
+    const buttonProps = this.props.asLink
+      ? {}
+      : {
+          border: '1px solid #D5DAE0',
+          borderRadius: '20px',
+          color: '#3385FF',
+          display: 'inline-block',
+          fontSize: '1.4rem',
+          px: 3,
+          py: 2,
+        };
     return (
       <Link route="signin" params={{ next: this.redirectAfterSignin }} passHref>
-        <StyledLink
-          border="1px solid #D5DAE0"
-          borderRadius="20px"
-          color="#3385FF"
-          display="inline-block"
-          fontSize="1.4rem"
-          px={3}
-          py={2}
-        >
-          {this.renderContent()}
-        </StyledLink>
+        <StyledLink {...buttonProps}>{this.renderContent()}</StyledLink>
       </Link>
     );
   }

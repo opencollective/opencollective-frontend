@@ -55,7 +55,8 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
 })``;
 
 const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, collective }) => {
-  const { payee, payeeLocation } = expense || {};
+  const { payeeLocation } = expense || {};
+  const payee = expense?.payee?.isNewUser ? expense?.payee : expense?.draft?.payee || expense?.payee;
   const isInvoice = expense?.type === expenseTypes.INVOICE;
 
   return isLoading ? (
@@ -71,10 +72,19 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
           <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
         </PrivateInfoColumnHeader>
         <LinkCollective collective={payee}>
-          <Flex alignItems="center">
-            <Avatar collective={payee} radius={24} />
-            <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-              {payee.name}
+          <Flex alignItems="center" fontSize="12px">
+            {payee.isInvite || payee.isNewUser ? (
+              <Avatar
+                name={payee.organization?.name || payee.name}
+                radius={24}
+                backgroundColor="blue.100"
+                color="blue.400"
+              />
+            ) : (
+              <Avatar collective={payee} radius={24} />
+            )}
+            <Span ml={2} color="black.900" fontWeight="bold" truncateOverflow>
+              {payee.organization?.name || payee.name}
             </Span>
           </Flex>
         </LinkCollective>
@@ -97,7 +107,13 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
         </PrivateInfoColumnHeader>
         <Container fontSize="12px" color="black.600">
           <Box mb={3} data-cy="expense-summary-payout-method-type">
-            <PayoutMethodTypeWithIcon type={expense.payoutMethod?.type} />
+            <PayoutMethodTypeWithIcon
+              type={
+                !expense.payoutMethod?.type && (expense.draft || expense.payee.isInvite)
+                  ? PayoutMethodType.INVITE
+                  : expense.payoutMethod?.type
+              }
+            />
           </Box>
           <div data-cy="expense-summary-payout-method-data">
             <PayoutMethodData payoutMethod={expense.payoutMethod} isLoading={isLoadingLoggedInUser} />
@@ -186,12 +202,16 @@ ExpensePayeeDetails.propTypes = {
     type: PropTypes.oneOf(Object.values(expenseTypes)),
     tags: PropTypes.arrayOf(PropTypes.string),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
+    draft: PropTypes.shape({
+      payee: PropTypes.object,
+    }),
     payee: PropTypes.shape({
       id: PropTypes.string,
       name: PropTypes.string,
       slug: PropTypes.string,
       type: PropTypes.string,
       isAdmin: PropTypes.bool,
+      isInvite: PropTypes.bool,
     }),
     payeeLocation: PropTypes.shape({
       address: PropTypes.string,

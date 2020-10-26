@@ -13,11 +13,13 @@ export const StyledSelectFilter = props => {
       fontSize="12px"
       lineHeight="14px"
       isSearchable={false}
-      controlStyles={{
-        borderRadius: 100,
-        background: '#F7F8FA',
-        padding: '0 8px',
-        fontWeight: 500,
+      styles={{
+        control: {
+          borderRadius: 100,
+          background: '#F7F8FA',
+          padding: '0 8px',
+          fontWeight: 500,
+        },
       }}
       {...props}
     />
