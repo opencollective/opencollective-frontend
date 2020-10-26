@@ -694,7 +694,7 @@ class ContributionFlow extends React.Component {
                         stepSummary={stepSummary}
                       />
                     </Box>
-                    <ContributeFAQ mt={4} titleProps={{ mb: 2 }} />
+                    <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />
                   </Box>
                 </Box>
               </Grid>

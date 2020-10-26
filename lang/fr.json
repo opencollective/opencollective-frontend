@@ -394,6 +394,7 @@
   "ContributeDetails.faq.frequency.title": "Quand serais-je facturé la prochaine fois ?",
   "ContributeDetails.faq.isIncognito.content": "Si vous choisissez de contribuer en \"incognito\", votre contribution financière apparaîtra publiquement comme un don privé qui ne sera pas lié à votre profil public. Afin d'être en conformité avec les réglementations KYC regulations (Know Your Customer), l'hôte fiscal et les administrateurs du collectifs peuvent toutefois exporter une liste de toutes les contributions financières avec vos information personnelles.",
   "ContributeDetails.faq.isIncognito.title": "Qu'est ce qu'une contribution incognito ?",
+  "ContributeFAQ.Policy.Title": "Does {name} has a contribution policy?",
   "ContributeFAQ.Safe": "Open Collective ne stocke aucun numéro de carte de crédit, nous nous basons sur le service de notre partenaire Stripe - une solution sécurisée et largement adoptée par l'industrie. Si nos systèmes sont compromis, nous ne pouvons pas perdre votre numéro de carte de crédit parce que nous ne l'avons tout simplement pas. <LearnMoreLink>En savoir plus</LearnMoreLink> sur la sécurité d'Open Collective.",
   "contributeFlow.contributedTotal": "Total de votre contribution :",
   "contributeFlow.successMessage": "{fromCollectiveName, select, incognito {Vous êtes} other {{fromCollectiveName} est}} maintenant membre du groupe « {tierName} » de {collectiveName} !",
