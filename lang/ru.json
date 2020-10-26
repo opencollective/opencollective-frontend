@@ -1403,7 +1403,6 @@
   "RejectContribution": "Reject and refund",
   "RejectionReason": "Type your rejection reason here if you want.",
   "Remove": "Удалить",
-  "RequiredFieldLabel": "{field} (required)",
   "Reset": "Reset",
   "response.status.interested": "{name} заинтересован",
   "response.status.yes": "{name} идёт",
