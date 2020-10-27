@@ -525,6 +525,7 @@ ExpenseFormBody.propTypes = {
       }),
     }),
     settings: PropTypes.object,
+    isApproved: PropTypes.bool.isRequired,
   }).isRequired,
 };
 
@@ -605,6 +606,7 @@ ExpenseForm.propTypes = {
       }),
     }),
     settings: PropTypes.object,
+    isApproved: PropTypes.bool.isRequired,
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({
