@@ -136,6 +136,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isSaved
       }
       ... on AccountWithHost {
+        isApproved
         host {
           id
         }

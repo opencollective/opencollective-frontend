@@ -141,7 +141,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             <Flex alignItems="center">
               <Avatar collective={host} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {collective.isApproved ? (
+                {collective && collective.isApproved ? (
                   host.name
                 ) : (
                   <FormattedMessage
@@ -232,7 +232,7 @@ ExpensePayeeDetails.propTypes = {
   /** Disable border and paiding in styled card, usefull for modals */
   borderless: PropTypes.bool,
   collective: PropTypes.shape({
-    isApproved: PropTypes.bool,
+    isApproved: PropTypes.bool.isRequired,
   }),
 };
 
