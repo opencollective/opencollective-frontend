@@ -82,7 +82,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     parseToBoolean(getEnvVar('REJECT_CONTRIBUTION')) || collectiveHasRejectContributionFeature;
   const showRefundButton = permissions?.canRefund && !isRefunded;
   const showRejectButton = permissions?.canReject && !isOrderRejected && showRejectContribution;
-  const showDownloadInvoiceButton = !showRefundButton && permissions?.canDownloadInvoice;
+  const showDownloadInvoiceButton = permissions?.canDownloadInvoice;
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
@@ -149,7 +149,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                     minWidth={140}
                     background="transparent"
                     textTransform="capitalize"
-                    ml={showRejectButton ? 2 : 0}
+                    ml={2}
                   >
                     {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
                     {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
