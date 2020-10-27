@@ -123,7 +123,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary }) => {
         <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
           <FormattedMessage
             id="ContributionSummary.NextCharge"
-            defaultMessage="Next charge on {date} and then the first day of each {interval, select, month {month} year {year} other {interval}}. You can cancel anytime or edit your contribution in your settings."
+            defaultMessage="Next charge on {date} and then the first day of {interval, select, month {each month} year {same month each year}}. You can cancel anytime or edit your contribution in your settings."
             values={{
               date: (
                 <FormattedDate
