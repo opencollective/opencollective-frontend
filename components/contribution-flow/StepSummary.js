@@ -21,7 +21,6 @@ import { capitalize } from '../../lib/utils';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import InputTypeCountry from '../InputTypeCountry';
-import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledLink from '../StyledLink';
@@ -152,13 +151,15 @@ const getTaxPerentageForProfile = (taxes, tierType, hostCountry, collectiveCount
 
 const VATInputs = ({ collective, taxInfo, dispatchChange, setFormState, formState }) => {
   const hasConfirmedTaxID = taxInfo.number && taxInfo.isReady;
+  const vatShortLabel = <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />;
+
   return (
     <React.Fragment>
       <AmountLine my={3}>
         <Flex flexDirection="column">
           <Container display="flex" alignItems="center">
             <Span fontSize="14px" fontWeight="bold" mr={2}>
-              <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />
+              {vatShortLabel}
             </Span>
             <InputTypeCountry
               minWidth={250}
@@ -183,21 +184,23 @@ const VATInputs = ({ collective, taxInfo, dispatchChange, setFormState, formStat
                     <FormattedMessage
                       id="contribute.changeTaxNumber"
                       defaultMessage="Change {taxName} number"
-                      values={{ taxName: 'VAT' }}
+                      values={{ taxName: vatShortLabel }}
                     />
                   </ClickableLabel>
                 </Flex>
               ) : (
                 <ClickableLabel
                   onClick={() => {
-                    setFormState({ isEnabled: true, error: false });
-                    dispatchChange(null, true);
+                    if (!formState.isEnabled) {
+                      setFormState({ isEnabled: true, error: false });
+                      dispatchChange(null, true);
+                    }
                   }}
                 >
                   <FormattedMessage
                     id="contribute.enterTaxNumber"
                     defaultMessage="Enter {taxName} number (if you have one)"
-                    values={{ taxName: 'VAT' }}
+                    values={{ taxName: vatShortLabel }}
                   />
                 </ClickableLabel>
               )}
@@ -205,10 +208,11 @@ const VATInputs = ({ collective, taxInfo, dispatchChange, setFormState, formStat
                 <Flex flexDirection="column" className="cf-tax-form">
                   <Container display="flex" ml={[-20, -26]} alignItems="center">
                     <Close
+                      data-cy="remove-vat-btn"
                       size={16}
-                      color="grey"
+                      color="#333333"
                       cursor="pointer"
-                      className="close"
+                      aria-label="Remove"
                       onClick={() => {
                         setFormState({ isEnabled: false, error: false });
                         dispatchChange({ number: null }, false);
@@ -221,21 +225,15 @@ const VATInputs = ({ collective, taxInfo, dispatchChange, setFormState, formStat
                       px={2}
                       py={1}
                       autoFocus
+                      required
                       maxWidth={180}
-                      onChange={e => {
-                        setFormState({ isEnabled: true, error: false });
-                        dispatchChange({ number: e.target.value });
-                      }}
-                    />
-                    <StyledButton
-                      buttonSize="small"
-                      disabled={!taxInfo.number || formState.error}
-                      onClick={() => {
+                      onBlur={e => {
+                        const rawNumber = e.target.value;
                         let error = false;
-                        let validationResult = checkVATNumberFormat(taxInfo.number);
+                        let validationResult = checkVATNumberFormat(rawNumber);
                         if (!validationResult.isValid) {
                           // Try again with the country code
-                          validationResult = checkVATNumberFormat(`${taxInfo.countryISO}${taxInfo.number}`);
+                          validationResult = checkVATNumberFormat(`${taxInfo.countryISO}${rawNumber}`);
                           if (!validationResult.isValid) {
                             error = 'invalid';
                           }
@@ -243,21 +241,23 @@ const VATInputs = ({ collective, taxInfo, dispatchChange, setFormState, formStat
                           error = 'bad_country';
                         }
 
-                        const number = !error ? validationResult.value : taxInfo.number;
+                        const number = !error ? validationResult.value : rawNumber;
                         const hasError = Boolean(error);
-                        setFormState({ isEnabled: hasError, error: error });
+                        setFormState({ isEnabled: true, error: error });
                         dispatchChange({ number }, hasError);
                       }}
-                    >
-                      <FormattedMessage id="actions.done" defaultMessage="Done" />
-                    </StyledButton>
+                      onChange={e => {
+                        setFormState({ isEnabled: true, error: false });
+                        dispatchChange({ number: e.target.value });
+                      }}
+                    />
                   </Container>
                   {formState.error === 'invalid' && (
                     <Span mt={1} fontSize="12px" color="red.500">
                       <FormattedMessage
                         id="contribute.taxInfoInvalid"
                         defaultMessage="Invalid {taxName} number"
-                        values={{ taxName: <FormattedMessage id="tax.vatShort" defaultMessage="VAT" /> }}
+                        values={{ taxName: vatShortLabel }}
                       />
                     </Span>
                   )}

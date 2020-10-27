@@ -64,6 +64,8 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
     } else {
       return (stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
     }
+  } else if (step.name === STEPS.SUMMARY) {
+    return stepSummary?.countryISO || null;
   } else {
     return null;
   }
