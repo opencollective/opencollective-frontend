@@ -96,6 +96,7 @@
   "bankaccount.instructions.preview": "Vista previa:",
   "bankaccount.instructions.reference": "identificador único para rastrear cuando se recibe el pedido",
   "bankaccount.instructions.variables": "Puede utilizar las siguientes variables en las instrucciones:",
+  "BankInfo.AccountHolder": "Account Holder: {name}",
   "BankInfo.Type": "Tipo: {type}",
   "becomeASponsor.backYourStack": "BackYourStack",
   "becomeASponsor.backYourStack.description": "Discover your Open Source dependencies and support them.",

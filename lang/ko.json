@@ -96,6 +96,7 @@
   "bankaccount.instructions.preview": "미리보기:",
   "bankaccount.instructions.reference": "unique id to track when the order is received",
   "bankaccount.instructions.variables": "You can use the following variables in the instructions:",
+  "BankInfo.AccountHolder": "Account Holder: {name}",
   "BankInfo.Type": "유형: {type}",
   "becomeASponsor.backYourStack": "BackYourStack",
   "becomeASponsor.backYourStack.description": "Discover your Open Source dependencies and support them.",
