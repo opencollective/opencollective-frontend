@@ -85,7 +85,7 @@ class InputTypeCountry extends Component {
   });
 
   render() {
-    const { defaultValue, value, intl, onChange, locale, ...props } = this.props;
+    const { defaultValue, value, intl, onChange, locale, name, ...props } = this.props;
     return (
       <StyledSelect
         name={name}
