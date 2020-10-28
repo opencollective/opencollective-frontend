@@ -976,6 +976,21 @@ input CommentUpdateInput {
 }
 
 """
+Response for the confirmGuestAccount mutation
+"""
+type ConfirmGuestAccountResponse {
+  """
+  The validated account
+  """
+  account: Account!
+
+  """
+  A token that can be used to sign in
+  """
+  accessToken: String!
+}
+
+"""
 This represents a Connected Account
 """
 type ConnectedAccount {
@@ -4830,6 +4845,36 @@ type Mutation {
     """
     host: AccountReferenceInput!
   ): Collective!
+
+  """
+  Sends an email for guest to confirm their emails and create their Open Collective account
+  """
+  sendGuestConfirmationEmail(
+    """
+    The email to validate
+    """
+    email: EmailAddress!
+  ): Boolean!
+
+  """
+  Mark an account as confirmed
+  """
+  confirmGuestAccount(
+    """
+    The email to confirm
+    """
+    email: EmailAddress!
+
+    """
+    The key that you want to edit in settings
+    """
+    emailConfirmationToken: String!
+
+    """
+    This can be used to link the other guest contributions to the user
+    """
+    guestTokens: [String!]
+  ): ConfirmGuestAccountResponse!
 
   """
   Create a new Payout Method to get paid through the platform
