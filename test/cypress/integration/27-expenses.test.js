@@ -92,6 +92,7 @@ describe('New expense flow', () => {
 
       // Start editing
       cy.getByDataCy('edit-expense-btn').click();
+      cy.getByDataCy('expense-next').click();
       cy.get('input[name="description"]').type(' edited');
       cy.get('input[name="items[0].description"]').type(' but not too expensive');
       cy.get('input[name="items[0].amount"]').type('{selectall}111');

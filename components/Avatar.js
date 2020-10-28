@@ -16,19 +16,19 @@ const StyledAvatar = styled(Flex).attrs(props => ({
 }))`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
-  ${color}
+  color: ${themeGet('colors.black.400')};
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: ${({ type }) => getAvatarBorderRadius(type)};
   ${border}
-  color: ${themeGet('colors.black.400')};
-  font-weight: bold;
+  font-weight: 600;
   justify-content: center;
   overflow: hidden;
   width: 64px;
   height: 64px;
   flex-shrink: 0;
+  ${color}
   ${space}
   ${layout}
 `;
@@ -67,7 +67,7 @@ Avatar.propTypes = {
   /** Collective type */
   type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   /** Avatar size */
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** Duration to transition size. Disabled if 0, null or undefined */
   animationDuration: PropTypes.number,
 };
@@ -92,7 +92,7 @@ ContributorAvatar.propTypes = {
     isIncognito: PropTypes.bool,
     type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   }).isRequired,
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 };
 
 /** A simple avatar for incognito users */

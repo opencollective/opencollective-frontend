@@ -4,6 +4,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import { connectAccount, disconnectAccount } from '../../lib/api';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -87,12 +88,17 @@ class EditConnectedAccount extends React.Component {
     const { collective, options } = this.props;
 
     if (service === 'github' || service === 'twitter') {
-      const redirect = `${window.location.protocol}//${window.location.host}/${collective.slug}/edit/connected-accounts`;
-      return window.location.replace(
-        `/api/connected-accounts/${service}/oauthUrl?CollectiveId=${collective.id}&redirect=${encodeURIComponent(
-          redirect,
-        )}&access_token=${getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)}`,
-      );
+      const redirectUrl = `${getWebsiteUrl()}/api/connected-accounts/${service}/oauthUrl`;
+      const redirectUrlParams = new URLSearchParams({ CollectiveId: collective.id });
+
+      const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+      if (accessToken) {
+        redirectUrlParams.set('access_token', accessToken); // eslint-disable-line camelcase
+      }
+
+      window.location.href = `${redirectUrl}?${redirectUrlParams.toString()}`;
+
+      return;
     }
 
     connectAccount(collective.id, service, options)

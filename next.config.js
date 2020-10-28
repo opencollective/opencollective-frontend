@@ -23,9 +23,9 @@ const nextConfig = {
         ONBOARDING_MODAL: true,
         NEW_HOST_APPLICATION_FLOW: null,
         TW_API_COLLECTIVE_SLUG: null,
-        NEW_CONTRIBUTION_FLOW: false,
         ENABLE_GUEST_CONTRIBUTIONS: false,
         REJECT_CONTRIBUTION: false,
+        REJECTED_CATEGORIES: false,
       }),
     );
 
@@ -68,24 +68,6 @@ const nextConfig = {
     config.module.rules.push({
       test: /\.md$/,
       use: ['babel-loader', 'raw-loader', 'markdown-loader'],
-    });
-
-    // Inspired by https://github.com/rohanray/next-fonts
-    // Load Bootstrap and Font-Awesome fonts
-    config.module.rules.push({
-      test: /fonts[\\/].*\.(woff|woff2|eot|ttf|otf|svg)$/,
-      use: [
-        {
-          loader: 'url-loader',
-          options: {
-            limit: 8192,
-            fallback: 'file-loader',
-            publicPath: '/_next/static/fonts/',
-            outputPath: 'static/fonts/',
-            name: '[name]-[hash].[ext]',
-          },
-        },
-      ],
     });
 
     // Configuration for images

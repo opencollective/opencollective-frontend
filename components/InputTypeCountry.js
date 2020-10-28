@@ -62,7 +62,7 @@ class InputTypeCountry extends Component {
       return null;
     }
 
-    const code = country && country.toUpperCase();
+    const code = country.toUpperCase();
     return {
       value: code,
       label: this.getCountryLabel(code, locale),

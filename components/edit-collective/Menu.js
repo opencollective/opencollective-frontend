@@ -20,11 +20,12 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   CONNECTED_ACCOUNTS: 'connected-accounts',
   UPDATES: 'updates',
   CONVERSATIONS: 'conversations',
-  EXPENSES: 'expenses',
+  POLICIES: 'policies',
   EXPORT: 'export',
   HOST: 'host',
   MEMBERS: 'members',
   PAYMENT_METHODS: 'payment-methods',
+  PAYMENT_RECEIPTS: 'payment-receipts',
   TICKETS: 'tickets',
   TIERS: 'tiers',
   VIRTUAL_CARDS: 'gift-cards',
@@ -69,9 +70,9 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.export',
     defaultMessage: 'Export',
   },
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: {
-    id: 'editCollective.menu.expenses',
-    defaultMessage: 'Expenses Policy',
+  [EDIT_COLLECTIVE_SECTIONS.POLICIES]: {
+    id: 'editCollective.menu.policies',
+    defaultMessage: 'Policies',
   },
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: {
     id: 'editCollective.expensesPayouts',
@@ -133,6 +134,10 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.twofa',
     defaultMessage: 'Two-factor authentication',
   },
+  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: {
+    id: 'editCollective.menu.paymentReceipts',
+    defaultMessage: 'Payment Receipts',
+  },
 });
 
 const MenuItem = styled(Link)`
@@ -167,12 +172,13 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || (isCollective(c) && !isFund(c)),
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: c => isFeatureAllowed(c, FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: c => isFeatureAllowed(c, FEATURES.CONVERSATIONS) && !isFund(c),
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: c => isCollective(c) || isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.POLICIES]: c => isCollective(c) || isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: c => isCollective(c) || isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c =>
     isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.FUND, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, CollectiveType.ORGANIZATION, CollectiveType.USER),
+  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: c => isOneOfTypes(c, CollectiveType.ORGANIZATION, CollectiveType.USER),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
     isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.FUND, CollectiveType.EVENT, CollectiveType.PROJECT) ||

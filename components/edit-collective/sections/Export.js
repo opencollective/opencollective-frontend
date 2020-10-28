@@ -5,8 +5,10 @@ import { FormattedMessage } from 'react-intl';
 
 import { exportMembers } from '../../../lib/export_file';
 
+import Container from '../../Container';
 import ExportImages from '../../ExportImages';
 import StyledLink from '../../StyledLink';
+import { P } from '../../Text';
 
 class Export extends React.Component {
   static propTypes = {
@@ -22,53 +24,31 @@ class Export extends React.Component {
     const widgetCode = `<script src="https://opencollective.com/${collective.slug}/banner.js"></script>`;
 
     return (
-      <div className="ExportData">
-        <style global jsx>
-          {`
-            table tr td {
-              vertical-align: top;
-            }
-            .param {
-              font-weight: bold;
-              padding-right: 0.5rem;
-              font-family: 'Courrier';
-            }
-            .actions {
-              text-align: center;
-            }
-            .code {
-              font-size: 1.4rem;
-              font-family: Courrier;
-              padding: 0.1rem 0.3rem;
-              background: #ddd;
-              margin: 0.5rem;
-              border: 1px solid #ccc;
-            }
-          `}
-        </style>
-
+      <div>
         <h1>
           <FormattedMessage id="export.widget.title" defaultMessage="Widget" />
         </h1>
-        <div className="code">{widgetCode}</div>
+        <Container as="pre" fontSize="11px">
+          {widgetCode}
+        </Container>
 
         <ExportImages collective={collective} />
 
         <h1>
           <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
         </h1>
-        <p>
+        <P textAlign="center">
           <FormattedMessage
             id="ExportContributors.Description"
             defaultMessage="Export your contributors data in {format} format"
             values={{ format: 'CSV' }}
           />
-        </p>
-        <div className="actions">
+        </P>
+        <Container textAlign="center">
           <Button onClick={async () => await exportMembers(collective.slug)}>
             <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
           </Button>
-        </div>
+        </Container>
 
         <h1>
           <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'JSON' }} />
@@ -131,16 +111,16 @@ class Export extends React.Component {
         <h2>
           <FormattedMessage id="export.json.parameters.title" defaultMessage="Parameters" />
         </h2>
-        <table>
+        <Container as="table" fontSize="14px" mb={3} width="100%" css={{ borderSpacing: 16 }}>
           <tbody>
             <tr>
-              <td className="param">limit</td>
+              <td>limit</td>
               <td>
                 <FormattedMessage id="export.json.parameters.limit" defaultMessage="number of contributors to return" />
               </td>
             </tr>
             <tr>
-              <td className="param">offset</td>
+              <td>offset</td>
               <td>
                 <FormattedMessage
                   id="export.json.parameters.offset"
@@ -149,7 +129,9 @@ class Export extends React.Component {
               </td>
             </tr>
             <tr>
-              <td className="param">TierId</td>
+              <Container as="td" pr={2}>
+                TierId
+              </Container>
               <td>
                 <FormattedMessage
                   id="export.json.parameters.TierId"
@@ -158,7 +140,7 @@ class Export extends React.Component {
               </td>
             </tr>
           </tbody>
-        </table>
+        </Container>
         {collective.tiers[0] && (
           <div>
             e.g.

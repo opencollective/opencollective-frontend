@@ -124,7 +124,6 @@ const CollectiveCallsToAction = ({
             <ApplyToHostBtn />
           ) : (
             <StyledTooltip
-              type="light"
               place="left"
               content={
                 <FormattedMessage
@@ -133,7 +132,7 @@ const CollectiveCallsToAction = ({
                   values={{
                     collectiveName: collective.name,
                     // eslint-disable-next-line react/display-name
-                    a: (...chunks) => <Link route={`/${collective.slug}/contact`}>{chunks}</Link>,
+                    a: chunks => <Link route={`/${collective.slug}/contact`}>{chunks}</Link>,
                   }}
                 />
               }

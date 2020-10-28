@@ -71,7 +71,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     permissions,
     order,
     expense,
-    isRejected,
+    isOrderRejected,
   } = transaction;
   const isCredit = type === TransactionTypes.CREDIT;
   const hasOrder = order !== null;
@@ -81,8 +81,8 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
   const showRejectContribution =
     parseToBoolean(getEnvVar('REJECT_CONTRIBUTION')) || collectiveHasRejectContributionFeature;
   const showRefundButton = permissions?.canRefund && !isRefunded;
-  const showRejectButton = permissions?.canReject && !isRejected && showRejectContribution;
-  const showDownloadInvoiceButton = !showRefundButton && permissions?.canDownloadInvoice;
+  const showRejectButton = permissions?.canReject && !isOrderRejected && showRejectContribution;
+  const showDownloadInvoiceButton = permissions?.canDownloadInvoice;
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
@@ -149,7 +149,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                     minWidth={140}
                     background="transparent"
                     textTransform="capitalize"
-                    ml={showRejectButton ? 2 : 0}
+                    ml={2}
                   >
                     {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
                     {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
@@ -168,7 +168,7 @@ TransactionDetails.propTypes = {
   displayActions: PropTypes.bool,
   transaction: PropTypes.shape({
     isRefunded: PropTypes.bool,
-    isRejected: PropTypes.bool,
+    isOrderRejected: PropTypes.bool,
     fromAccount: PropTypes.shape({
       id: PropTypes.string,
       slug: PropTypes.string.isRequired,

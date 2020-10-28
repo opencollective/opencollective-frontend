@@ -33,7 +33,7 @@ import StyledTooltip from '../../StyledTooltip';
 import { H3, P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 
-const getSettingsQuery = gqlV2/* GraphQL */ `
+export const getSettingsQuery = gqlV2/* GraphQL */ `
   query GetSettingsForEditCollectivePage($slug: String!) {
     account(slug: $slug) {
       id

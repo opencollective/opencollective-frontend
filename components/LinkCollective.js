@@ -21,6 +21,9 @@ const LinkCollective = ({ target, title, collective, children, ...props }) => {
   if (!collective || collective.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
+  if (!collective.slug) {
+    return children || collective.name;
+  }
 
   const { type, slug, name, parentCollective, isIncognito } = collective;
   if (type === 'USER' && (!name || isIncognito || !slug)) {
@@ -49,7 +52,7 @@ LinkCollective.propTypes = {
   collective: PropTypes.shape({
     name: PropTypes.string,
     slug: PropTypes.string,
-    type: PropTypes.string.isRequired,
+    type: PropTypes.string,
     isIncognito: PropTypes.bool,
     parentCollective: PropTypes.shape({
       slug: PropTypes.string,

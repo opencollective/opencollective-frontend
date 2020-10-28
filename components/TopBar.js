@@ -84,7 +84,7 @@ class TopBar extends React.Component {
 
   onClickOutside = e => {
     const ref = this.ref.current;
-    if (ref && !ref.contains(e.target)) {
+    if (this.state.showMobileMenu && ref && !ref.contains(e.target)) {
       this.setState({ showMobileMenu: false });
     }
   };

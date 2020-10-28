@@ -33,7 +33,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
       createdAt
       isRefunded
       isRefund
-      isRejected
+      isOrderRejected
       toAccount {
         id
         name

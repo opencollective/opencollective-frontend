@@ -61,7 +61,19 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                     <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
                   </Span>
                   <br />
-                  <LinkCollective collective={host}>{host.name}</LinkCollective>
+                  <LinkCollective collective={host}>
+                    {collective && collective.isApproved ? (
+                      host.name
+                    ) : (
+                      <FormattedMessage
+                        id="Fiscalhost.pending"
+                        defaultMessage="{host} (pending)"
+                        values={{
+                          host: host.name,
+                        }}
+                      />
+                    )}
+                  </LinkCollective>
                 </P>
               )}
             </Box>
@@ -88,6 +100,7 @@ ExpenseInfoSidebar.propTypes = {
     currency: PropTypes.string.isRequired,
     balance: PropTypes.number.isRequired,
     type: PropTypes.string,
+    isApproved: PropTypes.bool.isRequired,
   }),
   host: PropTypes.shape({
     name: PropTypes.string.isRequired,

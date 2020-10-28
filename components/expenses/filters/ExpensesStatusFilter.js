@@ -25,7 +25,7 @@ const ExpenseStatusFilter = ({ value, onChange, ...props }) => {
 
 ExpenseStatusFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOf(Object.values(expenseStatus)),
+  value: PropTypes.oneOf([...Object.values(expenseStatus), 'READY_TO_PAY']),
 };
 
 export default ExpenseStatusFilter;

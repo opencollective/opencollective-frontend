@@ -12,10 +12,6 @@ import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
-/**
- * Main contribution flow entrypoint. Render all the steps from contributeAs
- * to payment.
- */
 class ConfirmEmailPage extends React.Component {
   static getInitialProps({ query }) {
     return { token: query.token };

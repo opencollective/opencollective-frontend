@@ -1,26 +1,14 @@
-const isNewContributionFlow = Cypress.env('NEW_CONTRIBUTION_FLOW');
-
 describe('Recurring contributions', () => {
   let user;
 
   before(() => {
     cy.signup({ redirect: '/apex/contribute/sponsors-470/checkout' }).then(u => {
       user = u;
-      if (!isNewContributionFlow) {
-        cy.get(`[type="radio"][name=contributeAs]`).first().check();
-      }
-
-      cy.contains('button', 'Next step').click();
-
-      if (!isNewContributionFlow) {
-        cy.contains('Contribution Details');
-      } else {
-        cy.contains('Contribute as');
-      }
-
-      cy.contains('button', 'Next step').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.contains('Contribute as');
+      cy.get('button[data-cy="cf-next-step"]').click();
       cy.useAnyPaymentMethod();
-      cy.contains('button', 'Make contribution').click();
+      cy.contains('button', 'Contribute').click();
       cy.getByDataCy('order-success');
     });
   });

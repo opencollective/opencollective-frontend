@@ -45,7 +45,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
     createdAt,
     isRefunded,
     isRefund,
-    isRejected,
+    isOrderRejected,
   } = transaction;
   const { LoggedInUser } = useUser();
   const [isExpanded, setExpanded] = React.useState(false);
@@ -179,7 +179,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               <TransactionStatusTag
                 isRefund={isRefund}
                 isRefunded={isRefunded}
-                isOrderRejected={isRejected}
+                isOrderRejected={isOrderRejected}
                 fontSize="9px"
                 px="6px"
                 py="2px"
@@ -188,7 +188,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             {hasExpense && <ExpenseStatusTag status={expense.status} fontSize="9px" px="6px" py="2px" />}
           </Flex>
         </Flex>
-        {!hasExpense && (
+        {hasOrder && (
           <Container borderTop={['1px solid #E8E9EB', 'none']} mt={3} pt={[2, 0]}>
             <StyledButton
               data-cy="transaction-details"
@@ -223,7 +223,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
           </Container>
         )}
       </Box>
-      {isExpanded && !hasExpense && (
+      {isExpanded && hasOrder && (
         <TransactionDetails
           displayActions={displayActions}
           transaction={transaction}
@@ -248,7 +248,7 @@ TransactionItem.propTypes = {
   transaction: PropTypes.shape({
     isRefunded: PropTypes.bool,
     isRefund: PropTypes.bool,
-    isRejected: PropTypes.bool,
+    isOrderRejected: PropTypes.bool,
     fromAccount: PropTypes.shape({
       id: PropTypes.string,
       slug: PropTypes.string.isRequired,

@@ -37,8 +37,8 @@ const ArchiveCollective = ({ collective }) => {
     confirmationMsg: '',
   });
   const { processing, isArchived, error, confirmationMsg } = archiveStatus;
-  const [modal, setModal] = useState({ type: defaultAction, show: false });
   const defaultAction = isArchived ? 'Archive' : 'Unarchive';
+  const [modal, setModal] = useState({ type: defaultAction, show: false });
 
   const [archiveCollective] = useMutation(archiveCollectiveMutation);
   const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation);

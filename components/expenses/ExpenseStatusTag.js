@@ -14,6 +14,7 @@ const getExpenseStatusMsgType = status => {
     case expenseStatus.REJECTED:
       return 'error';
     case expenseStatus.PENDING:
+    case expenseStatus.UNVERIFIED:
       return 'warning';
     case expenseStatus.SCHEDULED_FOR_PAYMENT:
     case expenseStatus.APPROVED:
@@ -21,6 +22,25 @@ const getExpenseStatusMsgType = status => {
     case expenseStatus.PAID:
       return 'success';
   }
+};
+
+const ExtendedTag = ({ children, ...props }) => (
+  <StyledTag
+    {...props}
+    background="white"
+    border="1px solid"
+    borderColor="yellow.400"
+    color="black.700"
+    borderRadius="0px 4px 4px 0px"
+    ml="-3px"
+    lineHeight="100%"
+  >
+    {children}
+  </StyledTag>
+);
+
+ExtendedTag.propTypes = {
+  children: PropTypes.any,
 };
 
 /**
@@ -45,48 +65,45 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
     </StyledTag>
   );
 
-  if (!showTaxFormTag) {
-    return tag;
-  }
-
-  const taxFormTag = (
-    <StyledTag
-      {...tagProps}
-      background="white"
-      border="1px solid"
-      borderColor="yellow.400"
-      color="black.700"
-      borderRadius="0px 4px 4px 0px"
-      ml="-3px"
-    >
-      <FormattedMessage id="TaxForm" defaultMessage="Tax form" />
-    </StyledTag>
-  );
-
-  if (!showTaxFormMsg) {
+  if (status === expenseStatus.UNVERIFIED) {
     return (
       <Flex alignItems="center">
         {tag}
-        {taxFormTag}
+        <ExtendedTag {...tagProps}>
+          <FormattedMessage id="Unverified" defaultMessage="Unverified" />
+        </ExtendedTag>
+      </Flex>
+    );
+  } else if (!showTaxFormTag) {
+    return tag;
+  } else if (!showTaxFormMsg) {
+    return (
+      <Flex alignItems="center">
+        {tag}
+        <ExtendedTag>
+          <FormattedMessage id="TaxForm" defaultMessage="Tax form" />
+        </ExtendedTag>
+      </Flex>
+    );
+  } else {
+    return (
+      <Flex alignItems="center">
+        {tag}
+        <StyledTooltip
+          content={() => (
+            <FormattedMessage
+              id="expenseNeedsTaxForm.hover"
+              defaultMessage="We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact support@opencollective.com"
+            />
+          )}
+        >
+          <ExtendedTag>
+            <FormattedMessage id="TaxForm" defaultMessage="Tax form" />
+          </ExtendedTag>
+        </StyledTooltip>
       </Flex>
     );
   }
-
-  return (
-    <Flex alignItems="center">
-      {tag}
-      <StyledTooltip
-        content={() => (
-          <FormattedMessage
-            id="expenseNeedsTaxForm.hover"
-            defaultMessage="We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact support@opencollective.com"
-          />
-        )}
-      >
-        {taxFormTag}
-      </StyledTooltip>
-    </Flex>
-  );
 };
 
 ExpenseStatusTag.propTypes = {
