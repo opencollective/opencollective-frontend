@@ -4974,15 +4974,25 @@ type Mutation {
   """
   addStripeCreditCard(
     """
-    A Payment Method to add to an Account
+    The credit card info
     """
-    paymentMethod: PaymentMethodCreateInput
+    creditCardInfo: CreditCardCreateInput!
 
     """
-    Account to add Payment Method to
+    Name associated to this credit card
     """
-    account: AccountReferenceInput
-  ): PaymentMethod
+    name: String!
+
+    """
+    Whether this credit card should be saved for future payments
+    """
+    isSavedForLater: Boolean = true
+
+    """
+    Account to add the credit card to
+    """
+    account: AccountReferenceInput!
+  ): CreditCardWithStripeError! @deprecated(reason: "2020-10-23: Use addCreditCard")
 
   """
   Confirm a credit card is ready for use after strong customer authentication
@@ -5470,22 +5480,6 @@ type PaymentMethod {
   limitedToHosts: [Host]
   expiryDate: ISODateTime
   createdAt: ISODateTime
-}
-
-input PaymentMethodCreateInput {
-  data: PaymentMethodDataInput
-  name: String
-  token: String
-}
-
-input PaymentMethodDataInput {
-  brand: String!
-  country: String!
-  expMonth: Int!
-  expYear: Int!
-  fullName: String
-  funding: String
-  zip: String
 }
 
 """
