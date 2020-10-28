@@ -115,6 +115,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
               {inputProps => (
                 <InputTypeCountry
                   {...inputProps}
+                  autoDetect
                   onChange={value => dispatchChange('location.country', value)}
                   value={data?.country}
                 />

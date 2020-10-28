@@ -16,7 +16,6 @@ import tiersTypes from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { propTypeCountry } from '../../lib/custom-prop-types';
 import getPaymentMethodFees from '../../lib/fees';
-import fetchGeoLocation from '../../lib/geolocation_api';
 import { capitalize } from '../../lib/utils';
 
 import Container from '../Container';
@@ -167,6 +166,7 @@ const VATInputs = ({ collective, taxInfo, dispatchChange, setFormState, formStat
               onChange={code => dispatchChange({ countryISO: code, number: null })}
               value={taxInfo.countryISO}
               error={!taxInfo.countryISO}
+              autoDetect
             />
           </Container>
           {taxInfo.countryISO && (
@@ -327,23 +327,11 @@ const StepSummary = ({
   };
 
   useEffect(() => {
-    const profileLocation = get(stepProfile, 'location.country');
-
     // Dispatch initial value on mount
     dispatchChange({
-      countryISO: profileLocation,
-      number: get(stepProfile, 'settings.VAT.number'),
+      countryISO: data?.countryISO || get(stepProfile, 'location.country'),
+      number: data?.number || get(stepProfile, 'settings.VAT.number'),
     });
-
-    // Resolve country from IP if none provided
-    if (!profileLocation && !get(data, 'countryISO')) {
-      fetchGeoLocation().then(countryISO => {
-        // Country may have been changed by the user by the time geolocation API respond
-        if (!get(data, 'countryISO')) {
-          dispatchChange({ countryISO });
-        }
-      });
-    }
   }, []);
 
   return (
