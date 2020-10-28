@@ -97,7 +97,6 @@
   "bankaccount.instructions.variables": "Vous pouvez utiliser les variables suivantes dans les instructions :",
   "BankInfo.AccountHolder": "Account Holder: {name}",
   "BankInfo.Type": "Type : {type}",
-  "becomeASponsor.backYourStack": "BackYourStack",
   "becomeASponsor.backYourStack.description": "Identifiez vos dépendances Open Source et soutenez-les.",
   "becomeASponsor.bulkPayments": "Paiements groupés",
   "becomeASponsor.bulkPayments.description": "Au lieu de payer par carte de crédit pour chaque collectif, vous pouvez envoyer un paiement unique à l'hôte fiscal pour créditer votre organisation sur la plateforme. Ensuite, vous pouvez utiliser ce solde pour financer autant de Collectifs que vous le souhaitez.",

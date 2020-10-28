@@ -97,7 +97,6 @@
   "bankaccount.instructions.variables": "Puede utilizar las siguientes variables en las instrucciones:",
   "BankInfo.AccountHolder": "Account Holder: {name}",
   "BankInfo.Type": "Tipo: {type}",
-  "becomeASponsor.backYourStack": "BackYourStack",
   "becomeASponsor.backYourStack.description": "Discover your Open Source dependencies and support them.",
   "becomeASponsor.bulkPayments": "Bulk Payments",
   "becomeASponsor.bulkPayments.description": "Instead of paying by credit card to each Collective, you can send a single payment to the fiscal host for credit to your organization on the platform. Then you can use this balance to fund as many Collectives as you wish.",

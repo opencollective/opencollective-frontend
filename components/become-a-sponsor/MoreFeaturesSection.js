@@ -81,7 +81,7 @@ const MoreFeatures = () => (
           />
         </Box>
         <H3 fontSize="24px" lineHeight="32px" color="black.800" mb="12px">
-          <FormattedMessage id="becomeASponsor.backYourStack" defaultMessage="BackYourStack" />
+          BackYourStack
         </H3>
         <Box width={[null, '290px', '312px']}>
           <P fontSize="18px" lineHeight="32px" fontWeight="400" letterSpacing="-0.16px" color="black.600">
