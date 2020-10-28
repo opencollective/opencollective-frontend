@@ -96,6 +96,7 @@
   "bankaccount.instructions.preview": "预览：",
   "bankaccount.instructions.reference": "收到订单时通过唯一的 id进行追踪",
   "bankaccount.instructions.variables": "在操作指南中您可以使用以下变量：",
+  "BankInfo.AccountHolder": "Account Holder: {name}",
   "BankInfo.Type": "类型： {type}",
   "becomeASponsor.backYourStack": "BackYourStack",
   "becomeASponsor.backYourStack.description": "发现您的开源依赖并支持它们。",
