@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import momentTimezone from 'moment-timezone';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
@@ -26,7 +25,15 @@ class CreateEvent extends React.Component {
 
   constructor(props) {
     super(props);
-    const timezone = momentTimezone.tz.guess();
+
+    let timezone;
+    // fallback for old browsers
+    if (!Intl.DateTimeFormat || !Intl.DateTimeFormat().resolvedOptions) {
+      timezone = 'utc';
+    } else {
+      timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+
     this.state = {
       event: {
         parentCollective: props.parentCollective,

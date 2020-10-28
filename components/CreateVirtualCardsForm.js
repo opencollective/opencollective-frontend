@@ -5,9 +5,9 @@ import { graphql } from '@apollo/client/react/hoc';
 import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
 import themeGet from '@styled-system/theme-get';
+import dayjs from 'dayjs';
 import { get, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import moment from 'moment';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -207,7 +207,7 @@ class CreateVirtualCardsForm extends Component {
         customMessage: '',
         numberOfVirtualCards: 1,
         limitedToHosts: [],
-        expiryDate: moment().add(12, 'months').format('YYYY-MM-DD'),
+        expiryDate: dayjs().add(12, 'month').format('YYYY-MM-DD'),
       },
       errors: { emails: [] },
       multiEmailsInitialState: null,
@@ -531,7 +531,7 @@ class CreateVirtualCardsForm extends Component {
               onChange={e => this.onChange('expiryDate', e.target.value)}
               type="date"
               required
-              min={moment().add(1, 'day').format('YYYY-MM-DD')}
+              min={dayjs().add(1, 'day').format('YYYY-MM-DD')}
             />
           </InlineField>
 
