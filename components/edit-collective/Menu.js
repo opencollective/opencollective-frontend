@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import hasFeature, { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
+import { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { Flex } from '../Grid';
@@ -201,8 +201,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
   // 2FA
-  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c =>
-    isType(c, CollectiveType.USER) && hasFeature(c, FEATURES.TWO_FACTOR_AUTH),
+  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, CollectiveType.USER),
 };
 
 const shouldDisplaySection = (collective, section) => {
