@@ -96,6 +96,7 @@
   "bankaccount.instructions.preview": "معاينة:",
   "bankaccount.instructions.reference": "معرف فريد لتتبع عند استلام الطلب",
   "bankaccount.instructions.variables": "يمكنك استخدام المتغيرات التالية في التعليمات:",
+  "BankInfo.AccountHolder": "Account Holder: {name}",
   "BankInfo.Type": "النوع: {type}",
   "becomeASponsor.backYourStack": "المكدس الخلفي",
   "becomeASponsor.backYourStack.description": "اكتشف تبعيات المصدر المفتوح الخاصة بك ودعمها.",
