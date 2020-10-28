@@ -112,6 +112,7 @@ class ContributionFlow extends React.Component {
   constructor(props) {
     super(props);
     this.mainContainerRef = React.createRef();
+    this.formRef = React.createRef();
     this.state = {
       error: null,
       stripe: null,
@@ -286,6 +287,10 @@ class ContributionFlow extends React.Component {
   validateStepProfile = async action => {
     const { stepProfile, stepDetails } = this.state;
 
+    if (!this.checkFormValidity()) {
+      return false;
+    }
+
     // Can only ignore validation if going back
     if (!stepProfile) {
       return action === 'prev';
@@ -446,6 +451,14 @@ class ContributionFlow extends React.Component {
     }
   }
 
+  checkFormValidity = () => {
+    if (this.formRef.current?.checkValidity) {
+      return this.formRef.current.reportValidity();
+    } else {
+      return true;
+    }
+  };
+
   /** Returns the steps list */
   getSteps() {
     const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser } = this.props;
@@ -461,12 +474,12 @@ class ContributionFlow extends React.Component {
       {
         name: 'details',
         label: intl.formatMessage(STEP_LABELS.details),
-        isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount && stepDetails.quantity),
+        isCompleted: Boolean(stepDetails),
         validate: () => {
-          if (isNil(tier?.availableQuantity)) {
-            return true;
+          if (!this.checkFormValidity() || !stepDetails || stepDetails.amount < minAmount || !stepDetails.quantity) {
+            return false;
           } else {
-            return stepDetails.quantity <= tier.availableQuantity;
+            return isNil(tier?.availableQuantity) || stepDetails.quantity <= tier.availableQuantity;
           }
         },
       },
@@ -650,7 +663,7 @@ class ContributionFlow extends React.Component {
                 ]}
               >
                 <Box />
-                <Box as="form" onSubmit={e => e.preventDefault()} maxWidth="100%">
+                <Box as="form" ref={this.formRef} onSubmit={e => e.preventDefault()} maxWidth="100%">
                   {error && (
                     <MessageBox type="error" withIcon mb={3}>
                       {formatErrorMessage(this.props.intl, error)}

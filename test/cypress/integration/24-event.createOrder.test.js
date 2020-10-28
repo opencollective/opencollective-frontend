@@ -65,19 +65,23 @@ describe('event.createOrder page', () => {
       // ...except if they can provide a valid VAT number
       cy.contains('div', 'Enter VAT number (if you have one)').click();
 
-      // Submit is disabled while form is active
-      cy.get('button[data-cy="cf-next-step"]').should('be.disabled');
-      cy.get('.cf-tax-form .close').click();
-      cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
+      // Can't submit while form is active
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.contains('Invalid VAT number');
+      cy.getByDataCy('remove-vat-btn').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.contains('Choose your payment method');
+      cy.get('button[data-cy="cf-prev-step"]').click();
 
       // Must provide a valid VAT number
       cy.contains('div', 'Enter VAT number (if you have one)').click();
-      cy.contains('.cf-tax-form button', 'Done').should('be.disabled');
       cy.get('input[name=taxIndentificationNumber]').type('424242');
-      cy.contains('.cf-tax-form button', 'Done').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('Invalid VAT number');
       cy.get('input[name=taxIndentificationNumber]').type('{selectall}FR-XX999999999');
-      cy.contains('.cf-tax-form button', 'Done').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.contains('Choose your payment method');
+      cy.get('button[data-cy="cf-prev-step"]').click();
 
       // Values should be updated
       cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
@@ -89,7 +93,9 @@ describe('event.createOrder page', () => {
       cy.contains('div', 'Change VAT number').click();
       cy.get('input[name=taxIndentificationNumber]').should('have.value', 'FRXX999999999');
       cy.get('input[name=taxIndentificationNumber]').type('{selectall}FR-XX-999999998');
-      cy.contains('.cf-tax-form button', 'Done').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.contains('Choose your payment method');
+      cy.get('button[data-cy="cf-prev-step"]').click();
       cy.contains('FRXX999999998'); // Number is properly formatted
 
       // However if it's the same country than the collective than VAT should still apply,
@@ -100,11 +106,13 @@ describe('event.createOrder page', () => {
       cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');
       cy.contains('div', 'Enter VAT number (if you have one)').click();
       cy.get('input[name=taxIndentificationNumber]').type('FRXX999999998');
-      cy.contains('.cf-tax-form button', 'Done').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       // Tried to use a french VAT number with Belgium
       cy.contains("The VAT number doesn't match the country");
       cy.get('input[name=taxIndentificationNumber]').type('{selectall}BE-0414445663');
-      cy.contains('.cf-tax-form button', 'Done').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.contains('Choose your payment method');
+      cy.get('button[data-cy="cf-prev-step"]').click();
       cy.contains('BE0414445663'); // Number is properly formatted
       cy.contains(breakdownLineSelector, 'VAT').contains('+ $16.80');
       cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');

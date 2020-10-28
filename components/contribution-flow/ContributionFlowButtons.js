@@ -26,11 +26,13 @@ class NewContributionFlowButtons extends React.Component {
 
   state = { isLoadingNext: false };
 
-  goNext = async () => {
+  goNext = async e => {
+    e.preventDefault();
     if (this.props.goNext) {
-      this.setState({ isLoadingNext: true });
-      await this.props.goNext();
-      this.setState({ isLoadingNext: false });
+      this.setState({ isLoadingNext: true }, async () => {
+        await this.props.goNext();
+        this.setState({ isLoadingNext: false });
+      });
     }
   };
 
@@ -55,7 +57,7 @@ class NewContributionFlowButtons extends React.Component {
   }
 
   render() {
-    const { goBack, goNext, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency } = this.props;
+    const { goBack, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency } = this.props;
     return (
       <Flex justifyContent={'center'} mt={3}>
         <Fragment>
@@ -66,6 +68,7 @@ class NewContributionFlowButtons extends React.Component {
               color="black.600"
               disabled={isValidating}
               data-cy="cf-prev-step"
+              type="button"
             >
               &larr;{' '}
               {this.getStepLabel(prevStep) || <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />}
@@ -77,9 +80,9 @@ class NewContributionFlowButtons extends React.Component {
               minWidth={!nextStep ? 185 : 125}
               buttonStyle="primary"
               onClick={this.goNext}
-              disabled={!goNext}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
+              type="submit"
             >
               {nextStep ? (
                 <React.Fragment>{this.getNextButtonLabel()} &rarr;</React.Fragment>
