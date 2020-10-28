@@ -382,7 +382,7 @@
   "contribute.step.details": "Детали",
   "contribute.step.payment": "Информация о платеже",
   "contribute.step.profile": "Profile",
-  "contribute.submit": "Make contribution",
+  "contribute.submit": "Сделайте вклад",
   "contribute.taxInfoInvalid": "Некорректный номер {taxName}",
   "contribute.tierDetails": "Ваш вклад на сумму {amount}{interval, select, month {ежемесячно.} year {ежегодно.} other {}}.",
   "contribute.vatBadCountry": "Номер НДС не соответствует стране",

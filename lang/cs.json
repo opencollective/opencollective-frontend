@@ -382,7 +382,7 @@
   "contribute.step.details": "Podrobnosti",
   "contribute.step.payment": "Informace o platbě",
   "contribute.step.profile": "Profile",
-  "contribute.submit": "Make contribution",
+  "contribute.submit": "Přispět",
   "contribute.taxInfoInvalid": "Neplatné {taxName} číslo",
   "contribute.tierDetails": "You’ll contribute with the amount of {amount}{interval, select, month { monthly} year { yearly} other {}}.",
   "contribute.vatBadCountry": "The VAT number doesn't match the country",
