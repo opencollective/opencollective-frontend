@@ -114,7 +114,7 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   return uniquePMs;
 };
 
-export const getTotalAmount = (stepDetails, stepSummary) => {
+export const getTotalAmount = (stepDetails, stepSummary = null) => {
   const quantity = get(stepDetails, 'quantity') || 1;
   const amount = get(stepDetails, 'amount') || 0;
   const taxAmount = get(stepSummary, 'amount') || 0;
