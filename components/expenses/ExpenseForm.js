@@ -197,14 +197,14 @@ const ExpenseFormBody = ({
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
-    if (loggedInAccount && !isEmpty(payoutProfiles)) {
-      formik.setFieldValue('payee', first(payoutProfiles));
-    } else if (formik.values?.draft?.payee) {
+    if (values?.draft?.payee && !loggedInAccount) {
       formik.setFieldValue('payee', {
-        ...formik.values.draft.payee,
+        ...values.draft.payee,
         isInvite: false,
         isNewUser: true,
       });
+    } else if (!values.payee && loggedInAccount && !isEmpty(payoutProfiles)) {
+      formik.setFieldValue('payee', first(payoutProfiles));
     }
   }, [payoutProfiles, loggedInAccount]);
 
