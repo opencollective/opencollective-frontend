@@ -9,10 +9,10 @@ import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import InputTypeCountry from '../InputTypeCountry';
 import Link from '../Link';
+import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
-import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { P } from '../Text';
 
@@ -37,7 +37,7 @@ export const validateGuestProfile = (stepProfile, stepDetails) => {
   }
 };
 
-const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
+const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) => {
   const totalAmount = getTotalAmount(stepDetails);
   const dispatchChange = (field, value) => {
     const newData = set({ ...data, isGuest: true }, field, value);
@@ -150,10 +150,17 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
         <P fontSize="14px" mr={2}>
           <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
         </P>
-        <StyledLink as={Link} route="/signin" fontSize="14px">
+        <StyledButton
+          onClick={onSignInClick}
+          type="button"
+          buttonStyle="secondary"
+          buttonSize="tiny"
+          isBorderless
+          data-cy="cf-profile-signin-btn"
+        >
           <FormattedMessage id="signIn" defaultMessage="Sign In" />
           &nbsp;→
-        </StyledLink>
+        </StyledButton>
       </Flex>
     </Container>
   );
@@ -166,6 +173,7 @@ StepProfileGuestForm.propTypes = {
   }).isRequired,
   data: PropTypes.object,
   onChange: PropTypes.func,
+  onSignInClick: PropTypes.func,
 };
 
 export default StepProfileGuestForm;

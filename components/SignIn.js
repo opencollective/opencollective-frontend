@@ -41,12 +41,18 @@ export default class SignIn extends React.Component {
     const { loading, onSecondaryAction } = this.props;
     return typeof onSecondaryAction === 'string' ? (
       <Link route={onSecondaryAction} passHref>
-        <StyledLink disabled={loading} fontSize="14px">
+        <StyledLink disabled={loading} fontSize="14px" data-cy="signin-secondary-action-btn">
           {message}&nbsp;→
         </StyledLink>
       </Link>
     ) : (
-      <StyledButton asLink fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
+      <StyledButton
+        asLink
+        fontSize="14px"
+        onClick={onSecondaryAction}
+        disabled={loading}
+        data-cy="signin-secondary-action-btn"
+      >
         {message}&nbsp;→
       </StyledButton>
     );

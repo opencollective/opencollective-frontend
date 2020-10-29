@@ -121,6 +121,7 @@ class ContributionFlow extends React.Component {
       stepProfile: null,
       stepPayment: null,
       stepSummary: null,
+      showSignIn: false,
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || props.tier?.interval,
@@ -377,7 +378,10 @@ class ContributionFlow extends React.Component {
   };
 
   /** Steps component callback  */
-  onStepChange = async step => this.pushStepRoute(step.name);
+  onStepChange = async step => {
+    this.setState({ showSignIn: false });
+    this.pushStepRoute(step.name);
+  };
 
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, routeParams = {}) => {
@@ -635,9 +639,12 @@ class ContributionFlow extends React.Component {
               <Box py={[4, 5]}>
                 <Loading />
               </Box>
-            ) : currentStep.name === STEPS.PROFILE && !LoggedInUser && !HAS_GUEST_CONTRIBUTIONS ? (
+            ) : currentStep.name === STEPS.PROFILE &&
+              !LoggedInUser &&
+              (this.state.showSignIn || !HAS_GUEST_CONTRIBUTIONS) ? (
               <SignInOrJoinFree
-                defaultForm="create-account"
+                withShadow
+                defaultForm={this.state.showSignIn ? 'signin' : 'create-account'}
                 redirect={this.getRedirectUrlForSignIn()}
                 createPersonalProfileLabel={
                   <FormattedMessage
@@ -680,6 +687,7 @@ class ContributionFlow extends React.Component {
                     onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
                     defaultProfileSlug={this.props.contributeAs}
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
+                    onSignInClick={() => this.setState({ showSignIn: true })}
                   />
 
                   <Box mt={[4, 5]}>

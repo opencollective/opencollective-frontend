@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import MessageBox from '../MessageBox';
 
-const NewContributionFlowStepProfileInfoMessage = ({ amount }) => {
+const StepProfileInfoMessage = ({ amount }) => {
   const renderInfoMessage = amount => {
     if (amount < 25000) {
       return (
@@ -41,8 +41,8 @@ const NewContributionFlowStepProfileInfoMessage = ({ amount }) => {
   );
 };
 
-NewContributionFlowStepProfileInfoMessage.propTypes = {
+StepProfileInfoMessage.propTypes = {
   amount: PropTypes.number,
 };
 
-export default NewContributionFlowStepProfileInfoMessage;
+export default StepProfileInfoMessage;
