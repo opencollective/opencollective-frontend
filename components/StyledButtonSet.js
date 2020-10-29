@@ -6,10 +6,6 @@ import styled from 'styled-components';
 import Container from './Container';
 import StyledButton from './StyledButton';
 
-const borderRadius = '4px';
-
-const comboStyle = ({ combo }) => (combo ? '0' : `0 ${borderRadius} ${borderRadius} 0`);
-
 const StyledButtonItem = styled(StyledButton)`
   border-radius: 0;
   line-height: 1.5;
@@ -30,13 +26,14 @@ const StyledButtonItem = styled(StyledButton)`
     border: 0;
   }
   &:first-child {
-    border-radius: ${borderRadius} 0 0 ${borderRadius};
+    border-radius: ${({ customBorderRadius }) => `${customBorderRadius} 0 0 ${customBorderRadius}`};
   }
   &:not(:first-child) {
     margin-left: -1px;
   }
   &:last-child {
-    border-radius: ${comboStyle};
+    border-radius: ${({ combo, customBorderRadius }) =>
+      combo ? '0' : `0 ${customBorderRadius} ${customBorderRadius} 0`};
   }
 `;
 
@@ -54,6 +51,7 @@ const StyledButtonSet = ({
   onChange,
   combo,
   disabled,
+  customBorderRadius,
   ...props
 }) => (
   <Container display="flex" {...props}>
@@ -69,6 +67,7 @@ const StyledButtonSet = ({
         disabled={disabled}
         type="button"
         py="8px"
+        customBorderRadius={customBorderRadius}
         {...buttonProps}
         {...(buttonPropsBuilder ? buttonPropsBuilder({ item, index, isSelected: item === selected }) : {})}
       >
@@ -96,14 +95,15 @@ StyledButtonSet.propTypes = {
   /** Similar to `buttonProps` but allow props to be added dynamically based on item */
   buttonPropsBuilder: PropTypes.func,
   /** Button Props */
-
   buttonProps: PropTypes.object,
+  customBorderRadius: PropTypes.string,
 };
 
 StyledButtonSet.defaultProps = {
   combo: false,
   size: 'medium',
   fontSize: '14px',
+  customBorderRadius: '4px',
 };
 
 export default StyledButtonSet;

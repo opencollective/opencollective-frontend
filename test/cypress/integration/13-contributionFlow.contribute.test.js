@@ -15,7 +15,7 @@ describe('Contribution Flow: Order', () => {
     it('with /apex/contribute/tier/470-sponsors', () => {
       cy.login({ redirect: '/apex/donate/tier/470-sponsors' });
       cy.contains('Contribution details');
-      cy.contains('button', 'Next').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       // Ensure we enforce the new URLs
       cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/profile');
     });
@@ -23,7 +23,7 @@ describe('Contribution Flow: Order', () => {
     it('with /apex/donate/tier/470-sponsors', () => {
       cy.login({ redirect: '/apex/donate/tier/470-sponsors' });
       cy.contains('Contribution details');
-      cy.contains('button', 'Next').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       // Ensure we enforce the new URLs
       cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/profile');
     });
@@ -34,7 +34,6 @@ describe('Contribution Flow: Order', () => {
       const visitParams = { onBeforeLoad: mockRecaptcha, failOnStatusCode: false };
       const routeBase = '/apex/contribute';
       cy.visit(`${routeBase}/backer-46999999/checkout`, visitParams);
-      cy.contains('Next step').click();
       cy.contains("Oops! This tier doesn't exist or has been removed by the collective admins.");
       cy.contains('View all the other ways to contribute').click();
       cy.location('pathname').should('eq', '/apex/contribute');
@@ -45,7 +44,7 @@ describe('Contribution Flow: Order', () => {
     it('with a multipart slug', () => {
       cy.login({ redirect: '/apex/contribute/a-multipart-420-470/checkout' });
       cy.contains('Contribution details');
-      cy.contains('button', 'Next').click();
+      cy.get('button[data-cy="cf-next-step"]').click();
       cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/profile');
     });
   });
@@ -73,7 +72,7 @@ describe('Contribution Flow: Order', () => {
         // Frequency must not be disabled
         cy.contains('#interval button').should('not.be.disabled');
         cy.contains('Next charge on June 1, 2042');
-        cy.contains('Next step').click();
+        cy.get('button[data-cy="cf-next-step"]').click();
 
         // ---- Step Profile ----
         cy.checkStepsProgress({ enabled: ['details', 'profile'], disabled: 'payment' });
@@ -83,7 +82,7 @@ describe('Contribution Flow: Order', () => {
         cy.get('[data-cy="ContributionProfile"] > label:first input[type=radio]').should('be.checked');
 
         cy.getByDataCy('progress-step-profile').contains(`${user.firstName} ${user.lastName}`);
-        cy.contains('Next step').click();
+        cy.get('button[data-cy="cf-next-step"]').click();
 
         // ---- Step 3: Payment ----
         cy.checkStepsProgress({ enabled: ['profile', 'details', 'payment'] });
@@ -92,7 +91,7 @@ describe('Contribution Flow: Order', () => {
         cy.get('input[type=checkbox][name=save]').should('be.checked');
         cy.wait(1000); // Wait for stripe to be loaded
         cy.fillStripeInput();
-        cy.contains('button', 'Make contribution').click();
+        cy.contains('button', 'Contribute $500').click();
 
         // ---- Final: Success ----
         cy.getByDataCy('order-success', { timeout: 20000 }).contains('$500.00 USD / month');
@@ -138,12 +137,12 @@ describe('Contribution Flow: Order', () => {
         cy.get('#PaymentMethod').then($paymentMethod => {
           // Checks if the organization already has a payment method configured
           if ($paymentMethod.text().includes('VISA **** 4242')) {
-            cy.contains('button', 'Make contribution').click();
+            cy.contains('button', 'Contribute $').click();
           } else {
             cy.get('input[type=checkbox][name=save]').should('be.checked');
             cy.wait(1000); // Wait for stripe to be loaded
             cy.fillStripeInput();
-            cy.contains('button', 'Make contribution').click();
+            cy.contains('button', 'Contribute $100').click();
           }
           cy.getByDataCy('order-success', { timeout: 20000 }).contains('$100.00 USD / mont');
           cy.contains(`You are now supporting APEX.`);

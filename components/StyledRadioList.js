@@ -30,6 +30,9 @@ const RadioInput = styled.input`
   ${size}
   &[type='radio'] {
     margin: 0;
+    &:focus {
+      box-shadow: 0px 0px 5px 0px ${props => props.theme.colors.primary[500]};
+    }
   }
 `;
 

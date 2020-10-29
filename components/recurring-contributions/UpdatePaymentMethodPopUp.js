@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import themeGet from '@styled-system/theme-get';
-import { first, get, pick, uniqBy } from 'lodash';
+import { first, get, merge, pick, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -12,7 +12,7 @@ import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
-import { stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -73,13 +73,38 @@ const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const addPaymentMethodMutation = gqlV2/* GraphQL */ `
-  mutation AddPaymentMethod($paymentMethod: PaymentMethodCreateInput!, $account: AccountReferenceInput!) {
-    addStripeCreditCard(paymentMethod: $paymentMethod, account: $account) {
+const paymentMethodResponseFragment = gqlV2/* GraphQL */ `
+  fragment paymentMethodResponseFragment on CreditCardWithStripeError {
+    paymentMethod {
       id
-      name
+    }
+    stripeError {
+      message
+      response
     }
   }
+`;
+
+export const addCreditCardMutation = gqlV2/* GraphQL */ `
+  mutation AddCreditCardRecurringContributions(
+    $creditCardInfo: CreditCardCreateInput!
+    $name: String!
+    $account: AccountReferenceInput!
+  ) {
+    addCreditCard(creditCardInfo: $creditCardInfo, name: $name, account: $account) {
+      ...paymentMethodResponseFragment
+    }
+  }
+  ${paymentMethodResponseFragment}
+`;
+
+export const confirmCreditCardMutation = gqlV2/* GraphQL */ `
+  mutation ConfirmCreditCardRecurringContributions($paymentMethod: PaymentMethodReferenceInput!) {
+    confirmCreditCard(paymentMethod: $paymentMethod) {
+      ...paymentMethodResponseFragment
+    }
+  }
+  ${paymentMethodResponseFragment}
 `;
 
 const mutationOptions = { context: API_V2_CONTEXT };
@@ -103,9 +128,10 @@ const UpdatePaymentMethodPopUp = ({
   const [stripe, setStripe] = useState(null);
   const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
   const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
+  const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
 
   // GraphQL mutations and queries
-  const { data } = useQuery(paymentMethodsQuery, {
+  const { data, refetch } = useQuery(paymentMethodsQuery, {
     variables: {
       slug: router.query.slug,
     },
@@ -115,10 +141,54 @@ const UpdatePaymentMethodPopUp = ({
     updatePaymentMethodMutation,
     mutationOptions,
   );
-  const [submitAddPaymentMethod, { loading: loadingAddPaymentMethod }] = useMutation(
-    addPaymentMethodMutation,
-    mutationOptions,
-  );
+  const [submitAddPaymentMethod] = useMutation(addCreditCardMutation, mutationOptions);
+  const [submitConfirmPaymentMethodMutation] = useMutation(confirmCreditCardMutation, mutationOptions);
+
+  const handleAddPaymentMethodResponse = async response => {
+    const { paymentMethod, stripeError } = response;
+    if (stripeError) {
+      return handleStripeError(paymentMethod, stripeError);
+    } else {
+      return handleSuccess(paymentMethod);
+    }
+  };
+
+  const handleStripeError = async (paymentMethod, stripeError) => {
+    const { message, response } = stripeError;
+
+    if (!response) {
+      createNotification('error', message);
+      setAddingPaymentMethod(false);
+      return false;
+    }
+
+    const stripe = await getStripe();
+    const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
+    if (result.error) {
+      createNotification('error', result.error.message);
+      setAddingPaymentMethod(false);
+      return false;
+    } else {
+      try {
+        const response = await submitConfirmPaymentMethodMutation({
+          variables: { paymentMethod: { id: paymentMethod.id } },
+        });
+        return handleSuccess(response.data.confirmCreditCard.paymentMethod);
+      } catch (error) {
+        createNotification('error', error.message);
+        setAddingPaymentMethod(false);
+        return false;
+      }
+    }
+  };
+
+  const handleSuccess = paymentMethod => {
+    setAddingPaymentMethod(false);
+    refetch();
+    setAddedPaymentMethod(paymentMethod);
+    setShowAddPaymentMethod(false);
+    setLoadingSelectedPaymentMethod(true);
+  };
 
   // load stripe on mount
   useEffect(() => {
@@ -257,14 +327,16 @@ const UpdatePaymentMethodPopUp = ({
               buttonStyle="secondary"
               disabled={newPaymentMethodInfo ? !newPaymentMethodInfo?.value.complete : true}
               type="submit"
-              loading={loadingAddPaymentMethod}
+              loading={addingPaymentMethod}
               data-cy="recurring-contribution-submit-pm-button"
               onClick={async () => {
+                setAddingPaymentMethod(true);
                 if (!stripe) {
                   createNotification(
                     'error',
                     'There was a problem initializing the payment form. Please reload the page and try again',
                   );
+                  setAddingPaymentMethod(false);
                   return false;
                 }
                 const { token, error } = await stripe.createToken();
@@ -274,24 +346,20 @@ const UpdatePaymentMethodPopUp = ({
                   return false;
                 }
                 const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
-                const newPaymentMethod = pick(newStripePaymentMethod, ['name', 'token', 'data']);
+                const newCreditCardInfo = merge(newStripePaymentMethod.data, pick(newStripePaymentMethod, ['token']));
                 try {
                   const res = await submitAddPaymentMethod({
-                    variables: { paymentMethod: newPaymentMethod, account: { id: account.id } },
-                    refetchQueries: [
-                      {
-                        query: paymentMethodsQuery,
-                        variables: { slug: router.query.slug },
-                        context: API_V2_CONTEXT,
-                      },
-                    ],
+                    variables: {
+                      creditCardInfo: newCreditCardInfo,
+                      name: get(newStripePaymentMethod, 'name'),
+                      account: { id: account.id },
+                    },
                   });
-                  setAddedPaymentMethod(res.data.addStripeCreditCard);
-                  setShowAddPaymentMethod(false);
-                  setLoadingSelectedPaymentMethod(true);
+                  return handleAddPaymentMethodResponse(res.data.addCreditCard);
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
                   createNotification('error', errorMsg);
+                  setAddingPaymentMethod(false);
                   return false;
                 }
               }}

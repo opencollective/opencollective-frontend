@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+import { isEmail } from 'validator';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -15,10 +17,32 @@ import StyledTextarea from '../StyledTextarea';
 import { P } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
+import { getTotalAmount } from './utils';
 
-const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }) => {
-  const [locale, setLocale] = useState('en');
-  const { amount, interval } = stepDetails;
+const shouldRequireAllInfo = amount => {
+  return amount && amount >= 500000;
+};
+
+export const validateGuestProfile = (stepProfile, stepDetails) => {
+  if (shouldRequireAllInfo(getTotalAmount(stepDetails))) {
+    if (!stepProfile.name || !stepProfile.location?.address || !stepProfile.location?.country) {
+      return false;
+    }
+  }
+
+  if (!stepProfile.email || !isEmail(stepProfile.email)) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
+  const totalAmount = getTotalAmount(stepDetails);
+  const dispatchChange = (field, value) => {
+    const newData = set({ ...data, isGuest: true }, field, value);
+    onChange({ stepProfile: newData });
+  };
 
   return (
     <Container as="fieldset" border="none" width={1} py={3}>
@@ -27,15 +51,15 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
           <StyledInputField
             label={<FormattedMessage id="Fields.FullName" defaultMessage="Full name" />}
             htmlFor="name"
-            required={amount < 25000 ? false : true}
-            showLabelRequired
+            required={totalAmount < 25000 ? false : true}
           >
             {inputProps => (
               <StyledInput
                 {...inputProps}
                 defaultValue={data?.name}
                 placeholder="i.e. Thomas Anderson"
-                onChange={e => onChange({ stepProfile: { ...data, [e.target.name]: e.target.value } })}
+                onChange={e => dispatchChange(e.target.name, e.target.value)}
+                maxLength="255"
               />
             )}
           </StyledInputField>
@@ -44,8 +68,8 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
           <StyledInputField
             label={<FormattedMessage id="Email" defaultMessage="Email" />}
             htmlFor="email"
+            maxLength="254"
             required
-            showLabelRequired
           >
             {inputProps => (
               <StyledInput
@@ -53,31 +77,30 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
                 defaultValue={data?.email}
                 placeholder="i.e. tanderson@thematrix.com"
                 type="email"
-                onChange={e => onChange({ stepProfile: { ...data, [e.target.name]: e.target.value } })}
+                onChange={e => dispatchChange(e.target.name, e.target.value)}
               />
             )}
           </StyledInputField>
         </Box>
       </Flex>
-      {amount && amount >= 500000 && (
+      {shouldRequireAllInfo(totalAmount) && (
         <Flex justifyContent="space-between">
           <Box width={1 / 2} mb={3} mr={1}>
             <StyledInputField
               label={<FormattedMessage id="ExpenseForm.AddressLabel" defaultMessage="Physical address" />}
-              htmlFor="address"
+              htmlFor="location.address"
               required
-              showLabelRequired
             >
               {inputProps => (
                 <StyledTextarea
                   {...inputProps}
-                  defaultValue={data?.address}
+                  value={data?.location?.address ?? ''}
                   placeholder="160 Zion Ln.&#13;&#10;Temecula, CA&#13;&#10;90210"
                   width="100%"
-                  height="150px"
+                  minHeight="80px"
                   maxWidth={350}
                   fontSize="13px"
-                  onChange={e => onChange({ stepProfile: { ...data, [e.target.name]: e.target.value } })}
+                  onChange={e => dispatchChange(e.target.name, e.target.value)}
                 />
               )}
             </StyledInputField>
@@ -88,17 +111,13 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
               label={<FormattedMessage id="ExpenseForm.ChooseCountry" defaultMessage="Choose country" />}
               htmlFor="country"
               required
-              showLabelRequired
             >
               {inputProps => (
                 <InputTypeCountry
                   {...inputProps}
-                  locale={locale}
-                  onChange={value => {
-                    setLocale(value);
-                    onChange({ stepProfile: { ...data, country: value } });
-                  }}
-                  value={data?.country}
+                  autoDetect
+                  onChange={value => dispatchChange('location.country', value)}
+                  value={data?.location?.country}
                 />
               )}
             </StyledInputField>
@@ -111,8 +130,8 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
           defaultMessage="Your name and contribution will be public."
         />
       </P>
-      <StepProfileInfoMessage amount={amount} />
-      {interval && (
+      <StepProfileInfoMessage amount={totalAmount} />
+      {stepDetails.interval && (
         <P color="black.500" fontSize="12px" my={3} data-cy="join-conditions">
           <FormattedMessage
             id="SignIn.legal"
@@ -140,13 +159,13 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
   );
 };
 
-NewContributionFlowStepProfileGuestForm.propTypes = {
+StepProfileGuestForm.propTypes = {
   stepDetails: PropTypes.shape({
     amount: PropTypes.number,
     interval: PropTypes.string,
-  }),
+  }).isRequired,
   data: PropTypes.object,
   onChange: PropTypes.func,
 };
 
-export default NewContributionFlowStepProfileGuestForm;
+export default StepProfileGuestForm;

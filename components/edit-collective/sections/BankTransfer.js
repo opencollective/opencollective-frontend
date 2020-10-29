@@ -101,7 +101,8 @@ const BankTransfer = props => {
   // or if it was already defined by Stripe
   const existingPayoutMethodMatchesCurrency = existingPayoutMethod?.data?.currency === data.host.currency;
   const isConnectedToStripe = data.host.connectedAccounts?.find?.(ca => ca.service === 'stripe');
-  const fixedCurrency = (existingPayoutMethodMatchesCurrency || isConnectedToStripe) && data.host.currency;
+  const fixedCurrency =
+    useStructuredForm && (existingPayoutMethodMatchesCurrency || isConnectedToStripe) && data.host.currency;
 
   const initialValues = {
     ...(existingPayoutMethod || { data: { currency: fixedCurrency } }),

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import hasFeature, { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
+import { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { Flex } from '../Grid';
@@ -39,6 +39,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   INVOICES_RECEIPTS: 'invoices-receipts',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
+  HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
 };
 
 const SECTION_LABELS = defineMessages({
@@ -138,6 +139,10 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.paymentReceipts',
     defaultMessage: 'Payment Receipts',
   },
+  [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: {
+    id: 'editCollective.menu.twofa',
+    defaultMessage: 'Two-factor authentication',
+  },
 });
 
 const MenuItem = styled(Link)`
@@ -193,6 +198,7 @@ const sectionsDisplayConditions = {
       CollectiveType.EVENT,
     ) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
+  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, CollectiveType.USER),
   // Fiscal Host
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: () => false,
@@ -200,9 +206,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
-  // 2FA
-  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c =>
-    isType(c, CollectiveType.USER) && hasFeature(c, FEATURES.TWO_FACTOR_AUTH),
+  [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: () => false,
 };
 
 const shouldDisplaySection = (collective, section) => {
@@ -257,6 +261,7 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH))}
         </Fragment>
       )}
     </Flex>

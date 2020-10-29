@@ -9,7 +9,7 @@ describe('create an update', () => {
     cy.get('.ql-editor').type('This is some bold HTML{selectall}');
     cy.get('.ql-bold').click();
     cy.wait(300);
-    cy.get('.actions button').click();
+    cy.getByDataCy('edit-update-submit-btn').click();
     cy.wait(1000);
     cy.get('[data-cy=updateTitle]', { timeout: 10000 }).contains('New update');
     cy.get('[data-cy=meta]').contains('draft');
@@ -21,7 +21,7 @@ describe('create an update', () => {
     cy.get('[data-cy=toggleEditUpdate').click();
     cy.wait(300);
     cy.get('[data-cy="custom-checkbox"').click(); // Make private
-    cy.get('.actions button').click();
+    cy.getByDataCy('edit-update-submit-btn').click();
     cy.wait(1000);
     cy.get('[data-cy="privateIcon"]').should('exist');
   });

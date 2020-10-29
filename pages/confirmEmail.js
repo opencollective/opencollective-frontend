@@ -86,7 +86,7 @@ class ConfirmEmailPage extends React.Component {
           </Box>
           {status === 'submitting' && (
             <MessageBox type="info" isLoading>
-              <FormattedMessage id="confirmEmail.validating" defaultMessage="Validating your new email" />
+              <FormattedMessage id="confirmEmail.validating" defaultMessage="Validating your email address..." />
             </MessageBox>
           )}
           {status === 'success' && (

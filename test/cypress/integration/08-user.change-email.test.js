@@ -40,7 +40,7 @@ describe('Users can change their email address', () => {
     cy.contains('a', 'Confirm New Email').click();
 
     // Show loading state
-    cy.contains('Validating your new email');
+    cy.contains('Validating your email address...');
 
     // Then ensure we validate the change
     cy.contains('Your email has been changed');

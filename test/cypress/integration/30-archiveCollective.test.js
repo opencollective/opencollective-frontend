@@ -1,39 +1,50 @@
 describe('Archive Collective', () => {
-  it('Should archive organization', () => {
-    cy.login().then(() => {
-      // Create a new organization
-      cy.createCollective({ type: 'ORGANIZATION' }).then(collective => {
-        const collectiveSlug = collective.slug;
-        cy.visit(`/${collectiveSlug}/edit/advanced`);
-        cy.contains('button', 'Archive this Organization').click();
-        cy.get('[data-cy=action]').click();
-        cy.wait(500);
-        cy.contains('This organization has been archived');
-      });
+  let orgSlug = null;
+  let collectiveSlug = null;
+
+  before(() => {
+    cy.createCollective({ type: 'ORGANIZATION' }).then(({ slug }) => {
+      orgSlug = slug;
+    });
+
+    cy.createCollective({ type: 'COLLECTIVE' }).then(({ slug }) => {
+      collectiveSlug = slug;
     });
   });
 
-  it('Should archive collective', () => {
-    cy.login().then(() => {
-      // Create a new collective
-      cy.createCollective({ type: 'COLLECTIVE' }).then(collective => {
-        const collectiveSlug = collective.slug;
-        cy.visit(`/${collectiveSlug}/edit/advanced`);
-        cy.contains('button', 'Archive this Collective').click();
-        cy.get('[data-cy=action]').click();
-        cy.wait(500);
-        cy.contains('This collective has been archived');
+  describe('Archive organization', () => {
+    before(() => {
+      cy.login({ redirect: `/${orgSlug}/edit/advanced` });
+    });
 
-        // test to confirm expenses cannot be submitted for an archived collective
-        cy.visit(`${collectiveSlug}/expenses`);
-        cy.get('[data-cy=submit-expense-btn]').should('not.exist');
+    it('Should archive organization', () => {
+      cy.contains('button', 'Archive this Organization').click();
+      cy.get('[data-cy=action]').click();
+      cy.wait(500);
+      cy.contains('This organization has been archived');
+    });
+  });
 
-        cy.visit(`${collectiveSlug}`);
-        cy.get('[data-cy=submit-expense-btn]').should('not.exist');
+  describe('Archive collective', () => {
+    before(() => {
+      cy.login({ redirect: `/${collectiveSlug}/edit/advanced` });
+    });
 
-        cy.visit(`${collectiveSlug}/expenses/new`);
-        cy.contains('This feature is not activated for this collective.');
-      });
+    it('Should archive collective', () => {
+      cy.contains('button', 'Archive this Collective').click();
+      cy.get('[data-cy=action]').click();
+      cy.wait(500);
+      cy.contains('This collective has been archived');
+
+      // test to confirm expenses cannot be submitted for an archived collective
+      cy.visit(`${collectiveSlug}/expenses`);
+      cy.get('[data-cy=submit-expense-btn]').should('not.exist');
+
+      cy.visit(`${collectiveSlug}`);
+      cy.get('[data-cy=submit-expense-btn]').should('not.exist');
+
+      cy.visit(`${collectiveSlug}/expenses/new`);
+      cy.contains('This feature is not activated for this collective.');
     });
   });
 });

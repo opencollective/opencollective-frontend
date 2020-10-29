@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get, truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -43,7 +43,12 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
 
 const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency }) => {
   if (step.name === STEPS.PROFILE) {
-    return get(stepProfile, 'name') || get(stepProfile, 'email', null);
+    if (stepProfile?.isGuest && stepProfile.email) {
+      const truncatedEmail = truncate(stepProfile.email, { length: 100 });
+      return stepProfile.name ? `${stepProfile.name} · ${truncatedEmail}` : truncatedEmail;
+    } else {
+      return get(stepProfile, 'name') || get(stepProfile, 'email', null);
+    }
   } else if (step.name === STEPS.DETAILS) {
     if (stepDetails) {
       return (
@@ -59,6 +64,8 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
     } else {
       return (stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
     }
+  } else if (step.name === STEPS.SUMMARY) {
+    return stepSummary?.countryISO || null;
   } else {
     return null;
   }
@@ -90,7 +97,7 @@ const ContributionFlowStepsProgress = ({
       {({ step }) => (
         <Flex flexDirection="column" alignItems="center">
           <StepLabel>{step.label || step.name}</StepLabel>
-          <Span fontSize="12px" textAlign="center">
+          <Span fontSize="12px" textAlign="center" wordBreak="break-word">
             {step.isVisited && (
               <StepInfo
                 step={step}

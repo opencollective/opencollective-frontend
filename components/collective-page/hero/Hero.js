@@ -328,7 +328,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           <StyledShortDescription>{collective.description}</StyledShortDescription>
           {isEvent && <HeroEventDetails collective={collective} />}
 
-          {!isCollective && !isEvent && !collective.isHost && (
+          {!collective.isHost && [CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collective.type) && (
             <HeroTotalCollectiveContributionsWithData collective={collective} />
           )}
 

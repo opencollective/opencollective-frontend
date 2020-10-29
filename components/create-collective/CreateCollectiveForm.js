@@ -5,8 +5,9 @@ import { Field, Form, Formik } from 'formik';
 import { trim } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import slugify from 'slugify';
 import styled from 'styled-components';
+
+import { suggestSlug } from '../../lib/collective.lib';
 
 import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
@@ -197,19 +198,9 @@ class CreateCollectiveForm extends React.Component {
               {formik => {
                 const { values, handleSubmit, errors, touched, setFieldValue } = formik;
 
-                const suggestedSlug = value => {
-                  const slugOptions = {
-                    replacement: '-',
-                    lower: true,
-                    strict: true,
-                  };
-
-                  return trim(slugify(value, slugOptions), '-');
-                };
-
                 const handleSlugChange = e => {
                   if (!touched.slug) {
-                    setFieldValue('slug', suggestedSlug(e.target.value));
+                    setFieldValue('slug', suggestSlug(e.target.value));
                   }
                 };
 

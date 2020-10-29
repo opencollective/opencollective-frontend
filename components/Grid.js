@@ -7,7 +7,7 @@ import propTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
 import { color, compose, flexbox, grid, layout, space, typography } from 'styled-system';
 
-const boxProps = compose(space, color, layout, typography, flexbox);
+const boxProps = compose(space, color, layout, typography, flexbox, grid);
 export const Box = styled('div')(
   {
     boxSizing: 'border-box',

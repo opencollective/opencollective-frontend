@@ -1377,6 +1377,8 @@ type ExpensesStatsType {
 Possible statuses for an Expense
 """
 enum ExpenseStatus {
+  DRAFT
+  UNVERIFIED
   PENDING
   APPROVED
   REJECTED
@@ -1654,6 +1656,26 @@ type Fund implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+}
+
+"""
+Input type for guest contributions
+"""
+input GuestInfoInput {
+  """
+  Contributor's email
+  """
+  email: String
+
+  """
+  Full name of the user
+  """
+  name: String
+
+  """
+  The unique guest token
+  """
+  token: String
 }
 
 """
@@ -1957,7 +1979,7 @@ type Mutation {
     forceManual: Boolean
 
     """
-    2FA code for if the host account has it turned on and the transaction is large.
+    2FA code for if the host account has 2FA for payouts turned on.
     """
     twoFactorAuthenticatorCode: String
   ): ExpenseType
@@ -1989,6 +2011,7 @@ type Mutation {
   """
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
   createOrder(order: OrderInputType!): OrderType
+    @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
   confirmOrder(order: ConfirmOrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
@@ -1999,8 +2022,6 @@ type Mutation {
   createComment(comment: CommentInputType!): CommentType
   editComment(comment: CommentAttributesInputType!): CommentType
   deleteComment(id: Int!): CommentType
-  cancelSubscription(id: Int!): OrderType
-  updateSubscription(id: Int!, paymentMethod: PaymentMethodInputType, amount: Int): OrderType
   refundTransaction(id: Int!): Transaction
   addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
   createApplication(application: ApplicationInput!): Application
@@ -2384,6 +2405,11 @@ input OrderInputType {
   tier: TierInputType
   customData: JSON
   recaptchaToken: String
+
+  """
+  Use this when fromAccount is null to pass the guest info
+  """
+  guestInfo: GuestInfoInput
 
   """
   The amount of taxes that were included in totalAmount

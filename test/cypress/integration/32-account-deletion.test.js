@@ -1,21 +1,24 @@
 import mockRecaptcha from '../mocks/recaptcha';
 
 describe('Account Deletion', () => {
-  it('Should delete collective', () => {
-    cy.login().then(() => {
-      // Create a new collective
-      cy.createCollective({ type: 'COLLECTIVE' }).then(collective => {
-        const collectiveSlug = collective.slug;
-        cy.visit(`/${collectiveSlug}/edit/advanced`);
-        cy.contains('button', 'Delete this Collective', { timeout: 15000 }).click();
-        cy.get('[data-cy=delete]').click();
-        cy.wait(1000);
-        cy.location().should(location => {
-          expect(location.search).to.eq('?type=COLLECTIVE');
-        });
-        cy.contains('h1', 'Your collective has been deleted.');
-      });
+  let collectiveSlug = null;
+
+  before(() => {
+    cy.createCollective({ type: 'COLLECTIVE' }).then(({ slug }) => {
+      collectiveSlug = slug;
     });
+    cy.login({ redirect: `/${collectiveSlug}/edit/advanced` });
+  });
+
+  it('Should delete collective', () => {
+    cy.visit(`/${collectiveSlug}/edit/advanced`);
+    cy.contains('button', 'Delete this Collective', { timeout: 15000 }).click();
+    cy.get('[data-cy=delete]').click();
+    cy.wait(1000);
+    cy.location().should(location => {
+      expect(location.search).to.eq('?type=COLLECTIVE');
+    });
+    cy.contains('h1', 'Your collective has been deleted.');
   });
 
   it('Should delete user', () => {

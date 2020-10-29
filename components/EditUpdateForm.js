@@ -113,44 +113,10 @@ class EditUpdateForm extends React.Component {
 
     return (
       <UpdateFormWrapper className={`EditUpdateForm ${this.props.mode}`}>
-        <style jsx>
-          {`
-            .col {
-              float: left;
-              display: flex;
-              flex-direction: column;
-              margin-right: 1rem;
-              margin-top: 1rem;
-            }
-            .row {
-              clear: both;
-              margin-left: 0;
-              margin-right: 0;
-            }
-            .row .col.large {
-              width: 100%;
-            }
-            .row.actions {
-              margin-top: 7rem;
-            }
-            label {
-              text-transform: uppercase;
-              color: #aaaeb3;
-              font-weight: 300;
-              white-space: nowrap;
-            }
-            .netAmountInCollectiveCurrency {
-              font-weight: bold;
-            }
-            .error {
-              color: red;
-            }
-          `}
-        </style>
         <form data-cy="edit-update-form" onSubmit={this.onSubmit}>
-          <div className="row">
-            <div className="col large">
-              <Container mb={2} fontWeight="500" fontSize="1.6rem" lineHeight="1.7">
+          <Container margin="auto 0">
+            <Container width={1}>
+              <Container mb={2} mt={2} fontWeight="500" fontSize="1.6rem" lineHeight="1.7">
                 <Box as="span">Title</Box>
               </Container>
               <StyledInputField htmlFor="title">
@@ -168,17 +134,14 @@ class EditUpdateForm extends React.Component {
                   />
                 )}
               </StyledInputField>
-            </div>
-          </div>
-          <div className="row">
-            <Container className="col large" width={1}>
-              <Container fontWeight="500" mb={2} mt={3} fontSize="1.6rem" lineHeight="1.7">
-                <Box as="span">Message</Box>
-              </Container>
-              <HTMLEditor onChange={html => this.handleChange('html', html)} defaultValue={update.html} />
             </Container>
-          </div>
-
+          </Container>
+          <Container width={1}>
+            <Container fontWeight="500" mb={2} mt={3} fontSize="1.6rem" lineHeight="1.7">
+              <Box as="span">Message</Box>
+            </Container>
+            <HTMLEditor onChange={html => this.handleChange('html', html)} defaultValue={update.html} />
+          </Container>
           {(!collective.isHost || update.isPrivate) && (
             <Container
               mt={3}
@@ -238,7 +201,7 @@ class EditUpdateForm extends React.Component {
             </Container>
           )}
 
-          <ActionButtonWrapper className="row actions" mx={2} my={4}>
+          <ActionButtonWrapper mx={2} my={4}>
             <StyledButton
               data-cy="edit-update-submit-btn"
               className="bluewhite"
@@ -252,9 +215,11 @@ class EditUpdateForm extends React.Component {
             </StyledButton>
           </ActionButtonWrapper>
 
-          <div className="row">
-            <div className="col large">{this.state.error && <div className="error">{this.state.error}</div>}</div>
-          </div>
+          <Container margin="auto 0">
+            <Container width={1}>
+              {this.state.error && <Container style={{ color: 'red' }}>{this.state.error}</Container>}
+            </Container>
+          </Container>
         </form>
       </UpdateFormWrapper>
     );

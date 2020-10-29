@@ -107,6 +107,13 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
                 defaultMessage="Type: {type}"
                 values={{ type: upperCase(payoutMethod.data.type) }}
               />
+              {payoutMethod.data.accountHolderName && (
+                <FormattedMessage
+                  id="BankInfo.AccountHolder"
+                  defaultMessage="Account Holder: {name}"
+                  values={{ name: payoutMethod.data.accountHolderName }}
+                />
+              )}
               {payoutMethod.data.details && renderObject(payoutMethod.data.details)}
             </Container>
           ) : isLoading ? (

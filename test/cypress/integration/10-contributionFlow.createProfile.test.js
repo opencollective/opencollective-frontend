@@ -6,7 +6,7 @@ describe('Contribution Flow: Create profile', () => {
     cy.visit('/apex/donate');
 
     // Skip the step details on the new contribution flow
-    cy.contains('button', 'Next step').click();
+    cy.get('button[data-cy="cf-next-step"]').click();
 
     // Has TOS
     cy.contains('By joining, you agree to our Terms of Service and Privacy Policy.');
@@ -39,7 +39,7 @@ describe('Contribution Flow: Create profile', () => {
     cy.visit('/apex/donate');
 
     // Skip the step details on the new contribution flow
-    cy.contains('button', 'Next step').click();
+    cy.get('button[data-cy="cf-next-step"]').click();
 
     // Select "Create oganization"
     cy.get('[data-cy="cf-content"]').contains('Contribute as an organization').click();

@@ -193,7 +193,7 @@ class HostDashboardActionsBanner extends React.Component {
                       id="addFunds.error.planLimitReached"
                       defaultMessage="You reached your plan's limit, <a>upgrade your plan</a> to add more funds"
                       values={{
-                        a: (...chunks) => <Link route={`/${host.slug}/edit/host-plan`}>{chunks}</Link>,
+                        a: chunks => <Link route={`/${host.slug}/edit/host-plan`}>{chunks}</Link>,
                       }}
                     />
                     .

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
+import { compose, get, omit } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -63,6 +63,8 @@ class CreateExpensePage extends React.Component {
     intl: PropTypes.object,
     /** from apollo */
     createExpense: PropTypes.func.isRequired,
+    /** from apollo */
+    draftExpenseAndInviteUser: PropTypes.func.isRequired,
     /** from apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -155,8 +157,30 @@ class CreateExpensePage extends React.Component {
     }
   }
 
-  onFormSubmit = expense => {
-    this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
+  onFormSubmit = async expense => {
+    if (expense.payee.isInvite) {
+      const result = await this.props.draftExpenseAndInviteUser({
+        variables: {
+          account: { id: this.props.data.account.id },
+          expense: omit(expense, ['payoutMethod', 'currency']),
+        },
+      });
+      if (this.state.formPersister) {
+        this.state.formPersister.clearValues();
+      }
+
+      // Redirect to the expense page
+      const legacyExpenseId = result.data.draftExpenseAndInviteUser.legacyId;
+      const { collectiveSlug, parentCollectiveSlug, data } = this.props;
+      Router.pushRoute(`expense-v2`, {
+        parentCollectiveSlug,
+        collectiveSlug,
+        collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined,
+        ExpenseId: legacyExpenseId,
+      });
+    } else {
+      this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
+    }
   };
 
   onSummarySubmit = async () => {
@@ -273,6 +297,7 @@ class CreateExpensePage extends React.Component {
                         <ExpenseForm
                           collective={collective}
                           loading={loadingLoggedInUser}
+                          loggedInAccount={loggedInAccount}
                           onSubmit={this.onFormSubmit}
                           expense={this.state.expense}
                           expensesTags={this.getSuggestedTags(collective)}
@@ -290,6 +315,7 @@ class CreateExpensePage extends React.Component {
                               ...this.state.expense,
                               createdByAccount: this.props.data.loggedInAccount,
                             }}
+                            collective={collective}
                           />
                           <Box mt={24}>
                             <ExpenseNotesForm
@@ -443,4 +469,27 @@ const addCreateExpenseMutation = graphql(createExpenseMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-export default withUser(addCreateExpensePageData(withRouter(addCreateExpenseMutation(injectIntl(CreateExpensePage)))));
+const draftExpenseAndInviteUserMutation = gqlV2/* GraphQL */ `
+  mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
+    draftExpenseAndInviteUser(expense: $expense, account: $account) {
+      ...ExpensePageExpenseFields
+    }
+  }
+  ${expensePageExpenseFieldsFragment}
+`;
+
+const addDraftExpenseAndInviteUserMutation = graphql(draftExpenseAndInviteUserMutation, {
+  name: 'draftExpenseAndInviteUser',
+  options: { context: API_V2_CONTEXT },
+});
+
+const addHoc = compose(
+  withUser,
+  withRouter,
+  addCreateExpensePageData,
+  addCreateExpenseMutation,
+  addDraftExpenseAndInviteUserMutation,
+  injectIntl,
+);
+
+export default addHoc(CreateExpensePage);

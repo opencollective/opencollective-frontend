@@ -417,6 +417,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_PROCESSING
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED
   COLLECTIVE_MEMBER_CREATED
   COLLECTIVE_TRANSACTION_CREATED
   COLLECTIVE_UPDATE_CREATED
@@ -972,6 +973,21 @@ input CommentUpdateInput {
   id: String!
   markdown: String
   html: String
+}
+
+"""
+Response for the confirmGuestAccount mutation
+"""
+type ConfirmGuestAccountResponse {
+  """
+  The validated account
+  """
+  account: Account!
+
+  """
+  A token that can be used to sign in
+  """
+  accessToken: String!
 }
 
 """
@@ -2503,6 +2519,18 @@ input CreditCardCreateInput {
   zip: String
 }
 
+type CreditCardWithStripeError {
+  """
+  The payment method created
+  """
+  paymentMethod: PaymentMethod!
+
+  """
+  This field will be set if there was an error with Stripe during strong customer authentication
+  """
+  stripeError: StripeError
+}
+
 """
 All supported currencies
 """
@@ -2681,6 +2709,12 @@ type Debit implements Transaction {
   fromAccount: Account
   toAccount: Account
 }
+
+"""
+A field whose value conforms to the standard internet email address format as
+specified in RFC822: https://www.w3.org/Protocols/rfc822/.
+"""
+scalar EmailAddress
 
 """
 This represents an Event account
@@ -3052,6 +3086,11 @@ type Expense {
   Returns the list of legal documents required from the payee before the expense can be payed. Must be logged in.
   """
   requiredLegalDocuments: [LegalDocumentType]
+
+  """
+  Drafted field values that were still not persisted
+  """
+  draft: JSON
 }
 
 """
@@ -3148,6 +3187,71 @@ input ExpenseCreateInput {
   The address of the payee
   """
   payeeLocation: LocationInput
+}
+
+input ExpenseInviteDraftInput {
+  """
+  Main title of the expense
+  """
+  description: String
+
+  """
+  Longer text to attach to the expense
+  """
+  longDescription: String
+
+  """
+  Tags associated to the expense (ie. Food, Engineering...)
+  """
+  tags: [String]
+
+  """
+  The type of the expense
+  """
+  type: ExpenseType!
+
+  """
+  A private note that will be attached to your invoice, as HTML
+  """
+  privateMessage: String
+
+  """
+  Tax ID, VAT number...etc This information will be printed on your invoice.
+  """
+  invoiceInfo: String
+
+  """
+  Note to be sent to the invited user through email.
+  """
+  recipientNote: String
+
+  """
+  The list of items for this expense. Total amount will be computed from them.
+  """
+  items: [JSON]
+
+  """
+  (Optional) A list of files that you want to attach to this expense
+  """
+  attachedFiles: [JSON]
+
+  """
+  Account to reimburse
+  """
+  payee: ExpenseInvitee!
+
+  """
+  The address of the payee
+  """
+  payeeLocation: LocationInput
+}
+
+input ExpenseInvitee {
+  id: Int
+  slug: String
+  name: String
+  email: String
+  isInvite: Boolean
 }
 
 """
@@ -3333,6 +3437,8 @@ input ExpenseReferenceInput {
 }
 
 enum ExpenseStatus {
+  DRAFT
+  UNVERIFIED
   PENDING
   APPROVED
   REJECTED
@@ -3346,6 +3452,8 @@ enum ExpenseStatus {
 Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
 """
 enum ExpenseStatusFilter {
+  DRAFT
+  UNVERIFIED
   PENDING
   APPROVED
   REJECTED
@@ -3445,7 +3553,7 @@ input ExpenseUpdateInput {
   """
   Account to reimburse
   """
-  payee: AccountReferenceInput
+  payee: NewAccountOrReferenceInput
 
   """
   The address of the payee
@@ -3700,6 +3808,31 @@ input FundCreateInput {
   description: String!
   tags: [String]
   settings: JSON
+}
+
+"""
+Input type for guest contributions
+"""
+input GuestInfoInput {
+  """
+  Contributor's email
+  """
+  email: EmailAddress!
+
+  """
+  Full name of the user
+  """
+  name: String
+
+  """
+  The unique guest token
+  """
+  token: String
+
+  """
+  Address of the user, mandatory when amount is above $5000.
+  """
+  location: LocationInput
 }
 
 """
@@ -4215,9 +4348,10 @@ type Individual implements Account {
   location: Location
   categories: [String]!
   stats: AccountStats
-  firstName: String
-  lastName: String
+  firstName: String @deprecated(reason: "2020-10-12: Use the name field")
+  lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
+  isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
 }
@@ -4565,6 +4699,11 @@ type Mutation {
     Expense data
     """
     expense: ExpenseUpdateInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
   ): Expense!
 
   """
@@ -4595,6 +4734,46 @@ type Mutation {
     If action is related to a payment, this object used for the payment parameters
     """
     paymentParams: ProcessExpensePaymentParams
+  ): Expense!
+
+  """
+  Persist an Expense as a draft and invite someone to edit and submit it.
+  """
+  draftExpenseAndInviteUser(
+    """
+    Expense data
+    """
+    expense: ExpenseInviteDraftInput!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountReferenceInput!
+  ): Expense!
+
+  """
+  To verify an unverified expense.
+  """
+  resendDraftExpenseInvite(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+  ): Expense!
+
+  """
+  To verify and unverified expense.
+  """
+  verifyExpense(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
   ): Expense!
 
   """
@@ -4668,6 +4847,36 @@ type Mutation {
   ): Collective!
 
   """
+  Sends an email for guest to confirm their emails and create their Open Collective account
+  """
+  sendGuestConfirmationEmail(
+    """
+    The email to validate
+    """
+    email: EmailAddress!
+  ): Boolean!
+
+  """
+  Mark an account as confirmed
+  """
+  confirmGuestAccount(
+    """
+    The email to confirm
+    """
+    email: EmailAddress!
+
+    """
+    The key that you want to edit in settings
+    """
+    emailConfirmationToken: String!
+
+    """
+    This can be used to link the other guest contributions to the user
+    """
+    guestTokens: [String!]
+  ): ConfirmGuestAccountResponse!
+
+  """
   Create a new Payout Method to get paid through the platform
   """
   createPayoutMethod(
@@ -4703,16 +4912,6 @@ type Mutation {
   ): Order
 
   """
-  Reactivate a cancelled order
-  """
-  activateOrder(
-    """
-    Object matching the OrderReferenceInput (id)
-    """
-    order: OrderReferenceInput!
-  ): Order
-
-  """
   Update an Order's amount, tier, or payment method
   """
   updateOrder(
@@ -4736,67 +4935,69 @@ type Mutation {
     """
     amount: AmountInput
   ): Order
-  confirmOrder(order: OrderReferenceInput!): OrderWithPayment!
+  confirmOrder(
+    order: OrderReferenceInput!
+
+    """
+    If the order was made as a guest, you can use this field to authenticate
+    """
+    guestToken: String
+  ): OrderWithPayment!
 
   """
   Add a new payment method to be used with an Order
   """
   addCreditCard(
     """
-    A Payment Method to add to an Account
-    """
-    paymentMethod: PaymentMethodCreateInput
-
-    """
     The credit card info
     """
-    creditCardInfo: CreditCardCreateInput
+    creditCardInfo: CreditCardCreateInput!
 
     """
     Name associated to this credit card
     """
-    name: String
+    name: String!
 
     """
-    Wether this payment method should be saved for future payments
+    Whether this credit card should be saved for future payments
     """
     isSavedForLater: Boolean = true
 
     """
-    Account to add Payment Method to
+    Account to add the credit card to
     """
     account: AccountReferenceInput!
-  ): PaymentMethod!
+  ): CreditCardWithStripeError!
 
   """
   Add a new payment method to be used with an Order
   """
   addStripeCreditCard(
     """
-    A Payment Method to add to an Account
-    """
-    paymentMethod: PaymentMethodCreateInput
-
-    """
     The credit card info
     """
-    creditCardInfo: CreditCardCreateInput
+    creditCardInfo: CreditCardCreateInput!
 
     """
     Name associated to this credit card
     """
-    name: String
+    name: String!
 
     """
-    Wether this payment method should be saved for future payments
+    Whether this credit card should be saved for future payments
     """
     isSavedForLater: Boolean = true
 
     """
-    Account to add Payment Method to
+    Account to add the credit card to
     """
     account: AccountReferenceInput!
-  ): PaymentMethod! @deprecated(reason: "2020-08-24: Use addCreditCard")
+  ): CreditCardWithStripeError! @deprecated(reason: "2020-10-23: Use addCreditCard")
+
+  """
+  Confirm a credit card is ready for use after strong customer authentication
+  """
+  confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
 
   """
   Refunds transaction
@@ -4842,6 +5043,34 @@ type Mutation {
     """
     message: String
   ): Member!
+}
+
+input NewAccountOrganizationInput {
+  name: String
+  slug: String
+  description: String
+  website: String
+}
+
+input NewAccountOrReferenceInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
+  name: String
+  email: String
+  organization: NewAccountOrganizationInput
+  newsletterOptIn: Boolean
 }
 
 """
@@ -4910,14 +5139,19 @@ input OrderCreateInput {
   frequency: ContributionFrequency!
 
   """
-  The profile making the order
+  The profile making the order. Can be null for guest contributions.
   """
-  fromAccount: AccountReferenceInput!
+  fromAccount: AccountReferenceInput
 
   """
   The profile you want to contribute to
   """
   toAccount: AccountReferenceInput!
+
+  """
+  Use this when fromAccount is null to pass the guest info
+  """
+  guestInfo: GuestInfoInput
 
   """
   The payment method used for this order
@@ -5019,6 +5253,11 @@ type OrderWithPayment {
   The order created
   """
   order: Order!
+
+  """
+  If donating as a guest, this will contain your guest token to contribute again in the future
+  """
+  guestToken: String
 
   """
   This field will be set if the order was created but there was an error with Stripe during the payment
@@ -5243,22 +5482,6 @@ type PaymentMethod {
   createdAt: ISODateTime
 }
 
-input PaymentMethodCreateInput {
-  data: PaymentMethodDataInput
-  name: String
-  token: String
-}
-
-input PaymentMethodDataInput {
-  brand: String!
-  country: String!
-  expMonth: Int!
-  expYear: Int!
-  fullName: String
-  funding: String
-  zip: String
-}
-
 """
 An input to use for creating or retrieving payment methods
 """
@@ -5376,7 +5599,7 @@ input ProcessExpensePaymentParams {
   forceManual: Boolean
 
   """
-  2FA code for if the host account has it turned on and the transaction is large.
+  2FA code for if the host account has 2FA for payouts turned on.
   """
   twoFactorAuthenticatorCode: String
 }
@@ -5810,6 +6033,11 @@ type Query {
     Identifiers to retrieve the expense.
     """
     expense: ExpenseReferenceInput
+
+    """
+    Submit-on-behalf key to access drafted Expenses
+    """
+    draftKey: String
   ): Expense
   hosts(
     """

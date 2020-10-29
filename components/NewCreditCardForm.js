@@ -43,14 +43,16 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     onReady: PropTypes.func,
     stripe: PropTypes.object,
     useLegacyCallback: PropTypes.bool,
+    defaultIsSaved: PropTypes.bool,
   };
 
   static defaultProps = {
     hasSaveCheckBox: true,
     hidePostalCode: false,
+    defaultIsSaved: true,
   };
 
-  state = { value: null };
+  state = { value: null, showAllErrors: false };
 
   componentDidMount() {
     if (this.props.onReady && this.props.stripe) {
@@ -87,31 +89,50 @@ class NewCreditCardFormWithoutStripe extends React.Component {
   };
 
   onCardChange = e => {
-    if (this.props.useLegacyCallback) {
-      this.props.onChange({ name, type: 'StripeCreditCard', value: e });
+    const { useLegacyCallback, onChange, defaultIsSaved } = this.props;
+    this.setState({ showAllErrors: false });
+    if (useLegacyCallback) {
+      onChange({ name, type: 'StripeCreditCard', value: e });
     } else {
       this.setState(
         ({ value }) => ({
           value: {
             ...value,
             type: GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD,
-            isSavedForLater: isUndefined(value?.isSavedForLater) || value.isSavedForLater ? true : false,
+            isSavedForLater: isUndefined(value?.isSavedForLater) || value.isSavedForLater ? defaultIsSaved : false,
             stripeData: e,
           },
         }),
-        () => this.props.onChange(this.state.value),
+        () => onChange(this.state.value),
       );
     }
   };
 
+  getError() {
+    if (this.props.error) {
+      return this.props.error;
+    } else if (this.state.showAllErrors && this.state.value?.stripeData) {
+      const { stripeData } = this.state.value;
+      if (!stripeData.complete) {
+        if (!this.props.hidePostalCode && !stripeData.value?.postalCode) {
+          return (
+            <FormattedMessage id="NewCreditCardForm.PostalCode" defaultMessage="Credit card ZIP code is required" />
+          );
+        }
+      }
+    }
+  }
+
   render() {
-    const { error, hasSaveCheckBox, hidePostalCode } = this.props;
+    const { hasSaveCheckBox, hidePostalCode, defaultIsSaved } = this.props;
+    const error = this.getError();
     return (
       <Flex flexDirection="column">
         <StyledCardElement
           hidePostalCode={hidePostalCode}
-          onChange={this.onCardChange}
           onReady={input => input.focus()}
+          onChange={this.onCardChange}
+          onBlur={() => this.setState({ showAllErrors: true })}
         />
         {error && (
           <Span display="block" color="red.500" pt={2} fontSize="10px">
@@ -121,7 +142,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
         {hasSaveCheckBox && (
           <Flex mt={3} alignItems="center" color="black.700">
             <StyledCheckbox
-              defaultChecked
+              defaultChecked={defaultIsSaved}
               name="save"
               onChange={this.onCheckboxChange}
               label={<FormattedMessage id="paymentMethod.save" defaultMessage="Remember this payment method" />}
