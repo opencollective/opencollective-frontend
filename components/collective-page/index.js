@@ -12,6 +12,7 @@ import Container from '../Container';
 import Hero from './hero/Hero';
 import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
+import SectionConnect from './sections/Connect';
 import SectionContribute from './sections/Contribute';
 import SectionContributions from './sections/Contributions';
 import SectionContributors from './sections/Contributors';
@@ -166,6 +167,7 @@ class CollectivePage extends Component {
             transactions={this.props.transactions}
             expenses={this.props.expenses}
             stats={this.props.stats}
+            contributors={this.props.financialContributors}
           />
         );
       case Sections.CONTRIBUTE:
@@ -243,6 +245,16 @@ class CollectivePage extends Component {
             isAdmin={this.props.isAdmin}
           />
         );
+      case Sections.CONNECT:
+        return (
+          <SectionConnect
+            collective={this.props.collective}
+            conversations={this.props.conversations}
+            isAdmin={this.props.isAdmin}
+            isLoggedIn={Boolean(this.props.LoggedInUser)}
+          />
+        );
+
       default:
         return null;
     }

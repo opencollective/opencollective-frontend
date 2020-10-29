@@ -319,6 +319,18 @@ interface AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 }
 
 """
@@ -422,7 +434,6 @@ enum ActivityType {
   COLLECTIVE_TRANSACTION_CREATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
-  COLLECTIVE_USER_ADDED
   COLLECTIVE_CONTACT
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
@@ -439,6 +450,7 @@ enum ActivityType {
   ACTIVATED_COLLECTIVE_AS_HOST
   DEACTIVATED_COLLECTIVE_AS_HOST
   COLLECTIVE_TRANSACTION_PAID
+  COLLECTIVE_USER_ADDED
 }
 
 """
@@ -906,6 +918,18 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 }
 
 input CollectiveCreateInput {
@@ -2955,6 +2979,18 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 
   """
   The Collective hosting this Event
@@ -3800,6 +3836,18 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 }
 
 input FundCreateInput {
@@ -4049,6 +4097,18 @@ type Host implements Account & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
   hostFeePercent: Int
   totalHostedCollectives: Int
   isOpenToApplications: Boolean
@@ -5843,6 +5903,18 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 
   """
   The Fund hosting this Project
@@ -6389,6 +6461,62 @@ type TransferWiseRequiredField {
   type: String
   title: String
   fields: [TransferWiseField]
+}
+
+"""
+This represents an Update
+"""
+type Update {
+  id: String!
+  legacyId: Int
+  slug: String!
+
+  """
+  Indicates whether or not the user is allowed to see the content of this update
+  """
+  userCanSeeUpdate: Boolean!
+  isPrivate: Boolean!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  publishedAt: DateTime
+  notificationAudience: UpdateAudienceType
+  makePublicOn: DateTime
+  summary: String
+  html: String
+  tags: [String]
+  fromAccount: Account
+  account: Account
+}
+
+"""
+Defines targets for an update
+"""
+enum UpdateAudienceType {
+  """
+  Will be sent to collective admins and financial contributors
+  """
+  ALL
+
+  """
+  Will be sent to collective admins
+  """
+  COLLECTIVE_ADMINS
+
+  """
+  Will be sent to financial contributors
+  """
+  FINANCIAL_CONTRIBUTORS
+}
+
+"""
+A collection of "Updates"
+"""
+type UpdateCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Update]
 }
 
 """

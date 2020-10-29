@@ -29,6 +29,7 @@ export const Sections = {
   CONTRIBUTORS: 'contributors',
   CONVERSATIONS: 'conversations',
   TRANSACTIONS: 'transactions',
+  CONNECT: 'connect',
   ABOUT: 'about',
   PROJECTS: 'projects',
 };
