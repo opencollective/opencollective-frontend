@@ -31,6 +31,12 @@ const IncognitoUserCollective = dynamic(
   { loading: Loading },
 );
 
+/** A page rendered when collective is guest */
+const GuestUserProfile = dynamic(
+  () => import(/* webpackChunkName: 'GuestUserProfile' */ '../components/GuestUserProfile'),
+  { loading: Loading },
+);
+
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
   html {
@@ -91,6 +97,7 @@ class CollectivePage extends React.Component {
         isActive: PropTypes.bool,
         isPledged: PropTypes.bool,
         isIncognito: PropTypes.bool,
+        isGuest: PropTypes.bool,
         parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
         host: PropTypes.object,
         stats: PropTypes.object,
@@ -160,6 +167,8 @@ class CollectivePage extends React.Component {
         return <PledgedCollectivePage collective={data.Collective} />;
       } else if (data.Collective.isIncognito) {
         return <IncognitoUserCollective collective={data.Collective} />;
+      } else if (data.Collective.isGuest) {
+        return <GuestUserProfile account={data.Collective} />;
       }
     }
 

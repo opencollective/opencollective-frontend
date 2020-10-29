@@ -42,6 +42,7 @@ export const contributorsFieldsFragment = gql`
     type
     publicMessage
     isIncognito
+    isGuest
     tiersIds
     collectiveId
   }

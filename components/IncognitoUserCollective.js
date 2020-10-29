@@ -44,6 +44,7 @@ class IncognitoUserCollective extends React.Component {
           title={intl.formatMessage(this.messages['incognito.title'])}
           description={intl.formatMessage(this.messages['incognito.description'])}
           collective={{ collective }}
+          noRobots
         />
 
         <Body>
