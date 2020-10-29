@@ -441,7 +441,7 @@
   "contributions.startAccepting": "Accepter les contributions financières",
   "contributions.subtitle": "Il n'y a pas encore de contributions. Pour commencer à accepter des contributions financières, veuillez choisir un hôte fiscal.",
   "ContributionSummary": "Résumé de la contribution",
-  "ContributionSummary.NextCharge": "Next charge on {date} and then the first day of each month. You can cancel anytime or edit your contribution in your settings.",
+  "ContributionSummary.NextCharge": "Next charge on {date} and then the first day of {interval, select, month {each month} year {same month each year}}. You can cancel anytime or edit your contribution in your settings.",
   "ContributionToProject": "Contribution à {projectName}",
   "ContributionType.ChildCollective": "Collectif connecté",
   "ContributionType.Custom": "Contribution personnalisée",
