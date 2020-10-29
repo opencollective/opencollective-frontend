@@ -66,6 +66,13 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
           platformFeePercent
         }
       }
+      host {
+        id
+        name
+        slug
+        type
+        imageUrl
+      }
       giftCardEmitterAccount {
         id
         name
