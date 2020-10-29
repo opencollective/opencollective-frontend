@@ -698,9 +698,6 @@ const createPledgeMutation = gql`
       id
       createdAt
       status
-      createdByUser {
-        id
-      }
       fromCollective {
         id
         slug

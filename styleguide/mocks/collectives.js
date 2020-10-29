@@ -134,7 +134,6 @@ export const webpackCollective = {
   type: 'COLLECTIVE',
   slug: 'webpack',
   path: '/webpack',
-  createdByUser: { id: 1437, __typename: 'UserDetails' },
   name: 'webpack',
   company: null,
   tags: ['open source'],
