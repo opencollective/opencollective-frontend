@@ -255,6 +255,12 @@ TransactionItem.propTypes = {
       name: PropTypes.string.isRequired,
       imageUrl: PropTypes.string,
     }).isRequired,
+    host: PropTypes.shape({
+      id: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string,
+    }),
     toAccount: PropTypes.shape({
       id: PropTypes.string,
       slug: PropTypes.string.isRequired,

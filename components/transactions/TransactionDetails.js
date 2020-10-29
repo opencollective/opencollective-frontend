@@ -61,6 +61,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     isRefunded,
     toAccount,
     fromAccount,
+    host,
     uuid,
     platformFee,
     hostFee,
@@ -86,15 +87,15 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
-      {(toAccount.host || paymentMethod) && (
+      {(host || paymentMethod) && (
         <Flex flexDirection="column" width={[1, 0.4]}>
-          {toAccount.host && (
+          {host && (
             <Box>
               <DetailTitle>
                 <FormattedMessage id="Member.Role.FISCAL_HOST" defaultMessage="Fiscal Host" />
               </DetailTitle>
               <DetailDescription>
-                <StyledLink as={LinkCollective} collective={toAccount.host} colorShade={600} />
+                <StyledLink as={LinkCollective} collective={host} colorShade={600} />
               </DetailDescription>
             </Box>
           )}
@@ -175,16 +176,17 @@ TransactionDetails.propTypes = {
       name: PropTypes.string.isRequired,
       imageUrl: PropTypes.string,
     }).isRequired,
+    host: PropTypes.shape({
+      id: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string,
+    }),
     toAccount: PropTypes.shape({
       id: PropTypes.string,
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       imageUrl: PropTypes.string,
-      host: PropTypes.shape({
-        slug: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        imageUrl: PropTypes.string,
-      }),
     }),
     order: PropTypes.shape({
       id: PropTypes.string,
