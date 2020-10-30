@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
+import { cloneDeep, get } from 'lodash';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { compose } from '../../lib/utils';
@@ -133,10 +133,12 @@ const addEditCollectiveCreateHostMutation = graphql(editCollectiveCreateHostMuta
           };
 
           // Retrieve the query from the cache
-          const data = proxy.readQuery({
-            query: editCollectiveConnectedAccountsQuery,
-            variables,
-          });
+          const data = cloneDeep(
+            proxy.readQuery({
+              query: editCollectiveConnectedAccountsQuery,
+              variables,
+            }),
+          );
 
           // Insert new Collective at the beginning
           const membership = {

@@ -255,7 +255,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                   />
                 </Container>
               )}
-              {host && collective.isApproved && !collective.isHost && (
+              {host && collective.isApproved && host.id !== collective.id && !collective.isHost && (
                 <Fragment>
                   <Container mx={1} color="#969ba3" my={2}>
                     <FormattedMessage

@@ -63,7 +63,7 @@ const Image = styled.img`
   }
 `;
 
-class AcceptContributionsMyselfOrOrg extends React.Component {
+class AcceptContributionsOurselvesOrOrg extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     router: PropTypes.object,
@@ -182,7 +182,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
         this.setState({ loading: true });
         const { data } = values;
         await this.submitBankAccountInformation(data);
-        await this.addHost(collective, organization ? organization : LoggedInUser.collective);
+        await this.addHost(collective, organization ? organization : collective);
         await this.props.refetchLoggedInUser();
         await Router.pushRoute('accept-financial-contributions', {
           slug: this.props.collective.slug,
@@ -196,12 +196,13 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
       }
     };
 
-    const host = organization ? organization : LoggedInUser.collective;
+    const host = organization ? organization : collective;
     // Conditional rendering
     const noOrganizationPicked = router.query.path === 'organization' && !organization;
     const organizationPicked = router.query.path === 'organization' && organization;
     const ableToChooseStripeOrBankAccount =
-      (organizationPicked && !router.query.method) || (router.query.path === 'myself' && !router.query.method);
+      (organizationPicked && !router.query.method) ||
+      (['myself', 'ourselves'].includes(router.query.path) && !router.query.method);
 
     return (
       <Fragment>
@@ -228,9 +229,9 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
               </Fragment>
             ) : (
               <Fragment>
-                <Avatar collective={organizationPicked ? organization : LoggedInUser.collective} radius={64} mb={2} />
+                <Avatar collective={organizationPicked ? organization : collective} radius={64} mb={2} />
                 <P fontSize="16px" lineHeight="21px" fontWeight="bold" mb={3}>
-                  {organizationPicked ? organization.name : LoggedInUser.collective.name}
+                  {organizationPicked ? organization.name : collective.name}
                 </P>
                 <H2 fontSize="20px" fontWeight="bold" color="black.900" textAlign="center">
                   {router.query.method === 'bank' ? (
@@ -467,4 +468,4 @@ const inject = compose(
   addCreatePayoutMethodMutation,
 );
 
-export default inject(AcceptContributionsMyselfOrOrg);
+export default inject(AcceptContributionsOurselvesOrOrg);

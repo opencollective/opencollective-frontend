@@ -167,10 +167,9 @@ pages.add(
 );
 
 // New accept financial contributions flow
-
 pages.add(
   'accept-financial-contributions',
-  '/:slug/accept-financial-contributions/:path(myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
+  '/:slug/accept-financial-contributions/:path(ourselves|myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
 );
 
 // New recurring contributions page
