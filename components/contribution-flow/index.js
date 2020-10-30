@@ -639,7 +639,6 @@ class ContributionFlow extends React.Component {
               !LoggedInUser &&
               (this.state.showSignIn || !HAS_GUEST_CONTRIBUTIONS) ? (
               <SignInOrJoinFree
-                withShadow
                 defaultForm={this.state.showSignIn ? 'signin' : 'create-account'}
                 redirect={this.getRedirectUrlForSignIn()}
                 createPersonalProfileLabel={
