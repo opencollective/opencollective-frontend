@@ -21,7 +21,7 @@ import { getGuestToken, setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
-import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
+import { getWebsiteUrl, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -456,11 +456,7 @@ class ContributionFlow extends React.Component {
   }
 
   checkFormValidity = () => {
-    if (this.formRef.current?.checkValidity) {
-      return this.formRef.current.reportValidity();
-    } else {
-      return true;
-    }
+    return reportValidityHTML5(this.formRef.current);
   };
 
   /** Returns the steps list */
