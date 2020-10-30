@@ -64,7 +64,6 @@ export default class Steps extends React.Component {
 
   componentDidUpdate(oldProps) {
     const { currentStepName } = this.props;
-
     if (oldProps.currentStepName !== currentStepName) {
       const currentStep = this.getStepByName(currentStepName);
       const lastValidStep = this.getLastCompletedStep();

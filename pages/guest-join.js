@@ -44,7 +44,7 @@ const confirmGuestAccountMutation = gqlV2`
   }
 `;
 
-const EmailRadioEntry = styled.div`
+const EmailRadioEntry = styled.div.attrs({ 'data-cy': 'guest-email-entry' })`
   padding: 16px;
 
   &:hover,
@@ -153,6 +153,7 @@ const JoinAsGuest = () => {
             mt={4}
             disabled={!selectedEmail}
             onClick={() => sendGuestConfirmationEmail(selectedEmail)}
+            data-cy="send-verification-email-btn"
           >
             <FormattedMessage id="SendVerificationEmail" defaultMessage="Send verification email" />
           </StyledButton>

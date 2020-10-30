@@ -72,6 +72,7 @@ const GuestProfilePicker = ({ onChange, email, selectedTokens }) => {
         <EmailCheckbox
           key={guestEmail}
           name="guest-email"
+          data-cy="guest-email-checkbox"
           fontSize="13px"
           checked={selectedTokens.includes(guestToken)}
           label={<Box py={3}>{guestEmail}</Box>}
@@ -170,6 +171,7 @@ const ConfirmGuestPage = () => {
               buttonStyle="primary"
               mt={4}
               loading={status === STATUS.SUBMITTING_GUEST_PROFILES}
+              data-cy="confirm-account-btn"
               onClick={async () => {
                 setStatus(STATUS.SUBMITTING_GUEST_PROFILES);
                 await confirmGuestAccount(selectedGuestTokens);

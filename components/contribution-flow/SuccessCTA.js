@@ -73,7 +73,16 @@ const CTAContainer = styled(Container)`
 const SuccessCTAWrapper = ({ type, orderId, ...props }) => {
   switch (type) {
     case SUCCESS_CTA_TYPE.JOIN:
-      return <Link route="guest-join" params={{ OrderId: orderId }} {...props} />;
+      return (
+        <StyledLink
+          as={Link}
+          display="block"
+          data-cy="join-opencollective-link"
+          route="guest-join"
+          params={{ OrderId: orderId }}
+          {...props}
+        />
+      );
     case SUCCESS_CTA_TYPE.BLOG:
       return <StyledLink href="https://blog.opencollective.com" openInNewTab color="black.700" {...props} />;
     default:

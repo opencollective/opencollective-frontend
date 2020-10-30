@@ -419,6 +419,26 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
   });
 });
 
+let localStorageSnapshot = {};
+
+Cypress.Commands.add('resetLocalStorage', () => {
+  localStorageSnapshot = {};
+  localStorage.clear();
+});
+
+Cypress.Commands.add('saveLocalStorage', () => {
+  localStorageSnapshot = {};
+  Object.keys(localStorage).forEach(key => {
+    localStorageSnapshot[key] = localStorage[key];
+  });
+});
+
+Cypress.Commands.add('restoreLocalStorage', () => {
+  Object.keys(localStorageSnapshot).forEach(key => {
+    localStorage.setItem(key, localStorageSnapshot[key]);
+  });
+});
+
 // ---- Private ----
 
 /**

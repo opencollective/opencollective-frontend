@@ -42,7 +42,7 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
 
   const { stats, currency } = data.Collective;
   return (
-    <Box my={2}>
+    <Box my={2} data-cy="hero-total-amount-contributed">
       <P fontSize="10px" textTransform="uppercase">
         <FormattedMessage id="membership.totalDonations" defaultMessage="Total amount contributed" />
       </P>

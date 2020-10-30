@@ -16,6 +16,7 @@ const StepProfile = ({
   onChange,
   data,
   canUseIncognito,
+  onSignInClick,
 }) => {
   return (
     <Box width={1}>
@@ -29,7 +30,7 @@ const StepProfile = ({
           data={data}
         />
       ) : (
-        <StepProfileGuestForm stepDetails={stepDetails} data={data} onChange={onChange} />
+        <StepProfileGuestForm stepDetails={stepDetails} data={data} onChange={onChange} onSignInClick={onSignInClick} />
       )}
     </Box>
   );
@@ -44,6 +45,7 @@ StepProfile.propTypes = {
   }),
   data: PropTypes.object,
   onChange: PropTypes.func,
+  onSignInClick: PropTypes.func,
   defaultSelectedProfile: PropTypes.object,
   profiles: PropTypes.array,
   canUseIncognito: PropTypes.bool,
