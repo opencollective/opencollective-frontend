@@ -29,6 +29,7 @@ export const collectivePageQuery = gql`
       isArchived
       isHost
       isIncognito
+      isGuest
       hostFeePercent
       image
       imageUrl(height: 256)
@@ -119,6 +120,7 @@ export const collectivePageQuery = gql`
           collectiveSlug
           name
           type
+          isGuest
         }
       }
       events(includePastEvents: true, includeInactive: true) {

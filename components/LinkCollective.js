@@ -20,8 +20,9 @@ const getEventParentCollectiveSlug = parentCollective => {
 const LinkCollective = ({ target, title, collective, children, ...props }) => {
   if (!collective || collective.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
-  }
-  if (!collective.slug) {
+  } else if (collective.isGuest) {
+    return children || <FormattedMessage id="profile.guest" defaultMessage="Guest" />;
+  } else if (!collective.slug) {
     return children || collective.name;
   }
 
@@ -54,6 +55,7 @@ LinkCollective.propTypes = {
     slug: PropTypes.string,
     type: PropTypes.string,
     isIncognito: PropTypes.bool,
+    isGuest: PropTypes.bool,
     parentCollective: PropTypes.shape({
       slug: PropTypes.string,
     }),
