@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { IncognitoAvatar } from './Avatar';
+import { GuestAvatar } from './Avatar';
 import { Flex } from './Grid';
 import Page from './Page';
 
@@ -23,11 +23,10 @@ const GuestUserProfile = ({ account }) => {
   const description = intl.formatMessage(messages.description);
   return (
     <Page noRobots title={title} description={description} collective={{ account }}>
-      <Flex justifyContent="center" alignItems="center" flexDirection="column" my={[4, 5]}>
-        <IncognitoAvatar />
+      <Flex justifyContent="center" alignItems="center" flexDirection="column" my={[4, 5, 6]}>
+        <GuestAvatar />
         <h1>{title}</h1>
         <p>{description}</p>
-        <p>¯\_(ツ)_/¯</p>
       </Flex>
     </Page>
   );
