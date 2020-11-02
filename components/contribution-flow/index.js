@@ -13,7 +13,6 @@ import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-ca
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { TransactionTypes } from '../../lib/constants/transactions';
-import { getEnvVar } from '../../lib/env-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
@@ -21,7 +20,7 @@ import { getGuestToken, setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
-import { getWebsiteUrl, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
+import { getWebsiteUrl, reportValidityHTML5 } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -55,8 +54,6 @@ const StepsProgressBox = styled(Box)`
     max-width: 100%;
   }
 `;
-
-const HAS_GUEST_CONTRIBUTIONS = parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS'));
 
 const STEP_LABELS = defineMessages({
   profile: {
@@ -98,6 +95,7 @@ class ContributionFlow extends React.Component {
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
+    hasGuestContributions: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
     verb: PropTypes.string,
@@ -466,9 +464,8 @@ class ContributionFlow extends React.Component {
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
-    const isStepProfileCompleted = Boolean(
-      (stepProfile && LoggedInUser) || (HAS_GUEST_CONTRIBUTIONS && stepProfile?.isGuest),
-    );
+    const hasPickedGuestProfile = this.props.hasGuestContributions && stepProfile?.isGuest;
+    const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || hasPickedGuestProfile);
 
     const steps = [
       {
@@ -637,7 +634,7 @@ class ContributionFlow extends React.Component {
               </Box>
             ) : currentStep.name === STEPS.PROFILE &&
               !LoggedInUser &&
-              (this.state.showSignIn || !HAS_GUEST_CONTRIBUTIONS) ? (
+              (this.state.showSignIn || !this.props.hasGuestContributions) ? (
               <SignInOrJoinFree
                 defaultForm={this.state.showSignIn ? 'signin' : 'create-account'}
                 redirect={this.getRedirectUrlForSignIn()}
