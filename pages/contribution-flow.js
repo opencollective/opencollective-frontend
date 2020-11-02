@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
+import { getEnvVar } from '../lib/env-utils';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { floatAmountToCents } from '../lib/math';
@@ -256,6 +257,10 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
+          hasGuestContributions={
+            parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ||
+            get(account, 'settings.features.GUEST_CONTRIBUTIONS')
+          }
         />
       );
     }
