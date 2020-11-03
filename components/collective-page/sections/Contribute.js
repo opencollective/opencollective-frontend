@@ -221,12 +221,12 @@ class SectionContribute extends React.PureComponent {
     return partition(events, isPastEvent);
   });
 
-  getTopContributorsMemoized = memoizeOne(getTopContributors);
+  getTopContributors = memoizeOne(getTopContributors);
 
   render() {
     const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
     const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
-    const [topOrganizations, topIndividuals] = this.getTopContributorsMemoized(contributors);
+    const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const orderKeys = draggingContributionsOrder || this.getCollectiveContributionCardsOrder();
     const sortedTiers = this.getSortedCollectiveTiers(tiers, orderKeys);
@@ -339,7 +339,7 @@ class SectionContribute extends React.PureComponent {
                 </HorizontalScroller>
               </Box>
             )}
-            {hasOtherWaysToContribute && (
+            {hasOtherWaysToContribute && !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
               <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
                 {(ref, Chevrons) => (
                   <div>

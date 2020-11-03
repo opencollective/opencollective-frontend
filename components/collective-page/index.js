@@ -17,6 +17,7 @@ import SectionContribute from './sections/Contribute';
 import SectionContributions from './sections/Contributions';
 import SectionContributors from './sections/Contributors';
 import SectionConversations from './sections/Conversations';
+import SectionEvents from './sections/Events';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
 import SectionProjects from './sections/Projects';
@@ -254,7 +255,15 @@ class CollectivePage extends Component {
             isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
-
+      case Sections.EVENTS:
+        return (
+          <SectionEvents
+            collective={this.props.collective}
+            events={this.props.events}
+            connectedCollectives={this.props.connectedCollectives}
+            isAdmin={this.props.isAdmin}
+          />
+        );
       default:
         return null;
     }
