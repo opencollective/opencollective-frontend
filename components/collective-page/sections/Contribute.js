@@ -8,11 +8,14 @@ import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { getTopContributors } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
+import { getEnvVar } from '../../../lib/env-utils';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { parseToBoolean } from '../../../lib/utils';
 
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
@@ -42,7 +45,7 @@ const AdminContributeCardsContainer = dynamic(() => import('../../contribute-car
 });
 
 /** The container for Top Contributors view */
-const TopContributorsContainer = styled.div`
+export const TopContributorsContainer = styled.div`
   padding: 32px 16px;
   margin-top: 48px;
   background-color: #f5f7fa;
@@ -105,44 +108,6 @@ class SectionContribute extends React.PureComponent {
   onTiersAdminReady = () => {
     this.setState({ showTiersAdmin: true });
   };
-
-  getTopContributors = memoizeOne(contributors => {
-    const topOrgs = [];
-    const topIndividuals = [];
-
-    for (const contributor of contributors) {
-      // We only care about financial contributors that donated $$$
-      if (!contributor.isBacker || !contributor.totalAmountDonated) {
-        continue;
-      }
-
-      // Put contributors in the array corresponding to their types
-      if (contributor.type === CollectiveType.USER) {
-        topIndividuals.push(contributor);
-      } else if (contributor.type === CollectiveType.ORGANIZATION || contributor.type === CollectiveType.COLLECTIVE) {
-        topOrgs.push(contributor);
-      }
-
-      if (topIndividuals.length >= 10 && topOrgs.length >= 10) {
-        break;
-      }
-    }
-
-    // If one of the two categories is not filled, complete with more contributors from the other
-    const nbColsPerCategory = 2;
-    const nbFreeColsFromOrgs = nbColsPerCategory - Math.ceil(topOrgs.length / 5);
-    const nbFreeColsFromIndividuals = nbColsPerCategory - Math.ceil(topOrgs.length / 5);
-    let takeNbOrgs = 10;
-    let takeNbIndividuals = 10;
-
-    if (nbFreeColsFromOrgs > 0) {
-      takeNbIndividuals += nbFreeColsFromOrgs * 5;
-    } else if (nbFreeColsFromIndividuals > 0) {
-      takeNbOrgs += nbFreeColsFromIndividuals * 5;
-    }
-
-    return [topOrgs.slice(0, takeNbOrgs), topIndividuals.slice(0, takeNbIndividuals)];
-  });
 
   getFinancialContributorsWithoutTier = memoizeOne(contributors => {
     return contributors.filter(c => c.isBacker && (c.tiersIds.length === 0 || c.tiersIds[0] === null));
@@ -256,10 +221,12 @@ class SectionContribute extends React.PureComponent {
     return partition(events, isPastEvent);
   });
 
+  getTopContributorsMemoized = memoizeOne(getTopContributors);
+
   render() {
     const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
     const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
-    const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
+    const [topOrganizations, topIndividuals] = this.getTopContributorsMemoized(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const orderKeys = draggingContributionsOrder || this.getCollectiveContributionCardsOrder();
     const sortedTiers = this.getSortedCollectiveTiers(tiers, orderKeys);
@@ -441,23 +408,25 @@ class SectionContribute extends React.PureComponent {
                 </Link>
               </ContainerSectionContent>
             )}
-            {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
-              <TopContributorsContainer>
-                <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
-                  <H4 fontWeight="normal" color="black.700" mb={3}>
-                    <FormattedMessage
-                      id="SectionContribute.TopContributors"
-                      defaultMessage="Top financial contributors"
+            {!isEvent &&
+              (topOrganizations.length !== 0 || topIndividuals.length !== 0) &&
+              !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+                <TopContributorsContainer>
+                  <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
+                    <H4 fontWeight="normal" color="black.700" mb={3}>
+                      <FormattedMessage
+                        id="SectionContribute.TopContributors"
+                        defaultMessage="Top financial contributors"
+                      />
+                    </H4>
+                    <TopContributors
+                      organizations={topOrganizations}
+                      individuals={topIndividuals}
+                      currency={collective.currency}
                     />
-                  </H4>
-                  <TopContributors
-                    organizations={topOrganizations}
-                    individuals={topIndividuals}
-                    currency={collective.currency}
-                  />
-                </Container>
-              </TopContributorsContainer>
-            )}
+                  </Container>
+                </TopContributorsContainer>
+              )}
           </Fragment>
         )}
       </Box>
