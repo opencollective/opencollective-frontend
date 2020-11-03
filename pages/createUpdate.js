@@ -90,14 +90,7 @@ class CreateUpdatePage extends React.Component {
     const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
-      <div className="CreateUpdatePage">
-        <style jsx global>
-          {`
-            .CreateUpdatePage .Updates .update {
-              border-top: 1px solid #cacbcc;
-            }
-          `}
-        </style>
+      <div>
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
