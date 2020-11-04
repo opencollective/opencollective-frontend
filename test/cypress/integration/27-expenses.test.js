@@ -1,6 +1,6 @@
 import 'cypress-file-upload';
 
-describe('New expense flow', () => {
+describe.only('New expense flow', () => {
   describe('new expense when logged out', () => {
     it('shows the login screen', () => {
       cy.createHostedCollective().then(collective => {
