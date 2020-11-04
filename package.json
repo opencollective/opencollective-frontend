@@ -96,7 +96,7 @@
     "sanitize-html": "1.27.4",
     "slugify": "1.4.5",
     "speakeasy": "^2.0.0",
-    "styled-components": "5.2.0",
+    "styled-components": "5.2.1",
     "styled-jsx": "3.3.0",
     "styled-system": "5.1.5",
     "throng": "5.0.0",
