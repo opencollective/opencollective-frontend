@@ -2,7 +2,7 @@
 
 exports[`Currency abbreviated version 1`] = `
 <span
-  className="Text__P-sc-3suny7-0-span bpTFba"
+  className="Text__P-sc-3suny7-0-span XvQUT"
   fontSize="inherit"
   letterSpacing="-0.4px"
 >
@@ -13,7 +13,7 @@ exports[`Currency abbreviated version 1`] = `
 
 exports[`Currency abbreviated version 2`] = `
 <span
-  className="Text__P-sc-3suny7-0-span bpTFba"
+  className="Text__P-sc-3suny7-0-span XvQUT"
   fontSize="inherit"
   letterSpacing="-0.4px"
 >
@@ -24,7 +24,7 @@ exports[`Currency abbreviated version 2`] = `
 
 exports[`Currency renders default options 1`] = `
 <span
-  className="Text__P-sc-3suny7-0-span bpTFba"
+  className="Text__P-sc-3suny7-0-span XvQUT"
   fontSize="inherit"
   letterSpacing="-0.4px"
 >
@@ -34,7 +34,7 @@ exports[`Currency renders default options 1`] = `
 
 exports[`Currency renders default options 2`] = `
 <span
-  className="Text__P-sc-3suny7-0-span bpTFba"
+  className="Text__P-sc-3suny7-0-span XvQUT"
   fontSize="inherit"
   letterSpacing="-0.4px"
 >
