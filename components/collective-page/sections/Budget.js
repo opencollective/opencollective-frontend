@@ -26,7 +26,7 @@ import { transactionsQueryCollectionFragment } from '../../transactions/graphql/
 import TransactionsList from '../../transactions/TransactionsList';
 import { withUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
-import SectionTitle from '../SectionTitle';
+import SectionHeader from '../SectionHeader';
 import TopContributors from '../TopContributors';
 
 import { TopContributorsContainer } from './Contribute';
@@ -49,7 +49,7 @@ export const getBudgetSectionQueryVariables = slug => {
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats, contributors, LoggedInUser }) => {
+const SectionBudget = ({ collective, stats, contributors, LoggedInUser, section }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
     variables: getBudgetSectionQueryVariables(collective.slug),
     context: API_V2_CONTEXT,
@@ -97,16 +97,22 @@ const SectionBudget = ({ collective, stats, contributors, LoggedInUser }) => {
 
   return (
     <ContainerSectionContent pt={[4, 5]} pb={3}>
-      <SectionTitle>
-        <FormattedMessage id="section.budget.title" defaultMessage="Budget" />
-      </SectionTitle>
-      <P color="black.600" mb={4} maxWidth={830}>
-        <FormattedMessage
-          id="CollectivePage.SectionBudget.Description"
-          defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reimbursed and more!"
-          values={{ collectiveName: collective.name }}
-        />
-      </P>
+      <SectionHeader
+        section={section}
+        subtitle={
+          <FormattedMessage
+            id="CollectivePage.SectionBudget.Subtitle"
+            defaultMessage="Transparent and open finances."
+          />
+        }
+        info={
+          <FormattedMessage
+            id="CollectivePage.SectionBudget.Description"
+            defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reimbursed and more!"
+            values={{ collectiveName: collective.name }}
+          />
+        }
+      />
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
         {isEmpty(data?.transactions) && (
           <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="14px">
@@ -244,6 +250,8 @@ SectionBudget.propTypes = {
   ),
 
   LoggedInUser: PropTypes.object,
+
+  section: PropTypes.string,
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,
