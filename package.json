@@ -19,7 +19,7 @@
     "@hyperwatch/hyperwatch": "3.7.2",
     "@material-ui/core": "4.11.0",
     "@opencollective/taxes": "3.1.0",
-    "@popperjs/core": "2.5.3",
+    "@popperjs/core": "2.5.4",
     "@sentry/browser": "5.26.0",
     "@sentry/node": "5.27.1",
     "@styled-icons/boxicons-regular": "10.18.0",
