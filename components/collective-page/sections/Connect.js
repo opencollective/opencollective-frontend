@@ -121,6 +121,10 @@ class SectionConnect extends React.PureComponent {
     const { collective, data, isAdmin } = this.props;
     const updates = get(data, 'account.updates', {});
 
+    if (isEmpty(updates)) {
+      return null;
+    }
+
     // Nothing to show if updates is empty and user can't add new ones
     if (isEmpty(updates.nodes) && !isAdmin) {
       return null;

@@ -218,7 +218,7 @@ const inactiveCollectivesQuery = gql`
   }
 `;
 
-const applyToHostMutation = gql`
+export const applyToHostMutation = gql`
   mutation ApplyToHost($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
