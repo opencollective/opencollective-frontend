@@ -189,6 +189,18 @@ interface Account {
   """
   categories: [String]!
   stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 }
 
 """
@@ -319,18 +331,6 @@ interface AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  updates(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int = 0
-    onlyPublishedUpdates: Boolean
-  ): UpdateCollection!
 }
 
 """
@@ -653,6 +653,18 @@ type Bot implements Account {
   location: Location
   categories: [String]!
   stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 }
 
 """
@@ -850,6 +862,18 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   location: Location
   categories: [String]!
   stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 
   """
   Returns the Fiscal Host
@@ -918,18 +942,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  updates(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int = 0
-    onlyPublishedUpdates: Boolean
-  ): UpdateCollection!
 }
 
 input CollectiveCreateInput {
@@ -2911,6 +2923,18 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   location: Location
   categories: [String]!
   stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 
   """
   Returns the Fiscal Host
@@ -2979,18 +3003,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  updates(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int = 0
-    onlyPublishedUpdates: Boolean
-  ): UpdateCollection!
 
   """
   The Collective hosting this Event
@@ -3768,6 +3780,18 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   location: Location
   categories: [String]!
   stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 
   """
   Returns the Fiscal Host
@@ -3836,18 +3860,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  updates(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int = 0
-    onlyPublishedUpdates: Boolean
-  ): UpdateCollection!
 }
 
 input FundCreateInput {
@@ -4054,6 +4066,18 @@ type Host implements Account & AccountWithContributions {
   location: Location
   categories: [String]!
   stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 
   """
   Number of unique financial contributors.
@@ -4097,18 +4121,6 @@ type Host implements Account & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  updates(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int = 0
-    onlyPublishedUpdates: Boolean
-  ): UpdateCollection!
   hostFeePercent: Int
   totalHostedCollectives: Int
   isOpenToApplications: Boolean
@@ -4408,6 +4420,18 @@ type Individual implements Account {
   location: Location
   categories: [String]!
   stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
   firstName: String @deprecated(reason: "2020-10-12: Use the name field")
   lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
@@ -5498,6 +5522,18 @@ type Organization implements Account {
   location: Location
   categories: [String]!
   stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -5835,6 +5871,18 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   location: Location
   categories: [String]!
   stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
 
   """
   Returns the Fiscal Host
@@ -5903,18 +5951,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  updates(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int = 0
-    onlyPublishedUpdates: Boolean
-  ): UpdateCollection!
 
   """
   The Fund hosting this Project
