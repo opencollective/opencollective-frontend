@@ -167,7 +167,7 @@
     "babel-plugin-react-remove-properties": "0.3.0",
     "babel-plugin-styled-components": "1.11.1",
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
-    "codecov": "^3.8.0",
+    "codecov": "^3.8.1",
     "commitizen": "^4.2.2",
     "copy-webpack-plugin": "^6.2.1",
     "cross-env": "^7.0.2",
