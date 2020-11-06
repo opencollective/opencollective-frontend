@@ -36,10 +36,8 @@ export const connectSectionQuery = gqlV2/* GraphQL */ `
       conversations(limit: 3) {
         ...ConversationListFragment
       }
-      ... on AccountWithContributions {
-        updates {
-          ...UpdateListFragment
-        }
+      updates {
+        ...UpdateListFragment
       }
     }
   }
