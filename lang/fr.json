@@ -1442,7 +1442,6 @@
   "ResendInvite": "Resend invite",
   "ResendInviteSuccessful": "Invite sent",
   "Reset": "Réinitialiser",
-  "response.status.interested": "{name} est intéressé",
   "response.status.yes": "{name} est confirmé",
   "RoleDetails.ACCOUNTANT": "Les comptables ont accès à toutes les informations financières telles que les reçus, les rapports financiers ou les factures des dépenses.",
   "RoleDetails.ADMIN": "Admins have full permissions on the profile, and can in particular change the settings, approve expenses or make financial contributions to other Collectives.",
