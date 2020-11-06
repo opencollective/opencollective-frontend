@@ -231,7 +231,7 @@ class TopBarProfileMenu extends React.Component {
               <P mt={2} color="#313233" fontWeight="500">
                 {LoggedInUser.collective.name}
               </P>
-              <P mt={2} mb={5} color="#9D9FA3">
+              <P mt={2} mb={5} wordBreak="break-all" color="#9D9FA3">
                 {LoggedInUser.email}
               </P>
             </Hide>
