@@ -66,25 +66,7 @@ class Hosts extends React.Component {
     );
 
     return (
-      <div className="Hosts">
-        <style jsx>
-          {`
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-            .login {
-              text-align: center;
-            }
-            .actions {
-              text-align: center;
-              margin-bottom: 5rem;
-            }
-          `}
-        </style>
-
+      <Container>
         <Header
           title={title}
           description={description}
@@ -106,7 +88,7 @@ class Hosts extends React.Component {
           </div>
         </Body>
         <Footer />
-      </div>
+      </Container>
     );
   }
 }
