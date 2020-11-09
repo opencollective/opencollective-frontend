@@ -147,7 +147,7 @@ const ExpenseSummary = ({
         <LoadingPlaceholder height={68} mb={3} />
       ) : (
         <div data-cy="expense-summary-items">
-          {(expense.items.length > 0 ? expense.items : expense.draft.items || []).map(attachment => (
+          {(expense.items.length > 0 ? expense.items : expense.draft?.items || []).map(attachment => (
             <React.Fragment key={attachment.id}>
               <Flex my={24} flexWrap="wrap">
                 {(isReceipt || attachment.url) && (
