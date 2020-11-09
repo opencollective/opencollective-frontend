@@ -278,6 +278,7 @@ const ExpenseFormBody = ({
                 isOnBehalf={isOnBehalf}
                 onCancel={onCancel}
                 payoutProfiles={payoutProfiles}
+                loggedInAccount={loggedInAccount}
                 onNext={() => {
                   const validation = validatePayoutMethod(values.payoutMethod);
                   if (isEmpty(validation)) {

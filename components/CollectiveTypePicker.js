@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus } from '@styled-icons/fa-solid/Plus';
+import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 
-import Container from './Container';
+import { Box, Flex, Grid } from './Grid';
 import StyledButton from './StyledButton';
-import { Span } from './Text';
 
 /** Return the caption associated to a given collective type */
 const getTypeCaption = type => {
@@ -26,44 +25,25 @@ const getTypeCaption = type => {
  * A component showing big buttons to pick between collective types (user, org...etc)
  */
 const CollectiveTypePicker = ({ types, onChange }) => {
-  const marginBetweenButtons = 0.025;
-  const buttonWidth = 1 / (types.length || 1) - marginBetweenButtons;
-  const buttonFlex = `0 0 ${buttonWidth * 100}%`;
-
+  const isSingleType = types.length === 1;
   return (
-    <Container display="flex" background="white" justifyContent="space-between">
+    <Grid gridGap={1} gridTemplateColumns={`repeat(${types.length}, 1fr)`}>
       {types.map(type => (
         <StyledButton
           key={type}
-          flex={buttonFlex}
-          px={2}
-          py="28px"
-          borderRadius={8}
+          borderRadius="14px"
           onClick={() => onChange(type)}
           data-cy={`collective-type-picker-${type}`}
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
         >
-          <Container
-            mb={2}
-            size={24}
-            border="1px solid #C4C7CC"
-            borderRadius="100px"
-            textAlign="center"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            p={0}
-          >
-            <Plus size={12} color="black.500" />
-          </Container>
-          <Span fontSize="10px" fontWeight="500" lineHeight="15px">
-            {getTypeCaption(type)}
-          </Span>
+          <Flex alignItems="center" flexDirection={isSingleType ? 'row' : 'column'}>
+            <PlusCircle size={24} />
+            <Box ml={isSingleType ? '16px' : 0} fontSize="11px">
+              {getTypeCaption(type)}
+            </Box>
+          </Flex>
         </StyledButton>
       ))}
-    </Container>
+    </Grid>
   );
 };
 
