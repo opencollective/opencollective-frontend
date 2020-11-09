@@ -117,7 +117,7 @@
     "commit": "git-cz",
     "cypress:open": "cross-env TZ=UTC cypress open",
     "cypress:run": "cross-env TZ=UTC cypress run",
-    "depcheck": "npx depcheck",
+    "depcheck": "npx depcheck@1.2.0",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production master",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging master",
     "dev": "node --icu-data-dir=node_modules/full-icu server",
