@@ -36,7 +36,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../graphql/queries';
-import SectionTitle from '../SectionTitle';
+import SectionHeader from '../SectionHeader';
 import TopContributors from '../TopContributors';
 
 // Dynamic imports
@@ -86,6 +86,7 @@ class SectionContribute extends React.PureComponent {
       parentCollective: PropTypes.shape({
         slug: PropTypes.string.isRequired,
       }),
+      name: PropTypes.string,
     }),
     contributorsStats: PropTypes.object,
     contributors: PropTypes.arrayOf(
@@ -97,6 +98,7 @@ class SectionContribute extends React.PureComponent {
     ),
     isAdmin: PropTypes.bool,
     editAccountSettings: PropTypes.func.isRequired,
+    section: PropTypes.string,
   };
 
   state = {
@@ -224,7 +226,7 @@ class SectionContribute extends React.PureComponent {
   getTopContributors = memoizeOne(getTopContributors);
 
   render() {
-    const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
+    const { collective, tiers, events, connectedCollectives, contributors, isAdmin, section } = this.props;
     const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
@@ -257,12 +259,27 @@ class SectionContribute extends React.PureComponent {
     }
 
     return (
-      <Box pt={[4, 5]}>
+      <Fragment>
+        <ContainerSectionContent pt={[4, 5]} pb={3}>
+          <SectionHeader
+            section={section}
+            subtitle={
+              <FormattedMessage
+                id="CollectivePage.SectionContribute.Subtitle"
+                defaultMessage="Become a financial contributor."
+              />
+            }
+            info={
+              <FormattedMessage
+                id="CollectivePage.SectionContribute.info"
+                defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
+                values={{ collectiveName: collective.name }}
+              />
+            }
+          />
+        </ContainerSectionContent>
         {isAdmin && !hasHost && !isHost && (
           <ContainerSectionContent pt={5} pb={3}>
-            <SectionTitle mb={24}>
-              <FormattedMessage id="Contributions" defaultMessage="Contributions" />
-            </SectionTitle>
             <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
               <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
                 <FormattedMessage
@@ -283,12 +300,6 @@ class SectionContribute extends React.PureComponent {
 
         {((isAdmin && hasHost) || (isAdmin && isHost) || (!isAdmin && isActive)) && (
           <Fragment>
-            <ContainerSectionContent>
-              <SectionTitle>
-                <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />
-              </SectionTitle>
-            </ContainerSectionContent>
-
             {hasContribute && (
               <Box mb={4} data-cy="financial-contributions">
                 <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
@@ -429,7 +440,7 @@ class SectionContribute extends React.PureComponent {
               )}
           </Fragment>
         )}
-      </Box>
+      </Fragment>
     );
   }
 }

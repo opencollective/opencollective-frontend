@@ -27,7 +27,7 @@ import StyledTooltip from '../../StyledTooltip';
 import { H3, P, Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import { updatesFieldsFragment } from '../graphql/fragments';
-import SectionTitle from '../SectionTitle';
+import SectionHeader from '../SectionHeader';
 
 export const connectSectionQuery = gqlV2/* GraphQL */ `
   query ConnectSection($collectiveSlug: String!) {
@@ -100,6 +100,8 @@ class SectionConnect extends React.PureComponent {
         }),
       }),
     }),
+
+    section: PropTypes.string,
 
     /** Does user can see Updates drafts? */
     isAdmin: PropTypes.bool.isRequired,
@@ -302,18 +304,20 @@ class SectionConnect extends React.PureComponent {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, section } = this.props;
 
     return (
       <ContainerSectionContent pt={5} pb={3}>
-        <SectionTitle mb={24}>
-          <FormattedMessage id="CollectivePage.SectionConnect.Title" defaultMessage="Connect" />
-        </SectionTitle>
-        <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
-          <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
-            <FormattedMessage id="section.connect.subtitle" defaultMessage="Let’s get the ball rolling!" />
-          </P>
-        </Flex>
+        <SectionHeader
+          section={section}
+          subtitle={<FormattedMessage id="section.connect.subtitle" defaultMessage="Let’s get the ball rolling!" />}
+          info={
+            <FormattedMessage
+              id="section.connect.info"
+              defaultMessage="Start conversations with your community or share updates on how things are going."
+            />
+          }
+        />
         {data.loading ? (
           <Container py={[5, 6]}>
             <Loading />

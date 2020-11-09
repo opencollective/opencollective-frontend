@@ -160,7 +160,7 @@ class CollectivePage extends Component {
   renderSection(section) {
     switch (section) {
       case Sections.ABOUT:
-        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} />;
+        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} section={section} />;
       case Sections.BUDGET:
         return (
           <SectionBudget
@@ -169,6 +169,7 @@ class CollectivePage extends Component {
             expenses={this.props.expenses}
             stats={this.props.stats}
             contributors={this.props.financialContributors}
+            section={section}
           />
         );
       case Sections.CONTRIBUTE:
@@ -182,6 +183,7 @@ class CollectivePage extends Component {
             contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
             isAdmin={this.props.isAdmin}
+            section={section}
           />
         );
       case Sections.CONTRIBUTORS:
@@ -253,6 +255,7 @@ class CollectivePage extends Component {
             conversations={this.props.conversations}
             isAdmin={this.props.isAdmin}
             isLoggedIn={Boolean(this.props.LoggedInUser)}
+            section={section}
           />
         );
       case Sections.EVENTS:
@@ -262,6 +265,7 @@ class CollectivePage extends Component {
             events={this.props.events}
             connectedCollectives={this.props.connectedCollectives}
             isAdmin={this.props.isAdmin}
+            section={section}
           />
         );
       default:

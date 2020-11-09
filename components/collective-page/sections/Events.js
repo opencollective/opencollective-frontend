@@ -14,10 +14,10 @@ import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
-import { H3, P } from '../../Text';
+import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
-import SectionTitle from '../SectionTitle';
+import SectionHeader from '../SectionHeader';
 
 class SectionEvents extends React.PureComponent {
   static propTypes = {
@@ -43,6 +43,7 @@ class SectionEvents extends React.PureComponent {
     ),
 
     isAdmin: PropTypes.bool.isRequired,
+    section: PropTypes.string,
   };
 
   triageEvents = memoizeOne(events => {
@@ -50,20 +51,22 @@ class SectionEvents extends React.PureComponent {
   });
 
   render() {
-    const { collective, events, connectedCollectives, isAdmin } = this.props;
+    const { collective, events, connectedCollectives, isAdmin, section } = this.props;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
 
     return (
       <ContainerSectionContent pt={5} pb={3}>
-        <SectionTitle mb={24}>
-          <FormattedMessage id="Events" defaultMessage="Events" />
-        </SectionTitle>
-        <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
-          <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
-            <FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />
-          </P>
-        </Flex>
+        <SectionHeader
+          section={section}
+          subtitle={<FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />}
+          info={
+            <FormattedMessage
+              id="section.connect.info"
+              defaultMessage="Start conversations with your community or share updates on how things are going."
+            />
+          }
+        />
         <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
           {(ref, Chevrons) => (
             <div>
