@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { formatDate } from '../../../lib/utils';
 
+import { Sections } from '../_constants';
 import Avatar from '../../Avatar';
 import Container from '../../Container';
 import ConversationsList from '../../conversations/ConversationsList';
@@ -28,6 +29,8 @@ import { H3, P, Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import { updatesFieldsFragment } from '../graphql/fragments';
 import SectionHeader from '../SectionHeader';
+
+import connectSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconConnect.png';
 
 export const connectSectionQuery = gqlV2/* GraphQL */ `
   query ConnectSection($collectiveSlug: String!) {
@@ -100,8 +103,6 @@ class SectionConnect extends React.PureComponent {
         }),
       }),
     }),
-
-    section: PropTypes.string,
 
     /** Does user can see Updates drafts? */
     isAdmin: PropTypes.bool.isRequired,
@@ -308,12 +309,12 @@ class SectionConnect extends React.PureComponent {
   }
 
   render() {
-    const { data, section } = this.props;
+    const { data } = this.props;
 
     return (
       <ContainerSectionContent pt={5} pb={3}>
         <SectionHeader
-          section={section}
+          title={Sections.CONNECT}
           subtitle={<FormattedMessage id="section.connect.subtitle" defaultMessage="Let’s get the ball rolling!" />}
           info={
             <FormattedMessage
@@ -321,6 +322,7 @@ class SectionConnect extends React.PureComponent {
               defaultMessage="Start conversations with your community or share updates on how things are going."
             />
           }
+          illustrationSrc={connectSectionHeaderIcon}
         />
         {data.loading ? (
           <Container py={[5, 6]}>

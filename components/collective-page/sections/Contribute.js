@@ -17,6 +17,7 @@ import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { parseToBoolean } from '../../../lib/utils';
 
+import { Sections } from '../_constants';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
@@ -38,6 +39,8 @@ import { editAccountSettingMutation } from '../graphql/mutations';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../graphql/queries';
 import SectionHeader from '../SectionHeader';
 import TopContributors from '../TopContributors';
+
+import contributeSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconContribute.png';
 
 // Dynamic imports
 const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {
@@ -98,7 +101,6 @@ class SectionContribute extends React.PureComponent {
     ),
     isAdmin: PropTypes.bool,
     editAccountSettings: PropTypes.func.isRequired,
-    section: PropTypes.string,
   };
 
   state = {
@@ -226,7 +228,7 @@ class SectionContribute extends React.PureComponent {
   getTopContributors = memoizeOne(getTopContributors);
 
   render() {
-    const { collective, tiers, events, connectedCollectives, contributors, isAdmin, section } = this.props;
+    const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
     const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
@@ -262,7 +264,7 @@ class SectionContribute extends React.PureComponent {
       <Fragment>
         <ContainerSectionContent pt={[4, 5]} pb={3}>
           <SectionHeader
-            section={section}
+            title={Sections.CONTRIBUTE}
             subtitle={
               <FormattedMessage
                 id="CollectivePage.SectionContribute.Subtitle"
@@ -276,6 +278,7 @@ class SectionContribute extends React.PureComponent {
                 values={{ collectiveName: collective.name }}
               />
             }
+            illustrationSrc={contributeSectionHeaderIcon}
           />
         </ContainerSectionContent>
         {isAdmin && !hasHost && !isHost && (
