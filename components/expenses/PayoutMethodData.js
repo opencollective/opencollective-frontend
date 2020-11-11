@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get, startCase, upperCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -108,11 +108,14 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
                 values={{ type: upperCase(payoutMethod.data.type) }}
               />
               {payoutMethod.data.accountHolderName && (
-                <FormattedMessage
-                  id="BankInfo.AccountHolder"
-                  defaultMessage="Account Holder: {name}"
-                  values={{ name: payoutMethod.data.accountHolderName }}
-                />
+                <Fragment>
+                  <br />
+                  <FormattedMessage
+                    id="BankInfo.AccountHolder"
+                    defaultMessage="Account Holder: {name}"
+                    values={{ name: payoutMethod.data.accountHolderName }}
+                  />
+                </Fragment>
               )}
               {payoutMethod.data.details && renderObject(payoutMethod.data.details)}
             </Container>
