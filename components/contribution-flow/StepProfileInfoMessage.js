@@ -35,7 +35,7 @@ const StepProfileInfoMessage = ({ amount }) => {
       {renderInfoMessage(amount)}{' '}
       <FormattedMessage
         id="SpteProfile.EmailNoSpam"
-        defaultMessage="We wont send any spam or advertising, pinky promise."
+        defaultMessage="We won't send any spam or advertising, pinky promise."
       />
     </MessageBox>
   );
