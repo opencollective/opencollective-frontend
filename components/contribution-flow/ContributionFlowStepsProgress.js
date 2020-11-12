@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 
+import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
 import StepsProgress from '../StepsProgress';
-import { Span } from '../Text';
+import { P, Span } from '../Text';
 
 import { STEPS } from './constants';
 import { getTotalAmount } from './utils';
@@ -43,11 +43,14 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
 
 const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency }) => {
   if (step.name === STEPS.PROFILE) {
-    if (stepProfile?.isGuest && stepProfile.email) {
-      const truncatedEmail = truncate(stepProfile.email, { length: 100 });
-      return stepProfile.name ? `${stepProfile.name} · ${truncatedEmail}` : truncatedEmail;
-    } else {
-      return get(stepProfile, 'name') || get(stepProfile, 'email', null);
+    if (stepProfile) {
+      const mainInfo = stepProfile.email ?? stepProfile.name;
+      const fullDescription = [stepProfile.name, stepProfile.email].filter(Boolean).join(' · ');
+      return (
+        <P title={fullDescription} fontSize="12px" lineHeight="16px" truncateOverflow css={{ maxWidth: 150 }}>
+          {mainInfo}
+        </P>
+      );
     }
   } else if (step.name === STEPS.DETAILS) {
     if (stepDetails) {
@@ -66,9 +69,19 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
     }
   } else if (step.name === STEPS.SUMMARY) {
     return stepSummary?.countryISO || null;
-  } else {
-    return null;
   }
+
+  return null;
+};
+
+StepInfo.propTypes = {
+  step: PropTypes.object,
+  stepProfile: PropTypes.object,
+  stepDetails: PropTypes.object,
+  stepPayment: PropTypes.object,
+  stepSummary: PropTypes.object,
+  isFreeTier: PropTypes.bool,
+  currency: PropTypes.string,
 };
 
 const ContributionFlowStepsProgress = ({
@@ -97,7 +110,7 @@ const ContributionFlowStepsProgress = ({
       {({ step }) => (
         <Flex flexDirection="column" alignItems="center">
           <StepLabel>{step.label || step.name}</StepLabel>
-          <Span fontSize="12px" textAlign="center" wordBreak="break-word">
+          <Container fontSize="12px" textAlign="center" wordBreak="break-word">
             {step.isVisited && (
               <StepInfo
                 step={step}
@@ -109,7 +122,7 @@ const ContributionFlowStepsProgress = ({
                 currency={currency}
               />
             )}
-          </Span>
+          </Container>
         </Flex>
       )}
     </StepsProgress>
