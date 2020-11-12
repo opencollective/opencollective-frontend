@@ -5,9 +5,22 @@ import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, pick } from 'lodash';
 import { Col, Form, Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import InputField from '../InputField';
 import SmallButton from '../SmallButton';
+
+const NotificationSettingsContainer = styled.div`
+  label {
+    margin-top: 0.7rem;
+  }
+  .form-group {
+    margin-bottom: 0rem;
+  }
+  .inputField textarea {
+    height: 14rem;
+  }
+`;
 
 class EditTwitterAccount extends React.Component {
   static propTypes = {
@@ -133,20 +146,7 @@ class EditTwitterAccount extends React.Component {
     const { connectedAccount } = this.state;
 
     return (
-      <div className="notificationSettings" key={notificationType}>
-        <style jsx>
-          {`
-            .notificationSettings :global(label) {
-              margin-top: 0.7rem;
-            }
-            .notificationSettings :global(.form-group) {
-              margin-bottom: 0rem;
-            }
-            .notificationSettings :global(.inputField textarea) {
-              height: 14rem;
-            }
-          `}
-        </style>
+      <NotificationSettingsContainer key={notificationType}>
         <Row>
           <Col sm={12}>
             <InputField
@@ -177,7 +177,7 @@ class EditTwitterAccount extends React.Component {
             )}
           </Col>
         </Row>
-      </div>
+      </NotificationSettingsContainer>
     );
   }
 
