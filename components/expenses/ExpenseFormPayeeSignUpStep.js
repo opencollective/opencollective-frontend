@@ -14,7 +14,6 @@ import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 
 import { Box, Flex, Grid } from '../Grid';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import InputTypeCountry from '../InputTypeCountry';
 import LoginBtn from '../LoginBtn';
 import StyledButton from '../StyledButton';
@@ -77,10 +76,6 @@ const msg = defineMessages({
   address: {
     id: 'ExpenseForm.AddressLabel',
     defaultMessage: 'Physical address',
-  },
-  stepPayee: {
-    id: 'ExpenseForm.StepPayeeInvoice',
-    defaultMessage: 'Payee information',
   },
 });
 
@@ -183,16 +178,6 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
 
   return (
     <Fragment>
-      <Flex alignItems="center" mb={16}>
-        <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-          {formatMessage(msg.stepPayee)}
-        </Span>
-        <Box ml={2}>
-          <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
-        </Box>
-        <StyledHr flex="1" borderColor="black.300" mx={2} />
-      </Flex>
-
       <StyledInputField label="How you will receive the money of this expense?" labelFontSize="13px" mt={3}>
         <StyledCard>
           <Fieldset onChange={changePayeeType}>

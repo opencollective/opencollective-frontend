@@ -13,6 +13,8 @@ import { requireFields } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
@@ -68,6 +70,10 @@ const msg = defineMessages({
   recipientNoteLabel: {
     id: 'ExpenseForm.RecipientNoteLabel',
     defaultMessage: 'Add a note for the recipient',
+  },
+  stepPayee: {
+    id: 'ExpenseForm.StepPayeeInvoice',
+    defaultMessage: 'Payee information',
   },
 });
 
@@ -175,6 +181,7 @@ const ExpenseFormBody = ({
   onCancel,
   formPersister,
   loggedInAccount,
+  loading,
   expensesTags,
   shouldLoadValuesFromPersister,
   isDraft,
@@ -263,7 +270,18 @@ const ExpenseFormBody = ({
       {values.type && (
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
           <HiddenFragment show={step == STEPS.PAYEE}>
-            {isDraft && !loggedInAccount ? (
+            <Flex alignItems="center" mb={16}>
+              <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
+                {formatMessage(msg.stepPayee)}
+              </Span>
+              <Box ml={2}>
+                <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
+              </Box>
+              <StyledHr flex="1" borderColor="black.300" mx={2} />
+            </Flex>
+            {loading ? (
+              <LoadingPlaceholder height={32} />
+            ) : isDraft && !loggedInAccount ? (
               <ExpenseFormPayeeSignUpStep
                 collective={collective}
                 formik={formik}
@@ -515,6 +533,7 @@ ExpenseFormBody.propTypes = {
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
   loggedInAccount: PropTypes.object,
+  loading: PropTypes.bool,
   isDraft: PropTypes.bool,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
   collective: PropTypes.shape({
@@ -543,6 +562,7 @@ const ExpenseForm = ({
   validateOnChange,
   formPersister,
   loggedInAccount,
+  loading,
   expensesTags,
   shouldLoadValuesFromPersister,
 }) => {
@@ -579,6 +599,7 @@ const ExpenseForm = ({
           formPersister={formPersister}
           loggedInAccount={loggedInAccount}
           expensesTags={expensesTags}
+          loading={loading}
           shouldLoadValuesFromPersister={shouldLoadValuesFromPersister}
           isDraft={isDraft}
         />
@@ -596,6 +617,7 @@ ExpenseForm.propTypes = {
   /** To save draft of form values */
   formPersister: PropTypes.object,
   loggedInAccount: PropTypes.object,
+  loading: PropTypes.bool,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,

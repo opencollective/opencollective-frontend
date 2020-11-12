@@ -19,13 +19,11 @@ import CollectivePicker, {
 } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import InputTypeCountry from '../InputTypeCountry';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
-import { Span } from '../Text';
 
 import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
@@ -54,10 +52,6 @@ const msg = defineMessages({
   address: {
     id: 'ExpenseForm.AddressLabel',
     defaultMessage: 'Physical address',
-  },
-  stepPayee: {
-    id: 'ExpenseForm.StepPayeeInvoice',
-    defaultMessage: 'Payee information',
   },
 });
 
@@ -212,16 +206,6 @@ const ExpenseFormPayeeStep = ({
 
   return (
     <Fragment>
-      <Flex alignItems="center" mb={16}>
-        <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-          {formatMessage(msg.stepPayee)}
-        </Span>
-        <Box ml={2}>
-          <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
-        </Box>
-        <StyledHr flex="1" borderColor="black.300" mx={2} />
-      </Flex>
-
       <Flex flexDirection={['column', 'row']}>
         <Box mr={[null, 2, null, 4]} flexGrow="1" flexBasis="50%" maxWidth={[null, null, '60%']}>
           <Field name="payee">
