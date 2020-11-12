@@ -13,6 +13,7 @@ import { getCurrencySymbol } from '../../../lib/currency-utils';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { capitalize } from '../../../lib/utils';
 
+import Container from '../../Container';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
@@ -350,12 +351,12 @@ class Tiers extends React.Component {
     };
 
     return (
-      <div className={`tier ${tier.slug}`} key={key}>
-        <div className="tierActions">
+      <Container margin="3rem 0" className={`tier ${tier.slug}`} key={key}>
+        <Container textAlign="right" fontSize="1.3rem">
           <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>
             {intl.formatMessage(this.messages[`${this.defaultType}.remove`])}
           </a>
-        </div>
+        </Container>
         <Form horizontal>
           {this.fields.map(
             field =>
@@ -395,7 +396,7 @@ class Tiers extends React.Component {
               ),
           )}
         </Form>
-      </div>
+      </Container>
     );
   }
 
@@ -406,24 +407,6 @@ class Tiers extends React.Component {
 
     return (
       <div className="EditTiers">
-        <style jsx>
-          {`
-            :global(.tierActions) {
-              text-align: right;
-              font-size: 1.3rem;
-            }
-            :global(.field) {
-              margin: 1rem;
-            }
-            .editTiersActions {
-              text-align: right;
-              margin-top: -10px;
-            }
-            :global(.tier) {
-              margin: 3rem 0;
-            }
-          `}
-        </style>
         <H3>{this.props.title}</H3>
         <StyledHr my={4} borderColor="black.200" />
         {displayCustomContributionsSettings && (
@@ -472,11 +455,11 @@ class Tiers extends React.Component {
         )}
 
         <div className="tiers">{this.state.tiers.map(this.renderTier)}</div>
-        <div className="editTiersActions">
+        <Container textAlign="right" marginTop="-10px">
           <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
             {intl.formatMessage(this.messages[`${defaultType}.add`])}
           </Button>
-        </div>
+        </Container>
       </div>
     );
   }
