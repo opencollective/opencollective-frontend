@@ -22,7 +22,7 @@ import { H3, P } from '../../Text';
 
 import { getSettingsQuery } from './EditCollectivePage';
 
-const POLICY_MAX_LENGTH = 500;
+const POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
 const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
   mutation UpdateFilterCategories($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
