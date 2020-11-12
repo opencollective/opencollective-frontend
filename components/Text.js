@@ -23,6 +23,7 @@ export const P = styled.p.attrs(props => ({
       white-space: nowrap;
       overflow: hidden;
     `}
+  ${props => props.wordBreak}
 `;
 
 P.defaultProps = {
