@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
-import { first, get, partition, pick } from 'lodash';
+import { first, get, omit, partition, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
@@ -94,7 +94,7 @@ const refreshPayoutProfile = (formik, payoutProfiles) => {
     ? payoutProfiles.find(profile => profile.id === formik.values.payee.id)
     : first(payoutProfiles);
 
-  formik.setFieldValue('payee', payee);
+  formik.setValues({ ...formik.values, draft: omit(formik.values.draft, ['payee']), payee });
 };
 
 const ExpenseFormPayeeStep = ({

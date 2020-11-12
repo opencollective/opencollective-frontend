@@ -50,7 +50,7 @@ const ExpenseSummary = ({
   isLoading,
   isLoadingLoggedInUser,
   permissions,
-  showProcessActions,
+  isEditing,
   borderless,
   ...props
 }) => {
@@ -59,7 +59,7 @@ const ExpenseSummary = ({
   const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
   const isRequestedByOtherUser = createdByAccount?.id !== expense?.payee?.id;
   const existsInAPI = expense && (expense.id || expense.legacyId);
-  const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
+  const showProcessButtons = !isEditing && existsInAPI && collective && hasProcessButtons(permissions);
 
   return (
     <StyledCard p={borderless ? 0 : [16, 24, 32]} borderStyle={borderless ? 'none' : 'solid'} {...props}>
@@ -224,7 +224,13 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
-      <ExpensePayeeDetails isLoading={isLoading} host={host} expense={expense} collective={collective} />
+      <ExpensePayeeDetails
+        isLoading={isLoading}
+        host={host}
+        expense={expense}
+        collective={collective}
+        isDraft={!isEditing && expense?.status == expenseStatus.DRAFT}
+      />
       {showProcessButtons && (
         <Container borderTop="1px solid #DCDEE0" mt={4} pt={12}>
           <Flex flexWrap="wrap" justifyContent="flex-end">
@@ -308,8 +314,8 @@ ExpenseSummary.propTypes = {
       ),
     }),
   }),
-  /** Wether process actions (pay, approve, etc.) should be displayed */
-  showProcessActions: PropTypes.bool,
+  /** Wether or not this is being displayed for an edited Expense */
+  isEditing: PropTypes.bool,
   /** The account where the expense has been submitted, required to display the process actions */
   collective: PropTypes.object,
   /** To know which process buttons to display (if any) */
