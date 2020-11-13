@@ -171,7 +171,7 @@
     "commitizen": "^4.2.2",
     "copy-webpack-plugin": "^6.3.0",
     "cross-env": "^7.0.2",
-    "css-loader": "^5.0.0",
+    "css-loader": "^5.0.1",
     "cypress": "^4.12.1",
     "cypress-file-upload": "^3.5.3",
     "cz-conventional-changelog": "^3.3.0",
