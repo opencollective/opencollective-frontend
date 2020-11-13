@@ -392,7 +392,7 @@ class ExpensePage extends React.Component {
     const { collectiveSlug, data, loadingLoggedInUser, createSuccess, intl } = this.props;
     const { isRefetchingDataForUser, error, status, editedExpense, successMessageDismissed } = this.state;
 
-    if (!data.loading) {
+    if (!data.loading && !isRefetchingDataForUser) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.expense) {
@@ -484,9 +484,10 @@ class ExpensePage extends React.Component {
                 />
               </MessageBox>
             )}
-            {status === PAGE_STATUS.VIEW && (expense?.status === expenseStatus.UNVERIFIED || isDraft) && (
-              <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
-            )}
+            {status === PAGE_STATUS.VIEW &&
+              ((expense?.status === expenseStatus.UNVERIFIED && this.state.createdUser) || isDraft) && (
+                <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
+              )}
             {status !== PAGE_STATUS.EDIT && (
               <Box mb={3}>
                 <ExpenseSummary
@@ -681,12 +682,20 @@ class ExpensePage extends React.Component {
           </Box>
           <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
             <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
-              <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
+              <ExpenseInfoSidebar
+                isLoading={data.loading || loadingLoggedInUser || isRefetchingDataForUser}
+                collective={collective}
+                host={host}
+              />
             </Box>
           </Flex>
           <Box width={SIDE_MARGIN_WIDTH} />
         </Flex>
-        <MobileCollectiveInfoStickyBar isLoading={data.loading} collective={collective} host={host} />
+        <MobileCollectiveInfoStickyBar
+          isLoading={data.loading || loadingLoggedInUser || isRefetchingDataForUser}
+          collective={collective}
+          host={host}
+        />
       </Page>
     );
   }
