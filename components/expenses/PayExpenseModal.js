@@ -292,7 +292,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             )}
           </StyledInputField>
         )}
-        {!error && formik.values.forceManual && (
+        {!error && formik.values.forceManual && payoutMethodType !== PayoutMethodType.OTHER && (
           <MessageBox type="warning" withIcon my={3} fontSize="12px">
             <strong>
               <FormattedMessage id="Warning.Important" defaultMessage="Important" />
