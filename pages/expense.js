@@ -165,7 +165,7 @@ class ExpensePage extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.data.expense?.status === 'DRAFT' && this.props.draftKey) {
+    if (this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey) {
       this.setState(() => ({
         status: PAGE_STATUS.EDIT,
         editedExpense: this.props.data.expense,
@@ -173,11 +173,8 @@ class ExpensePage extends React.Component {
       }));
     }
 
-    const expense = this.props.data?.expense;
-    if (this.props.draftKey && expense?.status == expenseStatus.UNVERIFIED && expense?.permissions?.canEdit) {
-      this.props.verifyExpense({
-        variables: { expense: { id: expense.id }, draftKey: this.props.draftKey },
-      });
+    if (this.props.createSuccess) {
+      this.scrollToExpenseTop();
     }
 
     this.handlePolling();
@@ -193,6 +190,16 @@ class ExpensePage extends React.Component {
     // Scroll to expense's top when changing status
     if (oldState.status !== this.state.status) {
       this.scrollToExpenseTop();
+    }
+
+    const expense = this.props.data?.expense;
+    if (
+      expense?.status == expenseStatus.UNVERIFIED &&
+      expense?.permissions?.canEdit &&
+      this.props.LoggedInUser &&
+      expense?.createdByAccount?.slug == this.props.LoggedInUser?.collective?.slug
+    ) {
+      this.handleExpenseVerification();
     }
   }
 
@@ -239,6 +246,22 @@ class ExpensePage extends React.Component {
     } finally {
       this.setState({ isRefetchingDataForUser: false });
     }
+  }
+
+  async handleExpenseVerification() {
+    const expense = this.props.data?.expense;
+    await this.props.verifyExpense({
+      variables: { expense: { id: expense.id } },
+    });
+
+    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
+    Router.pushRoute(`expense-v2`, {
+      parentCollectiveSlug,
+      collectiveSlug,
+      collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined,
+      ExpenseId: legacyExpenseId,
+      createSuccess: true,
+    });
   }
 
   onSummarySubmit = async () => {
