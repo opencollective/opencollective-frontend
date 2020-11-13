@@ -18,24 +18,28 @@ import { getTotalAmount } from './utils';
 const StepLabel = styled(Span)`
   text-transform: uppercase;
   text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  letter-spacing: 0.06em;
+  margin-top: 8px;
+  margin-bottom: 4px;
 `;
-
-StepLabel.defaultProps = {
-  color: 'black.400',
-  fontSize: '10px',
-  mt: 1,
-};
 
 const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
   if (stepDetails.amount) {
     const totalAmount = stepDetails.amount + (stepDetails.platformContribution || 0);
-    return <FormattedMoneyAmount interval={stepDetails.interval} currency={currency} amount={totalAmount} />;
-  } else if (stepDetails.amount === 0 && isFreeTier) {
     return (
-      <strong>
-        <FormattedMessage id="Amount.Free" defaultMessage="Free" />
-      </strong>
+      <FormattedMoneyAmount
+        interval={stepDetails.interval}
+        currency={currency}
+        amount={totalAmount}
+        abbreviateInterval
+        amountStyles={null}
+      />
     );
+  } else if (stepDetails.amount === 0 && isFreeTier) {
+    return <FormattedMessage id="Amount.Free" defaultMessage="Free" />;
   } else {
     return null;
   }
@@ -47,7 +51,7 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
       const mainInfo = stepProfile.email ?? stepProfile.name;
       const fullDescription = [stepProfile.name, stepProfile.email].filter(Boolean).join(' · ');
       return (
-        <P title={fullDescription} fontSize="12px" lineHeight="16px" truncateOverflow css={{ maxWidth: 150 }}>
+        <P title={fullDescription} fontSize="inherit" lineHeight="inherit" truncateOverflow css={{ maxWidth: 150 }}>
           {mainInfo}
         </P>
       );
@@ -109,8 +113,10 @@ const ContributionFlowStepsProgress = ({
     >
       {({ step }) => (
         <Flex flexDirection="column" alignItems="center">
-          <StepLabel>{step.label || step.name}</StepLabel>
-          <Container fontSize="12px" textAlign="center" wordBreak="break-word">
+          <StepLabel color={currentStep.name === step.name ? 'primary.600' : 'black.700'}>
+            {step.label || step.name}
+          </StepLabel>
+          <Container fontSize="13px" lineHeight="20px" textAlign="center" wordBreak="break-word">
             {step.isVisited && (
               <StepInfo
                 step={step}
