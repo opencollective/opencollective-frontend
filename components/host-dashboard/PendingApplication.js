@@ -29,6 +29,7 @@ import StyledLink from '../StyledLink';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import ApplicationMessageModal from './ApplicationMessageModal';
 import ApplicationRejectionReasonModal from './ApplicationRejectionReasonModal';
@@ -107,25 +108,26 @@ const PendingApplication = ({ host, collective, ...props }) => {
   const [latestAction, setLatestAction] = React.useState(null);
   const [showRejectModal, setShowRejectModal] = React.useState(false);
   const [showContactModal, setShowContactModal] = React.useState(false);
-  const [callProcessApplication, { loading, error, data }] = useMutation(processApplicationMutation, {
+  const { addToast } = useToasts();
+  const [callProcessApplication, { loading, error }] = useMutation(processApplicationMutation, {
     context: API_V2_CONTEXT,
   });
   const applyMessage = null; // TODO: Doesn't exist yet
   const isRejected = isDone && latestAction === ACTIONS.REJECT;
   const isApproved = isDone && latestAction === ACTIONS.APPROVE;
-  const conversation = get(data, 'processHostApplication.conversation');
 
   const processApplication = async (action, message, onSuccess) => {
     setIsDone(false);
     setLatestAction(action);
     try {
-      await callProcessApplication({
+      const result = await callProcessApplication({
         variables: { host: { id: host.id }, account: { id: collective.id }, action, message },
       });
       setIsDone(true);
       if (onSuccess) {
         onSuccess();
       }
+      return result;
     } catch {
       // Ignore errors (handled through Apollo's `error`)
     }
@@ -269,24 +271,6 @@ const PendingApplication = ({ host, collective, ...props }) => {
             <StyledRoundButton size={32} onClick={() => setShowContactModal(true)}>
               <Mail size={15} color="#4E5052" />
             </StyledRoundButton>
-            {isDone && (latestAction === ACTIONS.SEND_PRIVATE_MESSAGE || latestAction === ACTIONS.SEND_PUBLIC_MESSAGE) && (
-              <P color="black.700" ml={2}>
-                {conversation ? (
-                  <StyledLink
-                    as={Link}
-                    openInNewTab
-                    route="conversation"
-                    params={{ collectiveSlug: collective.slug, id: conversation.id, slug: conversation.slug }}
-                  >
-                    <FormattedMessage id="Conversation.created" defaultMessage="Conversation created" />
-                    &nbsp;
-                    <ExternalLink size="1em" style={{ verticalAlign: 'middle' }} />
-                  </StyledLink>
-                ) : (
-                  <FormattedMessage id="MessageSent" defaultMessage="Message sent" />
-                )}
-              </P>
-            )}
           </Flex>
           {isApproved || isRejected ? (
             <div>
@@ -351,7 +335,29 @@ const PendingApplication = ({ host, collective, ...props }) => {
         onConfirm={async (message, isPrivate, resetMessage) => {
           setShowContactModal(false);
           const action = isPrivate ? ACTIONS.SEND_PRIVATE_MESSAGE : ACTIONS.SEND_PUBLIC_MESSAGE;
-          processApplication(action, message, resetMessage);
+          const result = await processApplication(action, message, resetMessage);
+          const conversation = get(result, 'data.processHostApplication.conversation');
+          addToast({
+            type: TOAST_TYPE.SUCCESS,
+            duration: 10000,
+            title: conversation ? (
+              <FormattedMessage id="Conversation.created" defaultMessage="Conversation created" />
+            ) : (
+              <FormattedMessage id="MessageSent" defaultMessage="Message sent" />
+            ),
+            message: conversation && (
+              <StyledLink
+                as={Link}
+                openInNewTab
+                route="conversation"
+                params={{ collectiveSlug: collective.slug, id: conversation.id, slug: conversation.slug }}
+              >
+                <FormattedMessage id="Conversation.view" defaultMessage="View conversation" />
+                &nbsp;
+                <ExternalLink size="1em" style={{ verticalAlign: 'middle' }} />
+              </StyledLink>
+            ),
+          });
         }}
       />
     </Container>

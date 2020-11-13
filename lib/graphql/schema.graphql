@@ -1920,12 +1920,13 @@ type Mutation {
   """
   Approve a collective
   """
-  approveCollective(id: Int!): CollectiveInterface
+  approveCollective(id: Int!): CollectiveInterface @deprecated(reason: "2020-11-16: Please use API V2")
 
   """
   Reject a collective
   """
   rejectCollective(id: Int!, rejectionReason: String): CollectiveInterface
+    @deprecated(reason: "2020-11-16: Please use API V2")
   archiveCollective(id: Int!): CollectiveInterface
   unarchiveCollective(id: Int!): CollectiveInterface
   sendMessageToCollective(collectiveId: Int!, message: String!, subject: String): SendMessageToCollectiveResult
