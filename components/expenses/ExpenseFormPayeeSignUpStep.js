@@ -100,6 +100,7 @@ const RadioOptionContainer = styled.label`
   line-height: 20px;
   margin: 0px;
   padding: 6px 16px;
+  cursor: pointer;
 
   :not(:last-child) {
     @media (max-width: ${themeGet('breakpoints.0')}) {

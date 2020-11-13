@@ -360,22 +360,22 @@ const ExpenseFormBody = ({
             <Field
               as={StyledInput}
               autoFocus={autoFocusTitle}
+              border="0"
+              error={errors.description}
+              fontSize="24px"
               id="expense-description"
+              maxLength={255}
+              mt={3}
               name="description"
+              px={2}
+              py={1}
+              width="100%"
+              withOutline
               placeholder={
                 values.type === expenseTypes.FUNDING_REQUEST
                   ? formatMessage(msg.grantSubjectPlaceholder)
                   : formatMessage(msg.descriptionPlaceholder)
               }
-              width="100%"
-              fontSize="24px"
-              border="0"
-              error={errors.description}
-              mt={3}
-              px={2}
-              py={1}
-              maxLength={255}
-              withOutline
             />
             <HiddenFragment show={hasBaseFormFieldsCompleted}>
               <Flex alignItems="flex-start" mt={3}>
