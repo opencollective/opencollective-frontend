@@ -17,35 +17,45 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const HostAdminCollectiveFilters = ({ filters, onChange }) => {
+export const COLLECTIVE_FILTER = {
+  SORT_BY: 'sort-by',
+  FEE_STRUCTURE: 'fees-structure',
+};
+
+const HostAdminCollectiveFilters = ({ filters, values, onChange }) => {
   const getFilterProps = name => ({
     inputId: `collectives-filter-${name}`,
-    value: filters?.[name],
+    value: values?.[name],
     onChange: value => {
-      onChange({ ...filters, [name]: value === 'ALL' ? null : value });
+      onChange({ ...values, [name]: value === 'ALL' ? null : value });
     },
   });
 
   return (
     <Grid gridGap={18} gridTemplateColumns={['1fr', '1fr 1fr']} maxWidth={400}>
-      <div>
-        <FilterLabel htmlFor="collectives-filter-sort-by">
-          <FormattedMessage id="SortBy" defaultMessage="Sort by" />
-        </FilterLabel>
-        <CollectiveSortByFilter {...getFilterProps('sort-by')} />
-      </div>
-      <div>
-        <FilterLabel htmlFor="collectives-filter-fees-structure">
-          <FormattedMessage id="FeeStructure" defaultMessage="Fee structure" />
-        </FilterLabel>
-        <CollectiveHostFeeStructureFilter {...getFilterProps('fees-structure')} />
-      </div>
+      {filters.includes(COLLECTIVE_FILTER.SORT_BY) && (
+        <div>
+          <FilterLabel htmlFor="collectives-filter-sort-by">
+            <FormattedMessage id="SortBy" defaultMessage="Sort by" />
+          </FilterLabel>
+          <CollectiveSortByFilter {...getFilterProps(COLLECTIVE_FILTER.SORT_BY)} />
+        </div>
+      )}
+      {filters.includes(COLLECTIVE_FILTER.FEE_STRUCTURE) && (
+        <div>
+          <FilterLabel htmlFor="collectives-filter-fees-structure">
+            <FormattedMessage id="FeeStructure" defaultMessage="Fee structure" />
+          </FilterLabel>
+          <CollectiveHostFeeStructureFilter {...getFilterProps(COLLECTIVE_FILTER.FEE_STRUCTURE)} />
+        </div>
+      )}
     </Grid>
   );
 };
 
 HostAdminCollectiveFilters.propTypes = {
-  filters: PropTypes.object,
+  filters: PropTypes.arrayOf(PropTypes.oneOf(Object.values(COLLECTIVE_FILTER))).isRequired,
+  values: PropTypes.object,
   onChange: PropTypes.func,
 };
 

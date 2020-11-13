@@ -125,7 +125,7 @@ class HostDashboardPage extends React.Component {
 
     switch (view) {
       case 'pending-applications':
-        return <PendingApplications hostCollectiveSlug={host.slug} />;
+        return <PendingApplications hostSlug={host.slug} />;
       case 'expenses-legacy':
       case 'donations':
         return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
