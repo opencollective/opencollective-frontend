@@ -57,7 +57,6 @@ const ExpenseSummary = ({
   const { createdByAccount } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
-  const isRequestedByOtherUser = createdByAccount?.id !== expense?.payee?.id;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const showProcessButtons = !isEditing && existsInAPI && collective && hasProcessButtons(permissions);
 
@@ -93,11 +92,14 @@ const ExpenseSummary = ({
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
             <P ml={2} fontSize="12px" color="black.600">
-              {isRequestedByOtherUser ? (
+              {expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedByOnDate"
                   defaultMessage="Requested by {name} on {date, date, long}"
-                  values={{ name: <CreatedByUserLink account={createdByAccount} />, date: new Date(expense.createdAt) }}
+                  values={{
+                    name: <CreatedByUserLink account={expense.requestedByAccount} />,
+                    date: new Date(expense.createdAt),
+                  }}
                 />
               ) : expense.createdAt ? (
                 <FormattedMessage
@@ -292,6 +294,12 @@ ExpenseSummary.propTypes = {
       country: PropTypes.string,
     }),
     createdByAccount: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+    }),
+    requestedByAccount: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,

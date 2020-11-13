@@ -3139,6 +3139,11 @@ type Expense {
   Drafted field values that were still not persisted
   """
   draft: JSON
+
+  """
+  The account that requested this expense to be submitted
+  """
+  requestedByAccount: Account
 }
 
 """
