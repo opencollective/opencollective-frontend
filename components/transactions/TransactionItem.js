@@ -141,7 +141,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
                 {INFO_SEPARATOR}
                 <span data-cy="transaction-date">
-                  <FormattedDate value={createdAt} />
+                  <FormattedDate value={createdAt} year="numeric" month="long" day="2-digit" />
                 </span>
                 {hasExpense && expense.comments?.totalCount > 0 && (
                   <React.Fragment>
