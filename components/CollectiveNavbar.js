@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { PropTypes } from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
@@ -8,11 +8,14 @@ import styled, { css } from 'styled-components';
 
 import { getFilteredSectionsForCollective } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
+import { getEnvVar } from '../lib/env-utils';
 import i18nCollectivePageSection from '../lib/i18n-collective-page-section';
+import { parseToBoolean } from '../lib/utils';
 
 import { AllSectionsNames, Dimensions } from './collective-page/_constants';
 import Avatar from './Avatar';
 import CollectiveCallsToAction from './CollectiveCallsToAction';
+import CollectiveNavbarActionsMenu from './CollectiveNavbarActionsMenu';
 import Container from './Container';
 import { Flex } from './Grid';
 import Link from './Link';
@@ -196,6 +199,7 @@ const CollectiveNavbar = ({
   hideInfos,
   onlyInfos,
   isAnimated,
+  createNotification,
   intl,
 }) => {
   const [isExpended, setExpended] = React.useState(false);
@@ -275,38 +279,58 @@ const CollectiveNavbar = ({
                   />
                 </MenuLinkContainer>
               ))}
-              {callsToAction.hasSubmitExpense && (
-                <MenuLinkContainer mobileOnly>
-                  <MenuLink as={Link} route="create-expense" params={{ collectiveSlug: collective.slug }}>
-                    <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-                  </MenuLink>
-                </MenuLinkContainer>
-              )}
-              {callsToAction.hasContact && (
-                <MenuLinkContainer mobileOnly>
-                  <MenuLink as={Link} route="collective-contact" params={{ collectiveSlug: collective.slug }}>
-                    <FormattedMessage id="Contact" defaultMessage="Contact" />
-                  </MenuLink>
-                </MenuLinkContainer>
-              )}
-              {callsToAction.hasDashboard && collective.plan.hostDashboard && (
-                <MenuLinkContainer mobileOnly>
-                  <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
-                    <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
-                  </MenuLink>
-                </MenuLinkContainer>
+              {!parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+                <Fragment>
+                  {/* mobile CTAs */}
+                  {callsToAction.hasSubmitExpense && (
+                    <MenuLinkContainer mobileOnly>
+                      <MenuLink as={Link} route="create-expense" params={{ collectiveSlug: collective.slug }}>
+                        <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+                      </MenuLink>
+                    </MenuLinkContainer>
+                  )}
+                  {callsToAction.hasContact && (
+                    <MenuLinkContainer mobileOnly>
+                      <MenuLink as={Link} route="collective-contact" params={{ collectiveSlug: collective.slug }}>
+                        <FormattedMessage id="Contact" defaultMessage="Contact" />
+                      </MenuLink>
+                    </MenuLinkContainer>
+                  )}
+                  {callsToAction.hasDashboard && collective.plan.hostDashboard && (
+                    <MenuLinkContainer mobileOnly>
+                      <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+                        <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                      </MenuLink>
+                    </MenuLinkContainer>
+                  )}
+                </Fragment>
               )}
             </Container>
           )}
-          <div>
-            {!isLoading && (
-              <CollectiveCallsToAction
-                display={['none', null, 'flex']}
-                collective={collective}
-                callsToAction={callsToAction}
-              />
-            )}
-          </div>
+          {!parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+            <div>
+              {!isLoading && (
+                // non-mobile CTAs
+                <CollectiveCallsToAction
+                  display={['none', null, 'flex']}
+                  collective={collective}
+                  callsToAction={callsToAction}
+                />
+              )}
+            </div>
+          )}
+          {/* CTAs for v2 navbar */}
+          {parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+            <Fragment>
+              {!isLoading && (
+                <CollectiveNavbarActionsMenu
+                  collective={collective}
+                  callsToAction={callsToAction}
+                  createNotification={createNotification}
+                />
+              )}
+            </Fragment>
+          )}
         </Container>
       )}
     </MainContainer>
@@ -362,6 +386,7 @@ CollectiveNavbar.propTypes = {
   isSmall: PropTypes.bool,
   /** @ignore From injectIntl */
   intl: PropTypes.object,
+  createNotification: PropTypes.func,
 };
 
 CollectiveNavbar.defaultProps = {
