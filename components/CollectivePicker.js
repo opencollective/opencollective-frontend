@@ -66,7 +66,7 @@ export const DefaultCollectiveLabel = ({ value: collective }) => (
         {truncate(collective.name, { length: 40 })}
       </Span>
       <Span fontSize="11px" lineHeight="13px" color="black.500">
-        {collective.isInvite ? collective.email : `@${collective.slug}`}
+        {collective.slug ? `@${collective.slug}` : collective.email || ''}
       </Span>
     </CollectiveLabelTextContainer>
   </Flex>

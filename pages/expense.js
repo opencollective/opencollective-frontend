@@ -37,6 +37,7 @@ import HTMLContent from '../components/HTMLContent';
 import I18nFormatters, { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
+import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
@@ -146,7 +147,7 @@ class ExpensePage extends React.Component {
     this.state = {
       isRefetchingDataForUser: false,
       error: null,
-      status: PAGE_STATUS.VIEW,
+      status: this.props.draftKey ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
       editedExpense: null,
       isSubmitting: false,
       successMessageDismissed: false,
@@ -164,7 +165,7 @@ class ExpensePage extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.data.expense?.status === 'DRAFT' && this.props.draftKey) {
+    if (this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey) {
       this.setState(() => ({
         status: PAGE_STATUS.EDIT,
         editedExpense: this.props.data.expense,
@@ -172,11 +173,8 @@ class ExpensePage extends React.Component {
       }));
     }
 
-    const expense = this.props.data?.expense;
-    if (this.props.draftKey && expense?.status == expenseStatus.UNVERIFIED && expense?.permissions?.canEdit) {
-      this.props.verifyExpense({
-        variables: { expense: { id: expense.id }, draftKey: this.props.draftKey },
-      });
+    if (this.props.createSuccess) {
+      this.scrollToExpenseTop();
     }
 
     this.handlePolling();
@@ -192,6 +190,16 @@ class ExpensePage extends React.Component {
     // Scroll to expense's top when changing status
     if (oldState.status !== this.state.status) {
       this.scrollToExpenseTop();
+    }
+
+    const expense = this.props.data?.expense;
+    if (
+      expense?.status == expenseStatus.UNVERIFIED &&
+      expense?.permissions?.canEdit &&
+      this.props.LoggedInUser &&
+      expense?.createdByAccount?.slug == this.props.LoggedInUser?.collective?.slug
+    ) {
+      this.handleExpenseVerification();
     }
   }
 
@@ -238,6 +246,22 @@ class ExpensePage extends React.Component {
     } finally {
       this.setState({ isRefetchingDataForUser: false });
     }
+  }
+
+  async handleExpenseVerification() {
+    const expense = this.props.data?.expense;
+    await this.props.verifyExpense({
+      variables: { expense: { id: expense.id } },
+    });
+
+    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
+    Router.pushRoute(`expense-v2`, {
+      parentCollectiveSlug,
+      collectiveSlug,
+      collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined,
+      ExpenseId: legacyExpenseId,
+      createSuccess: true,
+    });
   }
 
   onSummarySubmit = async () => {
@@ -368,7 +392,7 @@ class ExpensePage extends React.Component {
     const { collectiveSlug, data, loadingLoggedInUser, createSuccess, intl } = this.props;
     const { isRefetchingDataForUser, error, status, editedExpense, successMessageDismissed } = this.state;
 
-    if (!data.loading) {
+    if (!data.loading && !isRefetchingDataForUser) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.expense) {
@@ -460,19 +484,20 @@ class ExpensePage extends React.Component {
                 />
               </MessageBox>
             )}
-            {status === PAGE_STATUS.VIEW && (expense?.status === expenseStatus.UNVERIFIED || isDraft) && (
-              <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
-            )}
+            {status === PAGE_STATUS.VIEW &&
+              ((expense?.status === expenseStatus.UNVERIFIED && this.state.createdUser) || isDraft) && (
+                <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
+              )}
             {status !== PAGE_STATUS.EDIT && (
               <Box mb={3}>
                 <ExpenseSummary
                   expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
                   host={host}
                   isLoading={!expense}
+                  isEditing={status === PAGE_STATUS.EDIT_SUMMARY}
                   isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
                   permissions={expense?.permissions}
                   collective={collective}
-                  showProcessActions={status !== PAGE_STATUS.EDIT_SUMMARY}
                 />
                 {status !== PAGE_STATUS.EDIT_SUMMARY && (
                   <React.Fragment>
@@ -507,7 +532,7 @@ class ExpensePage extends React.Component {
                         <MessageBox type="info" fontSize="12px">
                           <FormattedMessage
                             id="Expense.SignUpInfoBox"
-                            defaultMessage="You need to create an account to receive a payment from {collectiveName}, by clicking 'Next' you agree to create an account on Open Collective."
+                            defaultMessage="You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on Open Collective."
                             values={{ collectiveName: collective.name }}
                           />
                         </MessageBox>
@@ -589,7 +614,7 @@ class ExpensePage extends React.Component {
                         disabled={isDraft ? !loggedInAccount && !this.state.tos : false}
                       >
                         {isDraft && !loggedInAccount ? (
-                          <FormattedMessage id="Expense.JoinAndSave" defaultMessage="Join and Save" />
+                          <FormattedMessage id="Expense.JoinAndSubmit" defaultMessage="Join and Submit" />
                         ) : (
                           <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
                         )}
@@ -601,23 +626,27 @@ class ExpensePage extends React.Component {
             )}
             {status === PAGE_STATUS.EDIT && (
               <Box mb={3}>
-                <ExpenseForm
-                  collective={collective}
-                  loading={loadingLoggedInUser}
-                  expense={editedExpense}
-                  expensesTags={this.getSuggestedTags(collective)}
-                  payoutProfiles={payoutProfiles}
-                  loggedInAccount={loggedInAccount}
-                  onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
-                  onSubmit={editedExpense =>
-                    this.setState({
-                      editedExpense,
-                      status: PAGE_STATUS.EDIT_SUMMARY,
-                    })
-                  }
-                  validateOnChange
-                  disableSubmitIfUntouched
-                />
+                {data.loading || loadingLoggedInUser ? (
+                  <LoadingPlaceholder width="100%" height={400} />
+                ) : (
+                  <ExpenseForm
+                    collective={collective}
+                    loading={data.loading || loadingLoggedInUser || isRefetchingDataForUser}
+                    expense={editedExpense}
+                    expensesTags={this.getSuggestedTags(collective)}
+                    payoutProfiles={payoutProfiles}
+                    loggedInAccount={loggedInAccount}
+                    onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
+                    onSubmit={editedExpense =>
+                      this.setState({
+                        editedExpense,
+                        status: PAGE_STATUS.EDIT_SUMMARY,
+                      })
+                    }
+                    validateOnChange
+                    disableSubmitIfUntouched
+                  />
+                )}
               </Box>
             )}
             <Box my={4}>
@@ -653,12 +682,20 @@ class ExpensePage extends React.Component {
           </Box>
           <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
             <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
-              <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
+              <ExpenseInfoSidebar
+                isLoading={data.loading || loadingLoggedInUser || isRefetchingDataForUser}
+                collective={collective}
+                host={host}
+              />
             </Box>
           </Flex>
           <Box width={SIDE_MARGIN_WIDTH} />
         </Flex>
-        <MobileCollectiveInfoStickyBar isLoading={data.loading} collective={collective} host={host} />
+        <MobileCollectiveInfoStickyBar
+          isLoading={data.loading || loadingLoggedInUser || isRefetchingDataForUser}
+          collective={collective}
+          host={host}
+        />
       </Page>
     );
   }

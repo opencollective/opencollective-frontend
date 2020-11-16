@@ -153,6 +153,13 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       type
       imageUrl
     }
+    requestedByAccount {
+      id
+      slug
+      name
+      type
+      imageUrl
+    }
     account {
       id
       slug

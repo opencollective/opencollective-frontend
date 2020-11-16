@@ -54,9 +54,9 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
   lineHeight: '15px',
 })``;
 
-const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, collective }) => {
+const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, isDraft, collective }) => {
   const { payeeLocation } = expense || {};
-  const payee = expense?.payee?.isNewUser ? expense?.payee : expense?.draft?.payee || expense?.payee;
+  const payee = isDraft ? expense?.draft?.payee : expense?.payee;
   const isInvoice = expense?.type === expenseTypes.INVOICE;
 
   return isLoading ? (
@@ -176,6 +176,8 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
 ExpensePayeeDetails.propTypes = {
   /** Set this to true if the expense is not loaded yet */
   isLoading: PropTypes.bool,
+  /** Set this to true if this shoud use information from expense.draft property */
+  isDraft: PropTypes.bool,
   /** Set this to true if the logged in user is currenltly loading */
   isLoadingLoggedInUser: PropTypes.bool,
   host: PropTypes.shape({
