@@ -185,8 +185,12 @@ class CreateExpensePage extends React.Component {
 
   onSummarySubmit = async () => {
     try {
+      const { expense, isSubmitting } = this.state;
+      if (isSubmitting) {
+        return;
+      }
+
       this.setState({ isSubmitting: true, error: null });
-      const { expense } = this.state;
       const result = await this.props.createExpense({
         variables: {
           account: { id: this.props.data.account.id },
