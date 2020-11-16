@@ -21,7 +21,7 @@ describe('host dashboard', () => {
     cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
     cy.get('[data-cy="host-dashboard-menu-bar"]').contains('Pending applications').click();
     cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-    cy.get(`[data-cy="${collectiveSlug}-approved"]`).should('have.attr', 'color', 'green.700');
+    cy.contains(`[data-cy="host-application"]`, 'Approved');
   });
 
   it('mark pending order as paid', () => {

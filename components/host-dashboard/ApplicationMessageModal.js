@@ -1,28 +1,22 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Lock } from '@styled-icons/feather/Lock';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
+import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
-const messages = defineMessages({
-  placeholder: {
-    id: 'appRejectionReason.placeholder',
-    defaultMessage: 'What is the reason for rejecting this application?',
-  },
-});
-
-const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...modalProps }) => {
-  const [rejectionReason, setRejectionReason] = useState('');
-  const intl = useIntl();
+const ApplicationMessageModal = ({ collective, onClose, onConfirm, ...modalProps }) => {
+  const [message, setMessage] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false);
 
   return (
     <Modal onClose={onClose} width="576px" {...modalProps}>
@@ -69,28 +63,18 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
         </Flex>
       </ModalHeader>
       <ModalBody>
-        <P color="red.900" fontSize="16px" lineHeight="24px" mb={2} mt={26}>
+        <P fontSize="16px" lineHeight="24px" mb={2}>
           <FormattedMessage
-            id="OptionalFieldLabel"
-            defaultMessage="{field} (optional)"
-            values={{
-              field: (
-                <FormattedMessage
-                  id="ApplicationRejectionReasonModal.Help"
-                  defaultMessage="Help {accountName} know why you rejected their application"
-                  values={{ accountName: collective.name }}
-                />
-              ),
-            }}
+            id="SendMessageTo"
+            defaultMessage="Send a message to {accountName}"
+            values={{ accountName: collective.name }}
           />
         </P>
         <P color="black.700" lineHeight="20px" mb={2}>
           <FormattedMessage
-            id="PrivateMessageToCollectiveAdmins"
-            defaultMessage="The message will be sent as a private email to the admins."
+            id="HostApplicationMessageInfo"
+            defaultMessage="The message will be published as a public conversation. If you want to send a private message, click on the private checkbox."
           />
-          &nbsp;&nbsp;
-          <Lock size="1.1em" />
         </P>
         <Container>
           <StyledTextarea
@@ -98,22 +82,46 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
             resize="none"
             autoSize={true}
             minHeight={200}
-            value={rejectionReason}
-            onChange={({ target }) => setRejectionReason(target.value)}
-            placeholder={intl.formatMessage(messages.placeholder)}
+            value={message}
+            onChange={({ target }) => setMessage(target.value)}
+            showCount
+            minLength={3}
+            maxLength={3000}
           />
-          <P mt={1} fontSize="11px" color="black.600">
-            <FormattedMessage id="forms.optional" defaultMessage="Optional" />
-          </P>
+          <Box mt={2}>
+            <StyledCheckbox
+              name="private"
+              checked={isPrivate}
+              onChange={({ checked }) => setIsPrivate(checked)}
+              label={
+                <Span>
+                  <Lock size="1em" />
+                  &nbsp;
+                  <Span css={{ verticalAlign: 'middle' }}>
+                    <FormattedMessage
+                      id="ApplicationMessageModal.Private"
+                      defaultMessage="Private (this will send an email to the Collective admins)"
+                    />
+                  </Span>
+                </Span>
+              }
+            />
+          </Box>
         </Container>
       </ModalBody>
       <ModalFooter isFullWidth>
         <Container display="flex" justifyContent="flex-end">
-          <StyledButton buttonStyle="dangerSecondary" mx={20} minWidth={95} onClick={onClose}>
+          <StyledButton buttonStyle="secondary" mx={20} minWidth={95} onClick={onClose}>
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
-          <StyledButton buttonStyle="danger" data-cy="action" minWidth={95} onClick={() => onConfirm(rejectionReason)}>
-            <FormattedMessage id="actions.reject" defaultMessage="Reject" />
+          <StyledButton
+            buttonStyle="primary"
+            data-cy="action"
+            minWidth={95}
+            onClick={() => onConfirm(message, isPrivate, () => setMessage(''))}
+            disabled={!message}
+          >
+            <FormattedMessage id="SendMessage" defaultMessage="Send message" />
           </StyledButton>
         </Container>
       </ModalFooter>
@@ -121,10 +129,10 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
   );
 };
 
-ApplicationRejectionReasonModal.propTypes = {
+ApplicationMessageModal.propTypes = {
   collective: PropTypes.object.isRequired,
   onConfirm: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
-export default ApplicationRejectionReasonModal;
+export default ApplicationMessageModal;

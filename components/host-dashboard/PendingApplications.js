@@ -1,170 +1,203 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
-import { Check } from '@styled-icons/boxicons-regular/Check';
-import { Github } from '@styled-icons/fa-brands/Github';
-import { TimesCircle } from '@styled-icons/fa-solid/TimesCircle';
-import { get } from 'lodash';
+import { useMutation, useQuery } from '@apollo/client';
+import { isNil } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import { hostPendingApplicationsQuery } from '../../lib/graphql/queries';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { Router } from '../../server/pages';
 
-import Avatar from '../Avatar';
 import Container from '../Container';
+import { editAccountSettingsMutation } from '../edit-collective/mutations';
 import { Box, Flex } from '../Grid';
-import LinkCollective from '../LinkCollective';
-import Loading from '../Loading';
+import InputSwitch from '../InputSwitch';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
-import StyledCard from '../StyledCard';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import Pagination from '../Pagination';
+import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
-import StyledLink from '../StyledLink';
-import { Span } from '../Text';
-import { withUser } from '../UserProvider';
+import { H1, Span } from '../Text';
 
-import AcceptRejectButtons from './AcceptRejectButtons';
+import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from './HostAdminCollectiveFilters';
+import PendingApplication, { processApplicationAccountFields } from './PendingApplication';
 
-class HostPendingApplications extends React.Component {
-  static propTypes = {
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      Collective: PropTypes.shape({
-        id: PropTypes.number,
-      }),
-    }),
-  };
+const COLLECTIVES_PER_PAGE = 20;
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      showRejectionModal: false,
-      collectiveId: null,
-    };
-  }
-
-  componentDidMount() {
-    this.scrollToSelectedApplication();
-  }
-
-  componentDidUpdate(oldProps) {
-    if (!oldProps.data.Collective && this.props.data.Collective) {
-      this.scrollToSelectedApplication();
-    }
-  }
-
-  scrollToSelectedApplication() {
-    const selectedCollectiveId = this.getSelectedApplicationCollectiveId();
-    if (selectedCollectiveId) {
-      const elem = document.getElementById(`application-${selectedCollectiveId}`);
-      if (elem) {
-        elem.scrollIntoView();
+const pendingApplicationsQuery = gqlV2/* GraphQL */ `
+  query HostDashboardPendingApplications(
+    $hostSlug: String!
+    $limit: Int!
+    $offset: Int!
+    $orderBy: ChronologicalOrderInput!
+    $searchTerm: String
+  ) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      name
+      type
+      settings
+      pendingApplications(limit: $limit, offset: $offset, orderBy: $orderBy, searchTerm: $searchTerm) {
+        offset
+        limit
+        totalCount
+        nodes {
+          id
+          legacyId
+          name
+          slug
+          website
+          description
+          type
+          imageUrl(height: 96)
+          createdAt
+          ... on AccountWithHost {
+            ...ProcessHostApplicationFields
+          }
+          admins: members(role: ADMIN) {
+            totalCount
+            nodes {
+              id
+              account {
+                id
+                type
+                slug
+                name
+                imageUrl(height: 48)
+              }
+            }
+          }
+        }
       }
     }
   }
+  ${processApplicationAccountFields}
+`;
 
-  getSelectedApplicationCollectiveId() {
-    try {
-      const hash = window.location.hash;
-      const regex = /application-(\d+)/;
-      const idStr = regex.exec(hash)[1];
-      const idInt = parseInt(idStr);
-      return idInt || null;
-    } catch {
-      return null;
-    }
-  }
+const checkIfQueryHasFilters = query =>
+  Object.entries(query).some(([key, value]) => {
+    return !['view', 'offset', 'limit', 'hostCollectiveSlug', 'sort-by'].includes(key) && value;
+  });
 
-  renderPendingCollectives(data, loading) {
-    if (loading) {
-      return (
-        <Box px={2} py={5}>
-          <Loading />
+const getVariablesFromQuery = query => {
+  return {
+    offset: parseInt(query.offset) || 0,
+    limit: parseInt(query.limit) || COLLECTIVES_PER_PAGE,
+    searchTerm: query.searchTerm,
+    hostFeesStructure: query['fees-structure'],
+    orderBy: {
+      field: 'CREATED_AT',
+      direction: query['sort-by'] === 'oldest' ? 'ASC' : 'DESC',
+    },
+  };
+};
+
+const PendingApplications = ({ hostSlug }) => {
+  const { query } = useRouter() || {};
+  const [isAcceptingApplications, setAcceptingApplications] = React.useState(null);
+  const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
+  const { data, error, loading, variables } = useQuery(pendingApplicationsQuery, {
+    variables: { hostSlug, ...getVariablesFromQuery(query) },
+    context: API_V2_CONTEXT,
+  });
+  const [submitSetting] = useMutation(editAccountSettingsMutation, { context: API_V2_CONTEXT });
+
+  const hostApplications = data?.host?.pendingApplications;
+  return (
+    <Box maxWidth={1000} m="0 auto" py={5} px={2}>
+      <Flex alignItems="center" mb={24} flexWrap="wrap">
+        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+          <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
+        </H1>
+        <Box mx="auto" />
+        <Box p={2}>
+          <SearchBar
+            defaultValue={query.searchTerm}
+            onSubmit={searchTerm => Router.pushRoute('host.dashboard', { ...query, searchTerm, offset: null })}
+          />
         </Box>
-      );
-    }
+      </Flex>
+      <StyledHr mb={26} borderWidth="0.5px" />
+      <Box mb={34}>
+        {data?.host ? (
+          <HostAdminCollectiveFilters
+            filters={[COLLECTIVE_FILTER.SORT_BY]}
+            values={query}
+            onChange={queryParams =>
+              Router.pushRoute('host.dashboard', {
+                ...query,
+                ...queryParams,
+                offset: null,
+              })
+            }
+          />
+        ) : loading ? (
+          <LoadingPlaceholder height={70} />
+        ) : null}
+      </Box>
 
-    const host = data?.Collective;
-    const pendingCollectives = get(host, 'pending.collectives', []);
-    const selectedCollectiveId = this.getSelectedApplicationCollectiveId();
-    return (
-      <Container
-        display="flex"
-        background="linear-gradient(180deg, #EBF4FF, #FFFFFF)"
-        flexDirection="column"
-        alignItems="center"
-        px={2}
-        py={5}
-      >
-        {pendingCollectives.length === 0 && (
-          <MessageBox type="info" withIcon mb={5}>
-            <FormattedMessage
-              id="host.pending-applications.noPending"
-              defaultMessage="No collective waiting for approval"
+      {data?.host && (
+        <Container borderTop="1px dashed #4E5052" borderBottom="1px dashed #4E5052" py={3} mb={4}>
+          <Flex justifyContent="space-between" alignItems="center">
+            <Span fontSize="14px" fontWeight="700" color="black.900">
+              <FormattedMessage id="PendingApplications.Accepting" defaultMessage="Accepting applications" />
+            </Span>
+            <InputSwitch
+              name="accept-applications"
+              checked={!isNil(isAcceptingApplications) ? isAcceptingApplications : data.host.settings?.apply}
+              onChange={e => {
+                const value = e.target.checked;
+                setAcceptingApplications(value);
+                submitSetting({ variables: { account: { id: data.host.id }, key: 'apply', value } });
+              }}
             />
-          </MessageBox>
-        )}
+          </Flex>
+        </Container>
+      )}
 
-        {pendingCollectives.map(c => (
-          <StyledCard
-            key={c.id}
-            width={1}
-            maxWidth={400}
-            p={3}
-            mb={4}
-            id={`application-${c.id}`}
-            boxShadow="rgba(144, 144, 144, 0.25) 4px 4px 16px"
-            borderColor={selectedCollectiveId === c.id ? 'primary.300' : undefined}
-          >
-            <Flex>
-              <Avatar collective={c} mr={2} radius={42} />
-              <Container pl={2} flex="1 1" borderLeft="1px solid #e8e8e8">
-                <div>
-                  <LinkCollective collective={c}>
-                    <strong>{c.name}</strong> <small>({c.slug})</small>
-                  </LinkCollective>
-                </div>
-                {c.githubHandle && (
-                  <StyledLink href={`https://github.com/${c.githubHandle}`} openInNewTab>
-                    <Github size="1em" />
-                    <Span ml={1}>{c.githubHandle}</Span>
-                  </StyledLink>
-                )}
-              </Container>
-            </Flex>
-            <StyledHr my={3} borderColor="black.200" />
-            <Flex justifyContent="space-evenly" flexWrap="wrap">
-              {c.isActive ? (
-                <Box color="green.700" data-cy={`${c.slug}-approved`}>
-                  <Check size={39} />
+      {error && <MessageBoxGraphqlError error={error} mb={2} />}
+
+      {!error && !loading && !hostApplications?.nodes.length ? (
+        <MessageBox type="info" withIcon data-cy="zero-collective-message">
+          {hasFilters ? (
+            <FormattedMessage id="discover.searchNoResult" defaultMessage="No collective matches the current search." />
+          ) : (
+            <FormattedMessage id="menu.collective.none" defaultMessage="No collectives yet" />
+          )}
+        </MessageBox>
+      ) : (
+        <React.Fragment>
+          {loading
+            ? Array.from(new Array(COLLECTIVES_PER_PAGE)).map((_, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <Box key={index} mb={24}>
+                  <LoadingPlaceholder height={362} borderRadius="8px" />
                 </Box>
-              ) : c.host?.id === host?.id ? (
-                <AcceptRejectButtons collective={c} />
-              ) : (
-                <Box color="red.700" data-cy={`${c.slug}-rejected`}>
-                  <TimesCircle size={39} />
+              ))
+            : hostApplications?.nodes.map(account => (
+                <Box key={account.id} mb={24} data-cy="host-application">
+                  <PendingApplication host={data.host} collective={account} />
                 </Box>
-              )}
-            </Flex>
-          </StyledCard>
-        ))}
-      </Container>
-    );
-  }
+              ))}
+          <Flex mt={5} justifyContent="center">
+            <Pagination
+              route="host.dashboard"
+              total={hostApplications?.totalCount}
+              limit={variables.limit}
+              offset={variables.offset}
+              scrollToTopOnChange
+            />
+          </Flex>
+        </React.Fragment>
+      )}
+    </Box>
+  );
+};
 
-  render() {
-    const { data } = this.props;
+PendingApplications.propTypes = {
+  hostSlug: PropTypes.string.isRequired,
+};
 
-    return data.error ? (
-      <MessageBox type="error" withIcon>
-        {getErrorFromGraphqlException(data.error).message}
-      </MessageBox>
-    ) : (
-      this.renderPendingCollectives(data, data.loading)
-    );
-  }
-}
-
-const addHostPendingApplicationsData = graphql(hostPendingApplicationsQuery);
-
-export default withUser(addHostPendingApplicationsData(HostPendingApplications));
+export default PendingApplications;

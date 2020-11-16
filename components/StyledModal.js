@@ -112,10 +112,10 @@ const CloseIcon = styled(Times)`
   cursor: pointer;
 `;
 
-export const ModalHeader = ({ children, onClose, ...props }) => (
+export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
   <Header {...props}>
     {children || <div />}
-    <CloseIcon onClick={onClose} />
+    {!hideCloseIcon && <CloseIcon onClick={onClose} />}
   </Header>
 );
 
@@ -124,6 +124,7 @@ ModalHeader.propTypes = {
   onClose: PropTypes.func,
   /** children */
   children: PropTypes.node,
+  hideCloseIcon: PropTypes.bool,
 };
 
 ModalHeader.displayName = 'Header';

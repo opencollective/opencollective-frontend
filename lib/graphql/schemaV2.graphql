@@ -4152,6 +4152,31 @@ type Host implements Account & AccountWithContributions {
   Transferwise balances. Returns null if Transferwise account is not connected.
   """
   transferwiseBalances: [Amount]
+
+  """
+  Pending applications for this host
+  """
+  pendingApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): AccountCollection!
 }
 
 """
@@ -4864,6 +4889,31 @@ type Mutation {
     """
     draftKey: String
   ): Expense!
+
+  """
+  Reply to a host application
+  """
+  processHostApplication(
+    """
+    The account that applied to the host
+    """
+    account: AccountReferenceInput!
+
+    """
+    The host concerned by the application
+    """
+    host: AccountReferenceInput!
+
+    """
+    What to do with the application
+    """
+    action: ProcessHostApplicationAction!
+
+    """
+    A message to attach as a reason for the action
+    """
+    message: String
+  ): ProcessHostApplicationResponse!
 
   """
   Edit the settings for the given account
@@ -5703,6 +5753,43 @@ input ProcessExpensePaymentParams {
   2FA code for if the host account has 2FA for payouts turned on.
   """
   twoFactorAuthenticatorCode: String
+}
+
+"""
+Action taken for an account application to the host
+"""
+enum ProcessHostApplicationAction {
+  """
+  Approve the account request to be hosted
+  """
+  APPROVE
+
+  """
+  Rejects the account request to be hosted
+  """
+  REJECT
+
+  """
+  Sends a private message to the admins of the account
+  """
+  SEND_PRIVATE_MESSAGE
+
+  """
+  Creates a public conversation
+  """
+  SEND_PUBLIC_MESSAGE
+}
+
+type ProcessHostApplicationResponse {
+  """
+  The account that applied to the host
+  """
+  account: Account!
+
+  """
+  When sending a public message, this field will have the info about the conversation created
+  """
+  conversation: Conversation
 }
 
 """

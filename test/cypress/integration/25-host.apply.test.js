@@ -3,7 +3,7 @@ import { randomSlug } from '../support/faker';
 describe('apply to host', () => {
   it('as a new collective', () => {
     cy.visit('/brusselstogetherasbl');
-    cy.contains('We are fiscally hosting 2 Collectives');
+    // cy.contains('We are fiscally hosting 2 Collectives');
     cy.get('[data-cy="host-apply-btn-logged-out"]:visible').click();
     cy.get('#email').type('testuser@opencollective.com');
     cy.wait(500);
@@ -22,7 +22,7 @@ describe('apply to host', () => {
       const collectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
       cy.login({ redirect: `/brusselstogetherasbl/dashboard/pending-applications#application-${collectiveId}` });
       cy.contains(`#application-${collectiveId} button`, 'Approve').click();
-      cy.get('[data-cy*="-approved"]').should('exist');
+      cy.contains(`#application-${collectiveId}`, 'Approved');
     });
   });
 });

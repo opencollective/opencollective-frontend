@@ -17,7 +17,7 @@ import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
 import HostAdminCollectiveCard from './HostAdminCollectiveCard';
-import HostAdminCollectiveFilters from './HostAdminCollectiveFilters';
+import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from './HostAdminCollectiveFilters';
 
 const COLLECTIVES_PER_PAGE = 20;
 
@@ -132,7 +132,8 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
       <Box mb={34}>
         {data?.host ? (
           <HostAdminCollectiveFilters
-            filters={query}
+            values={query}
+            filters={[COLLECTIVE_FILTER.SORT_BY, COLLECTIVE_FILTER.FEE_STRUCTURE]}
             onChange={queryParams =>
               Router.pushRoute('host.dashboard', {
                 ...query,

@@ -91,7 +91,7 @@ export default class StyledTextarea extends React.PureComponent {
   static defaultProps = {
     border: '1px solid',
     borderColor: 'black.300',
-    borderRadius: '4px',
+    borderRadius: '6px',
     fontSize: 'inherit',
     px: 12,
     py: 12,
