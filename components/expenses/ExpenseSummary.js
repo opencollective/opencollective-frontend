@@ -54,11 +54,11 @@ const ExpenseSummary = ({
   borderless,
   ...props
 }) => {
-  const { createdByAccount } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const showProcessButtons = !isEditing && existsInAPI && collective && hasProcessButtons(permissions);
+  const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
 
   return (
     <StyledCard p={borderless ? 0 : [16, 24, 32]} borderStyle={borderless ? 'none' : 'solid'} {...props}>
@@ -97,7 +97,7 @@ const ExpenseSummary = ({
                   id="Expense.RequestedByOnDate"
                   defaultMessage="Requested by {name} on {date, date, long}"
                   values={{
-                    name: <CreatedByUserLink account={expense.requestedByAccount} />,
+                    name: <CreatedByUserLink account={createdByAccount} />,
                     date: new Date(expense.createdAt),
                   }}
                 />
