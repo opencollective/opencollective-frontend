@@ -139,6 +139,7 @@ export const collectivePageQuery = gql`
           collectiveSlug
           name
           type
+          isGuest
         }
         stats {
           id
