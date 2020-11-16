@@ -109,7 +109,7 @@ const MenuOutline = styled(Container)`
 
 const getCollectivesNeedingAHost = user => {
   const memberships = uniqBy(
-    user.memberOf.filter(m => m.role === 'ADMIN'),
+    user?.memberOf.filter(m => m.role === 'ADMIN'),
     m => m.collective.id,
   );
   const collectives = memberships
