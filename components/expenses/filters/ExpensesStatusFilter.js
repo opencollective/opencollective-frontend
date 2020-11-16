@@ -7,10 +7,18 @@ import { i18nExpenseStatus } from '../../../lib/i18n/expense';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 
+const IGNORED_EXPENSE_STATUS = [expenseStatus.DRAFT, expenseStatus.UNVERIFIED];
+
 const ExpenseStatusFilter = ({ value, onChange, ...props }) => {
   const intl = useIntl();
   const getOption = value => ({ label: i18nExpenseStatus(intl, value), value });
-  const options = [getOption('ALL'), ...Object.values(expenseStatus).map(getOption), getOption('READY_TO_PAY')];
+  const options = [
+    getOption('ALL'),
+    ...Object.values(expenseStatus)
+      .filter(status => !IGNORED_EXPENSE_STATUS.includes(status))
+      .map(getOption),
+    getOption('READY_TO_PAY'),
+  ];
 
   return (
     <StyledSelectFilter
