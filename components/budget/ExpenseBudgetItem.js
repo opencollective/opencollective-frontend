@@ -365,6 +365,7 @@ ExpenseBudgetItem.propTypes = {
     createdByAccount: PropTypes.shape({
       type: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
     }),
     /** If available, this `account` will be used to link expense in place of the `collective` */
     account: PropTypes.shape({
