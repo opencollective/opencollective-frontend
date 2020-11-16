@@ -6,7 +6,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
-import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
@@ -121,10 +120,7 @@ const ExpenseFormPayeeStep = ({
     values.payee &&
     !values.payee.isInvite &&
     [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
-  const canInvite =
-    values.type === expenseTypes.INVOICE &&
-    hasFeature(collective, FEATURES.SUBMIT_EXPENSE_ON_BEHALF) &&
-    values?.status !== expenseStatus.DRAFT;
+  const canInvite = hasFeature(collective, FEATURES.SUBMIT_EXPENSE_ON_BEHALF) && !values?.status;
   const profileOptions = payoutProfiles.map(value => ({
     value,
     label: value.name,
