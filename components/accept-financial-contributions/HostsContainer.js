@@ -60,7 +60,11 @@ class HostsContainer extends React.Component {
     const { onChange, data, intl } = this.props;
 
     if (!data.hosts || !data.hosts.nodes) {
-      return <Loading />;
+      return (
+        <Flex justifyContent="center" width="100%" py={4}>
+          <Loading />
+        </Flex>
+      );
     }
 
     const hosts = [...data.hosts.nodes];
