@@ -42,6 +42,7 @@ const CustomCheckbox = styled.span`
 `;
 
 const CheckboxContainer = styled.div`
+  position: relative;
   display: flex;
   align-items: ${props => props.alignItems};
   line-height: 1.4em;

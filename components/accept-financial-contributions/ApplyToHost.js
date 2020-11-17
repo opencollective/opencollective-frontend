@@ -116,7 +116,7 @@ class ApplyToHost extends React.Component {
             {intl.formatMessage(this.messages.header)}
           </H1>
         </Box>
-        <Container px={[1, null, 7]}>
+        <Container px={[1, null, 7]} mb={5}>
           <Container
             display="flex"
             alignItems={['center', 'flex-end']}
