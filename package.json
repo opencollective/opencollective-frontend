@@ -82,6 +82,7 @@
     "react-dom": "16.14.0",
     "react-dropzone": "11.2.4",
     "react-easy-crop": "3.3.0",
+    "react-flip-move": "3.0.4",
     "react-geosuggest": "2.14.0",
     "react-intl": "5.10.0",
     "react-markdown": "4.3.1",

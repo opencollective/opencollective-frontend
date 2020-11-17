@@ -481,6 +481,7 @@
   "conversation.followers.rest": "{usersList} y {count, plural,one {one other} other {# otros}}",
   "conversation.notFound": "Esta conversación no existe o ha sido eliminada.",
   "conversation.unfollow": "Dejar de seguir esta conversación",
+  "Conversation.view": "View conversation",
   "conversations": "Conversaciones",
   "conversations.create": "Crear conversación",
   "conversations.createFirst": "Iniciar una nueva conversación",

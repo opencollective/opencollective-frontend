@@ -481,6 +481,7 @@
   "conversation.followers.rest": "{usersList} and {count, plural, one {one other} other {# others}}",
   "conversation.notFound": "Это обсуждение не существует или было удалено.",
   "conversation.unfollow": "Не следить за этим обсуждением",
+  "Conversation.view": "View conversation",
   "conversations": "Обсуждения",
   "conversations.create": "Создать обсуждение",
   "conversations.createFirst": "Начать новое обсуждение",
