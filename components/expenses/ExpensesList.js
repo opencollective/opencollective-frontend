@@ -34,7 +34,7 @@ const ExpensesList = ({
   return (
     <StyledCard>
       {expenses.map((expense, idx) => (
-        <ExpenseContainer key={expense?.id || idx} isFirst={!idx} data-cy="single-expense">
+        <ExpenseContainer key={expense?.id || idx} isFirst={!idx} data-cy={`expense-${expense?.status}`}>
           <ExpenseBudgetItem
             isLoading={isLoading}
             isInverted={isInverted}

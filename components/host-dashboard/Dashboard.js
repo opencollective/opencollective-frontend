@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
@@ -11,8 +11,6 @@ import {
   setLocalStorage,
 } from '../../lib/local-storage';
 
-import ExpensesStatsWithData from '../expenses/ExpensesStatsWithData';
-import ExpensesWithData from '../expenses/ExpensesWithData';
 import OrdersWithData from '../expenses/OrdersWithData';
 import { Flex } from '../Grid';
 import Loading from '../Loading';
@@ -25,7 +23,7 @@ import HostDashboardActionsBanner from './HostDashboardActionsBanner';
 class HostDashboard extends React.Component {
   static propTypes = {
     hostCollectiveSlug: PropTypes.string, // for addData
-    view: PropTypes.oneOf(['expenses', 'expenses-legacy', 'donations']).isRequired,
+    view: PropTypes.oneOf(['expenses', 'donations']).isRequired,
     LoggedInUser: PropTypes.object,
     data: PropTypes.object, // from addData
   };
@@ -62,38 +60,6 @@ class HostDashboard extends React.Component {
         removeFromLocalStorage(LOCAL_STORAGE_KEYS.HOST_DASHBOARD_FILTER_PREFERENCES);
       });
     }
-  }
-
-  renderExpenses(selectedCollective, includeHostedCollectives) {
-    const { LoggedInUser, data } = this.props;
-    const host = data.Collective;
-
-    return (
-      <Fragment>
-        <div id="expenses">
-          <div className="header">
-            <H5 my={3} textAlign="center">
-              <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
-            </H5>
-          </div>
-          <ExpensesWithData
-            collective={selectedCollective}
-            host={host}
-            includeHostedCollectives={includeHostedCollectives}
-            LoggedInUser={LoggedInUser}
-            hasFilters
-            filters={this.state.expensesFilters}
-            onFiltersChange={expensesFilters => this.setState({ expensesFilters })}
-            editable={true}
-          />
-        </div>
-        {this.state.selectedCollective && (
-          <div className="second col pullRight">
-            <ExpensesStatsWithData slug={selectedCollective.slug} />
-          </div>
-        )}
-      </Fragment>
-    );
   }
 
   renderDonations(selectedCollective, includeHostedCollectives) {
@@ -197,7 +163,6 @@ class HostDashboard extends React.Component {
           />
         )}
         <div className="content">
-          {view === 'expenses-legacy' && this.renderExpenses(selectedCollective, includeHostedCollectives)}
           {view === 'donations' && this.renderDonations(selectedCollective, includeHostedCollectives)}
         </div>
       </div>

@@ -38,7 +38,7 @@ const pages = routes()
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add(
     'host.dashboard',
-    '/:hostCollectiveSlug/dashboard/:view(expenses|expenses-legacy|pending-applications|hosted-collectives|donations)?',
+    '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations)?',
     'host.dashboard',
   )
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions')
@@ -52,19 +52,9 @@ const pages = routes()
     'expense',
   )
   .add(
-    'expense',
-    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/legacy',
-    'expense-legacy',
-  )
-  .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
     'expenses',
-  )
-  .add(
-    'expenses-legacy',
-    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
-    'expenses-legacy',
   )
   .add('orders', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders')
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)')

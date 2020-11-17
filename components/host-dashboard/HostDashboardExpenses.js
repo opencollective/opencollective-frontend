@@ -216,7 +216,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                       params={{
                         ...mapValues(query, () => null),
                         hostCollectiveSlug: data.host.slug,
-                        view: 'expenses-legacy',
+                        view: 'expenses',
                       }}
                     >
                       {text}
