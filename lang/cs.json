@@ -1459,7 +1459,6 @@
   "ResendInvite": "Resend invite",
   "ResendInviteSuccessful": "Invite sent",
   "Reset": "Obnovit výchozí",
-  "response.status.interested": "{name} má zájem",
   "response.status.yes": "{name} se zúčastní",
   "RoleDetails.ACCOUNTANT": "Accountants can access all the financial information such as receipts, financial reports or expense's invoices.",
   "RoleDetails.ADMIN": "Admins have full permissions on the profile, and can in particular change the settings, approve expenses or make financial contributions to other Collectives.",
