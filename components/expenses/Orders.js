@@ -119,7 +119,7 @@ class Orders extends React.Component {
                 bsStyle={!this.state.status ? 'primary' : 'default'}
                 onClick={() => this.refetch()}
               >
-                <FormattedMessage id="orders.all" defaultMessage="all" />
+                <FormattedMessage id="orders.all" defaultMessage="All" />
               </Button>
               <Button
                 className="filterBtn pending"
@@ -127,7 +127,7 @@ class Orders extends React.Component {
                 bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'}
                 onClick={() => this.refetch('PENDING')}
               >
-                <FormattedMessage id="order.pending" defaultMessage="pending" />
+                <FormattedMessage id="order.pending" defaultMessage="Pending" />
               </Button>
               <Button
                 className="filterBtn paid"
@@ -135,7 +135,7 @@ class Orders extends React.Component {
                 bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'}
                 onClick={() => this.refetch('PAID')}
               >
-                <FormattedMessage id="order.paid" defaultMessage="paid" />
+                <FormattedMessage id="order.paid" defaultMessage="Paid" />
               </Button>
               <Button
                 className="filterBtn cancelled"
@@ -143,7 +143,7 @@ class Orders extends React.Component {
                 bsStyle={this.state.status === 'CANCELLED' ? 'primary' : 'default'}
                 onClick={() => this.refetch('CANCELLED')}
               >
-                <FormattedMessage id="order.cancelled" defaultMessage="cancelled" />
+                <FormattedMessage id="order.cancelled" defaultMessage="Cancelled" />
               </Button>
               <Button
                 className="filterBtn error"
@@ -151,7 +151,7 @@ class Orders extends React.Component {
                 bsStyle={this.state.status === 'ERROR' ? 'primary' : 'default'}
                 onClick={() => this.refetch('ERROR')}
               >
-                <FormattedMessage id="order.error" defaultMessage="error" />
+                <FormattedMessage id="order.error" defaultMessage="Error" />
               </Button>
             </ButtonGroup>
           </div>

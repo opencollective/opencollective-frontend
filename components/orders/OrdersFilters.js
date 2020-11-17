@@ -7,9 +7,7 @@ import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Flex } from '../Grid';
 
-import ExpensesPayoutTypeFilter from './filters/ExpensesPayoutTypeFilter';
-import ExpensesStatusFilter from './filters/ExpensesStatusFilter';
-import ExpensesTypeFilter from './filters/ExpensesTypeFilter';
+import OrderStatusFilter from './OrderStatusFilter';
 
 const FilterContainer = styled.div`
   margin-bottom: 8px;
@@ -30,7 +28,7 @@ const FilterLabel = styled.label`
 
 const ExpensesFilters = ({ collective, filters, onChange }) => {
   const getFilterProps = name => ({
-    inputId: `expenses-filter-${name}`,
+    inputId: `orders-filter-${name}`,
     value: filters?.[name],
     onChange: value => {
       onChange({ ...filters, [name]: value === 'ALL' ? null : value });
@@ -40,34 +38,22 @@ const ExpensesFilters = ({ collective, filters, onChange }) => {
   return (
     <Flex flexWrap="wrap">
       <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-type">
-          <FormattedMessage id="expense.type" defaultMessage="Type" />
-        </FilterLabel>
-        <ExpensesTypeFilter {...getFilterProps('type')} />
-      </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-payout">
-          <FormattedMessage id="Payout" defaultMessage="Payout" />
-        </FilterLabel>
-        <ExpensesPayoutTypeFilter {...getFilterProps('payout')} />
-      </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-period">
+        <FilterLabel htmlFor="orders-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
         <PeriodFilter {...getFilterProps('period')} />
       </FilterContainer>
       <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-amount">
+        <FilterLabel htmlFor="orders-filter-amount">
           <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
         </FilterLabel>
         <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
       </FilterContainer>
       <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-status">
-          <FormattedMessage id="expense.status" defaultMessage="Status" />
+        <FilterLabel htmlFor="orders-filter-status">
+          <FormattedMessage id="order.status" defaultMessage="Status" />
         </FilterLabel>
-        <ExpensesStatusFilter {...getFilterProps('status')} />
+        <OrderStatusFilter {...getFilterProps('status')} />
       </FilterContainer>
     </Flex>
   );

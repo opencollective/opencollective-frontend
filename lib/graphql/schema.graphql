@@ -3481,6 +3481,11 @@ type Query {
     types: [TypeOfCollective]
 
     """
+    Filter on wether account is a host
+    """
+    isHost: Boolean
+
+    """
     Limit the amount of results. Defaults to 20
     """
     limit: Int = 20

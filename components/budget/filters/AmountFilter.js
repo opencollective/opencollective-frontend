@@ -8,7 +8,7 @@ import { StyledSelectFilter } from '../../StyledSelectFilter';
 
 const OPTION_LABELS = defineMessages({
   ALL: {
-    id: 'Expenses.AllShort',
+    id: 'Amount.AllShort',
     defaultMessage: 'All',
   },
   rangeFrom: {
@@ -32,34 +32,43 @@ export const parseAmountRange = strValue => {
   }
 };
 
-const ExpensesAmountFilter = ({ currency, onChange, value, ...props }) => {
+const getOption = (intl, currency, minAmount, maxAmount) => {
+  return {
+    value: maxAmount ? `${minAmount}-${maxAmount}` : `${minAmount}+`,
+    label: intl.formatMessage(OPTION_LABELS[maxAmount ? 'rangeFromTo' : 'rangeFrom'], {
+      minAmount: formatCurrency(minAmount * 100, currency, { precision: 0 }),
+      maxAmount: formatCurrency(maxAmount * 100, currency, { precision: 0 }),
+    }),
+  };
+};
+
+const AmountFilter = ({ currency, onChange, value, steps, ...props }) => {
   const intl = useIntl();
   const allExpensesOption = { label: intl.formatMessage(OPTION_LABELS.ALL), value: 'ALL' };
-  const getOption = (minAmount, maxAmount) => {
-    return {
-      value: maxAmount ? `${minAmount}-${maxAmount}` : `${minAmount}+`,
-      label: intl.formatMessage(OPTION_LABELS[maxAmount ? 'rangeFromTo' : 'rangeFrom'], {
-        minAmount: formatCurrency(minAmount * 100, currency, { precision: 0 }),
-        maxAmount: formatCurrency(maxAmount * 100, currency, { precision: 0 }),
-      }),
-    };
-  };
+  const options = React.useMemo(() => {
+    return [allExpensesOption, ...steps.map((step, idx) => getOption(intl, currency, step, steps[idx + 1]))];
+  }, [steps]);
 
   return (
     <StyledSelectFilter
       data-cy="expenses-filter-amount"
-      value={value ? getOption(...parseAmountRange(value)) : allExpensesOption}
+      value={value ? getOption(intl, currency, ...parseAmountRange(value)) : allExpensesOption}
       onChange={({ value }) => onChange(value)}
-      options={[allExpensesOption, getOption(0, 50), getOption(50, 500), getOption(500, 5000), getOption(5000)]}
+      options={options}
       {...props}
     />
   );
 };
 
-ExpensesAmountFilter.propTypes = {
+AmountFilter.propTypes = {
+  steps: PropTypes.arrayOf(PropTypes.number).isRequired,
   currency: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
 };
 
-export default ExpensesAmountFilter;
+AmountFilter.defaultProps = {
+  steps: [0, 50, 500, 5000],
+};
+
+export default AmountFilter;

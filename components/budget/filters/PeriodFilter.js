@@ -8,7 +8,7 @@ import { StyledSelectFilter } from '../../StyledSelectFilter';
 
 const OPTION_LABELS = defineMessages({
   ALL: {
-    id: 'Transactions.AllShort',
+    id: 'DateRange.All',
     defaultMessage: 'All',
   },
   month: {
@@ -55,7 +55,7 @@ const encodePeriod = (duration, period) => {
   return duration !== 1 ? `${duration}-${period}` : period;
 };
 
-const TransactionsDateFilter = ({ onChange, value, ...props }) => {
+const PeriodFilter = ({ onChange, value, ...props }) => {
   const intl = useIntl();
   const allPeriodsOption = { label: intl.formatMessage(OPTION_LABELS.ALL), value: 'ALL' };
   const selected = parsePeriod(value);
@@ -66,8 +66,7 @@ const TransactionsDateFilter = ({ onChange, value, ...props }) => {
 
   return (
     <StyledSelectFilter
-      data-cy="transactions-filter-period"
-      isSearchable={false}
+      data-cy="expenses-filter-period"
       value={selected ? getOption(...selected) : allPeriodsOption}
       onChange={({ value }) => onChange(value)}
       options={[allPeriodsOption, getOption(1, 'month'), getOption(6, 'month'), getOption(1, 'year')]}
@@ -76,9 +75,9 @@ const TransactionsDateFilter = ({ onChange, value, ...props }) => {
   );
 };
 
-TransactionsDateFilter.propTypes = {
+PeriodFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
 };
 
-export default TransactionsDateFilter;
+export default PeriodFilter;

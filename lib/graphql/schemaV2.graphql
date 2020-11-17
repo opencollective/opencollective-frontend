@@ -127,11 +127,31 @@ interface Account {
     tierSlug: String
 
     """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput
-  ): OrderCollection
+  ): OrderCollection!
   settings: JSON!
   conversations(
     limit: Int
@@ -598,11 +618,31 @@ type Bot implements Account {
     tierSlug: String
 
     """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): OrderCollection
+  ): OrderCollection!
   settings: JSON!
   conversations(
     limit: Int
@@ -807,11 +847,31 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     tierSlug: String
 
     """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): OrderCollection
+  ): OrderCollection!
   settings: JSON!
   conversations(
     limit: Int
@@ -2868,11 +2928,31 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     tierSlug: String
 
     """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): OrderCollection
+  ): OrderCollection!
   settings: JSON!
   conversations(
     limit: Int
@@ -3730,11 +3810,31 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     tierSlug: String
 
     """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): OrderCollection
+  ): OrderCollection!
   settings: JSON!
   conversations(
     limit: Int
@@ -4016,11 +4116,31 @@ type Host implements Account & AccountWithContributions {
     tierSlug: String
 
     """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): OrderCollection
+  ): OrderCollection!
   settings: JSON!
   conversations(
     limit: Int
@@ -4393,11 +4513,31 @@ type Individual implements Account {
     tierSlug: String
 
     """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): OrderCollection
+  ): OrderCollection!
   settings: JSON!
   conversations(
     limit: Int
@@ -5084,6 +5224,11 @@ type Mutation {
   ): OrderWithPayment!
 
   """
+  A mutation for the host to approve or reject an order
+  """
+  processOrder(order: OrderReferenceInput!, action: ProcessOrderAction!): Order!
+
+  """
   Add a new payment method to be used with an Order
   """
   addCreditCard(
@@ -5253,6 +5398,11 @@ type Order {
   This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
   """
   membership: MemberOf
+
+  """
+  The permissions given to current logged in user for this order
+  """
+  permissions: OrderPermissions!
 }
 
 """
@@ -5324,6 +5474,21 @@ Possible directions in which to order a list of items
 enum OrderDirection {
   ASC
   DESC
+}
+
+"""
+Fields for the user permissions on an order
+"""
+type OrderPermissions {
+  """
+  Whether the current user can mark this order as expired
+  """
+  canMarkAsExpired: Boolean!
+
+  """
+  Whether the current user can mark this order as unpaid
+  """
+  canMarkAsPaid: Boolean!
 }
 
 input OrderReferenceInput {
@@ -5520,11 +5685,31 @@ type Organization implements Account {
     tierSlug: String
 
     """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): OrderCollection
+  ): OrderCollection!
   settings: JSON!
   conversations(
     limit: Int
@@ -5793,6 +5978,21 @@ type ProcessHostApplicationResponse {
 }
 
 """
+Action to apply on the order
+"""
+enum ProcessOrderAction {
+  """
+  To mark the order as expired
+  """
+  MARK_AS_EXPIRED
+
+  """
+  To mark the order as paid
+  """
+  MARK_AS_PAID
+}
+
+"""
 This represents an Project account
 """
 type Project implements Account & AccountWithHost & AccountWithContributions {
@@ -5908,11 +6108,31 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     tierSlug: String
 
     """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): OrderCollection
+  ): OrderCollection!
   settings: JSON!
   conversations(
     limit: Int
@@ -6261,6 +6481,57 @@ type Query {
     """
     order: OrderReferenceInput!
   ): Order
+  orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+
+    """
+    Return orders only made under this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: OrderStatus
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+  ): OrderCollection!
   tier(
     """
     Identifiers to retrieve the tier
