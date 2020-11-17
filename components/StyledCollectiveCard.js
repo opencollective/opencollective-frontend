@@ -151,7 +151,7 @@ const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, borderRad
             </LinkCollective>
             {showWebsite && collective.website && (
               <P fontSize="11px" fontWeight="400" title={collective.website} truncateOverflow mt={1}>
-                <StyledLink color="black.600" openInNewTabNoFollow>
+                <StyledLink color="black.600" href={collective.website} openInNewTabNoFollow>
                   {collective.website}
                 </StyledLink>
               </P>
