@@ -5489,7 +5489,7 @@ type OrderWithPayment {
 """
 This represents an Organization account
 """
-type Organization implements Account {
+type Organization implements Account & AccountWithContributions {
   id: String
   legacyId: Int
 
@@ -5678,9 +5678,47 @@ type Organization implements Account {
   features: CollectiveFeatures!
 
   """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
+  tiers: TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
   Amount of money in cents in the currency of the collective currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
   email: String
 
   """
