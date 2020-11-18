@@ -7,7 +7,6 @@ import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
@@ -446,8 +445,6 @@ class ContributionFlow extends React.Component {
       return false;
     } else if (this.props.tier?.type === TierTypes.TICKET) {
       return false;
-    } else if (this.state.stepProfile?.type === CollectiveType.COLLECTIVE) {
-      return this.state.stepProfile.host?.id && this.state.stepProfile.host.id === this.props.host?.id;
     } else {
       return true;
     }
