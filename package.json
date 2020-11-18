@@ -10,9 +10,6 @@
     "node": "12.13.0",
     "npm": "6.12.0"
   },
-  "cacheDirectories": [
-    ".next/cache"
-  ],
   "dependencies": {
     "@apollo/client": "3.2.5",
     "@formatjs/intl-relativetimeformat": "7.3.2",
@@ -127,7 +124,6 @@
     "graphql:update": "npm-run-all graphql:updateV1 graphql:updateV2",
     "graphql:updateV1": "npx get-graphql-schema http://localhost:3060/graphql > lib/graphql/schema.graphql && prettier lib/graphql/schema.graphql --write",
     "graphql:updateV2": "npx get-graphql-schema http://localhost:3060/graphql/v2 > lib/graphql/schemaV2.graphql && prettier lib/graphql/schemaV2.graphql --write",
-    "heroku-cleanup": "rm -rf .next/cache",
     "langs:build": "babel . --only \"components/*,lib/*,pages/*\" --out-dir dist --delete-dir-on-start",
     "langs:check": "cross-env scripts/check_translations.sh",
     "langs:translate": "babel-node scripts/translate.js",
