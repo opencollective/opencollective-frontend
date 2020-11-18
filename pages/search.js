@@ -57,16 +57,16 @@ const I18nFilters = defineMessages({
     defaultMessage: 'View all',
   },
   [FILTERS.COLLECTIVE]: {
-    id: 'searchFilter.collective',
-    defaultMessage: 'Collectives',
+    id: 'CollectiveType.Collective',
+    defaultMessage: '{count, plural, one {Collective} other {Collectives}}',
   },
   [FILTERS.EVENT]: {
-    id: 'searchFilter.event',
-    defaultMessage: 'Events',
+    id: 'CollectiveType.Event',
+    defaultMessage: '{count, plural, one {Event} other {Events}}',
   },
   [FILTERS.ORGANIZATION]: {
-    id: 'searchFilter.organization',
-    defaultMessage: 'Organizations',
+    id: 'CollectiveType.Organization',
+    defaultMessage: '{count, plural, one {Organization} other {Organizations}}',
   },
   [FILTERS.HOST]: {
     id: 'searchFilter.host',
@@ -163,7 +163,7 @@ class SearchPage extends React.Component {
           <Box mt={4} mb={4} mx="auto">
             <StyledFilters
               filters={filters}
-              getLabel={key => intl.formatMessage(I18nFilters[key])}
+              getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
               selected={this.state.filter}
               justifyContent="left"
               minButtonWidth={150}
