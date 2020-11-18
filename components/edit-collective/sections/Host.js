@@ -32,6 +32,17 @@ const Fineprint = styled.div`
   font-size: 14px;
 `;
 
+const EditCollectiveHostSection = styled.div`
+  h2 label {
+    cursor: pointer;
+    width: auto;
+  }
+
+  select {
+    cursor: pointer;
+  }
+`;
+
 class Host extends React.Component {
   static propTypes = {
     goals: PropTypes.arrayOf(PropTypes.object),
@@ -254,27 +265,7 @@ class Host extends React.Component {
     }
 
     return (
-      <div className="EditCollectiveHostSection">
-        <style jsx>
-          {`
-            .suggestedHostsTitle {
-              display: flex;
-              align-items: baseline;
-            }
-            .suggestedHostsTitle :global(a) {
-              font-size: 1.3rem;
-              margin-left: 0.5rem;
-            }
-            .subtitle {
-              color: #666f80;
-              font-size: 1.5rem;
-            }
-            :global(.EditCollectiveHostSection h2 label, .CreateHostForm div.form-group:not(.horizontal) label) {
-              cursor: pointer;
-              width: auto;
-            }
-          `}
-        </style>
+      <EditCollectiveHostSection>
         <Option id="noHost">
           <Flex>
             <Box width="50px" mr={2}>
@@ -360,7 +351,7 @@ class Host extends React.Component {
               />
               {selectedOption === 'findHost' && (
                 <div>
-                  <div className="suggestedHostsTitle">
+                  <Container display="flex" alignItems="baseline">
                     <h3>
                       <FormattedMessage
                         id="collective.edit.host.suggestedHosts.title"
@@ -370,9 +361,9 @@ class Host extends React.Component {
                     <Link route="/hosts">
                       <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all Fiscal Hosts" />
                     </Link>
-                  </div>
+                  </Container>
                   {collective.tags && collective.tags.length > 0 && (
-                    <div className="suggestedHostsDescription subtitle">
+                    <Container color="#666f80" fontSize="1.5rem">
                       <FormattedMessage
                         id="collective.edit.host.suggestedHosts.description"
                         defaultMessage="Based on the tags ({tags})"
@@ -380,7 +371,7 @@ class Host extends React.Component {
                           tags: collective.tags.join(', '),
                         }}
                       />
-                    </div>
+                    </Container>
                   )}
                   <HostsWithData
                     limit={6}
@@ -397,7 +388,7 @@ class Host extends React.Component {
             </Box>
           </Flex>
         </Option>
-      </div>
+      </EditCollectiveHostSection>
     );
   }
 }
