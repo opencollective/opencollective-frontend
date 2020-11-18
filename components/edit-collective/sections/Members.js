@@ -70,8 +70,8 @@ class Members extends React.Component {
     };
     this.messages = defineMessages({
       roleLabel: { id: 'members.role.label', defaultMessage: 'role' },
-      addMember: { id: 'members.add', defaultMessage: 'Add Core Contributor' },
-      removeMember: { id: 'members.remove', defaultMessage: 'Remove Core Contributor' },
+      addMember: { id: 'members.add', defaultMessage: 'Add Team Member' },
+      removeMember: { id: 'members.remove', defaultMessage: 'Remove Team Member' },
       descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
       sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },
       memberPendingDetails: {
