@@ -103,7 +103,7 @@ class EditPaymentMethod extends React.Component {
 
         <Flex flexDirection={['column-reverse', null, 'row']}>
           <Flex alignItems="center" css={{ flexGrow: 1 }}>
-            <Box as="label" className="control-label">
+            <Box minWidth="150px" as="label" className="control-label">
               <FormattedMessage
                 id="paymentMethod.typeSelect"
                 values={{ type }}
@@ -113,13 +113,11 @@ class EditPaymentMethod extends React.Component {
             <Box>
               <div className="name col">{paymentMethodLabelWithIcon(intl, paymentMethod)}</div>
               {hasSubscriptions && (
-                <div className="actions">
-                  <FormattedMessage
-                    id="paymentMethod.activeSubscriptions"
-                    defaultMessage="{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}"
-                    values={{ n: subscriptions.length }}
-                  />
-                </div>
+                <FormattedMessage
+                  id="paymentMethod.activeSubscriptions"
+                  defaultMessage="{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}"
+                  values={{ n: subscriptions.length }}
+                />
               )}
             </Box>
           </Flex>
@@ -150,17 +148,15 @@ class EditPaymentMethod extends React.Component {
                 </Link>
               )}
               {canRemove && (
-                <div className="actions">
-                  <StyledButton
-                    disabled={isSaving}
-                    buttonStyle="standard"
-                    buttonSize="medium"
-                    onClick={() => this.removePaymentMethod()}
-                    mx={1}
-                  >
-                    {intl.formatMessage(this.messages['paymentMethod.remove'])}
-                  </StyledButton>
-                </div>
+                <StyledButton
+                  disabled={isSaving}
+                  buttonStyle="standard"
+                  buttonSize="medium"
+                  onClick={() => this.removePaymentMethod()}
+                  mx={1}
+                >
+                  {intl.formatMessage(this.messages['paymentMethod.remove'])}
+                </StyledButton>
               )}
             </Flex>
           )}
