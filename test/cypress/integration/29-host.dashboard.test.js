@@ -32,42 +32,51 @@ describe('host dashboard', () => {
     cy.wait(1000);
   });
 
-  describe('legacy expense tab', () => {
-    it('approve expense and reject expense', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses-legacy' });
-      cy.get('[data-cy="expense-paid"]').as('currentExpense');
-      cy.get('[data-cy="expense-actions"]').contains('button', 'Unapprove').click();
-      cy.get('[data-cy="confirmation-modal-continue"]').click();
-      cy.wait(500);
-      cy.get('[data-cy="reject-expense-btn"]').within(() => {
-        cy.get('button').click();
-      });
-      cy.get('[data-cy="approve-expense-btn"]').within(() => {
-        cy.get('button').click();
-      });
+  describe('expenses tab', () => {
+    let expense;
+
+    before(() => {
+      // 207 - BrusselsTogether
+      cy.createExpense({ collective: { id: 207 } }).then(e => (expense = e));
     });
 
-    it('record expense as paid', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses-legacy' });
-      cy.get('[data-cy="expense-approved"]').as('currentExpense');
-      cy.get('[data-cy="expense-actions"]').contains('button', 'Record as paid').click();
-      cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-paid');
-    });
+    it('Process expense', () => {
+      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses' });
+      cy.getByDataCy(`expense-container-${expense.id}`).as('currentExpense');
 
-    it('mark expense as unpaid', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses-legacy' });
-      cy.get('[data-cy="expense-paid"]').as('currentExpense');
-      cy.get('[data-cy="expense-actions"]').as('currentExpenseActions').contains('button', 'Mark as unpaid').click();
-      cy.get('@currentExpenseActions').contains('button', 'Continue').click();
-      cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-approved');
-    });
+      // Defaults to pending, approve it
+      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
+      cy.get('@currentExpense').find('[data-cy="approve-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Approved');
 
-    it('delete rejected expense', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses-legacy' });
-      cy.get('[data-cy="expense-rejected"]').as('currentExpense');
-      cy.get('[data-cy="expense-actions"]').contains('button', 'Delete').click();
-      cy.get('[data-cy="confirmation-modal-continue"]').click();
-      cy.get('[data-cy="errorMessage"]').should('not.exist');
+      // Unapprove
+      cy.get('@currentExpense').find('[data-cy="unapprove-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
+
+      // Approve
+      cy.get('@currentExpense').find('[data-cy="approve-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Approved');
+
+      // Pay
+      cy.get('@currentExpense').find('[data-cy="pay-button"]').click();
+      cy.getByDataCy('pay-expense-modal').as('payExpenseModal');
+      cy.get('@payExpenseModal').find('[data-cy="pay-type-MANUAL"]').click();
+      cy.get('@payExpenseModal').find('[data-cy="mark-as-paid-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Paid');
+
+      // Mark as unpaid
+      cy.get('@currentExpense').find('[data-cy="mark-as-unpaid-button"]').click();
+      cy.getByDataCy('mark-expense-as-unpaid-modal').as('markAsUnpaidModal');
+      cy.get('@markAsUnpaidModal').find('[data-cy="confirmation-modal-continue"]').click();
+      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Approved');
+
+      // Unapprove
+      cy.get('@currentExpense').find('[data-cy="unapprove-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
+
+      // Reject
+      cy.get('@currentExpense').find('[data-cy="reject-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Rejected');
     });
   });
 });

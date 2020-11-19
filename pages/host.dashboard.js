@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
 import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
-import { FileInvoice } from '@styled-icons/fa-solid/FileInvoice';
 import { Grid as HostedCollectivesIcon } from '@styled-icons/feather/Grid';
 import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
 import { omit } from 'lodash';
@@ -69,8 +68,7 @@ class HostDashboardPage extends React.Component {
     data: PropTypes.object, // from withData
     loadingLoggedInUser: PropTypes.bool.isRequired, // from withUser
     LoggedInUser: PropTypes.object, // from withUser
-    view: PropTypes.oneOf(['expenses', 'expenses-legacy', 'hosted-collectives', 'donations', 'pending-applications'])
-      .isRequired,
+    view: PropTypes.oneOf(['expenses', 'hosted-collectives', 'donations', 'pending-applications']).isRequired,
   };
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -126,7 +124,6 @@ class HostDashboardPage extends React.Component {
     switch (view) {
       case 'pending-applications':
         return <PendingApplications hostSlug={host.slug} />;
-      case 'expenses-legacy':
       case 'donations':
         return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
       case HOST_SECTIONS.HOSTED_COLLECTIVES:
@@ -143,11 +140,7 @@ class HostDashboardPage extends React.Component {
     const canEdit = LoggedInUser && host && LoggedInUser.canEditCollective(host);
 
     return (
-      <Page
-        collective={host}
-        title={host.name || 'Host Dashboard'}
-        withoutGlobalStyles={!['expenses-legacy', 'donations'].includes(view)}
-      >
+      <Page collective={host} title={host.name || 'Host Dashboard'} withoutGlobalStyles={!['donations'].includes(view)}>
         {data.Collective && (
           <Container>
             <CollectiveNavbar collective={host} isAdmin={canEdit} showEdit onlyInfos={true} />
@@ -179,16 +172,6 @@ class HostDashboardPage extends React.Component {
                 <ReceiptIcon size="1em" />
                 <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
               </MenuLink>
-              <Container display="none">
-                <MenuLink
-                  route="host.dashboard"
-                  params={{ hostCollectiveSlug: slug, view: 'expenses-legacy' }}
-                  isActive={view === 'expenses-legacy'}
-                >
-                  <FileInvoice size="1em" />
-                  <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" /> (Legacy)
-                </MenuLink>
-              </Container>
               <MenuLink
                 route="host.dashboard"
                 params={{ hostCollectiveSlug: slug, view: 'donations' }}
