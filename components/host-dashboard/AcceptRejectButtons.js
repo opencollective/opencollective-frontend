@@ -1,59 +1,58 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
-import { Mutation } from '@apollo/client/react/components';
+import { Ban } from '@styled-icons/fa-solid/Ban';
+import { Check } from '@styled-icons/fa-solid/Check';
 import { FormattedMessage } from 'react-intl';
 
+import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 
 import ApplicationRejectionReasonModal from './ApplicationRejectionReasonModal';
 
-const ApproveCollectiveMutation = gql`
-  mutation approveCollective($id: Int!) {
-    approveCollective(id: $id) {
-      id
-      isActive
-      isApproved
-      host {
-        id
-        name
-        slug
-        type
-        settings
-      }
-    }
-  }
-`;
-
-const AcceptRejectButtons = ({ collective }) => {
-  const [showRejectionModal, setShowRejectionModal] = useState(false);
+const AcceptRejectButtons = ({ collective, isLoading, onApprove, onReject }) => {
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [action, setAction] = useState(null);
   return (
-    <Fragment>
-      <Mutation mutation={ApproveCollectiveMutation}>
-        {(approveCollective, { loading }) => (
-          <StyledButton
-            m={1}
-            loading={loading}
-            onClick={() => approveCollective({ variables: { id: collective.id } })}
-            data-cy={`${collective.slug}-approve`}
-            buttonStyle="success"
-            minWidth={125}
-          >
-            <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-          </StyledButton>
-        )}
-      </Mutation>
-      <StyledButton buttonStyle="danger" minWidth={125} m={1} onClick={() => setShowRejectionModal(true)}>
-        <FormattedMessage id="actions.reject" defaultMessage="Reject" />
+    <Flex>
+      <StyledButton
+        buttonSize="tiny"
+        buttonStyle="successSecondary"
+        height={32}
+        disabled={isLoading}
+        loading={isLoading && action === 'APPROVE'}
+        data-cy={`${collective.slug}-approve`}
+        onClick={() => {
+          setAction('APPROVE');
+          onApprove();
+        }}
+      >
+        <Check size={12} />
+        &nbsp; <FormattedMessage id="actions.approve" defaultMessage="Approve" />
       </StyledButton>
-      {showRejectionModal && (
-        <ApplicationRejectionReasonModal
-          show={showRejectionModal}
-          onClose={() => setShowRejectionModal(false)}
-          collectiveId={collective.id}
-        />
-      )}
-    </Fragment>
+      <StyledButton
+        buttonSize="tiny"
+        buttonStyle="dangerSecondary"
+        ml={3}
+        height={32}
+        onClick={() => setShowRejectModal(true)}
+        disabled={isLoading}
+        loading={isLoading && action === 'REJECT'}
+        data-cy={`${collective.slug}-reject`}
+      >
+        <Ban size={12} />
+        &nbsp; <FormattedMessage id="actions.reject" defaultMessage="Reject" />
+      </StyledButton>
+      <ApplicationRejectionReasonModal
+        show={showRejectModal}
+        collective={collective}
+        onClose={() => setShowRejectModal(false)}
+        onConfirm={message => {
+          setAction('REJECT');
+          setShowRejectModal(false);
+          onReject(message);
+        }}
+      />
+    </Flex>
   );
 };
 
@@ -62,9 +61,9 @@ AcceptRejectButtons.propTypes = {
     id: PropTypes.number,
     slug: PropTypes.string,
   }),
-  host: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
+  isLoading: PropTypes.bool,
+  onApprove: PropTypes.func,
+  onReject: PropTypes.func,
 };
 
 export default AcceptRejectButtons;

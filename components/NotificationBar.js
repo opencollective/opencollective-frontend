@@ -1,9 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/client';
 import classNames from 'classnames';
 import styled from 'styled-components';
 
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+
 import AcceptRejectButtons from './host-dashboard/AcceptRejectButtons';
+import { processApplicationMutation } from './host-dashboard/PendingApplication';
 import Container from './Container';
 import { Flex } from './Grid';
 import { H1, P } from './Text';
@@ -71,12 +75,63 @@ const OCBar = styled.div`
   }
 `;
 
+const PendingApplicationActions = ({ collective, refetch }) => {
+  const [isLoading, setLoading] = React.useState(false);
+  const [callProcessApplication] = useMutation(processApplicationMutation, {
+    context: API_V2_CONTEXT,
+  });
+
+  const processApplication = async (action, message) => {
+    setLoading(true);
+    try {
+      await callProcessApplication({
+        variables: {
+          host: { legacyId: collective.host.id },
+          account: { legacyId: collective.id },
+          action,
+          message,
+        },
+      });
+
+      if (refetch) {
+        await refetch();
+      }
+      setLoading(false);
+    } catch {
+      // Ignore errors
+    }
+  };
+
+  return (
+    <Flex flexWrap="wrap" alignItems="center" justifyContent="center">
+      <AcceptRejectButtons
+        collective={collective}
+        isLoading={isLoading}
+        onApprove={() => processApplication('APPROVE')}
+        onReject={message => processApplication('REJECT', message)}
+      />
+    </Flex>
+  );
+};
+
+PendingApplicationActions.propTypes = {
+  refetch: PropTypes.func,
+  collective: PropTypes.shape({
+    id: PropTypes.number,
+    slug: PropTypes.string,
+    host: PropTypes.shape({
+      id: PropTypes.number,
+    }),
+  }),
+};
+
 class NotificationBar extends React.Component {
   static propTypes = {
     status: PropTypes.string,
     title: PropTypes.string,
     description: PropTypes.string,
     error: PropTypes.string,
+    refetch: PropTypes.func,
     actions: PropTypes.arrayOf(PropTypes.node),
     /** Collective */
     collective: PropTypes.shape({
@@ -105,23 +160,21 @@ class NotificationBar extends React.Component {
           <Container
             className={status}
             background="#1769f4"
-            padding="1rem"
+            padding="2rem 1rem"
             color="#FFFFFF"
             display="flex"
             alignItems="center"
             flexDirection="column"
           >
-            <H1 fontSize="1.8rem" margin="1rem">
+            <H1 fontSize="1.8rem" lineHeight="1.8rem" mt={2} mb="18px" mx="1rem">
               {title}
             </H1>
-            <P maxWidth="60rem" textAlign="center" mb="2">
+            <P maxWidth="60rem" textAlign="center" mb="24px">
               {description}
             </P>
 
             {status === 'collectivePending' && isHostAdmin && (
-              <Flex flexWrap="wrap" alignItems="center" justifyContent="center">
-                <AcceptRejectButtons collective={collective} />
-              </Flex>
+              <PendingApplicationActions collective={collective} refetch={this.props.refetch} />
             )}
             {actions && (
               <Container display="flex">
