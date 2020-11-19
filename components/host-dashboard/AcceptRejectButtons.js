@@ -15,6 +15,7 @@ const AcceptRejectButtons = ({ collective, isLoading, onApprove, onReject }) => 
   return (
     <Flex>
       <StyledButton
+        minWidth={100}
         buttonSize="tiny"
         buttonStyle="successSecondary"
         height={32}
@@ -30,6 +31,7 @@ const AcceptRejectButtons = ({ collective, isLoading, onApprove, onReject }) => 
         &nbsp; <FormattedMessage id="actions.approve" defaultMessage="Approve" />
       </StyledButton>
       <StyledButton
+        minWidth={100}
         buttonSize="tiny"
         buttonStyle="dangerSecondary"
         ml={3}
