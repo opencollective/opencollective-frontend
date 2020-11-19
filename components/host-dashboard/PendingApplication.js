@@ -22,7 +22,6 @@ import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
@@ -31,8 +30,8 @@ import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
+import AcceptRejectButtons from './AcceptRejectButtons';
 import ApplicationMessageModal from './ApplicationMessageModal';
-import ApplicationRejectionReasonModal from './ApplicationRejectionReasonModal';
 
 const ApplicationBody = styled.div`
   height: 267px;
@@ -73,7 +72,7 @@ export const processApplicationAccountFields = gqlV2/* GraphQL */ `
   }
 `;
 
-const processApplicationMutation = gqlV2/* GraphQL */ `
+export const processApplicationMutation = gqlV2/* GraphQL */ `
   mutation ProcessHostApplication(
     $host: AccountReferenceInput!
     $account: AccountReferenceInput!
@@ -106,7 +105,6 @@ const ACTIONS = {
 const PendingApplication = ({ host, collective, ...props }) => {
   const [isDone, setIsDone] = React.useState(false);
   const [latestAction, setLatestAction] = React.useState(null);
-  const [showRejectModal, setShowRejectModal] = React.useState(false);
   const [showContactModal, setShowContactModal] = React.useState(false);
   const { addToast } = useToasts();
   const [callProcessApplication, { loading, error }] = useMutation(processApplicationMutation, {
@@ -289,45 +287,15 @@ const PendingApplication = ({ host, collective, ...props }) => {
               )}
             </div>
           ) : (
-            <Flex>
-              <StyledButton
-                buttonSize="tiny"
-                buttonStyle="successSecondary"
-                height={32}
-                disabled={loading}
-                loading={loading && latestAction === ACTIONS.APPROVE}
-                onClick={() => processApplication(ACTIONS.APPROVE)}
-                data-cy={`${collective.slug}-approve`}
-              >
-                <Check size={12} />
-                &nbsp; <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-              </StyledButton>
-              <StyledButton
-                buttonSize="tiny"
-                buttonStyle="dangerSecondary"
-                ml={3}
-                height={32}
-                onClick={() => setShowRejectModal(true)}
-                disabled={loading}
-                loading={loading && latestAction === ACTIONS.REJECT}
-                data-cy={`${collective.slug}-reject`}
-              >
-                <Ban size={12} />
-                &nbsp; <FormattedMessage id="actions.reject" defaultMessage="Reject" />
-              </StyledButton>
-            </Flex>
+            <AcceptRejectButtons
+              collective={collective}
+              isLoading={loading}
+              onApprove={() => processApplication(ACTIONS.APPROVE)}
+              onReject={message => processApplication(ACTIONS.REJECT, message)}
+            />
           )}
         </Container>
       </Container>
-      <ApplicationRejectionReasonModal
-        show={showRejectModal}
-        collective={collective}
-        onClose={() => setShowRejectModal(false)}
-        onConfirm={async message => {
-          setShowRejectModal(false);
-          processApplication(ACTIONS.REJECT, message);
-        }}
-      />
       <ApplicationMessageModal
         show={showContactModal}
         collective={collective}

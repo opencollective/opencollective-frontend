@@ -188,6 +188,7 @@ class CollectivePage extends React.Component {
               host={collective.host}
               status={status}
               LoggedInUser={LoggedInUser}
+              refetch={data.refetch}
             />
             <CollectiveThemeProvider collective={collective}>
               {({ onPrimaryColorChange }) => (

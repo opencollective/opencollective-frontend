@@ -171,7 +171,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
 /**
  * Adds a notification bar for the collective.
  */
-const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUser }) => {
+const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUser, refetch }) => {
   const notification = getNotification(intl, status, collective, host, LoggedInUser);
 
   return !notification ? null : (
@@ -182,6 +182,7 @@ const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUse
       description={notification.description}
       actions={notification.actions}
       LoggedInUser={LoggedInUser}
+      refetch={refetch}
     />
   );
 };
@@ -201,6 +202,7 @@ CollectiveNotificationBar.propTypes = {
   status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated', 'projectCreated', 'eventCreated']),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
+  refetch: PropTypes.func,
   /** from withUser */
   LoggedInUser: PropTypes.object,
 };
