@@ -202,7 +202,7 @@ class HostDashboardPage extends React.Component {
                 <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
               </MenuLink>
             </Container>
-            <div>{this.renderView(host)}</div>
+            <Box py={['32px', '60px']}>{this.renderView(host)}</Box>
           </React.Fragment>
         )}
       </Page>

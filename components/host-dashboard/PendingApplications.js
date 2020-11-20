@@ -100,7 +100,7 @@ const PendingApplications = ({ hostSlug }) => {
 
   const hostApplications = data?.host?.pendingApplications;
   return (
-    <Box maxWidth={1000} m="0 auto" py={5} px={2}>
+    <Box maxWidth={1000} m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />

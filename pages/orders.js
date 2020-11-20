@@ -10,6 +10,7 @@ import Container from '../components/Container';
 import OrdersWithData from '../components/orders/OrdersWithData';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
+import { Box } from '../components/Grid';
 
 class OrdersPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
@@ -39,11 +40,13 @@ class OrdersPage extends React.Component {
             />
           </Container>
         )}
-        <OrdersWithData
-          accountSlug={slug}
-          status={ORDER_STATUS.PENDING}
-          title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
-        />
+        <Box py={4}>
+          <OrdersWithData
+            accountSlug={slug}
+            status={ORDER_STATUS.PENDING}
+            title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
+          />
+        </Box>
       </Page>
     );
   }
