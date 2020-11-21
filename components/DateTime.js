@@ -15,7 +15,7 @@ class DateTime extends React.Component {
     const { date, timezone } = props;
     const value = dayjs(new Date(date)).tz(timezone);
 
-    return <ReactDateTime value={value.isValid() ? value.$d : ''} utc={timezone === 'utc'} {...props} />;
+    return <ReactDateTime value={value.isValid() ? value.toDate() : ''} utc={timezone === 'utc'} {...props} />;
   }
 }
 
