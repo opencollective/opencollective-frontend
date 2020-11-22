@@ -12,21 +12,21 @@ import ErrorPage from '../components/ErrorPage';
 class NextJSErrorPage extends React.Component {
   static getInitialProps({ res, err, req }) {
     const statusCode = res ? res.statusCode : err ? err.statusCode : null;
-    return { statusCode, err, url: req && req.originalUrl };
+    return { statusCode, err, requestUrl: req && req.originalUrl };
   }
 
   static propTypes = {
     statusCode: PropTypes.number.isRequired,
-    url: PropTypes.string,
+    requestUrl: PropTypes.string,
     err: PropTypes.object,
   };
 
   render() {
-    const { statusCode, url } = this.props;
+    const { statusCode, requestUrl } = this.props;
 
-    if (statusCode === 404 && url) {
+    if (statusCode === 404 && requestUrl) {
       const slugRegex = /^\/([^/?]+)/;
-      const parsedUrl = slugRegex.exec(url);
+      const parsedUrl = slugRegex.exec(requestUrl);
       const pageSlug = parsedUrl && parsedUrl[1];
       return <ErrorPage log={false} error={generateNotFoundError(pageSlug)} />;
     } else {
