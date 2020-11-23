@@ -13,9 +13,9 @@ import ConfirmationModal from '../ConfirmationModal';
 import StyledButton from '../StyledButton';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const processOrderMutation = gqlV2/* GraphQL */ `
-  mutation ProcessOrder($id: String!, $action: ProcessOrderAction!) {
-    processOrder(order: { id: $id }, action: $action) {
+const processPendingOrderMutation = gqlV2/* GraphQL */ `
+  mutation ProcessPendingOrder($id: String!, $action: ProcessOrderAction!) {
+    processPendingOrder(order: { id: $id }, action: $action) {
       id
       status
       permissions {
@@ -44,7 +44,7 @@ const ProcessOrderButtons = ({ order, permissions }) => {
   const { addToast } = useToasts();
   const [selectedAction, setSelectedAction] = React.useState(null);
   const mutationOptions = { context: API_V2_CONTEXT };
-  const [processOrder, { loading }] = useMutation(processOrderMutation, mutationOptions);
+  const [processOrder, { loading }] = useMutation(processPendingOrderMutation, mutationOptions);
   const [hasConfirm, setConfirm] = React.useState(false);
 
   const triggerAction = async action => {

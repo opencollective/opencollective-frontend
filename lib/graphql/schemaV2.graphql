@@ -127,26 +127,6 @@ interface Account {
     tierSlug: String
 
     """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: ISODateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-
-    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
@@ -618,26 +598,6 @@ type Bot implements Account {
     tierSlug: String
 
     """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: ISODateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-
-    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
@@ -845,26 +805,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-
-    """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: ISODateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
 
     """
     Only returns orders that have an subscription (monthly/yearly)
@@ -2928,26 +2868,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     tierSlug: String
 
     """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: ISODateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-
-    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
@@ -3810,26 +3730,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     tierSlug: String
 
     """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: ISODateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-
-    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
@@ -4114,26 +4014,6 @@ type Host implements Account & AccountWithContributions {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-
-    """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: ISODateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
 
     """
     Only returns orders that have an subscription (monthly/yearly)
@@ -4511,26 +4391,6 @@ type Individual implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-
-    """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: ISODateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
 
     """
     Only returns orders that have an subscription (monthly/yearly)
@@ -5226,7 +5086,7 @@ type Mutation {
   """
   A mutation for the host to approve or reject an order
   """
-  processOrder(order: OrderReferenceInput!, action: ProcessOrderAction!): Order!
+  processPendingOrder(order: OrderReferenceInput!, action: ProcessOrderAction!): Order!
 
   """
   Add a new payment method to be used with an Order
@@ -5685,26 +5545,6 @@ type Organization implements Account {
     tierSlug: String
 
     """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: ISODateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-
-    """
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
@@ -6106,26 +5946,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-
-    """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: ISODateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
 
     """
     Only returns orders that have an subscription (monthly/yearly)
