@@ -115,7 +115,7 @@ const UploadedFilePreview = ({ isPrivate, isLoading, isDownloading, url, size, a
   } else if (isText) {
     const icon = <FileTextIcon color="#dcdee0" size="60%" />;
     content = url ? (
-      <StyledLink href={url} key={url} textAlign="center">
+      <StyledLink href={url} key={url} textAlign="center" openInNewTab>
         {icon}
       </StyledLink>
     ) : (
