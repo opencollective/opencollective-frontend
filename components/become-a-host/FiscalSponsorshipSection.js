@@ -26,7 +26,7 @@ const FiscalSponsorship = () => {
             textAlign={['center', 'left']}
           >
             <FormattedMessage
-              id="becomeAHost.fiscalSponsorship"
+              id="becomeAHost.title"
               defaultMessage="Fiscal 
               sponsorship has never been easier"
             />
@@ -41,7 +41,7 @@ const FiscalSponsorship = () => {
             color="black.800"
           >
             <FormattedMessage
-              id="becomeAHost.fiscalSponsorship.description"
+              id="becomeAHost.description"
               defaultMessage="Open Collective is purpose-built to streamline your processes, reduce overhead, increase transparency, and enable your organization to hold and manage funds for more projects in less time."
             />
           </P>
