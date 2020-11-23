@@ -14,6 +14,7 @@ import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { parseToBoolean } from '../../../lib/utils';
 
+import { Sections } from '../_constants';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
@@ -32,6 +33,8 @@ import TopContributors from '../TopContributors';
 import { TopContributorsContainer } from './Contribute';
 import SectionGoals from './Goals';
 
+import budgetSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconBudget.png';
+
 export const budgetSectionQuery = gqlV2/* GraphQL */ `
   query BudgetSection($slug: String!, $limit: Int!) {
     transactions(account: { slug: $slug }, limit: $limit) {
@@ -49,7 +52,7 @@ export const getBudgetSectionQueryVariables = slug => {
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats, contributors, LoggedInUser, section }) => {
+const SectionBudget = ({ collective, stats, financialContributors, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
     variables: getBudgetSectionQueryVariables(collective.slug),
     context: API_V2_CONTEXT,
@@ -61,7 +64,7 @@ const SectionBudget = ({ collective, stats, contributors, LoggedInUser, section 
   const isProject = collective.type === CollectiveType.PROJECT;
   const isEvent = collective.type === CollectiveType.EVENT;
   const getTopContributorsMemoized = memoizeOne(getTopContributors);
-  const [topOrganizations, topIndividuals] = getTopContributorsMemoized(contributors);
+  const [topOrganizations, topIndividuals] = getTopContributorsMemoized(financialContributors);
   React.useEffect(() => {
     refetch();
   }, [LoggedInUser]);
@@ -74,7 +77,7 @@ const SectionBudget = ({ collective, stats, contributors, LoggedInUser, section 
           {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
             <TopContributorsContainer>
               <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
-                <H4 fontWeight="normal" color="black.700" mb={3}>
+                <H4 fontWeight="500" color="black.900" mb={3}>
                   <FormattedMessage
                     id="SectionContribute.TopContributors"
                     defaultMessage="Top financial contributors"
@@ -98,7 +101,7 @@ const SectionBudget = ({ collective, stats, contributors, LoggedInUser, section 
   return (
     <ContainerSectionContent pt={[4, 5]} pb={3}>
       <SectionHeader
-        section={section}
+        title={Sections.BUDGET}
         subtitle={
           <FormattedMessage
             id="CollectivePage.SectionBudget.Subtitle"
@@ -112,6 +115,7 @@ const SectionBudget = ({ collective, stats, contributors, LoggedInUser, section 
             values={{ collectiveName: collective.name }}
           />
         }
+        illustrationSrc={budgetSectionHeaderIcon}
       />
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
         {isEmpty(data?.transactions) && (
@@ -241,7 +245,7 @@ SectionBudget.propTypes = {
     totalAmountReceived: PropTypes.number,
   }),
 
-  contributors: PropTypes.arrayOf(
+  financialContributors: PropTypes.arrayOf(
     PropTypes.shape({
       type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
       isBacker: PropTypes.bool,
@@ -250,8 +254,6 @@ SectionBudget.propTypes = {
   ),
 
   LoggedInUser: PropTypes.object,
-
-  section: PropTypes.string,
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,

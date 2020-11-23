@@ -165,19 +165,37 @@ class CollectivePage extends Component {
 
   renderSection(section) {
     switch (section) {
-      case Sections.ABOUT:
-        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} section={section} />;
-      case Sections.BUDGET:
+      // v2 transition - these standalone sections will be removed from render if feature flag is active
+      case Sections.GOALS:
+        return <SectionGoals collective={this.props.collective} />;
+      case Sections.UPDATES:
         return (
-          <SectionBudget
+          <SectionUpdates
             collective={this.props.collective}
-            transactions={this.props.transactions}
-            expenses={this.props.expenses}
-            stats={this.props.stats}
-            contributors={this.props.financialContributors}
-            section={section}
+            isAdmin={this.props.isAdmin}
+            isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
+      case Sections.CONVERSATIONS:
+        return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
+
+      case Sections.RECURRING_CONTRIBUTIONS:
+        return (
+          <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
+        );
+      case Sections.TICKETS:
+        return (
+          <SectionTickets
+            collective={this.props.collective}
+            tiers={this.props.tiers}
+            isAdmin={this.props.isAdmin}
+            contributors={this.props.financialContributors}
+          />
+        );
+      case Sections.LOCATION:
+        return <SectionLocation collective={this.props.collective} />;
+
+      // all other sections
       case Sections.CONTRIBUTE:
         return (
           <SectionContribute
@@ -192,75 +210,11 @@ class CollectivePage extends Component {
             section={section}
           />
         );
-      case Sections.CONTRIBUTORS:
-        return (
-          <SectionContributors
-            collective={this.props.collective}
-            financialContributors={this.props.financialContributors}
-            coreContributors={this.props.coreContributors}
-            stats={this.props.stats}
-          />
-        );
-      case Sections.UPDATES:
-        return (
-          <SectionUpdates
-            collective={this.props.collective}
-            isAdmin={this.props.isAdmin}
-            isLoggedIn={Boolean(this.props.LoggedInUser)}
-          />
-        );
       case Sections.CONTRIBUTIONS:
-        return <SectionContributions collective={this.props.collective} />;
-      case Sections.CONVERSATIONS:
-        return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
-      case Sections.TRANSACTIONS:
         return (
-          <SectionTransactions
-            collective={this.props.collective}
-            isAdmin={this.props.isAdmin}
-            isRoot={this.props.isRoot}
-          />
-        );
-      case Sections.GOALS:
-        return <SectionGoals collective={this.props.collective} />;
-      case Sections.TICKETS:
-        return (
-          <SectionTickets
-            collective={this.props.collective}
-            tiers={this.props.tiers}
-            isAdmin={this.props.isAdmin}
-            contributors={this.props.financialContributors}
-          />
-        );
-      case Sections.PARTICIPANTS:
-        return (
-          <SectionParticipants
-            refetch={this.props.refetch}
+          <SectionContributions
             collective={this.props.collective}
             LoggedInUser={this.props.LoggedInUser}
-          />
-        );
-      case Sections.LOCATION:
-        return <SectionLocation collective={this.props.collective} />;
-      case Sections.RECURRING_CONTRIBUTIONS:
-        return (
-          <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
-        );
-      case Sections.PROJECTS:
-        return (
-          <SectionProjects
-            collective={this.props.collective}
-            projects={this.props.projects}
-            isAdmin={this.props.isAdmin}
-          />
-        );
-      case Sections.CONNECT:
-        return (
-          <SectionConnect
-            collective={this.props.collective}
-            conversations={this.props.conversations}
-            isAdmin={this.props.isAdmin}
-            isLoggedIn={Boolean(this.props.LoggedInUser)}
             section={section}
           />
         );
@@ -274,6 +228,63 @@ class CollectivePage extends Component {
             section={section}
           />
         );
+      case Sections.PROJECTS:
+        return (
+          <SectionProjects
+            collective={this.props.collective}
+            projects={this.props.projects}
+            isAdmin={this.props.isAdmin}
+          />
+        );
+      case Sections.BUDGET:
+        return (
+          <SectionBudget
+            collective={this.props.collective}
+            transactions={this.props.transactions}
+            expenses={this.props.expenses}
+            stats={this.props.stats}
+            section={section}
+            financialContributors={this.props.financialContributors}
+          />
+        );
+      case Sections.TRANSACTIONS:
+        return (
+          <SectionTransactions
+            collective={this.props.collective}
+            isAdmin={this.props.isAdmin}
+            isRoot={this.props.isRoot}
+            section={section}
+          />
+        );
+      case Sections.CONTRIBUTORS:
+        return (
+          <SectionContributors
+            collective={this.props.collective}
+            financialContributors={this.props.financialContributors}
+            coreContributors={this.props.coreContributors}
+            stats={this.props.stats}
+          />
+        );
+      case Sections.PARTICIPANTS:
+        return (
+          <SectionParticipants
+            refetch={this.props.refetch}
+            collective={this.props.collective}
+            LoggedInUser={this.props.LoggedInUser}
+          />
+        );
+      case Sections.CONNECT:
+        return (
+          <SectionConnect
+            collective={this.props.collective}
+            conversations={this.props.conversations}
+            isAdmin={this.props.isAdmin}
+            isLoggedIn={Boolean(this.props.LoggedInUser)}
+            section={section}
+          />
+        );
+      case Sections.ABOUT:
+        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} section={section} />;
       default:
         return null;
     }

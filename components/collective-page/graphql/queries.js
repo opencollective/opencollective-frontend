@@ -35,6 +35,9 @@ export const collectivePageQuery = gql`
       imageUrl(height: 256)
       canApply
       canContact
+      features {
+        ...NavbarFields
+      }
       ordersFromCollective(subscriptionsOnly: true) {
         isSubscriptionActive
       }
@@ -254,6 +257,7 @@ export const collectivePageQuery = gql`
 
   ${fragments.updatesFieldsFragment}
   ${fragments.contributorsFieldsFragment}
+  ${fragments.collectiveNavbarFieldsFragment}
 `;
 
 export const getCollectivePageQueryVariables = slug => {

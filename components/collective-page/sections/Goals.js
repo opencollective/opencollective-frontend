@@ -25,7 +25,7 @@ const SectionGoals = ({ collective }) => {
     return (
       <Container background="rgb(245, 247, 250)" px={4} py={5} mt={3}>
         <Box pl={5}>
-          <H4 fontWeight="normal" color="black.700">
+          <H4 fontWeight="500" color="black.900">
             <FormattedMessage
               id="Collective.Goals"
               defaultMessage="{collective}'s Goals"

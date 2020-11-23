@@ -6,6 +6,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { isPastEvent } from '../../../lib/events';
 
+import { Sections } from '../_constants';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeCollective from '../../contribute-cards/ContributeCollective';
 import ContributeEvent from '../../contribute-cards/ContributeEvent';
@@ -18,6 +19,8 @@ import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import SectionHeader from '../SectionHeader';
+
+import eventsSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconEvents.png';
 
 class SectionEvents extends React.PureComponent {
   static propTypes = {
@@ -43,7 +46,6 @@ class SectionEvents extends React.PureComponent {
     ),
 
     isAdmin: PropTypes.bool.isRequired,
-    section: PropTypes.string,
   };
 
   triageEvents = memoizeOne(events => {
@@ -51,21 +53,22 @@ class SectionEvents extends React.PureComponent {
   });
 
   render() {
-    const { collective, events, connectedCollectives, isAdmin, section } = this.props;
+    const { collective, events, connectedCollectives, isAdmin } = this.props;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
 
     return (
       <ContainerSectionContent pt={5} pb={3}>
         <SectionHeader
-          section={section}
+          title={Sections.EVENTS}
           subtitle={<FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />}
           info={
             <FormattedMessage
-              id="section.connect.info"
-              defaultMessage="Start conversations with your community or share updates on how things are going."
+              id="section.events.info"
+              defaultMessage="Find out where your community is gathering next."
             />
           }
+          illustrationSrc={eventsSectionHeaderIcon}
         />
         <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
           {(ref, Chevrons) => (

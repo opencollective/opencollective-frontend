@@ -201,6 +201,11 @@ interface Account {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
   ): UpdateCollection!
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
 }
 
 """
@@ -665,6 +670,11 @@ type Bot implements Account {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
   ): UpdateCollection!
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
 }
 
 """
@@ -876,6 +886,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   ): UpdateCollection!
 
   """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
+
+  """
   Returns the Fiscal Host
   """
   host: Host
@@ -951,6 +966,53 @@ input CollectiveCreateInput {
   tags: [String]
   githubHandle: String
   settings: JSON
+}
+
+"""
+Describes the features enabled and available for this collective
+"""
+type CollectiveFeatures {
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
+  RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
+  EVENTS: CollectiveFeatureStatus
+  PROJECTS: CollectiveFeatureStatus
+  USE_EXPENSES: CollectiveFeatureStatus
+  RECEIVE_EXPENSES: CollectiveFeatureStatus
+  COLLECTIVE_GOALS: CollectiveFeatureStatus
+  TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
+  CONVERSATIONS: CollectiveFeatureStatus
+  UPDATES: CollectiveFeatureStatus
+  TEAM: CollectiveFeatureStatus
+  ORDER: CollectiveFeatureStatus
+  CONTACT_COLLECTIVE: CollectiveFeatureStatus
+  CONTACT_FORM: CollectiveFeatureStatus
+  CREATE_COLLECTIVE: CollectiveFeatureStatus
+  CROSS_CURRENCY_MANUAL_TRANSACTIONS: CollectiveFeatureStatus
+  TRANSFERWISE: CollectiveFeatureStatus
+  PAYPAL_PAYOUTS: CollectiveFeatureStatus
+  PAYPAL_DONATIONS: CollectiveFeatureStatus
+}
+
+enum CollectiveFeatureStatus {
+  """
+  The feature is enabled and is actively used
+  """
+  ACTIVE
+
+  """
+  The feature is enabled, but there is no data for it
+  """
+  AVAILABLE
+
+  """
+  The feature is disabled, but can be enabled by an admin
+  """
+  DISABLED
+
+  """
+  The feature is disabled and cannot be activated for this account
+  """
+  UNSUPPORTED
 }
 
 """
@@ -2937,6 +2999,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   ): UpdateCollection!
 
   """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
+
+  """
   Returns the Fiscal Host
   """
   host: Host
@@ -3799,6 +3866,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   ): UpdateCollection!
 
   """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
+
+  """
   Returns the Fiscal Host
   """
   host: Host
@@ -4083,6 +4155,11 @@ type Host implements Account & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
   ): UpdateCollection!
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
 
   """
   Number of unique financial contributors.
@@ -4462,6 +4539,11 @@ type Individual implements Account {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
   ): UpdateCollection!
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
   firstName: String @deprecated(reason: "2020-10-12: Use the name field")
   lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
@@ -5591,6 +5673,11 @@ type Organization implements Account {
   ): UpdateCollection!
 
   """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
+
+  """
   Amount of money in cents in the currency of the collective currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
@@ -5975,6 +6062,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
   ): UpdateCollection!
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
 
   """
   Returns the Fiscal Host
