@@ -323,6 +323,8 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
       country
     }
     ... on Organization {
+      platformFeePercent
+      platformContributionAvailable
       host {
         ...ContributionFlowHostFields
       }
