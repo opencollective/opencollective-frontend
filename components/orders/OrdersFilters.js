@@ -26,7 +26,7 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const ExpensesFilters = ({ collective, filters, onChange }) => {
+const ExpensesFilters = ({ currency, filters, onChange }) => {
   const getFilterProps = name => ({
     inputId: `orders-filter-${name}`,
     value: filters?.[name],
@@ -47,7 +47,7 @@ const ExpensesFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="orders-filter-amount">
           <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
         </FilterLabel>
-        <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
+        <AmountFilter currency={currency} {...getFilterProps('amount')} />
       </FilterContainer>
       <FilterContainer>
         <FilterLabel htmlFor="orders-filter-status">
@@ -62,9 +62,7 @@ const ExpensesFilters = ({ collective, filters, onChange }) => {
 ExpensesFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
-  collective: PropTypes.shape({
-    currency: PropTypes.string.isRequired,
-  }).isRequired,
+  currency: PropTypes.string,
 };
 
 export default React.memo(ExpensesFilters);

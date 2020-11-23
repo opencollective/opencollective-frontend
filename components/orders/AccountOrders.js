@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { mapValues } from 'lodash';
+import { mapValues, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { usePrevious } from '../../lib/hooks/usePrevious';
 import { Router } from '../../server/pages';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
@@ -16,16 +17,18 @@ import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import OrdersFilters from '../orders/OrdersFilters';
-import OrdersList from '../orders/OrdersList';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
+import { useUser } from '../UserProvider';
 
-const hostDashboardOrdersQuery = gqlV2/* GraphQL */ `
-  query HostDashboardOrders(
-    $hostSlug: String!
+import OrdersFilters from './OrdersFilters';
+import OrdersList from './OrdersList';
+
+const accountOrdersQuery = gqlV2/* GraphQL */ `
+  query AccountOrders(
+    $accountSlug: String
     $limit: Int!
     $offset: Int!
     $status: OrderStatus
@@ -34,13 +37,14 @@ const hostDashboardOrdersQuery = gqlV2/* GraphQL */ `
     $dateFrom: ISODateTime
     $searchTerm: String
   ) {
-    host(slug: $hostSlug) {
+    account(slug: $accountSlug) {
       id
       slug
       currency
     }
     orders(
-      host: { slug: $hostSlug }
+      account: { slug: $accountSlug }
+      includeHostedAccounts: true
       filter: INCOMING
       status: $status
       searchTerm: $searchTerm
@@ -53,6 +57,7 @@ const hostDashboardOrdersQuery = gqlV2/* GraphQL */ `
       totalCount
       nodes {
         id
+        legacyId
         description
         createdAt
         status
@@ -106,45 +111,54 @@ const getVariablesFromQuery = query => {
 
 const hasParams = query => {
   return Object.entries(query).some(([key, value]) => {
-    return !['view', 'offset', 'limit', 'hostCollectiveSlug', 'paypalApprovalError'].includes(key) && value;
+    return (
+      !['view', 'offset', 'limit', 'collectiveSlug', 'hostCollectiveSlug', 'paypalApprovalError'].includes(key) && value
+    );
   });
 };
 
-const HostDashboardOrders = ({ hostSlug }) => {
-  const { query } = useRouter() || {};
-  const hasFilters = React.useMemo(() => hasParams(query), [query]);
-  const { data, error, loading, variables } = useQuery(hostDashboardOrdersQuery, {
-    variables: { hostSlug, ...getVariablesFromQuery(query) },
-    context: API_V2_CONTEXT,
-  });
+const updateQuery = (router, queryParams) => {
+  const { route, query } = router;
+  return Router.pushRoute(route.slice(1), { ...query, ...queryParams });
+};
+
+const AccountOrders = ({ accountSlug }) => {
+  const router = useRouter() || { query: {} };
+  const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
+  const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query) };
+  const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
+  const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
+  const { LoggedInUser } = useUser();
+  const prevLoggedInUser = usePrevious(LoggedInUser);
+
+  // Refetch data when user logs in
+  React.useEffect(() => {
+    if (!prevLoggedInUser && LoggedInUser) {
+      refetch();
+    }
+  }, [LoggedInUser]);
 
   return (
     <Box maxWidth={1000} m="0 auto" py={5} px={2}>
       <Flex>
         <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
-          <FormattedMessage id="Orders" defaultMessage="Orders" />
+          <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
         </H1>
         <Box mx="auto" />
         <Box p={2}>
           <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm => Router.pushRoute('host.dashboard', { ...query, searchTerm, offset: null })}
+            defaultValue={router.query.searchTerm}
+            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
           />
         </Box>
       </Flex>
       <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
       <Box mb={34} maxWidth={500}>
-        {data?.host ? (
+        {data?.account ? (
           <OrdersFilters
-            collective={data.host}
-            filters={query}
-            onChange={queryParams =>
-              Router.pushRoute('host.dashboard', {
-                ...query,
-                ...queryParams,
-                offset: null,
-              })
-            }
+            currency={data.account.currency}
+            filters={router.query}
+            onChange={queryParams => updateQuery(router, { ...queryParams, offset: null })}
           />
         ) : loading ? (
           <LoadingPlaceholder height={70} />
@@ -163,11 +177,10 @@ const HostDashboardOrders = ({ hostSlug }) => {
                   return (
                     <Link
                       data-cy="reset-orders-filters"
-                      route="host.dashboard"
+                      route={router.route.slice(1)}
                       params={{
-                        ...mapValues(query, () => null),
-                        hostCollectiveSlug: data.host.slug,
-                        view: 'donations',
+                        ...mapValues(router.query, () => null),
+                        ...pick(router.query, ['collectiveSlug', 'hostCollectiveSlug', 'view']),
                       }}
                     >
                       {text}
@@ -185,11 +198,10 @@ const HostDashboardOrders = ({ hostSlug }) => {
           <OrdersList isLoading={loading} orders={data?.orders?.nodes} nbPlaceholders={variables.limit} />
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route="host.dashboard"
               total={data?.orders?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
-              scrollToTopOnChange
+              scrollToTopOnChanges
             />
           </Flex>
         </React.Fragment>
@@ -198,8 +210,8 @@ const HostDashboardOrders = ({ hostSlug }) => {
   );
 };
 
-HostDashboardOrders.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+AccountOrders.propTypes = {
+  accountSlug: PropTypes.string.isRequired,
 };
 
-export default HostDashboardOrders;
+export default AccountOrders;

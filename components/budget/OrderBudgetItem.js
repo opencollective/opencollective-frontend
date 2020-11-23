@@ -88,6 +88,7 @@ const OrderBudgetItem = ({ isLoading, order }) => {
                     textDecoration="none"
                     color="black.900"
                     fontSize={`${fontSize}px`}
+                    title={`#${order.legacyId}`}
                     data-cy="expense-title"
                   >
                     {value}
@@ -183,6 +184,7 @@ OrderBudgetItem.propTypes = {
   host: PropTypes.object,
   order: PropTypes.shape({
     id: PropTypes.string,
+    legacyId: PropTypes.number,
     description: PropTypes.string.isRequired,
     status: PropTypes.oneOf(Object.values(ORDER_STATUS)).isRequired,
     createdAt: PropTypes.string.isRequired,

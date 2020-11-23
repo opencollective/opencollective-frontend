@@ -12,15 +12,15 @@ import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
-import { Flex } from '../components/Grid';
+import { Box, Flex } from '../components/Grid';
 import { HOST_SECTIONS } from '../components/host-dashboard/constants';
 import HostDashboardExpenses from '../components/host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../components/host-dashboard/HostDashboardHostedCollectives';
-import HostDashboardOrders from '../components/host-dashboard/HostDashboardOrders';
 import PendingApplications from '../components/host-dashboard/PendingApplications';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import AccountOrders from '../components/orders/AccountOrders';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
@@ -126,7 +126,11 @@ class HostDashboardPage extends React.Component {
       case 'pending-applications':
         return <PendingApplications hostSlug={host.slug} />;
       case 'donations':
-        return <HostDashboardOrders hostSlug={host.slug} />;
+        return (
+          <Box py={4}>
+            <AccountOrders accountSlug={host.slug} />
+          </Box>
+        );
       case HOST_SECTIONS.HOSTED_COLLECTIVES:
         return <HostDashboardHostedCollectives hostSlug={host.slug} />;
       default:

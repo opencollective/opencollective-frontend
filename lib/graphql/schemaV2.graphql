@@ -6493,9 +6493,14 @@ type Query {
     offset: Int = 0
 
     """
-    Return orders only made under this host
+    Return only orders made from/to account
     """
-    host: AccountReferenceInput
+    account: AccountReferenceInput
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
 
     """
     Account orders filter (INCOMING or OUTGOING)
