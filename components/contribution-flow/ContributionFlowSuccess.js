@@ -138,9 +138,8 @@ class NewContributionFlowSuccess extends React.Component {
   renderBankTransferInformation = () => {
     const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
     const bankAccount = get(this.props.data, 'order.toAccount.host.bankAccount.data', null);
-    const amount =
-      (get(this.props.data, 'order.amount.value') + get(this.props.data, 'order.platformContributionAmount.value', 0)) *
-      100;
+    // The order Total Amount already considers the amount donated to the platform.
+    const amount = get(this.props.data, 'order.amount.value') * 100;
     const currency = get(this.props.data, 'order.amount.currency');
     const formattedAmount = formatCurrency(amount, currency);
 
