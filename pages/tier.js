@@ -16,8 +16,8 @@ import { withUser } from '../components/UserProvider';
  * to render `components/collective-page` with everything needed.
  */
 class TierPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, tierId, tierSlug } }) {
-    return { collectiveSlug, tierId: Number(tierId), tierSlug };
+  static getInitialProps({ query: { collectiveSlug, tierId, tierSlug, redirect } }) {
+    return { collectiveSlug, tierId: Number(tierId), tierSlug, redirect };
   }
 
   static propTypes = {
@@ -26,6 +26,7 @@ class TierPage extends React.Component {
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
     tierSlug: PropTypes.string,
+    redirect: PropTypes.string,
   };
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -57,7 +58,7 @@ class TierPage extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser } = this.props;
+    const { redirect, data, LoggedInUser } = this.props;
 
     return !data || data.error ? (
       <ErrorPage data={data} />
@@ -73,6 +74,7 @@ class TierPage extends React.Component {
               tier={data.Tier}
               contributors={data.Tier.contributors}
               contributorsStats={data.Tier.stats.contributors}
+              redirect={redirect}
             />
           </CollectiveThemeProvider>
         )}
