@@ -26,7 +26,7 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const ExpensesFilters = ({ currency, filters, onChange }) => {
+const ExpensesFilters = ({ currency, filters, hasStatus, onChange }) => {
   const getFilterProps = name => ({
     inputId: `orders-filter-${name}`,
     value: filters?.[name],
@@ -49,12 +49,14 @@ const ExpensesFilters = ({ currency, filters, onChange }) => {
         </FilterLabel>
         <AmountFilter currency={currency} {...getFilterProps('amount')} />
       </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="orders-filter-status">
-          <FormattedMessage id="order.status" defaultMessage="Status" />
-        </FilterLabel>
-        <OrderStatusFilter {...getFilterProps('status')} />
-      </FilterContainer>
+      {hasStatus && (
+        <FilterContainer>
+          <FilterLabel htmlFor="orders-filter-status">
+            <FormattedMessage id="order.status" defaultMessage="Status" />
+          </FilterLabel>
+          <OrderStatusFilter {...getFilterProps('status')} />
+        </FilterContainer>
+      )}
     </Flex>
   );
 };
@@ -63,6 +65,7 @@ ExpensesFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   currency: PropTypes.string,
+  hasStatus: PropTypes.bool,
 };
 
 export default React.memo(ExpensesFilters);

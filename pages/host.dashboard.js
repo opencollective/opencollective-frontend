@@ -8,6 +8,7 @@ import { omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { ORDER_STATUS } from '../lib/constants/order-status';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import CollectiveNavbar from '../components/CollectiveNavbar';
@@ -20,7 +21,7 @@ import PendingApplications from '../components/host-dashboard/PendingApplication
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
-import AccountOrders from '../components/orders/AccountOrders';
+import OrdersWithData from '../components/orders/OrdersWithData';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
@@ -128,7 +129,11 @@ class HostDashboardPage extends React.Component {
       case 'donations':
         return (
           <Box py={4}>
-            <AccountOrders accountSlug={host.slug} />
+            <OrdersWithData
+              accountSlug={host.slug}
+              status={ORDER_STATUS.PENDING}
+              title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
+            />
           </Box>
         );
       case HOST_SECTIONS.HOSTED_COLLECTIVES:
@@ -183,7 +188,7 @@ class HostDashboardPage extends React.Component {
                 isActive={view === 'donations'}
               >
                 <DonateIcon size="1em" />
-                <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
+                <FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />
               </MenuLink>
               <MenuLink
                 route="host.dashboard"

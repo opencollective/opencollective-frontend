@@ -27,7 +27,7 @@ import OrdersFilters from './OrdersFilters';
 import OrdersList from './OrdersList';
 
 const accountOrdersQuery = gqlV2/* GraphQL */ `
-  query AccountOrders(
+  query Orders(
     $accountSlug: String
     $limit: Int!
     $offset: Int!
@@ -95,13 +95,13 @@ const isValidStatus = status => {
   return Boolean(ORDER_STATUS[status]);
 };
 
-const getVariablesFromQuery = query => {
+const getVariablesFromQuery = (query, forcedStatus) => {
   const amountRange = parseAmountRange(query.amount);
   const [dateFrom] = getDateRangeFromPeriod(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || ORDERS_PER_PAGE,
-    status: isValidStatus(query.status) ? query.status : null,
+    status: forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
     minAmount: amountRange[0] && amountRange[0] * 100,
     maxAmount: amountRange[1] && amountRange[1] * 100,
     dateFrom,
@@ -122,10 +122,10 @@ const updateQuery = (router, queryParams) => {
   return Router.pushRoute(route.slice(1), { ...query, ...queryParams });
 };
 
-const AccountOrders = ({ accountSlug }) => {
+const OrdersWithData = ({ accountSlug, title, status }) => {
   const router = useRouter() || { query: {} };
   const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
-  const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query) };
+  const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
   const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
   const { LoggedInUser } = useUser();
@@ -142,7 +142,7 @@ const AccountOrders = ({ accountSlug }) => {
     <Box maxWidth={1000} m="0 auto" py={5} px={2}>
       <Flex>
         <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
-          <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
+          {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         </H1>
         <Box mx="auto" />
         <Box p={2}>
@@ -159,6 +159,7 @@ const AccountOrders = ({ accountSlug }) => {
             currency={data.account.currency}
             filters={router.query}
             onChange={queryParams => updateQuery(router, { ...queryParams, offset: null })}
+            hasStatus={!status}
           />
         ) : loading ? (
           <LoadingPlaceholder height={70} />
@@ -210,8 +211,12 @@ const AccountOrders = ({ accountSlug }) => {
   );
 };
 
-AccountOrders.propTypes = {
+OrdersWithData.propTypes = {
   accountSlug: PropTypes.string.isRequired,
+  /** If provided, only orders matching this status will be fetched */
+  status: PropTypes.string,
+  /** An optional title to be used instead of "Financial contributions" */
+  title: PropTypes.node,
 };
 
-export default AccountOrders;
+export default OrdersWithData;

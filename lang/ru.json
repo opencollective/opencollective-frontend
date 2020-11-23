@@ -1319,6 +1319,7 @@
   "PendingApplication.Message": "Message for fiscal host",
   "PendingApplication.Rejected": "Rejected",
   "PendingApplications.Accepting": "Accepting applications",
+  "PendingBankTransfers": "Pending bank transfers",
   "Period": "Period",
   "platform": "Platform",
   "platform.explainerVideo": "Explainer video",
