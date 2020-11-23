@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
+import { FEATURES, isFeatureAllowedForCollective } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { Flex } from '../Grid';
@@ -166,7 +166,7 @@ const MenuItem = styled(Link)`
 // Some condition helpers
 const isType = (c, collectiveType) => c.type === collectiveType;
 const isOneOfTypes = (c, ...collectiveTypes) => collectiveTypes.includes(c.type);
-const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollectiveType(c, feature);
+const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollective(c, feature);
 const isFund = c => c.type === CollectiveType.FUND || c.settings?.fund === true; // Funds MVP, to refactor
 const isHost = c => c.isHost === true;
 const isCollective = c => c.type === CollectiveType.COLLECTIVE;
