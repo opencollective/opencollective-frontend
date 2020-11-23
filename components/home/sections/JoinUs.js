@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -11,7 +12,10 @@ import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
 const SectionWrapper = styled(Container)`
-  background: url('/static/images/home/joinus-pink-bg-sm.png');
+  background: ${props =>
+    props.page && props.page === 'becomeAHost'
+      ? `url('/static/images/home/joinus-green-bg-sm.png')`
+      : `url('/static/images/home/joinus-pink-bg-sm.png')`};
   background-size: 100% 100%;
 
   a {
@@ -23,12 +27,18 @@ const SectionWrapper = styled(Container)`
   }
 
   @media screen and (min-width: 64em) {
-    background: url('/static/images/home/joinus-pink-bg-md.png');
+    background: ${props =>
+      props.page && props.page === 'becomeAHost'
+        ? `url('/static/images/home/joinus-green-bg-md.png')`
+        : `url('/static/images/home/joinus-pink-bg-md.png')`};
     background-size: 100% 100%;
   }
 
   @media screen and (min-width: 88em) {
-    background: url('/static/images/home/joinus-pink-bg-lg.png');
+    background: ${props =>
+      props.page && props.page === 'becomeAHost'
+        ? `url('/static/images/home/joinus-green-bg-lg.png')`
+        : `url('/static/images/home/joinus-pink-bg-lg.png')`};
     background-size: 100% 100%;
   }
 `;
@@ -50,8 +60,8 @@ const Wrapper = styled(Container)`
   }
 `;
 
-const JoinUs = () => (
-  <SectionWrapper py={[5, null, null, 4]} width={1}>
+const JoinUs = ({ page }) => (
+  <SectionWrapper py={[5, null, null, 4]} width={1} page={page}>
     <Flex
       mx={[3, 4]}
       flexDirection={['column', null, null, 'row']}
@@ -184,5 +194,9 @@ const JoinUs = () => (
     </Flex>
   </SectionWrapper>
 );
+
+JoinUs.propTypes = {
+  page: PropTypes.string,
+};
 
 export default JoinUs;
