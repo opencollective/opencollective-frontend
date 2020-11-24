@@ -4353,7 +4353,7 @@ type HostPlan {
   """
   Charge on revenues made through Host Fees.
   """
-  hostFeeChargePercent: Int
+  hostFeeSharePercent: Int
 }
 
 enum ImageFormat {

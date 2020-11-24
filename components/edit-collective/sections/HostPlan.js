@@ -111,30 +111,31 @@ const NewPlanFeatures = ({ collective, plan, label, loading, editHostPlan, hostF
       <PlanFeatures>
         <ul>
           <li>
-            <FormattedMessage id="Host.Plan.PlatformTips.yes" defaultMessage="Platform Tips" />
+            <FormattedMessage id="Host.Plan.PlatformTips.yes" defaultMessage="Voluntary Platform Tips" />
           </li>
           {hostFees && (
             <li>
-              <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fees" />
+              <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fee" />
               .&nbsp;
               <FormattedMessage
                 id="Host.Plan.RevenueCharge.yes"
                 defaultMessage="15% charge on revenue made through it"
-              />
+              />{' '}
+              <StyledTooltip
+                content={() => (
+                  <FormattedMessage
+                    id="newPricing.tab.hostFeeChargeExample"
+                    defaultMessage="If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform."
+                  />
+                )}
+              >
+                <LimitsInfoCircle size={12} />
+              </StyledTooltip>
             </li>
           )}
           {!hostFees && (
             <li>
-              <FormattedMessage id="Host.Plan.HostFees.no" defaultMessage="0% Host Fees (not configurable)" />
-            </li>
-          )}
-          {1 !== 1 && (
-            <li>
-              <FormattedMessage
-                id="Host.Plan.MoneyProcessed.limited"
-                values={{ maximumAmount: '$100,000' }}
-                defaultMessage="Up to {maximumAmount} in money processed"
-              />
+              <FormattedMessage id="Host.Plan.HostFees.no" defaultMessage="0% Host Fee (not configurable)" />
             </li>
           )}
           <li>
@@ -149,14 +150,16 @@ const NewPlanFeatures = ({ collective, plan, label, loading, editHostPlan, hostF
               defaultMessage="Unlimited payouts with TranferWise"
             />
           </li>
+          <li>
+            <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimal revenue." />
+          </li>
         </ul>
       </PlanFeatures>
-      <PlanPrice>Free</PlanPrice>
       <Button
         disabled={loading || collective.plan.name === plan}
         onClick={() => editHostPlan({ variables: { account: { slug: collective.slug }, plan: plan } })}
       >
-        {loading ? '...' : 'Activate'}
+        {loading ? '...' : collective.plan.name === plan ? 'Activated' : 'Activate'}
       </Button>
       {collective.plan.name === plan && <DisabledMessage>Current plan.</DisabledMessage>}
     </Plan>
@@ -236,7 +239,7 @@ const HostPlan = props => {
       </H3>
 
       <PlanGrid>
-        {collective.plan.name !== 'goer' && (
+        {true && (
           <Plan active={collective.plan.name === 'default'}>
             <PlanName>Default Plan (old)</PlanName>
             <PlanFeatures>
@@ -245,7 +248,7 @@ const HostPlan = props => {
                   <FormattedMessage id="Host.Plan.PlatformTips.no" defaultMessage="5% Platform Fees" />
                 </li>
                 <li>
-                  <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fees" />
+                  <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fee" />
                   .&nbsp;
                   <FormattedMessage
                     id="Host.Plan.RevenueCharge.no"
@@ -264,42 +267,42 @@ const HostPlan = props => {
                     defaultMessage="Up to $1000 payouts with TransferWise"
                   />
                 </li>
+                <li>
+                  <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimal revenue." />
+                </li>
               </ul>
             </PlanFeatures>
-            <PlanPrice>Free</PlanPrice>
             <Button
-              disabled={editHostPlanLoading || collective.plan.name === 'default'}
+              disabled={true}
               onClick={() => editHostPlan({ variables: { account: { slug: collective.slug }, plan: 'default' } })}
             >
-              {editHostPlanLoading ? '...' : 'Activate'}
+              Deprecated
             </Button>
             {collective.plan.name === 'default' && <DisabledMessage>Current plan.</DisabledMessage>}
           </Plan>
         )}
 
+        <NewPlanFeatures
+          collective={collective}
+          plan="start-plan-2021"
+          label="Start Plan"
+          hostFees={false}
+          editHostPlan={editHostPlan}
+          loading={editHostPlanLoading}
+        />
+
         {collective.type === 'ORGANIZATION' && (
           <NewPlanFeatures
             collective={collective}
-            plan="organization-plan-2021"
-            label="Organization Plan (new)"
+            plan="grow-plan-2021"
+            label="Grow Plan"
             hostFees={true}
             editHostPlan={editHostPlan}
             loading={editHostPlanLoading}
           />
         )}
 
-        {collective.type === 'USER' && (
-          <NewPlanFeatures
-            collective={collective}
-            plan="user-plan-2021"
-            label="User Plan (new)"
-            hostFees={false}
-            editHostPlan={editHostPlan}
-            loading={editHostPlanLoading}
-          />
-        )}
-
-        {!['organization-plan-2021', 'user-plan-2021', 'owned', 'custom'].includes(collective.plan) &&
+        {!['start-plan-2021', 'grow-plan-2021', 'owned', 'custom'].includes(collective.plan) &&
           tiers.map(tier => {
             const isCurrentPlan = collective.plan.name === tier.slug;
             const hostedCollectivesLimit = get(tier, 'data.hostedCollectivesLimit');
@@ -335,22 +338,19 @@ const HostPlan = props => {
               </Plan>
             );
           })}
-        <Plan active={collective.plan.name === 'network-host-plan'}>
+        <Plan active={collective.plan.name === 'custom'}>
           <PlanName>Custom Host Plan</PlanName>
           <PlanFeatures>
             <ul>
               <li>
-                <FormattedMessage
-                  id="Host.Plan.PlatformTips.disablable"
-                  defaultMessage="Platform Tips (if you want to)"
-                />
+                <FormattedMessage id="Host.Plan.PlatformTips.yes" defaultMessage="Voluntary Platform Tips" />
               </li>
               <li>
-                <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fees" />
+                <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fee" />
                 .&nbsp;
                 <FormattedMessage
                   id="Host.Plan.RevenueCharge.negotiable"
-                  defaultMessage="Negotiable charge on revenue made through it."
+                  defaultMessage="Negotiable revenue sharing model."
                 />
               </li>
               <li>
@@ -365,9 +365,15 @@ const HostPlan = props => {
                   defaultMessage="Unlimited payouts with TranferWise"
                 />
               </li>
+              <li>
+                <FormattedMessage
+                  id="newPricingTable.row.minimumRaised"
+                  defaultMessage="+ {minimumRaised} total raised"
+                  values={{ minimumRaised: '$150,000' }}
+                />
+              </li>
             </ul>
           </PlanFeatures>
-          <PlanPrice>Talk to Us</PlanPrice>
           <Button href="/support">Contact Us</Button>
         </Plan>
       </PlanGrid>
@@ -458,14 +464,17 @@ const HostPlan = props => {
           )}
         </li>
         <li>
-          <strong>Ability to configure Host Fees</strong> :{' '}
-          {collective.plan.hostFees && <FormattedMessage id="yes" defaultMessage="Yes" />}
+          <strong>
+            {' '}
+            <FormattedMessage id="newPricingTable.row.hostFee" defaultMessage="Ability to configure Host Fee" />
+          </strong>{' '}
+          : {collective.plan.hostFees && <FormattedMessage id="yes" defaultMessage="Yes" />}
           {!collective.plan.hostFees && <FormattedMessage id="no" defaultMessage="No" />}
         </li>
         <li>
           <strong>Charge on Host Fees</strong> :{' '}
-          {collective.plan.hostFeeChargePercent !== 0 && <span>{collective.plan.hostFeeChargePercent}%</span>}
-          {collective.plan.hostFeeChargePercent === 0 && <FormattedMessage id="no" defaultMessage="No" />}
+          {collective.plan.hostFeeSharePercent !== 0 && <span>{collective.plan.hostFeeSharePercent}%</span>}
+          {collective.plan.hostFeeSharePercent === 0 && <FormattedMessage id="no" defaultMessage="No" />}
         </li>
       </ul>
     </div>

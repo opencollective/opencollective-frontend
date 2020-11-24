@@ -321,6 +321,21 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                       }}
                     />
                   </Container>
+                  {collective.platformFeePercent && (
+                    <Container ml={2} mr={3} color="black.500" fontSize="12px">
+                      <FormattedMessage
+                        id="Hero.PlatformFee"
+                        defaultMessage="Platform fee: {fee}"
+                        values={{
+                          fee: (
+                            <DefinedTerm term={Terms.PLATFORM_FEE} color="black.700">
+                              {collective.platformFeePercent || 0}%
+                            </DefinedTerm>
+                          ),
+                        }}
+                      />
+                    </Container>
+                  )}
                 </Fragment>
               )}
             </Flex>
@@ -366,6 +381,7 @@ Hero.propTypes = {
     description: PropTypes.string,
     isHost: PropTypes.bool,
     hostFeePercent: PropTypes.number,
+    platformFeePercent: PropTypes.number,
     tags: PropTypes.arrayOf(PropTypes.string),
     settings: PropTypes.shape({
       tos: PropTypes.string,

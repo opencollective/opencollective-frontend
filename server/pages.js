@@ -10,7 +10,8 @@ const pages = routes()
   .add('home', '/', 'index')
   .add('become-a-sponsor', '/become-a-sponsor', 'become-a-sponsor')
   .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
-  .add('pricing', '/pricing', 'pricing')
+  .add('pricing', '/pricing')
+  .add('pricing-old', '/pricing-old')
   .add('redeem', '/:collectiveSlug?/redeem/:code?')
   .add('redeemed', '/:collectiveSlug?/redeemed/:code?')
   .add('updatePaymentMethod', '/:collectiveSlug/paymentmethod/:id/update')
@@ -150,7 +151,7 @@ pages.add('applications', '/applications');
 
 pages.add(
   'marketing',
-  '/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|become-a-fiscal-host)',
+  '/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|old-pricing|become-a-fiscal-host)',
   'marketingPage',
 );
 

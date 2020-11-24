@@ -3062,7 +3062,7 @@ type PlanType {
   transferwisePayouts: Int
   transferwisePayoutsLimit: Int
   hostFees: Boolean
-  hostFeeChargePercent: Int
+  hostFeeSharePercent: Int
 }
 
 """
