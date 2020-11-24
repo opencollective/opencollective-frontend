@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { editCollectivePageQuery } from '../../../lib/graphql/queries';
 
 import Button from '../../Button';
 import Loading from '../../Loading';
@@ -101,6 +104,74 @@ GenericPlanFeatures.propTypes = {
   plan: PropTypes.string.isRequired,
 };
 
+const NewPlanFeatures = ({ collective, plan, label, loading, editHostPlan, hostFees }) => {
+  return (
+    <Plan active={collective.plan.name === plan}>
+      <PlanName>{label}</PlanName>
+      <PlanFeatures>
+        <ul>
+          <li>
+            <FormattedMessage id="Host.Plan.PlatformTips.yes" defaultMessage="Platform Tips" />
+          </li>
+          {hostFees && (
+            <li>
+              <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fees" />
+              .&nbsp;
+              <FormattedMessage
+                id="Host.Plan.RevenueCharge.yes"
+                defaultMessage="15% charge on revenue made through it"
+              />
+            </li>
+          )}
+          {!hostFees && (
+            <li>
+              <FormattedMessage id="Host.Plan.HostFees.no" defaultMessage="0% Host Fees (not configurable)" />
+            </li>
+          )}
+          {1 !== 1 && (
+            <li>
+              <FormattedMessage
+                id="Host.Plan.MoneyProcessed.limited"
+                values={{ maximumAmount: '$100,000' }}
+                defaultMessage="Up to {maximumAmount} in money processed"
+              />
+            </li>
+          )}
+          <li>
+            <FormattedMessage id="Host.Plan.AddedFunds.unlimited" defaultMessage="Unlimited added funds" />
+          </li>
+          <li>
+            <FormattedMessage id="Host.Plan.BankTransfers.unlimited" defaultMessage="Unlimited bank transfers" />
+          </li>
+          <li>
+            <FormattedMessage
+              id="Host.Plan.TransferwisePayouts.unlimited"
+              defaultMessage="Unlimited payouts with TranferWise"
+            />
+          </li>
+        </ul>
+      </PlanFeatures>
+      <PlanPrice>Free</PlanPrice>
+      <Button
+        disabled={loading || collective.plan.name === plan}
+        onClick={() => editHostPlan({ variables: { account: { slug: collective.slug }, plan: plan } })}
+      >
+        {loading ? '...' : 'Activate'}
+      </Button>
+      {collective.plan.name === plan && <DisabledMessage>Current plan.</DisabledMessage>}
+    </Plan>
+  );
+};
+
+NewPlanFeatures.propTypes = {
+  collective: PropTypes.object.isRequired,
+  label: PropTypes.string.isRequired,
+  plan: PropTypes.string.isRequired,
+  editHostPlan: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
+  hostFees: PropTypes.bool.isRequired,
+};
+
 const editCollectiveHostPlansQuery = gql`
   query EditCollectiveHostPlans($slug: String) {
     Collective(slug: $slug) {
@@ -109,20 +180,21 @@ const editCollectiveHostPlansQuery = gql`
       tiers {
         id
         slug
-        type
         name
-        data
-        description
-        longDescription
-        hasLongDescription
-        button
-        amount
-        amountType
-        minimumAmount
-        presets
         interval
-        currency
-        maxQuantity
+        amount
+      }
+    }
+  }
+`;
+
+const editHostPlanMutation = gqlV2/* GraphQL */ `
+  mutation EditHostPlan($account: AccountReferenceInput!, $plan: String!) {
+    editHostPlan(account: $account, plan: $plan) {
+      id
+      slug
+      plan {
+        name
       }
     }
   }
@@ -133,6 +205,17 @@ const HostPlan = props => {
   const { data: opencollective, loading } = useQuery(editCollectiveHostPlansQuery, {
     variables: { slug: 'opencollective' },
   });
+
+  const editHostPlanMutationOptions = {
+    context: API_V2_CONTEXT,
+    refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: collective.slug } }],
+    awaitRefetchQueries: true,
+  };
+
+  const [editHostPlan, { loading: editHostPlanLoading }] = useMutation(
+    editHostPlanMutation,
+    editHostPlanMutationOptions,
+  );
 
   if (loading) {
     return (
@@ -153,79 +236,121 @@ const HostPlan = props => {
       </H3>
 
       <PlanGrid>
-        <Plan active={collective.plan.name === 'default'}>
-          <PlanName>Free Plan</PlanName>
-          <PlanFeatures>
-            <ul>
-              <li>
-                <FormattedMessage id="Host.Plan.Collectives.unlimited" defaultMessage="Unlimited hosted collectives" />
-              </li>
-              <li>
-                <FormattedMessage id="Host.Plan.AddedFunds.limited" defaultMessage="Up to $1000 added funds" />
-                <br />
-                (<FormattedMessage id="Host.Plan.acrossCollectives" defaultMessage="across all collectives" />)
-              </li>
-              <li>
-                <FormattedMessage id="Host.Plan.BankTransfers.limited" defaultMessage="Up to $1000 bank transfers" />
-                <br />
-                (<FormattedMessage id="Host.Plan.acrossCollectives" defaultMessage="across all collectives" />)
-              </li>
-              <li>
-                <FormattedMessage
-                  id="Host.Plan.TransferwisePayouts.limited"
-                  defaultMessage="Up to $1000 in payouts with TransferWise"
-                />
-                <br />
-                (<FormattedMessage id="Host.Plan.acrossCollectives" defaultMessage="across all collectives" />)
-              </li>
-            </ul>
-          </PlanFeatures>
-          <PlanPrice>Free</PlanPrice>
-        </Plan>
-        {tiers.map(tier => {
-          const isCurrentPlan = collective.plan.name === tier.slug;
-          const hostedCollectivesLimit = get(tier, 'data.hostedCollectivesLimit');
-          const isWithinLimits = hostedCollectivesLimit
-            ? collective.plan.hostedCollectives <= hostedCollectivesLimit
-            : true;
+        {collective.plan.name !== 'goer' && (
+          <Plan active={collective.plan.name === 'default'}>
+            <PlanName>Default Plan (old)</PlanName>
+            <PlanFeatures>
+              <ul>
+                <li>
+                  <FormattedMessage id="Host.Plan.PlatformTips.no" defaultMessage="5% Platform Fees" />
+                </li>
+                <li>
+                  <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fees" />
+                  .&nbsp;
+                  <FormattedMessage
+                    id="Host.Plan.RevenueCharge.no"
+                    defaultMessage="No charge on revenue made through it."
+                  />
+                </li>
+                <li>
+                  <FormattedMessage id="Host.Plan.AddedFunds.limited" defaultMessage="Up to $1000 added funds" />
+                </li>
+                <li>
+                  <FormattedMessage id="Host.Plan.BankTransfers.limited" defaultMessage="Up to $1000 bank transfers" />
+                </li>
+                <li>
+                  <FormattedMessage
+                    id="Host.Plan.TransferwisePayouts.limited"
+                    defaultMessage="Up to $1000 payouts with TransferWise"
+                  />
+                </li>
+              </ul>
+            </PlanFeatures>
+            <PlanPrice>Free</PlanPrice>
+            <Button
+              disabled={editHostPlanLoading || collective.plan.name === 'default'}
+              onClick={() => editHostPlan({ variables: { account: { slug: collective.slug }, plan: 'default' } })}
+            >
+              {editHostPlanLoading ? '...' : 'Activate'}
+            </Button>
+            {collective.plan.name === 'default' && <DisabledMessage>Current plan.</DisabledMessage>}
+          </Plan>
+        )}
 
-          let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
-          // Rename verb to Upgrade/Downgrade if subscribed to active Tier
-          if (subscribedTier && subscribedTier.amount > tier.amount) {
-            verb = 'Downgrade';
-          } else if (subscribedTier && subscribedTier.amount < tier.amount) {
-            verb = 'Upgrade';
-          }
+        {collective.type === 'ORGANIZATION' && (
+          <NewPlanFeatures
+            collective={collective}
+            plan="organization-plan-2021"
+            label="Organization Plan (new)"
+            hostFees={true}
+            editHostPlan={editHostPlan}
+            loading={editHostPlanLoading}
+          />
+        )}
 
-          return (
-            <Plan key={tier.id} disabled={!isWithinLimits && !isCurrentPlan} active={isCurrentPlan}>
-              <PlanName>{tier.name}</PlanName>
-              <PlanFeatures>
-                <GenericPlanFeatures plan={tier.slug} />
-              </PlanFeatures>
-              <PlanPrice>
-                ${tier.amount / 100} / {tier.interval}
-              </PlanPrice>
-              <Button
-                href={`/opencollective/contribute/${tier.slug}-${tier.id}/checkout?contributeAs=${collective.slug}&redirect=${redirectUrl}`}
-                disabled={!isWithinLimits || isCurrentPlan}
-              >
-                {verb}
-              </Button>
-              {isCurrentPlan && <DisabledMessage>Current plan.</DisabledMessage>}
-              {!isWithinLimits && !isCurrentPlan && <DisabledMessage>Current usage is above limits.</DisabledMessage>}
-            </Plan>
-          );
-        })}
+        {collective.type === 'USER' && (
+          <NewPlanFeatures
+            collective={collective}
+            plan="user-plan-2021"
+            label="User Plan (new)"
+            hostFees={false}
+            editHostPlan={editHostPlan}
+            loading={editHostPlanLoading}
+          />
+        )}
+
+        {!['organization-plan-2021', 'user-plan-2021', 'owned', 'custom'].includes(collective.plan) &&
+          tiers.map(tier => {
+            const isCurrentPlan = collective.plan.name === tier.slug;
+            const hostedCollectivesLimit = get(tier, 'data.hostedCollectivesLimit');
+            const isWithinLimits = hostedCollectivesLimit
+              ? collective.plan.hostedCollectives <= hostedCollectivesLimit
+              : true;
+
+            let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
+            // Rename verb to Upgrade/Downgrade if subscribed to active Tier
+            if (subscribedTier && subscribedTier.amount > tier.amount) {
+              verb = 'Downgrade';
+            } else if (subscribedTier && subscribedTier.amount < tier.amount) {
+              verb = 'Upgrade';
+            }
+
+            return (
+              <Plan key={tier.id} disabled={!isWithinLimits && !isCurrentPlan} active={isCurrentPlan}>
+                <PlanName>{tier.name}</PlanName>
+                <PlanFeatures>
+                  <GenericPlanFeatures plan={tier.slug} />
+                </PlanFeatures>
+                <PlanPrice>
+                  ${tier.amount / 100} / {tier.interval}
+                </PlanPrice>
+                <Button
+                  href={`/opencollective/contribute/${tier.slug}-${tier.id}/checkout?contributeAs=${collective.slug}&redirect=${redirectUrl}`}
+                  disabled={!isWithinLimits || isCurrentPlan}
+                >
+                  {verb}
+                </Button>
+                {isCurrentPlan && <DisabledMessage>Current plan.</DisabledMessage>}
+                {!isWithinLimits && !isCurrentPlan && <DisabledMessage>Current usage is above limits.</DisabledMessage>}
+              </Plan>
+            );
+          })}
         <Plan active={collective.plan.name === 'network-host-plan'}>
-          <PlanName>Network Host Plan</PlanName>
+          <PlanName>Custom Host Plan</PlanName>
           <PlanFeatures>
             <ul>
               <li>
                 <FormattedMessage
-                  id="Host.Plan.Collectives.more"
-                  values={{ n: 25 }}
-                  defaultMessage="More than {n} collectives"
+                  id="Host.Plan.PlatformTips.disablable"
+                  defaultMessage="Platform Tips (if you want to)"
+                />
+              </li>
+              <li>
+                <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fees" />
+                .&nbsp;
+                <FormattedMessage
+                  id="Host.Plan.RevenueCharge.negotiable"
+                  defaultMessage="Negotiable charge on revenue made through it."
                 />
               </li>
               <li>
@@ -243,7 +368,7 @@ const HostPlan = props => {
             </ul>
           </PlanFeatures>
           <PlanPrice>Talk to Us</PlanPrice>
-          <Button href="mailto:support@opencollective.com">Contact</Button>
+          <Button href="/support">Contact Us</Button>
         </Plan>
       </PlanGrid>
 
@@ -331,6 +456,16 @@ const HostPlan = props => {
           {!collective.plan.transferwisePayoutsLimit && (
             <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
           )}
+        </li>
+        <li>
+          <strong>Ability to configure Host Fees</strong> :{' '}
+          {collective.plan.hostFees && <FormattedMessage id="yes" defaultMessage="Yes" />}
+          {!collective.plan.hostFees && <FormattedMessage id="no" defaultMessage="No" />}
+        </li>
+        <li>
+          <strong>Charge on Host Fees</strong> :{' '}
+          {collective.plan.hostFeeChargePercent !== 0 && <span>{collective.plan.hostFeeChargePercent}%</span>}
+          {collective.plan.hostFeeChargePercent === 0 && <FormattedMessage id="no" defaultMessage="No" />}
         </li>
       </ul>
     </div>

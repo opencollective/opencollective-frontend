@@ -4344,6 +4344,16 @@ type HostPlan {
   Amount limit for the transferwise payouts feature under this plan
   """
   transferwisePayoutsLimit: Int
+
+  """
+  Ability to charge Host Fees.
+  """
+  hostFees: Boolean
+
+  """
+  Charge on revenues made through Host Fees.
+  """
+  hostFeeChargePercent: Int
 }
 
 enum ImageFormat {
@@ -5051,6 +5061,21 @@ type Mutation {
     """
     token: String!
   ): Individual!
+
+  """
+  Update the plan
+  """
+  editHostPlan(
+    """
+    Account that will have 2FA added to it
+    """
+    account: AccountReferenceInput!
+
+    """
+    The name of the plan to subscribe to.
+    """
+    plan: String!
+  ): Host!
 
   """
   Apply to an host with a collective

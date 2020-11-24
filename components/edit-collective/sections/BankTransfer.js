@@ -130,15 +130,17 @@ const BankTransfer = props => {
                   defaultMessage="Subscribe to our special plans for hosts"
                 />
               )}
-              <Box mt={1}>
-                <FormattedMessage
-                  id="paymentMethods.manual.add.trial"
-                  defaultMessage="Free for the first $1,000 received, "
-                />
-                <a href="/pricing">
-                  <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
-                </a>
-              </Box>
+              {data.host.plan.bankTransfersLimit && (
+                <Box mt={1}>
+                  <FormattedMessage
+                    id="paymentMethods.manual.add.trial"
+                    defaultMessage="Free for the first $1,000 received, "
+                  />
+                  <a href="/pricing">
+                    <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
+                  </a>
+                </Box>
+              )}
             </Container>
           </Box>
           <Flex alignItems="center" my={2}>
