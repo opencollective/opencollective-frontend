@@ -1444,6 +1444,8 @@
   "search.noResult": "No collectives found matching your query: \"{query}\"",
   "search.OpenCollective": "Open Collective 검색...",
   "search.placeholder": "검색...",
+  "searchFilter.all": "View all",
+  "searchFilter.host": "Fiscal hosts",
   "SearchFor": "{entity} 검색",
   "SearchFor2": "{entity1} 또는 {entity2} 검색",
   "SearchFor3": "{entity1}, {entity2}, {entity3} 검색",

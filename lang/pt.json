@@ -1444,6 +1444,8 @@
   "search.noResult": "Nenhum Coletivo encontrado com esta busca: \"{query}\"",
   "search.OpenCollective": "Search Open Collective...",
   "search.placeholder": "Search...",
+  "searchFilter.all": "View all",
+  "searchFilter.host": "Fiscal hosts",
   "SearchFor": "Procurar por {entity}",
   "SearchFor2": "Procurar por {entity1} ou {entity2}",
   "SearchFor3": "Procurar por {entity1}, {entity2} ou {entity3}",

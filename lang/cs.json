@@ -1444,6 +1444,8 @@
   "search.noResult": "Nebyly nalezeny žádné kolektivy odpovídající vašemu dotazu: \"{query}\"",
   "search.OpenCollective": "Search Open Collective...",
   "search.placeholder": "Search...",
+  "searchFilter.all": "View all",
+  "searchFilter.host": "Fiscal hosts",
   "SearchFor": "Hledat {entity}",
   "SearchFor2": "Hledat {entity1} nebo {entity2}",
   "SearchFor3": "Hledat {entity1}, {entity2} nebo {entity3}",

@@ -1444,6 +1444,8 @@
   "search.noResult": "Коллективы не найдены по вашему запросу: \"{query}\"",
   "search.OpenCollective": "Поиск на Open Collective...",
   "search.placeholder": "Поиск...",
+  "searchFilter.all": "View all",
+  "searchFilter.host": "Fiscal hosts",
   "SearchFor": "Искать {entity}",
   "SearchFor2": "Искать {entity1} или {entity2}",
   "SearchFor3": "Искать {entity1}, {entity2} или {entity3}",
