@@ -8,18 +8,20 @@ import { omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { ORDER_STATUS } from '../lib/constants/order-status';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
-import { Flex } from '../components/Grid';
-import { Dashboard, PendingApplications } from '../components/host-dashboard';
+import { Box, Flex } from '../components/Grid';
 import { HOST_SECTIONS } from '../components/host-dashboard/constants';
 import HostDashboardExpenses from '../components/host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../components/host-dashboard/HostDashboardHostedCollectives';
+import PendingApplications from '../components/host-dashboard/PendingApplications';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import OrdersWithData from '../components/orders/OrdersWithData';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
@@ -125,7 +127,15 @@ class HostDashboardPage extends React.Component {
       case 'pending-applications':
         return <PendingApplications hostSlug={host.slug} />;
       case 'donations':
-        return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
+        return (
+          <Box py={4}>
+            <OrdersWithData
+              accountSlug={host.slug}
+              status={ORDER_STATUS.PENDING}
+              title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
+            />
+          </Box>
+        );
       case HOST_SECTIONS.HOSTED_COLLECTIVES:
         return <HostDashboardHostedCollectives hostSlug={host.slug} />;
       default:
@@ -178,7 +188,7 @@ class HostDashboardPage extends React.Component {
                 isActive={view === 'donations'}
               >
                 <DonateIcon size="1em" />
-                <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
+                <FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />
               </MenuLink>
               <MenuLink
                 route="host.dashboard"

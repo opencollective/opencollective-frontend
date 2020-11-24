@@ -46,17 +46,17 @@ class Order extends React.Component {
     };
 
     this.messages = defineMessages({
-      pending: { id: 'order.pending', defaultMessage: 'pending' },
-      paid: { id: 'order.paid', defaultMessage: 'paid' },
-      error: { id: 'order.error', defaultMessage: 'error' },
-      active: { id: 'order.active', defaultMessage: 'active' },
-      cancelled: { id: 'order.cancelled', defaultMessage: 'cancelled' },
-      expired: { id: 'order.expired', defaultMessage: 'expired' },
-      new: { id: 'order.new', defaultMessage: 'new' },
-      pledged: { id: 'order.pledged', defaultMessage: 'pledged' },
+      pending: { id: 'order.pending', defaultMessage: 'Pending' },
+      paid: { id: 'order.paid', defaultMessage: 'Paid' },
+      error: { id: 'order.error', defaultMessage: 'Error' },
+      active: { id: 'order.active', defaultMessage: 'Active' },
+      cancelled: { id: 'order.cancelled', defaultMessage: 'Cancelled' },
+      expired: { id: 'order.expired', defaultMessage: 'Expired' },
+      new: { id: 'order.new', defaultMessage: 'New' },
+      pledged: { id: 'order.pledged', defaultMessage: 'Pledged' },
       require_client_confirmation: {
         id: 'order.require_client_confirmation',
-        defaultMessage: 'require client confirmation',
+        defaultMessage: 'Require client confirmation',
       },
       'cancelOrder.modal.header': {
         id: 'cancelOrder.modal.header',

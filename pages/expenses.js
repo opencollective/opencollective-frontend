@@ -14,6 +14,8 @@ import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
+import { parseAmountRange } from '../components/budget/filters/AmountFilter';
+import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
 import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
@@ -22,8 +24,6 @@ import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
-import { parseAmountRange } from '../components/expenses/filters/ExpensesAmountFilter';
-import { getDateRangeFromPeriod } from '../components/expenses/filters/ExpensesDateFilter';
 import { expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';

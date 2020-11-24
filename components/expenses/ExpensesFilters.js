@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import AmountFilter from '../budget/filters/AmountFilter';
+import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Flex } from '../Grid';
 
-import ExpensesAmountFilter from './filters/ExpensesAmountFilter';
-import ExpensesDateFilter from './filters/ExpensesDateFilter';
 import ExpensesPayoutTypeFilter from './filters/ExpensesPayoutTypeFilter';
 import ExpensesStatusFilter from './filters/ExpensesStatusFilter';
 import ExpensesTypeFilter from './filters/ExpensesTypeFilter';
@@ -55,13 +55,13 @@ const ExpensesFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="expenses-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <ExpensesDateFilter {...getFilterProps('period')} />
+        <PeriodFilter {...getFilterProps('period')} />
       </FilterContainer>
       <FilterContainer>
         <FilterLabel htmlFor="expenses-filter-amount">
           <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
         </FilterLabel>
-        <ExpensesAmountFilter currency={collective.currency} {...getFilterProps('amount')} />
+        <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
       </FilterContainer>
       <FilterContainer>
         <FilterLabel htmlFor="expenses-filter-status">
