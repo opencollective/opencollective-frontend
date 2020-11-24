@@ -242,7 +242,13 @@ const ExpenseFormBody = ({
         if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host?.transferwise) {
           formValues.payoutMethod = undefined;
         }
-        setValues(formValues);
+        setValues(
+          omit(
+            formValues,
+            // Omit deprecated fields, otherwise it will prevent expense submission
+            ['location', 'privateInfo'],
+          ),
+        );
       }
     }
   }, [formPersister, dirty]);
