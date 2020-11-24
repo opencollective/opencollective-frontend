@@ -74,6 +74,8 @@ const I18nFilters = defineMessages({
   },
 });
 
+const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
+
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
@@ -118,7 +120,7 @@ class SearchPage extends React.Component {
     } else if (filter !== 'ALL') {
       Router.pushRoute('search', { q: term, types: filter });
     } else {
-      Router.pushRoute('search', { q: term });
+      Router.pushRoute('search', { q: term, types: DEFAULT_SEARCH_TYPES });
     }
   };
 
@@ -261,7 +263,7 @@ export { SearchPage as MockSearchPage };
 
 export const searchPageQuery = gql`
   query SearchPage($term: String!, $types: [TypeOfCollective], $isHost: Boolean, $limit: Int, $offset: Int) {
-    search(term: $term, types: $types, isHost: $isHost, limit: $limit, offset: $offset) {
+    search(term: $term, types: $types, isHost: $isHost, limit: $limit, offset: $offset, onlyActive: true) {
       collectives {
         id
         isActive

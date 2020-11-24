@@ -3568,6 +3568,11 @@ type Query {
     isHost: Boolean
 
     """
+    Whether to return only active accounts
+    """
+    onlyActive: Boolean
+
+    """
     Limit the amount of results. Defaults to 20
     """
     limit: Int = 20
