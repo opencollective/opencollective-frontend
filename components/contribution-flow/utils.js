@@ -45,7 +45,11 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   const matchesHostCollectiveIdPrepaid = prepaid => {
     const hostCollectiveLegacyId = get(collective, 'host.legacyId');
     const prepaidLimitedToHostCollectiveIds = get(prepaid, 'limitedToHosts');
-    return find(prepaidLimitedToHostCollectiveIds, { legacyId: hostCollectiveLegacyId });
+    if (prepaidLimitedToHostCollectiveIds?.length) {
+      return find(prepaidLimitedToHostCollectiveIds, { legacyId: hostCollectiveLegacyId });
+    } else {
+      return prepaid.data?.HostCollectiveId && prepaid.data.HostCollectiveId === hostCollectiveLegacyId;
+    }
   };
 
   // gift card: can be limited to a specific host, see limitedToHosts
