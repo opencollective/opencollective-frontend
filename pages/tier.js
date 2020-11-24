@@ -46,13 +46,13 @@ class TierPage extends React.Component {
         description: tier.description || collective.description || collective.longDescription,
         twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
         image: collective.image || get(collective, 'parentCollective.image'),
-        canonicalURL: `/${tier.collective.slug}/contribute/${tier.slug}-${tier.id}`,
+        canonicalURL: `${process.env.WEBSITE_URL}/${tier.collective.slug}/contribute/${tier.slug}-${tier.id}`,
       };
     } else {
       return {
         title: 'Tier',
         image: '/static/images/defaultBackgroundImage.png',
-        canonicalURL: `/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${this.props.tierId}`,
+        canonicalURL: `${process.env.WEBSITE_URL}/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${this.props.tierId}`,
       };
     }
   }
