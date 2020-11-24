@@ -2,7 +2,7 @@ describe('Tiers page', () => {
   it('Can be accessed from "/collective/contribute" (default)', () => {
     cy.visit('/apex/contribute');
     cy.get('head > title').should('have.text', 'Contribute to APEX - Open Collective');
-    cy.get('link[rel=canonical]').should('have.attr', 'href', '/apex/contribute');
+    cy.get('link[rel=canonical]').should('have.attr', 'href', `${Cypress.config().baseUrl}/apex/contribute`);
   });
 
   it('Can be accessed from "/collective/tiers"', () => {
@@ -12,6 +12,6 @@ describe('Tiers page', () => {
     // safe to delete these tests.
     cy.visit('/apex/tiers');
     cy.get('head > title').should('have.text', 'Contribute to APEX - Open Collective');
-    cy.get('link[rel=canonical]').should('have.attr', 'href', '/apex/contribute');
+    cy.get('link[rel=canonical]').should('have.attr', 'href', `${Cypress.config().baseUrl}/apex/contribute`);
   });
 });

@@ -56,7 +56,7 @@ class TiersPage extends React.Component {
       return {
         title: `Contribute to ${collective.name}`,
         description: 'These are all the ways you can help make our community sustainable. ',
-        canonicalURL: `/${collective.slug}/contribute`,
+        canonicalURL: `${process.env.WEBSITE_URL}/${collective.slug}/contribute`,
       };
     }
   }

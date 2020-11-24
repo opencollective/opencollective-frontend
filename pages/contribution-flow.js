@@ -149,11 +149,12 @@ class NewContributionFlowPage extends React.Component {
 
   getCanonicalURL(collective, tier) {
     if (!tier) {
-      return `/${collective.slug}/donate`;
+      return `${process.env.WEBSITE_URL}/${collective.slug}/donate`;
     } else if (collective.type === CollectiveType.EVENT) {
-      return `/${get(collective.parent, 'slug', collective.slug)}/events/${collective.slug}/order/${tier.id}`;
+      const parentSlug = get(collective.parent, 'slug', collective.slug);
+      return `${process.env.WEBSITE_URL}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
     } else {
-      return `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
+      return `${process.env.WEBSITE_URL}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
     }
   }
 

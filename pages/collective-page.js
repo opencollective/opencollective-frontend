@@ -152,6 +152,10 @@ class CollectivePage extends React.Component {
     this.setState({ showOnboardingModal: bool });
   };
 
+  getCanonicalURL(slug) {
+    return `${process.env.WEBSITE_URL}/${slug}`;
+  }
+
   render() {
     const { slug, data, LoggedInUser, status, step, mode } = this.props;
     const { showOnboardingModal } = this.state;
@@ -175,7 +179,7 @@ class CollectivePage extends React.Component {
     const collective = data && data.Collective;
 
     return (
-      <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles smooth={this.state.smooth} />
         {loading ? (
           <Container py={[5, 6]}>
