@@ -83,7 +83,13 @@ class OnboardingNavButtons extends React.Component {
               </StyledRoundButton>
             )}
 
-            <StyledButton buttonStyle="primary" onClick={() => handleSubmit} loading={loading} data-cy="finish-button">
+            <StyledButton
+              type="submit"
+              buttonStyle="primary"
+              onClick={() => handleSubmit}
+              loading={loading}
+              data-cy="finish-button"
+            >
               <FormattedMessage id="Finish" defaultMessage="Finish" />
             </StyledButton>
           </Fragment>
@@ -130,7 +136,8 @@ class OnboardingNavButtons extends React.Component {
                 data-cy="step-forward-button"
                 mx={1}
                 buttonStyle="primary"
-                onClick={() => {
+                onClick={e => {
+                  e.preventDefault();
                   Router.pushRoute('collective-with-onboarding', {
                     slug,
                     mode,

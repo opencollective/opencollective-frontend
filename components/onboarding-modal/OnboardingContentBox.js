@@ -47,9 +47,9 @@ class OnboardingContentBox extends React.Component {
   }
 
   componentDidMount() {
-    const member = this.props.LoggedInUser.memberOf.filter(member => member.collective.id === this.props.collective.id);
+    const member = this.props.LoggedInUser.memberOf.find(member => member.collective.id === this.props.collective.id);
     this.setState({
-      admins: [{ role: 'ADMIN', member: this.props.LoggedInUser.collective, id: member[0].id }],
+      admins: [{ role: 'ADMIN', member: this.props.LoggedInUser.collective, id: member.id }],
     });
   }
 
