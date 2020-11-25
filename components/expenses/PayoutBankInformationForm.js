@@ -36,6 +36,8 @@ const accountHolderFieldOptions = {
       name: 'Account Holder Name',
       type: 'text',
       example: 'Jane Doe',
+      validationRegexp: '^[^!@#$%&*+]+$',
+      validationError: 'Special characters are not allowed. (!@#$%&*+)',
     },
   ],
 };
@@ -81,7 +83,7 @@ const Input = props => {
         if (!value && input.required) {
           return `${input.name} is required`;
         } else if (!matches && value) {
-          return `Invalid ${input.name}`;
+          return input.validationError || `Invalid ${input.name}`;
         }
       };
     }
