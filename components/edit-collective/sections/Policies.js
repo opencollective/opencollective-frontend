@@ -14,16 +14,13 @@ import { parseToBoolean } from '../../../lib/utils';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
-import StyledTextarea from '../../StyledTextarea';
 import { H3, P } from '../../Text';
 
 import { getSettingsQuery } from './EditCollectivePage';
-
-const EXPENSE_POLICY_MAX_LENGTH = 16000; // max in database is ~15,500
-const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
 const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
   mutation UpdateFilterCategories($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -161,17 +158,16 @@ const Policies = ({ collective }) => {
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
           >
             {inputProps => (
-              <StyledTextarea
-                {...inputProps}
-                resize="none"
-                maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
-                showCount
-                height={'20rem'}
-                width={1}
-                fontSize="14px"
-                value={formik.values.contributionPolicy}
-                placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
+              <RichTextEditor
+                withBorders
+                version="simplified"
+                editorMinHeight="20rem"
+                id={inputProps.id}
+                inputName={inputProps.name}
                 onChange={formik.handleChange}
+                placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
+                defaultValue={formik.values.contributionPolicy}
+                fontSize="14px"
               />
             )}
           </StyledInputField>
@@ -190,17 +186,16 @@ const Policies = ({ collective }) => {
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
           >
             {inputProps => (
-              <StyledTextarea
-                {...inputProps}
-                resize="none"
-                maxLength={EXPENSE_POLICY_MAX_LENGTH}
-                showCount
-                height={'20rem'}
-                width={1}
-                fontSize="14px"
-                value={formik.values.expensePolicy}
-                placeholder={formatMessage(messages['expensePolicy.placeholder'])}
+              <RichTextEditor
+                withBorders
+                version="simplified"
+                editorMinHeight="20rem"
+                id={inputProps.id}
+                inputName={inputProps.name}
                 onChange={formik.handleChange}
+                placeholder={formatMessage(messages['expensePolicy.placeholder'])}
+                defaultValue={formik.values.expensePolicy}
+                fontSize="14px"
               />
             )}
           </StyledInputField>
