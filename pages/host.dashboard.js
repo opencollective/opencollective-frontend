@@ -8,7 +8,6 @@ import { omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { ORDER_STATUS } from '../lib/constants/order-status';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import CollectiveNavbar from '../components/CollectiveNavbar';
@@ -129,11 +128,7 @@ class HostDashboardPage extends React.Component {
       case 'donations':
         return (
           <Box py={4}>
-            <OrdersWithData
-              accountSlug={host.slug}
-              status={ORDER_STATUS.PENDING}
-              title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
-            />
+            <OrdersWithData accountSlug={host.slug} />
           </Box>
         );
       case HOST_SECTIONS.HOSTED_COLLECTIVES:
@@ -188,7 +183,7 @@ class HostDashboardPage extends React.Component {
                 isActive={view === 'donations'}
               >
                 <DonateIcon size="1em" />
-                <FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />
+                <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
               </MenuLink>
               <MenuLink
                 route="host.dashboard"
