@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { filter, get, isNil, map } from 'lodash';
 import dynamic from 'next/dynamic';
 import { Checkbox, Col, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'react-bootstrap';
+import styled from 'styled-components';
 
 import { capitalize } from '../lib/utils';
 
@@ -73,6 +74,43 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
     );
   }
 }
+
+const InputFieldContainer = styled.div`
+  span.input-group {
+    width: 100%;
+  }
+  .inputField {
+    margin: 1rem 0;
+  }
+  .inputField,
+  .inputField textarea {
+    font-size: 1.6rem;
+  }
+  .horizontal .form-group label {
+    margin-top: 5px;
+  }
+  .form-horizontal .form-group label {
+    padding-top: 3px;
+  }
+  .inputField .checkbox label {
+    width: auto;
+  }
+  .inputField input[type='number'] {
+    text-align: right;
+  }
+  .inputField .currency input[type='number'] {
+    text-align: left;
+  }
+  .inputField .switch {
+    display: flex;
+    align-items: center;
+  }
+  .archiveField {
+    width: 100%;
+    display: flex;
+    padding-top: 20px;
+  }
+`;
 
 class InputField extends React.Component {
   static propTypes = {
@@ -587,47 +625,12 @@ class InputField extends React.Component {
     }
 
     return (
-      <div className={`inputField ${this.props.className} ${this.props.name}`} key={`input-${this.props.name}`}>
-        <style jsx global>
-          {`
-            span.input-group {
-              width: 100%;
-            }
-            .inputField {
-              margin: 1rem 0;
-            }
-            .inputField,
-            .inputField textarea {
-              font-size: 1.6rem;
-            }
-            .horizontal .form-group label {
-              margin-top: 5px;
-            }
-            .form-horizontal .form-group label {
-              padding-top: 3px;
-            }
-            .inputField .checkbox label {
-              width: auto;
-            }
-            .inputField input[type='number'] {
-              text-align: right;
-            }
-            .inputField .currency input[type='number'] {
-              text-align: left;
-            }
-            .inputField .switch {
-              display: flex;
-              align-items: center;
-            }
-            .archiveField {
-              width: 100%;
-              display: flex;
-              padding-top: 20px;
-            }
-          `}
-        </style>
+      <InputFieldContainer
+        className={`inputField ${this.props.className} ${this.props.name}`}
+        key={`input-${this.props.name}`}
+      >
         {this.input}
-      </div>
+      </InputFieldContainer>
     );
   }
 }
