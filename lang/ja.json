@@ -1203,6 +1203,7 @@
   "OpenInbox": "{providerName} を開く",
   "openSourceApply.GithubRepositories.title": "リポジトリを選ぶ",
   "OptionalFieldLabel": "{field} (optional)",
+  "Order": "Order",
   "order.active": "Active",
   "order.cancelled": "Cancelled",
   "Order.Confirm.Processing": "Confirming your payment method…",

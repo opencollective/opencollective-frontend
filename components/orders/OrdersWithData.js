@@ -63,6 +63,7 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
         status
         amount {
           valueInCents
+          currency
         }
         paymentMethod {
           id

@@ -15,6 +15,7 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import ProcessOrderButtons from '../orders/ProcessOrderButtons';
+import StyledTag from '../StyledTag';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
@@ -88,7 +89,6 @@ const OrderBudgetItem = ({ isLoading, order }) => {
                     textDecoration="none"
                     color="black.900"
                     fontSize={`${fontSize}px`}
-                    title={`#${order.legacyId}`}
                     data-cy="expense-title"
                   >
                     {value}
@@ -120,12 +120,25 @@ const OrderBudgetItem = ({ isLoading, order }) => {
               <Flex alignItems="center">
                 <TransactionSign isCredit />
                 <Span color="black.500" fontSize="15px">
-                  <FormattedMoneyAmount amount={order.amount.valueInCents} currency={order.currency} precision={2} />
+                  <FormattedMoneyAmount
+                    amount={order.amount.valueInCents}
+                    currency={order.amount.currency}
+                    precision={2}
+                  />
                 </Span>
               </Flex>
             )}
           </Flex>
-          {isLoading ? <LoadingPlaceholder height={20} width={140} /> : <OrderStatusTag status={order.status} />}
+          {isLoading ? (
+            <LoadingPlaceholder height={20} width={140} />
+          ) : (
+            <Flex>
+              <StyledTag variant="rounded-left" fontSize="10px" fontWeight="500" mr={1}>
+                <FormattedMessage id="Order" defaultMessage="Order" /> #{order.legacyId}
+              </StyledTag>
+              <OrderStatusTag status={order.status} />
+            </Flex>
+          )}
         </Flex>
       </Flex>
       <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
@@ -188,8 +201,7 @@ OrderBudgetItem.propTypes = {
     description: PropTypes.string.isRequired,
     status: PropTypes.oneOf(Object.values(ORDER_STATUS)).isRequired,
     createdAt: PropTypes.string.isRequired,
-    amount: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
+    amount: PropTypes.object.isRequired,
     permissions: PropTypes.shape({
       canReject: PropTypes.bool,
       canMarkAsPaid: PropTypes.bool,

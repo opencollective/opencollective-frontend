@@ -1203,6 +1203,7 @@
   "OpenInbox": "Open {providerName}",
   "openSourceApply.GithubRepositories.title": "Pick a repository",
   "OptionalFieldLabel": "{field} (optional)",
+  "Order": "Order",
   "order.active": "Active",
   "order.cancelled": "Cancelled",
   "Order.Confirm.Processing": "Confirming your payment method…",
