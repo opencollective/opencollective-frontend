@@ -173,6 +173,14 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.hostFeePercent.description',
         defaultMessage: 'Commission on financial contributions to Collectives you fiscally host.',
       },
+      'hostFeePercent.warning': {
+        id: 'collective.hostFeePercent.warning',
+        defaultMessage: `Open Collective will charge an extra 15% fee on the money raised through Host Fees.`,
+      },
+      'hostFeePercent.warning2': {
+        id: 'newPricing.tab.hostFeeChargeExample',
+        defaultMessage: `If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform.`,
+      },
       'location.label': {
         id: 'collective.location.label',
         defaultMessage: 'City',
@@ -699,7 +707,8 @@ class EditCollectiveForm extends React.Component {
           className: 'horizontal',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.apply'),
-          when: () => collective.isHost,
+          when: () =>
+            collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.apply),
         },
         {
           name: 'hostFeePercent',
@@ -707,7 +716,10 @@ class EditCollectiveForm extends React.Component {
           className: 'horizontal',
           post: '%',
           defaultValue: get(this.state.collective, 'hostFeePercent'),
-          when: () => collective.isHost,
+          when: () =>
+            collective.isHost &&
+            ((collective.plan?.name !== 'start-plan-2021' && collective.type === CollectiveType.ORGANIZATION) ||
+              collective.hostFeePercent !== 0),
         },
         {
           name: 'tos',
@@ -715,7 +727,7 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
           className: 'horizontal',
           defaultValue: get(this.state.collective, 'settings.tos'),
-          when: () => collective.isHost,
+          when: () => collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.tos),
         },
       ],
     };
@@ -730,6 +742,12 @@ class EditCollectiveForm extends React.Component {
         }
         if (this.messages[`${field.name}.placeholder`]) {
           field.placeholder = intl.formatMessage(this.messages[`${field.name}.placeholder`]);
+        }
+        if (field.name === 'hostFeePercent' && collective.plan.name.includes('2021')) {
+          field.description += ` `;
+          field.description += intl.formatMessage(this.messages[`${field.name}.warning`], collective);
+          field.description += ` `;
+          field.description += intl.formatMessage(this.messages[`${field.name}.warning2`], collective);
         }
         return field;
       });

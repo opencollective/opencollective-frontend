@@ -100,12 +100,12 @@ const PricingTabs = ({ onChange, activeTab }) => {
           <img width="100%" src="/static/images/pricing-star-bg-sm.png" alt="Pricing" />
         </Box>
         <Title
-          fontSize={['24px', null, '48px']}
+          fontSize={['32px', null, '52px']}
           lineHeight={['40px', null, '56px']}
           letterSpacing="-0.4px"
           textAlign="center"
         >
-          <FormattedMessage id="newPricing.title" defaultMessage="Our new pricing" />
+          <FormattedMessage id="oldPricing.title" defaultMessage="Our old pricing" />
         </Title>
       </Wrapper>
       <Container>
@@ -118,16 +118,16 @@ const PricingTabs = ({ onChange, activeTab }) => {
             letterSpacing={['-0.012em', null, '-0.4px']}
           >
             <FormattedMessage
-              id="newPricing.warning"
-              defaultMessage="Below you’ll see the pricing for new users. Existing users will be moved to the new pricing in 2021."
+              id="pricing.warning"
+              defaultMessage="This is the OLD pricing that we're currently phasing out. Existing users will be moved to our new pricing in 2021."
             />
             <br />
             <FormattedMessage
-              id="newPricing.warning2"
-              defaultMessage="For reference, you can check <a>our old pricing page.</a>"
+              id="pricing.warning2"
+              defaultMessage="You can check <a>our new pricing page.</a>"
               values={{
                 // eslint-disable-next-line react/display-name
-                a: chunks => <Link route={`/pricing-old`}>{chunks}</Link>,
+                a: chunks => <Link route={`/pricing`}>{chunks}</Link>,
               }}
             />
           </P>
