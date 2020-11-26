@@ -697,6 +697,7 @@
   "EditUserEmailForm.success": "Um e-mail com o link de confirmação foi enviado para {email}.",
   "Email": "Email",
   "emptyBalance": "Empty Balance",
+  "EmptyCollectivePage": "{collective} is now working on its public profile, and don't have anything to show, yet. Meanwhile, there are dozens of Collectives you can discover, take a look!",
   "Error": "Error",
   "Error.BadCollectiveType": "Este tipo de perfil não é aceito",
   "error.code.invalid": "Vale-presente inválido",

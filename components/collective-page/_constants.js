@@ -38,6 +38,8 @@ export const Sections = {
   CONNECT: 'connect',
   // ABOUT
   ABOUT: 'about',
+  // EMPTY for new collectives/no data in any category sections
+  EMPTY: 'empty',
 };
 
 /** A list of all section names */

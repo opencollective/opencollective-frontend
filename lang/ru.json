@@ -697,6 +697,7 @@
   "EditUserEmailForm.success": "Письмо с ссылкой для подтверждения отправлено на {email}.",
   "Email": "Email",
   "emptyBalance": "Нулевой Баланс",
+  "EmptyCollectivePage": "{collective} is now working on its public profile, and don't have anything to show, yet. Meanwhile, there are dozens of Collectives you can discover, take a look!",
   "Error": "Error",
   "Error.BadCollectiveType": "Этот тип профиля не поддерживается",
   "error.code.invalid": "Неверный код подарочной карты",

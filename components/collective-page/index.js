@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { throttle } from 'lodash';
+import { isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 
@@ -19,6 +19,7 @@ import SectionContribute from './sections/Contribute';
 import SectionContributions from './sections/Contributions';
 import SectionContributors from './sections/Contributors';
 import SectionConversations from './sections/Conversations';
+import SectionEmpty from './sections/Empty';
 import SectionEvents from './sections/Events';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
@@ -382,16 +383,20 @@ class CollectivePage extends Component {
             createNotification={this.createNotification}
           />
         </Container>
-        {sections.map((section, idx) => (
-          <SectionContainer
-            key={section}
-            ref={sectionRef => (this.sectionsRefs[section] = sectionRef)}
-            id={`section-${section}`}
-            withPaddingBottom={idx === sections.length - 1 && !sectionsWithoutPaddingBottom[section]}
-          >
-            {this.renderSection(section, idx === sections.length - 1)}
-          </SectionContainer>
-        ))}
+        {isEmpty(sections) ? (
+          <SectionEmpty collective={this.props.collective} />
+        ) : (
+          sections.map((section, idx) => (
+            <SectionContainer
+              key={section}
+              ref={sectionRef => (this.sectionsRefs[section] = sectionRef)}
+              id={`section-${section}`}
+              withPaddingBottom={idx === sections.length - 1 && !sectionsWithoutPaddingBottom[section]}
+            >
+              {this.renderSection(section, idx === sections.length - 1)}
+            </SectionContainer>
+          ))
+        )}
       </Container>
     );
   }
