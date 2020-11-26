@@ -12,6 +12,8 @@ import { Flex } from './Grid';
 import { fadeIn } from './StyledKeyframes';
 import { P } from './Text';
 
+import useKeyBoardShortcut from '../lib/hooks/useEscapeKey'
+
 const Wrapper = styled(Flex)`
   position: fixed;
   top: 0;
@@ -173,6 +175,9 @@ ModalFooter.defaultProps = {
  * a styled `Container`.
  */
 const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
+  // Closes the modal upon the `ESC` key press.
+  useKeyBoardShortcut(() =>  onClose())
+  
   if (show && usePortal === false) {
     return (
       <React.Fragment>

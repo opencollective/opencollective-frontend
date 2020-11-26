@@ -7,6 +7,7 @@ import { Col, Modal, Row } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import useKeyboardShortcut from '../lib/hooks/useEscapeKey'
 
 import AddFundsForm from './AddFundsForm';
 import Button from './Button';
@@ -59,6 +60,8 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective, host }) => {
   if (!LoggedInUser) {
     return null;
   }
+
+  useKeyboardShortcut(() => close())
 
   return (
     <Modal show={show} onHide={close}>

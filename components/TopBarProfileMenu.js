@@ -29,6 +29,8 @@ import StyledRoundButton from './StyledRoundButton';
 import { P } from './Text';
 import { withUser } from './UserProvider';
 
+import useKeyBoardShortcut from '../lib/hooks/useEscapeKey';
+
 const memberInvitationsCountQuery = gql`
   query MemberInvitationsCount($memberCollectiveId: Int!) {
     memberInvitations(MemberCollectiveId: $memberCollectiveId) {
@@ -94,6 +96,7 @@ class TopBarProfileMenu extends React.Component {
   }
 
   componentDidMount() {
+    document.addEventListener('keydown', this.handleEscKey);
     document.addEventListener('click', this.onClickOutside);
     if (!getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)) {
       this.setState({ loading: false });
@@ -102,7 +105,17 @@ class TopBarProfileMenu extends React.Component {
 
   componentWillUnmount() {
     document.removeEventListener('click', this.onClickOutside);
+    document.removeEventListener('keydown', this.handleEscKey);
   }
+
+  handleEscKey = event => {
+    const { key, keyCode } = event;
+    if (key === 'Escape' || key === 'Esc' || keyCode === 27) {
+      this.setState({
+        showProfileMenu: false,
+      });
+    }
+  };
 
   logout = () => {
     this.setState({ showProfileMenu: false, status: 'loggingout' });
