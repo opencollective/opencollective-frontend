@@ -49,7 +49,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
       <Flex justifyContent="space-between">
         <Box width={1 / 2} mb={3} mr={1}>
           <StyledInputField
-            label={<FormattedMessage id="Fields.FullName" defaultMessage="Full name" />}
+            label={<FormattedMessage id="User.FullName" defaultMessage="Full name" />}
             htmlFor="name"
             required={totalAmount < 25000 ? false : true}
           >

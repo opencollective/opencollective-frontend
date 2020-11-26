@@ -56,7 +56,7 @@ const StepsProgressBox = styled(Box)`
 
 const STEP_LABELS = defineMessages({
   profile: {
-    id: 'contribute.step.profile',
+    id: 'menu.profile',
     defaultMessage: 'Profile',
   },
   details: {

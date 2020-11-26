@@ -119,7 +119,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   />
                 ) : (
                   <FormattedMessage
-                    id="Transaction.by"
+                    id="CreatedBy"
                     defaultMessage="by {name}"
                     values={{ name: <StyledLink as={LinkCollective} collective={toAccount} colorShade={600} /> }}
                   />

@@ -92,7 +92,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           {host && (
             <Box>
               <DetailTitle>
-                <FormattedMessage id="Member.Role.FISCAL_HOST" defaultMessage="Fiscal Host" />
+                <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
               </DetailTitle>
               <DetailDescription>
                 <StyledLink as={LinkCollective} collective={host} colorShade={600} />

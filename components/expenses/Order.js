@@ -48,9 +48,9 @@ class Order extends React.Component {
     this.messages = defineMessages({
       pending: { id: 'order.pending', defaultMessage: 'Pending' },
       paid: { id: 'order.paid', defaultMessage: 'Paid' },
-      error: { id: 'order.error', defaultMessage: 'Error' },
-      active: { id: 'order.active', defaultMessage: 'Active' },
-      cancelled: { id: 'order.cancelled', defaultMessage: 'Cancelled' },
+      error: { id: 'Error', defaultMessage: 'Error' },
+      active: { id: 'Subscriptions.Active', defaultMessage: 'Active' },
+      cancelled: { id: 'Subscriptions.Cancelled', defaultMessage: 'Cancelled' },
       expired: { id: 'order.expired', defaultMessage: 'Expired' },
       new: { id: 'order.new', defaultMessage: 'New' },
       pledged: { id: 'order.pledged', defaultMessage: 'Pledged' },

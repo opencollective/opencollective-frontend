@@ -9,7 +9,16 @@ import locales from '../lib/constants/locales';
 const MESSAGES_PATTERN = './dist/messages/**/*.json';
 const LANG_DIR = './lang/';
 const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
-const DUPLICATED_IGNORED_IDS = new Set(['section.team.title', 'contribute.step.details']);
+const DUPLICATED_IGNORED_IDS = new Set([
+  'section.team.title',
+  'contribute.step.details',
+  'order.status',
+  'expense.status',
+  'expense.markAsPaid',
+  'expense.approved',
+  'expense.rejected',
+  'order.rejected',
+]);
 const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', 'other']);
 
 /* eslint-disable no-console */

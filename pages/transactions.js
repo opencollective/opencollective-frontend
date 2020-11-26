@@ -191,7 +191,7 @@ class TransactionsPage extends React.Component {
             <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
               <Flex justifyContent="space-between">
                 <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
-                  <FormattedMessage id="section.transactions.title" defaultMessage="Transactions" />
+                  <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
                 </H1>
                 <Box p={2} flexGrow={[1, 0]}>
                   <SearchBar

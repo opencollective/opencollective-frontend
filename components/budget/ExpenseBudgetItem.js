@@ -176,7 +176,7 @@ const ExpenseBudgetItem = ({
                   <LinkCollective collective={collective} />
                 ) : (
                   <FormattedMessage
-                    id="Expense.By"
+                    id="CreatedBy"
                     defaultMessage="by {name}"
                     values={{ name: <LinkCollective collective={expense.createdByAccount} /> }}
                   />
