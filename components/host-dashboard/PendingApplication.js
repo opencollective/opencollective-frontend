@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import { Ban } from '@styled-icons/fa-solid/Ban';
-import { Check } from '@styled-icons/fa-solid/Check';
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Mail } from '@styled-icons/feather/Mail';
 import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { padding } from 'styled-system';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { CustomScrollbarCSS } from '../../lib/styled-components-shared-styles';
 
@@ -21,7 +20,6 @@ import I18nCollectiveTags from '../I18nCollectiveTags';
 import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
-import MessageBox from '../MessageBox';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
@@ -95,6 +93,17 @@ export const processApplicationMutation = gqlV2/* GraphQL */ `
   ${processApplicationAccountFields}
 `;
 
+const msg = defineMessages({
+  approved: {
+    id: 'HostApplication.Approved',
+    defaultMessage: '{name} has been approved',
+  },
+  rejected: {
+    id: 'HostApplication.Rejected',
+    defaultMessage: '{name} has been rejected',
+  },
+});
+
 const ACTIONS = {
   APPROVE: 'APPROVE',
   REJECT: 'REJECT',
@@ -102,32 +111,113 @@ const ACTIONS = {
   SEND_PUBLIC_MESSAGE: 'SEND_PUBLIC_MESSAGE',
 };
 
+const StatusTag = ({ status }) => {
+  const tagProps = { textTransform: 'uppercase', mr: 2 };
+
+  switch (status) {
+    case 'PENDING':
+      return (
+        <StyledTag {...tagProps} type="warning">
+          <FormattedMessage id="Pending" defaultMessage="Pending" />
+        </StyledTag>
+      );
+    case 'APPROVED':
+      return (
+        <StyledTag {...tagProps} type="success">
+          <FormattedMessage id="PendingApplication.Approved" defaultMessage="Approved" />
+        </StyledTag>
+      );
+    case 'REJECTED':
+      return (
+        <StyledTag {...tagProps} type="error">
+          <FormattedMessage id="PendingApplication.Rejected" defaultMessage="Rejected" />
+        </StyledTag>
+      );
+    default:
+      return null;
+  }
+};
+
+StatusTag.propTypes = {
+  status: PropTypes.oneOf(['PENDING', 'REJECTED', 'APPROVED']),
+};
+
+const getStatus = (isDone, latestAction) => {
+  if (!isDone) {
+    return 'PENDING';
+  } else if (latestAction === ACTIONS.REJECT) {
+    return 'REJECTED';
+  } else if (latestAction === ACTIONS.APPROVE) {
+    return 'APPROVED';
+  }
+};
+
+const getSuccessToast = (intl, action, collective, result) => {
+  if (action === ACTIONS.SEND_PRIVATE_MESSAGE || action === ACTIONS.SEND_PUBLIC_MESSAGE) {
+    const conversation = get(result, 'data.processHostApplication.conversation');
+    return {
+      type: TOAST_TYPE.SUCCESS,
+      duration: 10000,
+      title: conversation ? (
+        <FormattedMessage id="Conversation.created" defaultMessage="Conversation created" />
+      ) : (
+        <FormattedMessage id="MessageSent" defaultMessage="Message sent" />
+      ),
+      message: conversation && (
+        <StyledLink
+          as={Link}
+          openInNewTab
+          route="conversation"
+          params={{ collectiveSlug: collective.slug, id: conversation.id, slug: conversation.slug }}
+        >
+          <FormattedMessage id="Conversation.view" defaultMessage="View conversation" />
+          &nbsp;
+          <ExternalLink size="1em" style={{ verticalAlign: 'middle' }} />
+        </StyledLink>
+      ),
+    };
+  } else if (action === ACTIONS.APPROVE) {
+    return {
+      type: TOAST_TYPE.SUCCESS,
+      message: intl.formatMessage(msg.approved, { name: collective.name }),
+    };
+  } else if (action === ACTIONS.REJECT) {
+    return {
+      type: TOAST_TYPE.SUCCESS,
+      message: intl.formatMessage(msg.rejected, { name: collective.name }),
+    };
+  } else {
+    return { type: TOAST_TYPE.SUCCESS };
+  }
+};
+
 const PendingApplication = ({ host, collective, ...props }) => {
+  const intl = useIntl();
   const [isDone, setIsDone] = React.useState(false);
   const [latestAction, setLatestAction] = React.useState(null);
   const [showContactModal, setShowContactModal] = React.useState(false);
   const { addToast } = useToasts();
-  const [callProcessApplication, { loading, error }] = useMutation(processApplicationMutation, {
+  const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
     context: API_V2_CONTEXT,
   });
   const applyMessage = null; // TODO: Doesn't exist yet
-  const isRejected = isDone && latestAction === ACTIONS.REJECT;
-  const isApproved = isDone && latestAction === ACTIONS.APPROVE;
 
   const processApplication = async (action, message, onSuccess) => {
     setIsDone(false);
     setLatestAction(action);
     try {
-      const result = await callProcessApplication({
-        variables: { host: { id: host.id }, account: { id: collective.id }, action, message },
-      });
-      setIsDone(true);
+      const variables = { host: { id: host.id }, account: { id: collective.id }, action, message };
+      const result = await callProcessApplication({ variables });
+      addToast(getSuccessToast(intl, action, collective, result));
+      if (action === ACTIONS.APPROVE || action === ACTIONS.REJECT) {
+        setIsDone(true);
+      }
       if (onSuccess) {
         onSuccess();
       }
       return result;
-    } catch {
-      // Ignore errors (handled through Apollo's `error`)
+    } catch (e) {
+      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
     }
   };
 
@@ -148,9 +238,7 @@ const PendingApplication = ({ host, collective, ...props }) => {
         showWebsite
         tag={
           <Flex mt={12}>
-            <StyledTag type="warning" textTransform="uppercase" mr={2}>
-              <FormattedMessage id="Pending" defaultMessage="Pending" />
-            </StyledTag>
+            <StatusTag status={getStatus(isDone, latestAction)} />
             <StyledTag variant="rounded-right">
               <I18nCollectiveTags
                 tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
@@ -224,13 +312,6 @@ const PendingApplication = ({ host, collective, ...props }) => {
         height={332}
       >
         <Container px="4px" position="relative">
-          {error && (
-            <Container position="absolute" bottom="15px" ml="5%" width="90%">
-              <MessageBox type="error" withIcon>
-                {error.message}
-              </MessageBox>
-            </Container>
-          )}
           <ApplicationBody p={[12, 22]}>
             <Flex alignItems="center" mb={3}>
               <CommentIcon size={16} />
@@ -257,75 +338,37 @@ const PendingApplication = ({ host, collective, ...props }) => {
             )}
           </ApplicationBody>
         </Container>
-        <Container
-          display="flex"
-          p={3}
-          justifyContent="space-between"
-          alignItems="center"
-          borderTop="1px solid #DCDEE0"
-          boxShadow="0px -2px 4px 0px rgb(49 50 51 / 6%)"
-        >
-          <Flex alignItems="center">
-            <StyledRoundButton size={32} onClick={() => setShowContactModal(true)}>
-              <Mail size={15} color="#4E5052" />
-            </StyledRoundButton>
-          </Flex>
-          {isApproved || isRejected ? (
-            <div>
-              {isApproved ? (
-                <P color="green.500">
-                  <Check size={12} />
-                  &nbsp;
-                  <FormattedMessage id="PendingApplication.Approved" defaultMessage="Approved" />
-                </P>
-              ) : (
-                <P color="red.500">
-                  <Ban size={12} />
-                  &nbsp;
-                  <FormattedMessage id="PendingApplication.Rejected" defaultMessage="Rejected" />
-                </P>
-              )}
-            </div>
-          ) : (
+        {!isDone && (
+          <Container
+            display="flex"
+            p={3}
+            justifyContent="space-between"
+            alignItems="center"
+            borderTop="1px solid #DCDEE0"
+            boxShadow="0px -2px 4px 0px rgb(49 50 51 / 6%)"
+          >
+            <Flex alignItems="center">
+              <StyledRoundButton size={32} onClick={() => setShowContactModal(true)}>
+                <Mail size={15} color="#4E5052" />
+              </StyledRoundButton>
+            </Flex>
             <AcceptRejectButtons
               collective={collective}
               isLoading={loading}
               onApprove={() => processApplication(ACTIONS.APPROVE)}
               onReject={message => processApplication(ACTIONS.REJECT, message)}
             />
-          )}
-        </Container>
+          </Container>
+        )}
       </Container>
       <ApplicationMessageModal
         show={showContactModal}
         collective={collective}
         onClose={() => setShowContactModal(false)}
-        onConfirm={async (message, isPrivate, resetMessage) => {
+        onConfirm={(message, isPrivate, resetMessage) => {
           setShowContactModal(false);
           const action = isPrivate ? ACTIONS.SEND_PRIVATE_MESSAGE : ACTIONS.SEND_PUBLIC_MESSAGE;
-          const result = await processApplication(action, message, resetMessage);
-          const conversation = get(result, 'data.processHostApplication.conversation');
-          addToast({
-            type: TOAST_TYPE.SUCCESS,
-            duration: 10000,
-            title: conversation ? (
-              <FormattedMessage id="Conversation.created" defaultMessage="Conversation created" />
-            ) : (
-              <FormattedMessage id="MessageSent" defaultMessage="Message sent" />
-            ),
-            message: conversation && (
-              <StyledLink
-                as={Link}
-                openInNewTab
-                route="conversation"
-                params={{ collectiveSlug: collective.slug, id: conversation.id, slug: conversation.slug }}
-              >
-                <FormattedMessage id="Conversation.view" defaultMessage="View conversation" />
-                &nbsp;
-                <ExternalLink size="1em" style={{ verticalAlign: 'middle' }} />
-              </StyledLink>
-            ),
-          });
+          processApplication(action, message, resetMessage);
         }}
       />
     </Container>
@@ -340,6 +383,7 @@ PendingApplication.propTypes = {
     id: PropTypes.string.isRequired,
     legacyId: PropTypes.number,
     slug: PropTypes.string,
+    name: PropTypes.string,
     description: PropTypes.string,
     isApproved: PropTypes.bool,
     tags: PropTypes.array,

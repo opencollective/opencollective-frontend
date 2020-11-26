@@ -1,24 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
-import { isNil } from 'lodash';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
-import Container from '../Container';
-import { editAccountSettingsMutation } from '../edit-collective/mutations';
 import { Box, Flex } from '../Grid';
-import InputSwitch from '../InputSwitch';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
-import { H1, Span } from '../Text';
+import { H1 } from '../Text';
 
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from './HostAdminCollectiveFilters';
 import PendingApplication, { processApplicationAccountFields } from './PendingApplication';
@@ -96,13 +92,11 @@ const getVariablesFromQuery = query => {
 
 const PendingApplications = ({ hostSlug }) => {
   const { query } = useRouter() || {};
-  const [isAcceptingApplications, setAcceptingApplications] = React.useState(null);
   const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
   const { data, error, loading, variables } = useQuery(pendingApplicationsQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     context: API_V2_CONTEXT,
   });
-  const [submitSetting] = useMutation(editAccountSettingsMutation, { context: API_V2_CONTEXT });
 
   const hostApplications = data?.host?.pendingApplications;
   return (
@@ -137,25 +131,6 @@ const PendingApplications = ({ hostSlug }) => {
           <LoadingPlaceholder height={70} />
         ) : null}
       </Box>
-
-      {data?.host && (
-        <Container borderTop="1px dashed #4E5052" borderBottom="1px dashed #4E5052" py={3} mb={4}>
-          <Flex justifyContent="space-between" alignItems="center">
-            <Span fontSize="14px" fontWeight="700" color="black.900">
-              <FormattedMessage id="PendingApplications.Accepting" defaultMessage="Accepting applications" />
-            </Span>
-            <InputSwitch
-              name="accept-applications"
-              checked={!isNil(isAcceptingApplications) ? isAcceptingApplications : data.host.settings?.apply}
-              onChange={e => {
-                const value = e.target.checked;
-                setAcceptingApplications(value);
-                submitSetting({ variables: { account: { id: data.host.id }, key: 'apply', value } });
-              }}
-            />
-          </Flex>
-        </Container>
-      )}
 
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
 
