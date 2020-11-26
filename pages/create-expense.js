@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { compose, get, omit } from 'lodash';
+import { compose, get, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -159,10 +159,23 @@ class CreateExpensePage extends React.Component {
 
   onFormSubmit = async expense => {
     if (expense.payee.isInvite) {
+      const expenseDraft = pick(expense, [
+        'description',
+        'longDescription',
+        'tags',
+        'type',
+        'privateMessage',
+        'invoiceInfo',
+        'recipientNote',
+        'items',
+        'attachedFiles',
+        'payee',
+        'payeeLocation',
+      ]);
       const result = await this.props.draftExpenseAndInviteUser({
         variables: {
           account: { id: this.props.data.account.id },
-          expense: omit(expense, ['payoutMethod', 'currency']),
+          expense: expenseDraft,
         },
       });
       if (this.state.formPersister) {
