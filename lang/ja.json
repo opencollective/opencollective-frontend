@@ -130,6 +130,7 @@
   "CancelEdit": "編集をキャンセル",
   "cancelOrder.modal.body": "ご注文をキャンセルしてもよろしいですか？",
   "cancelOrder.modal.header": "注文をキャンセル",
+  "checkingBrowser": "Your browser is being verified. If this message doesn't disappear, try to move your mouse or to touch your screen for mobile.",
   "clickHere": "こちらからどうぞ",
   "Clipboard.Copied": "コピーしました!",
   "Clipboard.Copy": "クリップボードにコピー",

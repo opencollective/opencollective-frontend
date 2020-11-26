@@ -130,6 +130,7 @@
   "CancelEdit": "Annulla modifica",
   "cancelOrder.modal.body": "Sei sicuro di voler annullare questo ordine?",
   "cancelOrder.modal.header": "Annulla Ordine",
+  "checkingBrowser": "Your browser is being verified. If this message doesn't disappear, try to move your mouse or to touch your screen for mobile.",
   "clickHere": "Clicca qui",
   "Clipboard.Copied": "Copiato!",
   "Clipboard.Copy": "Copia nella clipboard",

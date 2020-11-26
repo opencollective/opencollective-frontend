@@ -130,6 +130,7 @@
   "CancelEdit": "변경 취소",
   "cancelOrder.modal.body": "정말 이 주문을 취소하시겠습니까?",
   "cancelOrder.modal.header": "주문 취소",
+  "checkingBrowser": "Your browser is being verified. If this message doesn't disappear, try to move your mouse or to touch your screen for mobile.",
   "clickHere": "더 알아보기",
   "Clipboard.Copied": "복사되었습니다!",
   "Clipboard.Copy": "클립보드에 복사",

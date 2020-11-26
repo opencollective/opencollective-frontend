@@ -130,6 +130,7 @@
   "CancelEdit": "取消编辑",
   "cancelOrder.modal.body": "您确定要取消此订单吗？",
   "cancelOrder.modal.header": "取消订单",
+  "checkingBrowser": "Your browser is being verified. If this message doesn't disappear, try to move your mouse or to touch your screen for mobile.",
   "clickHere": "单击此处",
   "Clipboard.Copied": "已复制！",
   "Clipboard.Copy": "复制到剪贴板",

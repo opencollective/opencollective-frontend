@@ -130,6 +130,7 @@
   "CancelEdit": "Bearbeitung abbrechen",
   "cancelOrder.modal.body": "Sind Sie sicher, dass Sie diese Bestellung stornieren möchten?",
   "cancelOrder.modal.header": "Bestellung abbrechen",
+  "checkingBrowser": "Your browser is being verified. If this message doesn't disappear, try to move your mouse or to touch your screen for mobile.",
   "clickHere": "Klick hier",
   "Clipboard.Copied": "Kopiert!",
   "Clipboard.Copy": "In die Zwischenablage kopieren",
