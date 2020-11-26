@@ -22,6 +22,9 @@ import { H3, P } from '../../Text';
 
 import { getSettingsQuery } from './EditCollectivePage';
 
+const EXPENSE_POLICY_MAX_LENGTH = 16000; // max in database is ~15,500
+const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
+
 const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
   mutation UpdateFilterCategories($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
@@ -160,6 +163,8 @@ const Policies = ({ collective }) => {
             {inputProps => (
               <RichTextEditor
                 withBorders
+                showCount
+                maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
                 version="simplified"
                 editorMinHeight="20rem"
                 id={inputProps.id}
@@ -188,6 +193,8 @@ const Policies = ({ collective }) => {
             {inputProps => (
               <RichTextEditor
                 withBorders
+                showCount
+                maxLength={EXPENSE_POLICY_MAX_LENGTH}
                 version="simplified"
                 editorMinHeight="20rem"
                 id={inputProps.id}

@@ -6,10 +6,13 @@ import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
 
 import { uploadImageWithXHR } from '../lib/api';
+import { stripHTML } from '../lib/utils';
 
+import Container from './Container';
 import HTMLContent from './HTMLContent';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
+import StyledTag from './StyledTag';
 
 const TrixEditorContainer = styled.div`
   ${props =>
@@ -161,6 +164,10 @@ export default class RichTextEditor extends React.Component {
     inputName: PropTypes.string,
     /** Change this prop to reset the value */
     reset: PropTypes.any,
+    /** If true, max text length will be displayed at the bottom right */
+    showCount: PropTypes.bool,
+    /** max length which is allowed */
+    maxLength: PropTypes.number,
     /** Wether the toolbar should stick to the top */
     withStickyToolbar: PropTypes.bool,
     /** This component is borderless by default. Set this to `true` to change that. */
@@ -395,6 +402,8 @@ export default class RichTextEditor extends React.Component {
       fontSize,
       value,
       version,
+      showCount,
+      maxLength,
     } = this.props;
 
     return !this.state.id ? (
@@ -419,12 +428,29 @@ export default class RichTextEditor extends React.Component {
         )}
         <input id={this.state.id} value={value || defaultValue} type="hidden" name={inputName} />
         <HTMLContent fontSize={fontSize}>
-          <trix-editor
-            ref={this.editorRef}
-            input={this.state.id}
-            autofocus={autoFocus ? true : undefined}
-            placeholder={placeholder}
-          />
+          {!showCount ? (
+            <trix-editor
+              ref={this.editorRef}
+              input={this.state.id}
+              autofocus={autoFocus ? true : undefined}
+              placeholder={placeholder}
+            />
+          ) : (
+            <Container position="relative">
+              <trix-editor
+                ref={this.editorRef}
+                input={this.state.id}
+                autofocus={autoFocus ? true : undefined}
+                placeholder={placeholder}
+              />
+              <Container position="absolute" bottom="1em" right="1em">
+                <StyledTag textTransform="uppercase">
+                  <span>{stripHTML(defaultValue).length}</span>
+                  {maxLength && <span> / {maxLength}</span>}
+                </StyledTag>
+              </Container>
+            </Container>
+          )}
         </HTMLContent>
       </TrixEditorContainer>
     );
