@@ -739,66 +739,6 @@ class EditCollectiveForm extends React.Component {
 
     return (
       <div className="EditCollectiveForm">
-        <style jsx>
-          {`
-            :global(.field) {
-              margin: 1rem;
-            }
-            :global(label) {
-              min-width: 150px;
-              display: inline-block;
-              vertical-align: top;
-            }
-            :global(input),
-            select,
-            :global(textarea) {
-              width: 300px;
-              font-size: 1.5rem;
-            }
-
-            .EditCollectiveForm :global(textarea[name='expensePolicy']) {
-              height: 30rem;
-            }
-
-            .actions {
-              margin: 5rem auto 1rem;
-              text-align: center;
-            }
-            .backToProfile {
-              font-size: 1.3rem;
-              margin: 1rem;
-            }
-          `}
-        </style>
-        <style global jsx>
-          {`
-            section#location {
-              margin-top: 0;
-            }
-
-            .image .InputTypeDropzone {
-              width: 100px;
-            }
-
-            .backgroundImage-dropzone {
-              max-width: 500px;
-              overflow: hidden;
-            }
-
-            .user .image-dropzone {
-              width: 64px;
-              height: 64px;
-              border-radius: 50%;
-              overflow: hidden;
-            }
-
-            .menu {
-              text-align: center;
-              margin: 1rem 0 3rem 0;
-            }
-          `}
-        </style>
-
         <Flex flexWrap="wrap">
           <Menu collective={collective} selectedSection={this.getMenuSelectedSection(section)} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
@@ -843,7 +783,7 @@ class EditCollectiveForm extends React.Component {
 
             {((fields && fields.length > 0) ||
               [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
-              <div className="actions">
+              <Container className="actions" margin="5rem auto 1rem" textAlign="center">
                 <Button
                   bsStyle="primary"
                   type="submit"
@@ -853,7 +793,7 @@ class EditCollectiveForm extends React.Component {
                   {submitBtnLabel}
                 </Button>
 
-                <div className="backToProfile">
+                <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
                   <Link
                     route={isEvent ? 'event' : 'collective'}
                     params={
@@ -868,8 +808,8 @@ class EditCollectiveForm extends React.Component {
                       values={{ type }}
                     />
                   </Link>
-                </div>
-              </div>
+                </Container>
+              </Container>
             )}
 
             {![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
