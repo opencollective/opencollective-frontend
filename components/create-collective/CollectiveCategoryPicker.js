@@ -41,7 +41,7 @@ const messages = defineMessages({
     defaultMessage: 'For any community',
   },
   opensource: {
-    id: 'createCollective.category.newOpenSource',
+    id: 'OSC.description',
     defaultMessage: 'For open source projects',
   },
   climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },

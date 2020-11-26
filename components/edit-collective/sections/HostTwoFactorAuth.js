@@ -28,7 +28,7 @@ const messages = defineMessages({
     defaultMessage: 'Rolling payout limit',
   },
   'rollingLimit.placeholder': {
-    id: 'editCollective.rollingLimit.placeholder',
+    id: 'collective.contributionPolicy.placeholder',
     defaultMessage:
       'For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.',
   },

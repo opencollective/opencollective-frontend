@@ -69,7 +69,7 @@ const WhatCanYouDo = () => {
         </SectionSubTitle>
         <SectionSubTitle display={[null, 'none']}>
           <FormattedMessage
-            id="home.whatCanYouDoSection.subTitleMobile"
+            id="home.whatIsGreatAboutOC.description"
             defaultMessage="Money management made simple, plus great tools for community engagement, budget reporting, and fiscal sponsorship."
           />
         </SectionSubTitle>

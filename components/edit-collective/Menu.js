@@ -92,7 +92,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Info',
   },
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: {
-    id: 'editCollective.invoicesAndReceipts',
+    id: 'becomeASponsor.invoiceReceipts',
     defaultMessage: 'Invoices & Receipts',
   },
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: {
@@ -108,7 +108,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Fiscal Hosting',
   },
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: {
-    id: 'editCollective.menu.members',
+    id: 'ContributorsFilter.Core',
     defaultMessage: 'Team',
   },
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: {

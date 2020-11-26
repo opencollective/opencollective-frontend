@@ -23,7 +23,7 @@ const headerMessages = defineMessages({
     defaultMessage: 'Join Open Collective',
   },
   [SUCCESS_CTA_TYPE.BLOG]: {
-    id: 'NewContributionFlow.Success.CTA.Read.Header',
+    id: 'ReadOurStories',
     defaultMessage: 'Read our stories',
   },
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {

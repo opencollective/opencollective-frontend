@@ -124,7 +124,7 @@ const JoinUs = () => (
                 mb={2}
                 fontWeight="bold"
               >
-                <FormattedMessage id="home.joinUsSection.team" defaultMessage="Read our stories" />
+                <FormattedMessage id="ReadOurStories" defaultMessage="Read our stories" />
               </H3>
               <Box width={[null, '460px']}>
                 <P fontSize="15px" lineHeight="23px" letterSpacing="-0.12px" color="black.700" display={[null, 'none']}>

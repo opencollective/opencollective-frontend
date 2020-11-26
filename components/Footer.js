@@ -80,11 +80,11 @@ const messages = defineMessages({
     defaultMessage: 'Join',
   },
   'join.createACollective': {
-    id: 'join.createACollective',
+    id: 'home.create',
     defaultMessage: 'Create a Collective',
   },
   'join.discover': {
-    id: 'join.discover',
+    id: 'menu.discover',
     defaultMessage: 'Discover',
   },
   'join.findAFiscalHost': {
@@ -104,7 +104,7 @@ const messages = defineMessages({
     defaultMessage: 'Open Source',
   },
   'community.docsAndHelp': {
-    id: 'community.docsAndHelp',
+    id: 'menu.docs',
     defaultMessage: 'Docs & Help',
   },
   'community.support': {
@@ -116,7 +116,7 @@ const messages = defineMessages({
     defaultMessage: 'Company',
   },
   'company.about': {
-    id: 'company.about',
+    id: 'collective.about.title',
     defaultMessage: 'About',
   },
   'company.blog': {
