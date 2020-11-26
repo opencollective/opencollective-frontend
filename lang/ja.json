@@ -1047,7 +1047,7 @@
   "Host.Plan.HostFees.no": "0% Host Fee (not configurable)",
   "Host.Plan.HostFees.yes": "Configurable Host Fee",
   "Host.Plan.MinimalRevenue.no": "No minimal revenue.",
-  "Host.Plan.PlatformTips.no": "5% Platform Fees",
+  "Host.Plan.PlatformTips.sometimes": "5% Platform Fees or Platform Tips",
   "Host.Plan.PlatformTips.yes": "Voluntary Platform Tips",
   "Host.Plan.RevenueCharge.negotiable": "Negotiable revenue sharing model.",
   "Host.Plan.RevenueCharge.no": "No charge on revenue made through it.",

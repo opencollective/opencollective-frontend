@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import themeGet from '@styled-system/theme-get';
-import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -11,7 +10,6 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { editCollectivePageQuery } from '../../../lib/graphql/queries';
 
 import Button from '../../Button';
-import Loading from '../../Loading';
 import StyledTooltip from '../../StyledTooltip';
 import { H3 } from '../../Text';
 
@@ -46,12 +44,6 @@ const PlanFeatures = styled.div`
 `;
 
 const PlanName = styled.h4`
-  font-size: 1.4rem;
-  text-align: center;
-  font-weight: bold;
-`;
-
-const PlanPrice = styled.p`
   font-size: 1.4rem;
   text-align: center;
   font-weight: bold;
@@ -175,22 +167,6 @@ NewPlanFeatures.propTypes = {
   hostFees: PropTypes.bool.isRequired,
 };
 
-const editCollectiveHostPlansQuery = gql`
-  query EditCollectiveHostPlans($slug: String) {
-    Collective(slug: $slug) {
-      id
-      slug
-      tiers {
-        id
-        slug
-        name
-        interval
-        amount
-      }
-    }
-  }
-`;
-
 const editHostPlanMutation = gqlV2/* GraphQL */ `
   mutation EditHostPlan($account: AccountReferenceInput!, $plan: String!) {
     editHostPlan(account: $account, plan: $plan) {
@@ -205,9 +181,6 @@ const editHostPlanMutation = gqlV2/* GraphQL */ `
 
 const HostPlan = props => {
   const { collective } = props;
-  const { data: opencollective, loading } = useQuery(editCollectiveHostPlansQuery, {
-    variables: { slug: 'opencollective' },
-  });
 
   const editHostPlanMutationOptions = {
     context: API_V2_CONTEXT,
@@ -219,18 +192,6 @@ const HostPlan = props => {
     editHostPlanMutation,
     editHostPlanMutationOptions,
   );
-
-  if (loading) {
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
-  }
-
-  const tiers = get(opencollective, 'Collective.tiers') || [];
-  const subscribedTier = tiers.find(tier => tier.slug === collective.plan.name);
-  const redirectUrl = `${process.env.WEBSITE_URL}/${collective.slug}/edit/host-plan`;
 
   return (
     <div>
@@ -245,7 +206,10 @@ const HostPlan = props => {
             <PlanFeatures>
               <ul>
                 <li>
-                  <FormattedMessage id="Host.Plan.PlatformTips.no" defaultMessage="5% Platform Fees" />
+                  <FormattedMessage
+                    id="Host.Plan.PlatformTips.sometimes"
+                    defaultMessage="5% Platform Fees or Platform Tips"
+                  />
                 </li>
                 <li>
                   <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fee" />
@@ -302,42 +266,6 @@ const HostPlan = props => {
           />
         )}
 
-        {!['start-plan-2021', 'grow-plan-2021', 'owned', 'custom'].includes(collective.plan) &&
-          tiers.map(tier => {
-            const isCurrentPlan = collective.plan.name === tier.slug;
-            const hostedCollectivesLimit = get(tier, 'data.hostedCollectivesLimit');
-            const isWithinLimits = hostedCollectivesLimit
-              ? collective.plan.hostedCollectives <= hostedCollectivesLimit
-              : true;
-
-            let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
-            // Rename verb to Upgrade/Downgrade if subscribed to active Tier
-            if (subscribedTier && subscribedTier.amount > tier.amount) {
-              verb = 'Downgrade';
-            } else if (subscribedTier && subscribedTier.amount < tier.amount) {
-              verb = 'Upgrade';
-            }
-
-            return (
-              <Plan key={tier.id} disabled={!isWithinLimits && !isCurrentPlan} active={isCurrentPlan}>
-                <PlanName>{tier.name}</PlanName>
-                <PlanFeatures>
-                  <GenericPlanFeatures plan={tier.slug} />
-                </PlanFeatures>
-                <PlanPrice>
-                  ${tier.amount / 100} / {tier.interval}
-                </PlanPrice>
-                <Button
-                  href={`/opencollective/contribute/${tier.slug}-${tier.id}/checkout?contributeAs=${collective.slug}&redirect=${redirectUrl}`}
-                  disabled={!isWithinLimits || isCurrentPlan}
-                >
-                  {verb}
-                </Button>
-                {isCurrentPlan && <DisabledMessage>Current plan.</DisabledMessage>}
-                {!isWithinLimits && !isCurrentPlan && <DisabledMessage>Current usage is above limits.</DisabledMessage>}
-              </Plan>
-            );
-          })}
         <Plan active={collective.plan.name === 'custom'}>
           <PlanName>Custom Host Plan</PlanName>
           <PlanFeatures>
