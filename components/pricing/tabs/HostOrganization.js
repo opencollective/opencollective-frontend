@@ -225,6 +225,7 @@ const rows = [
 const footings = [
   '',
   '',
+  '',
   {
     type: 'button',
     cta: 'Contact Us',
