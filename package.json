@@ -157,7 +157,7 @@
     "@babel/node": "7.7.7",
     "@cypress/code-coverage": "^3.8.3",
     "babel-eslint": "^10.1.0",
-    "babel-loader": "8.2.1",
+    "babel-loader": "8.2.2",
     "babel-plugin-istanbul": "^6.0.0",
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-react-intl": "^7.9.4",
