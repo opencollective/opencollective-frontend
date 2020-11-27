@@ -6,31 +6,39 @@ import { cloneDeep, orderBy, partition, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
+import { getTopContributors } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
+import { getEnvVar } from '../../../lib/env-utils';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { canOrderTicketsFromEvent, isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { parseToBoolean } from '../../../lib/utils';
 
 import { Sections } from '../_constants';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import ContributeCardContainer, { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
+import ContributeCollective from '../../contribute-cards/ContributeCollective';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
+import ContributeEvent from '../../contribute-cards/ContributeEvent';
 import ContributeTier from '../../contribute-cards/ContributeTier';
+import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
-import { H3, P } from '../../Text';
+import { H3, H4, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../graphql/queries';
 import SectionHeader from '../SectionHeader';
+import TopContributors from '../TopContributors';
 
 import contributeSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconContribute.png';
 
@@ -38,6 +46,13 @@ import contributeSectionHeaderIcon from '../../../public/static/images/collectiv
 const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {
   ssr: false,
 });
+
+/** The container for Top Contributors view */
+const TopContributorsContainer = styled.div`
+  padding: 32px 16px;
+  margin-top: 48px;
+  background-color: #f5f7fa;
+`;
 
 const TIERS_ORDER_KEY = 'collectivePage.tiersOrder';
 
@@ -225,8 +240,10 @@ class SectionContribute extends React.PureComponent {
   });
 
   render() {
-    const { collective, tiers, events, connectedCollectives, isAdmin } = this.props;
+    const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
     const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
+    const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
+    const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const orderKeys = draggingContributionsOrder || this.getCollectiveContributionCardsOrder();
     const sortedTiers = this.getSortedCollectiveTiers(tiers, orderKeys);
     const isEvent = collective.type === CollectiveType.EVENT;
@@ -492,6 +509,25 @@ class SectionContribute extends React.PureComponent {
                   </Container>
                 </TopContributorsContainer>
               )}
+              {!isEvent &&
+                (topOrganizations.length !== 0 || topIndividuals.length !== 0) &&
+                !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+                  <TopContributorsContainer>
+                    <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
+                      <H4 fontWeight="normal" color="black.700" mb={3}>
+                        <FormattedMessage
+                          id="SectionContribute.TopContributors"
+                          defaultMessage="Top financial contributors"
+                        />
+                      </H4>
+                      <TopContributors
+                        organizations={topOrganizations}
+                        individuals={topIndividuals}
+                        currency={collective.currency}
+                      />
+                    </Container>
+                  </TopContributorsContainer>
+                )}
             </Fragment>
           )}
         </ContainerSectionContent>

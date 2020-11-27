@@ -53,7 +53,7 @@ const MenuLink = styled.a`
 
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  font-weight: 200;
+  font-weight: 500;
 
   &:focus {
     color: ${themeGet('colors.primary.700')};

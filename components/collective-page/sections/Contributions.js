@@ -8,6 +8,8 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
+import { getEnvVar } from '../../../lib/env-utils';
+import { parseToBoolean } from '../../../lib/utils';
 
 import { Dimensions, Sections } from '../_constants';
 import Container from '../../Container';
@@ -310,7 +312,9 @@ class SectionContributions extends React.PureComponent {
           </React.Fragment>
         )}
 
-        <SectionRecurringContributions slug={collective.slug} LoggedInUser={LoggedInUser} />
+        {parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+          <SectionRecurringContributions slug={collective.slug} LoggedInUser={LoggedInUser} />
+        )}
 
         {connectedCollectives.length > 0 && (
           <Box mt={5}>

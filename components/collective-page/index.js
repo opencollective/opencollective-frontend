@@ -24,6 +24,7 @@ import SectionEvents from './sections/Events';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
 import SectionProjects from './sections/Projects';
+import SectionRecurringContributions from './sections/RecurringContributions';
 import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionTickets from './sections/Tickets';
 import SectionTransactions from './sections/Transactions';
@@ -178,6 +179,11 @@ class CollectivePage extends Component {
         );
       case Sections.CONVERSATIONS:
         return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
+
+      case Sections.RECURRING_CONTRIBUTIONS:
+        return (
+          <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
+        );
       case Sections.TICKETS:
         return (
           <SectionTickets
