@@ -60,12 +60,13 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   };
 
   uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
-    const sourceProviderType = paymentMethod.sourcePaymentMethod?.providerType ?? paymentMethod.providerType;
+    const sourcePaymentMethod = paymentMethod.sourcePaymentMethod || paymentMethod;
+    const sourceProviderType = sourcePaymentMethod.providerType;
 
     if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.GIFT_CARD && paymentMethod.limitedToHosts) {
       return matchesHostCollectiveId(paymentMethod);
     } else if (sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.PREPAID_BUDGET) {
-      return matchesHostCollectiveIdPrepaid(paymentMethod);
+      return matchesHostCollectiveIdPrepaid(sourcePaymentMethod);
     } else if (!hostHasStripe && sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD) {
       return false;
     } else {
