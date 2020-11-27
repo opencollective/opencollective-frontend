@@ -4,7 +4,6 @@ import { FastField, Field } from 'formik';
 import { first, get, omit, partition, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -120,7 +119,7 @@ const ExpenseFormPayeeStep = ({
     values.payee &&
     !values.payee.isInvite &&
     [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
-  const canInvite = hasFeature(collective, FEATURES.SUBMIT_EXPENSE_ON_BEHALF) && !values?.status;
+  const canInvite = !values?.status;
   const profileOptions = payoutProfiles.map(value => ({
     value,
     label: value.name,
