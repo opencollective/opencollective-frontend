@@ -111,15 +111,15 @@ const rows = [
     },
     {
       type: 'html',
-      html: '0',
+      html: 'Free',
     },
     {
       type: 'html',
-      html: '0',
+      html: 'Free',
     },
     {
       type: 'html',
-      html: '0',
+      html: 'Free',
     },
   ],
   [
@@ -133,15 +133,15 @@ const rows = [
     },
     {
       type: 'html',
-      html: '0',
+      html: 'Free',
     },
     {
       type: 'html',
-      html: '0',
+      html: 'Free',
     },
     {
       type: 'html',
-      html: '0',
+      html: 'Free',
     },
   ],
   [
