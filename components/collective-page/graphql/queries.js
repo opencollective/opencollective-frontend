@@ -42,6 +42,9 @@ export const collectivePageQuery = gql`
       ordersFromCollective(subscriptionsOnly: true) {
         isSubscriptionActive
       }
+      memberOf(onlyActiveCollectives: true, limit: 1) {
+        id
+      }
       stats {
         id
         balance

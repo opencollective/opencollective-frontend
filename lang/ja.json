@@ -698,6 +698,7 @@
   "EditUserEmailForm.success": "認証リンクを記載したメールを {email} に送信しました。",
   "Email": "メールアドレス",
   "emptyBalance": "Empty Balance",
+  "EmptyCollectivePage": "{collective} is now working on its public profile, and don't have anything to show, yet. Meanwhile, there are dozens of Collectives you can discover, take a look!",
   "Error": "Error",
   "Error.BadCollectiveType": "このプロファイル形式はサポートされていません。",
   "error.code.invalid": "無効なギフトカードのコード",

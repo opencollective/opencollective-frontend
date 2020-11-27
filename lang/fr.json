@@ -698,6 +698,7 @@
   "EditUserEmailForm.success": "Un email avec un lien de confirmation a été envoyé sur {email}.",
   "Email": "Email",
   "emptyBalance": "Vider la balance",
+  "EmptyCollectivePage": "{collective} is now working on its public profile, and don't have anything to show, yet. Meanwhile, there are dozens of Collectives you can discover, take a look!",
   "Error": "Error",
   "Error.BadCollectiveType": "Ce type de profil n'est pas supporté",
   "error.code.invalid": "Code de carte cadeau invalide",
