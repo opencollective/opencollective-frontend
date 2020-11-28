@@ -84,7 +84,7 @@ class CollectivesWithData extends React.Component {
           margin="1rem 0"
         >
           {collectives.map(collective => (
-            <CollectiveCard key={collective.id} collective={collective} />
+            <CollectiveCard m={1} key={collective.id} collective={collective} />
           ))}
         </Container>
         {collectives.length % 10 === 0 && collectives.length >= limit && (

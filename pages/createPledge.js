@@ -732,5 +732,4 @@ export const addCreatePledgeMutation = graphql(createPledgeMutation, {
 
 const addGraphql = compose(addCreatePledgePageData, addCreatePledgeMutation);
 
-export { CreatePledgePage as MockCreatePledgePage };
 export default injectIntl(withUser(addGraphql(CreatePledgePage)));
