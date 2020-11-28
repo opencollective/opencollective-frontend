@@ -6,11 +6,23 @@ import classNames from 'classnames';
 import { uniqBy } from 'lodash';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
+import Container from './Container';
 import Error from './Error';
 import Member from './Member';
 
 const MEMBERS_PER_PAGE = 10;
+
+const MembersContainer = styled.div`
+  .filterBtnGroup {
+    width: 100%;
+  }
+
+  .filterBtn {
+    width: 33%;
+  }
+`;
 
 class MembersWithData extends React.Component {
   static propTypes = {
@@ -96,47 +108,9 @@ class MembersWithData extends React.Component {
     }
     const limit = this.props.limit || MEMBERS_PER_PAGE * 2;
     return (
-      <div className="MembersContainer" ref={node => (this.node = node)}>
-        <style jsx>
-          {`
-            .MembersContainer :global(.loadMoreBtn) {
-              margin: 1rem;
-              text-align: center;
-            }
-            .filter {
-              width: 100%;
-              max-width: 400px;
-              margin: 0 auto;
-            }
-            :global(.filterBtnGroup) {
-              width: 100%;
-            }
-            :global(.filterBtn) {
-              width: 33%;
-            }
-            .Members {
-              display: flex;
-              flex-wrap: wrap;
-              flex-direction: row;
-              justify-content: center;
-              overflow: hidden;
-              margin: 1rem 0;
-            }
-          `}
-        </style>
-        <style jsx global>
-          {`
-            .cardsList .Member.ORGANIZATION {
-              margin: 1rem !important;
-            }
-            .cardsList .Member.USER {
-              margin: 0.5rem 0.25rem;
-            }
-          `}
-        </style>
-
+      <MembersContainer ref={node => (this.node = node)}>
         {!role && !tier && (
-          <div className="filter">
+          <Container width="100%" maxWidth="400px" margin="0 auto">
             <ButtonGroup className="filterBtnGroup">
               <Button
                 className="filterBtn"
@@ -167,10 +141,18 @@ class MembersWithData extends React.Component {
                 <FormattedMessage id="members.paid" defaultMessage="backers" />
               </Button>
             </ButtonGroup>
-          </div>
+          </Container>
         )}
 
-        <div className="Members cardsList">
+        <Container
+          className="cardsList"
+          display="flex"
+          flexWrap="wrap"
+          flexDirection="row"
+          justifyContent="center"
+          overflow="hidden"
+          margin="1rem 0"
+        >
           {members.map(member => (
             <Member
               key={member.id}
@@ -181,16 +163,16 @@ class MembersWithData extends React.Component {
               LoggedInUser={LoggedInUser}
             />
           ))}
-        </div>
+        </Container>
         {members.length % 10 === 0 && members.length >= limit && (
-          <div className="loadMoreBtn">
+          <Container margin="1rem" textAlign="center">
             <Button bsStyle="default" onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
             </Button>
-          </div>
+          </Container>
         )}
-      </div>
+      </MembersContainer>
     );
   }
 }

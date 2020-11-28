@@ -6,6 +6,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { partition } from 'lodash';
 import Head from 'next/head';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -46,6 +47,159 @@ const topContributorsQuery = gqlV2/* GraphQL */ `
         }
       }
     }
+  }
+`;
+
+const Button = styled.a`
+  width: 338px;
+  height: 50px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  background-repeat: no-repeat;
+  float: left;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  background-image: url(/static/images/buttons/contribute-button-blue.svg);
+
+  :hover {
+    background-position: 0 -50px;
+  }
+  :active {
+    background-position: 0 -100px;
+  }
+  :focus {
+    outline: 0;
+  }
+`;
+
+const IFrameContainer = styled.div`
+  overflow: hidden;
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-Regular.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-Regular.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-Italic.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-Italic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-Medium.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-Medium.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-MediumItalic.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-MediumItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-SemiBold.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-SemiBold.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-SemiBoldItalic.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-SemiBoldItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-Bold.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-Bold.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-BoldItalic.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-BoldItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-ExtraBold.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-ExtraBold.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 800;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-ExtraBoldItalic.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-ExtraBoldItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-Black.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-Black.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 900;
+    font-display: swap;
+    src: url('/static/fonts/inter/Inter-BlackItalic.woff2') format('woff2'),
+      url('/static/fonts/inter/Inter-BlackItalic.woff') format('woff');
+  }
+
+  a {
+    text-decoration: none;
+    color: ${style => (style.a && style.a.color) || '#46b0ed'}
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .actions {
+    text-align: center;
+  }
+
+  h2 {
+    font-size: 16px;
+    margin-bottom: 0;
+    font-weight: 300;
+    text-align: center;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
   }
 `;
 
@@ -192,207 +346,15 @@ class BannerIframe extends React.Component {
     const { backers } = collective.stats;
 
     return (
-      <div className="iframeContainer" ref={node => (this.node = node)}>
+      <IFrameContainer linkColor={style} ref={node => (this.node = node)}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
           <title>{`${collectiveSlug} collectives`}</title>
         </Head>
-        <style jsx>
-          {`
-            @font-face {
-              font-family: 'Inter';
-              font-style: normal;
-              font-weight: 400;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-Regular.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-Regular.woff') format('woff');
-            }
-            @font-face {
-              font-family: 'Inter';
-              font-style: italic;
-              font-weight: 400;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-Italic.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-Italic.woff') format('woff');
-            }
-
-            @font-face {
-              font-family: 'Inter';
-              font-style: normal;
-              font-weight: 500;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-Medium.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-Medium.woff') format('woff');
-            }
-            @font-face {
-              font-family: 'Inter';
-              font-style: italic;
-              font-weight: 500;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-MediumItalic.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-MediumItalic.woff') format('woff');
-            }
-
-            @font-face {
-              font-family: 'Inter';
-              font-style: normal;
-              font-weight: 600;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-SemiBold.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-SemiBold.woff') format('woff');
-            }
-            @font-face {
-              font-family: 'Inter';
-              font-style: italic;
-              font-weight: 600;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-SemiBoldItalic.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-SemiBoldItalic.woff') format('woff');
-            }
-
-            @font-face {
-              font-family: 'Inter';
-              font-style: normal;
-              font-weight: 700;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-Bold.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-Bold.woff') format('woff');
-            }
-            @font-face {
-              font-family: 'Inter';
-              font-style: italic;
-              font-weight: 700;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-BoldItalic.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-BoldItalic.woff') format('woff');
-            }
-
-            @font-face {
-              font-family: 'Inter';
-              font-style: normal;
-              font-weight: 800;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-ExtraBold.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-ExtraBold.woff') format('woff');
-            }
-            @font-face {
-              font-family: 'Inter';
-              font-style: italic;
-              font-weight: 800;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-ExtraBoldItalic.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-ExtraBoldItalic.woff') format('woff');
-            }
-
-            @font-face {
-              font-family: 'Inter';
-              font-style: normal;
-              font-weight: 900;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-Black.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-Black.woff') format('woff');
-            }
-            @font-face {
-              font-family: 'Inter';
-              font-style: italic;
-              font-weight: 900;
-              font-display: swap;
-              src: url('/static/fonts/inter/Inter-BlackItalic.woff2') format('woff2'),
-                url('/static/fonts/inter/Inter-BlackItalic.woff') format('woff');
-            }
-
-            body {
-              width: 100%;
-              height: 100%;
-              padding: 0;
-              margin: 0;
-              font-family: ${style.body && `${style.body.fontFamily},`} 'Inter', Helvetica, sans-serif;
-              font-weight: 300;
-              font-size: 1rem;
-              line-height: 1.5;
-              overflow-x: hidden;
-            }
-
-            .iframeContainer {
-              overflow: hidden;
-            }
-
-            a {
-              text-decoration: none;
-              color: ${(style.a && style.a.color) || '#46b0ed'};
-              cursor: pointer;
-              font-size: 14px;
-            }
-
-            .actions {
-              text-align: center;
-            }
-
-            .title {
-              display: flex;
-              align-items: baseline;
-            }
-
-            .title .action {
-              font-size: 0.8rem;
-            }
-
-            h2 {
-              font-size: 16px;
-              margin-bottom: 0;
-              font-weight: 300;
-            }
-
-            ul {
-              list-style: none;
-              padding: 0;
-            }
-
-            section h1,
-            section h2 {
-              text-align: center;
-            }
-
-            .button {
-              width: 300px;
-              height: 50px;
-              overflow: hidden;
-              margin: 0;
-              padding: 0;
-              background-repeat: no-repeat;
-              float: left;
-              border: none;
-              background-color: transparent;
-              cursor: pointer;
-            }
-
-            .button.contribute {
-              width: 338px;
-            }
-            .contribute.button.blue {
-              background-image: url(/static/images/buttons/contribute-button-blue.svg);
-            }
-            .button:hover {
-              background-position: 0 -50px;
-            }
-            .button:active {
-              background-position: 0 -100px;
-            }
-            .button:focus {
-              outline: 0;
-            }
-
-            .button.hover {
-              background-position: 0 -100px;
-            }
-          `}
-        </style>
-
         {backers.organizations + backers.collectives + backers.users === 0 && (
-          <a
+          <Button
             type="button"
-            className="button blue contribute"
             target="_blank"
             rel="noopener noreferrer"
             href={`https://opencollective.com/${collectiveSlug}`}
@@ -470,7 +432,7 @@ class BannerIframe extends React.Component {
             />
           </section>
         )}
-      </div>
+      </IFrameContainer>
     );
   }
 }
