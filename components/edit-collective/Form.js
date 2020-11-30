@@ -368,7 +368,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case EDIT_COLLECTIVE_SECTIONS.MEMBERS:
-        return <Members collective={collective} LoggedInUser={LoggedInUser} />;
+        return <Members collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;
