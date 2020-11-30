@@ -59,6 +59,7 @@
   "AddFundsForm.PutAside": "请您预留 {hostFeePercent}% ({hostFeeAmount}) 作为主办方手续费，预留 {platformFeePercent}% ({platformFeeAmount}) 作为平台手续费。",
   "AddFundsToCollectiveModal.Title": "向Collective添加资金",
   "administrators": "管理者",
+  "AdminPanel": "Admin Panel",
   "Admins": "Admins",
   "AllExpenses": "所有支出",
   "AllTransactions": "所有交易",
