@@ -140,7 +140,7 @@ const OrdersWithData = ({ accountSlug, title, status }) => {
   }, [LoggedInUser]);
 
   return (
-    <Box maxWidth={1000} m="0 auto" py={5} px={2}>
+    <Box maxWidth={1000} width="100%" m="0 auto" px={2}>
       <Flex>
         <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}

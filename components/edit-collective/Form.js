@@ -10,6 +10,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { AccountTypesWithHost, CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
 import { Currency } from '../../lib/constants/currency';
+import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 
@@ -18,6 +19,7 @@ import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 import Link from '../Link';
+import OrdersWithData from '../orders/OrdersWithData';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H3 } from '../Text';
@@ -471,6 +473,15 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS:
+        return (
+          <OrdersWithData
+            accountSlug={collective.slug}
+            status={ORDER_STATUS.PENDING}
+            title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
+          />
+        );
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;

@@ -30,6 +30,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   TIERS: 'tiers',
   VIRTUAL_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
+  PENDING_ORDERS: 'pending-orders',
   TWO_FACTOR_AUTH: 'two-factor-auth',
   ADVANCED: 'advanced', // Last on purpose
   // Host Specific
@@ -98,6 +99,10 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: {
     id: 'editCollective.receivingMoney',
     defaultMessage: 'Receiving Money',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: {
+    id: 'PendingBankTransfers',
+    defaultMessage: 'Pending bank transfers',
   },
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: {
     id: 'editCollective.sendingMoney',
@@ -205,6 +210,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: () => false,
 };
