@@ -59,6 +59,7 @@
   "AddFundsForm.PutAside": "اطفا {hostFeePercent}% از ({hostFeeAmount}) را برای هزینه‌های میزبانی و {platformFeePercent}% از ({platformFeeAmount}) برای هزینه‌های سامانه در نظر بگیرید.",
   "AddFundsToCollectiveModal.Title": "Add funds to the Collective:",
   "administrators": "مدیران",
+  "AdminPanel": "Admin Panel",
   "Admins": "Admins",
   "AllExpenses": "All expenses",
   "AllTransactions": "All transactions",
