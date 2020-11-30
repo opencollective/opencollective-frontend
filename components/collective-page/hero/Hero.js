@@ -321,7 +321,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                       }}
                     />
                   </Container>
-                  {collective.platformFeePercent && collective.platformFeePercent > 0 && (
+                  {collective.platformFeePercent > 0 && (
                     <Container ml={2} mr={3} color="black.500" fontSize="12px">
                       <FormattedMessage
                         id="Hero.PlatformFee"
