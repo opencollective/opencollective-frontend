@@ -1105,7 +1105,7 @@
   "members.paid": "попечители",
   "members.pending.details": "This member has not approved the invitation to join the collective yet",
   "members.remove": "Remove Team Member",
-  "members.remove.cantRemoveYourself": "Вы не можете удалить себя как администратора Коллектива. Если вы единственный администратор, пожалуйста, добавьте нового и попросите его удалить вас.",
+  "members.remove.cantRemoveLast": "The last admin cannot be removed. Please add another admin before doing so.",
   "members.remove.confirm": "Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?",
   "members.role.label": "роль",
   "Membership.ContributorSince": "{contributorType} с",
