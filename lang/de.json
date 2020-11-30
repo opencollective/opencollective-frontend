@@ -59,6 +59,7 @@
   "AddFundsForm.PutAside": "Bitte legen Sie {hostFeePercent}% ({hostFeeAmount}) für Ihre Hostgebühren und {platformFeePercent}% ({platformFeeAmount}) für Plattformgebühren beiseite.",
   "AddFundsToCollectiveModal.Title": "Guthaben zum Kollektiv hinzufügen:",
   "administrators": "Administratoren",
+  "AdminPanel": "Admin Panel",
   "Admins": "Administratoren",
   "AllExpenses": "Alle Ausgaben",
   "AllTransactions": "Alle Transaktionen",
