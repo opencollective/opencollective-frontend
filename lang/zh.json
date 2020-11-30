@@ -479,6 +479,7 @@
   "CopyLink": "Copy link",
   "cover.bar.balance": "今天的结余",
   "cover.bar.yearlyBudget": "预计的年度预算",
+  "CP.Contribute.Financial": "Financial contributions",
   "CP.Contribute.Title": "成为贡献者",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",

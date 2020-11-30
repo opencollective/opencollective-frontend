@@ -479,6 +479,7 @@
   "CopyLink": "Link kopieren",
   "cover.bar.balance": "Heutiger Kontostand",
   "cover.bar.yearlyBudget": "Geschätztes jährliches Budget",
+  "CP.Contribute.Financial": "Financial contributions",
   "CP.Contribute.Title": "Werde ein Unterstützer",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",

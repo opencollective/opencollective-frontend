@@ -479,6 +479,7 @@
   "CopyLink": "リンクをコピー",
   "cover.bar.balance": "今日の残高",
   "cover.bar.yearlyBudget": "推定年間予算",
+  "CP.Contribute.Financial": "Financial contributions",
   "CP.Contribute.Title": "コントリビューターになる",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",

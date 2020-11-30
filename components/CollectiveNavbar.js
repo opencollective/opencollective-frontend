@@ -232,7 +232,7 @@ const CollectiveNavbar = ({
   const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
   callsToAction = { ...getDefaultCallsToactions(collective, isAdmin), ...callsToAction };
-  const isEvent = collective.type === CollectiveType.EVENT;
+  const isEvent = collective?.type === CollectiveType.EVENT;
 
   return (
     <MainContainer>

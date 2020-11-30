@@ -296,219 +296,206 @@ class SectionContribute extends React.PureComponent {
             }
             illustrationSrc={contributeSectionHeaderIcon}
           />
-        </ContainerSectionContent>
 
-        {/* "Start accepting financial contributions" for admins */}
-        {isAdmin && !hasHost && !isHost && (
-          <ContainerSectionContent pt={5} pb={3}>
-            <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
-              <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
-                <FormattedMessage
-                  id="contributions.subtitle"
-                  defaultMessage="There are no contributions yet. To start accepting financial contributions, please choose a fiscal host."
-                />
-              </P>
-            </Flex>
-            <Box my={5}>
-              <Link route={'accept-financial-contributions'} params={{ slug: collective.slug }}>
-                <StyledButton buttonStyle="primary" buttonSize="large">
-                  <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
-                </StyledButton>
-              </Link>
-            </Box>
-          </ContainerSectionContent>
-        )}
+          {/* "Start accepting financial contributions" for admins */}
+          {isAdmin && !hasHost && !isHost && (
+            <ContainerSectionContent pt={5} pb={3}>
+              <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
+                <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
+                  <FormattedMessage
+                    id="contributions.subtitle"
+                    defaultMessage="There are no contributions yet. To start accepting financial contributions, please choose a fiscal host."
+                  />
+                </P>
+              </Flex>
+              <Box my={5}>
+                <Link route={'accept-financial-contributions'} params={{ slug: collective.slug }}>
+                  <StyledButton buttonStyle="primary" buttonSize="large">
+                    <FormattedMessage
+                      id="contributions.startAccepting"
+                      defaultMessage="Start accepting contributions"
+                    />
+                  </StyledButton>
+                </Link>
+              </Box>
+            </ContainerSectionContent>
+          )}
 
-        {((isAdmin && hasHost) || (isAdmin && isHost) || (!isAdmin && isActive)) && (
-          <Fragment>
-            {/* Tickets for type EVENT */}
-            {isEvent &&
-              parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) &&
-              !cannotOrderTickets &&
-              !hideTicketsFromNonAdmins && (
-                <Box mb={4} data-cy="Tickets">
+          {((isAdmin && hasHost) || (isAdmin && isHost) || (!isAdmin && isActive)) && (
+            <Fragment>
+              {/* Financial contributions tiers */}
+              {hasContribute && (
+                <Box mb={4} data-cy="financial-contributions">
                   <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
                     {(ref, Chevrons) => (
                       <div>
                         <ContainerSectionContent>
                           <Flex justifyContent="space-between" alignItems="center" mb={3}>
                             <H3 fontSize="20px" fontWeight="600" color="black.700">
-                              <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
+                              <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
                             </H3>
                             <Box m={2} flex="0 0 50px">
                               <Chevrons />
                             </Box>
                           </Flex>
                         </ContainerSectionContent>
-
-                        <ContributeCardsContainer ref={ref}>
-                          {sortedTicketTiers.map(tier => (
-                            <ContributeCardContainer key={tier.id}>
-                              <ContributeTier
-                                collective={collective}
-                                tier={tier}
-                                hideContributors={hasNoContributor}
-                                disableCTA={!collective.isActive}
-                              />
-                            </ContributeCardContainer>
-                          ))}
-                          {isAdmin && (
-                            <ContributeCardContainer minHeight={150}>
-                              <CreateNew
-                                route={`/${collective.parentCollective.slug}/events/${collective.slug}/edit/tickets`}
-                              >
-                                <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
-                              </CreateNew>
-                            </ContributeCardContainer>
+                        <Container position="relative">
+                          {isSaving && (
+                            <ContainerOverlay alignItems="center">
+                              <StyledSpinner size={64} />
+                              <P mt={3} fontSize="15px">
+                                <FormattedMessage id="Saving" defaultMessage="Saving..." />
+                              </P>
+                            </ContainerOverlay>
                           )}
-                        </ContributeCardsContainer>
+                          {!(isAdmin && showTiersAdmin) && (
+                            <ContributeCardsContainer ref={ref} disableScrollSnapping={!!draggingContributionsOrder}>
+                              {waysToContribute.map(({ key, Component, componentProps }) => (
+                                <ContributeCardContainer key={key}>
+                                  <Component {...componentProps} />
+                                </ContributeCardContainer>
+                              ))}
+                            </ContributeCardsContainer>
+                          )}
+                          {isAdmin && (
+                            <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
+                              <AdminContributeCardsContainer
+                                collective={collective}
+                                cards={waysToContribute}
+                                onContributionCardMove={this.onContributionCardMove}
+                                onContributionCardDrop={this.onContributionCardDrop}
+                                onMount={this.onTiersAdminReady}
+                              />
+                            </Container>
+                          )}
+                        </Container>
                       </div>
                     )}
                   </HorizontalScroller>
                 </Box>
               )}
-            {/* Financial contributions tiers */}
-            {hasContribute && (
-              <Box mb={4} data-cy="financial-contributions">
+
+              {/* Events, for now (til v2 standalone section) */}
+              {hasOtherWaysToContribute && !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
                 <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
                   {(ref, Chevrons) => (
                     <div>
                       <ContainerSectionContent>
                         <Flex justifyContent="space-between" alignItems="center" mb={3}>
                           <H3 fontSize="20px" fontWeight="600" color="black.700">
-                            <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
+                            {connectedCollectives.length > 0 ? (
+                              <FormattedMessage
+                                id="SectionContribute.MoreWays"
+                                defaultMessage="More ways to contribute"
+                              />
+                            ) : (
+                              <FormattedMessage id="Events" defaultMessage="Events" />
+                            )}
                           </H3>
                           <Box m={2} flex="0 0 50px">
                             <Chevrons />
                           </Box>
                         </Flex>
                       </ContainerSectionContent>
-                      <Container position="relative">
-                        {isSaving && (
-                          <ContainerOverlay alignItems="center">
-                            <StyledSpinner size={64} />
-                            <P mt={3} fontSize="15px">
-                              <FormattedMessage id="Saving" defaultMessage="Saving..." />
-                            </P>
-                          </ContainerOverlay>
-                        )}
-                        {!(isAdmin && showTiersAdmin) && (
-                          <ContributeCardsContainer ref={ref} disableScrollSnapping={!!draggingContributionsOrder}>
-                            {waysToContribute.map(({ key, Component, componentProps }) => (
-                              <ContributeCardContainer key={key}>
-                                <Component {...componentProps} />
-                              </ContributeCardContainer>
-                            ))}
-                          </ContributeCardsContainer>
-                        )}
-                        {isAdmin && (
-                          <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
-                            <AdminContributeCardsContainer
+
+                      <ContributeCardsContainer ref={ref}>
+                        {upcomingEvents.map(event => (
+                          <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                            <ContributeEvent
                               collective={collective}
-                              cards={waysToContribute}
-                              onContributionCardMove={this.onContributionCardMove}
-                              onContributionCardDrop={this.onContributionCardDrop}
-                              onMount={this.onTiersAdminReady}
+                              event={event}
+                              hideContributors={hasNoContributorForEvents}
+                              disableCTA={!collective.isActive || !event.isActive}
                             />
-                          </Container>
+                          </Box>
+                        ))}
+                        {connectedCollectives.map(({ id, collective }) => (
+                          <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
+                            <ContributeCollective collective={collective} />
+                          </Box>
+                        ))}
+                        {pastEvents.map(event => (
+                          <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                            <ContributeEvent
+                              collective={collective}
+                              event={event}
+                              hideContributors={hasNoContributorForEvents}
+                              disableCTA={!collective.isActive || !event.isActive}
+                            />
+                          </Box>
+                        ))}
+                        {isAdmin && (
+                          <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
+                            <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
+                              <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+                            </CreateNew>
+                          </Box>
                         )}
-                      </Container>
+                      </ContributeCardsContainer>
                     </div>
                   )}
                 </HorizontalScroller>
-              </Box>
-            )}
-            {/* Events, for now (til v2 standalone section) */}
-            {hasOtherWaysToContribute && !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
-              <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-                {(ref, Chevrons) => (
-                  <div>
-                    <ContainerSectionContent>
-                      <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                        <H3 fontSize="20px" fontWeight="600" color="black.700">
-                          {connectedCollectives.length > 0 ? (
-                            <FormattedMessage
-                              id="SectionContribute.MoreWays"
-                              defaultMessage="More ways to contribute"
-                            />
-                          ) : (
-                            <FormattedMessage id="Events" defaultMessage="Events" />
-                          )}
-                        </H3>
-                        <Box m={2} flex="0 0 50px">
-                          <Chevrons />
-                        </Box>
-                      </Flex>
-                    </ContainerSectionContent>
-
-                    <ContributeCardsContainer ref={ref}>
-                      {upcomingEvents.map(event => (
-                        <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                          <ContributeEvent
-                            collective={collective}
-                            event={event}
-                            hideContributors={hasNoContributorForEvents}
-                            disableCTA={!collective.isActive || !event.isActive}
-                          />
-                        </Box>
-                      ))}
-                      {connectedCollectives.map(({ id, collective }) => (
-                        <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
-                          <ContributeCollective collective={collective} />
-                        </Box>
-                      ))}
-                      {pastEvents.map(event => (
-                        <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                          <ContributeEvent
-                            collective={collective}
-                            event={event}
-                            hideContributors={hasNoContributorForEvents}
-                            disableCTA={!collective.isActive || !event.isActive}
-                          />
-                        </Box>
-                      ))}
-                      {isAdmin && (
-                        <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
-                          <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
-                            <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
-                          </CreateNew>
-                        </Box>
-                      )}
-                    </ContributeCardsContainer>
-                  </div>
-                )}
-              </HorizontalScroller>
-            )}
-            {/* "View all ways to contribute" button */}
-            {!isEvent && (
-              <ContainerSectionContent>
-                <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-                  <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
-                    <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
-                  </StyledButton>
-                </Link>
-              </ContainerSectionContent>
-            )}
-            {/* Top contributors, for now (til moved to Budget in v2) */}
-            {!isEvent &&
-              (topOrganizations.length !== 0 || topIndividuals.length !== 0) &&
-              !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
-                <TopContributorsContainer>
-                  <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
-                    <H4 fontWeight="normal" color="black.700" mb={3}>
-                      <FormattedMessage
-                        id="SectionContribute.TopContributors"
-                        defaultMessage="Top financial contributors"
-                      />
-                    </H4>
-                    <TopContributors
-                      organizations={topOrganizations}
-                      individuals={topIndividuals}
-                      currency={collective.currency}
-                    />
-                  </Container>
-                </TopContributorsContainer>
               )}
+
+              {/* Tickets for type EVENT */}
+              {isEvent &&
+                parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) &&
+                !cannotOrderTickets &&
+                !hideTicketsFromNonAdmins && (
+                  <Box mb={4} data-cy="Tickets">
+                    <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
+                      {(ref, Chevrons) => (
+                        <div>
+                          <ContainerSectionContent>
+                            <Flex justifyContent="space-between" alignItems="center" mb={3}>
+                              <H3 fontSize="20px" fontWeight="600" color="black.700">
+                                <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
+                              </H3>
+                              <Box m={2} flex="0 0 50px">
+                                <Chevrons />
+                              </Box>
+                            </Flex>
+                          </ContainerSectionContent>
+
+                          <ContributeCardsContainer ref={ref}>
+                            {sortedTicketTiers.map(tier => (
+                              <ContributeCardContainer key={tier.id}>
+                                <ContributeTier
+                                  collective={collective}
+                                  tier={tier}
+                                  hideContributors={hasNoContributor}
+                                  disableCTA={!collective.isActive}
+                                />
+                              </ContributeCardContainer>
+                            ))}
+                            {isAdmin && (
+                              <ContributeCardContainer minHeight={150}>
+                                <CreateNew
+                                  route={`/${collective.parentCollective.slug}/events/${collective.slug}/edit/tickets`}
+                                >
+                                  <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
+                                </CreateNew>
+                              </ContributeCardContainer>
+                            )}
+                          </ContributeCardsContainer>
+                        </div>
+                      )}
+                    </HorizontalScroller>
+                  </Box>
+                )}
+
+              {/* "View all ways to contribute" button */}
+              {!isEvent && (
+                <ContainerSectionContent>
+                  <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+                    <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
+                      <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
+                    </StyledButton>
+                  </Link>
+                </ContainerSectionContent>
+              )}
+
+              {/* Top contributors, for now (til moved to Budget in v2) */}
               {!isEvent &&
                 (topOrganizations.length !== 0 || topIndividuals.length !== 0) &&
                 !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (

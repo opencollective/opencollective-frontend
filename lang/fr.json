@@ -479,6 +479,7 @@
   "CopyLink": "Copier le lien",
   "cover.bar.balance": "Solde aujourd'hui",
   "cover.bar.yearlyBudget": "Estimation du budget annuel",
+  "CP.Contribute.Financial": "Financial contributions",
   "CP.Contribute.Title": "Contribuez",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {Ce Collectif fait} other {Ces Collectifs font}} partie de ce que nous faisons",
   "CP.Contributions.PartOfOrg": "{n, plural, one {Ce Collectif fait} other {Ces Collectifs font}} partie de notre Organisation",

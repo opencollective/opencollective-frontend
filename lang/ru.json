@@ -479,6 +479,7 @@
   "CopyLink": "Скопировать ссылку",
   "cover.bar.balance": "Баланс",
   "cover.bar.yearlyBudget": "Предполагаемый Годовой Бюджет",
+  "CP.Contribute.Financial": "Financial contributions",
   "CP.Contribute.Title": "Стать вкладчиком",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",

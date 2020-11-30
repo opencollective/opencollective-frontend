@@ -479,6 +479,7 @@
   "CopyLink": "주소 복사",
   "cover.bar.balance": "Today's Balance",
   "cover.bar.yearlyBudget": "예상 연간 예산",
+  "CP.Contribute.Financial": "Financial contributions",
   "CP.Contribute.Title": "기여자가 되기",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",

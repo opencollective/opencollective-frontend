@@ -479,6 +479,7 @@
   "CopyLink": "Copiar enlace",
   "cover.bar.balance": "Balance actual",
   "cover.bar.yearlyBudget": "Presupuesto anual estimado",
+  "CP.Contribute.Financial": "Financial contributions",
   "CP.Contribute.Title": "Conviértete en contribuidor",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",

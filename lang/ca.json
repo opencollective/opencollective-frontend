@@ -479,6 +479,7 @@
   "CopyLink": "Copy link",
   "cover.bar.balance": "Saldo d'avui",
   "cover.bar.yearlyBudget": "Estimated Annual Budget",
+  "CP.Contribute.Financial": "Financial contributions",
   "CP.Contribute.Title": "Become a contributor",
   "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",
