@@ -59,6 +59,7 @@
   "AddFundsForm.PutAside": "호스트 비용으로 {hostFeePercent}% ({hostFeeAmount}), 플랫폼 비용으로 {platformFeePercent}% ({platformFeeAmount}) 만큼을 예치해 주십시오.",
   "AddFundsToCollectiveModal.Title": "Add funds to the Collective:",
   "administrators": "관리자",
+  "AdminPanel": "Admin Panel",
   "Admins": "Admins",
   "AllExpenses": "All expenses",
   "AllTransactions": "All transactions",
