@@ -59,6 +59,7 @@
   "AddFundsForm.PutAside": "Пожалуйста зарезервируйте {hostFeePercent}% ({hostFeeAmount}) для оплаты налогов представителя и {platformFeePercent}% ({platformFeeAmount}) для оплаты сборов платформы.",
   "AddFundsToCollectiveModal.Title": "Добавить средства Коллективу:",
   "administrators": "Администраторы",
+  "AdminPanel": "Admin Panel",
   "Admins": "Администрация",
   "AllExpenses": "Все расходы",
   "AllTransactions": "Все транзакции",
