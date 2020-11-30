@@ -59,6 +59,7 @@
   "AddFundsForm.PutAside": "Відкладіть {hostFeePercent}% ({hostFeeAmount}) для платні своєму скарбнику, а {platformFeePercent}% ({platformFeeAmount}) на оплату за користування платформою.",
   "AddFundsToCollectiveModal.Title": "Додати кошти для Колективу:",
   "administrators": "Адміністратори",
+  "AdminPanel": "Admin Panel",
   "Admins": "Адміністратори",
   "AllExpenses": "Всі витрати",
   "AllTransactions": "Всі транзакції",
