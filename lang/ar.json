@@ -59,6 +59,7 @@
   "AddFundsForm.PutAside": "الرجاء وضع {hostFeePercent}% ({hostFeeAmount}) لرسوم المضيف و {platformFeePercent}% ({platformFeeAmount}) لرسوم المنصة.",
   "AddFundsToCollectiveModal.Title": "Add funds to the Collective:",
   "administrators": "مدير",
+  "AdminPanel": "Admin Panel",
   "Admins": "Admins",
   "AllExpenses": "جميع المصروفات",
   "AllTransactions": "عرض جميع المعاملات",
