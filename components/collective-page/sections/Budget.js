@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { getTopContributors } from '../../../lib/collective.lib';
@@ -30,7 +31,6 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import SectionHeader from '../SectionHeader';
 import TopContributors from '../TopContributors';
 
-import { TopContributorsContainer } from './Contribute';
 import SectionGoals from './Goals';
 
 import budgetSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconBudget.png';
@@ -47,6 +47,13 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
 export const getBudgetSectionQueryVariables = slug => {
   return { slug, limit: 3 };
 };
+
+/** The container for Top Contributors view */
+const TopContributorsContainer = styled.div`
+  padding: 32px 16px;
+  margin-top: 48px;
+  background-color: #f5f7fa;
+`;
 
 /**
  * The budget section. Shows the expenses, the latests transactions and some statistics

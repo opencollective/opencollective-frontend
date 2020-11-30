@@ -96,7 +96,7 @@ const CollectiveNavbarActionsMenu = ({
   }
 
   return (
-    <Container>
+    <Container display="flex" alignItems="center" flex={1} mx={2}>
       <Box px={1}>
         <MenuPopover
           place="bottom-end"
@@ -210,6 +210,7 @@ const CollectiveNavbarActionsMenu = ({
             fontWeight="500"
             textTransform="uppercase"
             color="blue.700"
+            letterSpacing="60%"
           >
             <Span css={{ verticalAlign: 'middle' }}>
               <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
