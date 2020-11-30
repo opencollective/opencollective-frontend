@@ -4,8 +4,8 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
 import classnames from 'classnames';
+import dayjs from 'dayjs';
 import { groupBy, omit, uniq } from 'lodash';
-import moment from 'moment';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
@@ -82,7 +82,7 @@ class Overlay extends React.Component {
   renderYear(year) {
     const invoices = this.props.data.allInvoices.filter(i => Number(i.year) === Number(year));
     const invoicesByHost = groupBy(invoices, 'host.slug');
-    const dateYear = moment.utc(year, 'YYYY');
+    const dateYear = dayjs.utc(year, 'YYYY');
     const dateFrom = dateYear.toISOString();
     const dateTo = dateYear.endOf('year').toISOString();
 
@@ -111,7 +111,7 @@ class Overlay extends React.Component {
     const invoices = this.props.data.allInvoices.filter(
       i => Number(i.year) === Number(this.state.year) && Number(i.month) === Number(month),
     );
-    const dateMonth = moment.utc(`${this.state.year}${month}`, 'YYYYMM');
+    const dateMonth = dayjs.utc(`${this.state.year}${month}`, 'YYYYMM');
     const dateFrom = dateMonth.toISOString();
     const dateTo = dateMonth.endOf('month').toISOString();
     const month2digit = month < 10 ? `0${month}` : month;
@@ -126,7 +126,7 @@ class Overlay extends React.Component {
               }
             `}
           </style>
-          <h2>{moment.utc(new Date(`${this.state.year}-${month2digit}-01`)).format('MMMM')}</h2>
+          <h2>{dayjs.utc(new Date(`${this.state.year}-${month2digit}-01`)).format('MMMM')}</h2>
           {invoices.map(invoice => this.renderInvoice(invoice, dateFrom, dateTo, invoice.totalAmount))}
         </div>
       )
