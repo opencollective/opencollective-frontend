@@ -1104,7 +1104,7 @@
   "members.paid": "contributeurs",
   "members.pending.details": "Ce membre n'a pas encore accepté l'invitation à rejoindre le collectif",
   "members.remove": "Remove Team Member",
-  "members.remove.cantRemoveYourself": "Vous ne pouvez pas vous enlever vous-même des administrateurs du Collectif. Si vous êtes le seul administrateur, ajoutez quelqu'un d'autre et demandez-lui de vous enlever.",
+  "members.remove.cantRemoveLast": "The last admin cannot be removed. Please add another admin before doing so.",
   "members.remove.confirm": "Voulez-vous vraiment enlever {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?",
   "members.role.label": "rôle",
   "Membership.ContributorSince": "{contributorType} depuis le",

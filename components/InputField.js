@@ -491,6 +491,7 @@ class InputField extends React.Component {
                 : this.handleChange(event.target.value)
             }
             multiple={field.multiple}
+            disabled={field.disabled}
           >
             {field.options &&
               field.options.map(option => {
