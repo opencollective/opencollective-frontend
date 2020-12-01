@@ -14,7 +14,6 @@ export const AnimationsDurations = {
 };
 
 export const Sections = {
-  // legacy, will be removed as they are not standalone sections anymore
   GOALS: 'goals',
   UPDATES: 'updates',
   CONVERSATIONS: 'conversations',
@@ -34,12 +33,12 @@ export const Sections = {
   // CONTRIBUTORS/PARTICIPANTS - is this a stand alone or in BUDGET as per Figma??
   CONTRIBUTORS: 'contributors',
   PARTICIPANTS: 'participants',
-  // CONNECT
-  CONNECT: 'connect',
   // ABOUT
   ABOUT: 'about',
   // EMPTY for new collectives/no data in any category sections
   EMPTY: 'empty',
+  // @deprecated will be removed as they are now considered as "navbar categories"
+  CONNECT: 'connect',
 };
 
 /** A list of all section names */
