@@ -30,6 +30,8 @@ import connectNavbarIcon from '../public/static/images/collective-navigation/Col
 import contributeNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconContribute.png';
 import eventsNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconEvents.png';
 
+const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
+
 /** Main container for the entire component */
 const MainContainer = styled.div`
   background: white;
@@ -301,10 +303,12 @@ const CollectiveNavbar = ({
                   }}
                 >
                   <Flex py={3} mx={3}>
-                    <Flex flexGrow={1} alignItems="center">
-                      <IconIllustration src={getCollectiveNavbarIcon(section)} />
-                    </Flex>
-                    <Flex flexGrow={1} alignItems="center" ml={2}>
+                    {NAV_V2_FEATURE_FLAG && (
+                      <Flex flexGrow={1} alignItems="center">
+                        <IconIllustration src={getCollectiveNavbarIcon(section)} />
+                      </Flex>
+                    )}
+                    <Flex flexGrow={1} alignItems="center" ml={NAV_V2_FEATURE_FLAG ? 2 : 0}>
                       <MenuLink
                         as={LinkComponent}
                         collectivePath={collective.path || `/${collective.slug}`}
@@ -315,7 +319,7 @@ const CollectiveNavbar = ({
                   </Flex>
                 </MenuLinkContainer>
               ))}
-              {!parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+              {!NAV_V2_FEATURE_FLAG && (
                 <Fragment>
                   {/* mobile CTAs */}
                   {callsToAction.hasSubmitExpense && (
@@ -343,7 +347,7 @@ const CollectiveNavbar = ({
               )}
             </Container>
           )}
-          {!parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+          {!NAV_V2_FEATURE_FLAG && (
             <div>
               {!isLoading && (
                 // non-mobile CTAs
@@ -356,7 +360,7 @@ const CollectiveNavbar = ({
             </div>
           )}
           {/* CTAs for v2 navbar & admin panel */}
-          {parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+          {NAV_V2_FEATURE_FLAG && (
             <Container
               display={['none', null, 'flex']}
               flexDirection={['column', null, 'row']}
