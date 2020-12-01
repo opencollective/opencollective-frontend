@@ -7,6 +7,7 @@ import NProgress from 'nprogress';
 import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
+import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import theme from '../lib/theme';
 import withData from '../lib/withData';
 
