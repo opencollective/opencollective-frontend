@@ -11,6 +11,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
+import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -256,7 +257,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
                   SettingsLink: getI18nLink({
                     as: Link,
                     route: 'editCollective',
-                    params: { slug: LoggedInUser.collective.slug },
+                    params: { slug: LoggedInUser.collective.slug, section: EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH },
+                    openInNewTab: true,
                   }),
                 }}
               />

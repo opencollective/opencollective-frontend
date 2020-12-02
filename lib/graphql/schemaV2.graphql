@@ -4208,6 +4208,17 @@ type Host implements Account & AccountWithContributions {
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
+  hostMetrics(
+    """
+    Inferior date limit in which we're calculating the metrics
+    """
+    from: String
+
+    """
+    Superior date limit in which we're calculating the metrics
+    """
+    to: String
+  ): HostMetrics!
 
   """
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
@@ -4284,6 +4295,51 @@ enum HostFeeStructure {
   Set a monthly retainer for this Collective
   """
   MONTHLY_RETAINER
+}
+
+"""
+Host metrics related to collected and pending fees/tips.
+"""
+type HostMetrics {
+  """
+  Amount collected in host fees for given period
+  """
+  hostFees: Amount
+
+  """
+  Amount collected in platform fees for given period
+  """
+  platformFees: Amount
+
+  """
+  Amount collected in platform fees requiring settlement
+  """
+  pendingPlatformFees: Amount
+
+  """
+  Amount collected in platform tips for given period
+  """
+  platformTips: Amount
+
+  """
+  Amount collected in platform tips requiring settlement
+  """
+  pendingPlatformTips: Amount
+
+  """
+  Amount in host fee shared with the platform
+  """
+  hostFeeCharge: Amount
+
+  """
+  Total amount managed on behalf of hosted collectives
+  """
+  totalMoneyManaged: Amount
+
+  """
+  Host fee sharing percent
+  """
+  hostFeeChargePercent: Int
 }
 
 """
@@ -5060,6 +5116,21 @@ type Mutation {
     The generated secret to save to the Account
     """
     token: String!
+  ): Individual!
+
+  """
+  Add 2FA to the Account if it does not have it
+  """
+  removeTwoFactorAuthTokenFromIndividual(
+    """
+    Account that will have 2FA added to it
+    """
+    account: AccountReferenceInput!
+
+    """
+    The 6-digit 2FA code
+    """
+    code: String!
   ): Individual!
 
   """
