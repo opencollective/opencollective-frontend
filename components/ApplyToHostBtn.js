@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import ApplyToHostBtnLoggedIn from './ApplyToHostBtnLoggedIn';
+import Container from './Container';
 import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledTooltip from './StyledTooltip';
@@ -48,14 +49,6 @@ class ApplyToHostBtn extends React.Component {
 
     return (
       <div className="ApplyToHostBtn">
-        <style jsx>
-          {`
-            .hostConditions {
-              margin: 5px;
-              font-size: 11pt;
-            }
-          `}
-        </style>
         {!LoggedInUser && (
           <Link route={`/${host.slug}/apply`}>
             <StyledButton
@@ -80,7 +73,7 @@ class ApplyToHostBtn extends React.Component {
           />
         )}
         {showConditions && (
-          <div className="hostConditions">
+          <Container margin="5px" fontSize="11pt">
             <FormattedMessage
               id="transaction.hostFeeInHostCurrency"
               defaultMessage="{percentage} host fee"
@@ -105,7 +98,7 @@ class ApplyToHostBtn extends React.Component {
                 </a>
               </span>
             )}
-          </div>
+          </Container>
         )}
       </div>
     );
