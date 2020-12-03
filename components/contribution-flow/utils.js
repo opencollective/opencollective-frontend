@@ -138,5 +138,5 @@ export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
 };
 
 export const isAllowedRedirect = host => {
-  return ['octobox.io', 'dotnetfoundation.org'].includes(host);
+  return ['octobox.io', 'dotnetfoundation.org', 'hopin.com'].includes(host);
 };
