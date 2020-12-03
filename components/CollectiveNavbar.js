@@ -3,6 +3,7 @@ import { PropTypes } from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
+import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -180,13 +181,29 @@ const CollectiveName = styled.h1`
   }
 `;
 
-const getDefaultCallsToactions = (collective, isAdmin) => {
+const isFeatureAvailable = (collective, feature) => {
+  const status = get(collective.features, feature);
+  return status === 'ACTIVE' || status === 'AVAILABLE';
+};
+
+const getDefaultCallsToActions = (collective, isAdmin) => {
   if (!collective) {
     return {};
   }
 
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
+
+  if (NAV_V2_FEATURE_FLAG) {
+    return {
+      hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
+      hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
+      hasSubmitExpense: isFeatureAvailable(collective, 'RECEIVE_EXPENSES'),
+      hasManageSubscriptions: isAdmin && isFeatureAvailable(collective, 'RECURRING_CONTRIBUTIONS'),
+      hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
+    };
+  }
+
   return {
     hasContact: collective.canContact,
     hasApply: collective.canApply && !isAdmin,
@@ -233,7 +250,7 @@ const CollectiveNavbar = ({
 }) => {
   const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
-  callsToAction = { ...getDefaultCallsToactions(collective, isAdmin), ...callsToAction };
+  callsToAction = { ...getDefaultCallsToActions(collective, isAdmin), ...callsToAction };
   const isEvent = collective?.type === CollectiveType.EVENT;
 
   return (
@@ -384,17 +401,18 @@ const CollectiveNavbar = ({
                       alignItems="center"
                       borderRadius={8}
                       background="rgba(72, 95, 211, 0.1)"
-                      px={3}
-                      py={1}
+                      px="8px"
+                      py="6px"
                     >
-                      <Settings size={20} color="rgb(48, 76, 220)" />
+                      <Settings size={14} color="rgb(48, 76, 220)" />
                       <P
-                        ml={1}
+                        ml={2}
                         textTransform="uppercase"
                         color="rgb(48, 76, 220)"
                         fontSize="14px"
                         lineHeight="16px"
                         letterSpacing="60%"
+                        fontWeight="500"
                       >
                         <FormattedMessage id="AdminPanel" defaultMessage="Admin Panel" />
                       </P>

@@ -183,9 +183,6 @@ class TransactionsPage extends React.Component {
                 selectedSection={
                   collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS
                 }
-                callsToAction={{
-                  hasSubmitExpense: [CollectiveType.COLLECTIVE, CollectiveType.EVENT].includes(collective.type),
-                }}
               />
             </Container>
             <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>

@@ -17,6 +17,7 @@ import { Router } from '../server/pages';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
 import { Sections } from '../components/collective-page/_constants';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -316,6 +317,9 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         id
         tag
       }
+      features {
+        ...NavbarFields
+      }
 
       ... on AccountWithContributions {
         balance
@@ -385,6 +389,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
   }
 
   ${expensesListFieldsFragment}
+  ${collectiveNavbarFieldsFragment}
 `;
 
 const addExpensesPageData = graphql(expensesPageQuery, {
