@@ -5,8 +5,8 @@ import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
-import useEscapeKey from '../lib/hooks/useKeyboardKey';
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
+import useEscapeKey, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
 
 const StyledMenuPopoverContainer = styled(`div`)`
   max-width: 320px;
@@ -105,7 +105,7 @@ const TooltipContent = ({ place, content, onClose }) => {
   });
 
   // Close when Escape is pressed
-  useEscapeKey({ callback: onClose, keyName: 'Escape', keyAbb: 'Esc', keyCode: 27 });
+  useEscapeKey({ callback: onClose, keyMatch: ESCAPE_KEY });
 
   // Focus menu when opening
   React.useEffect(() => {

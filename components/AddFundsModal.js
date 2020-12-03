@@ -7,7 +7,6 @@ import { Col, Modal, Row } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import useKeyboardShortcut from '../lib/hooks/useKeyboardKey';
 
 import AddFundsForm from './AddFundsForm';
 import Button from './Button';
@@ -60,8 +59,6 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective, host }) => {
   if (!LoggedInUser) {
     return null;
   }
-
-  useKeyboardShortcut({ callback: () => close(), keyName: 'Escape', keyCode: 27, keyAbb: 'Esc' });
 
   return (
     <Modal show={show} onHide={close}>

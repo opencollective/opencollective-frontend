@@ -4,8 +4,8 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKey';
 
-import useKeyboardShortcut from '../../../lib/hooks/useKeyboardKey';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
@@ -159,7 +159,7 @@ const FiscalHosting = ({ collective }) => {
     }
   };
 
-  useKeyboardShortcut({ callback: handlePrimaryBtnClick, keyAbb: 'Enter', keyName: 'Enter', keyCode: 13 });
+  useKeyboardShortcut({ callback: handlePrimaryBtnClick, keyMatch: ENTER_KEY });
 
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
