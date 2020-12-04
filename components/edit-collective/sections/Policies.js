@@ -9,7 +9,7 @@ import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { getEnvVar } from '../../../lib/env-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import { parseToBoolean } from '../../../lib/utils';
+import { parseToBoolean, stripHTML } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -61,6 +61,10 @@ const messages = defineMessages({
     defaultMessage:
       'For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.',
   },
+  'contributionPolicy.error': {
+    id: 'collective.contributionPolicy.error',
+    defaultMessage: 'Contribution policy must contain less than {maxLength} characters',
+  },
   'expensePolicy.label': {
     id: 'editCollective.menu.expenses',
     defaultMessage: 'Expenses Policy',
@@ -69,6 +73,10 @@ const messages = defineMessages({
     id: 'collective.expensePolicy.placeholder',
     defaultMessage:
       'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
+  },
+  'expensePolicy.error': {
+    id: 'collective.expensePolicy.error',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
   },
 });
 
@@ -143,6 +151,21 @@ const Policies = ({ collective }) => {
         },
       });
     },
+    validate(values) {
+      const errors = {};
+      const contributionPolicyText = stripHTML(values.contributionPolicy);
+      const expensePolicyText = stripHTML(values.expensePolicy);
+
+      if (contributionPolicyText.length > CONTRIBUTION_POLICY_MAX_LENGTH) {
+        errors.contributionPolicy = formatMessage(messages['contributionPolicy.error'], {
+          maxLength: CONTRIBUTION_POLICY_MAX_LENGTH,
+        });
+      }
+      if (expensePolicyText.length > EXPENSE_POLICY_MAX_LENGTH) {
+        errors.expensePolicy = formatMessage(messages['expensePolicy.error'], { maxLength: EXPENSE_POLICY_MAX_LENGTH });
+      }
+      return errors;
+    },
   });
 
   return (
@@ -156,6 +179,7 @@ const Policies = ({ collective }) => {
           <StyledInputField
             name="contributionPolicy"
             htmlFor="contributionPolicy"
+            error={formik.errors.contributionPolicy}
             disabled={isSubmittingPolicies}
             label={formatMessage(messages['contributionPolicy.label'])}
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
@@ -165,6 +189,7 @@ const Policies = ({ collective }) => {
                 withBorders
                 showCount
                 maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
+                error={formik.errors.contributionPolicy}
                 version="simplified"
                 editorMinHeight="20rem"
                 id={inputProps.id}
@@ -186,6 +211,7 @@ const Policies = ({ collective }) => {
           <StyledInputField
             name="expensePolicy"
             htmlFor="expensePolicy"
+            error={formik.errors.expensePolicy}
             disabled={isSubmittingPolicies}
             label={formatMessage(messages['expensePolicy.label'])}
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
@@ -195,6 +221,7 @@ const Policies = ({ collective }) => {
                 withBorders
                 showCount
                 maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                error={formik.errors.expensePolicy}
                 version="simplified"
                 editorMinHeight="20rem"
                 id={inputProps.id}
