@@ -100,7 +100,7 @@ const CollectiveNavbarActionsMenu = ({
   }
 
   return (
-    <Container display="flex" alignItems="center" flex={1} mx={2}>
+    <Container display="flex" alignItems="center" order={[-1, 0]}>
       <Box px={1}>
         <MenuPopover
           place="bottom-end"
