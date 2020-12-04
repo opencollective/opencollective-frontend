@@ -6,7 +6,8 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
-import { get, truncate, uniqBy } from 'lodash';
+import { Settings } from '@styled-icons/feather/Settings';
+import { get, some, truncate, uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -31,7 +32,10 @@ const MenuItem = styled('li')`
   align-items: center;
 
   &,
-  & > a {
+  & > a,
+  & > button {
+    width: 100%;
+    text-align: left;
     font-style: normal;
     font-weight: 500;
     font-size: 13px;
@@ -71,14 +75,14 @@ const getCollectivesNeedingAHost = user => {
 
 const CollectiveNavbarActionsMenu = ({
   collective,
-  callsToAction: { hasSubmitExpense, hasContact, hasApply },
+  callsToAction,
   LoggedInUser,
   loadingLoggedInUser,
   createNotification,
 }) => {
   const hasRequestGrant =
     [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true;
-  const hasActions = hasSubmitExpense || hasContact || hasApply || hasRequestGrant;
+  const hasActions = hasRequestGrant || some(callsToAction);
   const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
   const hostWithinLimit = hostedCollectivesLimit
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
@@ -102,7 +106,20 @@ const CollectiveNavbarActionsMenu = ({
           place="bottom-end"
           content={() => (
             <Box as="ul" p={0} m={0} minWidth={184}>
-              {hasSubmitExpense && (
+              {callsToAction.hasDashboard && (
+                <MenuItem>
+                  <StyledLink
+                    as={Link}
+                    route="host.dashboard"
+                    params={{ hostCollectiveSlug: collective.slug }}
+                    p={ITEM_PADDING}
+                  >
+                    <Settings size="20px" color="#304CDC" />
+                    <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                  </StyledLink>
+                </MenuItem>
+              )}
+              {callsToAction.hasSubmitExpense && (
                 <MenuItem>
                   <StyledLink
                     as={Link}
@@ -123,7 +140,7 @@ const CollectiveNavbarActionsMenu = ({
                   </P>
                 </MenuItem>
               )}
-              {hasContact && (
+              {callsToAction.hasContact && (
                 <MenuItem py={1}>
                   <StyledLink
                     as={Link}
@@ -136,7 +153,7 @@ const CollectiveNavbarActionsMenu = ({
                   </StyledLink>
                 </MenuItem>
               )}
-              {hasApply && (
+              {callsToAction.hasApply && (
                 <React.Fragment>
                   {hostWithinLimit ? (
                     collectivesToApplyToHostWith.map(c => {
@@ -160,16 +177,18 @@ const CollectiveNavbarActionsMenu = ({
                             }
                           }}
                         >
-                          <CheckCircle size="20px" color="#304CDC" />
-                          <Span>
-                            <FormattedMessage
-                              id="host.apply.btn"
-                              defaultMessage="Apply with {collective}"
-                              values={{
-                                collective: <strong>{truncate(c.collective.name, { length: 15 })}</strong>,
-                              }}
-                            />
-                          </Span>
+                          <StyledButton p={ITEM_PADDING} isBorderless>
+                            <CheckCircle size="20px" color="#304CDC" />
+                            <Span>
+                              <FormattedMessage
+                                id="host.apply.btn"
+                                defaultMessage="Apply with {collective}"
+                                values={{
+                                  collective: <strong>{truncate(c.collective.name, { length: 15 })}</strong>,
+                                }}
+                              />
+                            </Span>
+                          </StyledButton>
                         </MenuItem>
                       );
                     })
@@ -238,6 +257,7 @@ CollectiveNavbarActionsMenu.propTypes = {
     hasSubmitExpense: PropTypes.bool,
     /** Hosts "Apply" button */
     hasApply: PropTypes.bool,
+    hasDashboard: PropTypes.bool,
   }).isRequired,
   LoggedInUser: PropTypes.object,
   loadingLoggedInUser: PropTypes.bool,

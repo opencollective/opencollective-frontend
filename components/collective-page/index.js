@@ -6,6 +6,8 @@ import { FormattedMessage } from 'react-intl';
 
 import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import { getEnvVar } from '../../lib/env-utils';
+import { parseToBoolean } from '../../lib/utils';
 
 import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
@@ -32,6 +34,8 @@ import SectionUpdates from './sections/Updates';
 import { Sections } from './_constants';
 import SectionContainer from './SectionContainer';
 import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
+
+const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -146,6 +150,18 @@ class CollectivePage extends Component {
       const isCollective = type === CollectiveType.COLLECTIVE;
       const isEvent = type === CollectiveType.EVENT;
       const isProject = type === CollectiveType.PROJECT;
+
+      if (NAV_V2_FEATURE_FLAG) {
+        // The "too many calls to action" issue doesn't stand anymore with the new navbar, so
+        // we can let the CollectiveNavbar component in charge of most of the flags, to make sure
+        // we display the same thing everywhere. The two flags below should be migrated and this
+        // function removed once we switch the the new navbar as default
+        return {
+          hasContribute: (isFund || isProject) && isActive,
+          addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
+        };
+      }
+
       return {
         hasContact: !isAdmin && canContact && (!isFund || isAuthenticated),
         hasContribute: (isFund || isProject) && isActive,
