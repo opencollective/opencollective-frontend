@@ -139,6 +139,11 @@ type Collective implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is a guest profile
+  """
+  isGuest: Boolean
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -295,6 +300,11 @@ type Collective implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
@@ -328,6 +338,53 @@ input CollectiveAttributesInputType {
   isIncognito: Boolean
   tags: [String]
   contributionPolicy: String
+}
+
+"""
+Describes the features enabled and available for this collective
+"""
+type CollectiveFeatures {
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
+  RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
+  EVENTS: CollectiveFeatureStatus
+  PROJECTS: CollectiveFeatureStatus
+  USE_EXPENSES: CollectiveFeatureStatus
+  RECEIVE_EXPENSES: CollectiveFeatureStatus
+  COLLECTIVE_GOALS: CollectiveFeatureStatus
+  TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
+  CONVERSATIONS: CollectiveFeatureStatus
+  UPDATES: CollectiveFeatureStatus
+  TEAM: CollectiveFeatureStatus
+  ORDER: CollectiveFeatureStatus
+  CONTACT_COLLECTIVE: CollectiveFeatureStatus
+  CONTACT_FORM: CollectiveFeatureStatus
+  CREATE_COLLECTIVE: CollectiveFeatureStatus
+  CROSS_CURRENCY_MANUAL_TRANSACTIONS: CollectiveFeatureStatus
+  TRANSFERWISE: CollectiveFeatureStatus
+  PAYPAL_PAYOUTS: CollectiveFeatureStatus
+  PAYPAL_DONATIONS: CollectiveFeatureStatus
+}
+
+enum CollectiveFeatureStatus {
+  """
+  The feature is enabled and is actively used
+  """
+  ACTIVE
+
+  """
+  The feature is enabled, but there is no data for it
+  """
+  AVAILABLE
+
+  """
+  The feature is disabled, but can be enabled by an admin
+  """
+  DISABLED
+
+  """
+  The feature is disabled and cannot be activated for this account
+  """
+  UNSUPPORTED
 }
 
 """
@@ -417,6 +474,7 @@ interface CollectiveInterface {
   path: String
   isHost: Boolean
   isIncognito: Boolean
+  isGuest: Boolean
   canApply: Boolean
   canContact: Boolean
   isArchived: Boolean
@@ -582,6 +640,11 @@ interface CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
   plan: PlanType
   contributionPolicy: String
 
@@ -738,7 +801,7 @@ type CollectiveStatsType {
   ): Int
   yearlyBudget: Int
   yearlyBudgetManaged: Int
-  topExpenses: JSON
+  topExpenses: JSON @deprecated(reason: "[LegacyExpenseFlow] 2020-11-17: Not used anymore")
   topFundingSources: JSON
   activeRecurringContributions: JSON
 }
@@ -889,6 +952,11 @@ type Contributor {
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Defines if the contributors is a guest account
+  """
+  isGuest: Boolean!
 
   """
   Description of how the member contribute. Will usually be a tier name, or "design" or "code".
@@ -1061,6 +1129,11 @@ type Event implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is a guest profile
+  """
+  isGuest: Boolean
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -1217,6 +1290,11 @@ type Event implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
@@ -1412,7 +1490,7 @@ type ExpenseType {
   attachments: [ExpenseItem] @deprecated(reason: "2020-04-09 - Please use items")
   items: [ExpenseItem]
   attachedFiles: [ExpenseAttachedFile!]
-  userTaxFormRequiredBeforePayment: Boolean
+  userTaxFormRequiredBeforePayment: Boolean @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Please use API V2")
   user: UserDetails
   fromCollective: CollectiveInterface
 
@@ -1420,6 +1498,7 @@ type ExpenseType {
   Returns the list of comments for this expense, or `null` if user is not allowed to see them
   """
   comments(limit: Int, offset: Int): CommentListType
+    @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
   collective: CollectiveInterface
 
   """
@@ -1494,6 +1573,11 @@ type Fund implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is a guest profile
+  """
+  isGuest: Boolean
 
   """
   Returns whether this collective is archived
@@ -1652,6 +1736,11 @@ type Fund implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
@@ -1899,12 +1988,13 @@ type Mutation {
   """
   Approve a collective
   """
-  approveCollective(id: Int!): CollectiveInterface
+  approveCollective(id: Int!): CollectiveInterface @deprecated(reason: "2020-11-16: Please use API V2")
 
   """
   Reject a collective
   """
   rejectCollective(id: Int!, rejectionReason: String): CollectiveInterface
+    @deprecated(reason: "2020-11-16: Please use API V2")
   archiveCollective(id: Int!): CollectiveInterface
   unarchiveCollective(id: Int!): CollectiveInterface
   sendMessageToCollective(collectiveId: Int!, message: String!, subject: String): SendMessageToCollectiveResult
@@ -1964,8 +2054,9 @@ type Mutation {
     token: String!
   ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
-  approveExpense(id: Int!): ExpenseType
+  approveExpense(id: Int!): ExpenseType @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
   unapproveExpense(id: Int!): ExpenseType
+    @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
   rejectExpense(id: Int!): ExpenseType
   payExpense(
     id: Int!
@@ -1982,13 +2073,16 @@ type Mutation {
     2FA code for if the host account has 2FA for payouts turned on.
     """
     twoFactorAuthenticatorCode: String
-  ): ExpenseType
+  ): ExpenseType @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
   markOrderAsPaid(id: Int!): OrderType
   markPendingOrderAsExpired(id: Int!): OrderType
-  createExpense(expense: ExpenseInputType!): ExpenseType @deprecated(reason: "2020-09-17: Now using GQLV2 for that")
+  createExpense(expense: ExpenseInputType!): ExpenseType
+    @deprecated(reason: "2020-09-17: [LegacyExpenseFlow] Now using GQLV2 for that")
   editExpense(expense: ExpenseInputType!): ExpenseType
-  deleteExpense(id: Int!): ExpenseType
+    @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
+  deleteExpense(id: Int!): ExpenseType @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
   markExpenseAsUnpaid(id: Int!, processorFeeRefunded: Boolean!): ExpenseType
+    @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
 
   """
   Update a single tier
@@ -2613,6 +2707,11 @@ type Organization implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is a guest profile
+  """
+  isGuest: Boolean
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -2769,6 +2868,11 @@ type Organization implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
@@ -2957,6 +3061,8 @@ type PlanType {
   bankTransfersLimit: Int
   transferwisePayouts: Int
   transferwisePayoutsLimit: Int
+  hostFees: Boolean
+  hostFeeSharePercent: Int
 }
 
 """
@@ -3025,6 +3131,11 @@ type Project implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is a guest profile
+  """
+  isGuest: Boolean
 
   """
   Returns whether this collective is archived
@@ -3183,6 +3294,11 @@ type Project implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String
@@ -3265,6 +3381,7 @@ type Query {
   Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
   Application(id: Int): Application
   allComments(ExpenseId: Int, UpdateId: Int, limit: Int, offset: Int): [UpdateType]
+    @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Please use API V2")
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
   allOrders(
     CollectiveId: Int
@@ -3287,7 +3404,7 @@ type Query {
     fromCollectiveSlug: String
     limit: Int
     offset: Int
-  ): [ExpenseType]
+  ): [ExpenseType] @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Please use API V2")
   expenses(
     CollectiveId: Int
     CollectiveSlug: String
@@ -3302,8 +3419,8 @@ type Query {
     limit: Int = 100
     offset: Int = 0
     orderBy: OrderByType = { field: createdAt, direction: DESC }
-  ): PaginatedExpenses
-  Expense(id: Int!): ExpenseType
+  ): PaginatedExpenses @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Please use API V2")
+  Expense(id: Int!): ExpenseType @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Please use API V2")
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """
@@ -3429,8 +3546,7 @@ type Query {
   PaymentMethod(id: Int, code: String): PaymentMethodType
 
   """
-  Search for collectives. Uses Algolia, except if searching for users or if using flag to opt-out.
-  Results are returned with best matches first.
+  Search for collectives. Results are returned with best matches first.
   """
   search(
     """
@@ -3449,6 +3565,16 @@ type Query {
     types: [TypeOfCollective]
 
     """
+    Filter on wether account is a host
+    """
+    isHost: Boolean
+
+    """
+    Whether to return only active accounts
+    """
+    onlyActive: Boolean
+
+    """
     Limit the amount of results. Defaults to 20
     """
     limit: Int = 20
@@ -3458,7 +3584,7 @@ type Query {
     If set to false, an internal query will be used to search the collective rather than Algolia.
     You **must** set this to false when searching for users/organizations.
     """
-    useAlgolia: Boolean = true
+    useAlgolia: Boolean = false
   ): CollectiveSearchResults
   allTransactionsFromPaymentMethod(
     uuid: String!
@@ -3941,6 +4067,11 @@ type User implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is a guest profile
+  """
+  isGuest: Boolean
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -4097,6 +4228,11 @@ type User implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
   plan: PlanType
   stats: CollectiveStatsType
   contributionPolicy: String

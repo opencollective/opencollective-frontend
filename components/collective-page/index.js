@@ -1,21 +1,26 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { throttle } from 'lodash';
+import { isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { FormattedMessage } from 'react-intl';
 
 import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
+import TemporaryNotification from '../TemporaryNotification';
 
 import Hero from './hero/Hero';
 import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
+import SectionConnect from './sections/Connect';
 import SectionContribute from './sections/Contribute';
 import SectionContributions from './sections/Contributions';
 import SectionContributors from './sections/Contributors';
 import SectionConversations from './sections/Conversations';
+import SectionEmpty from './sections/Empty';
+import SectionEvents from './sections/Events';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
 import SectionProjects from './sections/Projects';
@@ -69,7 +74,11 @@ class CollectivePage extends Component {
     super(props);
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
     this.navbarRef = React.createRef();
-    this.state = { isFixed: false, selectedSection: null };
+    this.state = {
+      isFixed: false,
+      selectedSection: null,
+      notification: false,
+    };
   }
 
   componentDidMount() {
@@ -157,17 +166,37 @@ class CollectivePage extends Component {
 
   renderSection(section) {
     switch (section) {
-      case Sections.ABOUT:
-        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} />;
-      case Sections.BUDGET:
+      // v2 transition - these standalone sections will be removed from render if feature flag is active
+      case Sections.GOALS:
+        return <SectionGoals collective={this.props.collective} />;
+      case Sections.UPDATES:
         return (
-          <SectionBudget
+          <SectionUpdates
             collective={this.props.collective}
-            transactions={this.props.transactions}
-            expenses={this.props.expenses}
-            stats={this.props.stats}
+            isAdmin={this.props.isAdmin}
+            isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
+      case Sections.CONVERSATIONS:
+        return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
+
+      case Sections.RECURRING_CONTRIBUTIONS:
+        return (
+          <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
+        );
+      case Sections.TICKETS:
+        return (
+          <SectionTickets
+            collective={this.props.collective}
+            tiers={this.props.tiers}
+            isAdmin={this.props.isAdmin}
+            contributors={this.props.financialContributors}
+          />
+        );
+      case Sections.LOCATION:
+        return <SectionLocation collective={this.props.collective} />;
+
+      // all other sections
       case Sections.CONTRIBUTE:
         return (
           <SectionContribute
@@ -179,6 +208,53 @@ class CollectivePage extends Component {
             contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
             isAdmin={this.props.isAdmin}
+            section={section}
+          />
+        );
+      case Sections.CONTRIBUTIONS:
+        return (
+          <SectionContributions
+            collective={this.props.collective}
+            LoggedInUser={this.props.LoggedInUser}
+            section={section}
+          />
+        );
+      case Sections.EVENTS:
+        return (
+          <SectionEvents
+            collective={this.props.collective}
+            events={this.props.events}
+            connectedCollectives={this.props.connectedCollectives}
+            isAdmin={this.props.isAdmin}
+            section={section}
+          />
+        );
+      case Sections.PROJECTS:
+        return (
+          <SectionProjects
+            collective={this.props.collective}
+            projects={this.props.projects}
+            isAdmin={this.props.isAdmin}
+          />
+        );
+      case Sections.BUDGET:
+        return (
+          <SectionBudget
+            collective={this.props.collective}
+            transactions={this.props.transactions}
+            expenses={this.props.expenses}
+            stats={this.props.stats}
+            section={section}
+            financialContributors={this.props.financialContributors}
+          />
+        );
+      case Sections.TRANSACTIONS:
+        return (
+          <SectionTransactions
+            collective={this.props.collective}
+            isAdmin={this.props.isAdmin}
+            isRoot={this.props.isRoot}
+            section={section}
           />
         );
       case Sections.CONTRIBUTORS:
@@ -190,37 +266,6 @@ class CollectivePage extends Component {
             stats={this.props.stats}
           />
         );
-      case Sections.UPDATES:
-        return (
-          <SectionUpdates
-            collective={this.props.collective}
-            isAdmin={this.props.isAdmin}
-            isLoggedIn={Boolean(this.props.LoggedInUser)}
-          />
-        );
-      case Sections.CONTRIBUTIONS:
-        return <SectionContributions collective={this.props.collective} />;
-      case Sections.CONVERSATIONS:
-        return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
-      case Sections.TRANSACTIONS:
-        return (
-          <SectionTransactions
-            collective={this.props.collective}
-            isAdmin={this.props.isAdmin}
-            isRoot={this.props.isRoot}
-          />
-        );
-      case Sections.GOALS:
-        return <SectionGoals collective={this.props.collective} />;
-      case Sections.TICKETS:
-        return (
-          <SectionTickets
-            collective={this.props.collective}
-            tiers={this.props.tiers}
-            isAdmin={this.props.isAdmin}
-            contributors={this.props.financialContributors}
-          />
-        );
       case Sections.PARTICIPANTS:
         return (
           <SectionParticipants
@@ -229,29 +274,39 @@ class CollectivePage extends Component {
             LoggedInUser={this.props.LoggedInUser}
           />
         );
-      case Sections.LOCATION:
-        return <SectionLocation collective={this.props.collective} />;
-      case Sections.RECURRING_CONTRIBUTIONS:
+      case Sections.CONNECT:
         return (
-          <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
-        );
-      case Sections.PROJECTS:
-        return (
-          <SectionProjects
+          <SectionConnect
             collective={this.props.collective}
-            projects={this.props.projects}
+            conversations={this.props.conversations}
             isAdmin={this.props.isAdmin}
+            isLoggedIn={Boolean(this.props.LoggedInUser)}
+            section={section}
           />
         );
+      case Sections.ABOUT:
+        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} section={section} />;
       default:
         return null;
     }
   }
 
+  createNotification = (type, message) => {
+    this.setState({ notification: { type, message } });
+    window.scrollTo(0, 0);
+  };
+
+  dismissNotification = () => {
+    this.setState(state => ({
+      ...state,
+      notification: false,
+    }));
+  };
+
   render() {
     const { collective, host, isAdmin, isRoot, onPrimaryColorChange, LoggedInUser } = this.props;
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
-    const { isFixed, selectedSection } = this.state;
+    const { isFixed, selectedSection, notification } = this.state;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
     const isFund = collective.type === CollectiveType.FUND || settings?.fund === true; // Funds MVP, to refactor
     const isAuthenticated = LoggedInUser ? true : false;
@@ -274,6 +329,29 @@ class CollectivePage extends Component {
         css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
         data-cy="collective-page-main"
       >
+        {notification && (
+          <TemporaryNotification onDismiss={this.dismissNotification} type={notification.type}>
+            {notification.type === 'error' ? (
+              <FormattedMessage
+                id="ApplyToHost.error"
+                defaultMessage="An error occurred while applying to {hostName} with {collectiveName}."
+                values={{
+                  hostName: collective.name,
+                  collectiveName: notification.message,
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="ApplyToHost.success"
+                defaultMessage="{collectiveName} has applied to be hosted by {hostName}."
+                values={{
+                  hostName: collective.name,
+                  collectiveName: notification.message,
+                }}
+              />
+            )}
+          </TemporaryNotification>
+        )}
         <Hero
           collective={collective}
           host={host}
@@ -302,18 +380,23 @@ class CollectivePage extends Component {
                 {label}
               </a>
             )}
+            createNotification={this.createNotification}
           />
         </Container>
-        {sections.map((section, idx) => (
-          <SectionContainer
-            key={section}
-            ref={sectionRef => (this.sectionsRefs[section] = sectionRef)}
-            id={`section-${section}`}
-            withPaddingBottom={idx === sections.length - 1 && !sectionsWithoutPaddingBottom[section]}
-          >
-            {this.renderSection(section, idx === sections.length - 1)}
-          </SectionContainer>
-        ))}
+        {isEmpty(sections) ? (
+          <SectionEmpty collective={this.props.collective} />
+        ) : (
+          sections.map((section, idx) => (
+            <SectionContainer
+              key={section}
+              ref={sectionRef => (this.sectionsRefs[section] = sectionRef)}
+              id={`section-${section}`}
+              withPaddingBottom={idx === sections.length - 1 && !sectionsWithoutPaddingBottom[section]}
+            >
+              {this.renderSection(section, idx === sections.length - 1)}
+            </SectionContainer>
+          ))
+        )}
       </Container>
     );
   }

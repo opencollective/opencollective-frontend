@@ -5,7 +5,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
 import { withRouter } from 'next/router';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import colors from '../lib/constants/colors';
@@ -19,6 +19,7 @@ import { Box, Flex } from '../components/Grid';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
+import StyledFilters from '../components/StyledFilters';
 import StyledLink from '../components/StyledLink';
 import { P } from '../components/Text';
 
@@ -42,10 +43,45 @@ const SearchButton = styled(Button).attrs({
   }
 `;
 
+const FILTERS = {
+  ALL: 'ALL',
+  COLLECTIVE: 'COLLECTIVE',
+  EVENT: 'EVENT',
+  ORGANIZATION: 'ORGANIZATION',
+  HOST: 'HOST',
+};
+
+const I18nFilters = defineMessages({
+  [FILTERS.ALL]: {
+    id: 'searchFilter.all',
+    defaultMessage: 'View all',
+  },
+  [FILTERS.COLLECTIVE]: {
+    id: 'CollectiveType.Collective',
+    defaultMessage: '{count, plural, one {Collective} other {Collectives}}',
+  },
+  [FILTERS.EVENT]: {
+    id: 'CollectiveType.Event',
+    defaultMessage: '{count, plural, one {Event} other {Events}}',
+  },
+  [FILTERS.ORGANIZATION]: {
+    id: 'CollectiveType.Organization',
+    defaultMessage: '{count, plural, one {Organization} other {Organizations}}',
+  },
+  [FILTERS.HOST]: {
+    id: 'searchFilter.host',
+    defaultMessage: 'Fiscal hosts',
+  },
+});
+
+const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
+
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
       term: query.q || '',
+      types: query.types,
+      isHost: Boolean(query.isHost),
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
@@ -57,7 +93,14 @@ class SearchPage extends React.Component {
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
+    intl: PropTypes.object,
   };
+
+  constructor(props) {
+    super(props);
+    this.onClick = this.onClick.bind(this);
+    this.state = { filter: 'ALL' };
+  }
 
   refetch = event => {
     event.preventDefault();
@@ -69,6 +112,18 @@ class SearchPage extends React.Component {
     router.push({ pathname: router.pathname, query: { q: q.value } });
   };
 
+  onClick = filter => {
+    const { term } = this.props;
+
+    if (filter === 'HOST') {
+      Router.pushRoute('search', { q: term, isHost: true });
+    } else if (filter !== 'ALL') {
+      Router.pushRoute('search', { q: term, types: filter });
+    } else {
+      Router.pushRoute('search', { q: term, types: DEFAULT_SEARCH_TYPES });
+    }
+  };
+
   changePage = offset => {
     const { router } = this.props;
     Router.pushRoute('search', { ...router.query, offset });
@@ -78,12 +133,14 @@ class SearchPage extends React.Component {
     const {
       data: { error, loading, search },
       term = '',
+      intl,
     } = this.props;
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
     }
 
+    const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST'];
     const { collectives, limit = 20, offset, total = 0 } = search || {};
     const showCollectives = term.trim() !== '' && !!collectives;
 
@@ -104,6 +161,19 @@ class SearchPage extends React.Component {
                 </Flex>
               </FormGroup>
             </form>
+          </Box>
+          <Box mt={4} mb={4} mx="auto">
+            <StyledFilters
+              filters={filters}
+              getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
+              selected={this.state.filter}
+              justifyContent="left"
+              minButtonWidth={150}
+              onChange={filter => {
+                this.setState({ filter: filter });
+                this.onClick(filter);
+              }}
+            />
           </Box>
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && !collectives && (
@@ -192,8 +262,8 @@ class SearchPage extends React.Component {
 export { SearchPage as MockSearchPage };
 
 export const searchPageQuery = gql`
-  query SearchPage($term: String!, $limit: Int, $offset: Int) {
-    search(term: $term, limit: $limit, offset: $offset) {
+  query SearchPage($term: String!, $types: [TypeOfCollective], $isHost: Boolean, $limit: Int, $offset: Int) {
+    search(term: $term, types: $types, isHost: $isHost, limit: $limit, offset: $offset, onlyActive: true) {
       collectives {
         id
         isActive
@@ -234,4 +304,4 @@ export const searchPageQuery = gql`
 
 export const addSearchPageData = graphql(searchPageQuery);
 
-export default withRouter(addSearchPageData(SearchPage));
+export default injectIntl(withRouter(addSearchPageData(SearchPage)));

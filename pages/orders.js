@@ -2,17 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { generateNotFoundError } from '../lib/errors';
+import { ORDER_STATUS } from '../lib/constants/order-status';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
-import Body from '../components/Body';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
-import ErrorPage from '../components/ErrorPage';
-import OrdersWithData from '../components/expenses/OrdersWithData';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
-import SectionTitle from '../components/SectionTitle';
+import { Box } from '../components/Grid';
+import OrdersWithData from '../components/orders/OrdersWithData';
+import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
 class OrdersPage extends React.Component {
@@ -30,98 +27,27 @@ class OrdersPage extends React.Component {
 
   render() {
     const { slug, data, LoggedInUser } = this.props;
-
-    if (!data || data.error || data.loading) {
-      return <ErrorPage data={data} />;
-    } else if (!data.Collective) {
-      return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
-    }
-
-    const collective = data.Collective;
-
-    let action, subtitle, filter;
-    if (this.props.value) {
-      action = {
-        label: <FormattedMessage id="orders.viewAll" defaultMessage="View All Orders" />,
-        href: `/${collective.slug}/orders`,
-      };
-
-      if (this.props.filter === 'categories') {
-        const category = decodeURIComponent(this.props.value);
-        filter = { category };
-        subtitle = (
-          <FormattedMessage id="orders.byCategory" defaultMessage="Orders in {category}" values={{ category }} />
-        );
-      }
-      if (this.props.filter === 'recipients') {
-        const recipient = decodeURIComponent(this.props.value);
-        filter = { recipient };
-        subtitle = (
-          <FormattedMessage id="orders.byRecipient" defaultMessage="Orders by {recipient}" values={{ recipient }} />
-        );
-      }
-    }
-
+    const collective = data?.collective;
     return (
-      <div className="OrdersPage">
-        <style jsx>
-          {`
-            .columns {
-              display: flex;
-            }
-
-            .col.side {
-              width: 100%;
-              min-width: 20rem;
-              max-width: 25%;
-              margin-left: 5rem;
-            }
-
-            .col.large {
-              width: 100%;
-              min-width: 30rem;
-              max-width: 75%;
-            }
-
-            @media (max-width: 600px) {
-              .columns {
-                flex-direction: column-reverse;
-              }
-              .columns .col {
-                max-width: 100%;
-              }
-            }
-          `}
-        </style>
-
-        <Header collective={collective} LoggedInUser={LoggedInUser} />
-
-        <Body>
+      <Page>
+        {(data?.loading || data?.Collective) && (
           <Container mb={4}>
             <CollectiveNavbar
-              collective={collective}
-              isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+              isLoading={data.loading}
+              collective={data.Collective}
+              isAdmin={LoggedInUser?.canEditCollective(collective)}
               showEdit
             />
           </Container>
-
-          <div className="content">
-            <SectionTitle
-              title={<FormattedMessage id="Orders" defaultMessage="Orders" />}
-              subtitle={subtitle}
-              action={action}
-            />
-
-            <div className=" columns">
-              <div className="col large">
-                <OrdersWithData collective={collective} LoggedInUser={LoggedInUser} filter={filter} />
-              </div>
-            </div>
-          </div>
-        </Body>
-
-        <Footer />
-      </div>
+        )}
+        <Box py={4}>
+          <OrdersWithData
+            accountSlug={slug}
+            status={ORDER_STATUS.PENDING}
+            title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
+          />
+        </Box>
+      </Page>
     );
   }
 }

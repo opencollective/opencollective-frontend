@@ -7,13 +7,11 @@ import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { TransactionTypes } from '../../lib/constants/transactions';
-import { getEnvVar } from '../../lib/env-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
@@ -21,7 +19,7 @@ import { getGuestToken, setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
-import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
+import { getWebsiteUrl, reportValidityHTML5 } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -56,11 +54,9 @@ const StepsProgressBox = styled(Box)`
   }
 `;
 
-const HAS_GUEST_CONTRIBUTIONS = parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS'));
-
 const STEP_LABELS = defineMessages({
   profile: {
-    id: 'contribute.step.profile',
+    id: 'menu.profile',
     defaultMessage: 'Profile',
   },
   details: {
@@ -98,6 +94,7 @@ class ContributionFlow extends React.Component {
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
+    hasGuestContributions: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
     verb: PropTypes.string,
@@ -112,6 +109,7 @@ class ContributionFlow extends React.Component {
   constructor(props) {
     super(props);
     this.mainContainerRef = React.createRef();
+    this.formRef = React.createRef();
     this.state = {
       error: null,
       stripe: null,
@@ -120,6 +118,7 @@ class ContributionFlow extends React.Component {
       stepProfile: null,
       stepPayment: null,
       stepSummary: null,
+      showSignIn: false,
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || props.tier?.interval,
@@ -286,6 +285,10 @@ class ContributionFlow extends React.Component {
   validateStepProfile = async action => {
     const { stepProfile, stepDetails } = this.state;
 
+    if (!this.checkFormValidity()) {
+      return false;
+    }
+
     // Can only ignore validation if going back
     if (!stepProfile) {
       return action === 'prev';
@@ -372,7 +375,10 @@ class ContributionFlow extends React.Component {
   };
 
   /** Steps component callback  */
-  onStepChange = async step => this.pushStepRoute(step.name);
+  onStepChange = async step => {
+    this.setState({ showSignIn: false });
+    this.pushStepRoute(step.name);
+  };
 
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, routeParams = {}) => {
@@ -439,12 +445,14 @@ class ContributionFlow extends React.Component {
       return false;
     } else if (this.props.tier?.type === TierTypes.TICKET) {
       return false;
-    } else if (this.state.stepProfile?.type === CollectiveType.COLLECTIVE) {
-      return this.state.stepProfile.host?.id && this.state.stepProfile.host.id === this.props.host?.id;
     } else {
       return true;
     }
   }
+
+  checkFormValidity = () => {
+    return reportValidityHTML5(this.formRef.current);
+  };
 
   /** Returns the steps list */
   getSteps() {
@@ -453,20 +461,19 @@ class ContributionFlow extends React.Component {
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
-    const isStepProfileCompleted = Boolean(
-      (stepProfile && LoggedInUser) || (HAS_GUEST_CONTRIBUTIONS && stepProfile?.isGuest),
-    );
+    const hasPickedGuestProfile = this.props.hasGuestContributions && stepProfile?.isGuest;
+    const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || hasPickedGuestProfile);
 
     const steps = [
       {
         name: 'details',
         label: intl.formatMessage(STEP_LABELS.details),
-        isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount && stepDetails.quantity),
+        isCompleted: Boolean(stepDetails),
         validate: () => {
-          if (isNil(tier?.availableQuantity)) {
-            return true;
+          if (!this.checkFormValidity() || !stepDetails || stepDetails.amount < minAmount || !stepDetails.quantity) {
+            return false;
           } else {
-            return stepDetails.quantity <= tier.availableQuantity;
+            return isNil(tier?.availableQuantity) || stepDetails.quantity <= tier.availableQuantity;
           }
         },
       },
@@ -622,9 +629,11 @@ class ContributionFlow extends React.Component {
               <Box py={[4, 5]}>
                 <Loading />
               </Box>
-            ) : currentStep.name === STEPS.PROFILE && !LoggedInUser && !HAS_GUEST_CONTRIBUTIONS ? (
+            ) : currentStep.name === STEPS.PROFILE &&
+              !LoggedInUser &&
+              (this.state.showSignIn || !this.props.hasGuestContributions) ? (
               <SignInOrJoinFree
-                defaultForm="create-account"
+                defaultForm={this.state.showSignIn ? 'signin' : 'create-account'}
                 redirect={this.getRedirectUrlForSignIn()}
                 createPersonalProfileLabel={
                   <FormattedMessage
@@ -650,7 +659,7 @@ class ContributionFlow extends React.Component {
                 ]}
               >
                 <Box />
-                <Box as="form" onSubmit={e => e.preventDefault()} maxWidth="100%">
+                <Box as="form" ref={this.formRef} onSubmit={e => e.preventDefault()} maxWidth="100%">
                   {error && (
                     <MessageBox type="error" withIcon mb={3}>
                       {formatErrorMessage(this.props.intl, error)}
@@ -667,6 +676,7 @@ class ContributionFlow extends React.Component {
                     onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
                     defaultProfileSlug={this.props.contributeAs}
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
+                    onSignInClick={() => this.setState({ showSignIn: true })}
                   />
 
                   <Box mt={[4, 5]}>

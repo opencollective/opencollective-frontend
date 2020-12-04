@@ -66,7 +66,7 @@ export const DefaultCollectiveLabel = ({ value: collective }) => (
         {truncate(collective.name, { length: 40 })}
       </Span>
       <Span fontSize="11px" lineHeight="13px" color="black.500">
-        {collective.isInvite ? collective.email : `@${collective.slug}`}
+        {collective.slug ? `@${collective.slug}` : collective.email || ''}
       </Span>
     </CollectiveLabelTextContainer>
   </Flex>
@@ -84,7 +84,7 @@ DefaultCollectiveLabel.propTypes = {
 
 // Some flags to differentiate options in the picker
 export const FLAG_COLLECTIVE_PICKER_COLLECTIVE = '__collective_picker_collective__';
-const FLAG_NEW_COLLECTIVE = '__collective_picker_new__';
+export const FLAG_NEW_COLLECTIVE = '__collective_picker_new__';
 const FLAG_INVITE_NEW = '__collective_picker_invite_new__';
 
 export const CUSTOM_OPTIONS_POSITION = {
@@ -316,7 +316,9 @@ class CollectivePicker extends React.PureComponent {
                   if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
                     return formatOptionLabel(option, context);
                   } else if (option[FLAG_NEW_COLLECTIVE]) {
-                    return <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={types} />;
+                    return (
+                      <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={option.types || types} />
+                    );
                   } else if (option[FLAG_INVITE_NEW]) {
                     return (
                       <InviteCollectiveDropdownOption
@@ -362,6 +364,7 @@ class CollectivePicker extends React.PureComponent {
                         type={createFormCollectiveType}
                         onCancel={this.setCreateFormCollectiveType}
                         addLoggedInUserAsAdmin={addLoggedInUserAsAdmin}
+                        excludeAdminFields={this.props.excludeAdminFields}
                         optionalFields={this.props.createCollectiveOptionalFields}
                         onSuccess={collective => {
                           if (onChange) {
@@ -437,6 +440,7 @@ CollectivePicker.propTypes = {
   invitable: PropTypes.bool,
   /** If true, logged in user will be added as an admin of the created account */
   addLoggedInUserAsAdmin: PropTypes.bool,
+  excludeAdminFields: PropTypes.bool,
   /** Force menu to be open. Ignored during collective creation */
   menuIsOpen: PropTypes.bool,
   /** Disabled */

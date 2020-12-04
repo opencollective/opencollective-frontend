@@ -26,6 +26,7 @@ const nextConfig = {
         ENABLE_GUEST_CONTRIBUTIONS: false,
         REJECT_CONTRIBUTION: false,
         REJECTED_CATEGORIES: false,
+        NEW_COLLECTIVE_NAVBAR: false,
       }),
     );
 

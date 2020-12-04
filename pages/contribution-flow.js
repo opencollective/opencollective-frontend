@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
+import { getEnvVar } from '../lib/env-utils';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { floatAmountToCents } from '../lib/math';
@@ -148,11 +149,12 @@ class NewContributionFlowPage extends React.Component {
 
   getCanonicalURL(collective, tier) {
     if (!tier) {
-      return `/${collective.slug}/donate`;
+      return `${process.env.WEBSITE_URL}/${collective.slug}/donate`;
     } else if (collective.type === CollectiveType.EVENT) {
-      return `/${get(collective.parent, 'slug', collective.slug)}/events/${collective.slug}/order/${tier.id}`;
+      const parentSlug = get(collective.parent, 'slug', collective.slug);
+      return `${process.env.WEBSITE_URL}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
     } else {
-      return `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
+      return `${process.env.WEBSITE_URL}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
     }
   }
 
@@ -256,6 +258,10 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
+          hasGuestContributions={
+            parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ||
+            get(account, 'settings.features.GUEST_CONTRIBUTIONS')
+          }
         />
       );
     }
@@ -318,6 +324,8 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
       country
     }
     ... on Organization {
+      platformFeePercent
+      platformContributionAvailable
       host {
         ...ContributionFlowHostFields
       }

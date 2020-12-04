@@ -24,7 +24,7 @@ describe('Contribution Flow: Donate', () => {
       // Change frequency - monthly
       cy.contains('#interval button', 'Monthly').click();
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
-      cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / month');
+      cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / mo.');
       cy.contains("Today's charge");
       // next charge in 2 months time, first day, because it was made on or after 15th.
       cy.contains('Next charge on July 1, 2042');
@@ -32,7 +32,7 @@ describe('Contribution Flow: Donate', () => {
       // Change frequency - yearly
       cy.contains('#interval button', 'Yearly').click();
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
-      cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / year');
+      cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / yr.');
       cy.contains("Today's charge");
       cy.contains('Next charge on May 1, 2043');
 
@@ -41,13 +41,14 @@ describe('Contribution Flow: Donate', () => {
       // ---- Step profile ----
       cy.checkStepsProgress({ enabled: ['profile', 'details'], disabled: 'payment' });
       // Personal account must be the first entry, and it must be checked
-      cy.contains('[data-cy="ContributionProfile"] > label:first', `${user.firstName} ${user.lastName}`);
+      const userName = `${user.firstName} ${user.lastName}`;
+      cy.contains('[data-cy="ContributionProfile"] > label:first', userName);
       cy.contains('[data-cy="ContributionProfile"] > label:first', `Personal`);
       cy.contains('[data-cy="ContributionProfile"] > label:first', user.email);
       cy.get('[data-cy="ContributionProfile"] > label:first input[type=radio]').should('be.checked');
 
       // User profile is shown on step, all other steps must be disabled
-      cy.getByDataCy(`progress-step-profile`).contains(`${user.firstName} ${user.lastName}`);
+      cy.getByDataCy(`progress-step-profile`).contains(userName);
       cy.get('button[data-cy="cf-next-step"]').click();
 
       // ---- Step Payment ----
@@ -125,7 +126,7 @@ describe('Contribution Flow: Donate', () => {
       cy.fillStripeInput();
 
       // Should display the contribution details
-      cy.contains('[data-cy="progress-step-details"]', '$42.00 USD / year');
+      cy.contains('[data-cy="progress-step-details"]', '$42.00 USD / yr.');
 
       // Submit order
       cy.contains('button', 'Contribute $42').click();

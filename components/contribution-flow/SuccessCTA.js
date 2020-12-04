@@ -23,7 +23,7 @@ const headerMessages = defineMessages({
     defaultMessage: 'Join Open Collective',
   },
   [SUCCESS_CTA_TYPE.BLOG]: {
-    id: 'NewContributionFlow.Success.CTA.Read.Header',
+    id: 'ReadOurStories',
     defaultMessage: 'Read our stories',
   },
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {
@@ -70,10 +70,19 @@ const CTAContainer = styled(Container)`
     `}
 `;
 
-const SuccessCTAWrapper = ({ type, ...props }) => {
+const SuccessCTAWrapper = ({ type, orderId, ...props }) => {
   switch (type) {
     case SUCCESS_CTA_TYPE.JOIN:
-      return <Link route="create-account" params={{ form: 'create-account' }} {...props} />;
+      return (
+        <StyledLink
+          as={Link}
+          display="block"
+          data-cy="join-opencollective-link"
+          route="guest-join"
+          params={{ OrderId: orderId }}
+          {...props}
+        />
+      );
     case SUCCESS_CTA_TYPE.BLOG:
       return <StyledLink href="https://blog.opencollective.com" openInNewTab color="black.700" {...props} />;
     default:
@@ -83,14 +92,15 @@ const SuccessCTAWrapper = ({ type, ...props }) => {
 
 SuccessCTAWrapper.propTypes = {
   type: PropTypes.string,
+  orderId: PropTypes.string,
 };
 
-const SuccessCTA = ({ type }) => {
+const SuccessCTA = ({ type, orderId }) => {
   const { formatMessage } = useIntl();
   const isNewsletter = type === SUCCESS_CTA_TYPE.NEWSLETTER;
   return (
     <Container px={[3, 0]} my={3} maxWidth={600}>
-      <SuccessCTAWrapper type={type}>
+      <SuccessCTAWrapper type={type} orderId={orderId}>
         <CTAContainer px={4} py={2} hoverable={!isNewsletter}>
           <Flex
             flexDirection="column"
@@ -122,6 +132,7 @@ const SuccessCTA = ({ type }) => {
 
 SuccessCTA.propTypes = {
   type: PropTypes.oneOf(Object.values(SUCCESS_CTA_TYPE)),
+  orderId: PropTypes.string,
 };
 
 export default SuccessCTA;

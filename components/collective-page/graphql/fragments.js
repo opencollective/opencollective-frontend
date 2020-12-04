@@ -42,7 +42,28 @@ export const contributorsFieldsFragment = gql`
     type
     publicMessage
     isIncognito
+    isGuest
     tiersIds
     collectiveId
+  }
+`;
+
+/**
+ * Fields fetched for all possible collective page features
+ */
+export const collectiveNavbarFieldsFragment = gql`
+  fragment NavbarFields on CollectiveFeatures {
+    RECEIVE_FINANCIAL_CONTRIBUTIONS
+    RECURRING_CONTRIBUTIONS
+    EVENTS
+    PROJECTS
+    USE_EXPENSES
+    RECEIVE_EXPENSES
+    USE_EXPENSES
+    COLLECTIVE_GOALS
+    TOP_FINANCIAL_CONTRIBUTORS
+    CONVERSATIONS
+    UPDATES
+    TEAM
   }
 `;

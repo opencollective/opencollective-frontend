@@ -28,10 +28,11 @@ const load = async app => {
 
   const lookup = async (req, res, opts, next) => {
     if (!whitelist(req)) {
-      if (req.hyperwatch && req.hyperwatch.getAugmentedLog) {
-        const log = await req.hyperwatch.getAugmentedLog({ fast: true });
-        req.hyperwatch.identity = log.getIn(['identity']) || log.getIn(['request', 'address']);
-        opts.lookup = 'hyperwatch.identity';
+      if (!req.identityOrIp && req.hyperwatch) {
+        req.identityOrIp = await req.hyperwatch.getIdentityOrIp();
+      }
+      if (req.identityOrIp) {
+        opts.lookup = 'identityOrIp';
       } else {
         opts.lookup = 'ip';
       }

@@ -7,6 +7,8 @@ import { isUndefined, orderBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import fetchGeoLocation from '../lib/geolocation_api';
+
 import StyledSelect from './StyledSelect';
 
 const COUNTRY_NAMES = {
@@ -35,6 +37,8 @@ class InputTypeCountry extends Component {
     value: PropTypes.string,
     /** Switch between display modes */
     mode: PropTypes.oneOf(['select', 'underlined']),
+    /** If true, we'll try to autodetect country form the IP */
+    autoDetect: PropTypes.bool,
     /** From injectIntl */
     intl: PropTypes.object.isRequired,
     /** Is this input required? */
@@ -42,6 +46,17 @@ class InputTypeCountry extends Component {
   };
 
   static defaultProps = { name: 'country' };
+
+  async componentDidMount() {
+    if (this.props.autoDetect && !this.props.value && !this.props.defaultValue) {
+      const country = await fetchGeoLocation();
+
+      // Country may have been changed by the user by the time geolocation API respond
+      if (country && !this.props.value && !this.props.defaultValue) {
+        this.props.onChange(country);
+      }
+    }
+  }
 
   getCountryLabel(code, locale) {
     const name = getCountryName(locale, code);
@@ -70,7 +85,7 @@ class InputTypeCountry extends Component {
   });
 
   render() {
-    const { defaultValue, value, intl, onChange, locale, ...props } = this.props;
+    const { defaultValue, value, intl, onChange, locale, name, ...props } = this.props;
     return (
       <StyledSelect
         name={name}

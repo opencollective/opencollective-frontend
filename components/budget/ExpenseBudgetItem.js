@@ -37,7 +37,7 @@ const DetailColumnHeader = styled.div`
   margin-bottom: 2px;
 `;
 
-const ButtonsContainer = styled.div`
+const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
   display: flex;
   flex-wrap: wrap;
   margin-top: 8px;
@@ -127,7 +127,7 @@ const ExpenseBudgetItem = ({
   const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
 
   return (
-    <ExpenseContainer>
+    <ExpenseContainer data-cy={`expense-container-${expense?.legacyId}`}>
       <Flex justifyContent="space-between" flexWrap="wrap">
         <Flex flex="1" minWidth="max(60%, 300px)" maxWidth={[null, '70%']}>
           <Box mr={3}>
@@ -176,7 +176,7 @@ const ExpenseBudgetItem = ({
                   <LinkCollective collective={collective} />
                 ) : (
                   <FormattedMessage
-                    id="Expense.By"
+                    id="CreatedBy"
                     defaultMessage="by {name}"
                     values={{ name: <LinkCollective collective={expense.createdByAccount} /> }}
                   />
@@ -365,6 +365,7 @@ ExpenseBudgetItem.propTypes = {
     createdByAccount: PropTypes.shape({
       type: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
     }),
     /** If available, this `account` will be used to link expense in place of the `collective` */
     account: PropTypes.shape({

@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import AmountFilter from '../budget/filters/AmountFilter';
+import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Box, Flex } from '../Grid';
 
-import TransactionsAmountFilter from './filters/TransactionsAmountFilter';
-import TransactionsDateFilter from './filters/TransactionsDateFilter';
 import TransactionsTypeFilter from './filters/TransactionsTypeFilter';
 
 const FilterContainer = styled(Box)`
@@ -43,13 +43,13 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="transactions-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <TransactionsDateFilter {...getFilterProps('period')} />
+        <PeriodFilter {...getFilterProps('period')} />
       </FilterContainer>
       <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-amount">
           <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
         </FilterLabel>
-        <TransactionsAmountFilter currency={collective.currency} {...getFilterProps('amount')} />
+        <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
       </FilterContainer>
     </Flex>
   );

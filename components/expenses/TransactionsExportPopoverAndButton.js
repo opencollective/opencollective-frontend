@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
@@ -16,7 +16,7 @@ import InputField from '../InputField';
 export const transformResultInCSV = json => {
   const q = value => `"${value}"`; /* Quote value */
   const f = value => (value / 100).toFixed(2); /* Add cents */
-  const d = value => moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss');
+  const d = value => dayjs(new Date(value)).format('YYYY-MM-DD HH:mm:ss');
 
   // Sanity check. It will return an empty CSV for the user
   if (json.length === 0) {
@@ -77,7 +77,7 @@ class ExportForm extends React.Component {
     super(props);
 
     // Calculate the start: first day of previous month & end date: today.
-    const oneMonthAgo = moment().subtract(1, 'months')._d;
+    const oneMonthAgo = dayjs().subtract(1, 'month').toDate();
     const defaultStartDate = new Date(oneMonthAgo.getFullYear(), oneMonthAgo.getMonth(), 1);
     const defaultEndDate = new Date();
 
@@ -108,7 +108,7 @@ class ExportForm extends React.Component {
     }
 
     // Helper to prepare date values to be part of the file name
-    const format = d => moment(d).format('YYYY-MM-DD');
+    const format = d => dayjs(d).format('YYYY-MM-DD');
     let fileName = `${this.props.collective.slug}-from-`;
     fileName += `${format(this.state.dateFrom)}-to-`;
     fileName += `${format(this.state.dateTo)}.csv`;

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
+import styled from 'styled-components';
 
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -17,6 +18,68 @@ const getContent = (path, pageSlug) => {
     return get(staticPages, pageSlug);
   }
 };
+
+const StaticPageContainer = styled.div`
+  .content {
+    max-width: 96rem;
+  }
+  .content .path {
+    color: #9399a3;
+    font-size: 1.5rem;
+    margin-bottom: -2rem;
+    margin-left: 0.5rem;
+    margin-top: 1rem;
+    text-transform: uppercase;
+  }
+  .content h1 {
+    margin: 4rem 0px 6rem;
+    font-size: 4.8rem;
+    color: #121314;
+    line-height: 5.2rem;
+    font-weight: 300;
+    text-align: left;
+  }
+  .content h2 {
+    font-size: 2.4rem;
+    color: #6e747a;
+    font-weight: 500;
+    line-height: 3.2rem;
+    margin: 5rem 0 1rem;
+  }
+  .content h3 {
+    margin-top: 2.5rem;
+    line-height: 1.3;
+  }
+  .content h4 {
+    margin-top: 1rem;
+    line-height: 1.3;
+  }
+
+  .content p,
+  .content li,
+  .content summary {
+    color: #6e747a;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .content th {
+    min-width: 200px;
+    text-align: left;
+    vertical-align: top;
+    padding-top: 1rem;
+  }
+  .content li {
+    margin: 0.5rem;
+  }
+  .content code {
+    padding: 0.5rem !important;
+    margin: -7px 0;
+    line-height: 1.5rem;
+  }
+  .content iframe {
+    max-width: 100%;
+  }
+`;
 
 class StaticPage extends React.Component {
   static async getInitialProps(props) {
@@ -49,70 +112,7 @@ class StaticPage extends React.Component {
     const { path, pageSlug, title, LoggedInUser } = this.props;
 
     return (
-      <div className="staticPage">
-        <style global jsx>
-          {`
-            .staticPage .content {
-              max-width: 96rem;
-            }
-            .staticPage .content .path {
-              color: #9399a3;
-              font-size: 1.5rem;
-              margin-bottom: -2rem;
-              margin-left: 0.5rem;
-              margin-top: 1rem;
-              text-transform: uppercase;
-            }
-            .staticPage .content h1 {
-              margin: 4rem 0px 6rem;
-              font-size: 4.8rem;
-              color: #121314;
-              line-height: 5.2rem;
-              font-weight: 300;
-              text-align: left;
-            }
-            .staticPage .content h2 {
-              font-size: 2.4rem;
-              color: #6e747a;
-              font-weight: 500;
-              line-height: 3.2rem;
-              margin: 5rem 0 1rem;
-            }
-            .staticPage .content h3 {
-              margin-top: 2.5rem;
-              line-height: 1.3;
-            }
-            .staticPage .content h4 {
-              margin-top: 1rem;
-              line-height: 1.3;
-            }
-
-            .staticPage .content p,
-            .staticPage .content li,
-            .staticPage .content summary {
-              color: #6e747a;
-              font-size: 16px;
-              line-height: 24px;
-            }
-            .staticPage .content th {
-              min-width: 200px;
-              text-align: left;
-              vertical-align: top;
-              padding-top: 1rem;
-            }
-            .staticPage .content li {
-              margin: 0.5rem;
-            }
-            .staticPage .content code {
-              padding: 0.5rem !important;
-              margin: -7px 0;
-              line-height: 1.5rem;
-            }
-            .staticPage .content iframe {
-              max-width: 100%;
-            }
-          `}
-        </style>
+      <StaticPageContainer>
         <Header title={title} LoggedInUser={LoggedInUser} />
         <Body>
           <div className="content">
@@ -126,7 +126,7 @@ class StaticPage extends React.Component {
           <NewsletterContainer />
         </Body>
         <Footer />
-      </div>
+      </StaticPageContainer>
     );
   }
 }

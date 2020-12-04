@@ -31,6 +31,10 @@ const TranslatedTerms = defineMessages({
     id: 'HostFee',
     defaultMessage: 'Host fee',
   },
+  [Terms.PLATFORM_FEE]: {
+    id: 'PlatformFee',
+    defaultMessage: 'Platform fee',
+  },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard',
     defaultMessage: 'Gift card',
@@ -55,6 +59,11 @@ const TranslatedDefinitions = defineMessages({
     id: 'host.hostFee.help',
     defaultMessage:
       'The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities.',
+  },
+  [Terms.PLATFORM_FEE]: {
+    id: 'host.platformFee.help',
+    defaultMessage:
+      'The platform fee is the fee that the Open Collective platform charges your collective on incoming contributions.',
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard.definition',

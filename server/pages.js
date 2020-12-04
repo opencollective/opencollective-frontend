@@ -10,7 +10,8 @@ const pages = routes()
   .add('home', '/', 'index')
   .add('become-a-sponsor', '/become-a-sponsor', 'become-a-sponsor')
   .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
-  .add('pricing', '/pricing', 'pricing')
+  .add('pricing', '/pricing')
+  .add('pricing-old', '/pricing-old')
   .add('redeem', '/:collectiveSlug?/redeem/:code?')
   .add('redeemed', '/:collectiveSlug?/redeemed/:code?')
   .add('updatePaymentMethod', '/:collectiveSlug/paymentmethod/:id/update')
@@ -18,8 +19,10 @@ const pages = routes()
   .add('confirmCollectiveDeletion', '/deleteCollective/confirmed')
   .add('signin', '/signin/:token?')
   .add('confirmEmail', '/confirm/email/:token')
+  .add('confirm-guest', '/confirm/guest/:token')
   .add('unsubscribeEmail', '/email/unsubscribe/:email/:slug/:type/:token')
   .add('create-account', '/:form(create-account)', 'signin')
+  .add('guest-join', '/create-account/guest')
   .add('subscriptions_redirect', '/subscriptions', 'recurring-contributions-redirect')
   .add('recurring-contributions-redirect', '/recurring-contributions')
   .add('search', '/search')
@@ -36,7 +39,7 @@ const pages = routes()
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add(
     'host.dashboard',
-    '/:hostCollectiveSlug/dashboard/:view(expenses|expenses-legacy|pending-applications|hosted-collectives|donations)?',
+    '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations)?',
     'host.dashboard',
   )
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions')
@@ -50,19 +53,9 @@ const pages = routes()
     'expense',
   )
   .add(
-    'expense',
-    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/legacy',
-    'expense-legacy',
-  )
-  .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
     'expenses',
-  )
-  .add(
-    'expenses-legacy',
-    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
-    'expenses-legacy',
   )
   .add('orders', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders')
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)')
@@ -158,7 +151,7 @@ pages.add('applications', '/applications');
 
 pages.add(
   'marketing',
-  '/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|become-a-fiscal-host)',
+  '/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|old-pricing|become-a-fiscal-host)',
   'marketingPage',
 );
 

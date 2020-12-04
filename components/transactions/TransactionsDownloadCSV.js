@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 
 import { exportFile } from '../../lib/export_file';
@@ -18,7 +18,7 @@ import StyledInputField from '../StyledInputField';
 const transformResultInCSV = json => {
   const q = value => `"${value}"`; /* Quote value */
   const f = value => (value / 100).toFixed(2); /* Add cents */
-  const d = value => moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss');
+  const d = value => dayjs(new Date(value)).format('YYYY-MM-DD HH:mm:ss');
 
   // Sanity check. It will return an empty CSV for the user
   if (json.length === 0) {
@@ -71,8 +71,8 @@ const transformResultInCSV = json => {
 
 const TransactionsDownloadCSV = ({ collective, client }) => {
   const [dateInterval, setDateInterval] = React.useState({
-    dateFrom: moment().subtract(1, 'months').format('YYYY-MM-DD'),
-    dateTo: moment().format('YYYY-MM-DD'),
+    dateFrom: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
+    dateTo: dayjs().format('YYYY-MM-DD'),
   });
   const [isEmpty, setEmpty] = React.useState(false);
   const [isLoading, setLoading] = React.useState(false);
@@ -97,7 +97,7 @@ const TransactionsDownloadCSV = ({ collective, client }) => {
     }
 
     // Helper to prepare date values to be part of the file name
-    const format = d => moment(d).format('YYYY-MM-DD');
+    const format = d => dayjs(d).format('YYYY-MM-DD');
     let fileName = `${collective.slug}-from-`;
     fileName += `${format(dateInterval.dateFrom)}-to-`;
     fileName += `${format(dateInterval.dateTo)}.csv`;

@@ -223,6 +223,7 @@ class TopBarProfileMenu extends React.Component {
         top={[69, 75]}
         zIndex={3000}
         data-cy="user-menu"
+        css={{ overflow: 'hidden' }}
       >
         <Flex flexDirection={['column', 'row']} maxHeight={['calc(100vh - 68px)', '100%']}>
           <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={3} bg="#F7F8FA">
@@ -231,7 +232,7 @@ class TopBarProfileMenu extends React.Component {
               <P mt={2} color="#313233" fontWeight="500">
                 {LoggedInUser.collective.name}
               </P>
-              <P mt={2} mb={5} color="#9D9FA3">
+              <P mt={2} mb={5} wordBreak="break-all" color="#9D9FA3">
                 {LoggedInUser.email}
               </P>
             </Hide>

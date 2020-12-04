@@ -1,13 +1,17 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { has } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
+import { CollectiveType } from '../../../lib/constants/collectives';
 
 import { H3 } from '../../Text';
 
 import BankTransfer from './BankTransfer';
 import ConnectedAccounts from './ConnectedAccounts';
+
+const { USER } = CollectiveType;
 
 class ReceivingMoney extends React.Component {
   static propTypes = {
@@ -43,7 +47,9 @@ class ReceivingMoney extends React.Component {
             />
           </React.Fragment>
         )}
-        <BankTransfer collectiveSlug={this.props.collective.slug} hideTopsection={this.hideTopsection} />
+        {(this.props.collective.type !== USER || has(this.props.collective, 'data.settings.paymentMethods.manual')) && (
+          <BankTransfer collectiveSlug={this.props.collective.slug} hideTopsection={this.hideTopsection} />
+        )}
       </Fragment>
     );
   }

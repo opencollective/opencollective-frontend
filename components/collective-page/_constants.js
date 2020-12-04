@@ -13,24 +13,32 @@ export const AnimationsDurations = {
   HERO_COLLAPSE: 150,
 };
 
-/**
- * A map of unique identifiers for the sections of the page
- */
 export const Sections = {
   GOALS: 'goals',
-  TICKETS: 'tickets',
-  CONTRIBUTIONS: 'contributions',
-  RECURRING_CONTRIBUTIONS: 'recurring-contributions',
-  CONTRIBUTE: 'contribute',
   UPDATES: 'updates',
-  PARTICIPANTS: 'participants',
-  LOCATION: 'location',
-  BUDGET: 'budget',
-  CONTRIBUTORS: 'contributors',
   CONVERSATIONS: 'conversations',
-  TRANSACTIONS: 'transactions',
-  ABOUT: 'about',
+  RECURRING_CONTRIBUTIONS: 'recurring-contributions',
+  TICKETS: 'tickets',
+  LOCATION: 'location',
+  // Navigation v2 main sections
+  // CONTRIBUTE/CONTRIBUTIONS
+  CONTRIBUTE: 'contribute',
+  CONTRIBUTIONS: 'contributions',
+  // EVENTS/PROJECTS
+  EVENTS: 'events',
   PROJECTS: 'projects',
+  // BUDGET/TRANSACTIONS
+  TRANSACTIONS: 'transactions',
+  BUDGET: 'budget',
+  // CONTRIBUTORS/PARTICIPANTS - is this a stand alone or in BUDGET as per Figma??
+  CONTRIBUTORS: 'contributors',
+  PARTICIPANTS: 'participants',
+  // ABOUT
+  ABOUT: 'about',
+  // EMPTY for new collectives/no data in any category sections
+  EMPTY: 'empty',
+  // @deprecated will be removed as they are now considered as "navbar categories"
+  CONNECT: 'connect',
 };
 
 /** A list of all section names */

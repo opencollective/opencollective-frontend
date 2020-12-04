@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
+import Link from '../Link';
 import StyledCard from '../StyledCard';
 import StyledInputField from '../StyledInputField';
 import StyledRadioList from '../StyledRadioList';
@@ -99,15 +100,39 @@ const PricingTabs = ({ onChange, activeTab }) => {
           <img width="100%" src="/static/images/pricing-star-bg-sm.png" alt="Pricing" />
         </Box>
         <Title
-          fontSize={['32px', null, '52px']}
+          fontSize={['24px', null, '48px']}
           lineHeight={['40px', null, '56px']}
           letterSpacing="-0.4px"
           textAlign="center"
         >
-          <FormattedMessage id="pricing.title" defaultMessage="Our pricing" />
+          <FormattedMessage id="newPricing.title" defaultMessage="Our new pricing" />
         </Title>
       </Wrapper>
       <Container>
+        <Box mx={3} my={5}>
+          <P
+            textAlign={['left', 'center']}
+            fontSize={['12px', null, '16px']}
+            fontWeight={['bold', null, 500]}
+            lineHeight={['26px', null, '20px']}
+            letterSpacing={['-0.012em', null, '-0.4px']}
+          >
+            <FormattedMessage
+              id="newPricing.warning"
+              defaultMessage="Below you’ll see the pricing for new users. Existing users will be moved to the new pricing in 2021."
+            />
+            <br />
+            <FormattedMessage
+              id="newPricing.warning2"
+              defaultMessage="For reference, you can check <a>our old pricing page.</a>"
+              values={{
+                // eslint-disable-next-line react/display-name
+                a: chunks => <Link route={`/pricing-old`}>{chunks}</Link>,
+              }}
+            />
+          </P>
+        </Box>
+
         <Box mx={3} my={2}>
           <P
             textAlign={['left', 'center']}

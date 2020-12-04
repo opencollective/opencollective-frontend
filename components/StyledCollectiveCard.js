@@ -8,10 +8,10 @@ import { getCollectiveMainTag } from '../lib/collective.lib';
 
 import Avatar from './Avatar';
 import Container from './Container';
-import { Flex } from './Grid';
 import I18nCollectiveTags from './I18nCollectiveTags';
 import LinkCollective from './LinkCollective';
 import StyledCard from './StyledCard';
+import StyledLink from './StyledLink';
 import StyledTag from './StyledTag';
 import { P } from './Text';
 
@@ -122,9 +122,9 @@ const getBackground = collective => {
 /**
  * A card to show a collective that supports including a custom body.
  */
-const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, ...props }) => {
+const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, borderRadius, showWebsite, ...props }) => {
   return (
-    <StyledCard {...props} position="relative" borderRadius={16}>
+    <StyledCard {...props} position="relative" borderRadius={borderRadius}>
       <Container
         position="absolute"
         width="95%"
@@ -136,21 +136,28 @@ const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, ...props 
       </Container>
       <Container position="relative">
         <Container height={74} px={3} pt={26}>
-          <Container borderRadius="25%" background="white" width={48} border="3px solid white">
+          <Container borderRadius={borderRadius} background="white" width={48} border="3px solid white">
             <LinkCollective collective={collective}>
               <Avatar collective={collective} radius={48} />
             </LinkCollective>
           </Container>
         </Container>
-        <Flex flexDirection="column" justifyContent="space-between" height={bodyHeight}>
+        <Container display="flex" flexDirection="column" justifyContent="space-between" height={bodyHeight}>
           <Container p={3}>
             <LinkCollective collective={collective}>
               <P fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
                 {collective.name}
               </P>
             </LinkCollective>
+            {showWebsite && collective.website && (
+              <P fontSize="11px" fontWeight="400" title={collective.website} truncateOverflow mt={1}>
+                <StyledLink color="black.600" href={collective.website} openInNewTabNoFollow>
+                  {collective.website}
+                </StyledLink>
+              </P>
+            )}
             {tag === undefined ? (
-              <StyledTag display="inline-block" textTransform="uppercase" my={2}>
+              <StyledTag display="inline-block" variant="rounded-right" my={2}>
                 <I18nCollectiveTags
                   tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
                 />
@@ -160,7 +167,7 @@ const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, ...props 
             )}
           </Container>
           {children}
-        </Flex>
+        </Container>
       </Container>
     </StyledCard>
   );
@@ -179,6 +186,7 @@ StyledCollectiveCard.propTypes = {
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     backgroundImageUrl: PropTypes.string,
+    website: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     settings: PropTypes.object,
     host: PropTypes.shape({
@@ -188,10 +196,13 @@ StyledCollectiveCard.propTypes = {
       backgroundImageUrl: PropTypes.string,
     }),
   }).isRequired,
+  borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  showWebsite: PropTypes.bool,
 };
 
 StyledCollectiveCard.defaultProps = {
   bodyHeight: 260,
+  borderRadius: 16,
 };
 
 export default injectIntl(StyledCollectiveCard);

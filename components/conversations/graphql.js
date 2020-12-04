@@ -70,3 +70,28 @@ export const isUserFollowingConversationQuery = gqlV2/* GraphQL */ `
     }
   }
 `;
+
+export const updateListFragment = gqlV2/* GraphQL */ `
+  fragment UpdateListFragment on UpdateCollection {
+    totalCount
+    offset
+    limit
+    nodes {
+      id
+      slug
+      title
+      summary
+      createdAt
+      publishedAt
+      isPrivate
+      userCanSeeUpdate
+      fromAccount {
+        id
+        type
+        name
+        slug
+        imageUrl
+      }
+    }
+  }
+`;

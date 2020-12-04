@@ -1,27 +1,27 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
-import { first, get, partition, pick } from 'lodash';
+import { first, get, omit, partition, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { AccountTypesWithHost } from '../../lib/constants/collectives';
-import expenseStatus from '../../lib/constants/expense-status';
+import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 
-import CollectivePicker, { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
+import CollectivePicker, {
+  CUSTOM_OPTIONS_POSITION,
+  FLAG_COLLECTIVE_PICKER_COLLECTIVE,
+  FLAG_NEW_COLLECTIVE,
+} from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import InputTypeCountry from '../InputTypeCountry';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
-import { Span } from '../Text';
 
 import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
@@ -50,10 +50,6 @@ const msg = defineMessages({
   address: {
     id: 'ExpenseForm.AddressLabel',
     defaultMessage: 'Physical address',
-  },
-  stepPayee: {
-    id: 'ExpenseForm.StepPayeeInvoice',
-    defaultMessage: 'Payee information',
   },
 });
 
@@ -96,10 +92,18 @@ const refreshPayoutProfile = (formik, payoutProfiles) => {
     ? payoutProfiles.find(profile => profile.id === formik.values.payee.id)
     : first(payoutProfiles);
 
-  formik.setFieldValue('payee', payee);
+  formik.setValues({ ...formik.values, draft: omit(formik.values.draft, ['payee']), payee });
 };
 
-const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, onNext, isOnBehalf }) => {
+const ExpenseFormPayeeStep = ({
+  formik,
+  payoutProfiles,
+  collective,
+  onCancel,
+  onNext,
+  isOnBehalf,
+  loggedInAccount,
+}) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
@@ -115,16 +119,22 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
     values.payee &&
     !values.payee.isInvite &&
     [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
-  const canInvite =
-    values.type === expenseTypes.INVOICE &&
-    hasFeature(collective, FEATURES.SUBMIT_EXPENSE_ON_BEHALF) &&
-    values?.status !== expenseStatus.DRAFT;
+  const canInvite = !values?.status;
   const profileOptions = payoutProfiles.map(value => ({
     value,
     label: value.name,
     [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
   }));
   const [myself, myorganizations] = partition(profileOptions, p => p.value.type == 'INDIVIDUAL');
+
+  myorganizations.push({
+    label: null,
+    value: null,
+    isDisabled: true,
+    [FLAG_NEW_COLLECTIVE]: true,
+    types: [CollectiveType.ORGANIZATION],
+    __background__: 'white',
+  });
 
   const collectivePick = canInvite
     ? ({ id }) => (
@@ -134,10 +144,19 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
           collective={values.payee}
           onChange={({ value }) => {
             if (value) {
+              const isExistingProfile = payoutProfiles.some(p => p.slug === value.slug);
+              const isNewlyCreatedProfile = value.members?.some(
+                m => m.role === 'ADMIN' && m.member.slug === loggedInAccount.slug,
+              );
+
               const payee =
-                value.slug && payoutProfiles.some(p => p.slug === value.slug)
+                value.slug && (isExistingProfile || isNewlyCreatedProfile)
                   ? value
                   : { ...pick(value, ['id', 'name', 'slug', 'email']), isInvite: true };
+
+              if (isNewlyCreatedProfile) {
+                payee.payoutMethods = [];
+              }
 
               formik.setFieldValue('payee', payee);
               formik.setFieldValue('payoutMethod', null);
@@ -160,6 +179,9 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
           customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
           getDefaultOptions={build => values.payee && build(values.payee)}
           invitable
+          LoggedInUser={loggedInAccount}
+          addLoggedInUserAsAdmin
+          excludeAdminFields
         />
       )
     : ({ id }) => (
@@ -179,16 +201,6 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
 
   return (
     <Fragment>
-      <Flex alignItems="center" mb={16}>
-        <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-          {formatMessage(msg.stepPayee)}
-        </Span>
-        <Box ml={2}>
-          <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
-        </Box>
-        <StyledHr flex="1" borderColor="black.300" mx={2} />
-      </Flex>
-
       <Flex flexDirection={['column', 'row']}>
         <Box mr={[null, 2, null, 4]} flexGrow="1" flexBasis="50%" maxWidth={[null, null, '60%']}>
           <Field name="payee">
@@ -375,6 +387,7 @@ ExpenseFormPayeeStep.propTypes = {
   onCancel: PropTypes.func,
   onNext: PropTypes.func,
   isOnBehalf: PropTypes.bool,
+  loggedInAccount: PropTypes.object,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,

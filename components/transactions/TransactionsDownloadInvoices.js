@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
+import dayjs from 'dayjs';
 import { groupBy, sumBy, truncate, uniq } from 'lodash';
-import moment from 'moment';
 import { FormattedMessage } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -62,7 +62,7 @@ const makeMonthlyOptions = (allInvoices, year) => {
   const byMonth = groupBy(invoices, 'month');
   return Object.keys(byMonth)
     .map(month => {
-      const dateMonth = moment.utc(`${year}${month}`, 'YYYYMM');
+      const dateMonth = dayjs.utc(`${year}${month}`, 'YYYYMM');
       const dateFrom = dateMonth.toISOString();
       const dateTo = dateMonth.endOf('month').toISOString();
       return {
@@ -82,8 +82,8 @@ const makeYearlyOptions = invoices => {
         .map(slug => {
           const invoices = bySlug[slug];
           const totalAmount = sumBy(invoices, 'totalAmount');
-          const dateFrom = moment.utc(year, 'YYYY').toISOString();
-          const dateTo = moment.utc(year, 'YYYY').endOf('year').toISOString();
+          const dateFrom = dayjs.utc(year, 'YYYY').toISOString();
+          const dateTo = dayjs.utc(year, 'YYYY').endOf('year').toISOString();
           return { ...invoices[0], dateFrom, dateTo, totalAmount };
         })
         .map(makeLabel);

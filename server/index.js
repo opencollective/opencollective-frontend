@@ -18,6 +18,7 @@ const hyperwatch = require('./hyperwatch');
 const rateLimiter = require('./rate-limiter');
 const duplicateHandler = require('./duplicate-handler');
 const { getContentSecurityPolicyConfig } = require('./content-security-policy');
+const { serviceLimiterMiddleware, increaseServiceLevel } = require('./service-limiter');
 const { parseToBooleanDefaultFalse } = require('./utils');
 
 const app = express();
@@ -32,6 +33,8 @@ const port = process.env.PORT;
 
 const workers = process.env.WEB_CONCURRENCY || 1;
 
+const desiredServiceLevel = Number(process.env.SERVICE_LEVEL) || 100;
+
 const start = id =>
   nextApp.prepare().then(() => {
     // app.buildId is only available after app.prepare(), hence why we setup here
@@ -40,6 +43,10 @@ const start = id =>
     hyperwatch(app);
 
     rateLimiter(app);
+
+    if (parseToBooleanDefaultFalse(process.env.SERVICE_LIMITER)) {
+      app.use(serviceLimiterMiddleware);
+    }
 
     app.use(helmet({ contentSecurityPolicy: getContentSecurityPolicyConfig() }));
 
@@ -68,6 +75,16 @@ const start = id =>
         throw err;
       }
       logger.info(`Ready on http://localhost:${port}, Worker #${id}`);
+
+      // Wait 30 seconds before reaching service level 50 or desiredServiceLevel
+      setTimeout(() => {
+        increaseServiceLevel(Math.min(50, desiredServiceLevel));
+      }, 30000);
+
+      // Wait 3 minutes before reaching desiredServiceLevel
+      setTimeout(() => {
+        increaseServiceLevel(desiredServiceLevel);
+      }, 180000);
     });
   });
 

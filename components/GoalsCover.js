@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 
 import { formatCurrency } from '../lib/currency-utils';
 
+import Container from './Container';
 import { fadeIn } from './StyledKeyframes';
 
 const getProgressColor = theme => theme.colors.primary[600];
@@ -114,6 +115,29 @@ const GoalContainer = styled.div`
     css`
       opacity: 0;
     `}
+`;
+
+const BarContainer = styled.div`
+  position: relative;
+  width: 80%;
+  margin: 6rem auto 1rem;
+  min-height: 80px;
+
+  .withGoals {
+    margin-top: 10rem;
+  }
+
+  .max-level-above-1 {
+    margin-top: 15rem;
+  }
+
+  @media (max-width: 1400px) {
+    width: 90%;
+  }
+
+  @media (max-width: 420px) {
+    width: 95%;
+  }
 `;
 
 class GoalsCover extends React.Component {
@@ -408,7 +432,7 @@ class GoalsCover extends React.Component {
       }
 
       // Change progress to animate goal. Never animate the last goal as it would
-      // result in a patial progress bar for first rendering. Hide when rendered
+      // result in a partial progress bar for first rendering. Hide when rendered
       // on server side to avoid getting the marker stuck while waiting for
       // re-hydrating
       if (goal.animateProgress && !isLastGoal) {
@@ -476,56 +500,18 @@ class GoalsCover extends React.Component {
     }
 
     return (
-      <div className="GoalsCover">
-        <style jsx>
-          {`
-            .GoalsCover {
-              overflow: hidden;
-            }
-
-            .barContainer {
-              position: relative;
-              width: 80%;
-              margin: 6rem auto 1rem;
-              min-height: 80px;
-            }
-
-            .barContainer.withGoals {
-              margin-top: 10rem;
-            }
-
-            .barContainer.max-level-above-1 {
-              margin-top: 15rem;
-            }
-
-            @media (max-width: 1400px) {
-              .barContainer {
-                width: 90%;
-              }
-            }
-
-            @media (max-width: 420px) {
-              .barContainer {
-                width: 95%;
-              }
-            }
-          `}
-        </style>
-        <div>
-          <div
-            className={`barContainer max-level-above-${this.state.maxLevelAbove} ${
-              this.state.hasCustomGoals ? 'withGoals' : ''
-            }`}
-          >
-            <div className="bars">
-              {this.state.goals &&
-                this.state.goals.map((goal, index) => {
-                  return this.renderGoal(goal, index);
-                })}
-            </div>
-          </div>
-        </div>
-      </div>
+      <BarContainer>
+        <Container
+          className={`max-level-above-${this.state.maxLevelAbove} ${this.state.hasCustomGoals ? 'withGoals' : ''}`}
+        >
+          <Container>
+            {this.state.goals &&
+              this.state.goals.map((goal, index) => {
+                return this.renderGoal(goal, index);
+              })}
+          </Container>
+        </Container>
+      </BarContainer>
     );
   }
 }

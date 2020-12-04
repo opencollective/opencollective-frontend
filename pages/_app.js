@@ -7,6 +7,7 @@ import NProgress from 'nprogress';
 import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
+import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import theme from '../lib/theme';
 import withData from '../lib/withData';
 
@@ -29,6 +30,9 @@ Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 import sentryLib from '../server/sentry';
+
+import GlobalToasts from '../components/GlobalToasts';
+import ToastProvider from '../components/ToastProvider';
 
 // Use JSDOM on server-side so that react-intl can render rich messages
 // See https://github.com/formatjs/react-intl/blob/c736c2e6c6096b1d5ad1fb6be85fa374891d0a6c/docs/Getting-Started.md#domparser
@@ -128,7 +132,10 @@ class OpenCollectiveFrontendApp extends App {
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
                 <UserProvider>
-                  <Component {...pageProps} />
+                  <ToastProvider>
+                    <Component {...pageProps} />
+                    <GlobalToasts />
+                  </ToastProvider>
                 </UserProvider>
               </RawIntlProvider>
             </StripeProviderSSR>

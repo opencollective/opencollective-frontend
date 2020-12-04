@@ -64,7 +64,6 @@ export default class Steps extends React.Component {
 
   componentDidUpdate(oldProps) {
     const { currentStepName } = this.props;
-
     if (oldProps.currentStepName !== currentStepName) {
       const currentStep = this.getStepByName(currentStepName);
       const lastValidStep = this.getLastCompletedStep();
@@ -140,8 +139,6 @@ export default class Steps extends React.Component {
     const currentStep = this.getStepByName(this.props.currentStepName);
     if (!currentStep) {
       return false;
-    } else if (currentStep.isCompleted === false && action !== 'prev') {
-      return false;
     } else if (currentStep.validate) {
       this.setState({ isValidating: true });
       const result = await currentStep.validate(action);
@@ -149,7 +146,10 @@ export default class Steps extends React.Component {
       if (!result) {
         return false;
       }
+    } else if (currentStep.isCompleted === false && action !== 'prev') {
+      return false;
     }
+
     return true;
   };
 
@@ -187,11 +187,19 @@ export default class Steps extends React.Component {
    */
   goToStep = async (step, opts = {}) => {
     const currentStep = this.getStepByName(this.props.currentStepName);
+    let ignoreValidation = opts.ignoreValidation;
     if (step.index < currentStep?.index) {
       opts.action = 'prev';
+
+      if (!ignoreValidation) {
+        // Ignore validation when going back if it's a new step
+        const lastValidStep = this.getLastCompletedStep();
+        const lastVisitedStep = this.getLastVisitedStep(lastValidStep);
+        ignoreValidation = lastVisitedStep.index === currentStep.index;
+      }
     }
 
-    if (!opts.ignoreValidation && !(await this.validateCurrentStep(opts.action))) {
+    if (!ignoreValidation && !(await this.validateCurrentStep(opts.action))) {
       return false;
     }
 
@@ -222,7 +230,7 @@ export default class Steps extends React.Component {
       isValidating: this.state.isValidating,
       lastVisitedStep: this.getLastVisitedStep(lastValidStep),
       steps: this.props.steps.map(this.buildStep),
-      goNext: lastValidStep && lastValidStep.index >= currentStep.index ? this.goNext : undefined,
+      goNext: this.goNext,
       goBack: currentStep.index > 0 ? this.goBack : undefined,
       goToStep: this.goToStep,
       isValidStep: lastValidStep ? lastValidStep.index + 1 >= currentStep.index : currentStep.index === 0,

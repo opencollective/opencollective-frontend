@@ -8,6 +8,7 @@ import Body from './Body';
 import Footer from './Footer';
 import { Flex } from './Grid';
 import Header from './Header';
+import { H1 } from './Text';
 
 class IncognitoUserCollective extends React.Component {
   static propTypes = {
@@ -32,24 +33,17 @@ class IncognitoUserCollective extends React.Component {
 
     return (
       <div className={classNames('UserCollectivePage')}>
-        <style jsx>
-          {`
-            h1 {
-              font-size: 2rem;
-            }
-          `}
-        </style>
-
         <Header
           title={intl.formatMessage(this.messages['incognito.title'])}
           description={intl.formatMessage(this.messages['incognito.description'])}
           collective={{ collective }}
+          noRobots
         />
 
         <Body>
           <Flex justifyContent="center" alignItems="center" flexDirection="column" my={4}>
             <IncognitoAvatar />
-            <h1>{intl.formatMessage(this.messages['incognito.title'])}</h1>
+            <H1 fontSize="2rem">{intl.formatMessage(this.messages['incognito.title'])}</H1>
             <p>{intl.formatMessage(this.messages['incognito.description'])}</p>
             <p>¯\_(ツ)_/¯</p>
           </Flex>

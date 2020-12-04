@@ -9,11 +9,11 @@ import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
+import { parseAmountRange } from '../budget/filters/AmountFilter';
+import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
 import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
-import { parseAmountRange } from '../expenses/filters/ExpensesAmountFilter';
-import { getDateRangeFromPeriod } from '../expenses/filters/ExpensesDateFilter';
 import {
   expenseHostFields,
   expensesListAdminFieldsFragment,
@@ -136,7 +136,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   }, [query.paypalApprovalError]);
 
   return (
-    <Box maxWidth={1000} m="0 auto" py={5} px={2}>
+    <Box maxWidth={1000} m="0 auto" px={2}>
       <Flex>
         <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
           <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
@@ -157,8 +157,16 @@ const HostDashboardExpenses = ({ hostSlug }) => {
               {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
                 <FormattedMessage
                   id="paypal.preApproval.emailWarning"
-                  defaultMessage="Warning: the PayPal email for this account just changed from {oldEmail} to {newEmail}. If it's not the change you inteded to do, you can click on Refill balance and choose a different one"
-                  values={{ oldEmail: query.oldPaypalEmail, newEmail: query.newPaypalEmail }}
+                  defaultMessage="Warning: the PayPal email for this account just changed from {oldEmail} to {newEmail}. If it's not the change you intended to do, you can click on {refillBalance} and choose a different one"
+                  values={{
+                    oldEmail: <strong>{query.oldPaypalEmail}</strong>,
+                    newEmail: <strong>{query.newPaypalEmail}</strong>,
+                    refillBalance: (
+                      <q>
+                        <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
+                      </q>
+                    ),
+                  }}
                 />
               ) : (
                 paypalPreApprovalError
@@ -208,7 +216,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                       params={{
                         ...mapValues(query, () => null),
                         hostCollectiveSlug: data.host.slug,
-                        view: 'expenses-legacy',
+                        view: 'expenses',
                       }}
                     >
                       {text}

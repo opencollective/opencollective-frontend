@@ -137,6 +137,8 @@ class TierPage extends Component {
       users: PropTypes.number.isRequired,
     }).isRequired,
 
+    redirect: PropTypes.string,
+
     /** The logged in user */
     LoggedInUser: PropTypes.object,
 
@@ -157,7 +159,7 @@ class TierPage extends Component {
   }
 
   render() {
-    const { collective, tier, contributors, contributorsStats, LoggedInUser } = this.props;
+    const { collective, tier, contributors, contributorsStats, redirect, LoggedInUser } = this.props;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
     const shareBlock = this.renderShareBlock();
@@ -339,7 +341,10 @@ class TierPage extends Component {
                   {isPassed ? (
                     <P textAlign="center">
                       <FormattedMessage id="Tier.Past" defaultMessage="This contribution type is not active anymore." />{' '}
-                      <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+                      <Link
+                        route="contribute"
+                        params={{ collectiveSlug: collective.slug, verb: 'contribute', redirect }}
+                      >
                         <FormattedMessage
                           id="createOrder.backToTier"
                           defaultMessage="View all the other ways to contribute"
@@ -355,6 +360,7 @@ class TierPage extends Component {
                         tierId: tier.id,
                         tierSlug: tier.slug,
                         collectiveSlug: collective.slug,
+                        redirect,
                       }}
                     >
                       <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">

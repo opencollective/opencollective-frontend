@@ -45,7 +45,11 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   const matchesHostCollectiveIdPrepaid = prepaid => {
     const hostCollectiveLegacyId = get(collective, 'host.legacyId');
     const prepaidLimitedToHostCollectiveIds = get(prepaid, 'limitedToHosts');
-    return find(prepaidLimitedToHostCollectiveIds, { legacyId: hostCollectiveLegacyId });
+    if (prepaidLimitedToHostCollectiveIds?.length) {
+      return find(prepaidLimitedToHostCollectiveIds, { legacyId: hostCollectiveLegacyId });
+    } else {
+      return prepaid.data?.HostCollectiveId && prepaid.data.HostCollectiveId === hostCollectiveLegacyId;
+    }
   };
 
   // gift card: can be limited to a specific host, see limitedToHosts
@@ -56,12 +60,13 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   };
 
   uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
-    const sourceProviderType = paymentMethod.sourcePaymentMethod?.providerType ?? paymentMethod.providerType;
+    const sourcePaymentMethod = paymentMethod.sourcePaymentMethod || paymentMethod;
+    const sourceProviderType = sourcePaymentMethod.providerType;
 
     if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.GIFT_CARD && paymentMethod.limitedToHosts) {
       return matchesHostCollectiveId(paymentMethod);
     } else if (sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.PREPAID_BUDGET) {
-      return matchesHostCollectiveIdPrepaid(paymentMethod);
+      return matchesHostCollectiveIdPrepaid(sourcePaymentMethod);
     } else if (!hostHasStripe && sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD) {
       return false;
     } else {
@@ -114,7 +119,7 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   return uniquePMs;
 };
 
-export const getTotalAmount = (stepDetails, stepSummary) => {
+export const getTotalAmount = (stepDetails, stepSummary = null) => {
   const quantity = get(stepDetails, 'quantity') || 1;
   const amount = get(stepDetails, 'amount') || 0;
   const taxAmount = get(stepSummary, 'amount') || 0;
@@ -133,5 +138,5 @@ export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
 };
 
 export const isAllowedRedirect = host => {
-  return ['octobox.io', 'dotnetfoundation.org'].includes(host);
+  return ['octobox.io', 'dotnetfoundation.org', 'hopin.com'].includes(host);
 };

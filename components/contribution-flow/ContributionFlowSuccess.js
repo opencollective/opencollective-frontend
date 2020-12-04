@@ -114,7 +114,7 @@ class NewContributionFlowSuccess extends React.Component {
   };
 
   renderCallsToAction = () => {
-    const { LoggedInUser, router } = this.props;
+    const { LoggedInUser, router, data } = this.props;
     const callsToAction = [SUCCESS_CTA_TYPE.NEWSLETTER];
 
     if (!LoggedInUser) {
@@ -129,7 +129,7 @@ class NewContributionFlowSuccess extends React.Component {
       <Flex flexDirection="column" justifyContent="center" p={2}>
         {callsToAction.length <= 2 && <SuccessIllustration />}
         {callsToAction.map(type => (
-          <SuccessCTA key={type} type={type} />
+          <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} />
         ))}
       </Flex>
     );
@@ -138,9 +138,8 @@ class NewContributionFlowSuccess extends React.Component {
   renderBankTransferInformation = () => {
     const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
     const bankAccount = get(this.props.data, 'order.toAccount.host.bankAccount.data', null);
-    const amount =
-      (get(this.props.data, 'order.amount.value') + get(this.props.data, 'order.platformContributionAmount.value', 0)) *
-      100;
+    // The order Total Amount already considers the amount donated to the platform.
+    const amount = get(this.props.data, 'order.amount.value') * 100;
     const currency = get(this.props.data, 'order.amount.currency');
     const formattedAmount = formatCurrency(amount, currency);
 

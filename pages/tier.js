@@ -16,8 +16,8 @@ import { withUser } from '../components/UserProvider';
  * to render `components/collective-page` with everything needed.
  */
 class TierPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, tierId, tierSlug } }) {
-    return { collectiveSlug, tierId: Number(tierId), tierSlug };
+  static getInitialProps({ query: { collectiveSlug, tierId, tierSlug, redirect } }) {
+    return { collectiveSlug, tierId: Number(tierId), tierSlug, redirect };
   }
 
   static propTypes = {
@@ -26,6 +26,7 @@ class TierPage extends React.Component {
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
     tierSlug: PropTypes.string,
+    redirect: PropTypes.string,
   };
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -45,19 +46,19 @@ class TierPage extends React.Component {
         description: tier.description || collective.description || collective.longDescription,
         twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
         image: collective.image || get(collective, 'parentCollective.image'),
-        canonicalURL: `/${tier.collective.slug}/contribute/${tier.slug}-${tier.id}`,
+        canonicalURL: `${process.env.WEBSITE_URL}/${tier.collective.slug}/contribute/${tier.slug}-${tier.id}`,
       };
     } else {
       return {
         title: 'Tier',
         image: '/static/images/defaultBackgroundImage.png',
-        canonicalURL: `/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${this.props.tierId}`,
+        canonicalURL: `${process.env.WEBSITE_URL}/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${this.props.tierId}`,
       };
     }
   }
 
   render() {
-    const { data, LoggedInUser } = this.props;
+    const { redirect, data, LoggedInUser } = this.props;
 
     return !data || data.error ? (
       <ErrorPage data={data} />
@@ -73,6 +74,7 @@ class TierPage extends React.Component {
               tier={data.Tier}
               contributors={data.Tier.contributors}
               contributorsStats={data.Tier.stats.contributors}
+              redirect={redirect}
             />
           </CollectiveThemeProvider>
         )}

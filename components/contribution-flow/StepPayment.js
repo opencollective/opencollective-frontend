@@ -55,6 +55,11 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
         sourcePaymentMethod {
           id
           providerType
+          limitedToHosts {
+            id
+            legacyId
+            slug
+          }
         }
         balance {
           valueInCents

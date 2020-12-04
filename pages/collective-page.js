@@ -31,6 +31,12 @@ const IncognitoUserCollective = dynamic(
   { loading: Loading },
 );
 
+/** A page rendered when collective is guest */
+const GuestUserProfile = dynamic(
+  () => import(/* webpackChunkName: 'GuestUserProfile' */ '../components/GuestUserProfile'),
+  { loading: Loading },
+);
+
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
   html {
@@ -91,6 +97,7 @@ class CollectivePage extends React.Component {
         isActive: PropTypes.bool,
         isPledged: PropTypes.bool,
         isIncognito: PropTypes.bool,
+        isGuest: PropTypes.bool,
         parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
         host: PropTypes.object,
         stats: PropTypes.object,
@@ -145,6 +152,10 @@ class CollectivePage extends React.Component {
     this.setState({ showOnboardingModal: bool });
   };
 
+  getCanonicalURL(slug) {
+    return `${process.env.WEBSITE_URL}/${slug}`;
+  }
+
   render() {
     const { slug, data, LoggedInUser, status, step, mode } = this.props;
     const { showOnboardingModal } = this.state;
@@ -160,13 +171,15 @@ class CollectivePage extends React.Component {
         return <PledgedCollectivePage collective={data.Collective} />;
       } else if (data.Collective.isIncognito) {
         return <IncognitoUserCollective collective={data.Collective} />;
+      } else if (data.Collective.isGuest) {
+        return <GuestUserProfile account={data.Collective} />;
       }
     }
 
     const collective = data && data.Collective;
 
     return (
-      <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles smooth={this.state.smooth} />
         {loading ? (
           <Container py={[5, 6]}>
@@ -179,6 +192,7 @@ class CollectivePage extends React.Component {
               host={collective.host}
               status={status}
               LoggedInUser={LoggedInUser}
+              refetch={data.refetch}
             />
             <CollectiveThemeProvider collective={collective}>
               {({ onPrimaryColorChange }) => (

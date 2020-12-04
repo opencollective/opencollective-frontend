@@ -13,6 +13,8 @@ import { requireFields } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
@@ -68,6 +70,10 @@ const msg = defineMessages({
   recipientNoteLabel: {
     id: 'ExpenseForm.RecipientNoteLabel',
     defaultMessage: 'Add a note for the recipient',
+  },
+  stepPayee: {
+    id: 'ExpenseForm.StepPayeeInvoice',
+    defaultMessage: 'Payee information',
   },
 });
 
@@ -175,6 +181,7 @@ const ExpenseFormBody = ({
   onCancel,
   formPersister,
   loggedInAccount,
+  loading,
   expensesTags,
   shouldLoadValuesFromPersister,
   isDraft,
@@ -193,18 +200,21 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite ? true : stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
 
   const [step, setStep] = React.useState(stepOneCompleted ? STEPS.EXPENSE : STEPS.PAYEE);
+  // Only true when logged in and drafting the expense
   const isOnBehalf = values.payee?.isInvite;
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
-    if (loggedInAccount && !isEmpty(payoutProfiles)) {
-      formik.setFieldValue('payee', first(payoutProfiles));
-    } else if (formik.values?.draft?.payee) {
+    if (values?.draft?.payee && !loggedInAccount) {
       formik.setFieldValue('payee', {
-        ...formik.values.draft.payee,
+        ...values.draft.payee,
         isInvite: false,
         isNewUser: true,
       });
+    }
+    // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
+    else if (!isOnBehalf && loggedInAccount && !isEmpty(payoutProfiles)) {
+      formik.setFieldValue('payee', first(payoutProfiles));
     }
   }, [payoutProfiles, loggedInAccount]);
 
@@ -235,7 +245,13 @@ const ExpenseFormBody = ({
         if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host?.transferwise) {
           formValues.payoutMethod = undefined;
         }
-        setValues(formValues);
+        setValues(
+          omit(
+            formValues,
+            // Omit deprecated fields, otherwise it will prevent expense submission
+            ['location', 'privateInfo'],
+          ),
+        );
       }
     }
   }, [formPersister, dirty]);
@@ -263,7 +279,18 @@ const ExpenseFormBody = ({
       {values.type && (
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
           <HiddenFragment show={step == STEPS.PAYEE}>
-            {isDraft && !loggedInAccount ? (
+            <Flex alignItems="center" mb={16}>
+              <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
+                {formatMessage(msg.stepPayee)}
+              </Span>
+              <Box ml={2}>
+                <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
+              </Box>
+              <StyledHr flex="1" borderColor="black.300" mx={2} />
+            </Flex>
+            {loading ? (
+              <LoadingPlaceholder height={32} />
+            ) : isDraft && !loggedInAccount ? (
               <ExpenseFormPayeeSignUpStep
                 collective={collective}
                 formik={formik}
@@ -278,6 +305,7 @@ const ExpenseFormBody = ({
                 isOnBehalf={isOnBehalf}
                 onCancel={onCancel}
                 payoutProfiles={payoutProfiles}
+                loggedInAccount={loggedInAccount}
                 onNext={() => {
                   const validation = validatePayoutMethod(values.payoutMethod);
                   if (isEmpty(validation)) {
@@ -341,22 +369,22 @@ const ExpenseFormBody = ({
             <Field
               as={StyledInput}
               autoFocus={autoFocusTitle}
+              border="0"
+              error={errors.description}
+              fontSize="24px"
               id="expense-description"
+              maxLength={255}
+              mt={3}
               name="description"
+              px={2}
+              py={1}
+              width="100%"
+              withOutline
               placeholder={
                 values.type === expenseTypes.FUNDING_REQUEST
                   ? formatMessage(msg.grantSubjectPlaceholder)
                   : formatMessage(msg.descriptionPlaceholder)
               }
-              width="100%"
-              fontSize="24px"
-              border="0"
-              error={errors.description}
-              mt={3}
-              px={2}
-              py={1}
-              maxLength={255}
-              withOutline
             />
             <HiddenFragment show={hasBaseFormFieldsCompleted}>
               <Flex alignItems="flex-start" mt={3}>
@@ -514,6 +542,7 @@ ExpenseFormBody.propTypes = {
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
   loggedInAccount: PropTypes.object,
+  loading: PropTypes.bool,
   isDraft: PropTypes.bool,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
   collective: PropTypes.shape({
@@ -542,6 +571,7 @@ const ExpenseForm = ({
   validateOnChange,
   formPersister,
   loggedInAccount,
+  loading,
   expensesTags,
   shouldLoadValuesFromPersister,
 }) => {
@@ -578,6 +608,7 @@ const ExpenseForm = ({
           formPersister={formPersister}
           loggedInAccount={loggedInAccount}
           expensesTags={expensesTags}
+          loading={loading}
           shouldLoadValuesFromPersister={shouldLoadValuesFromPersister}
           isDraft={isDraft}
         />
@@ -595,6 +626,7 @@ ExpenseForm.propTypes = {
   /** To save draft of form values */
   formPersister: PropTypes.object,
   loggedInAccount: PropTypes.object,
+  loading: PropTypes.bool,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,

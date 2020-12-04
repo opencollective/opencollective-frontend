@@ -113,7 +113,7 @@ const ExpenseInviteNotificationBanner = props => {
             {props.createdUser ? (
               <FormattedMessage
                 id="VerifyEmailInstructions"
-                defaultMessage="An email has been sent to {email} with a link to verify your account. if you have not
+                defaultMessage="An email has been sent to {email} with a link to verify your account, this expense will be automatically submitted after your account is verified. If you have not
                       received the email after a few minutes, please check your spam folder."
                 values={{
                   email: props.createdUser?.email || props.expense.draft?.payee?.name,
@@ -135,7 +135,7 @@ const ExpenseInviteNotificationBanner = props => {
             ) : (
               <ResendDraftInviteButton expense={props.expense} />
             )}
-            <StyledLink href="mailto:support@opencollective.com" buttonStyle="standard" buttonSize="tiny">
+            <StyledLink href="/support" buttonStyle="standard" buttonSize="tiny">
               <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
             </StyledLink>
           </Box>

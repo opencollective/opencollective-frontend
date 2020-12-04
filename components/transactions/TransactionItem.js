@@ -119,7 +119,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   />
                 ) : (
                   <FormattedMessage
-                    id="Transaction.by"
+                    id="CreatedBy"
                     defaultMessage="by {name}"
                     values={{ name: <StyledLink as={LinkCollective} collective={toAccount} colorShade={600} /> }}
                   />
@@ -255,6 +255,12 @@ TransactionItem.propTypes = {
       name: PropTypes.string.isRequired,
       imageUrl: PropTypes.string,
     }).isRequired,
+    host: PropTypes.shape({
+      id: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string,
+    }),
     toAccount: PropTypes.shape({
       id: PropTypes.string,
       slug: PropTypes.string.isRequired,

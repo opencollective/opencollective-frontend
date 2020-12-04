@@ -698,9 +698,6 @@ const createPledgeMutation = gql`
       id
       createdAt
       status
-      createdByUser {
-        id
-      }
       fromCollective {
         id
         slug
@@ -735,5 +732,4 @@ export const addCreatePledgeMutation = graphql(createPledgeMutation, {
 
 const addGraphql = compose(addCreatePledgePageData, addCreatePledgeMutation);
 
-export { CreatePledgePage as MockCreatePledgePage };
 export default injectIntl(withUser(addGraphql(CreatePledgePage)));

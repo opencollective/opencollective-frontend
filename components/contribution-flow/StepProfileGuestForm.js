@@ -9,21 +9,22 @@ import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import InputTypeCountry from '../InputTypeCountry';
 import Link from '../Link';
+import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
-import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { P } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
+import { getTotalAmount } from './utils';
 
 const shouldRequireAllInfo = amount => {
   return amount && amount >= 500000;
 };
 
 export const validateGuestProfile = (stepProfile, stepDetails) => {
-  if (shouldRequireAllInfo(stepDetails.amount)) {
+  if (shouldRequireAllInfo(getTotalAmount(stepDetails))) {
     if (!stepProfile.name || !stepProfile.location?.address || !stepProfile.location?.country) {
       return false;
     }
@@ -36,9 +37,8 @@ export const validateGuestProfile = (stepProfile, stepDetails) => {
   }
 };
 
-const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
-  const { amount, interval } = stepDetails;
-
+const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) => {
+  const totalAmount = getTotalAmount(stepDetails);
   const dispatchChange = (field, value) => {
     const newData = set({ ...data, isGuest: true }, field, value);
     onChange({ stepProfile: newData });
@@ -49,9 +49,9 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
       <Flex justifyContent="space-between">
         <Box width={1 / 2} mb={3} mr={1}>
           <StyledInputField
-            label={<FormattedMessage id="Fields.FullName" defaultMessage="Full name" />}
+            label={<FormattedMessage id="User.FullName" defaultMessage="Full name" />}
             htmlFor="name"
-            required={amount < 25000 ? false : true}
+            required={totalAmount < 25000 ? false : true}
           >
             {inputProps => (
               <StyledInput
@@ -83,7 +83,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
           </StyledInputField>
         </Box>
       </Flex>
-      {amount && shouldRequireAllInfo(amount) && (
+      {shouldRequireAllInfo(totalAmount) && (
         <Flex justifyContent="space-between">
           <Box width={1 / 2} mb={3} mr={1}>
             <StyledInputField
@@ -115,8 +115,9 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
               {inputProps => (
                 <InputTypeCountry
                   {...inputProps}
+                  autoDetect
                   onChange={value => dispatchChange('location.country', value)}
-                  value={data?.country}
+                  value={data?.location?.country}
                 />
               )}
             </StyledInputField>
@@ -129,8 +130,8 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
           defaultMessage="Your name and contribution will be public."
         />
       </P>
-      <StepProfileInfoMessage amount={amount} />
-      {interval && (
+      <StepProfileInfoMessage amount={totalAmount} />
+      {stepDetails.interval && (
         <P color="black.500" fontSize="12px" my={3} data-cy="join-conditions">
           <FormattedMessage
             id="SignIn.legal"
@@ -149,10 +150,17 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data }) => {
         <P fontSize="14px" mr={2}>
           <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
         </P>
-        <StyledLink as={Link} route="/signin" fontSize="14px">
+        <StyledButton
+          onClick={onSignInClick}
+          type="button"
+          buttonStyle="secondary"
+          buttonSize="tiny"
+          isBorderless
+          data-cy="cf-profile-signin-btn"
+        >
           <FormattedMessage id="signIn" defaultMessage="Sign In" />
           &nbsp;→
-        </StyledLink>
+        </StyledButton>
       </Flex>
     </Container>
   );
@@ -162,9 +170,10 @@ StepProfileGuestForm.propTypes = {
   stepDetails: PropTypes.shape({
     amount: PropTypes.number,
     interval: PropTypes.string,
-  }),
+  }).isRequired,
   data: PropTypes.object,
   onChange: PropTypes.func,
+  onSignInClick: PropTypes.func,
 };
 
 export default StepProfileGuestForm;

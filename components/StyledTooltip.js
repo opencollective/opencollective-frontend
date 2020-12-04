@@ -84,6 +84,9 @@ const Arrow = styled('div')`
 const ChildrenContainer = styled.div`
   display: ${props => props.display};
   cursor: help;
+  button:disabled {
+    pointer-events: none;
+  }
 `;
 
 const REACT_POPPER_MODIFIERS = [
@@ -151,7 +154,7 @@ class StyledTooltip extends React.Component {
   static defaultProps = {
     type: 'dark',
     place: 'top',
-    delayHide: 1000,
+    delayHide: 500,
     display: 'inline-block',
   };
 

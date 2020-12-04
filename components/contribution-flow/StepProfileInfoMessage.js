@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import MessageBox from '../MessageBox';
 
-const NewContributionFlowStepProfileInfoMessage = ({ amount }) => {
+const StepProfileInfoMessage = ({ amount }) => {
   const renderInfoMessage = amount => {
     if (amount < 25000) {
       return (
@@ -35,14 +35,14 @@ const NewContributionFlowStepProfileInfoMessage = ({ amount }) => {
       {renderInfoMessage(amount)}{' '}
       <FormattedMessage
         id="SpteProfile.EmailNoSpam"
-        defaultMessage="We wont send any spam or advertising, pinky promise."
+        defaultMessage="We won't send any spam or advertising, pinky promise."
       />
     </MessageBox>
   );
 };
 
-NewContributionFlowStepProfileInfoMessage.propTypes = {
+StepProfileInfoMessage.propTypes = {
   amount: PropTypes.number,
 };
 
-export default NewContributionFlowStepProfileInfoMessage;
+export default StepProfileInfoMessage;

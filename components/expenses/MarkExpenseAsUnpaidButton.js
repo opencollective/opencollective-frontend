@@ -32,6 +32,7 @@ const MarkExpenseAsUnpaidButton = ({ onConfirm, ...props }) => {
         maxWidth={450}
         isDanger
         onClose={() => setHasModal(false)}
+        data-cy="mark-expense-as-unpaid-modal"
         continueHandler={async () => {
           try {
             await onConfirm(refundPaymentProcessorFee);

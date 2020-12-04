@@ -52,7 +52,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     defaultIsSaved: true,
   };
 
-  state = { value: null };
+  state = { value: null, showAllErrors: false };
 
   componentDidMount() {
     if (this.props.onReady && this.props.stripe) {
@@ -90,6 +90,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
 
   onCardChange = e => {
     const { useLegacyCallback, onChange, defaultIsSaved } = this.props;
+    this.setState({ showAllErrors: false });
     if (useLegacyCallback) {
       onChange({ name, type: 'StripeCreditCard', value: e });
     } else {
@@ -107,14 +108,31 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     }
   };
 
+  getError() {
+    if (this.props.error) {
+      return this.props.error;
+    } else if (this.state.showAllErrors && this.state.value?.stripeData) {
+      const { stripeData } = this.state.value;
+      if (!stripeData.complete) {
+        if (!this.props.hidePostalCode && !stripeData.value?.postalCode) {
+          return (
+            <FormattedMessage id="NewCreditCardForm.PostalCode" defaultMessage="Credit card ZIP code is required" />
+          );
+        }
+      }
+    }
+  }
+
   render() {
-    const { error, hasSaveCheckBox, hidePostalCode, defaultIsSaved } = this.props;
+    const { hasSaveCheckBox, hidePostalCode, defaultIsSaved } = this.props;
+    const error = this.getError();
     return (
       <Flex flexDirection="column">
         <StyledCardElement
           hidePostalCode={hidePostalCode}
-          onChange={this.onCardChange}
           onReady={input => input.focus()}
+          onChange={this.onCardChange}
+          onBlur={() => this.setState({ showAllErrors: true })}
         />
         {error && (
           <Span display="block" color="red.500" pt={2} fontSize="10px">

@@ -44,7 +44,7 @@ const InvoicesReceipts = ({ collective }) => {
   return (
     <Container>
       <H3>
-        <FormattedMessage id="editCollective.invoicesAndReceipts" defaultMessage="Invoices & Receipts" />
+        <FormattedMessage id="becomeASponsor.invoiceReceipts" defaultMessage="Invoices & Receipts" />
       </H3>
       <H4 mt={2}>
         <FormattedMessage id="EditHostInvoice.receiptsSettings" defaultMessage="Receipt Settings" />

@@ -41,6 +41,7 @@ const ConfirmationModal = ({
   onClose,
   type,
   isDanger,
+  isSuccess,
   cancelLabel,
   continueLabel,
   cancelHandler,
@@ -69,7 +70,7 @@ const ConfirmationModal = ({
           <StyledButton
             my={1}
             minWidth={140}
-            buttonStyle={isDanger ? 'danger' : 'primary'}
+            buttonStyle={isDanger ? 'danger' : isSuccess ? 'success' : 'primary'}
             data-cy="confirmation-modal-continue"
             loading={submitting}
             onClick={async () => {
@@ -107,6 +108,7 @@ ConfirmationModal.propTypes = {
   type: PropTypes.oneOf(['confirm', 'delete', 'remove']),
   /** If true, a danger style button will be used for the main button */
   isDanger: PropTypes.bool,
+  isSuccess: PropTypes.bool,
   /** handles onClick cancel button. Defaults to `onClose` prop. */
   cancelHandler: PropTypes.func,
   /** continue button label of the confirmation modal. Defaults to `Confirm`. */

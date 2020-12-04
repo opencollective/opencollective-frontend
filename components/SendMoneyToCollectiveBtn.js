@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { formatCurrency } from '../lib/currency-utils';
 import { compose } from '../lib/utils';
 
+import Container from './Container';
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
 
@@ -70,13 +71,6 @@ class SendMoneyToCollectiveBtn extends React.Component {
     const { amount, currency, toCollective } = this.props;
     return (
       <div className="SendMoneyToCollectiveBtn">
-        <style jsx>
-          {`
-            .error {
-              font-size: 1.1rem;
-            }
-          `}
-        </style>
         <Flex justifyContent="center" mb={1}>
           <StyledButton onClick={this.props.confirmTransfer || this.onClick}>
             {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
@@ -92,7 +86,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
             )}
           </StyledButton>
         </Flex>
-        {this.state.error && <div className="error">{this.state.error}</div>}
+        {this.state.error && <Container fontSize="1.1rem">{this.state.error}</Container>}
       </div>
     );
   }

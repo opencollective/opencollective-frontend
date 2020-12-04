@@ -12,7 +12,6 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import Container from '../../Container';
 import PayoutBankInformationForm from '../../expenses/PayoutBankInformationForm';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
 import { H3, H4, P } from '../../Text';
@@ -130,15 +129,17 @@ const BankTransfer = props => {
                   defaultMessage="Subscribe to our special plans for hosts"
                 />
               )}
-              <Box mt={1}>
-                <FormattedMessage
-                  id="paymentMethods.manual.add.trial"
-                  defaultMessage="Free for the first $1,000 received, "
-                />
-                <a href="/pricing">
-                  <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
-                </a>
-              </Box>
+              {data.host.plan.bankTransfersLimit && (
+                <Box mt={1}>
+                  <FormattedMessage
+                    id="paymentMethods.manual.add.trial"
+                    defaultMessage="Free for the first $1,000 received, "
+                  />
+                  <a href="/pricing">
+                    <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
+                  </a>
+                </Box>
+              )}
             </Container>
           </Box>
           <Flex alignItems="center" my={2}>
@@ -207,20 +208,6 @@ const BankTransfer = props => {
               <H3>
                 <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
               </H3>
-              <P>
-                <FormattedMessage
-                  id="paymentMethod.manual.edit.description.pricing"
-                  defaultMessage="There is no platform fee for donations made this way. However, we ask you to kindly subscribe to our special plans for fiscal hosts to be able to maintain and improve this feature over time (the first $1,000 of yearly budget are included in the free plan)"
-                />
-                .
-                <br />
-                <Link route={`/${data.host.slug}/edit/host-plan`}>
-                  <FormattedMessage
-                    id="paymentMethods.manual.upgradePlan"
-                    defaultMessage="Subscribe to our special plans for hosts"
-                  />
-                </Link>
-              </P>
               {useStructuredForm && (
                 <React.Fragment>
                   <H3>

@@ -278,13 +278,13 @@ const FiscalHosting = ({ collective }) => {
 
       {isHostAccount && (
         <Fragment>
-          {!isBudgetActive && (
+          {!isBudgetActive && collective.type === 'ORGANIZATION' && (
             <H2>
               <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage={'Activate Host Budget'} />
             </H2>
           )}
 
-          {isBudgetActive ? (
+          {isBudgetActive && (
             <P>
               <FormattedMessage
                 id="FiscalHosting.budget.deactivate.description"
@@ -293,7 +293,9 @@ const FiscalHosting = ({ collective }) => {
                 }
               />
             </P>
-          ) : (
+          )}
+
+          {!isBudgetActive && collective.type === 'ORGANIZATION' && (
             <P>
               <FormattedMessage
                 id="FiscalHosting.budget.activate.description"
@@ -306,7 +308,7 @@ const FiscalHosting = ({ collective }) => {
 
           {activateBudgetStatus.error && <P color="#ff5252">{activateBudgetStatus.error}</P>}
 
-          {!isBudgetActive && (
+          {!isBudgetActive && collective.type === 'ORGANIZATION' && (
             <StyledButton
               onClick={() => setActivateBudgetModal({ type: 'Activate', show: true })}
               loading={activateBudgetStatus.processing}

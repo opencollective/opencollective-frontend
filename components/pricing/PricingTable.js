@@ -172,13 +172,17 @@ const StyledTable = styled(Box)`
 `;
 
 const messages = defineMessages({
-  'table.head.starter': {
-    id: 'table.head.starter',
-    defaultMessage: 'Starter',
+  'table.head.start': {
+    id: 'table.head.start',
+    defaultMessage: 'Start',
   },
-  'table.head.singleCollective': {
-    id: 'table.head.singleCollective',
-    defaultMessage: 'Single Collective',
+  'table.head.grow': {
+    id: 'table.head.grow',
+    defaultMessage: 'Grow',
+  },
+  'table.head.scale': {
+    id: 'table.head.scale',
+    defaultMessage: 'Scale',
   },
   'table.head.small': {
     id: 'table.head.small',
@@ -354,13 +358,17 @@ class PricingTable extends React.Component {
       <Container display="flex" my={4} justifyContent="center" {...props}>
         <Wrapper>
           <StyledTable as="table" ref={this.tableRef}>
-            <thead>
-              <tr>{headings.map(this.renderHeadingRow)}</tr>
-            </thead>
+            {headings && headings.length > 0 && (
+              <thead>
+                <tr>{headings.map(this.renderHeadingRow)}</tr>
+              </thead>
+            )}
             <tbody>{rows.map(this.renderRow)}</tbody>
-            <tfoot>
-              <tr>{footings.map(this.renderFootingRow)}</tr>
-            </tfoot>
+            {footings && footings.length > 0 && (
+              <tfoot>
+                <tr>{footings.map(this.renderFootingRow)}</tr>
+              </tfoot>
+            )}
           </StyledTable>
         </Wrapper>
       </Container>

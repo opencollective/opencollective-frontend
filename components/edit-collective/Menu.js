@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import hasFeature, { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
+import { FEATURES, isFeatureAllowedForCollective } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { Flex } from '../Grid';
@@ -30,6 +30,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   TIERS: 'tiers',
   VIRTUAL_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
+  PENDING_ORDERS: 'pending-orders',
   TWO_FACTOR_AUTH: 'two-factor-auth',
   ADVANCED: 'advanced', // Last on purpose
   // Host Specific
@@ -39,6 +40,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   INVOICES_RECEIPTS: 'invoices-receipts',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
+  HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
 };
 
 const SECTION_LABELS = defineMessages({
@@ -91,12 +93,16 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Info',
   },
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: {
-    id: 'editCollective.invoicesAndReceipts',
+    id: 'becomeASponsor.invoiceReceipts',
     defaultMessage: 'Invoices & Receipts',
   },
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: {
     id: 'editCollective.receivingMoney',
     defaultMessage: 'Receiving Money',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: {
+    id: 'PendingBankTransfers',
+    defaultMessage: 'Pending bank transfers',
   },
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: {
     id: 'editCollective.sendingMoney',
@@ -107,7 +113,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Fiscal Hosting',
   },
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: {
-    id: 'editCollective.menu.members',
+    id: 'ContributorsFilter.Core',
     defaultMessage: 'Team',
   },
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: {
@@ -138,6 +144,10 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.paymentReceipts',
     defaultMessage: 'Payment Receipts',
   },
+  [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: {
+    id: 'editCollective.menu.twofa',
+    defaultMessage: 'Two-factor authentication',
+  },
 });
 
 const MenuItem = styled(Link)`
@@ -161,7 +171,7 @@ const MenuItem = styled(Link)`
 // Some condition helpers
 const isType = (c, collectiveType) => c.type === collectiveType;
 const isOneOfTypes = (c, ...collectiveTypes) => collectiveTypes.includes(c.type);
-const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollectiveType(c.type, feature);
+const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollective(c, feature);
 const isFund = c => c.type === CollectiveType.FUND || c.settings?.fund === true; // Funds MVP, to refactor
 const isHost = c => c.isHost === true;
 const isCollective = c => c.type === CollectiveType.COLLECTIVE;
@@ -193,16 +203,16 @@ const sectionsDisplayConditions = {
       CollectiveType.EVENT,
     ) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
+  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, CollectiveType.USER),
   // Fiscal Host
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
-  // 2FA
-  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c =>
-    isType(c, CollectiveType.USER) && hasFeature(c, FEATURES.TWO_FACTOR_AUTH),
+  [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: () => false,
 };
 
 const shouldDisplaySection = (collective, section) => {
@@ -257,6 +267,7 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH))}
         </Fragment>
       )}
     </Flex>

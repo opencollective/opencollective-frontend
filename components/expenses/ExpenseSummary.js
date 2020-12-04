@@ -50,16 +50,15 @@ const ExpenseSummary = ({
   isLoading,
   isLoadingLoggedInUser,
   permissions,
-  showProcessActions,
+  isEditing,
   borderless,
   ...props
 }) => {
-  const { createdByAccount } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
-  const isRequestedByOtherUser = createdByAccount?.id !== expense?.payee?.id;
   const existsInAPI = expense && (expense.id || expense.legacyId);
-  const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
+  const showProcessButtons = !isEditing && existsInAPI && collective && hasProcessButtons(permissions);
+  const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
 
   return (
     <StyledCard p={borderless ? 0 : [16, 24, 32]} borderStyle={borderless ? 'none' : 'solid'} {...props}>
@@ -93,11 +92,14 @@ const ExpenseSummary = ({
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
             <P ml={2} fontSize="12px" color="black.600">
-              {isRequestedByOtherUser ? (
+              {expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedByOnDate"
                   defaultMessage="Requested by {name} on {date, date, long}"
-                  values={{ name: <CreatedByUserLink account={createdByAccount} />, date: new Date(expense.createdAt) }}
+                  values={{
+                    name: <CreatedByUserLink account={createdByAccount} />,
+                    date: new Date(expense.createdAt),
+                  }}
                 />
               ) : expense.createdAt ? (
                 <FormattedMessage
@@ -147,7 +149,7 @@ const ExpenseSummary = ({
         <LoadingPlaceholder height={68} mb={3} />
       ) : (
         <div data-cy="expense-summary-items">
-          {(expense.items.length > 0 ? expense.items : expense.draft.items || []).map(attachment => (
+          {(expense.items.length > 0 ? expense.items : expense.draft?.items || []).map(attachment => (
             <React.Fragment key={attachment.id}>
               <Flex my={24} flexWrap="wrap">
                 {(isReceipt || attachment.url) && (
@@ -224,7 +226,13 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
-      <ExpensePayeeDetails isLoading={isLoading} host={host} expense={expense} collective={collective} />
+      <ExpensePayeeDetails
+        isLoading={isLoading}
+        host={host}
+        expense={expense}
+        collective={collective}
+        isDraft={!isEditing && expense?.status == expenseStatus.DRAFT}
+      />
       {showProcessButtons && (
         <Container borderTop="1px solid #DCDEE0" mt={4} pt={12}>
           <Flex flexWrap="wrap" justifyContent="flex-end">
@@ -291,6 +299,12 @@ ExpenseSummary.propTypes = {
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
     }),
+    requestedByAccount: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+    }),
     payoutMethod: PropTypes.shape({
       id: PropTypes.string,
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
@@ -308,8 +322,8 @@ ExpenseSummary.propTypes = {
       ),
     }),
   }),
-  /** Wether process actions (pay, approve, etc.) should be displayed */
-  showProcessActions: PropTypes.bool,
+  /** Wether or not this is being displayed for an edited Expense */
+  isEditing: PropTypes.bool,
   /** The account where the expense has been submitted, required to display the process actions */
   collective: PropTypes.object,
   /** To know which process buttons to display (if any) */

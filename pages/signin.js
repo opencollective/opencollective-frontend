@@ -4,6 +4,7 @@ import { mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
 import { Router } from '../server/pages';
 
@@ -14,17 +15,23 @@ import Header from '../components/Header';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 class SigninPage extends React.Component {
-  static getInitialProps({ query: { token, next, form } }) {
+  static getInitialProps({ query: { token, next, form }, req }) {
     // Decode next URL if URI encoded
     if (next && next.startsWith('%2F')) {
       next = decodeURIComponent(next);
     }
 
     next = next && isValidRelativeUrl(next) ? next : null;
-    return { token, next, form: form || 'signin' };
+    return {
+      token,
+      next,
+      form: form || 'signin',
+      isSuspiciousUserAgent: isSuspiciousUserAgent(req?.get('User-Agent')),
+    };
   }
 
   static propTypes = {
@@ -36,11 +43,50 @@ class SigninPage extends React.Component {
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
+    isSuspiciousUserAgent: PropTypes.bool,
   };
 
-  state = { error: null, success: null };
+  constructor(props) {
+    super(props);
+    this.robotsDetector = new RobotsDetector();
+    this.state = { error: null, success: null, isRobot: props.isSuspiciousUserAgent };
+  }
 
-  async componentDidMount() {
+  componentDidMount() {
+    if (this.state.isRobot) {
+      this.robotsDetector.startListening(() => this.setState({ isRobot: false }));
+    } else {
+      this.initialize();
+    }
+  }
+
+  async componentDidUpdate(oldProps, oldState) {
+    const wasConnected = !oldProps.LoggedInUser && this.props.LoggedInUser;
+
+    if (oldState.isRobot && !this.state.isRobot) {
+      this.initialize();
+    } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
+      // --- User logged in ---
+      this.setState({ success: true });
+      // Avoid redirect loop: replace '/signin' redirects by '/'
+      const { next } = this.props;
+      const redirect = next && next.match(/^\/?signin[?/]?/) ? null : next;
+      await Router.replaceRoute(redirect || '/');
+      window.scroll(0, 0);
+    } else if (this.props.token && oldProps.token !== this.props.token) {
+      // --- There's a new token in town 🤠 ---
+      const user = await this.props.login(this.props.token);
+      if (!user) {
+        this.setState({ error: 'Token rejected' });
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    this.robotsDetector.stopListening();
+  }
+
+  async initialize() {
     if (this.props.token) {
       let user;
       try {
@@ -60,25 +106,6 @@ class SigninPage extends React.Component {
       }
     } else {
       this.props.login();
-    }
-  }
-
-  async componentDidUpdate(oldProps) {
-    const wasConnected = !oldProps.LoggedInUser && this.props.LoggedInUser;
-    if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
-      // --- User logged in ---
-      this.setState({ success: true });
-      // Avoid redirect loop: replace '/signin' redirects by '/'
-      const { next } = this.props;
-      const redirect = next && next.match(/^\/?signin[?/]?/) ? null : next;
-      await Router.replaceRoute(redirect || '/');
-      window.scroll(0, 0);
-    } else if (this.props.token && oldProps.token !== this.props.token) {
-      // --- There's a new token in town 🤠 ---
-      const user = await this.props.login(this.props.token);
-      if (!user) {
-        this.setState({ error: 'Token rejected' });
-      }
     }
   }
 
@@ -104,7 +131,22 @@ class SigninPage extends React.Component {
       enforceTwoFactorAuthForLoggedInUser,
     } = this.props;
 
-    if ((loadingLoggedInUser || this.state.success) && token) {
+    if (this.state.isRobot && token) {
+      return (
+        <Flex flexDirection="column" alignItems="center" px={3} pb={3}>
+          <P fontSize="30px" mb={3}>
+            🤖
+          </P>
+          <P mb={5} textAlign="center">
+            <FormattedMessage
+              id="checkingBrowser"
+              defaultMessage="Your browser is being verified. If this message doesn't disappear, try to move your mouse or to touch your screen for mobile."
+            />
+          </P>
+          <Loading />
+        </Flex>
+      );
+    } else if ((loadingLoggedInUser || this.state.success) && token) {
       return <Loading />;
     } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account') {
       return (

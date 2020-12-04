@@ -67,7 +67,7 @@ describe('Contribution Flow: Order', () => {
         // Change amount
         cy.contains('button', '$500').click();
         cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
-        cy.contains('[data-cy="progress-step-details"]', '$500.00 USD / month');
+        cy.contains('[data-cy="progress-step-details"]', '$500.00 USD / mo.');
 
         // Frequency must not be disabled
         cy.contains('#interval button').should('not.be.disabled');
@@ -77,11 +77,12 @@ describe('Contribution Flow: Order', () => {
         // ---- Step Profile ----
         cy.checkStepsProgress({ enabled: ['details', 'profile'], disabled: 'payment' });
         // Personnal account must be the first entry, and it must be checked
-        cy.contains('[data-cy="ContributionProfile"] > label:first', `${user.firstName} ${user.lastName}`);
+        const userName = `${user.firstName} ${user.lastName}`;
+        cy.contains('[data-cy="ContributionProfile"] > label:first', userName);
         cy.contains('[data-cy="ContributionProfile"] > label:first', user.email);
         cy.get('[data-cy="ContributionProfile"] > label:first input[type=radio]').should('be.checked');
 
-        cy.getByDataCy('progress-step-profile').contains(`${user.firstName} ${user.lastName}`);
+        cy.getByDataCy('progress-step-profile').contains(userName);
         cy.get('button[data-cy="cf-next-step"]').click();
 
         // ---- Step 3: Payment ----

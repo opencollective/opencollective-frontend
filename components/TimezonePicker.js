@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import momentTimezone from 'moment-timezone';
+
+import timezones from '../lib/constants/timezones';
 
 import { Box } from './Grid';
 import StyledSelect from './StyledSelect';
@@ -33,7 +34,7 @@ class TimezonePicker extends React.Component {
           </P>
         )}
         <StyledSelect
-          options={momentTimezone.tz.names().map(tz => ({
+          options={timezones.map(tz => ({
             label: tz,
             value: tz,
           }))}

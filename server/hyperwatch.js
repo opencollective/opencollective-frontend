@@ -2,6 +2,7 @@ const hyperwatch = require('@hyperwatch/hyperwatch');
 const expressBasicAuth = require('express-basic-auth');
 const expressWs = require('express-ws');
 
+const redisProvider = require('./redis-provider');
 const { parseToBooleanDefaultFalse } = require('./utils');
 
 const {
@@ -9,6 +10,7 @@ const {
   HYPERWATCH_PATH: path,
   HYPERWATCH_USERNAME: username,
   HYPERWATCH_SECRET: secret,
+  REDIS_URL: redisServerUrl,
 } = process.env;
 
 const load = async app => {
@@ -16,7 +18,11 @@ const load = async app => {
     return;
   }
 
-  const { input, lib, modules, pipeline } = hyperwatch;
+  const { input, lib, modules, pipeline, cache } = hyperwatch;
+
+  if (redisServerUrl) {
+    cache.setProvider(redisProvider({ serverUrl: redisServerUrl }));
+  }
 
   // Init
 
@@ -60,6 +66,24 @@ const load = async app => {
   });
 
   app.use(expressInput.middleware());
+
+  app.use((req, res, next) => {
+    req.hyperwatch.getIdentityOrIp = async () => {
+      let log = req.hyperwatch.augmentedLog;
+      if (!log) {
+        log = req.hyperwatch.augmentedLog = await req.hyperwatch.getAugmentedLog({ fast: true });
+      }
+      return log.getIn(['identity']) || log.getIn(['request', 'address']);
+    };
+    req.hyperwatch.getIdentity = async () => {
+      let log = req.hyperwatch.augmentedLog;
+      if (!log) {
+        log = req.hyperwatch.augmentedLog = await req.hyperwatch.getAugmentedLog({ fast: true });
+      }
+      return log.getIn(['identity']);
+    };
+    next();
+  });
 
   pipeline.registerInput(expressInput);
 

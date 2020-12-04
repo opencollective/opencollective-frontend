@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
+import dayjs from 'dayjs';
 import { get } from 'lodash';
-import moment from 'moment';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 
@@ -111,7 +111,7 @@ class VirtualCardDetails extends React.Component {
           <DetailsColumnHeader>
             <FormattedMessage id="virtualCards.expiryDate" defaultMessage="EXPIRY DATE" />
           </DetailsColumnHeader>
-          <span>{moment(virtualCard.expiryDate).format('MM/Y')}</span>
+          <span>{dayjs(virtualCard.expiryDate).format('MM/YYYY')}</span>
         </Flex>
         <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>

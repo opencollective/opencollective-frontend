@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { PropTypes } from 'prop-types';
-import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -8,17 +8,29 @@ import styled, { css } from 'styled-components';
 
 import { getFilteredSectionsForCollective } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
+import { getEnvVar } from '../lib/env-utils';
 import i18nCollectivePageSection from '../lib/i18n-collective-page-section';
+import { parseToBoolean } from '../lib/utils';
 
 import { AllSectionsNames, Dimensions } from './collective-page/_constants';
 import Avatar from './Avatar';
 import CollectiveCallsToAction from './CollectiveCallsToAction';
+import CollectiveNavbarActionsMenu from './CollectiveNavbarActionsMenu';
 import Container from './Container';
-import { Flex } from './Grid';
+import { Box, Flex } from './Grid';
 import Link from './Link';
 import LinkCollective from './LinkCollective';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import StyledRoundButton from './StyledRoundButton';
+import { P } from './Text';
+
+import aboutNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconAbout.png';
+import budgetNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconBudget.png';
+import connectNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconConnect.png';
+import contributeNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconContribute.png';
+import eventsNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconEvents.png';
+
+const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
 
 /** Main container for the entire component */
 const MainContainer = styled.div`
@@ -36,12 +48,14 @@ const MainContainer = styled.div`
 const MenuLink = styled.a`
   display: block;
   color: #71757a;
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: -0.2px;
+  font-size: 14px;
+  line-height: 16px;
   text-decoration: none;
   white-space: nowrap;
-  padding: 12px 16px 16px;
+
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  font-weight: 500;
 
   &:focus {
     color: ${themeGet('colors.primary.700')};
@@ -58,7 +72,7 @@ const MenuLink = styled.a`
   }
 `;
 
-const MenuLinkContainer = styled.div`
+const MenuLinkContainer = styled(Box).attrs({ px: [Dimensions.PADDING_X[1], null, 0] })`
   cursor: pointer;
 
   &::after {
@@ -103,6 +117,11 @@ const MenuLinkContainer = styled.div`
   }
 `;
 
+const IconIllustration = styled.img.attrs({ alt: '' })`
+  width: 32px;
+  height: 32px;
+`;
+
 const InfosContainer = styled(Container)`
   padding: 14px 30px;
   display: flex;
@@ -128,18 +147,14 @@ const InfosContainer = styled(Container)`
 `;
 
 /** Displayed on mobile to toggle the menu */
-const ExpandMenuIcon = styled(ChevronDown).attrs({ size: 28 })`
+const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
   cursor: pointer;
-  padding-top: 4px;
-  margin-rigth: 4px;
+  margin-right: 4px;
   flex: 0 0 28px;
+  color: ${themeGet('colors.black.500')};
 
   @media (min-width: 52em) {
     display: none;
-  }
-
-  &:hover {
-    color: ${themeGet('colors.primary.300')};
   }
 `;
 
@@ -179,6 +194,23 @@ const getDefaultCallsToactions = (collective, isAdmin) => {
   };
 };
 
+const getCollectiveNavbarIcon = section => {
+  switch (section) {
+    case 'about':
+      return aboutNavbarIcon;
+    case 'budget' || 'transactions':
+      return budgetNavbarIcon;
+    case 'connect':
+      return connectNavbarIcon;
+    case 'contribute' || 'contributions':
+      return contributeNavbarIcon;
+    case 'events' || 'projects':
+      return eventsNavbarIcon;
+    default:
+      return contributeNavbarIcon;
+  }
+};
+
 /**
  * The NavBar that displays all the invidual sections.
  */
@@ -196,11 +228,13 @@ const CollectiveNavbar = ({
   hideInfos,
   onlyInfos,
   isAnimated,
+  createNotification,
   intl,
 }) => {
-  const [isExpended, setExpended] = React.useState(false);
+  const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
   callsToAction = { ...getDefaultCallsToactions(collective, isAdmin), ...callsToAction };
+  const isEvent = collective?.type === CollectiveType.EVENT;
 
   return (
     <MainContainer>
@@ -227,7 +261,7 @@ const CollectiveNavbar = ({
             </Link>
           )}
         </Flex>
-        {!onlyInfos && <ExpandMenuIcon onClick={() => setExpended(!isExpended)} />}
+        {!onlyInfos && <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />}
       </InfosContainer>
 
       {/** Navbar items and buttons */}
@@ -235,18 +269,19 @@ const CollectiveNavbar = ({
         <Container
           position={['absolute', 'relative']}
           display="flex"
-          justifyContent="space-between"
-          px={[0, Dimensions.PADDING_X[1]]}
+          justifyContent={['space-evenly', null, 'space-between']}
+          px={[0, 0, Dimensions.PADDING_X[1]]}
           width="100%"
           background="white"
+          flexDirection={['column', null, 'row']}
         >
           {isLoading ? (
             <LoadingPlaceholder height={43} minWidth={150} mb={2} />
           ) : (
             <Container
-              flex="2 1 600px"
-              display={isExpended ? 'flex' : ['none', null, 'flex']}
+              flex="2 0"
               css={{ overflowX: 'auto' }}
+              display={isExpanded ? 'flex' : ['none', null, 'flex']}
               data-cy="CollectivePage.NavBar"
               flexDirection={['column', null, 'row']}
               height="100%"
@@ -259,54 +294,123 @@ const CollectiveNavbar = ({
                   key={section}
                   isSelected={section === selected}
                   onClick={() => {
-                    if (isExpended) {
-                      setExpended(false);
+                    if (isExpanded) {
+                      setExpanded(false);
                     }
                     if (onSectionClick) {
                       onSectionClick(section);
                     }
                   }}
                 >
-                  <MenuLink
-                    as={LinkComponent}
-                    collectivePath={collective.path || `/${collective.slug}`}
-                    section={section}
-                    label={i18nCollectivePageSection(intl, section)}
-                  />
+                  <Flex py={3} mx={3}>
+                    {NAV_V2_FEATURE_FLAG && (
+                      <Flex flexGrow={1} alignItems="center">
+                        <IconIllustration src={getCollectiveNavbarIcon(section)} />
+                      </Flex>
+                    )}
+                    <Flex flexGrow={1} alignItems="center" ml={NAV_V2_FEATURE_FLAG ? 2 : 0}>
+                      <MenuLink
+                        as={LinkComponent}
+                        collectivePath={collective.path || `/${collective.slug}`}
+                        section={section}
+                        label={i18nCollectivePageSection(intl, section)}
+                      />
+                    </Flex>
+                  </Flex>
                 </MenuLinkContainer>
               ))}
-              {callsToAction.hasSubmitExpense && (
-                <MenuLinkContainer mobileOnly>
-                  <MenuLink as={Link} route="create-expense" params={{ collectiveSlug: collective.slug }}>
-                    <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-                  </MenuLink>
-                </MenuLinkContainer>
-              )}
-              {callsToAction.hasContact && (
-                <MenuLinkContainer mobileOnly>
-                  <MenuLink as={Link} route="collective-contact" params={{ collectiveSlug: collective.slug }}>
-                    <FormattedMessage id="Contact" defaultMessage="Contact" />
-                  </MenuLink>
-                </MenuLinkContainer>
-              )}
-              {callsToAction.hasDashboard && collective.plan.hostDashboard && (
-                <MenuLinkContainer mobileOnly>
-                  <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
-                    <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
-                  </MenuLink>
-                </MenuLinkContainer>
+              {!NAV_V2_FEATURE_FLAG && (
+                <Fragment>
+                  {/* mobile CTAs */}
+                  {callsToAction.hasSubmitExpense && (
+                    <MenuLinkContainer mobileOnly>
+                      <MenuLink as={Link} route="create-expense" params={{ collectiveSlug: collective.slug }}>
+                        <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+                      </MenuLink>
+                    </MenuLinkContainer>
+                  )}
+                  {callsToAction.hasContact && (
+                    <MenuLinkContainer mobileOnly>
+                      <MenuLink as={Link} route="collective-contact" params={{ collectiveSlug: collective.slug }}>
+                        <FormattedMessage id="Contact" defaultMessage="Contact" />
+                      </MenuLink>
+                    </MenuLinkContainer>
+                  )}
+                  {callsToAction.hasDashboard && collective.plan.hostDashboard && (
+                    <MenuLinkContainer mobileOnly>
+                      <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+                        <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                      </MenuLink>
+                    </MenuLinkContainer>
+                  )}
+                </Fragment>
               )}
             </Container>
           )}
-          <div>
-            {!isLoading && (
-              <CollectiveCallsToAction
-                display={['none', null, 'flex']}
-                collective={collective}
-                callsToAction={callsToAction}
-              />
-            )}
-          </div>
+          {!NAV_V2_FEATURE_FLAG && (
+            <div>
+              {!isLoading && (
+                // non-mobile CTAs
+                <CollectiveCallsToAction
+                  display={['none', null, 'flex']}
+                  collective={collective}
+                  callsToAction={callsToAction}
+                />
+              )}
+            </div>
+          )}
+          {/* CTAs for v2 navbar & admin panel */}
+          {NAV_V2_FEATURE_FLAG && (
+            <Container
+              display={['none', null, 'flex']}
+              flexDirection={['column', null, 'row']}
+              flex="1 1 fit-content"
+              backgroundColor="#fff"
+              zIndex={1}
+            >
+              {isAdmin && (
+                <Flex mx={2} alignItems="center">
+                  <Link
+                    route={isEvent ? 'editEvent' : 'editCollective'}
+                    params={
+                      isEvent
+                        ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
+                        : { slug: collective.slug }
+                    }
+                  >
+                    <Container
+                      display="flex"
+                      flexGrow={1}
+                      alignItems="center"
+                      borderRadius={8}
+                      background="rgba(72, 95, 211, 0.1)"
+                      px={3}
+                      py={1}
+                    >
+                      <Settings size={20} color="rgb(48, 76, 220)" />
+                      <P
+                        ml={1}
+                        textTransform="uppercase"
+                        color="rgb(48, 76, 220)"
+                        fontSize="14px"
+                        lineHeight="16px"
+                        letterSpacing="60%"
+                      >
+                        <FormattedMessage id="AdminPanel" defaultMessage="Admin Panel" />
+                      </P>
+                    </Container>
+                  </Link>
+                </Flex>
+              )}
+              {!isLoading && (
+                <CollectiveNavbarActionsMenu
+                  collective={collective}
+                  callsToAction={callsToAction}
+                  createNotification={createNotification}
+                />
+              )}
+            </Container>
+          )}
         </Container>
       )}
     </MainContainer>
@@ -325,6 +429,7 @@ CollectiveNavbar.propTypes = {
     canApply: PropTypes.bool,
     host: PropTypes.object,
     plan: PropTypes.object,
+    parentCollective: PropTypes.object,
   }),
   /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
   callsToAction: PropTypes.shape({
@@ -362,6 +467,7 @@ CollectiveNavbar.propTypes = {
   isSmall: PropTypes.bool,
   /** @ignore From injectIntl */
   intl: PropTypes.object,
+  createNotification: PropTypes.func,
 };
 
 CollectiveNavbar.defaultProps = {

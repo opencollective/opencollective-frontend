@@ -70,6 +70,7 @@ const StyledAmountPicker = ({ presets, currency, value, otherAmountDisplay, onCh
       {options.length > 0 && (
         <StyledButtonSet
           id="amount"
+          data-cy="amount-picker"
           width="100%"
           justifyContent="center"
           items={options}
