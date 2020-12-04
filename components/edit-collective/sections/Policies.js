@@ -80,7 +80,7 @@ const messages = defineMessages({
   },
 });
 
-const Policies = ({ collective }) => {
+const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const { formatMessage } = useIntl();
   const [selected, setSelected] = React.useState([]);
   const hasRejectCategoriesFeature =
@@ -171,42 +171,48 @@ const Policies = ({ collective }) => {
   return (
     <Flex flexDirection="column">
       {error && <MessageBoxGraphqlError error={error} />}
-      <H3 mt={2}>
-        <FormattedMessage id="editCollective.menu.policies" defaultMessage="Policies" />
-      </H3>
+      {!showOnlyExpensePolicy && (
+        <H3 mt={2}>
+          <FormattedMessage id="editCollective.menu.policies" defaultMessage="Policies" />
+        </H3>
+      )}
       <form onSubmit={formik.handleSubmit}>
         <Container>
-          <StyledInputField
-            name="contributionPolicy"
-            htmlFor="contributionPolicy"
-            error={formik.errors.contributionPolicy}
-            disabled={isSubmittingPolicies}
-            label={formatMessage(messages['contributionPolicy.label'])}
-            labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
-          >
-            {inputProps => (
-              <RichTextEditor
-                withBorders
-                showCount
-                maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
+          {!showOnlyExpensePolicy && (
+            <Container>
+              <StyledInputField
+                name="contributionPolicy"
+                htmlFor="contributionPolicy"
                 error={formik.errors.contributionPolicy}
-                version="simplified"
-                editorMinHeight="20rem"
-                id={inputProps.id}
-                inputName={inputProps.name}
-                onChange={formik.handleChange}
-                placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
-                defaultValue={formik.values.contributionPolicy}
-                fontSize="14px"
-              />
-            )}
-          </StyledInputField>
-          <P fontSize="14px" color="black.600">
-            <FormattedMessage
-              id="collective.contributionPolicy.description"
-              defaultMessage="All categorized Financial Contributors are manually classified by the Open Collective team. Only contributors that are thought to be abusing are classified with these categories. Financial Contributors with a good reputation should normally not be affected by this setting."
-            />
-          </P>
+                disabled={isSubmittingPolicies}
+                label={formatMessage(messages['contributionPolicy.label'])}
+                labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+              >
+                {inputProps => (
+                  <RichTextEditor
+                    withBorders
+                    showCount
+                    maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
+                    error={formik.errors.contributionPolicy}
+                    version="simplified"
+                    editorMinHeight="20rem"
+                    id={inputProps.id}
+                    inputName={inputProps.name}
+                    onChange={formik.handleChange}
+                    placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
+                    defaultValue={formik.values.contributionPolicy}
+                    fontSize="14px"
+                  />
+                )}
+              </StyledInputField>
+              <P fontSize="14px" color="black.600">
+                <FormattedMessage
+                  id="collective.contributionPolicy.description"
+                  defaultMessage="All categorized Financial Contributors are manually classified by the Open Collective team. Only contributors that are thought to be abusing are classified with these categories. Financial Contributors with a good reputation should normally not be affected by this setting."
+                />
+              </P>
+            </Container>
+          )}
 
           <StyledInputField
             name="expensePolicy"
@@ -288,6 +294,7 @@ Policies.propTypes = {
     id: PropTypes.number,
     slug: PropTypes.string,
   }),
+  showOnlyExpensePolicy: PropTypes.bool,
 };
 
 export default Policies;
