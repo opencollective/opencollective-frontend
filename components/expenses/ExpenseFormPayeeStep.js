@@ -144,15 +144,15 @@ const ExpenseFormPayeeStep = ({
           collective={values.payee}
           onChange={({ value }) => {
             if (value) {
-              const isExistingProfile = payoutProfiles.some(p => p.slug === value.slug);
+              const existingProfile = payoutProfiles.find(p => p.slug === value.slug);
               const isNewlyCreatedProfile = value.members?.some(
                 m => m.role === 'ADMIN' && m.member.slug === loggedInAccount.slug,
               );
 
-              const payee =
-                value.slug && (isExistingProfile || isNewlyCreatedProfile)
-                  ? value
-                  : { ...pick(value, ['id', 'name', 'slug', 'email']), isInvite: true };
+              const payee = existingProfile || {
+                ...pick(value, ['id', 'name', 'slug', 'email']),
+                isInvite: !isNewlyCreatedProfile,
+              };
 
               if (isNewlyCreatedProfile) {
                 payee.payoutMethods = [];
