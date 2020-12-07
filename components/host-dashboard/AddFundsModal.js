@@ -89,7 +89,7 @@ const buildAccountReference = input => {
   return typeof input.id === 'string' ? { id: input.id } : { legacyId: input.id };
 };
 
-const AddFunds = ({ host, collective, ...props }) => {
+const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
   const [submitAddFunds, { error }] = useMutation(addFundsMutation, { context: API_V2_CONTEXT });
   const defaultHostFeePercent = collective.hostFeePercent;
@@ -283,9 +283,9 @@ const AddFunds = ({ host, collective, ...props }) => {
   );
 };
 
-AddFunds.propTypes = {
+AddFundsModal.propTypes = {
   host: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     legacyId: PropTypes.number,
     currency: PropTypes.string,
     name: PropTypes.string,
@@ -298,4 +298,4 @@ AddFunds.propTypes = {
   onClose: PropTypes.func,
 };
 
-export default AddFunds;
+export default AddFundsModal;

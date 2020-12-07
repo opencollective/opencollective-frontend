@@ -171,7 +171,9 @@ class CollectivePage extends Component {
         hasDashboard: isHost && isAdmin && !isCollective,
         hasManageSubscriptions: isAdmin && !isCollective && !isFund && !isEvent && !isProject,
         // Don't display "Add Funds" if it's an Host and you're the Admin
-        addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
+        addFundsToOrganization: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
+        // Add Funds for Self Hosted Collectives
+        addFunds: isCollective && isHost,
       };
     },
   );
