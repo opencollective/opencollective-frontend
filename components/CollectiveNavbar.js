@@ -4,7 +4,6 @@ import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVertical
 import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -380,13 +379,12 @@ const CollectiveNavbar = ({
   isAnimated,
   createNotification,
   intl,
-  router,
+  showBackButton,
 }) => {
   const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
   callsToAction = { ...getDefaultCallsToActions(collective, isAdmin), ...callsToAction };
   const isEvent = collective?.type === CollectiveType.EVENT;
-  const isPageMainCollectivePage = router.pathname === '/collective-page';
 
   return NAV_V2_FEATURE_FLAG ? (
     // v2
@@ -409,7 +407,7 @@ const CollectiveNavbar = ({
         px={[3, 0]}
         py={[2, 1]}
       >
-        <Box display={['none', isPageMainCollectivePage ? 'none' : 'block']} mr={2}>
+        <Box display={['none', showBackButton ? 'block' : 'none']} mr={2}>
           <StyledButton px={1} isBorderless onClick={() => window && window.history.back()}>
             &larr;
           </StyledButton>
@@ -719,7 +717,7 @@ CollectiveNavbar.propTypes = {
   /** @ignore From injectIntl */
   intl: PropTypes.object,
   createNotification: PropTypes.func,
-  router: PropTypes.object,
+  showBackButton: PropTypes.bool,
 };
 
 CollectiveNavbar.defaultProps = {
@@ -735,6 +733,7 @@ CollectiveNavbar.defaultProps = {
       </Link>
     );
   },
+  showBackButton: true,
 };
 
-export default React.memo(injectIntl(withRouter(CollectiveNavbar)));
+export default React.memo(injectIntl(CollectiveNavbar));

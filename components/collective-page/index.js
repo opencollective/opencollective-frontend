@@ -17,6 +17,7 @@ import Hero from './hero/Hero';
 import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
 import SectionConnect from './sections/Connect';
+import SectionConnectedCollectives from './sections/ConnectedCollectives';
 import SectionContribute from './sections/Contribute';
 import SectionContributions from './sections/Contributions';
 import SectionContributors from './sections/Contributors';
@@ -25,6 +26,7 @@ import SectionEmpty from './sections/Empty';
 import SectionEvents from './sections/Events';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
+import SectionOurTeam from './sections/OurTeam';
 import SectionProjects from './sections/Projects';
 import SectionRecurringContributions from './sections/RecurringContributions';
 import SectionParticipants from './sections/SponsorsAndParticipants';
@@ -182,7 +184,6 @@ class CollectivePage extends Component {
 
   renderSection(section) {
     switch (section) {
-      // v2 transition - these standalone sections will be removed from render if feature flag is active
       case Sections.UPDATES:
         return (
           <SectionUpdates
@@ -287,17 +288,19 @@ class CollectivePage extends Component {
           />
         );
       case Sections.ABOUT:
+        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} />;
+      case Sections.GOALS:
+        return <SectionGoals collective={this.props.collective} />;
+      case Sections.OUR_TEAM:
         return (
-          <SectionAbout
+          <SectionOurTeam
             collective={this.props.collective}
-            canEdit={this.props.isAdmin}
             coreContributors={this.props.coreContributors}
-            connectedCollectives={this.props.connectedCollectives}
             LoggedInUser={this.props.LoggedInUser}
           />
         );
-      case Sections.GOALS:
-        return <SectionGoals collective={this.props.collective} />;
+      case Sections.CONNECTED_COLLECTIVES:
+        return <SectionConnectedCollectives connectedCollectives={this.props.connectedCollectives} />;
       default:
         return null;
     }

@@ -1,33 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { getEnvVar } from '../../../lib/env-utils';
-import { parseToBoolean } from '../../../lib/utils';
 
 import { Sections } from '../_constants';
 import Container from '../../Container';
-import ContributeCollective from '../../contribute-cards/ContributeCollective';
-import ContributorCard from '../../ContributorCard';
 import { Flex } from '../../Grid';
 import HTMLContent, { isEmptyValue } from '../../HTMLContent';
 import InlineEditField from '../../InlineEditField';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
-import { H2, Span } from '../../Text';
+import { Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 import SectionHeader from '../SectionHeader';
 
 import aboutSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconAbout.png';
-
-const COLLECTIVE_CARD_WIDTH = 144;
-const COLLECTIVE_CARD_HEIGHT = 190;
-const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -44,17 +35,16 @@ const messages = defineMessages({
 });
 
 /**
- * Display the inline editable description section for the collective
+ * About section category with editable description and Our Team + Connected Collectives sections
  */
-const SectionAbout = ({ collective, canEdit, coreContributors, connectedCollectives, LoggedInUser, intl }) => {
+const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isFund = collective.type === CollectiveType.FUND;
   canEdit = collective.isArchived ? false : canEdit;
-  const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
 
   return (
-    <ContainerSectionContent px={2} py={[4, 5]} background="white">
+    <ContainerSectionContent px={2} py={[4, 5]}>
       <SectionHeader title={Sections.ABOUT} illustrationSrc={aboutSectionHeaderIcon} />
 
       <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
@@ -118,42 +108,6 @@ const SectionAbout = ({ collective, canEdit, coreContributors, connectedCollecti
           }}
         </InlineEditField>
       </Container>
-      {NAV_V2_FEATURE_FLAG && coreContributors && (
-        <Container width="100%" maxWidth={700} margin="0 auto" mb={4}>
-          <H2 textAlign="center" fontSize="20px" lineHeight="28px" fontWeight="500" color="black.700" mb={4}>
-            <FormattedMessage id="OurTeam" defaultMessage="Our team" />
-          </H2>
-          <Container display="flex" flexWrap="wrap" justifyContent="space-evenly" py={2}>
-            {coreContributors.map(contributor => (
-              <ContributorCard
-                key={contributor.id}
-                m={2}
-                width={COLLECTIVE_CARD_WIDTH}
-                height={COLLECTIVE_CARD_HEIGHT}
-                contributor={contributor}
-                currency={collective.currency}
-                collectiveId={collective.id}
-                isLoggedUser={loggedUserCollectiveId === contributor.collectiveId}
-                hideTotalAmountDonated
-              />
-            ))}
-          </Container>
-        </Container>
-      )}
-      {NAV_V2_FEATURE_FLAG && connectedCollectives.length > 0 && (
-        <Container width="100%" margin="0 auto" mb={4}>
-          <H2 textAlign="center" fontSize="20px" lineHeight="28px" fontWeight="500" color="black.700" mb={4}>
-            <FormattedMessage id="ConnectedCollectives" defaultMessage="Connected collectives" />
-          </H2>
-          <Container display="flex" flexWrap="wrap" justifyContent="space-evenly" py={2}>
-            {connectedCollectives.map(({ id, collective }) => (
-              <Container key={id} px={3}>
-                <ContributeCollective collective={collective} />
-              </Container>
-            ))}
-          </Container>
-        </Container>
-      )}
     </ContainerSectionContent>
   );
 };
@@ -172,12 +126,6 @@ SectionAbout.propTypes = {
 
   /** Can user edit the description? */
   canEdit: PropTypes.bool,
-
-  coreContributors: PropTypes.array,
-
-  connectedCollectives: PropTypes.array,
-
-  LoggedInUser: PropTypes.object,
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,
