@@ -5,9 +5,12 @@ import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { getEnvVar } from '../../../lib/env-utils';
+import { parseToBoolean } from '../../../lib/utils';
 
 import { Sections } from '../_constants';
 import Container from '../../Container';
+import ContributeCollective from '../../contribute-cards/ContributeCollective';
 import ContributorCard from '../../ContributorCard';
 import { Flex } from '../../Grid';
 import HTMLContent, { isEmptyValue } from '../../HTMLContent';
@@ -20,10 +23,11 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 import SectionHeader from '../SectionHeader';
 
+import aboutSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconAbout.png';
+
 const COLLECTIVE_CARD_WIDTH = 144;
 const COLLECTIVE_CARD_HEIGHT = 190;
-
-import aboutSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconAbout.png';
+const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -42,7 +46,7 @@ const messages = defineMessages({
 /**
  * Display the inline editable description section for the collective
  */
-const SectionAbout = ({ collective, canEdit, coreContributors, LoggedInUser, intl }) => {
+const SectionAbout = ({ collective, canEdit, coreContributors, connectedCollectives, LoggedInUser, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isFund = collective.type === CollectiveType.FUND;
@@ -114,12 +118,12 @@ const SectionAbout = ({ collective, canEdit, coreContributors, LoggedInUser, int
           }}
         </InlineEditField>
       </Container>
-      {coreContributors && (
-        <Container width="100%" maxWidth={700} margin="0 auto">
-          <H2 textAlign="center" fontSize="20px" lineHeight="28px" fontWeight="500" color="black.700">
+      {NAV_V2_FEATURE_FLAG && coreContributors && (
+        <Container width="100%" maxWidth={700} margin="0 auto" mb={4}>
+          <H2 textAlign="center" fontSize="20px" lineHeight="28px" fontWeight="500" color="black.700" mb={4}>
             <FormattedMessage id="OurTeam" defaultMessage="Our team" />
           </H2>
-          <Container display="flex" flexWrap="wrap" justifyContent="space-evenly" py={2} border="1px red solid">
+          <Container display="flex" flexWrap="wrap" justifyContent="space-evenly" py={2}>
             {coreContributors.map(contributor => (
               <ContributorCard
                 key={contributor.id}
@@ -132,6 +136,20 @@ const SectionAbout = ({ collective, canEdit, coreContributors, LoggedInUser, int
                 isLoggedUser={loggedUserCollectiveId === contributor.collectiveId}
                 hideTotalAmountDonated
               />
+            ))}
+          </Container>
+        </Container>
+      )}
+      {NAV_V2_FEATURE_FLAG && connectedCollectives.length > 0 && (
+        <Container width="100%" margin="0 auto" mb={4}>
+          <H2 textAlign="center" fontSize="20px" lineHeight="28px" fontWeight="500" color="black.700" mb={4}>
+            <FormattedMessage id="ConnectedCollectives" defaultMessage="Connected collectives" />
+          </H2>
+          <Container display="flex" flexWrap="wrap" justifyContent="space-evenly" py={2}>
+            {connectedCollectives.map(({ id, collective }) => (
+              <Container key={id} px={3}>
+                <ContributeCollective collective={collective} />
+              </Container>
             ))}
           </Container>
         </Container>
@@ -156,6 +174,8 @@ SectionAbout.propTypes = {
   canEdit: PropTypes.bool,
 
   coreContributors: PropTypes.array,
+
+  connectedCollectives: PropTypes.array,
 
   LoggedInUser: PropTypes.object,
 

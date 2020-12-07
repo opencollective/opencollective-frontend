@@ -295,6 +295,7 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             canEdit={this.props.isAdmin}
             coreContributors={this.props.coreContributors}
+            connectedCollectives={this.props.connectedCollectives}
             LoggedInUser={this.props.LoggedInUser}
           />
         );
