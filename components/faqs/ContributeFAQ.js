@@ -41,7 +41,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
           />
         </Title>
         <Content>
-          <HTMLContent content={collective.contributionPolicy} />
+          <HTMLContent fontSize="13px" content={collective.contributionPolicy} />
         </Content>
       </Entry>
     )}

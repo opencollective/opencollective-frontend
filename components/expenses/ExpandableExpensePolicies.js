@@ -28,13 +28,13 @@ const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
     <Box {...props}>
       <Collapse title={<H5>{formatMessage(msg.policies)}</H5>} defaultIsOpen>
         {host && host.expensePolicy && (
-          <Container fontSize="12px" color="black.800" lineHeight="20px" mb={2}>
-            <HTMLContent content={host.expensePolicy} />
+          <Container mb={2}>
+            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={host.expensePolicy} />
           </Container>
         )}
         {collective && collective.expensePolicy && (
-          <Container fontSize="12px" color="black.800" lineHeight="20px">
-            <HTMLContent content={collective.expensePolicy} />
+          <Container>
+            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={collective.expensePolicy} />
           </Container>
         )}
       </Collapse>
