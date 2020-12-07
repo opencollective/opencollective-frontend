@@ -183,8 +183,6 @@ class CollectivePage extends Component {
   renderSection(section) {
     switch (section) {
       // v2 transition - these standalone sections will be removed from render if feature flag is active
-      case Sections.GOALS:
-        return <SectionGoals collective={this.props.collective} />;
       case Sections.UPDATES:
         return (
           <SectionUpdates
@@ -252,7 +250,6 @@ class CollectivePage extends Component {
             transactions={this.props.transactions}
             expenses={this.props.expenses}
             stats={this.props.stats}
-            financialContributors={this.props.financialContributors}
           />
         );
       case Sections.TRANSACTIONS:
@@ -299,6 +296,8 @@ class CollectivePage extends Component {
             LoggedInUser={this.props.LoggedInUser}
           />
         );
+      case Sections.GOALS:
+        return <SectionGoals collective={this.props.collective} />;
       default:
         return null;
     }

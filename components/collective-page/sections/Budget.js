@@ -2,18 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
-import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 
-import hasFeature, { FEATURES } from '../../../lib/allowed-features';
-import { getTopContributors } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
-import { getEnvVar } from '../../../lib/env-utils';
 import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import { parseToBoolean } from '../../../lib/utils';
 
 import { Sections } from '../_constants';
 import Container from '../../Container';
@@ -23,15 +17,12 @@ import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
-import { H4, P, Span } from '../../Text';
+import { P, Span } from '../../Text';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionsList from '../../transactions/TransactionsList';
 import { withUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionHeader from '../SectionHeader';
-import TopContributors from '../TopContributors';
-
-import SectionGoals from './Goals';
 
 import budgetSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconBudget.png';
 
@@ -48,18 +39,11 @@ export const getBudgetSectionQueryVariables = slug => {
   return { slug, limit: 3 };
 };
 
-/** The container for Top Contributors view */
-const TopContributorsContainer = styled.div`
-  padding: 32px 16px;
-  margin-top: 48px;
-  background-color: #f5f7fa;
-`;
-
 /**
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats, financialContributors, LoggedInUser }) => {
+const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
     variables: getBudgetSectionQueryVariables(collective.slug),
     context: API_V2_CONTEXT,
@@ -69,41 +53,10 @@ const SectionBudget = ({ collective, stats, financialContributors, LoggedInUser 
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
   const isProject = collective.type === CollectiveType.PROJECT;
-  const isEvent = collective.type === CollectiveType.EVENT;
-  const getTopContributorsMemoized = memoizeOne(getTopContributors);
-  const [topOrganizations, topIndividuals] = getTopContributorsMemoized(financialContributors);
+
   React.useEffect(() => {
     refetch();
   }, [LoggedInUser]);
-
-  const renderNewSubsections = () => {
-    if (parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'))) {
-      return (
-        <React.Fragment>
-          {hasFeature(collective, FEATURES.COLLECTIVE_GOALS) && <SectionGoals collective={collective} />}
-          {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
-            <TopContributorsContainer>
-              <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
-                <H4 fontWeight="500" color="black.900" mb={3}>
-                  <FormattedMessage
-                    id="SectionContribute.TopContributors"
-                    defaultMessage="Top financial contributors"
-                  />
-                </H4>
-                <TopContributors
-                  organizations={topOrganizations}
-                  individuals={topIndividuals}
-                  currency={collective.currency}
-                />
-              </Container>
-            </TopContributorsContainer>
-          )}
-        </React.Fragment>
-      );
-    } else {
-      return null;
-    }
-  };
 
   return (
     <ContainerSectionContent pt={[4, 5]} pb={3}>
@@ -228,7 +181,6 @@ const SectionBudget = ({ collective, stats, financialContributors, LoggedInUser 
           )}
         </StyledCard>
       </Flex>
-      {renderNewSubsections()}
     </ContainerSectionContent>
   );
 };
@@ -251,14 +203,6 @@ SectionBudget.propTypes = {
     activeRecurringContributions: PropTypes.object,
     totalAmountReceived: PropTypes.number,
   }),
-
-  financialContributors: PropTypes.arrayOf(
-    PropTypes.shape({
-      type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-      isBacker: PropTypes.bool,
-      tiersIds: PropTypes.arrayOf(PropTypes.number),
-    }),
-  ),
 
   LoggedInUser: PropTypes.object,
 
