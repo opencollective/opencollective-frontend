@@ -37,7 +37,7 @@ class UpdatePage extends React.Component {
       <div className="UpdatePage">
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
-        <Body>
+        <Body withoutGlobalStyles={false}>
           <CollectiveNavbar
             collective={collective}
             isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}

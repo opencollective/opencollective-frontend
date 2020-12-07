@@ -93,7 +93,7 @@ class CreateUpdatePage extends React.Component {
       <div>
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
-        <Body>
+        <Body withoutGlobalStyles={false}>
           <CollectiveNavbar collective={collective} isAdmin={isAdmin} />
           <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
             <BackButtonWrapper>

@@ -96,7 +96,7 @@ class CreateEvent extends React.Component {
       <div className="CreateEvent">
         <Header title={title} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
-        <Body>
+        <Body withoutGlobalStyles={false}>
           <CollectiveNavbar collective={collective} isAdmin={canCreateEvent} />
 
           <div className="content">

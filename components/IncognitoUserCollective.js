@@ -40,7 +40,7 @@ class IncognitoUserCollective extends React.Component {
           noRobots
         />
 
-        <Body>
+        <Body withoutGlobalStyles={false}>
           <Flex justifyContent="center" alignItems="center" flexDirection="column" my={4}>
             <IncognitoAvatar />
             <H1 fontSize="2rem">{intl.formatMessage(this.messages['incognito.title'])}</H1>

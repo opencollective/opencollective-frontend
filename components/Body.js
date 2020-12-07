@@ -110,7 +110,7 @@ export default class Body extends React.Component {
   };
 
   static defaultProps = {
-    withoutGlobalStyles: false,
+    withoutGlobalStyles: true,
     withBorderTop: true,
   };
 

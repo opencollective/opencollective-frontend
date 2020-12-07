@@ -75,7 +75,7 @@ class Hosts extends React.Component {
           LoggedInUser={LoggedInUser}
         />
 
-        <Body>
+        <Body withoutGlobalStyles={false}>
           <Container mt={2} mb={2}>
             <H1 fontSize={['24px', '40px']} lineHeight={3} fontWeight="bold" textAlign="center" color="black.900">
               {title}

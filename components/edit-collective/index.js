@@ -138,7 +138,7 @@ class EditCollective extends React.Component {
       <EditCollectiveContainer>
         <Header collective={collective} className={this.state.status} LoggedInUser={LoggedInUser} />
 
-        <Body>
+        <Body withoutGlobalStyles={false}>
           {collective.isArchived && (
             <NotificationBar
               status={notification.status}

@@ -86,7 +86,7 @@ class OrderPage extends React.Component {
 
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
-        <Body>
+        <Body withoutGlobalStyles={false}>
           <Container mb={4}>
             <CollectiveNavbar
               collective={collective}
