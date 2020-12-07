@@ -14,13 +14,23 @@ const FiscalSponsorship = () => {
       <Box ml={[null, '6px', '40px', null, '84px']} width={['288px', '324px', '478px', null, '558px']}>
         <Illustration
           alt="Fiscal sponsorship illustration"
-          src="/static/images/become-a-host/fiscalSponsorship-illustration-sm.png"
-          display={[null, null, 'none']}
+          src="/static/images/become-a-host/fiscalSponsorship-illustration-xs.png"
+          display={[null, 'none']}
         />
         <Illustration
           alt="Fiscal sponsorship illustration"
-          src="/static/images/become-a-host/fiscalSponsorship-illustration.png"
-          display={['none', null, 'block']}
+          src="/static/images/become-a-host/fiscalSponsorship-illustration-sm.png"
+          display={['none', 'block', 'none']}
+        />
+        <Illustration
+          alt="Fiscal sponsorship illustration"
+          src="/static/images/become-a-host/fiscalSponsorship-illustration-md.png"
+          display={['none', null, 'block', null, 'none']}
+        />
+        <Illustration
+          alt="Fiscal sponsorship illustration"
+          src="/static/images/become-a-host/fiscalSponsorship-illustration-lg.png"
+          display={['none', null, null, null, 'block']}
         />
       </Box>
       <Container display="flex" flexDirection="column" alignItems={['center', 'flex-start']}>
