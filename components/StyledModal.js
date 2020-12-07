@@ -6,6 +6,8 @@ import { createPortal } from 'react-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { background, margin, overflow, space } from 'styled-system';
 
+import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
+
 import Avatar from './Avatar';
 import Container from './Container';
 import { Flex } from './Grid';
@@ -173,6 +175,9 @@ ModalFooter.defaultProps = {
  * a styled `Container`.
  */
 const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
+  // Closes the modal upon the `ESC` key press.
+  useKeyBoardShortcut({ callback: () => onClose(), keyMatch: ESCAPE_KEY });
+
   if (show && usePortal === false) {
     return (
       <React.Fragment>

@@ -4,6 +4,7 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKey';
 
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
@@ -149,6 +150,16 @@ const FiscalHosting = ({ collective }) => {
   };
 
   const closeActivateBudget = () => setActivateBudgetModal({ ...activateBudgetModal, show: false });
+
+  const handlePrimaryBtnClick = () => {
+    if (activateBudgetModal.type === 'Deactivate') {
+      handleDeactivateBudget({ id: collective.id });
+    } else {
+      handleActivateBudget({ id: collective.id });
+    }
+  };
+
+  useKeyboardShortcut({ callback: handlePrimaryBtnClick, keyMatch: ENTER_KEY });
 
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
@@ -349,17 +360,7 @@ const FiscalHosting = ({ collective }) => {
             <StyledButton mx={20} onClick={() => setActivateBudgetModal({ ...activateBudgetModal, show: false })}>
               <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
             </StyledButton>
-            <StyledButton
-              buttonStyle="primary"
-              data-cy="action"
-              onClick={() => {
-                if (activateBudgetModal.type === 'Deactivate') {
-                  handleDeactivateBudget({ id: collective.id });
-                } else {
-                  handleActivateBudget({ id: collective.id });
-                }
-              }}
-            >
+            <StyledButton buttonStyle="primary" data-cy="action" onClick={() => handlePrimaryBtnClick()}>
               {activateBudgetModal.type === 'Activate' && (
                 <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage={'Activate Host Budget'} />
               )}
