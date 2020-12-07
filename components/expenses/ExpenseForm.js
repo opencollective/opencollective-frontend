@@ -213,7 +213,7 @@ const ExpenseFormBody = ({
       });
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
-    else if (!isOnBehalf && loggedInAccount && !isEmpty(payoutProfiles)) {
+    else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
       formik.setFieldValue('payee', first(payoutProfiles));
     }
   }, [payoutProfiles, loggedInAccount]);
