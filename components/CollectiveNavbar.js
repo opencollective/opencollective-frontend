@@ -4,6 +4,7 @@ import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVertical
 import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -22,6 +23,7 @@ import { Box, Flex } from './Grid';
 import Link from './Link';
 import LinkCollective from './LinkCollective';
 import LoadingPlaceholder from './LoadingPlaceholder';
+import StyledButton from './StyledButton';
 import StyledRoundButton from './StyledRoundButton';
 import { H1, P } from './Text';
 
@@ -40,7 +42,7 @@ const MainContainerV2 = styled(Container)`
   max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
   margin: 0 auto;
 
-  margin-top: 30px;
+  margin-top: 50px;
 
   /** Everything's inside cannot be larger than max section width */
   & > * {
@@ -184,7 +186,7 @@ const MainContainer = styled.div`
 const MenuLink = styled.a`
   display: block;
   color: ${themeGet('colors.black.700')};
-  font-size: 16px;
+  font-size: 14px;
   line-height: 24px;
   text-decoration: none;
   white-space: nowrap;
@@ -378,11 +380,13 @@ const CollectiveNavbar = ({
   isAnimated,
   createNotification,
   intl,
+  router,
 }) => {
   const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
   callsToAction = { ...getDefaultCallsToActions(collective, isAdmin), ...callsToAction };
   const isEvent = collective?.type === CollectiveType.EVENT;
+  const isPageMainCollectivePage = router.pathname === '/collective-page';
 
   return NAV_V2_FEATURE_FLAG ? (
     // v2
@@ -405,9 +409,10 @@ const CollectiveNavbar = ({
         px={[3, 0]}
         py={[2, 1]}
       >
-        {/* TO DO: hide back arrow unless on a standalone section page */}
-        <Box display={['none', 'block']} mr={2}>
-          <P>&larr;</P>
+        <Box display={['none', isPageMainCollectivePage ? 'none' : 'block']} mr={2}>
+          <StyledButton px={1} isBorderless onClick={() => window && window.history.back()}>
+            &larr;
+          </StyledButton>
         </Box>
         <AvatarBox>
           <LinkCollective collective={collective} onClick={onCollectiveClick}>
@@ -416,7 +421,7 @@ const CollectiveNavbar = ({
             </Container>
           </LinkCollective>
         </AvatarBox>
-        <Box display={['block', null, null, 'none']}>
+        <Box display={['block', null, null, onlyInfos ? 'block' : 'none']}>
           <CollectiveNameV2
             mx={2}
             py={2}
@@ -441,108 +446,113 @@ const CollectiveNavbar = ({
       </InfosContainerV2>
       {/** Main navbar items */}
       {/* TO DO: they don't shrink properly when the container gets small - needs work */}
-      <Container
-        backgroundColor="#fff"
-        zIndex={1}
-        display={isExpanded ? 'flex' : ['none', 'flex']}
-        flexDirection={['column', 'row']}
-        flexBasis="600px"
-        flexShrink={2}
-        flexGrow={1}
-        justifyContent={['space-between', null, 'flex-start']}
-        minWidth={0}
-        order={[0, 3, 0]}
-        borderTop={['none', '1px solid #e1e1e1', 'none']}
-        overflowX="auto"
-      >
-        {isLoading ? (
-          <LoadingPlaceholder height={43} minWidth={150} mb={2} />
-        ) : (
-          <Fragment>
-            {sections.map(section => (
-              <MenuLinkContainerV2
-                mr={[0, 3]}
-                key={section}
-                isSelected={section === selected}
-                onClick={() => {
-                  if (isExpanded) {
-                    setExpanded(false);
+      {!onlyInfos && (
+        <Fragment>
+          <Container
+            backgroundColor="#fff"
+            zIndex={1}
+            display={isExpanded ? 'flex' : ['none', 'flex']}
+            flexDirection={['column', 'row']}
+            flexBasis="600px"
+            flexShrink={2}
+            flexGrow={1}
+            justifyContent={['space-between', null, 'flex-start']}
+            minWidth={0}
+            order={[0, 3, 0]}
+            borderTop={['none', '1px solid #e1e1e1', 'none']}
+            overflowX="auto"
+          >
+            {isLoading ? (
+              <LoadingPlaceholder height={43} minWidth={150} mb={2} />
+            ) : (
+              <Fragment>
+                {sections.map(section => (
+                  <MenuLinkContainerV2
+                    mr={[0, 3]}
+                    key={section}
+                    isSelected={section === selected}
+                    onClick={() => {
+                      if (isExpanded) {
+                        setExpanded(false);
+                      }
+                      if (onSectionClick) {
+                        onSectionClick(section);
+                      }
+                    }}
+                  >
+                    <Flex py={2} px={[3, 0]}>
+                      <Flex alignItems="center" mr={2}>
+                        <IconIllustration src={getCollectiveNavbarIcon(section)} />
+                      </Flex>
+                      <Flex alignItems="center">
+                        <MenuLinkV2
+                          as={LinkComponent}
+                          collectivePath={collective.path || `/${collective.slug}`}
+                          section={section}
+                          label={i18nCollectivePageSection(intl, section)}
+                        />
+                      </Flex>
+                    </Flex>
+                  </MenuLinkContainerV2>
+                ))}
+              </Fragment>
+            )}
+          </Container>
+          {/* CTAs for v2 navbar & admin panel */}
+          <Container
+            display={isExpanded ? 'flex' : ['none', 'flex']}
+            flexDirection={['column', 'row']}
+            flexBasis="fit-content"
+            marginLeft={[0, 'auto']}
+            backgroundColor="#fff"
+            zIndex={1}
+          >
+            {isAdmin && (
+              <Flex flexDirection={['column', 'row']} alignItems={['stretch', 'center']}>
+                <Link
+                  width="100%"
+                  route={isEvent ? 'editEvent' : 'editCollective'}
+                  params={
+                    isEvent
+                      ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
+                      : { slug: collective.slug }
                   }
-                  if (onSectionClick) {
-                    onSectionClick(section);
-                  }
-                }}
-              >
-                <Flex py={2} px={[3, 0]}>
-                  <Flex alignItems="center" mr={2}>
-                    <IconIllustration src={getCollectiveNavbarIcon(section)} />
-                  </Flex>
-                  <Flex alignItems="center">
-                    <MenuLinkV2
-                      as={LinkComponent}
-                      collectivePath={collective.path || `/${collective.slug}`}
-                      section={section}
-                      label={i18nCollectivePageSection(intl, section)}
-                    />
-                  </Flex>
-                </Flex>
-              </MenuLinkContainerV2>
-            ))}
-          </Fragment>
-        )}
-      </Container>
-      {/* CTAs for v2 navbar & admin panel */}
-      <Container
-        display={isExpanded ? 'flex' : ['none', 'flex']}
-        flexDirection={['column', 'row']}
-        flexBasis="fit-content"
-        marginLeft={[0, 'auto']}
-        backgroundColor="#fff"
-        zIndex={1}
-      >
-        {isAdmin && (
-          <Flex flexDirection={['column', 'row']} alignItems={['stretch', 'center']}>
-            <Link
-              width="100%"
-              route={isEvent ? 'editEvent' : 'editCollective'}
-              params={
-                isEvent
-                  ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
-                  : { slug: collective.slug }
-              }
-            >
-              <Container
-                display="flex"
-                flexGrow={1}
-                alignItems="center"
-                borderRadius={[0, 8]}
-                background="rgba(72, 95, 211, 0.1)"
-                px={3}
-                py={[3, 1]}
-              >
-                <Settings size={20} color="rgb(48, 76, 220)" />
-                <P
-                  ml={1}
-                  textTransform="uppercase"
-                  color="rgb(48, 76, 220)"
-                  fontSize="14px"
-                  lineHeight="16px"
-                  letterSpacing="60%"
+                  textDecoration="none"
                 >
-                  <FormattedMessage id="AdminPanel" defaultMessage="Admin Panel" />
-                </P>
-              </Container>
-            </Link>
-          </Flex>
-        )}
-        {!isLoading && (
-          <CollectiveNavbarActionsMenu
-            collective={collective}
-            callsToAction={callsToAction}
-            createNotification={createNotification}
-          />
-        )}
-      </Container>
+                  <Container
+                    display="flex"
+                    flexGrow={1}
+                    alignItems="center"
+                    borderRadius={[0, 8]}
+                    background="rgba(72, 95, 211, 0.1)"
+                    px={3}
+                    py={[3, 1]}
+                  >
+                    <Settings size={20} color="rgb(48, 76, 220)" />
+                    <P
+                      ml={1}
+                      textTransform="uppercase"
+                      color="rgb(48, 76, 220)"
+                      fontSize="14px"
+                      lineHeight="16px"
+                      letterSpacing="60%"
+                    >
+                      <FormattedMessage id="AdminPanel" defaultMessage="Admin Panel" />
+                    </P>
+                  </Container>
+                </Link>
+              </Flex>
+            )}
+            {!isLoading && (
+              <CollectiveNavbarActionsMenu
+                collective={collective}
+                callsToAction={callsToAction}
+                createNotification={createNotification}
+              />
+            )}
+          </Container>
+        </Fragment>
+      )}
     </MainContainerV2>
   ) : (
     // v1
@@ -709,6 +719,7 @@ CollectiveNavbar.propTypes = {
   /** @ignore From injectIntl */
   intl: PropTypes.object,
   createNotification: PropTypes.func,
+  router: PropTypes.object,
 };
 
 CollectiveNavbar.defaultProps = {
@@ -726,4 +737,4 @@ CollectiveNavbar.defaultProps = {
   },
 };
 
-export default React.memo(injectIntl(CollectiveNavbar));
+export default React.memo(injectIntl(withRouter(CollectiveNavbar)));

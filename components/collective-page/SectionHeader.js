@@ -38,7 +38,7 @@ const SectionHeader = ({ title, subtitle, info, illustrationSrc }) => {
             <TypeIllustration src={illustrationSrc} />
           </Flex>
           <Flex alignItems="center" mr={3}>
-            <SectionTitle mr={2} data-cy={`section-${title}-title`}>
+            <SectionTitle mr={2} my={3} data-cy={`section-${title}-title`}>
               {i18nCollectivePageSection(intl, title)}
             </SectionTitle>
             {info && (
@@ -47,7 +47,7 @@ const SectionHeader = ({ title, subtitle, info, illustrationSrc }) => {
               </StyledTooltip>
             )}
           </Flex>
-          <StyledHr flex="1" borderStyle="solid" borderColor="black.300" />
+          <StyledHr flex="1" borderStyle="solid" borderColor="black.300" mt={1} />
         </Flex>
         {subtitle && (
           <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">

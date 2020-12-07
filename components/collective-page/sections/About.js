@@ -1,20 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 
+import { Sections } from '../_constants';
 import Container from '../../Container';
+import ContributorCard from '../../ContributorCard';
 import { Flex } from '../../Grid';
 import HTMLContent, { isEmptyValue } from '../../HTMLContent';
 import InlineEditField from '../../InlineEditField';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
-import { Span } from '../../Text';
+import { H2, Span } from '../../Text';
+import ContainerSectionContent from '../ContainerSectionContent';
 import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
-import SectionTitle from '../SectionTitle';
+import SectionHeader from '../SectionHeader';
+
+const COLLECTIVE_CARD_WIDTH = 144;
+const COLLECTIVE_CARD_HEIGHT = 190;
+
+import aboutSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconAbout.png';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -33,27 +42,18 @@ const messages = defineMessages({
 /**
  * Display the inline editable description section for the collective
  */
-const SectionAbout = ({ collective, canEdit, intl }) => {
+const SectionAbout = ({ collective, canEdit, coreContributors, LoggedInUser, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isFund = collective.type === CollectiveType.FUND;
   canEdit = collective.isArchived ? false : canEdit;
+  const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
 
   return (
-    <Container
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      px={2}
-      py={[4, 5]}
-      background="#f5f7fa"
-      boxShadow="0px 11px 15px -5px #bfbfbf2b inset"
-    >
-      <SectionTitle textAlign="center" mb={5}>
-        <FormattedMessage id="collective.about.title" defaultMessage="About" />
-      </SectionTitle>
+    <ContainerSectionContent px={2} py={[4, 5]} background="white">
+      <SectionHeader title={Sections.ABOUT} illustrationSrc={aboutSectionHeaderIcon} />
 
-      <Container width="100%" maxWidth={700} margin="0 auto">
+      <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
         <InlineEditField
           mutation={editCollectiveLongDescriptionMutation}
           values={collective}
@@ -114,7 +114,29 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           }}
         </InlineEditField>
       </Container>
-    </Container>
+      {coreContributors && (
+        <Container width="100%" maxWidth={700} margin="0 auto">
+          <H2 textAlign="center" fontSize="20px" lineHeight="28px" fontWeight="500" color="black.700">
+            <FormattedMessage id="OurTeam" defaultMessage="Our team" />
+          </H2>
+          <Container display="flex" flexWrap="wrap" justifyContent="space-evenly" py={2} border="1px red solid">
+            {coreContributors.map(contributor => (
+              <ContributorCard
+                key={contributor.id}
+                m={2}
+                width={COLLECTIVE_CARD_WIDTH}
+                height={COLLECTIVE_CARD_HEIGHT}
+                contributor={contributor}
+                currency={collective.currency}
+                collectiveId={collective.id}
+                isLoggedUser={loggedUserCollectiveId === contributor.collectiveId}
+                hideTotalAmountDonated
+              />
+            ))}
+          </Container>
+        </Container>
+      )}
+    </ContainerSectionContent>
   );
 };
 
@@ -127,10 +149,15 @@ SectionAbout.propTypes = {
     type: PropTypes.string,
     isArchived: PropTypes.bool,
     settings: PropTypes.object,
+    currency: PropTypes.string,
   }).isRequired,
 
   /** Can user edit the description? */
   canEdit: PropTypes.bool,
+
+  coreContributors: PropTypes.array,
+
+  LoggedInUser: PropTypes.object,
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,

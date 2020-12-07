@@ -224,17 +224,10 @@ class CollectivePage extends Component {
             contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
             isAdmin={this.props.isAdmin}
-            section={section}
           />
         );
       case Sections.CONTRIBUTIONS:
-        return (
-          <SectionContributions
-            collective={this.props.collective}
-            LoggedInUser={this.props.LoggedInUser}
-            section={section}
-          />
-        );
+        return <SectionContributions collective={this.props.collective} LoggedInUser={this.props.LoggedInUser} />;
       case Sections.EVENTS:
         return (
           <SectionEvents
@@ -242,7 +235,6 @@ class CollectivePage extends Component {
             events={this.props.events}
             connectedCollectives={this.props.connectedCollectives}
             isAdmin={this.props.isAdmin}
-            section={section}
           />
         );
       case Sections.PROJECTS:
@@ -260,7 +252,6 @@ class CollectivePage extends Component {
             transactions={this.props.transactions}
             expenses={this.props.expenses}
             stats={this.props.stats}
-            section={section}
             financialContributors={this.props.financialContributors}
           />
         );
@@ -270,7 +261,6 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             isAdmin={this.props.isAdmin}
             isRoot={this.props.isRoot}
-            section={section}
           />
         );
       case Sections.CONTRIBUTORS:
@@ -297,11 +287,17 @@ class CollectivePage extends Component {
             conversations={this.props.conversations}
             isAdmin={this.props.isAdmin}
             isLoggedIn={Boolean(this.props.LoggedInUser)}
-            section={section}
           />
         );
       case Sections.ABOUT:
-        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} section={section} />;
+        return (
+          <SectionAbout
+            collective={this.props.collective}
+            canEdit={this.props.isAdmin}
+            coreContributors={this.props.coreContributors}
+            LoggedInUser={this.props.LoggedInUser}
+          />
+        );
       default:
         return null;
     }
