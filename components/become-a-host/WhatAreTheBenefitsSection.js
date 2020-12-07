@@ -302,7 +302,7 @@ const WhatAreTheBenefits = () => {
           flexDirection={['column', 'row-reverse']}
           alignItems="center"
           position="relative"
-          mr="178px"
+          mr={[null, null, null, null, '178px']}
         >
           <Container
             width={['88px', '105px', '122px', null, '156px']}

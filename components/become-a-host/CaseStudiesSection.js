@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -7,7 +8,11 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import StyledCarousel from '../StyledCarousel';
 import StyledLink from '../StyledLink';
-import { H2, H3, P } from '../Text';
+import { H2, P } from '../Text';
+
+const CollectiveNameLink = styled(StyledLink)`
+  text-decoration: underline !important;
+`;
 
 const messages = defineMessages({
   'becomeAHost.caseStudies.wwcode': {
@@ -113,14 +118,18 @@ const CaseStudy = ({ bgImage, name, id, logo, learnMorePath }) => {
         mt={['12px', 3, '24px']}
         width={[1, '206px', '306px', null, '360px']}
       >
-        <H3
+        <CollectiveNameLink
+          href={learnMorePath}
+          fontWeight="700"
           fontSize={['18px', '24px']}
           lineHeight={['26px', '32px']}
           color="black.800"
           letterSpacing={[null, '-0.008em']}
+          textDecoration="underline"
         >
           {name}
-        </H3>
+        </CollectiveNameLink>
+
         <P
           fontSize={['15px', '16px', null, null, '18px']}
           lineHeight={['22px', '24px', null, null, '26px']}
@@ -131,11 +140,6 @@ const CaseStudy = ({ bgImage, name, id, logo, learnMorePath }) => {
           &ldquo;{intl.formatMessage(messages[`becomeAHost.caseStudies.${id}`])}&ldquo;
         </P>
       </Container>
-      <Box mt={4} alignSelf={[null, null, null, null, 'end']}>
-        <StyledLink buttonStyle="standard" buttonSize="medium" href={learnMorePath} fontWeight="500">
-          <FormattedMessage id="LearnMore" defaultMessage="Learn more" />
-        </StyledLink>
-      </Box>
     </Container>
   );
 };
@@ -172,6 +176,11 @@ const CaseStudies = () => {
           <CaseStudy key={caseStudy.id} {...caseStudy} />
         ))}
       </Container>
+      <Box mt={4}>
+        <StyledLink buttonStyle="standard" buttonSize="medium" href="/hosts" fontWeight="500">
+          <FormattedMessage id="becomeAHost.discoverMore" defaultMessage="Discover more hosts" />
+        </StyledLink>
+      </Box>
     </Flex>
   );
 };
