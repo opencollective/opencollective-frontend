@@ -42,40 +42,40 @@ const caseStudies = [
     id: 'wwcode',
     name: 'Women Who Code',
     collectivePath: '/wwcode',
-    learnMorePath: '#',
-    bgImage: '/static/images/become-a-host/wwc.png',
+    learnMorePath: 'https://opencollective.com/wwcodeinc',
+    bgImage: 'wwc',
     logo: '/static/images/become-a-host/wwc-logo.png',
   },
   {
     id: 'socialchangenestcollective',
     name: 'Social Change Nest',
     collectivePath: '/socialchangenestcollective',
-    learnMorePath: '#',
-    bgImage: '/static/images/become-a-host/socialchangenest.png',
+    learnMorePath: 'https://opencollective.com/the-social-change-nest',
+    bgImage: 'socialchangenest',
     logo: '/static/images/become-a-host/socialchangenest-logo.png',
   },
   {
     id: 'foundation',
     name: 'Open Collective Foundation',
     collectivePath: '/foundation',
-    learnMorePath: '#',
-    bgImage: '/static/images/become-a-host/ocf.png',
+    learnMorePath: 'https://opencollective.foundation/',
+    bgImage: 'ocf',
     logo: '/static/images/become-a-host/ocf-logo.png',
   },
   {
     id: 'opensource',
     name: 'Open Source Collective',
     collectivePath: '/opensource',
-    learnMorePath: '#',
-    bgImage: '/static/images/become-a-host/osc.png',
+    learnMorePath: 'https://oscollective.org/',
+    bgImage: 'osc',
     logo: '/static/images/become-a-host/osc-logo.png',
   },
   {
     id: 'allforclimate-collective',
     name: 'All for Climate',
     collectivePath: '/allforclimate-collective',
-    learnMorePath: '#',
-    bgImage: '/static/images/become-a-host/allforclimate-collective.png',
+    learnMorePath: 'https://opencollective.com/allforclimate',
+    bgImage: 'allforclimate-collective',
     logo: '/static/images/become-a-host/climate-logo.png',
   },
 ];
@@ -94,8 +94,12 @@ const CaseStudy = ({ bgImage, name, id, logo, learnMorePath }) => {
       <Container
         width={[1, '205px', '306px', null, '360px']}
         height={['210px', '218px', null, null, '256px']}
-        background={`url("${bgImage}") no-repeat`}
-        backgroundSize="contain"
+        background={[
+          `url("/static/images/become-a-host/${bgImage}.png") no-repeat`,
+          `url("/static/images/become-a-host/${bgImage}-sm.png") no-repeat`,
+          `url("/static/images/become-a-host/${bgImage}.png") no-repeat`,
+        ]}
+        backgroundSize={['contain', 'cover', 'contain']}
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -106,7 +110,7 @@ const CaseStudy = ({ bgImage, name, id, logo, learnMorePath }) => {
         display="flex"
         flexDirection="column"
         alignItems="flex-start"
-        mt={['12px', 0, '24px']}
+        mt={['12px', 3, '24px']}
         width={[1, '206px', '306px', null, '360px']}
       >
         <H3
@@ -140,22 +144,28 @@ CaseStudy.propTypes = {
   bgImage: PropTypes.string,
   name: PropTypes.string,
   id: PropTypes.string,
+  logo: PropTypes.string,
+  learnMorePath: PropTypes.string,
 };
 
 const CaseStudies = () => {
   return (
-    <Flex flexDirection="column" justifyContent="center" alignItems="center" px="16px" my={4}>
+    <Flex
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      px="16px"
+      my={[4, null, null, null, '118px']}
+    >
       <H2 fontSize={['24px']} lineHeight={['32px']} color="black.800" letterSpacing="-0.008em" mb={[4, 3]}>
         <FormattedMessage id="becomeAHost.caseStudies" defaultMessage="Case studies" />
       </H2>
 
-      {/* <Flex justifyContent="center" alignItems="center"> */}
       <StyledCarousel width="288px" options={caseStudies} display={[null, 'none']}>
         {caseStudies.map(caseStudy => (
           <CaseStudy key={caseStudy.id} {...caseStudy} />
         ))}
       </StyledCarousel>
-      {/* </Flex> */}
 
       <Container display={['none', 'flex']} flexWrap="wrap" justifyContent="center">
         {caseStudies.map(caseStudy => (

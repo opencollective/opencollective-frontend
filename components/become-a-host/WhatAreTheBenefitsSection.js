@@ -8,9 +8,9 @@ import { H2, H3, P } from '../Text';
 
 const WhatAreTheBenefits = () => {
   return (
-    <Flex my="80px" flexDirection="column">
+    <Flex mt={['96px', '80px', null, null, '104px']} mb="80px" flexDirection="column">
       <Container display="flex" flexDirection="column" alignItems="center" mx={3}>
-        <Box mb={2}>
+        <Box mb={[2, 3]} width={['288px', 1]}>
           <H2
             fontSize={['24px', '32px', null, null, '40px']}
             lineHeight={['32px', '40px', null, null, '48px']}
@@ -31,10 +31,11 @@ const WhatAreTheBenefits = () => {
             letterSpacing="-0.008em"
             textAlign="center"
             color="black.700"
+            fontWeight="500"
           >
             <FormattedMessage
               id="becomeAHost.whatAreTheBenefits.description"
-              defaultMessage="Money management made simple, plus great tools for community engagement, budget reporting, and fiscal sponsorship."
+              defaultMessage="Accept donations and sponsorship, celebrate your supporters, pay expenses, and keep everyone up to date — all in one place."
             />
           </P>
         </Box>
@@ -43,25 +44,25 @@ const WhatAreTheBenefits = () => {
         mx={3}
         flexDirection={['column', null, 'row']}
         justifyContent="center"
-        alignItems="center"
+        alignItems={['center', null, 'baseline']}
         mt={['24px', '48px', null, null, '80px']}
       >
         <Container
           display="flex"
           flexDirection={['column', 'row', 'column']}
-          alignItems={['flex-start', 'center']}
+          alignItems={['flex-start', 'center', 'flex-start']}
           mb={4}
           mr={[null, null, '40px', null, '103px']}
         >
           <Box
-            width={['120px', '132px', null, null, '140px']}
-            height={['120px', '132px', null, null, '140px']}
-            mb={[2, null, '21px', null, '51px']}
+            width={['132px', null, null, null, '208px']}
+            height={['132px', null, null, null, '208px']}
+            mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
-            <Illustration src={`/static/images/home/documentation-illustration.png`} alt={`illustration`} />
+            <Illustration src="/static/images/become-a-host/reduceOverhead-icon.png" alt="Reduce Overhead Icon" />
           </Box>
-          <Box width={[null, '472px', '250px', null, '289px']}>
+          <Box width={['288px', '472px', '250px', null, '289px']}>
             <H3
               fontSize={['20px', null, null, null, '24px']}
               lineHeight={['28px', null, null, null, '32px']}
@@ -82,19 +83,19 @@ const WhatAreTheBenefits = () => {
         <Container
           display="flex"
           flexDirection={['column', 'row', 'column']}
-          alignItems={['flex-start', 'center']}
+          alignItems={['flex-start', 'center', 'flex-start']}
           mb={4}
           mr={[null, null, '40px', null, '103px']}
         >
           <Box
-            width={['120px', '132px', null, null, '140px']}
-            height={['120px', '132px', null, null, '140px']}
-            mb={[2, null, '21px', null, '51px']}
+            width={['132px', null, null, null, '208px']}
+            height={['132px', null, null, null, '208px']}
+            mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
-            <Illustration src={`/static/images/home/documentation-illustration.png`} alt={`illustration`} />
+            <Illustration src="/static/images/become-a-host/increaseCapacity-icon.png" alt="Increase Capacity Icon" />
           </Box>
-          <Box width={[null, '472px', '250px', null, '289px']}>
+          <Box width={['288px', '472px', '250px', null, '289px']}>
             <H3
               fontSize={['20px', null, null, null, '24px']}
               lineHeight={['28px', null, null, null, '32px']}
@@ -115,18 +116,21 @@ const WhatAreTheBenefits = () => {
         <Container
           display="flex"
           flexDirection={['column', 'row', 'column']}
-          alignItems={['flex-start', 'center']}
+          alignItems={['flex-start', 'center', 'flex-start']}
           mb={4}
         >
           <Box
-            width={['120px', '132px', null, null, '140px']}
-            height={['120px', '132px', null, null, '140px']}
-            mb={[2, null, '21px', null, '51px']}
+            width={['132px', null, null, null, '208px']}
+            height={['132px', null, null, null, '208px']}
+            mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
-            <Illustration src={`/static/images/home/documentation-illustration.png`} alt={`illustration`} />
+            <Illustration
+              src="/static/images/become-a-host/ABetterExperience-icon.png"
+              alt="A Better Experience Icon"
+            />
           </Box>
-          <Box width={[null, '472px', '250px', null, '289px']}>
+          <Box width={['288px', '472px', '250px', null, '289px']}>
             <H3
               fontSize={['20px', null, null, null, '24px']}
               lineHeight={['28px', null, null, null, '32px']}
@@ -145,26 +149,51 @@ const WhatAreTheBenefits = () => {
           </Box>
         </Container>
       </Flex>
-      <Flex mx={2} mt={[2, 4, null, null, '80px']} flexDirection="column" alignItems="center">
-        <Container display="flex" flexDirection={['column', 'row-reverse']} alignItems="center">
-          <Box mb="24px" display={[null, 'none']}>
-            <H2 fontSize={['24px']} lineHeight={['32px']} letterSpacing="-0.008em" color="black.900" textAlign="center">
-              <FormattedMessage id="becomeAHost.benefit.keepTrack" defaultMessage="Keep track of all the budgets" />
+      <Flex mx={2} mt={[2, '48px', null, null, '80px']} flexDirection="column" alignItems="center">
+        <Container
+          display="flex"
+          flexDirection={['column', 'row-reverse']}
+          alignItems="center"
+          position="relative"
+          mr={[null, null, null, null, '178px']}
+        >
+          <Container
+            width={['83px', '79px', '115px', null, '147px']}
+            height={['68px', '65px', '94px', null, '120px']}
+            position="absolute"
+            top={[null, 0, '265px', null, '290px']}
+            left={['0', '215px', '330px', null, '350px']}
+          >
+            <Illustration src="/static/images/become-a-host/keepTrackBird.png" alt="Bird illustration" />
+          </Container>
+          <Box width="304px" mb="24px" display={[null, 'none']} mt="27px">
+            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
+              <FormattedMessage
+                id="becomeAHost.benefit.keepTrack"
+                defaultMessage="Keep track {lineBreak} of all the budgets"
+                values={{ lineBreak: <br /> }}
+              />
             </H2>
           </Box>
           <Box
-            width={['304px', '322px', '478px', null, '558px']}
-            height={['229px', '280px', '355px', null, '420px']}
+            width={['304px', '324px', '478px', null, '558px']}
+            height={['229px', '281px', '355px', null, '420px']}
             mb={['24px', 0]}
           >
             <Illustration
               alt="Keep track of all budgets Illustration"
-              src="/static/images/home/collectmoney-illustration-lg.png"
+              src="/static/images/become-a-host/keepTrackOfBudget-xs.png"
+              display={[null, 'none']}
+            />
+            <Illustration
+              alt="Keep track of all budgets Illustration"
+              src="/static/images/become-a-host/keepTrackOfBudget.png"
+              display={['none', 'block']}
             />
           </Box>
           <Box
             width={['304px', '288px', '437px', null, '408px']}
-            mr={[null, '25px', '41px', null, '134px']}
+            mr={[null, '24px', '41px', null, '134px']}
             textAlign={['center', 'left']}
           >
             <H2
@@ -175,7 +204,11 @@ const WhatAreTheBenefits = () => {
               display={['none', 'block']}
               mb={3}
             >
-              <FormattedMessage id="becomeAHost.benefit.keepTrack" defaultMessage="Keep track of all the budgets" />
+              <FormattedMessage
+                id="becomeAHost.benefit.keepTrack"
+                defaultMessage="Keep track {lineBreak} of all the budgets"
+                values={{ lineBreak: <br /> }}
+              />{' '}
             </H2>
             <P
               fontSize={['16px', null, null, null, '18px']}
@@ -186,6 +219,229 @@ const WhatAreTheBenefits = () => {
               <FormattedMessage
                 id="becomeAHost.benefit.keepTrack.description"
                 defaultMessage="Create Collectives for as many projects as you need, in a few clicks, at no extra cost. Each has its own page for fundraising, budget tracking, and community engagement. Incoming payments are added to the balance of the right Collective. No spreadsheets required!"
+              />
+            </P>
+          </Box>
+        </Container>
+        <Container
+          mt={['64px', '48px', '58px', null, '94px']}
+          display="flex"
+          flexDirection={['column', 'row']}
+          alignItems={['center', 'flex-start', 'center']}
+          position="relative"
+        >
+          <Container
+            width={['71px', '85px', '115px', null, '126px']}
+            height={['44px', '52px', '71px', null, '78px']}
+            position="absolute"
+            right={['0', null, '124px', null, '28px']}
+            top={[null, null, '65px']}
+          >
+            <Illustration src="/static/images/become-a-host/easyExpenseBird.png" alt="Bird illustration" />
+          </Container>
+          <Box width="304px" mb="24px" display={[null, 'none']} mr={['10px', 0]}>
+            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
+              <FormattedMessage
+                id="becomeAHost.benefit.easyExpense"
+                defaultMessage="Easy expense {lineBreak} management"
+                values={{ lineBreak: <br /> }}
+              />
+            </H2>
+          </Box>
+          <Box
+            width={['304px', '324px', '478px', null, '558px']}
+            height={['229px', '281px', '355px', null, '420px']}
+            mb={['24px', 0]}
+          >
+            <Illustration
+              alt="Keep track of all budgets Illustration"
+              src="/static/images/become-a-host/easyExpense-xs.png"
+              display={[null, 'none']}
+            />
+            <Illustration
+              alt="Keep track of all budgets Illustration"
+              src="/static/images/become-a-host/easyExpense.png"
+              display={['none', 'block']}
+            />
+          </Box>
+          <Box
+            width={['304px', '288px', '437px', null, '408px']}
+            ml={[null, '24px', '41px', null, '96px']}
+            textAlign={['center', 'left']}
+          >
+            <H2
+              fontSize={['24px', null, null, null, '30px']}
+              lineHeight={['32px', null, null, null, '40px']}
+              letterSpacing="-0.008em"
+              color="black.900"
+              display={['none', 'block']}
+              mb={3}
+            >
+              <FormattedMessage
+                id="becomeAHost.benefit.easyExpense"
+                defaultMessage="Easy expense {lineBreak} management"
+                values={{ lineBreak: <br /> }}
+              />
+            </H2>
+            <P
+              fontSize={['16px', null, null, null, '18px']}
+              lineHeight={['24px', null, null, null, '26px']}
+              color="black.800"
+              fontWeight="500"
+            >
+              <FormattedMessage
+                id="becomeAHost.benefit.easyExpense.description"
+                defaultMessage="To withdraw funds, payees submit expenses through the platform, with associated invoices and receipts. Easily view and approve expenses through your admin dashboard—payment via bank transfer or Paypal is built-in, so you can pay in a single click."
+              />
+            </P>
+          </Box>
+        </Container>
+        <Container
+          mt={['35px', '48px', '58px', null, '94px']}
+          display="flex"
+          flexDirection={['column', 'row-reverse']}
+          alignItems="center"
+          position="relative"
+          mr="178px"
+        >
+          <Container
+            width={['88px', '105px', '122px', null, '156px']}
+            height={['44px', '52px', '61px', null, '78px']}
+            position="absolute"
+            left={['0', '150px', '200px']}
+            top={[null, '-10px', '35px']}
+          >
+            <Illustration src="/static/images/become-a-host/combineFundingBird.png" alt="Bird illustration" />
+          </Container>
+          <Box width="304px" mb="24px" display={[null, 'none']} mt={['27px', 0]}>
+            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
+              <FormattedMessage
+                id="becomeAHost.benefit.combineFunding"
+                defaultMessage="Combine {lineBreak} funding sources"
+                values={{ lineBreak: <br /> }}
+              />
+            </H2>
+          </Box>
+          <Box
+            width={['304px', '324px', '478px', null, '558px']}
+            height={['229px', '281px', '355px', null, '420px']}
+            mb={['24px', 0]}
+          >
+            <Illustration
+              alt="Keep track of all budgets Illustration"
+              src="/static/images/become-a-host/combineFunding-xs.png"
+              display={[null, 'none']}
+            />
+            <Illustration
+              alt="Keep track of all budgets Illustration"
+              src="/static/images/become-a-host/combineFunding.png"
+              display={['none', 'block']}
+            />
+          </Box>
+          <Box
+            width={['304px', '288px', '437px', null, '408px']}
+            mr={[null, '24px', '41px', null, '134px']}
+            textAlign={['center', 'left']}
+          >
+            <H2
+              fontSize={['24px', null, null, null, '30px']}
+              lineHeight={['32px', null, null, null, '40px']}
+              letterSpacing="-0.008em"
+              color="black.900"
+              display={['none', 'block']}
+              mb={3}
+            >
+              <FormattedMessage
+                id="becomeAHost.benefit.combineFunding"
+                defaultMessage="Combine {lineBreak} funding sources"
+                values={{ lineBreak: <br /> }}
+              />
+            </H2>
+            <P
+              fontSize={['16px', null, null, null, '18px']}
+              lineHeight={['24px', null, null, null, '26px']}
+              color="black.800"
+              fontWeight="500"
+            >
+              <FormattedMessage
+                id="becomeAHost.benefit.combineFunding.description"
+                defaultMessage="Collectives can seek support through diverse channels while tracking everything in one budget. Crowdfunding, credit card payments, and event ticket sales are built-in, and you can easily credit funds coming in by any other means to the right budget."
+              />
+            </P>
+          </Box>
+        </Container>
+        <Container
+          mt={['35px', '48px', '58px', null, '94px']}
+          display="flex"
+          flexDirection={['column', 'row']}
+          alignItems="center"
+          position="relative"
+        >
+          <Container
+            width={['77px', '91px', '106px', null, '136px']}
+            height={['31px', '37px', '43px', null, '55px']}
+            position="absolute"
+            left={['49px', '380px', '550px', null, '660px']}
+            bottom="0"
+          >
+            <Illustration src="/static/images/become-a-host/indepthReportBird1.png" alt="Bird illustration" />
+          </Container>
+          <Container
+            width={['78px', '93px', '108px', null, '138px']}
+            height={['38px', '47px', '53px', null, '68px']}
+            position="absolute"
+            right={['42px', 0, '98px', null, 0]}
+            bottom="0"
+          >
+            <Illustration src="/static/images/become-a-host/indepthReportBird2.png" alt="Bird illustration" />
+          </Container>
+          <Box width="304px" mb="24px" display={[null, 'none']}>
+            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
+              <FormattedMessage id="becomeAHost.benefit.inDepthReports" defaultMessage="In-depth reports" />
+            </H2>
+          </Box>
+          <Box
+            width={['304px', '324px', '478px', null, '558px']}
+            height={['229px', '281px', '355px', null, '420px']}
+            mb={['24px', 0]}
+          >
+            <Illustration
+              alt="Keep track of all budgets Illustration"
+              src="/static/images/become-a-host/InDepthReport-xs.png"
+              display={[null, 'none']}
+            />
+            <Illustration
+              alt="Keep track of all budgets Illustration"
+              src="/static/images/become-a-host/indepthReport.png"
+              display={['none', 'block']}
+            />
+          </Box>
+          <Box
+            width={['304px', '288px', '437px', null, '408px']}
+            ml={[null, '24px', '41px', null, '96px']}
+            textAlign={['center', 'left']}
+            mb={['50px', null, 0]}
+          >
+            <H2
+              fontSize={['24px', null, null, null, '30px']}
+              lineHeight={['32px', null, null, null, '40px']}
+              letterSpacing="-0.008em"
+              color="black.900"
+              display={['none', 'block']}
+              mb={3}
+            >
+              <FormattedMessage id="becomeAHost.benefit.inDepthReports" defaultMessage="In-depth reports" />
+            </H2>
+            <P
+              fontSize={['16px', null, null, null, '18px']}
+              lineHeight={['24px', null, null, null, '26px']}
+              color="black.800"
+              fontWeight="500"
+            >
+              <FormattedMessage
+                id="becomeAHost.benefit.inDepthReports.description"
+                defaultMessage="No need to spend time creating reports for funders—it’s all documented automatically and transparently as you go. In addition, you'll receive a consolidated report every month with all transactions and documentation included. 
+                Your accountant will thank you!"
               />
             </P>
           </Box>

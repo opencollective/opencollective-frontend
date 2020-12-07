@@ -86,16 +86,23 @@ const JoinUs = ({ page }) => (
             letterSpacing={['-0.6px', null, null, '-0.8px']}
             color={['black.800', null, null, 'black.900']}
           >
-            <FormattedMessage
-              id="home.joinUsSection.subtitle"
-              defaultMessage="Be part of the new generation of communities."
-            />
+            {page === 'becomeAHost' ? (
+              <FormattedMessage
+                id="becomeAHost.joinUsSection.subtitle"
+                defaultMessage="Open Collective makes fiscal sponsorship shine. Grantees and project participants will love the simplicity and accessibility, and you’ll love the huge reduction of overheads."
+              />
+            ) : (
+              <FormattedMessage
+                id="home.joinUsSection.subtitle"
+                defaultMessage="Be part of the new generation of communities."
+              />
+            )}
           </SectionSubtitle>
         </Box>
       </Box>
 
       <Container ml={[null, null, null, 3, 6]}>
-        <Link route="/create">
+        <Link route={page === 'becomeAHost' ? '/organizations/new' : '/create'}>
           <Wrapper
             color="black.900"
             className="linkWrapper"
@@ -111,7 +118,11 @@ const JoinUs = ({ page }) => (
                 mb={2}
                 fontWeight="bold"
               >
-                <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+                {page === 'becomeAHost' ? (
+                  <FormattedMessage id="becomeAHost.create" defaultMessage="Join as a Fiscal Host" />
+                ) : (
+                  <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+                )}
               </H3>
               <P fontSize="15px" color="black.700" lineHeight="23px" letterSpacing="-0.12px">
                 <FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />

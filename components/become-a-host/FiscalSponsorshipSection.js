@@ -14,16 +14,24 @@ const FiscalSponsorship = () => {
       <Box ml={[null, '6px', '40px', null, '84px']} width={['288px', '324px', '478px', null, '558px']}>
         <Illustration
           alt="Fiscal sponsorship illustration"
-          src="/static/images/home/makecommunity-section-illustration.png"
+          src="/static/images/become-a-host/fiscalSponsorship-illustration-sm.png"
+          display={[null, null, 'none']}
+        />
+        <Illustration
+          alt="Fiscal sponsorship illustration"
+          src="/static/images/become-a-host/fiscalSponsorship-illustration.png"
+          display={['none', null, 'block']}
         />
       </Box>
       <Container display="flex" flexDirection="column" alignItems={['center', 'flex-start']}>
-        <Box mt={[3, 0]} mb={[3, null, null, null, '24px']} width={[null, '306px', '438px', null, '555px']}>
+        <Box mt={[3, 0]} mb={[3, null, null, null, '24px']} width={['288px', '306px', '438px', null, '555px']}>
           <H1
             letterSpacing={['-0.008em', '-0.04em']}
             fontSize={['32px', '40px', null, null, '52px']}
             lineHeight={['40px', '48px', null, null, '56px']}
             textAlign={['center', 'left']}
+            color="black.900"
+            whiteSpace={[null, null, 'pre-line']}
           >
             <FormattedMessage
               id="becomeAHost.title"
@@ -46,7 +54,7 @@ const FiscalSponsorship = () => {
             />
           </P>
         </Box>
-        <Link route="/create">
+        <Link route="/organizations/new">
           <StyledButton minWidth={[283, 165, null, null, 183]} buttonStyle="dark" whiteSpace="nowrap">
             <FormattedMessage id="home.createHost" defaultMessage="Create a Fiscal Host" />
           </StyledButton>
