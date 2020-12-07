@@ -466,7 +466,7 @@ class EditCollectiveForm extends React.Component {
         return <HostPlan collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS:
-        return null;
+        return <Policies collective={collective} showOnlyExpensePolicy />;
 
       case EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS:
         return <InvoicesReceipts collective={collective} />;
@@ -704,12 +704,6 @@ class EditCollectiveForm extends React.Component {
           type: 'tags',
           placeholder: 'meetup, javascript',
           when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type),
-        },
-      ],
-      'expenses-payouts': [
-        {
-          name: 'expensePolicy',
-          type: 'textarea',
         },
       ],
       'fiscal-hosting': [
