@@ -24,17 +24,16 @@ import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H3 } from '../Text';
 
+// Actions
 import Archive from './actions/Archive';
 import Delete from './actions/Delete';
-// Actions
 import EmptyBalance from './actions/EmptyBalance';
-// Generic Sections
+// Sections
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
 import Conversations from './sections/Conversations';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
-// Fical Host Sections
 import FiscalHosting from './sections/FiscalHosting';
 import Host from './sections/Host';
 import HostPlan from './sections/HostPlan';
@@ -52,6 +51,7 @@ import Tiers from './sections/Tiers';
 import Updates from './sections/Updates';
 import VirtualCards from './sections/VirtualCards';
 import Webhooks from './sections/Webhooks';
+// Other Components
 import EditUserEmailForm from './EditUserEmailForm';
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 

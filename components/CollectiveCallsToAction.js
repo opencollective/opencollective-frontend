@@ -14,7 +14,8 @@ import StyledButton from './StyledButton';
 import StyledTooltip from './StyledTooltip';
 
 // Dynamic imports
-const AddFundsModal = dynamic(() => import('./AddFundsModal'));
+const AddFundsToOrganizationModal = dynamic(() => import('./AddFundsToOrganizationModal'));
+const AddFundsModal = dynamic(() => import('./host-dashboard/AddFundsModal'));
 
 /**
  * Show call to actions as buttons for the collective.
@@ -29,10 +30,12 @@ const CollectiveCallsToAction = ({
     hasApply,
     hasDashboard,
     hasManageSubscriptions,
+    addFundsToOrganization,
     addFunds,
   },
   ...props
 }) => {
+  const [hasAddFundsToOrganizationModal, showAddFundsToOrganizationModal] = React.useState(false);
   const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
   const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
   const hostWithinLimit = hostedCollectivesLimit
@@ -142,6 +145,24 @@ const CollectiveCallsToAction = ({
           )}
         </Box>
       )}
+      {addFundsToOrganization && (
+        <Fragment>
+          <StyledButton
+            buttonSize="small"
+            mx={2}
+            my={1}
+            minWidth={buttonsMinWidth}
+            onClick={() => showAddFundsToOrganizationModal(true)}
+          >
+            <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
+          </StyledButton>
+          <AddFundsToOrganizationModal
+            collective={collective}
+            show={hasAddFundsToOrganizationModal}
+            setShow={showAddFundsToOrganizationModal}
+          />
+        </Fragment>
+      )}
       {addFunds && (
         <Fragment>
           <StyledButton
@@ -153,7 +174,12 @@ const CollectiveCallsToAction = ({
           >
             <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
           </StyledButton>
-          <AddFundsModal collective={collective} show={hasAddFundsModal} setShow={showAddFundsModal} />
+          <AddFundsModal
+            show={hasAddFundsModal}
+            collective={collective}
+            host={collective}
+            onClose={() => showAddFundsModal(null)}
+          />
         </Fragment>
       )}
     </Container>
@@ -185,6 +211,8 @@ CollectiveCallsToAction.propTypes = {
     hasDashboard: PropTypes.bool,
     /** Link to edit subscriptions */
     hasManageSubscriptions: PropTypes.bool,
+    /** Link to add funds */
+    addFundsToOrganization: PropTypes.bool,
     /** Link to add funds */
     addFunds: PropTypes.bool,
   }).isRequired,

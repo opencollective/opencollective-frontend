@@ -113,7 +113,16 @@ const getVariablesFromQuery = (query, forcedStatus) => {
 const hasParams = query => {
   return Object.entries(query).some(([key, value]) => {
     return (
-      !['view', 'offset', 'limit', 'collectiveSlug', 'hostCollectiveSlug', 'paypalApprovalError'].includes(key) && value
+      ![
+        'collectiveSlug',
+        'hostCollectiveSlug',
+        'limit',
+        'offset',
+        'paypalApprovalError',
+        'section',
+        'slug',
+        'view',
+      ].includes(key) && value
     );
   });
 };
@@ -182,7 +191,7 @@ const OrdersWithData = ({ accountSlug, title, status }) => {
                       route={router.route.slice(1)}
                       params={{
                         ...mapValues(router.query, () => null),
-                        ...pick(router.query, ['collectiveSlug', 'hostCollectiveSlug', 'view']),
+                        ...pick(router.query, ['slug', 'collectiveSlug', 'hostCollectiveSlug', 'view']),
                       }}
                     >
                       {text}

@@ -5,8 +5,6 @@ import { withRouter } from 'next/router';
 import { Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { Router } from '../../server/pages';
-
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 
@@ -27,8 +25,7 @@ class CreateHostForm extends React.Component {
   constructor(props) {
     super(props);
 
-    const hostType = this.getCurrentHostType();
-    const hostId = this.getDefaultHostId(hostType);
+    const hostId = this.getDefaultHostId();
 
     this.state = { form: { hostId } };
 
@@ -71,44 +68,13 @@ class CreateHostForm extends React.Component {
   handleChange(attr, value) {
     const { form } = this.state;
 
-    if (attr === 'hostType') {
-      form['hostId'] = this.getDefaultHostId(value);
-      Router.pushRoute('editCollective', {
-        slug: this.props.collective.slug,
-        section: 'host',
-        selectedOption: 'ownHost',
-        hostType: value,
-      });
-    } else {
-      form[attr] = value;
-    }
+    form[attr] = value;
 
     this.setState({ form });
   }
 
-  getCurrentHostType() {
-    return get(this.props.router, 'query.hostType', 'individual');
-  }
-
-  getDefaultHostId(hostType) {
-    if (hostType === 'individual') {
-      return this.props.userCollective.id;
-    } else {
-      return get(this.props, 'organizations[0].id', 0);
-    }
-  }
-
-  getHostTypesOptions() {
-    return [
-      {
-        label: this.props.intl.formatMessage(this.messages['host.types.user.label']),
-        value: 'individual',
-      },
-      {
-        label: this.props.intl.formatMessage(this.messages['host.types.organization.label']),
-        value: 'organization',
-      },
-    ];
+  getDefaultHostId() {
+    return get(this.props, 'organizations[0].id', 0);
   }
 
   getOrganizationsOptions() {
@@ -128,18 +94,10 @@ class CreateHostForm extends React.Component {
   getInputFields() {
     const fields = [
       {
-        name: 'hostType',
-        type: 'select',
-        options: this.getHostTypesOptions(),
-        value: this.getCurrentHostType(),
-        focus: true,
-      },
-      {
         name: 'hostId',
         type: 'select',
         options: this.getOrganizationsOptions(),
         value: this.state.form.hostId,
-        when: () => this.getCurrentHostType() === 'organization',
       },
     ];
 
@@ -151,19 +109,16 @@ class CreateHostForm extends React.Component {
     });
   }
 
-  getHost(hostType) {
+  getHost() {
     if (this.state.host) {
       return this.state.host;
-    } else if (hostType === 'individual') {
-      return this.props.userCollective;
     } else {
       return this.props.organizations.find(c => c.id === Number(this.state.form.hostId));
     }
   }
 
   render() {
-    const hostType = this.getCurrentHostType();
-    const host = this.getHost(hostType);
+    const host = this.getHost();
 
     const connectedAccounts = host && groupBy(host.connectedAccounts, 'service');
     const stripeAccount = connectedAccounts && connectedAccounts['stripe'] && connectedAccounts['stripe'][0];
@@ -181,7 +136,7 @@ class CreateHostForm extends React.Component {
             ),
         )}
 
-        {hostType === 'organization' && !host && (
+        {!host && (
           <Fragment>
             <CreateOrganizationForm onChange={org => this.handleChange('organization', org)} />
             <Button
@@ -199,7 +154,7 @@ class CreateHostForm extends React.Component {
           <Flex justifyContent="space-between" alignItems="flex-end">
             <Box>
               <Button bsStyle="primary" type="submit" onClick={() => this.props.onSubmit(host)}>
-                <FormattedMessage id="host.link" defaultMessage="Use this host" />
+                <FormattedMessage id="host.link" defaultMessage="Yes, use this Organization as Fiscal Host" />
               </Button>
             </Box>
             {!stripeAccount && (

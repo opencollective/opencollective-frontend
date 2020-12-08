@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 
-import AcceptContributionsMyselfOrOrg from './AcceptContributionsMyselfOrOrg';
+import AcceptContributionsOurselvesOrOrg from './AcceptContributionsOurselvesOrOrg';
 import ApplyToHost from './ApplyToHost';
 import ContributionCategoryPicker from './ContributionCategoryPicker';
 import SuccessPage from './SuccessPage';
@@ -43,7 +43,7 @@ class AcceptFinancialContributions extends Component {
     if (path === 'host') {
       return <ApplyToHost collective={this.props.collective} onChange={this.handleChange} />;
     } else {
-      return <AcceptContributionsMyselfOrOrg collective={this.props.collective} />;
+      return <AcceptContributionsOurselvesOrOrg collective={this.props.collective} />;
     }
   }
 }

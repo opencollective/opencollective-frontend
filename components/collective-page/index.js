@@ -170,10 +170,12 @@ class CollectivePage extends Component {
         hasSubmitExpense: (isCollective || isFund || isEvent || isProject || (isHost && isActive)) && !isArchived,
         // Don't display Apply if you're the admin (you can go to "Edit Collective" for that)
         hasApply: canApply && !isAdmin,
-        hasDashboard: isHost && isAdmin,
+        hasDashboard: isHost && isAdmin && !isCollective,
         hasManageSubscriptions: isAdmin && !isCollective && !isFund && !isEvent && !isProject,
         // Don't display "Add Funds" if it's an Host and you're the Admin
-        addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
+        addFundsToOrganization: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
+        // Add Funds for Self Hosted Collectives
+        addFunds: isCollective && isHost,
       };
     },
   );

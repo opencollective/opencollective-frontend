@@ -124,7 +124,7 @@ class SuccessPage extends React.Component {
                   }}
                 />
               </P>
-              {path !== 'host' && (
+              {path === 'organization' && (
                 <Fragment>
                   <H2 fontSize="13px" fontWeight="bold" color="black.800">
                     <FormattedMessage
