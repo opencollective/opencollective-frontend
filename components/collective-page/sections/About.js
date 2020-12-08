@@ -35,7 +35,7 @@ const messages = defineMessages({
 });
 
 /**
- * About section category with editable description and Our Team + Connected Collectives sections
+ * About section category with editable description
  */
 const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
