@@ -196,7 +196,7 @@
     "prettier": "2.2.1",
     "raf": "^3.4.1",
     "raw-loader": "^4.0.2",
-    "react-styleguidist": "11.1.1",
+    "react-styleguidist": "11.1.5",
     "react-test-renderer": "^16.14.0",
     "shx": "^0.3.3",
     "style-loader": "^2.0.0",
