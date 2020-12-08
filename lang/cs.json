@@ -554,7 +554,7 @@
   "CreateOrder.TitleForEvent": "Order tickets for {event}",
   "createPledge.collectiveDetails": "Podrobnosti o novém kolektivu:",
   "createPledge.conditions": "At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We\n                request the project to have a least 100 stars on GitHub!",
-  "createPledge.faq.howToClaim": "You’ll need to contact <SupportLink></SupportLink> to proove that you are an admin of this project.",
+  "createPledge.faq.howToClaim": "You’ll need to contact <SupportLink></SupportLink> to prove that you are an admin of this project.",
   "createPledge.faq.howToClaimSummary": "How do I claim a pledged collective?",
   "createPledge.faq.pay": "Once that pledged collective is claimed, we will email you to fulfill your pledge.",
   "createPledge.faq.paySummary": "Kdy platím?",
