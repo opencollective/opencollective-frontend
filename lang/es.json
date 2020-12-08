@@ -554,7 +554,7 @@
   "CreateOrder.TitleForEvent": "Solicitar billetes para {event}",
   "createPledge.collectiveDetails": "Detalles del nuevo colectivo:",
   "createPledge.conditions": "Por el momento, solo puedes prometer proyectos de Código Abierto con un repositorio u organización de GitHub. ¡Nosotros\n                pedimos al proyecto que tenga al menos 100 estrellas en GitHub!",
-  "createPledge.faq.howToClaim": "Necesitarás contactar con <SupportLink></SupportLink> para probar que eres un administrador de este proyecto.",
+  "createPledge.faq.howToClaim": "You’ll need to contact <SupportLink></SupportLink> to prove that you are an admin of this project.",
   "createPledge.faq.howToClaimSummary": "¿Cómo puedo reclamar una garantía colectiva?",
   "createPledge.faq.pay": "Una vez se haya aprobado la demanda, le enviaremos un correo electrónico para confirmarla.",
   "createPledge.faq.paySummary": "¿Cuando pago?",
