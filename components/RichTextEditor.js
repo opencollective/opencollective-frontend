@@ -251,6 +251,15 @@ export default class RichTextEditor extends React.Component {
       this.editorRef.current.addEventListener('trix-attachment-add', this.handleUpload);
       this.editorRef.current.addEventListener('trix-file-accept', this.handleFileAccept);
 
+      // We must listen when the user presses the 'Enter' key and when the user clicks the 'Link' button as well
+      const _this = this;
+      document.querySelector("[data-trix-input][name='href']").addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          _this.handleLink();
+        }
+      });
+      document.querySelector("[data-trix-method='setAttribute']").addEventListener('click', this.handleLink);
+
       // Component ready!
       this.isReady = true;
     }
@@ -295,6 +304,16 @@ export default class RichTextEditor extends React.Component {
     const onFailure = () => this.setState({ error: 'File upload failed' });
     uploadImageWithXHR(attachment.file, { onProgress, onSuccess, onFailure });
     return e;
+  };
+
+  handleLink = () => {
+    const urlInput = document.querySelector("[data-trix-input][name='href']");
+    const urlInputValue = urlInput.value;
+
+    // Automatically add 'https://' to the url
+    if (!urlInputValue.startsWith('http')) {
+      urlInput.value = `https://${urlInputValue}`;
+    }
   };
 
   /** Automatically create anchors with hrefs for links */
