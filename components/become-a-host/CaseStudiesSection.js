@@ -11,7 +11,10 @@ import StyledLink from '../StyledLink';
 import { H2, P } from '../Text';
 
 const CollectiveNameLink = styled(StyledLink)`
-  text-decoration: underline !important;
+  &:hover {
+    text-decoration: underline !important;
+    color: #313233;
+  }
 `;
 
 const messages = defineMessages({
@@ -161,7 +164,13 @@ const CaseStudies = () => {
       px="16px"
       my={[4, null, null, null, '118px']}
     >
-      <H2 fontSize={['24px']} lineHeight={['32px']} color="black.800" letterSpacing="-0.008em" mb={[4, 3]}>
+      <H2
+        fontSize={['28px', '32px', null, null, '40px']}
+        lineHeight={['36px', '40px', null, null, '48px']}
+        color="black.800"
+        letterSpacing="-0.008em"
+        mb={[4, 3]}
+      >
         <FormattedMessage id="becomeAHost.caseStudies" defaultMessage="Case studies" />
       </H2>
 

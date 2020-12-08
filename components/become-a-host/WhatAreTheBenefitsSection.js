@@ -17,8 +17,8 @@ const WhatAreTheBenefits = () => {
       <Container display="flex" flexDirection="column" alignItems="center" mx={3}>
         <Box mb={[2, 3]} width={['288px', 1]}>
           <H2
-            fontSize={['24px', '32px', null, null, '40px']}
-            lineHeight={['32px', '40px', null, null, '48px']}
+            fontSize={['28px', '32px', null, null, '40px']}
+            lineHeight={['36px', '40px', null, null, '48px']}
             letterSpacing={['-0.008em', null, null, '-0.04em']}
             color={['black.900', null, null, null, 'black.800']}
             textAlign="center"
