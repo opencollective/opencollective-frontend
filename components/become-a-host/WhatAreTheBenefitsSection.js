@@ -1,10 +1,15 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
 import { H2, H3, P } from '../Text';
+
+const ScreenShotWrapper = styled(Illustration)`
+  max-height: none;
+`;
 
 const WhatAreTheBenefits = () => {
   return (
@@ -181,22 +186,22 @@ const WhatAreTheBenefits = () => {
             maxWidth={['304px', '324px', '478px', null, '558px']}
             maxHeight={['229px', '281px', '355px', null, '420px']}
           >
-            <Illustration
+            <ScreenShotWrapper
               alt="Keep track of all budgets Illustration"
               src="/static/images/become-a-host/keepTrackOfBudget-xs.png"
               display={[null, 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="Keep track of all budgets Illustration"
               src="/static/images/become-a-host/keepTrackOfBudget-sm.png"
               display={['none', 'block', 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="Keep track of all budgets Illustration"
               src="/static/images/become-a-host/keepTrackOfBudget-md.png"
               display={['none', null, 'block', null, 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="Keep track of all budgets Illustration"
               src="/static/images/become-a-host/keepTrackOfBudget-lg.png"
               display={['none', null, null, null, 'block']}
@@ -265,22 +270,22 @@ const WhatAreTheBenefits = () => {
             maxWidth={['304px', '324px', '478px', null, '558px']}
             maxHeight={['229px', '281px', '355px', null, '420px']}
           >
-            <Illustration
+            <ScreenShotWrapper
               alt="Easy expense management Illustration"
               src="/static/images/become-a-host/easyExpense-xs.png"
               display={[null, 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="Easy expense management Illustration"
               src="/static/images/become-a-host/easyExpense-sm.png"
               display={['none', 'block', 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="Easy expense management Illustration"
               src="/static/images/become-a-host/easyExpense-md.png"
               display={['none', null, 'block', null, 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="Easy expense management Illustration"
               src="/static/images/become-a-host/easyExpense-lg.png"
               display={['none', null, null, null, 'block']}
@@ -350,22 +355,22 @@ const WhatAreTheBenefits = () => {
             maxWidth={['304px', '324px', '478px', null, '558px']}
             maxHeight={['229px', '281px', '355px', null, '420px']}
           >
-            <Illustration
+            <ScreenShotWrapper
               alt="Combine Funding sources Illustration"
               src="/static/images/become-a-host/combineFunding-xs.png"
               display={[null, 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="Combine Funding sources Illustration"
               src="/static/images/become-a-host/combineFunding-sm.png"
               display={['none', 'block', 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="Combine Funding sources Illustration"
               src="/static/images/become-a-host/combineFunding-md.png"
               display={['none', null, 'block', null, 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="Combine Funding sources Illustration"
               src="/static/images/become-a-host/combineFunding-lg.png"
               display={['none', null, null, null, 'block']}
@@ -439,22 +444,22 @@ const WhatAreTheBenefits = () => {
             maxWidth={['304px', '324px', '478px', null, '558px']}
             maxHeight={['229px', '281px', '355px', null, '420px']}
           >
-            <Illustration
+            <ScreenShotWrapper
               alt="In-depth Reports Illustration"
               src="/static/images/become-a-host/indepth-report-xs.png"
               display={[null, 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="In-depth Reports Illustration"
               src="/static/images/become-a-host/indepth-report-sm.png"
               display={['none', 'block', 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="In-depth Reports Illustration"
               src="/static/images/become-a-host/indepth-report-md.png"
               display={['none', null, 'block', null, 'none']}
             />
-            <Illustration
+            <ScreenShotWrapper
               alt="In-depth Reports Illustration"
               src="/static/images/become-a-host/indepth-report-lg.png"
               display={['none', null, null, null, 'block']}
