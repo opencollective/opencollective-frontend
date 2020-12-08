@@ -176,9 +176,10 @@ const WhatAreTheBenefits = () => {
             </H2>
           </Box>
           <Box
-            width={['304px', '324px', '478px', null, '558px']}
-            height={['229px', '281px', '355px', null, '420px']}
             mb={['24px', 0]}
+            overflow="auto"
+            maxWidth={['304px', '324px', '478px', null, '558px']}
+            maxHeight={['229px', '281px', '355px', null, '420px']}
           >
             <Illustration
               alt="Keep track of all budgets Illustration"
@@ -187,8 +188,18 @@ const WhatAreTheBenefits = () => {
             />
             <Illustration
               alt="Keep track of all budgets Illustration"
-              src="/static/images/become-a-host/keepTrackOfBudget.png"
-              display={['none', 'block']}
+              src="/static/images/become-a-host/keepTrackOfBudget-sm.png"
+              display={['none', 'block', 'none']}
+            />
+            <Illustration
+              alt="Keep track of all budgets Illustration"
+              src="/static/images/become-a-host/keepTrackOfBudget-md.png"
+              display={['none', null, 'block', null, 'none']}
+            />
+            <Illustration
+              alt="Keep track of all budgets Illustration"
+              src="/static/images/become-a-host/keepTrackOfBudget-lg.png"
+              display={['none', null, null, null, 'block']}
             />
           </Box>
           <Box
@@ -249,19 +260,30 @@ const WhatAreTheBenefits = () => {
             </H2>
           </Box>
           <Box
-            width={['304px', '324px', '478px', null, '558px']}
-            height={['229px', '281px', '355px', null, '420px']}
             mb={['24px', 0]}
+            overflow="auto"
+            maxWidth={['304px', '324px', '478px', null, '558px']}
+            maxHeight={['229px', '281px', '355px', null, '420px']}
           >
             <Illustration
-              alt="Keep track of all budgets Illustration"
+              alt="Easy expense management Illustration"
               src="/static/images/become-a-host/easyExpense-xs.png"
               display={[null, 'none']}
             />
             <Illustration
-              alt="Keep track of all budgets Illustration"
-              src="/static/images/become-a-host/easyExpense.png"
-              display={['none', 'block']}
+              alt="Easy expense management Illustration"
+              src="/static/images/become-a-host/easyExpense-sm.png"
+              display={['none', 'block', 'none']}
+            />
+            <Illustration
+              alt="Easy expense management Illustration"
+              src="/static/images/become-a-host/easyExpense-md.png"
+              display={['none', null, 'block', null, 'none']}
+            />
+            <Illustration
+              alt="Easy expense management Illustration"
+              src="/static/images/become-a-host/easyExpense-lg.png"
+              display={['none', null, null, null, 'block']}
             />
           </Box>
           <Box
@@ -323,19 +345,30 @@ const WhatAreTheBenefits = () => {
             </H2>
           </Box>
           <Box
-            width={['304px', '324px', '478px', null, '558px']}
-            height={['229px', '281px', '355px', null, '420px']}
             mb={['24px', 0]}
+            overflow="auto"
+            maxWidth={['304px', '324px', '478px', null, '558px']}
+            maxHeight={['229px', '281px', '355px', null, '420px']}
           >
             <Illustration
-              alt="Keep track of all budgets Illustration"
+              alt="Combine Funding sources Illustration"
               src="/static/images/become-a-host/combineFunding-xs.png"
               display={[null, 'none']}
             />
             <Illustration
-              alt="Keep track of all budgets Illustration"
-              src="/static/images/become-a-host/combineFunding.png"
-              display={['none', 'block']}
+              alt="Combine Funding sources Illustration"
+              src="/static/images/become-a-host/combineFunding-sm.png"
+              display={['none', 'block', 'none']}
+            />
+            <Illustration
+              alt="Combine Funding sources Illustration"
+              src="/static/images/become-a-host/combineFunding-md.png"
+              display={['none', null, 'block', null, 'none']}
+            />
+            <Illustration
+              alt="Combine Funding sources Illustration"
+              src="/static/images/become-a-host/combineFunding-lg.png"
+              display={['none', null, null, null, 'block']}
             />
           </Box>
           <Box
@@ -401,19 +434,30 @@ const WhatAreTheBenefits = () => {
             </H2>
           </Box>
           <Box
-            width={['304px', '324px', '478px', null, '558px']}
-            height={['229px', '281px', '355px', null, '420px']}
             mb={['24px', 0]}
+            overflow="auto"
+            maxWidth={['304px', '324px', '478px', null, '558px']}
+            maxHeight={['229px', '281px', '355px', null, '420px']}
           >
             <Illustration
-              alt="Keep track of all budgets Illustration"
-              src="/static/images/become-a-host/InDepthReport-xs.png"
+              alt="In-depth Reports Illustration"
+              src="/static/images/become-a-host/indepth-report-xs.png"
               display={[null, 'none']}
             />
             <Illustration
-              alt="Keep track of all budgets Illustration"
-              src="/static/images/become-a-host/indepthReport.png"
-              display={['none', 'block']}
+              alt="In-depth Reports Illustration"
+              src="/static/images/become-a-host/indepth-report-sm.png"
+              display={['none', 'block', 'none']}
+            />
+            <Illustration
+              alt="In-depth Reports Illustration"
+              src="/static/images/become-a-host/indepth-report-md.png"
+              display={['none', null, 'block', null, 'none']}
+            />
+            <Illustration
+              alt="In-depth Reports Illustration"
+              src="/static/images/become-a-host/indepth-report-lg.png"
+              display={['none', null, null, null, 'block']}
             />
           </Box>
           <Box
