@@ -652,7 +652,7 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.howToClaim"
-                  defaultMessage="You’ll need to contact <SupportLink></SupportLink> to proove that you are an admin of this project."
+                  defaultMessage="You’ll need to contact <SupportLink></SupportLink> to prove that you are an admin of this project."
                   values={I18nFormatters}
                 />
               </Details>
