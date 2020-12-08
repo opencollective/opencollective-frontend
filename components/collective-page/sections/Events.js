@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { partition } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -69,74 +69,77 @@ class SectionEvents extends React.PureComponent {
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
 
     return (
-      <ContainerSectionContent pt={5}>
-        <SectionHeader
-          title={Sections.EVENTS}
-          subtitle={<FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />}
-          info={
-            <FormattedMessage
-              id="section.events.info"
-              defaultMessage="Find out where your community is gathering next."
-            />
-          }
-          illustrationSrc={eventsSectionHeaderIcon}
-        />
-        <ContainerSectionContent>
-          <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-            {(ref, Chevrons) => (
-              <div>
-                <ContainerSectionContent>
-                  <Flex justifyContent="flex-end" alignItems="center" mb={3}>
-                    <Box m={2} flex="0 0 50px">
-                      <Chevrons />
-                    </Box>
-                  </Flex>
-                </ContainerSectionContent>
-
-                <ContributeCardsContainer ref={ref}>
-                  {isAdmin && (
-                    <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
-                      <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
-                        <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
-                      </CreateNew>
-                    </Box>
-                  )}
-                  {upcomingEvents.map(event => (
-                    <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeEvent
-                        collective={collective}
-                        event={event}
-                        hideContributors={hasNoContributorForEvents}
-                        disableCTA={!collective.isActive || !event.isActive}
-                      />
-                    </Box>
-                  ))}
-                  {connectedCollectives.map(({ id, collective }) => (
-                    <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeCollective collective={collective} />
-                    </Box>
-                  ))}
-                  {pastEvents.map(event => (
-                    <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeEvent
-                        collective={collective}
-                        event={event}
-                        hideContributors={hasNoContributorForEvents}
-                        disableCTA={!collective.isActive || !event.isActive}
-                      />
-                    </Box>
-                  ))}
-                </ContributeCardsContainer>
-              </div>
-            )}
-          </HorizontalScroller>
+      <Fragment>
+        <ContainerSectionContent pt={5}>
+          <SectionHeader
+            title={Sections.EVENTS}
+            subtitle={<FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />}
+            info={
+              <FormattedMessage
+                id="section.events.info"
+                defaultMessage="Find out where your community is gathering next."
+              />
+            }
+            illustrationSrc={eventsSectionHeaderIcon}
+          />
         </ContainerSectionContent>
-        <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-          <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
-            <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
-          </StyledButton>
-        </Link>
-      </ContainerSectionContent>
+
+        <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
+          {(ref, Chevrons) => (
+            <div>
+              <ContainerSectionContent>
+                <Flex justifyContent="flex-end" alignItems="center" mb={3}>
+                  <Box m={2} flex="0 0 50px">
+                    <Chevrons />
+                  </Box>
+                </Flex>
+              </ContainerSectionContent>
+
+              <ContributeCardsContainer ref={ref}>
+                {isAdmin && (
+                  <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
+                    <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
+                      <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+                    </CreateNew>
+                  </Box>
+                )}
+                {upcomingEvents.map(event => (
+                  <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                    <ContributeEvent
+                      collective={collective}
+                      event={event}
+                      hideContributors={hasNoContributorForEvents}
+                      disableCTA={!collective.isActive || !event.isActive}
+                    />
+                  </Box>
+                ))}
+                {connectedCollectives.map(({ id, collective }) => (
+                  <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
+                    <ContributeCollective collective={collective} />
+                  </Box>
+                ))}
+                {pastEvents.map(event => (
+                  <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                    <ContributeEvent
+                      collective={collective}
+                      event={event}
+                      hideContributors={hasNoContributorForEvents}
+                      disableCTA={!collective.isActive || !event.isActive}
+                    />
+                  </Box>
+                ))}
+              </ContributeCardsContainer>
+            </div>
+          )}
+        </HorizontalScroller>
+        <ContainerSectionContent>
+          <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+            <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
+              <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
+            </StyledButton>
+          </Link>
+        </ContainerSectionContent>
+      </Fragment>
     );
   }
 }

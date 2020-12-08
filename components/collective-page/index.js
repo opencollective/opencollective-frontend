@@ -17,6 +17,7 @@ import Hero from './hero/Hero';
 import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
 import SectionConnect from './sections/Connect';
+import SectionConnectedCollectives from './sections/ConnectedCollectives';
 import SectionContribute from './sections/Contribute';
 import SectionContributions from './sections/Contributions';
 import SectionContributors from './sections/Contributors';
@@ -25,6 +26,7 @@ import SectionEmpty from './sections/Empty';
 import SectionEvents from './sections/Events';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
+import SectionOurTeam from './sections/OurTeam';
 import SectionProjects from './sections/Projects';
 import SectionRecurringContributions from './sections/RecurringContributions';
 import SectionParticipants from './sections/SponsorsAndParticipants';
@@ -182,9 +184,6 @@ class CollectivePage extends Component {
 
   renderSection(section) {
     switch (section) {
-      // v2 transition - these standalone sections will be removed from render if feature flag is active
-      case Sections.GOALS:
-        return <SectionGoals collective={this.props.collective} />;
       case Sections.UPDATES:
         return (
           <SectionUpdates
@@ -224,17 +223,10 @@ class CollectivePage extends Component {
             contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
             isAdmin={this.props.isAdmin}
-            section={section}
           />
         );
       case Sections.CONTRIBUTIONS:
-        return (
-          <SectionContributions
-            collective={this.props.collective}
-            LoggedInUser={this.props.LoggedInUser}
-            section={section}
-          />
-        );
+        return <SectionContributions collective={this.props.collective} LoggedInUser={this.props.LoggedInUser} />;
       case Sections.EVENTS:
         return (
           <SectionEvents
@@ -242,7 +234,6 @@ class CollectivePage extends Component {
             events={this.props.events}
             connectedCollectives={this.props.connectedCollectives}
             isAdmin={this.props.isAdmin}
-            section={section}
           />
         );
       case Sections.PROJECTS:
@@ -260,8 +251,6 @@ class CollectivePage extends Component {
             transactions={this.props.transactions}
             expenses={this.props.expenses}
             stats={this.props.stats}
-            section={section}
-            financialContributors={this.props.financialContributors}
           />
         );
       case Sections.TRANSACTIONS:
@@ -270,7 +259,6 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             isAdmin={this.props.isAdmin}
             isRoot={this.props.isRoot}
-            section={section}
           />
         );
       case Sections.CONTRIBUTORS:
@@ -297,11 +285,22 @@ class CollectivePage extends Component {
             conversations={this.props.conversations}
             isAdmin={this.props.isAdmin}
             isLoggedIn={Boolean(this.props.LoggedInUser)}
-            section={section}
           />
         );
       case Sections.ABOUT:
-        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} section={section} />;
+        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} />;
+      case Sections.GOALS:
+        return <SectionGoals collective={this.props.collective} />;
+      case Sections.OUR_TEAM:
+        return (
+          <SectionOurTeam
+            collective={this.props.collective}
+            coreContributors={this.props.coreContributors}
+            LoggedInUser={this.props.LoggedInUser}
+          />
+        );
+      case Sections.CONNECTED_COLLECTIVES:
+        return <SectionConnectedCollectives connectedCollectives={this.props.connectedCollectives} />;
       default:
         return null;
     }

@@ -5,6 +5,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 
+import { Sections } from '../_constants';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import HTMLContent, { isEmptyValue } from '../../HTMLContent';
@@ -13,8 +14,11 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
+import ContainerSectionContent from '../ContainerSectionContent';
 import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
-import SectionTitle from '../SectionTitle';
+import SectionHeader from '../SectionHeader';
+
+import aboutSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconAbout.png';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -31,7 +35,7 @@ const messages = defineMessages({
 });
 
 /**
- * Display the inline editable description section for the collective
+ * About section category with editable description
  */
 const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
@@ -40,20 +44,10 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
-    <Container
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      px={2}
-      py={[4, 5]}
-      background="#f5f7fa"
-      boxShadow="0px 11px 15px -5px #bfbfbf2b inset"
-    >
-      <SectionTitle textAlign="center" mb={5}>
-        <FormattedMessage id="collective.about.title" defaultMessage="About" />
-      </SectionTitle>
+    <ContainerSectionContent px={2} py={[4, 5]}>
+      <SectionHeader title={Sections.ABOUT} illustrationSrc={aboutSectionHeaderIcon} />
 
-      <Container width="100%" maxWidth={700} margin="0 auto">
+      <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
         <InlineEditField
           mutation={editCollectiveLongDescriptionMutation}
           values={collective}
@@ -114,7 +108,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           }}
         </InlineEditField>
       </Container>
-    </Container>
+    </ContainerSectionContent>
   );
 };
 
@@ -127,6 +121,7 @@ SectionAbout.propTypes = {
     type: PropTypes.string,
     isArchived: PropTypes.bool,
     settings: PropTypes.object,
+    currency: PropTypes.string,
   }).isRequired,
 
   /** Can user edit the description? */

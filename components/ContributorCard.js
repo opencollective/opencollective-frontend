@@ -100,7 +100,17 @@ const ContributorTag = styled(StyledTag)`
  * A single contributor card, exported as a PureComponent to improve performances.
  * Accept all the props from [StyledCard](/#/Atoms?id=styledcard).
  */
-const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedUser, collectiveId, ...props }) => {
+const ContributorCard = ({
+  intl,
+  width,
+  height,
+  contributor,
+  currency,
+  isLoggedUser,
+  collectiveId,
+  hideTotalAmountDonated,
+  ...props
+}) => {
   const { collectiveId: fromCollectiveId, publicMessage, description } = contributor;
   const truncatedPublicMessage = publicMessage && truncate(publicMessage, { length: 140 });
   const truncatedDescription = description && truncate(description, { length: 140 });
@@ -122,7 +132,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
           </H5>
         </LinkContributor>
         <ContributorTag>{formatMemberRole(intl, getMainContributorRole(contributor))}</ContributorTag>
-        {contributor.totalAmountDonated > 0 && (
+        {contributor.totalAmountDonated > 0 && !hideTotalAmountDonated && (
           <React.Fragment>
             <P fontSize="10px" lineHeight="18px" color="black.500">
               <FormattedMessage id="ContributorCard.Total" defaultMessage="Total contributions" />
@@ -193,12 +203,15 @@ ContributorCard.propTypes = {
   isLoggedUser: PropTypes.bool,
   /** Collective id */
   collectiveId: PropTypes.number,
+  /** True if you want to hide the total amount donated */
+  hideTotalAmountDonated: PropTypes.bool,
 };
 
 ContributorCard.defaultProps = {
   width: 144,
   height: 272,
   currency: 'USD',
+  hideTotalAmountDonated: false,
 };
 
 export default React.memo(injectIntl(ContributorCard));

@@ -14,6 +14,8 @@ export const AnimationsDurations = {
 };
 
 export const Sections = {
+  CONNECTED_COLLECTIVES: 'connected-collectives',
+  OUR_TEAM: 'our-team',
   GOALS: 'goals',
   UPDATES: 'updates',
   CONVERSATIONS: 'conversations',
@@ -37,7 +39,7 @@ export const Sections = {
   ABOUT: 'about',
   // EMPTY for new collectives/no data in any category sections
   EMPTY: 'empty',
-  // @deprecated will be removed as they are now considered as "navbar categories"
+  // @deprecated will be removed as they are now considered as "navbar section categories"
   CONNECT: 'connect',
 };
 
