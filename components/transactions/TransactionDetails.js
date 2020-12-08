@@ -151,6 +151,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                     background="transparent"
                     textTransform="capitalize"
                     ml={2}
+                    px="unset"
                   >
                     {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
                     {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
