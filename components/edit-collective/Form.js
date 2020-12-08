@@ -28,13 +28,12 @@ import { H3 } from '../Text';
 import Archive from './actions/Archive';
 import Delete from './actions/Delete';
 import EmptyBalance from './actions/EmptyBalance';
-// Generic Sections
+// Sections
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
 import Conversations from './sections/Conversations';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
-// Fical Host Sections
 import FiscalHosting from './sections/FiscalHosting';
 import Host from './sections/Host';
 import HostPlan from './sections/HostPlan';

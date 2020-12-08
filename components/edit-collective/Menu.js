@@ -247,7 +247,7 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
   return (
     <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
       {displayedSectionsInfos.map(renderMenuItem)}
-      {['USER', 'ORGANIZATION'].includes(collective.type) && (
+      {(collective.type === ORGANIZATION || (collective.type === USER && collective.isHost)) && (
         <Fragment>
           <MenuDivider />
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING))}
