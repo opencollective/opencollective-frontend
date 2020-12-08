@@ -554,7 +554,7 @@
   "CreateOrder.TitleForEvent": "Commander des tickets pour {event}",
   "createPledge.collectiveDetails": "Détails du nouveau collectif :",
   "createPledge.conditions": "Vous ne pouvez pour l'instant faire de promesse de dons qu'aux projets qui disposent d'un dépôt ou d'un profil d'organisation sur GitHub. Le projet doit avoir au moins 100 étoiles !",
-  "createPledge.faq.howToClaim": "Vous devrez contacter <SupportLink></SupportLink> pour prouver que vous êtes un administrateur de ce projet.",
+  "createPledge.faq.howToClaim": "You’ll need to contact <SupportLink></SupportLink> to prove that you are an admin of this project.",
   "createPledge.faq.howToClaimSummary": "Comment revendiquer un collectif ?",
   "createPledge.faq.pay": "Une fois le collectif revendiqué, vous recevrez un email vous demandant de compléter votre promesse de don.",
   "createPledge.faq.paySummary": "Quand dois-je payer ?",
