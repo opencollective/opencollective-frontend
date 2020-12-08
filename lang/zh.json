@@ -554,7 +554,7 @@
   "CreateOrder.TitleForEvent": "Order tickets for {event}",
   "createPledge.collectiveDetails": "新集体的细节：",
   "createPledge.conditions": "目前, 您只能使用 GitHub 存储库或组织为开源项目认捐。我们要求至少有一个Github储存库有100星!",
-  "createPledge.faq.howToClaim": "You’ll need to contact <SupportLink></SupportLink> to proove that you are an admin of this project.",
+  "createPledge.faq.howToClaim": "You’ll need to contact <SupportLink></SupportLink> to prove that you are an admin of this project.",
   "createPledge.faq.howToClaimSummary": "How do I claim a pledged collective?",
   "createPledge.faq.pay": "Once that pledged collective is claimed, we will email you to fulfill your pledge.",
   "createPledge.faq.paySummary": "When do I pay?",
