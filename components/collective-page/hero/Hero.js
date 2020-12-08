@@ -107,7 +107,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         </MessageBox>
       )}
       <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
-        {isEditing ? (
+        {isEditingCover ? (
           <HeroBackgroundEdit collective={collective} onEditCancel={() => editCover(false)} />
         ) : (
           <HeroBackground collective={collective} />
