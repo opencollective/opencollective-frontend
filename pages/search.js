@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
+import { isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import colors from '../lib/constants/colors';
+import { parseToBoolean } from '../lib/utils';
 import { Link, Router } from '../server/pages';
 
 import Button from '../components/Button';
@@ -81,7 +83,7 @@ class SearchPage extends React.Component {
     return {
       term: query.q || '',
       types: query.types,
-      isHost: Boolean(query.isHost),
+      isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
