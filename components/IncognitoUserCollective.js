@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { IncognitoAvatar } from './Avatar';
-import Body from './Body';
+import Container from './Container';
 import Footer from './Footer';
 import { Flex } from './Grid';
 import Header from './Header';
@@ -40,14 +40,14 @@ class IncognitoUserCollective extends React.Component {
           noRobots
         />
 
-        <Body>
+        <Container fontSize="1.6rem">
           <Flex justifyContent="center" alignItems="center" flexDirection="column" my={4}>
             <IncognitoAvatar />
             <H1 fontSize="2rem">{intl.formatMessage(this.messages['incognito.title'])}</H1>
             <p>{intl.formatMessage(this.messages['incognito.description'])}</p>
             <p>¯\_(ツ)_/¯</p>
           </Flex>
-        </Body>
+        </Container>
         <Footer />
       </div>
     );
