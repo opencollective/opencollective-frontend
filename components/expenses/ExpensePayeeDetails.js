@@ -135,7 +135,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
       {host && (
         <PrivateInfoColumn data-cy="expense-summary-host" borderless={borderless}>
           <PrivateInfoColumnHeader>
-            <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
+            <FormattedMessage id="expense.PayFromFiscalhost" defaultMessage="Pay from Fiscal Host" />
           </PrivateInfoColumnHeader>
           <LinkCollective collective={host}>
             <Flex alignItems="center">
