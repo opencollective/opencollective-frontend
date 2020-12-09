@@ -9,7 +9,7 @@ import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import { Router } from '../server/pages';
 
 import Body from './Body';
-import CollectiveNavbar from './CollectiveNavbar';
+import CollectiveNavbar from './collective-navbar';
 import Container from './Container';
 import EditEventForm from './EditEventForm';
 import Footer from './Footer';

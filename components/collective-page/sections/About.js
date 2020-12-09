@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { hasNewNavBar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 
 import { Sections } from '../_constants';
@@ -45,7 +46,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
 
   return (
     <ContainerSectionContent px={2} py={[4, 5]}>
-      <SectionHeader title={Sections.ABOUT} illustrationSrc={aboutSectionHeaderIcon} />
+      {!hasNewNavBar(collective) && <SectionHeader title={Sections.ABOUT} illustrationSrc={aboutSectionHeaderIcon} />}
 
       <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
         <InlineEditField

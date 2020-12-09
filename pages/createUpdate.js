@@ -12,7 +12,7 @@ import { Router } from '../server/pages';
 
 import Body from '../components/Body';
 import Button from '../components/Button';
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
 import EditUpdateForm from '../components/EditUpdateForm';
 import ErrorPage from '../components/ErrorPage';

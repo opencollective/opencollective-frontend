@@ -152,21 +152,23 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             <HeroAvatar collective={collective} isAdmin={isAdmin} handleHeroMessage={handleHeroMessage} />
           </Container>
           {isAdmin && (
-            <Link
-              route={isEvent ? 'editEvent' : 'editCollective'}
-              params={
-                isEvent
-                  ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
-                  : { slug: collective.slug }
-              }
-            >
-              <StyledButton buttonSize="tiny" minWidth={96} my={3} data-cy="edit-collective-btn">
-                <Settings size={14} />
-                <Span ml={1} css={{ verticalAlign: 'middle' }}>
-                  <FormattedMessage id="Settings" defaultMessage="Settings" />
-                </Span>
-              </StyledButton>
-            </Link>
+            <Box>
+              <Link
+                route={isEvent ? 'editEvent' : 'editCollective'}
+                params={
+                  isEvent
+                    ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
+                    : { slug: collective.slug }
+                }
+              >
+                <StyledButton buttonSize="tiny" minWidth={96} my={3} data-cy="edit-collective-btn" tabIndex="-1">
+                  <Settings size={14} />
+                  <Span ml={1} css={{ verticalAlign: 'middle' }}>
+                    <FormattedMessage id="Settings" defaultMessage="Settings" />
+                  </Span>
+                </StyledButton>
+              </Link>
+            </Box>
           )}
           <Box maxWidth={['70%', '60%', null, '40%', '45%']}>
             <H1

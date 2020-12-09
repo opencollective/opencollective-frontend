@@ -1,5 +1,7 @@
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
+import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+
 export const recurringContributionsQuery = gqlV2/* GraphQL */ `
   query RecurringContributions($slug: String) {
     account(slug: $slug) {
@@ -9,6 +11,9 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
       type
       settings
       imageUrl
+      features {
+        ...NavbarFields
+      }
       orders(filter: OUTGOING, onlySubscriptions: true) {
         totalCount
         nodes {
@@ -50,4 +55,5 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
       }
     }
   }
+  ${collectiveNavbarFieldsFragment}
 `;

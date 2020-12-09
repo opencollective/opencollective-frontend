@@ -6,9 +6,11 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+
 import Body from '../components/Body';
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
@@ -82,7 +84,11 @@ class TiersPage extends React.Component {
           ) : (
             <CollectiveThemeProvider collective={data.Collective}>
               <Container pb={3}>
-                <CollectiveNavbar collective={collective} selected={Sections.CONTRIBUTE} />
+                <CollectiveNavbar
+                  collective={collective}
+                  selected={Sections.CONTRIBUTE}
+                  selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE}
+                />
                 <Container maxWidth={1260} my={5} px={[15, 30]} mx="auto">
                   <H2 fontWeight="normal" my={4}>
                     <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />

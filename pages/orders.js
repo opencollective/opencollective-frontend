@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { ORDER_STATUS } from '../lib/constants/order-status';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
 import { Box } from '../components/Grid';
 import OrdersWithData from '../components/orders/OrdersWithData';

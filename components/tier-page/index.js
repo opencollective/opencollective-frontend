@@ -6,12 +6,13 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { isTierExpired } from '../../lib/tier-utils';
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
 
+import CollectiveNavbar from '../collective-navbar';
 import { Sections } from '../collective-page/_constants';
-import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -169,7 +170,12 @@ class TierPage extends Component {
       <Container pb={4}>
         {/** ---- Hero / Banner ---- */}
         <Container position="sticky" top={0} zIndex={999}>
-          <CollectiveNavbar collective={collective} selected={Sections.CONTRIBUTE} isAdmin={canEdit} />
+          <CollectiveNavbar
+            collective={collective}
+            selected={Sections.CONTRIBUTE}
+            selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE}
+            isAdmin={canEdit}
+          />
         </Container>
         <Container position="relative">
           <Container position="absolute" width={1} zIndex={-1} overflow="hidden">

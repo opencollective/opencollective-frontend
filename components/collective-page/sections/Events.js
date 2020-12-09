@@ -4,6 +4,7 @@ import { partition } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { hasNewNavBar } from '../../../lib/collective-sections';
 import { isPastEvent } from '../../../lib/events';
 
 import { Sections } from '../_constants';
@@ -70,19 +71,21 @@ class SectionEvents extends React.PureComponent {
 
     return (
       <Fragment>
-        <ContainerSectionContent pt={5}>
-          <SectionHeader
-            title={Sections.EVENTS}
-            subtitle={<FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />}
-            info={
-              <FormattedMessage
-                id="section.events.info"
-                defaultMessage="Find out where your community is gathering next."
-              />
-            }
-            illustrationSrc={eventsSectionHeaderIcon}
-          />
-        </ContainerSectionContent>
+        {!hasNewNavBar(collective) && (
+          <ContainerSectionContent pt={5}>
+            <SectionHeader
+              title={Sections.EVENTS}
+              subtitle={<FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />}
+              info={
+                <FormattedMessage
+                  id="section.events.info"
+                  defaultMessage="Find out where your community is gathering next."
+                />
+              }
+              illustrationSrc={eventsSectionHeaderIcon}
+            />
+          </ContainerSectionContent>
+        )}
 
         <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
           {(ref, Chevrons) => (

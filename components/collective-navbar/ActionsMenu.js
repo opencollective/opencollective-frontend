@@ -11,19 +11,19 @@ import { get, some, truncate, uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../lib/constants/collectives';
+import { CollectiveType } from '../../lib/constants/collectives';
 
-import { applyToHostMutation } from './ApplyToHostBtnLoggedIn';
-import Container from './Container';
-import { Box } from './Grid';
-import Link from './Link';
-import Loading from './Loading';
-import MenuPopover from './MenuPopover';
-import StyledButton from './StyledButton';
-import StyledLink from './StyledLink';
-import StyledTooltip from './StyledTooltip';
-import { P, Span } from './Text';
-import { withUser } from './UserProvider';
+import { applyToHostMutation } from '../ApplyToHostBtnLoggedIn';
+import Container from '../Container';
+import { Box } from '../Grid';
+import Link from '../Link';
+import Loading from '../Loading';
+import StyledButton from '../StyledButton';
+import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
+import StyledLink from '../StyledLink';
+import StyledTooltip from '../StyledTooltip';
+import { P, Span } from '../Text';
+import { withUser } from '../UserProvider';
 
 //  Styled components
 
@@ -102,9 +102,26 @@ const CollectiveNavbarActionsMenu = ({
   return (
     <Container display="flex" alignItems="center" order={[-1, 0]}>
       <Box px={1}>
-        <MenuPopover
-          place="bottom-end"
-          content={() => (
+        <Dropdown trigger="click">
+          <StyledButton
+            isBorderless
+            buttonSize="tiny"
+            buttonStyle="secondary"
+            my={2}
+            fontSize="14px"
+            fontWeight="500"
+            textTransform="uppercase"
+            color="blue.700"
+            letterSpacing="60%"
+            tabIndex="-1"
+          >
+            <Span css={{ verticalAlign: 'middle' }}>
+              <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
+            </Span>
+            <ChevronDown size="24px" />
+          </StyledButton>
+          <DropdownArrow />
+          <DropdownContent>
             <Box as="ul" p={0} m={0} minWidth={184}>
               {callsToAction.hasDashboard && (
                 <MenuItem>
@@ -165,8 +182,8 @@ const CollectiveNavbarActionsMenu = ({
                             await applyToHostWithCollective({
                               variables: {
                                 collective: {
-                                  id: c.collective.id,
-                                  HostCollectiveId: collective.id,
+                                  id: c.collective.legacyId || c.collective.id,
+                                  HostCollectiveId: collective.legacyId || collective.id,
                                 },
                               },
                             });
@@ -218,25 +235,8 @@ const CollectiveNavbarActionsMenu = ({
                 </React.Fragment>
               )}
             </Box>
-          )}
-        >
-          <StyledButton
-            isBorderless
-            buttonSize="tiny"
-            buttonStyle="secondary"
-            my={2}
-            fontSize="14px"
-            fontWeight="500"
-            textTransform="uppercase"
-            color="blue.700"
-            letterSpacing="60%"
-          >
-            <Span css={{ verticalAlign: 'middle' }}>
-              <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
-            </Span>
-            <ChevronDown size="24px" />
-          </StyledButton>
-        </MenuPopover>
+          </DropdownContent>
+        </Dropdown>
       </Box>
     </Container>
   );
@@ -244,7 +244,8 @@ const CollectiveNavbarActionsMenu = ({
 
 CollectiveNavbarActionsMenu.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.oneOf([PropTypes.number, PropTypes.string]).isRequired,
+    legacyId: PropTypes.number,
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
     type: PropTypes.string,

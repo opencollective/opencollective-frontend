@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { hasNewNavBar } from '../../../lib/collective-sections';
 import { getTopContributors } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
@@ -278,25 +279,27 @@ class SectionContribute extends React.PureComponent {
 
     return (
       <Fragment>
-        <ContainerSectionContent pt={[4, 5]}>
-          <SectionHeader
-            title={Sections.CONTRIBUTE}
-            subtitle={
-              <FormattedMessage
-                id="CollectivePage.SectionContribute.Subtitle"
-                defaultMessage="Become a financial contributor."
-              />
-            }
-            info={
-              <FormattedMessage
-                id="CollectivePage.SectionContribute.info"
-                defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
-                values={{ collectiveName: collective.name }}
-              />
-            }
-            illustrationSrc={contributeSectionHeaderIcon}
-          />
-        </ContainerSectionContent>
+        {!hasNewNavBar(collective) && (
+          <ContainerSectionContent pt={[4, 5]}>
+            <SectionHeader
+              title={Sections.CONTRIBUTE}
+              subtitle={
+                <FormattedMessage
+                  id="CollectivePage.SectionContribute.Subtitle"
+                  defaultMessage="Become a financial contributor."
+                />
+              }
+              info={
+                <FormattedMessage
+                  id="CollectivePage.SectionContribute.info"
+                  defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
+                  values={{ collectiveName: collective.name }}
+                />
+              }
+              illustrationSrc={contributeSectionHeaderIcon}
+            />
+          </ContainerSectionContent>
+        )}
 
         {/* "Start accepting financial contributions" for admins */}
         {isAdmin && !hasHost && !isHost && (

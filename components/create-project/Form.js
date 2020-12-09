@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective.lib';
 
-import CollectiveNavbar from '../CollectiveNavbar';
+import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';

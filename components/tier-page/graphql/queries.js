@@ -1,5 +1,7 @@
 import { gql } from '@apollo/client';
 
+import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+
 export const tierPageQuery = gql`
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
@@ -50,6 +52,9 @@ export const tierPageQuery = gql`
             all
           }
         }
+        features {
+          ...NavbarFields
+        }
         admins: members(role: "ADMIN") {
           id
           role
@@ -87,4 +92,5 @@ export const tierPageQuery = gql`
       }
     }
   }
+  ${collectiveNavbarFieldsFragment}
 `;
