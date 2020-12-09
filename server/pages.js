@@ -9,7 +9,7 @@ const routes = require('next-routes');
 const pages = routes()
   .add('home', '/', 'index')
   .add('become-a-sponsor', '/become-a-sponsor', 'become-a-sponsor')
-  .add('become-a-host', '/(become-a-sponsor|become-a-fiscal-host)', 'become-a-host')
+  .add('become-a-host', '/:pageSlug(become-a-host|become-a-fiscal-host)', 'become-a-host')
   .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
   .add('pricing', '/pricing')
   .add('pricing-old', '/pricing-old')
