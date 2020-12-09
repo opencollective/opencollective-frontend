@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
 import { first, get, omit, partition, pick } from 'lodash';
@@ -135,6 +135,17 @@ const ExpenseFormPayeeStep = ({
     types: [CollectiveType.ORGANIZATION],
     __background__: 'white',
   });
+
+  const setDefaultHostAddress = () => {
+    formik.setFieldValue('payeeLocation.country', loggedInAccount.location.country);
+    formik.setFieldValue('payeeLocation.address', loggedInAccount.location.address);
+  }
+
+  useEffect(() => {
+    loggedInAccount && setDefaultHostAddress()
+
+    return () => loggedInAccount && setDefaultHostAddress()
+  }, [loggedInAccount]);
 
   const collectivePick = canInvite
     ? ({ id }) => (
