@@ -139,12 +139,12 @@ const ExpenseFormPayeeStep = ({
   const setDefaultHostAddress = () => {
     formik.setFieldValue('payeeLocation.country', loggedInAccount.location.country);
     formik.setFieldValue('payeeLocation.address', loggedInAccount.location.address);
-  }
+  };
 
   useEffect(() => {
-    loggedInAccount && setDefaultHostAddress()
+    loggedInAccount && setDefaultHostAddress();
 
-    return () => loggedInAccount && setDefaultHostAddress()
+    return () => loggedInAccount && setDefaultHostAddress();
   }, [loggedInAccount]);
 
   const collectivePick = canInvite
