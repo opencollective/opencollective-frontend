@@ -21,13 +21,14 @@ options.plugins.push(
 const baseDirectory = `public/static/images`;
 
 const directories = [
-  // 'home',
+  'home',
   // 'create-collective',
-  'become-a-sponsor',
+  // 'become-a-sponsor',
+  // 'become-a-host',
 ];
 
 for (const directory of directories) {
-  imagemin([`${baseDirectory}/${directory}/original/**.png`], {
+  imagemin([`${baseDirectory}/${directory}/original/joinus-green**.png`], {
     ...options,
     destination: `${baseDirectory}/${directory}`,
   }).then(files => {
