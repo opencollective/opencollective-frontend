@@ -8,7 +8,7 @@ import { getErrorFromGraphqlException } from '../../lib/errors';
 import { Router } from '../../server/pages';
 
 import Body from '../Body';
-import CollectiveNavbar from '../CollectiveNavbar';
+import CollectiveNavbar from '../collective-navbar';
 import Footer from '../Footer';
 import Header from '../Header';
 import NotificationBar from '../NotificationBar';

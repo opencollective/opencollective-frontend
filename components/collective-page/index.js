@@ -1,22 +1,23 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty, throttle } from 'lodash';
+import { get, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+import { space } from 'styled-system';
 
 import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getEnvVar } from '../../lib/env-utils';
 import { parseToBoolean } from '../../lib/utils';
 
-import CollectiveNavbar from '../CollectiveNavbar';
+import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import TemporaryNotification from '../TemporaryNotification';
 
 import Hero from './hero/Hero';
 import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
-import SectionConnect from './sections/Connect';
 import SectionConnectedCollectives from './sections/ConnectedCollectives';
 import SectionContribute from './sections/Contribute';
 import SectionContributions from './sections/Contributions';
@@ -34,10 +35,20 @@ import SectionTickets from './sections/Tickets';
 import SectionTransactions from './sections/Transactions';
 import SectionUpdates from './sections/Updates';
 import { Sections } from './_constants';
+import CategoryHeader from './CategoryHeader';
 import SectionContainer from './SectionContainer';
 import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
 
 const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
+
+const NavBarContainer = styled.div`
+  ${space}
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: white;
+  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
+`;
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -78,11 +89,14 @@ class CollectivePage extends Component {
 
   constructor(props) {
     super(props);
+    // @deprecated This will be useless once new navbar will be the default
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
+    this.sectionCategoriesRefs = {}; // This will store a map of category => ref
     this.navbarRef = React.createRef();
     this.state = {
       isFixed: false,
       selectedSection: null,
+      selectedCategory: null,
       notification: false,
     };
   }
@@ -106,7 +120,7 @@ class CollectivePage extends Component {
       return;
     }
 
-    let { isFixed, selectedSection } = this.state;
+    let { isFixed, selectedSection, selectedCategory } = this.state;
 
     // Fixes the Hero when a certain scroll threshold is reached
     if (this.navbarRef.current.getBoundingClientRect().top <= 0) {
@@ -119,18 +133,38 @@ class CollectivePage extends Component {
     const distanceThreshold = 200;
     const breakpoint = window.scrollY + distanceThreshold;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
-    for (let i = sections.length - 1; i >= 0; i--) {
-      const sectionName = sections[i];
-      const sectionRef = this.sectionsRefs[sectionName];
-      if (sectionRef && breakpoint >= sectionRef.offsetTop) {
-        selectedSection = sectionName;
-        break;
+
+    if (NAV_V2_FEATURE_FLAG && get(this.props.collective, 'settings.collectivePage.useNewSections')) {
+      for (let i = sections.length - 1; i >= 0; i--) {
+        if (sections[i].type !== 'CATEGORY') {
+          continue;
+        }
+
+        const categoryName = sections[i].name;
+        const categoryRef = this.sectionCategoriesRefs[categoryName];
+        if (categoryRef && breakpoint >= categoryRef.offsetTop) {
+          selectedCategory = categoryName;
+          break;
+        }
+      }
+    } else {
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const sectionName = sections[i];
+        const sectionRef = this.sectionsRefs[sectionName];
+        if (sectionRef && breakpoint >= sectionRef.offsetTop) {
+          selectedSection = sectionName;
+          break;
+        }
       }
     }
 
     // Update the state only if necessary
-    if (this.state.isFixed !== isFixed || this.state.selectedSection !== selectedSection) {
-      this.setState({ isFixed, selectedSection });
+    if (
+      this.state.isFixed !== isFixed ||
+      this.state.selectedSection !== selectedSection ||
+      this.state.selectedCategory !== selectedCategory
+    ) {
+      this.setState({ isFixed, selectedSection, selectedCategory });
     }
   }, 100);
 
@@ -280,15 +314,6 @@ class CollectivePage extends Component {
             LoggedInUser={this.props.LoggedInUser}
           />
         );
-      case Sections.CONNECT:
-        return (
-          <SectionConnect
-            collective={this.props.collective}
-            conversations={this.props.conversations}
-            isAdmin={this.props.isAdmin}
-            isLoggedIn={Boolean(this.props.LoggedInUser)}
-          />
-        );
       case Sections.ABOUT:
         return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} />;
       case Sections.GOALS:
@@ -323,10 +348,11 @@ class CollectivePage extends Component {
   render() {
     const { collective, host, isAdmin, isRoot, onPrimaryColorChange, LoggedInUser } = this.props;
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
-    const { isFixed, selectedSection, notification } = this.state;
+    const { isFixed, selectedSection, selectedCategory, notification } = this.state;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
     const isFund = collective.type === CollectiveType.FUND || settings?.fund === true; // Funds MVP, to refactor
     const isAuthenticated = LoggedInUser ? true : false;
+    const useNewSectionsFormat = get(collective, 'settings.collectivePage.useNewSections');
     const callsToAction = this.getCallsToAction(
       type,
       isHost,
@@ -376,17 +402,22 @@ class CollectivePage extends Component {
           callsToAction={callsToAction}
           onPrimaryColorChange={onPrimaryColorChange}
         />
-        <Container mt={[0, -30]} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
+        <NavBarContainer mt={[0, -30]} ref={this.navbarRef}>
           <CollectiveNavbar
             collective={collective}
             sections={sections}
             isAdmin={isAdmin}
-            selected={selectedSection || sections[0]}
+            selected={selectedSection || null}
+            selectedCategory={selectedCategory}
             onCollectiveClick={this.onCollectiveClick}
             callsToAction={callsToAction}
             hideInfos={!isFixed}
             isAnimated={true}
             onSectionClick={this.onSectionClick}
+            showBackButton={false}
+            isFullWidth
+            useAnchorsForCategories
+            withShadow={false}
             LinkComponent={({ section, label, className }) => (
               <a
                 data-cy={`section-${section}`}
@@ -399,9 +430,45 @@ class CollectivePage extends Component {
             )}
             createNotification={this.createNotification}
           />
-        </Container>
+        </NavBarContainer>
+
         {isEmpty(sections) ? (
           <SectionEmpty collective={this.props.collective} />
+        ) : useNewSectionsFormat ? (
+          sections.map((entry, entryIdx) =>
+            entry.type === 'CATEGORY' ? (
+              <Fragment key={`category-${entry.name}`}>
+                <CategoryHeader
+                  id={`category-${entry.name}`}
+                  ref={categoryRef => (this.sectionCategoriesRefs[entry.name] = categoryRef)}
+                  collective={collective}
+                  category={entry.name}
+                />
+                {entry.sections.map((section, idx) => (
+                  <SectionContainer
+                    key={section.name}
+                    ref={sectionRef => (this.sectionsRefs[section.name] = sectionRef)}
+                    id={`section-${section.name}`}
+                    withPaddingBottom={
+                      idx === entry.sections.length - 1 &&
+                      entryIdx === sections.length - 1 &&
+                      !sectionsWithoutPaddingBottom[section.name]
+                    }
+                  >
+                    {this.renderSection(section.name)}
+                  </SectionContainer>
+                ))}
+              </Fragment>
+            ) : entry.type === 'SECTION' ? (
+              <SectionContainer
+                key={`section-${entry.name}`}
+                id={`section-${entry.name}`}
+                withPaddingBottom={entryIdx === sections.length - 1 && !sectionsWithoutPaddingBottom[entry.name]}
+              >
+                {this.renderSection(entry.name)}
+              </SectionContainer>
+            ) : null,
+          )
         ) : (
           sections.map((section, idx) => (
             <SectionContainer
@@ -410,7 +477,7 @@ class CollectivePage extends Component {
               id={`section-${section}`}
               withPaddingBottom={idx === sections.length - 1 && !sectionsWithoutPaddingBottom[section]}
             >
-              {this.renderSection(section, idx === sections.length - 1)}
+              {this.renderSection(section)}
             </SectionContainer>
           ))
         )}

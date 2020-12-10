@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { hasNewNavBar } from '../../../lib/collective-sections';
 import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
@@ -81,7 +82,9 @@ const SectionTransactions = props => {
   return (
     <Box py={5}>
       <ContainerSectionContent>
-        <SectionHeader title={Sections.TRANSACTIONS} illustrationSrc={budgetSectionHeaderIcon} />
+        {!hasNewNavBar(collective) && (
+          <SectionHeader title={Sections.TRANSACTIONS} illustrationSrc={budgetSectionHeaderIcon} />
+        )}
         {collectiveHasNoTransactions && (
           <MessageBox type="info" withIcon>
             <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />

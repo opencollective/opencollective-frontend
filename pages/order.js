@@ -6,7 +6,7 @@ import { generateNotFoundError } from '../lib/errors';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import Body from '../components/Body';
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import OrderWithData from '../components/expenses/OrderWithData';

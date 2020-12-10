@@ -5,6 +5,7 @@ import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'loda
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
 import expenseStatus from '../lib/constants/expense-status';
@@ -13,8 +14,8 @@ import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
 import Thread from '../components/conversations/Thread';
@@ -430,6 +431,7 @@ class ExpensePage extends React.Component {
           collective={collective}
           isLoading={!collective}
           selected={Sections.BUDGET}
+          selectedCategory={NAVBAR_CATEGORIES.BUDGET}
           callsToAction={{ hasSubmitExpense: status === PAGE_STATUS.VIEW }}
         />
         <Flex flexDirection={['column', 'row']} my={[4, 5]} data-cy="expense-page-content">

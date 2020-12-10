@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { hasNewNavBar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { GraphQLContext } from '../../../lib/graphql/context';
@@ -60,23 +61,25 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
 
   return (
     <ContainerSectionContent pt={[4, 5]} pb={3}>
-      <SectionHeader
-        title={Sections.BUDGET}
-        subtitle={
-          <FormattedMessage
-            id="CollectivePage.SectionBudget.Subtitle"
-            defaultMessage="Transparent and open finances."
-          />
-        }
-        info={
-          <FormattedMessage
-            id="CollectivePage.SectionBudget.Description"
-            defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reimbursed and more!"
-            values={{ collectiveName: collective.name }}
-          />
-        }
-        illustrationSrc={budgetSectionHeaderIcon}
-      />
+      {!hasNewNavBar(collective) && (
+        <SectionHeader
+          title={Sections.BUDGET}
+          subtitle={
+            <FormattedMessage
+              id="CollectivePage.SectionBudget.Subtitle"
+              defaultMessage="Transparent and open finances."
+            />
+          }
+          info={
+            <FormattedMessage
+              id="CollectivePage.SectionBudget.Description"
+              defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reimbursed and more!"
+              values={{ collectiveName: collective.name }}
+            />
+          }
+          illustrationSrc={budgetSectionHeaderIcon}
+        />
+      )}
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
         {isEmpty(data?.transactions) && (
           <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="14px">

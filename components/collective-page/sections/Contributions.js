@@ -6,6 +6,7 @@ import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { hasNewNavBar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 import { getEnvVar } from '../../../lib/env-utils';
@@ -249,16 +250,18 @@ class SectionContributions extends React.PureComponent {
         {memberOf.length > 0 && (
           <React.Fragment>
             <ContainerSectionContent>
-              <SectionHeader
-                title={Sections.CONTRIBUTIONS}
-                subtitle={
-                  <FormattedMessage
-                    id="CollectivePage.SectionContributions.Subtitle"
-                    defaultMessage="How we are supporting other Collectives."
-                  />
-                }
-                illustrationSrc={contributeSectionHeaderIcon}
-              />
+              {!hasNewNavBar(collective) && (
+                <SectionHeader
+                  title={Sections.CONTRIBUTIONS}
+                  subtitle={
+                    <FormattedMessage
+                      id="CollectivePage.SectionContributions.Subtitle"
+                      defaultMessage="How we are supporting other Collectives."
+                    />
+                  }
+                  illustrationSrc={contributeSectionHeaderIcon}
+                />
+              )}
               {data.Collective.stats.collectives.hosted > 0 && (
                 <H3 fontSize="20px" fontWeight="500" color="black.600">
                   <FormattedMessage

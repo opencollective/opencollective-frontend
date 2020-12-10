@@ -14,8 +14,8 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
 import Avatar from '../Avatar';
+import CollectiveNavbar from '../collective-navbar';
 import { collectivePageQuery } from '../collective-page/graphql/queries';
-import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
 import CreateCollectiveMiniForm from '../CreateCollectiveMiniForm';
 import PayoutBankInformationForm from '../expenses/PayoutBankInformationForm';

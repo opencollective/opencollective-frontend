@@ -5,6 +5,7 @@ import { get, mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
@@ -16,8 +17,8 @@ import { Router } from '../server/pages';
 import Body from '../components/Body';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
@@ -180,6 +181,7 @@ class TransactionsPage extends React.Component {
                 collective={collective}
                 isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
                 showEdit
+                selectedCategory={NAVBAR_CATEGORIES.BUDGET}
                 selectedSection={
                   collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS
                 }

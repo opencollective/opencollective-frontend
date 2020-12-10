@@ -4,72 +4,40 @@ import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVertical
 import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { getFilteredSectionsForCollective } from '../lib/collective-sections';
-import { CollectiveType } from '../lib/constants/collectives';
-import { getEnvVar } from '../lib/env-utils';
-import i18nCollectivePageSection from '../lib/i18n-collective-page-section';
-import { parseToBoolean } from '../lib/utils';
+import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
+import { CollectiveType } from '../../lib/constants/collectives';
+import { getEnvVar } from '../../lib/env-utils';
+import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
+import { parseToBoolean } from '../../lib/utils';
 
-import { AllSectionsNames, Dimensions } from './collective-page/_constants';
-import Avatar from './Avatar';
-import CollectiveCallsToAction from './CollectiveCallsToAction';
-import CollectiveNavbarActionsMenu from './CollectiveNavbarActionsMenu';
-import Container from './Container';
-import { Box, Flex } from './Grid';
-import Link from './Link';
-import LinkCollective from './LinkCollective';
-import LoadingPlaceholder from './LoadingPlaceholder';
-import StyledButton from './StyledButton';
-import StyledRoundButton from './StyledRoundButton';
-import { H1, P } from './Text';
+import Avatar from '../Avatar';
+import { AllSectionsNames, Dimensions } from '../collective-page/_constants';
+import CollectiveCallsToAction from '../CollectiveCallsToAction';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import Link from '../Link';
+import LinkCollective from '../LinkCollective';
+import LoadingPlaceholder from '../LoadingPlaceholder';
+import StyledButton from '../StyledButton';
+import StyledRoundButton from '../StyledRoundButton';
+import { H1, P } from '../Text';
 
-import aboutNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconAbout.png';
-import budgetNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconBudget.png';
-import connectNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconConnect.png';
-import contributeNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconContribute.png';
-import eventsNavbarIcon from '../public/static/images/collective-navigation/CollectiveNavbarIconEvents.png';
+import CollectiveNavbarActionsMenu from './ActionsMenu';
+import { getNavBarMenu } from './menu';
+import NavBarCategoryDropdown from './NavBarCategoryDropdown';
 
 const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
 
 // Nav v2 styled components
 const MainContainerV2 = styled(Container)`
   background: white;
-  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
-  max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
-  margin: 0 auto;
-
-  margin-top: 50px;
-
-  /** Everything's inside cannot be larger than max section width */
-  & > * {
-    max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
-  }
-`;
-
-const MenuLinkV2 = styled.a`
-  display: block;
-  color: ${themeGet('colors.black.700')};
-  font-size: 14px;
-  line-height: 16px;
-  text-decoration: none;
-  white-space: nowrap;
-
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  font-weight: 500;
-
-  &:focus {
-    color: ${themeGet('colors.primary.700')};
-    text-decoration: none;
-  }
-
-  &:hover {
-    color: ${themeGet('colors.primary.400')};
-    text-decoration: none;
-  }
+  display: flex;
+  justify-content: flex-start;
+  overflow-y: auto;
+  max-height: 350px;
 `;
 
 const AvatarBox = styled(Box)`
@@ -85,51 +53,6 @@ const AvatarBox = styled(Box)`
     margin-top: auto;
     margin-bottom: auto;
     border-right: 2px solid rgba(214, 214, 214, 1);
-  }
-`;
-
-const MenuLinkContainerV2 = styled(Box).attrs({ px: [1, null, 0] })`
-  cursor: pointer;
-
-  &::after {
-    content: '';
-    display: block;
-    width: 0;
-    height: 3px;
-    background: ${themeGet('colors.primary.500')};
-    transition: width 0.2s;
-    float: right;
-  }
-
-  ${props =>
-    props.isSelected &&
-    css`
-      color: #090a0a;
-      font-weight: 500;
-      ${MenuLink} {
-        color: #090a0a;
-      }
-      @media (min-width: 52em) {
-        &::after {
-          width: 75%;
-          margin: 0 auto;
-        }
-      }
-    `}
-
-  ${props =>
-    props.mobileOnly &&
-    css`
-      @media (min-width: 52em) {
-        display: none;
-      }
-    `}
-
-  @media (max-width: 40em) {
-    border-top: 1px solid #e1e1e1;
-    &::after {
-      display: none;
-    }
   }
 `;
 
@@ -149,11 +72,6 @@ const InfosContainerV2 = styled(Container)`
       opacity: 0;
       transform: translateX(-20px);
     `}
-`;
-
-const IconIllustration = styled.img.attrs({ alt: '' })`
-  width: 32px;
-  height: 32px;
 `;
 
 const CollectiveNameV2 = styled(H1)`
@@ -343,25 +261,8 @@ const getDefaultCallsToActions = (collective, isAdmin) => {
   };
 };
 
-const getCollectiveNavbarIcon = section => {
-  switch (section) {
-    case 'about':
-      return aboutNavbarIcon;
-    case 'budget' || 'transactions':
-      return budgetNavbarIcon;
-    case 'connect':
-      return connectNavbarIcon;
-    case 'contribute' || 'contributions':
-      return contributeNavbarIcon;
-    case 'events' || 'projects':
-      return eventsNavbarIcon;
-    default:
-      return contributeNavbarIcon;
-  }
-};
-
 /**
- * The NavBar that displays all the invidual sections.
+ * The NavBar that displays all the individual sections.
  */
 const CollectiveNavbar = ({
   collective,
@@ -370,6 +271,7 @@ const CollectiveNavbar = ({
   showEdit,
   sections,
   selected,
+  selectedCategory,
   LinkComponent,
   callsToAction,
   onCollectiveClick,
@@ -378,24 +280,27 @@ const CollectiveNavbar = ({
   onlyInfos,
   isAnimated,
   createNotification,
-  intl,
   showBackButton,
+  withShadow,
+  useAnchorsForCategories,
 }) => {
+  const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
   callsToAction = { ...getDefaultCallsToActions(collective, isAdmin), ...callsToAction };
   const isEvent = collective?.type === CollectiveType.EVENT;
+  const useNewSectionsFormat = get(collective, 'settings.collectivePage.useNewSections');
 
-  return NAV_V2_FEATURE_FLAG ? (
+  return NAV_V2_FEATURE_FLAG && useNewSectionsFormat ? (
     // v2
     <MainContainerV2
-      display="flex"
       flexDirection={['column', 'row']}
       flexWrap={['nowrap', 'wrap']}
-      justifyContent="flex-start"
       px={[0, Dimensions.PADDING_X[1]]}
-      overflowY="auto"
-      maxHeight="350px"
+      mx="auto"
+      mt={onlyInfos ? 0 : '50px'}
+      maxWidth={Dimensions.MAX_SECTION_WIDTH}
+      boxShadow={withShadow ? ' 0px 6px 10px -5px rgba(214, 214, 214, 0.5)' : 'none'}
     >
       {/** Collective info */}
       <InfosContainerV2
@@ -407,11 +312,13 @@ const CollectiveNavbar = ({
         px={[3, 0]}
         py={[2, 1]}
       >
-        <Box display={['none', showBackButton ? 'block' : 'none']} mr={2}>
-          <StyledButton px={1} isBorderless onClick={() => window && window.history.back()}>
-            &larr;
-          </StyledButton>
-        </Box>
+        {showBackButton && (
+          <Box display={['none', 'block']} mr={2}>
+            <StyledButton px={1} isBorderless onClick={() => window && window.history.back()}>
+              &larr;
+            </StyledButton>
+          </Box>
+        )}
         <AvatarBox>
           <LinkCollective collective={collective} onClick={onCollectiveClick}>
             <Container borderRadius="25%" mr={2}>
@@ -443,6 +350,7 @@ const CollectiveNavbar = ({
         )}
       </InfosContainerV2>
       {/** Main navbar items */}
+
       {/* TO DO: they don't shrink properly when the container gets small - needs work */}
       {!onlyInfos && (
         <Fragment>
@@ -463,39 +371,19 @@ const CollectiveNavbar = ({
             {isLoading ? (
               <LoadingPlaceholder height={43} minWidth={150} mb={2} />
             ) : (
-              <Fragment>
-                {sections.map(section => (
-                  <MenuLinkContainerV2
-                    mr={[0, 3]}
-                    key={section}
-                    isSelected={section === selected}
-                    onClick={() => {
-                      if (isExpanded) {
-                        setExpanded(false);
-                      }
-                      if (onSectionClick) {
-                        onSectionClick(section);
-                      }
-                    }}
-                  >
-                    <Flex py={2} px={[3, 0]}>
-                      <Flex alignItems="center" mr={2}>
-                        <IconIllustration src={getCollectiveNavbarIcon(section)} />
-                      </Flex>
-                      <Flex alignItems="center">
-                        <MenuLinkV2
-                          as={LinkComponent}
-                          collectivePath={collective.path || `/${collective.slug}`}
-                          section={section}
-                          label={i18nCollectivePageSection(intl, section)}
-                        />
-                      </Flex>
-                    </Flex>
-                  </MenuLinkContainerV2>
-                ))}
-              </Fragment>
+              getNavBarMenu(intl, collective, sections).map(({ category, links }) => (
+                <NavBarCategoryDropdown
+                  key={category}
+                  collective={collective}
+                  category={category}
+                  links={links}
+                  isSelected={selectedCategory === category}
+                  useAnchor={useAnchorsForCategories}
+                />
+              ))
             )}
           </Container>
+
           {/* CTAs for v2 navbar & admin panel */}
           <Container
             display={isExpanded ? 'flex' : ['none', 'flex']}
@@ -510,12 +398,12 @@ const CollectiveNavbar = ({
                 <Link
                   width="100%"
                   route={isEvent ? 'editEvent' : 'editCollective'}
+                  textDecoration="none"
                   params={
                     isEvent
                       ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
                       : { slug: collective.slug }
                   }
-                  textDecoration="none"
                 >
                   <Container
                     display="flex"
@@ -699,11 +587,17 @@ CollectiveNavbar.propTypes = {
   /** An optionnal function to build links URLs. Useful to override behaviour in test/styleguide envs. */
   LinkComponent: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   /** The list of sections to be displayed by the NavBar. If not provided, will show all the sections available to this collective type. */
-  sections: PropTypes.arrayOf(PropTypes.oneOf(AllSectionsNames)),
+  sections: PropTypes.arrayOf(
+    PropTypes.shape({
+      type: PropTypes.oneOf(['CATEGORY', 'SECTION']),
+      name: PropTypes.string,
+    }),
+  ),
   /** Called when users click the collective logo or name */
   onCollectiveClick: PropTypes.func,
   /** Currently selected section */
   selected: PropTypes.oneOf(AllSectionsNames),
+  selectedCategory: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)),
   /** If true, the collective infos (avatar + name) will be hidden with css `visibility` */
   hideInfos: PropTypes.bool,
   /** If true, the CTAs will be hidden on mobile */
@@ -714,10 +608,11 @@ CollectiveNavbar.propTypes = {
   isAnimated: PropTypes.bool,
   /** Set this to true to make the component smaller in height */
   isSmall: PropTypes.bool,
-  /** @ignore From injectIntl */
-  intl: PropTypes.object,
   createNotification: PropTypes.func,
   showBackButton: PropTypes.bool,
+  withShadow: PropTypes.bool,
+  /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */
+  useAnchorsForCategories: PropTypes.bool,
 };
 
 CollectiveNavbar.defaultProps = {
@@ -725,6 +620,9 @@ CollectiveNavbar.defaultProps = {
   isAnimated: false,
   onlyInfos: false,
   callsToAction: {},
+  showBackButton: true,
+  withShadow: true,
+
   // eslint-disable-next-line react/prop-types
   LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, className }) {
     return (
@@ -733,7 +631,6 @@ CollectiveNavbar.defaultProps = {
       </Link>
     );
   },
-  showBackButton: true,
 };
 
-export default React.memo(injectIntl(CollectiveNavbar));
+export default React.memo(CollectiveNavbar);

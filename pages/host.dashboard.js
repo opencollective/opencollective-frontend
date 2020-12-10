@@ -10,7 +10,7 @@ import styled, { css } from 'styled-components';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
 import { Box, Flex } from '../components/Grid';
 import { HOST_SECTIONS } from '../components/host-dashboard/constants';
