@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
+import { Planet } from '@styled-icons/boxicons-regular/Planet';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
-import { Settings } from '@styled-icons/feather/Settings';
+import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
+import { AttachMoney } from '@styled-icons/material/AttachMoney';
+import { Dashboard } from '@styled-icons/material/Dashboard';
+import { Stack } from '@styled-icons/remix-line/Stack';
 import { get, some, truncate, uniqBy } from 'lodash';
+import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -22,8 +26,12 @@ import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
-import { P, Span } from '../Text';
+import { Span } from '../Text';
 import { withUser } from '../UserProvider';
+
+// Dynamic imports
+const AddFundsToOrganizationModal = dynamic(() => import('../AddFundsToOrganizationModal'));
+const AddFundsModal = dynamic(() => import('../host-dashboard/AddFundsModal'));
 
 //  Styled components
 
@@ -88,6 +96,27 @@ const CollectiveNavbarActionsMenu = ({
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
     : true;
   const [applyToHostWithCollective, { error }] = useMutation(applyToHostMutation);
+  const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
+  const [hasAddFundsToOrganizationModal, showAddFundsToOrganizationModal] = React.useState(false);
+
+  let contributeRoute = 'orderCollectiveNew';
+  let contributeRouteParams = { collectiveSlug: collective.slug, verb: 'donate' };
+  if (collective.settings?.disableCustomContributions) {
+    if (collective.tiers && collective.tiers.length > 0) {
+      const tier = collective.tiers[0];
+      contributeRoute = 'orderCollectiveTierNew';
+      contributeRouteParams = {
+        collectiveSlug: collective.slug,
+        verb: 'contribute',
+        tierSlug: tier.slug,
+        tierId: tier.id,
+      };
+    } else {
+      callsToAction.hasContribute = false;
+    }
+  }
+
+  callsToAction.addFunds = true;
 
   if (loadingLoggedInUser) {
     return <Loading />;
@@ -131,7 +160,7 @@ const CollectiveNavbarActionsMenu = ({
                     params={{ hostCollectiveSlug: collective.slug }}
                     p={ITEM_PADDING}
                   >
-                    <Settings size="20px" color="#304CDC" />
+                    <Dashboard size="20px" color="#304CDC" />
                     <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
                   </StyledLink>
                 </MenuItem>
@@ -151,11 +180,73 @@ const CollectiveNavbarActionsMenu = ({
               )}
               {hasRequestGrant && (
                 <MenuItem py={1}>
-                  <Dollar size="20px" color="#304CDC" />
-                  <P my={2} fontSize="13px" color="black.800">
-                    <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
-                  </P>
+                  <StyledLink
+                    as={Link}
+                    route="create-expense"
+                    params={{ collectiveSlug: collective.slug }}
+                    p={ITEM_PADDING}
+                  >
+                    <MoneyCheckAlt size="20px" color="#304CDC" />
+                  </StyledLink>
                 </MenuItem>
+              )}
+              {callsToAction.hasManageSubscriptions && (
+                <MenuItem>
+                  <StyledLink
+                    as={Link}
+                    route="recurring-contributions"
+                    params={{ slug: collective.slug }}
+                    p={ITEM_PADDING}
+                  >
+                    <Stack size="20px" color="#304CDC" />
+                    <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                  </StyledLink>
+                </MenuItem>
+              )}
+              {callsToAction.hasContribute && (
+                <MenuItem py={1}>
+                  <StyledLink as={Link} route={contributeRoute} params={contributeRouteParams} p={ITEM_PADDING}>
+                    <Planet size="20px" color="#304CDC" />
+                    <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
+                  </StyledLink>
+                </MenuItem>
+              )}
+              {callsToAction.addFunds && (
+                <Fragment>
+                  <MenuItem py={1}>
+                    <StyledButton p={ITEM_PADDING} onClick={() => showAddFundsModal(true)} isBorderless>
+                      <AttachMoney size="20px" color="#304CDC" />
+                      <Span>
+                        <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
+                      </Span>
+                    </StyledButton>
+                  </MenuItem>
+                  <AddFundsModal
+                    collective={collective}
+                    host={collective}
+                    show={hasAddFundsModal}
+                    setShow={showAddFundsModal}
+                    onClose={() => showAddFundsModal(null)}
+                  />
+                </Fragment>
+              )}
+              {callsToAction.addFundsToOrganization && (
+                <Fragment>
+                  <MenuItem py={1}>
+                    <StyledButton p={ITEM_PADDING} onClick={() => showAddFundsToOrganizationModal(true)} isBorderless>
+                      <AttachMoney size="20px" color="#304CDC" />
+                      <Span>
+                        <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
+                      </Span>
+                    </StyledButton>
+                  </MenuItem>
+                  <AddFundsToOrganizationModal
+                    collective={collective}
+                    show={hasAddFundsToOrganizationModal}
+                    setShow={showAddFundsToOrganizationModal}
+                    onClose={() => showAddFundsToOrganizationModal(null)}
+                  />
+                </Fragment>
               )}
               {callsToAction.hasContact && (
                 <MenuItem py={1}>
@@ -250,15 +341,27 @@ CollectiveNavbarActionsMenu.propTypes = {
     slug: PropTypes.string.isRequired,
     type: PropTypes.string,
     settings: PropTypes.object,
+    tiers: PropTypes.array,
   }),
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */
     hasContact: PropTypes.bool,
     /** Submit new expense button */
     hasSubmitExpense: PropTypes.bool,
-    /** Hosts "Apply" button */
+    /** Host's "Apply" button */
     hasApply: PropTypes.bool,
+    /** Host's dashboard */
     hasDashboard: PropTypes.bool,
+    /** Manage recurring contributions */
+    hasManageSubscriptions: PropTypes.bool,
+    /** Request a grant from a fund */
+    hasRequestGrant: PropTypes.bool,
+    /** Contribute financially to a collective */
+    hasContribute: PropTypes.bool,
+    /** Add funds to a collective */
+    addFunds: PropTypes.bool,
+    /** Add funds to an organization */
+    addFundsToOrganization: PropTypes.bool,
   }).isRequired,
   LoggedInUser: PropTypes.object,
   loadingLoggedInUser: PropTypes.bool,
