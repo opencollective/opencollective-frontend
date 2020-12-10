@@ -126,11 +126,7 @@ class HostDashboardPage extends React.Component {
       case 'pending-applications':
         return <PendingApplications hostSlug={host.slug} />;
       case 'donations':
-        return (
-          <Box py={4}>
-            <OrdersWithData accountSlug={host.slug} showPlatformTip />
-          </Box>
-        );
+        return <OrdersWithData accountSlug={host.slug} showPlatformTip />;
       case HOST_SECTIONS.HOSTED_COLLECTIVES:
         return <HostDashboardHostedCollectives hostSlug={host.slug} />;
       default:
