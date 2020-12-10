@@ -1300,6 +1300,7 @@
   "Order.Status.Completed": "完了",
   "Order.Status.Refunded": "Refunded",
   "order.tier": "Tier",
+  "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "orders.all": "All",
   "orders.empty": "注文はありません",
   "orders.viewAll": "全ての注文を表示",

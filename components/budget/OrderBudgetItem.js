@@ -9,6 +9,7 @@ import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-pro
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
+import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
@@ -56,7 +57,7 @@ const OrderContainer = styled.div`
   }
 `;
 
-const OrderBudgetItem = ({ isLoading, order }) => {
+const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
   const intl = useIntl();
   return (
     <OrderContainer>
@@ -117,22 +118,46 @@ const OrderBudgetItem = ({ isLoading, order }) => {
             {isLoading ? (
               <LoadingPlaceholder height={19} width={120} />
             ) : (
-              <Flex alignItems="center">
-                <TransactionSign isCredit />
-                <Span color="black.500" fontSize="15px">
-                  <FormattedMoneyAmount
-                    amount={order.amount.valueInCents}
-                    currency={order.amount.currency}
-                    precision={2}
-                  />
-                </Span>
+              <Flex flexDirection="column" alignItems={['flex-start', 'flex-end']}>
+                <Flex alignItems="center">
+                  <TransactionSign isCredit />
+                  <Span color="black.500" fontSize="15px">
+                    <FormattedMoneyAmount
+                      currency={order.amount.currency}
+                      precision={2}
+                      amount={
+                        showPlatformTip
+                          ? order.amount.valueInCents
+                          : order.amount.valueInCents - (order.platformContributionAmount?.valueInCents || 0)
+                      }
+                    />
+                  </Span>
+                </Flex>
+                {showPlatformTip && order.platformContributionAmount?.valueInCents && (
+                  <Container fontSize="10px" color="black.500">
+                    <FormattedMessage
+                      id="OrderBudgetItem.Tip"
+                      defaultMessage="(includes {amount} platform tip)"
+                      values={{
+                        amount: (
+                          <FormattedMoneyAmount
+                            amount={order.platformContributionAmount.valueInCents}
+                            currency={order.platformContributionAmount.currency}
+                            precision={2}
+                            amountStyles={null}
+                          />
+                        ),
+                      }}
+                    />
+                  </Container>
+                )}
               </Flex>
             )}
           </Flex>
           {isLoading ? (
-            <LoadingPlaceholder height={20} width={140} />
+            <LoadingPlaceholder height={20} width={140} mt={2} />
           ) : (
-            <Flex>
+            <Flex mt={2}>
               <StyledTag variant="rounded-left" fontSize="10px" fontWeight="500" mr={1}>
                 <FormattedMessage id="Order" defaultMessage="Order" /> #{order.legacyId}
               </StyledTag>
@@ -202,6 +227,7 @@ OrderBudgetItem.propTypes = {
     status: PropTypes.oneOf(Object.values(ORDER_STATUS)).isRequired,
     createdAt: PropTypes.string.isRequired,
     amount: PropTypes.object.isRequired,
+    platformContributionAmount: PropTypes.object.isRequired,
     permissions: PropTypes.shape({
       canReject: PropTypes.bool,
       canMarkAsPaid: PropTypes.bool,
@@ -217,6 +243,7 @@ OrderBudgetItem.propTypes = {
       slug: PropTypes.string,
     }),
   }),
+  showPlatformTip: PropTypes.bool,
 };
 
 export default OrderBudgetItem;

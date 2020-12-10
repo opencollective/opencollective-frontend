@@ -128,7 +128,7 @@ class HostDashboardPage extends React.Component {
       case 'donations':
         return (
           <Box py={4}>
-            <OrdersWithData accountSlug={host.slug} />
+            <OrdersWithData accountSlug={host.slug} showPlatformTip />
           </Box>
         );
       case HOST_SECTIONS.HOSTED_COLLECTIVES:

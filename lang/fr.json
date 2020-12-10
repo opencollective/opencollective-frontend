@@ -1300,6 +1300,7 @@
   "Order.Status.Completed": "Completé",
   "Order.Status.Refunded": "Remboursé",
   "order.tier": "tier",
+  "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "orders.all": "All",
   "orders.empty": "Pas de commandes",
   "orders.viewAll": "Voir toutes les commandes",

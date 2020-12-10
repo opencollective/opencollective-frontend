@@ -65,6 +65,10 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
           valueInCents
           currency
         }
+        platformContributionAmount {
+          valueInCents
+          currency
+        }
         paymentMethod {
           id
           providerType
@@ -132,7 +136,7 @@ const updateQuery = (router, queryParams) => {
   return Router.pushRoute(route.slice(1), { ...query, ...queryParams });
 };
 
-const OrdersWithData = ({ accountSlug, title, status }) => {
+const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
   const router = useRouter() || { query: {} };
   const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
   const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
@@ -206,7 +210,12 @@ const OrdersWithData = ({ accountSlug, title, status }) => {
         </MessageBox>
       ) : (
         <React.Fragment>
-          <OrdersList isLoading={loading} orders={data?.orders?.nodes} nbPlaceholders={variables.limit} />
+          <OrdersList
+            isLoading={loading}
+            orders={data?.orders?.nodes}
+            nbPlaceholders={variables.limit}
+            showPlatformTip={showPlatformTip}
+          />
           <Flex mt={5} justifyContent="center">
             <Pagination
               total={data?.orders?.totalCount}
@@ -227,6 +236,7 @@ OrdersWithData.propTypes = {
   status: PropTypes.string,
   /** An optional title to be used instead of "Financial contributions" */
   title: PropTypes.node,
+  showPlatformTip: PropTypes.bool,
 };
 
 export default OrdersWithData;

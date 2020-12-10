@@ -480,6 +480,7 @@ class EditCollectiveForm extends React.Component {
             accountSlug={collective.slug}
             status={ORDER_STATUS.PENDING}
             title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
+            showPlatformTip
           />
         );
 
