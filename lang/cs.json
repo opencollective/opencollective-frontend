@@ -1300,6 +1300,7 @@
   "Order.Status.Completed": "Completed",
   "Order.Status.Refunded": "Refunded",
   "order.tier": "úroveň",
+  "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "orders.all": "All",
   "orders.empty": "Žádné objednávky",
   "orders.viewAll": "Zobrazit všechny objednávky",

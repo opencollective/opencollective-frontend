@@ -13,7 +13,7 @@ const OrderContainer = styled.div`
     `}
 `;
 
-const OrdersList = ({ orders, isLoading, nbPlaceholders }) => {
+const OrdersList = ({ orders, isLoading, nbPlaceholders, showPlatformTip }) => {
   orders = !isLoading ? orders : [...new Array(nbPlaceholders)];
   if (!orders?.length) {
     return null;
@@ -23,7 +23,7 @@ const OrdersList = ({ orders, isLoading, nbPlaceholders }) => {
     <StyledCard>
       {orders.map((order, idx) => (
         <OrderContainer key={order?.id || idx} isFirst={!idx} data-cy={`order-${order?.status}`}>
-          <OrderBudgetItem isLoading={isLoading} order={order} />
+          <OrderBudgetItem isLoading={isLoading} order={order} showPlatformTip={showPlatformTip} />
         </OrderContainer>
       ))}
     </StyledCard>
@@ -40,6 +40,7 @@ OrdersList.propTypes = {
       legacyId: PropTypes.number.isRequired,
     }),
   ),
+  showPlatformTip: PropTypes.bool,
 };
 
 OrdersList.defaultProps = {

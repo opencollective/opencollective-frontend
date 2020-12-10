@@ -1300,6 +1300,7 @@
   "Order.Status.Completed": "Completed",
   "Order.Status.Refunded": "Возвращено",
   "order.tier": "уровень",
+  "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "orders.all": "All",
   "orders.empty": "Нет заказов",
   "orders.viewAll": "View All Orders",
