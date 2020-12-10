@@ -1,7 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
-import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
@@ -10,24 +8,21 @@ import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
-import { get, some, truncate, uniqBy } from 'lodash';
+import { get, some } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
-import { applyToHostMutation } from '../ApplyToHostBtnLoggedIn';
+import ApplyToHostBtn from '../ApplyToHostBtn';
 import Container from '../Container';
 import { Box } from '../Grid';
 import Link from '../Link';
-import Loading from '../Loading';
 import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledLink from '../StyledLink';
-import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
-import { withUser } from '../UserProvider';
 
 // Dynamic imports
 const AddFundsToOrganizationModal = dynamic(() => import('../AddFundsToOrganizationModal'));
@@ -63,31 +58,7 @@ const MenuItem = styled('li')`
 
 const ITEM_PADDING = '11px 14px';
 
-const getCollectivesNeedingAHost = user => {
-  const memberships = uniqBy(
-    user?.memberOf.filter(m => m.role === 'ADMIN'),
-    m => m.collective.id,
-  );
-  const collectives = memberships
-    .filter(m => m.collective.type === 'COLLECTIVE')
-    .sort((a, b) => {
-      return a.collective.slug.localeCompare(b.collective.slug);
-    });
-  const collectivesNeedingAHost = collectives
-    .filter(c => c.collective.host === null)
-    .sort((a, b) => {
-      return a.collective.slug.localeCompare(b.collective.slug);
-    });
-  return collectivesNeedingAHost;
-};
-
-const CollectiveNavbarActionsMenu = ({
-  collective,
-  callsToAction,
-  LoggedInUser,
-  loadingLoggedInUser,
-  createNotification,
-}) => {
+const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
   const hasRequestGrant =
     [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true;
   const hasActions = hasRequestGrant || some(callsToAction);
@@ -95,7 +66,6 @@ const CollectiveNavbarActionsMenu = ({
   const hostWithinLimit = hostedCollectivesLimit
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
     : true;
-  const [applyToHostWithCollective, { error }] = useMutation(applyToHostMutation);
   const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
   const [hasAddFundsToOrganizationModal, showAddFundsToOrganizationModal] = React.useState(false);
 
@@ -115,11 +85,6 @@ const CollectiveNavbarActionsMenu = ({
       callsToAction.hasContribute = false;
     }
   }
-
-  if (loadingLoggedInUser) {
-    return <Loading />;
-  }
-  const collectivesToApplyToHostWith = getCollectivesNeedingAHost(LoggedInUser);
 
   // Do not render the menu if there are no available CTAs
   if (!hasActions) {
@@ -141,6 +106,7 @@ const CollectiveNavbarActionsMenu = ({
             color="blue.700"
             letterSpacing="60%"
             tabIndex="-1"
+            data-cy="collective-navbar-actions-btn"
           >
             <Span css={{ verticalAlign: 'middle' }}>
               <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
@@ -261,66 +227,13 @@ const CollectiveNavbarActionsMenu = ({
               )}
               {callsToAction.hasApply && (
                 <React.Fragment>
-                  {hostWithinLimit ? (
-                    collectivesToApplyToHostWith.map(c => {
-                      return (
-                        <MenuItem
-                          key={c.collective.name}
-                          py={1}
-                          onClick={async () => {
-                            await applyToHostWithCollective({
-                              variables: {
-                                collective: {
-                                  id: c.collective.legacyId || c.collective.id,
-                                  HostCollectiveId: collective.legacyId || collective.id,
-                                },
-                              },
-                            });
-                            if (error) {
-                              createNotification('error', c.collective.name);
-                            } else {
-                              createNotification('default', c.collective.name);
-                            }
-                          }}
-                        >
-                          <StyledButton p={ITEM_PADDING} isBorderless>
-                            <CheckCircle size="20px" color="#304CDC" />
-                            <Span>
-                              <FormattedMessage
-                                id="host.apply.btn"
-                                defaultMessage="Apply with {collective}"
-                                values={{
-                                  collective: <strong>{truncate(c.collective.name, { length: 15 })}</strong>,
-                                }}
-                              />
-                            </Span>
-                          </StyledButton>
-                        </MenuItem>
-                      );
-                    })
-                  ) : (
-                    <StyledTooltip
-                      place="left"
-                      content={
-                        <FormattedMessage
-                          id="host.hostLimit.warning"
-                          defaultMessage="Host already reached the limit of hosted collectives for its plan. <a>Contact {collectiveName}</a> and let them know you want to apply."
-                          values={{
-                            collectiveName: collective.name,
-                            // eslint-disable-next-line react/display-name
-                            a: chunks => <Link route={`/${collective.slug}/contact`}>{chunks}</Link>,
-                          }}
-                        />
-                      }
-                    >
-                      <MenuItem py={1}>
-                        <CheckCircle size="20px" color="#304CDC" />
-                        <Span>
-                          <FormattedMessage id="Actions.ApplyToHost" defaultMessage="Apply to this host" />
-                        </Span>
-                      </MenuItem>
-                    </StyledTooltip>
-                  )}
+                  <MenuItem py={1}>
+                    <ApplyToHostBtn
+                      hostSlug={collective.slug}
+                      hostWithinLimit={hostWithinLimit}
+                      buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
+                    />
+                  </MenuItem>
                 </React.Fragment>
               )}
             </Box>
@@ -361,8 +274,6 @@ CollectiveNavbarActionsMenu.propTypes = {
     /** Add funds to an organization */
     addFundsToOrganization: PropTypes.bool,
   }).isRequired,
-  LoggedInUser: PropTypes.object,
-  loadingLoggedInUser: PropTypes.bool,
   createNotification: PropTypes.func,
 };
 
@@ -371,4 +282,4 @@ CollectiveNavbarActionsMenu.defaultProps = {
   buttonsMinWidth: 100,
 };
 
-export default withUser(CollectiveNavbarActionsMenu);
+export default CollectiveNavbarActionsMenu;

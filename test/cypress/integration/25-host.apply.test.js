@@ -1,19 +1,33 @@
 import { randomSlug } from '../support/faker';
 
+const hasNewNavbar = Cypress.env('NEW_COLLECTIVE_NAVBAR');
+const env = Cypress.env('OC_ENV');
+
 describe('apply to host', () => {
   it('as a new collective', () => {
     cy.visit('/brusselstogetherasbl');
-    // cy.contains('We are fiscally hosting 2 Collectives');
-    cy.get('[data-cy="host-apply-btn-logged-out"]:visible').click();
+
+    if (env === 'ci') {
+      // Can easily change on local dev setup, so only checked on CI
+      cy.contains('We are fiscally hosting 2 Collectives');
+    }
+
+    if (hasNewNavbar) {
+      cy.getByDataCy('collective-navbar-actions-btn').click();
+      cy.getByDataCy('host-apply-btn').click({ force: true });
+    } else {
+      cy.get('[data-cy="host-apply-btn"]:visible').click();
+    }
+
+    cy.getByDataCy('host-apply-collective-picker').click();
+    cy.getByDataCy('host-apply-new-collective-link').click();
     cy.get('#email').type('testuser@opencollective.com');
     cy.wait(500);
     cy.getByDataCy('signin-btn').click();
     cy.get(`input[name="name"]`).type('New collective');
     cy.get(`input[name="slug"]`).type(randomSlug());
     cy.get(`input[name="description"]`).type('short description for new collective');
-    // FIXME: more precise selector such as
-    // cy.get('input[name="tos"] [data-cy="custom-checkbox"]').click();
-    cy.get('[data-cy="custom-checkbox"]').click();
+    cy.getByDataCy('checkbox-tos').click();
     cy.wait(300);
     cy.get('button[type="submit"]').click();
     cy.wait(1000);

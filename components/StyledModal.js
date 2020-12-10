@@ -28,7 +28,7 @@ const Wrapper = styled(Flex)`
 
 const Modal = styled(Container).attrs(props => ({
   maxWidth: props.maxWidth || '95%',
-  maxHeight: props.maxHeight || '100%',
+  maxHeight: props.maxHeight || '97%',
 }))`
   border: 1px solid rgba(9, 10, 10, 0.12);
   border-radius: 8px;

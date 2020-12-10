@@ -25,7 +25,7 @@ const StyledToast = styled.div`
   border: 1px solid #efefef;
   opacity: 1;
   /** Above modals */
-  z-index: 4000;
+  z-index: 1000000;
 
   ${props =>
     !props.isClosing &&
@@ -152,7 +152,7 @@ Toast.propTypes = {
   toast: PropTypes.shape({
     id: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.values(TOAST_TYPE)).isRequired,
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
     message: PropTypes.string,
     createdAt: PropTypes.number,
   }).isRequired,
