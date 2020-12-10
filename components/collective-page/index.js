@@ -91,7 +91,7 @@ class CollectivePage extends Component {
     super(props);
     // @deprecated This will be useless once new navbar will be the default
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
-    this.categoriesRefs = {}; // This will store a map of category => ref
+    this.sectionCategoriesRefs = {}; // This will store a map of category => ref
     this.navbarRef = React.createRef();
     this.state = {
       isFixed: false,
@@ -141,7 +141,7 @@ class CollectivePage extends Component {
         }
 
         const categoryName = sections[i].name;
-        const categoryRef = this.categoriesRefs[categoryName];
+        const categoryRef = this.sectionCategoriesRefs[categoryName];
         if (categoryRef && breakpoint >= categoryRef.offsetTop) {
           selectedCategory = categoryName;
           break;
@@ -440,7 +440,7 @@ class CollectivePage extends Component {
               <Fragment key={`category-${entry.name}`}>
                 <CategoryHeader
                   id={`category-${entry.name}`}
-                  ref={categoryRef => (this.categoriesRefs[entry.name] = categoryRef)}
+                  ref={categoryRef => (this.sectionCategoriesRefs[entry.name] = categoryRef)}
                   collective={collective}
                   category={entry.name}
                 />

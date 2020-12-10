@@ -27,10 +27,6 @@ const titles = defineMessages({
     id: 'conversations',
     defaultMessage: 'Conversations',
   },
-  CONTACT: {
-    id: 'ContactCollective',
-    defaultMessage: 'Contact {collective}',
-  },
 });
 
 const addSectionLink = (intl, links, collective, sections, section) => {
@@ -94,13 +90,6 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
         route: 'conversations',
         params: { collectiveSlug },
         title: intl.formatMessage(titles.CONVERSATIONS),
-      });
-    }
-    if (hasFeature(collective, FEATURES.CONTACT_FORM)) {
-      links.push({
-        route: 'collective-contact',
-        params: { collectiveSlug },
-        title: intl.formatMessage(titles.CONTACT, { collective: collective.name }),
       });
     }
   } else if (category === NAVBAR_CATEGORIES.EVENTS) {
