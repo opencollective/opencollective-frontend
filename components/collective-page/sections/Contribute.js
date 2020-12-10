@@ -496,7 +496,7 @@ class SectionContribute extends React.PureComponent {
               </ContainerSectionContent>
             )}
 
-            {/* Top contributors, for now (til moved to Budget in v2) */}
+            {/* Top contributors, for now (til moved to own widget in v2) */}
             {!isEvent &&
               (topOrganizations.length !== 0 || topIndividuals.length !== 0) &&
               !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (

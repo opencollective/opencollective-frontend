@@ -32,6 +32,7 @@ import SectionProjects from './sections/Projects';
 import SectionRecurringContributions from './sections/RecurringContributions';
 import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionTickets from './sections/Tickets';
+import SectionTopFinancialContributors from './sections/TopFinancialContributors';
 import SectionTransactions from './sections/Transactions';
 import SectionUpdates from './sections/Updates';
 import { Sections } from './_constants';
@@ -328,6 +329,13 @@ class CollectivePage extends Component {
         );
       case Sections.CONNECTED_COLLECTIVES:
         return <SectionConnectedCollectives connectedCollectives={this.props.connectedCollectives} />;
+      case Sections.TOP_FINANCIAL_CONTRIBUTORS:
+        return (
+          <SectionTopFinancialContributors
+            collective={this.props.collective}
+            financialContributors={this.props.financialContributors}
+          />
+        );
       default:
         return null;
     }
