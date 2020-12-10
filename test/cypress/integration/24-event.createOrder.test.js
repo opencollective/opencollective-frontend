@@ -34,7 +34,7 @@ describe('event.createOrder page', () => {
 
     cy.contains('button', 'Create Event').click();
     cy.contains('a', 'Create Ticket').click();
-    cy.get('.addTier.btn').click();
+    cy.get('.addTier').click();
 
     // Create tickets
     cy.get('.EditTiers input[name="name"]').type('Ticket with VAT');

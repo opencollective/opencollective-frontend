@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, sortBy } from 'lodash';
-import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -167,7 +166,7 @@ class CollectiveGoals extends React.Component {
 
     return (
       <Container mt={4} pb={4} borderBottom={BORDER} key={`goal-${index}-${goal.key}`}>
-        <Form>
+        <form>
           <Box mb={4}>
             <StyledInputField name={this.fields[0].name} label={this.fields[0].label}>
               <StyledInput
@@ -215,7 +214,7 @@ class CollectiveGoals extends React.Component {
               />
             </StyledInputField>
           </Box>
-        </Form>
+        </form>
         <Container className="goalActions" textAlign="right">
           <StyledButton isBorderless={true} buttonStyle="dangerSecondary" onClick={() => this.removeGoal(index)}>
             {intl.formatMessage(this.messages.remove)}

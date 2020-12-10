@@ -2,11 +2,11 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get, groupBy } from 'lodash';
 import { withRouter } from 'next/router';
-import { Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
+import StyledButton from '../StyledButton';
 
 import CreateOrganizationForm from './CreateOrganizationForm';
 import EditConnectedAccount from './EditConnectedAccount';
@@ -139,23 +139,23 @@ class CreateHostForm extends React.Component {
         {!host && (
           <Fragment>
             <CreateOrganizationForm onChange={org => this.handleChange('organization', org)} />
-            <Button
-              bsStyle="primary"
+            <StyledButton
+              buttonStyle="primary"
               type="submit"
               onClick={() => this.createOrganization(this.state.form.organization)}
               className="createOrganizationBtn"
             >
               <FormattedMessage id="organization.create" defaultMessage="Create organization" />
-            </Button>
+            </StyledButton>
           </Fragment>
         )}
 
         {host && (
           <Flex justifyContent="space-between" alignItems="flex-end">
             <Box>
-              <Button bsStyle="primary" type="submit" onClick={() => this.props.onSubmit(host)}>
+              <StyledButton buttonStyle="primary" type="submit" onClick={() => this.props.onSubmit(host)}>
                 <FormattedMessage id="host.link" defaultMessage="Yes, use this Organization as Fiscal Host" />
-              </Button>
+              </StyledButton>
             </Box>
             {!stripeAccount && (
               <Box textAlign="right">

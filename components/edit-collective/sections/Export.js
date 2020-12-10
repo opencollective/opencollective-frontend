@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 import { exportMembers } from '../../../lib/export_file';
 
 import Container from '../../Container';
 import ExportImages from '../../ExportImages';
+import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
 import { P } from '../../Text';
 
@@ -45,9 +45,9 @@ class Export extends React.Component {
           />
         </P>
         <Container textAlign="center">
-          <Button onClick={async () => await exportMembers(collective.slug)}>
+          <StyledButton onClick={async () => await exportMembers(collective.slug)}>
             <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-          </Button>
+          </StyledButton>
         </Container>
 
         <h1>
