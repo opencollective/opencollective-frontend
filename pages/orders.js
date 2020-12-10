@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
 
-import { ORDER_STATUS } from '../lib/constants/order-status';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -41,11 +39,7 @@ class OrdersPage extends React.Component {
           </Container>
         )}
         <Box py={4}>
-          <OrdersWithData
-            accountSlug={slug}
-            status={ORDER_STATUS.PENDING}
-            title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
-          />
+          <OrdersWithData accountSlug={slug} />
         </Box>
       </Page>
     );
