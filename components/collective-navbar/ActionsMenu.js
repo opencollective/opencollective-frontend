@@ -244,7 +244,7 @@ const CollectiveNavbarActionsMenu = ({
 
 CollectiveNavbarActionsMenu.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.oneOf([PropTypes.number, PropTypes.string]).isRequired,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     legacyId: PropTypes.number,
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
