@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, Form, Formik } from 'formik';
+import { get } from 'lodash';
 import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
@@ -64,7 +65,10 @@ class SetupTwoFactorAuth extends React.Component {
     /** From graphql query */
     addTwoFactorAuthTokenToIndividual: PropTypes.func.isRequired,
     removeTwoFactorAuthTokenFromIndividual: PropTypes.func.isRequired,
-    data: PropTypes.object,
+    data: PropTypes.shape({
+      individual: PropTypes.object,
+      loading: PropTypes.bool,
+    }),
     /** From parent component */
     slug: PropTypes.string,
     userEmail: PropTypes.string,
@@ -74,12 +78,11 @@ class SetupTwoFactorAuth extends React.Component {
     super(props);
     this.state = {
       error: null,
-      tokenAdded: null,
       disablingTwoFactorAuth: false,
       disableError: null,
     };
 
-    this.submit = this.submit.bind(this);
+    this.enableTwoFactorAuth = this.enableTwoFactorAuth.bind(this);
     this.disableTwoFactorAuth = this.disableTwoFactorAuth.bind(this);
   }
 
@@ -104,7 +107,7 @@ class SetupTwoFactorAuth extends React.Component {
     this.setState({ secret, base32: secret.base32, otpauth_url: fullOTPUrl });
   }
 
-  async submit(values) {
+  async enableTwoFactorAuth(values) {
     try {
       // verify QR code
       const { twoFactorAuthenticatorCode } = values;
@@ -136,7 +139,7 @@ class SetupTwoFactorAuth extends React.Component {
           .then(() => {
             confettiFireworks(2000, { zIndex: 3000 });
           });
-        this.setState({ tokenAdded: true, error: null });
+        this.setState({ error: null });
       }
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
@@ -157,6 +160,7 @@ class SetupTwoFactorAuth extends React.Component {
           code: twoFactorAuthenticatorCode,
         },
       });
+      this.setState({ disablingTwoFactorAuth: false, error: null });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ disableError: errorMsg });
@@ -165,7 +169,7 @@ class SetupTwoFactorAuth extends React.Component {
 
   render() {
     const { intl, data } = this.props;
-    const { error, disableError, tokenAdded, secret, base32, otpauth_url, disablingTwoFactorAuth } = this.state;
+    const { error, disableError, secret, base32, otpauth_url, disablingTwoFactorAuth } = this.state;
 
     const { loading } = data;
 
@@ -173,8 +177,8 @@ class SetupTwoFactorAuth extends React.Component {
       return <Loading />;
     }
 
-    const account = data && data.individual;
-    const doesAccountAlreadyHave2FA = tokenAdded || account.hasTwoFactorAuth;
+    const account = get(data, 'individual', null);
+    const doesAccountAlreadyHave2FA = get(account, 'hasTwoFactorAuth', false);
 
     const initialSetupFormValues = {
       twoFactorAuthenticatorCode: '',
@@ -360,7 +364,11 @@ class SetupTwoFactorAuth extends React.Component {
                     />
                   </H3>
                   <Container>
-                    <Formik validate={validate} initialValues={initialSetupFormValues} onSubmit={this.submit}>
+                    <Formik
+                      validate={validate}
+                      initialValues={initialSetupFormValues}
+                      onSubmit={this.enableTwoFactorAuth}
+                    >
                       {formik => {
                         const { values, handleSubmit, errors, touched, isSubmitting } = formik;
 
