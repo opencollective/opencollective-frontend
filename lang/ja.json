@@ -21,7 +21,7 @@
   "acceptContributions.picker.hostInfo": "Apply to a Fiscal Host. Fiscal Hosts hold money on behalf of Collectives and take care of accounting, taxes, payments, and liability for them. {moreInfo}",
   "acceptContributions.picker.organizationInfo": "Use an organization you own as Fiscal Host  and host multiple collectives. The organization will be responsible for their accounting, taxes, payments, and liability.",
   "acceptContributions.picker.ourselves": "Ourselves",
-  "acceptContributions.picker.ourselvesInfo": "Simply connect a bank account to your collective. You will be responsible for accounting, taxes, payments, and liability.",
+  "acceptContributions.picker.ourselvesInfo": "銀行口座を collective に接続するだけです。あなたは会計、税金、支払い、責任を負うことになります。",
   "acceptContributions.picker.subtitle": "Who will hold money on behalf of the Collective?",
   "acceptContributions.stripe.info": "Automatically accept contributions with credit cards from all over the world.",
   "acceptContributions.stripeConnected": "Stripeに接続済み",
