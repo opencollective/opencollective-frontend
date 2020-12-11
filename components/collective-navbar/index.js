@@ -289,9 +289,8 @@ const CollectiveNavbar = ({
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
   callsToAction = { ...getDefaultCallsToActions(collective, isAdmin), ...callsToAction };
   const isEvent = collective?.type === CollectiveType.EVENT;
-  const useNewSectionsFormat = get(collective, 'settings.collectivePage.useNewSections');
 
-  return NAV_V2_FEATURE_FLAG && useNewSectionsFormat ? (
+  return NAV_V2_FEATURE_FLAG ? (
     // v2
     <MainContainerV2
       flexDirection={['column', 'row']}

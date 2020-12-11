@@ -360,7 +360,6 @@ class CollectivePage extends Component {
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
     const isFund = collective.type === CollectiveType.FUND || settings?.fund === true; // Funds MVP, to refactor
     const isAuthenticated = LoggedInUser ? true : false;
-    const useNewSectionsFormat = get(collective, 'settings.collectivePage.useNewSections');
     const callsToAction = this.getCallsToAction(
       type,
       isHost,
@@ -442,7 +441,7 @@ class CollectivePage extends Component {
 
         {isEmpty(sections) ? (
           <SectionEmpty collective={this.props.collective} />
-        ) : useNewSectionsFormat ? (
+        ) : NAV_V2_FEATURE_FLAG ? (
           sections.map((entry, entryIdx) =>
             entry.type === 'CATEGORY' ? (
               <Fragment key={`category-${entry.name}`}>
