@@ -99,6 +99,10 @@ const MenuItem = styled('li')`
 
   & > a {
     padding: 12px;
+
+    @media (max-width: 40em) {
+      padding-top: 4px;
+    }
   }
 
   &,

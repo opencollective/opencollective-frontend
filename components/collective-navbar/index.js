@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useRef } from 'react';
 import { PropTypes } from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Settings } from '@styled-icons/feather/Settings';
@@ -10,6 +10,7 @@ import styled, { css } from 'styled-components';
 import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getEnvVar } from '../../lib/env-utils';
+import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
 import { parseToBoolean } from '../../lib/utils';
 
@@ -37,7 +38,6 @@ const MainContainerV2 = styled(Container)`
   display: flex;
   justify-content: flex-start;
   overflow-y: auto;
-  max-height: 350px;
 `;
 
 const AvatarBox = styled(Box)`
@@ -80,6 +80,7 @@ const CollectiveNameV2 = styled(H1)`
   white-space: nowrap;
   overflow: hidden;
   min-width: 0;
+  text-decoration: none;
 
   a:not(:hover) {
     color: #313233;
@@ -290,6 +291,13 @@ const CollectiveNavbar = ({
   callsToAction = { ...getDefaultCallsToActions(collective, isAdmin), ...callsToAction };
   const isEvent = collective?.type === CollectiveType.EVENT;
 
+  const navbarRef = useRef();
+  useGlobalBlur(navbarRef, outside => {
+    if (!outside) {
+      setTimeout(() => setExpanded(false), 200);
+    }
+  });
+
   return NAV_V2_FEATURE_FLAG ? (
     // v2
     <MainContainerV2
@@ -300,6 +308,7 @@ const CollectiveNavbar = ({
       mt={onlyInfos ? 0 : '50px'}
       maxWidth={Dimensions.MAX_SECTION_WIDTH}
       boxShadow={withShadow ? ' 0px 6px 10px -5px rgba(214, 214, 214, 0.5)' : 'none'}
+      maxHeight="100vh"
     >
       {/** Collective info */}
       <InfosContainerV2
@@ -350,15 +359,13 @@ const CollectiveNavbar = ({
       </InfosContainerV2>
       {/** Main navbar items */}
 
-      {/* TO DO: they don't shrink properly when the container gets small - needs work */}
       {!onlyInfos && (
         <Fragment>
           <Container
+            ref={navbarRef}
             backgroundColor="#fff"
-            zIndex={1}
             display={isExpanded ? 'flex' : ['none', 'flex']}
             flexDirection={['column', 'row']}
-            flexBasis="600px"
             flexShrink={2}
             flexGrow={1}
             justifyContent={['space-between', null, 'flex-start']}
@@ -410,12 +417,12 @@ const CollectiveNavbar = ({
                     alignItems="center"
                     borderRadius={[0, 8]}
                     background="rgba(72, 95, 211, 0.1)"
-                    px={3}
+                    px={[4, 3]}
                     py={[3, 1]}
                   >
                     <Settings size={20} color="rgb(48, 76, 220)" />
                     <P
-                      ml={1}
+                      ml={[2, 1]}
                       textTransform="uppercase"
                       color="rgb(48, 76, 220)"
                       fontSize="14px"
