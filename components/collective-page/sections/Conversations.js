@@ -11,7 +11,7 @@ import { conversationListFragment } from '../../conversations/graphql';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
-import { P } from '../../Text';
+import { P, Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
@@ -67,6 +67,9 @@ class SectionConversations extends React.PureComponent {
           </P>
           <Link route="create-conversation" params={{ collectiveSlug: collective.slug }}>
             <StyledButton buttonStyle="primary">
+              <Span fontSize="16px" fontWeight="bold" mr={2}>
+                +
+              </Span>
               <FormattedMessage id="conversations.create" defaultMessage="Create conversation" />
             </StyledButton>
           </Link>
