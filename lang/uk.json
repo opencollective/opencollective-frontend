@@ -821,6 +821,7 @@
   "expense.pay.error.payee.noHost": "Одержувач платежу повинен мати скарбника, щоб могти отримувати на свій рахунок Open Collective.",
   "expense.pay.error.payee.sameHost": "Одержувач платежу повинен співпрацювати з тим же скарбником що й платник, щоб могти отримувати на свій рахунок Open Collective.",
   "expense.pay.transferwise.planlimit": "You reached your plan's limit, <Link>upgrade your plan</Link> to continue paying expense with TransferWise",
+  "expense.PayFromFiscalhost": "Pay from Fiscal Host",
   "expense.paymentProcessorFeeInCollectiveCurrency": "платня обробника платежу",
   "expense.payoutMethod": "payout method",
   "Expense.PayTo": "Pay to",
