@@ -16,7 +16,7 @@ const collectivePickerSearchQuery = gql`
     $limit: Int
     $hostCollectiveIds: [Int]
   ) {
-    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds, useAlgolia: false) {
+    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds) {
       id
       collectives {
         id
