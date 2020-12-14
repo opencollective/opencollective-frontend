@@ -821,6 +821,7 @@
   "expense.pay.error.payee.noHost": "Le bénéficiaire doit avoir un Hôte pour pouvoir être payé sur son solde Open Collective.",
   "expense.pay.error.payee.sameHost": "Le bénéficiaire doit être sur le même hôte que le payeur pour être payé sur son solde Open Collective.",
   "expense.pay.transferwise.planlimit": "Vous avez atteint la limite de votre forfait, <Link>mettez à niveau votre abonnement</Link> pour continuer à payer des dépenses avec TransferWise",
+  "expense.PayFromFiscalhost": "Pay from Fiscal Host",
   "expense.paymentProcessorFeeInCollectiveCurrency": "commission du processeur de paiement",
   "expense.payoutMethod": "méthode de remboursement",
   "Expense.PayTo": "Payer à",
