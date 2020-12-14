@@ -1,7 +1,5 @@
 import { randomEmail } from '../support/faker';
 
-const hasGuestContributions = Cypress.env('ENABLE_GUEST_CONTRIBUTIONS');
-
 describe('Contribution Flow: Create profile', () => {
   // @deprecated This path is going to be removed in favor of guest contributions
   it('Personal profile', () => {
@@ -11,10 +9,8 @@ describe('Contribution Flow: Create profile', () => {
     // Skip the step details on the new contribution flow
     cy.get('button[data-cy="cf-next-step"]').click();
 
-    if (hasGuestContributions) {
-      cy.getByDataCy('cf-profile-signin-btn').click();
-      cy.getByDataCy('signin-secondary-action-btn').click();
-    }
+    cy.getByDataCy('cf-profile-signin-btn').click();
+    cy.getByDataCy('signin-secondary-action-btn').click();
 
     // Has TOS
     cy.contains('By joining, you agree to our Terms of Service and Privacy Policy.');
@@ -49,10 +45,8 @@ describe('Contribution Flow: Create profile', () => {
     // Skip the step details on the new contribution flow
     cy.get('button[data-cy="cf-next-step"]').click();
 
-    if (hasGuestContributions) {
-      cy.getByDataCy('cf-profile-signin-btn').click();
-      cy.getByDataCy('signin-secondary-action-btn').click();
-    }
+    cy.getByDataCy('cf-profile-signin-btn').click();
+    cy.getByDataCy('signin-secondary-action-btn').click();
 
     // Select "Create oganization"
     cy.get('[data-cy="cf-content"]').contains('Contribute as an organization').click();

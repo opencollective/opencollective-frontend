@@ -6,7 +6,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
-import { getEnvVar } from '../lib/env-utils';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { floatAmountToCents } from '../lib/math';
@@ -15,8 +14,8 @@ import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
 import { STEPS } from '../components/contribution-flow/constants';
-import NewContributionFlowSuccess from '../components/contribution-flow/ContributionFlowSuccess';
-import NewContributionFlowContainer from '../components/contribution-flow/index';
+import ContributionFlowSuccess from '../components/contribution-flow/ContributionFlowSuccess';
+import ContributionFlowContainer from '../components/contribution-flow/index';
 import ErrorPage from '../components/ErrorPage';
 import { Flex } from '../components/Grid';
 import Link from '../components/Link';
@@ -240,10 +239,10 @@ class NewContributionFlowPage extends React.Component {
     } else if (account.settings.disableCustomContributions && !tier) {
       return this.renderMessage('warning', intl.formatMessage(messages.disableCustomContributions), true);
     } else if (step === 'success') {
-      return <NewContributionFlowSuccess collective={account} />;
+      return <ContributionFlowSuccess collective={account} />;
     } else {
       return (
-        <NewContributionFlowContainer
+        <ContributionFlowContainer
           collective={account}
           host={account.host}
           tier={tier}
@@ -258,10 +257,6 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
-          hasGuestContributions={
-            parseToBoolean(getEnvVar('ENABLE_GUEST_CONTRIBUTIONS')) ||
-            get(account, 'settings.features.GUEST_CONTRIBUTIONS')
-          }
         />
       );
     }
