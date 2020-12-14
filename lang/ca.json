@@ -821,6 +821,7 @@
   "expense.pay.error.payee.noHost": "The payee needs to have an Host to be able to be paid on its Open Collective balance.",
   "expense.pay.error.payee.sameHost": "The payee needs to be on the same Host than the payer to be paid on its Open Collective balance.",
   "expense.pay.transferwise.planlimit": "You reached your plan's limit, <Link>upgrade your plan</Link> to continue paying expense with TransferWise",
+  "expense.PayFromFiscalhost": "Pay from Fiscal Host",
   "expense.paymentProcessorFeeInCollectiveCurrency": "payment processor fee",
   "expense.payoutMethod": "mètode de pagament",
   "Expense.PayTo": "Pay to",
