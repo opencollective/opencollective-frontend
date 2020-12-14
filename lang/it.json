@@ -1,7 +1,7 @@
 {
   "Accept": "Accetta",
   "acceptContributions.addBankAccount": "Aggiungi conto bancario",
-  "acceptContributions.bankAccount.info": "Manually sync contributions received on your bank account with your Collective's budget.",
+  "acceptContributions.bankAccount.info": "Contributi sincronizzati manualmente ricevuti sul tuo conto bancario con il tuo budget Collettivo.",
   "acceptContributions.bankAccountSetUp": "Impostazioni conto bancario",
   "acceptContributions.definePaymentInstructions": "Definisci metodi di pagamento",
   "acceptContributions.definePaymentInstructionsDetails": "Fornisci ai contributori tutti i dettagli necessari per poterti inviare denaro. come: nome e numero account; IBAN, Swift, codici di routing; nome della banca, indirizzo, ecc. L' importo e il numero dell'ordine verranno automaticamente inclusi.",
