@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
@@ -17,10 +16,11 @@ import { CollectiveType } from '../../lib/constants/collectives';
 
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Container from '../Container';
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
+import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
@@ -29,7 +29,6 @@ const AddFundsToOrganizationModal = dynamic(() => import('../AddFundsToOrganizat
 const AddFundsModal = dynamic(() => import('../host-dashboard/AddFundsModal'));
 
 //  Styled components
-
 const MenuItem = styled('li')`
   display: flex;
   align-items: center;
@@ -53,6 +52,33 @@ const MenuItem = styled('li')`
 
   svg {
     margin-right: 8px;
+  }
+`;
+
+const ActionsDropdown = styled(Dropdown)`
+  @media screen and (min-width: 40em) and (max-width: 64em) {
+    ${DropdownContent} {
+      right: 1em;
+    }
+  }
+  @media (max-width: 40em) {
+    ${DropdownArrow} {
+      display: none !important;
+    }
+    ${DropdownContent} {
+      display: block;
+      position: relative;
+      box-shadow: none;
+      border: none;
+      padding-left: 28px;
+    }
+  }
+`;
+
+const StyledActionButton = styled(StyledButton)`
+  @media (max-width: 40em) {
+    cursor: none;
+    pointer-events: none;
   }
 `;
 
@@ -92,27 +118,31 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
   }
 
   return (
-    <Container display="flex" alignItems="center" order={[-1, 0]}>
+    <Container display="flex" alignItems="center" order={[-1, 0]} borderTop={['1px solid #e1e1e1', 'none']}>
       <Box px={1}>
-        <Dropdown trigger="click">
-          <StyledButton
-            isBorderless
-            buttonSize="tiny"
-            buttonStyle="secondary"
-            my={2}
-            fontSize="14px"
-            fontWeight="500"
-            textTransform="uppercase"
-            color="blue.700"
-            letterSpacing="60%"
-            tabIndex="-1"
-            data-cy="collective-navbar-actions-btn"
-          >
-            <Span css={{ verticalAlign: 'middle' }}>
-              <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
-            </Span>
-            <ChevronDown size="24px" />
-          </StyledButton>
+        <ActionsDropdown trigger="click">
+          <Flex alignItems="center">
+            <Box display={['block', 'none']} width={'33px'} ml={2}>
+              <StyledHr borderStyle="solid" borderColor="#304CDC" />
+            </Box>
+            <StyledActionButton
+              isBorderless
+              buttonSize="tiny"
+              buttonStyle="secondary"
+              my={2}
+              fontSize="14px"
+              fontWeight="500"
+              textTransform="uppercase"
+              color="#304CDC"
+              letterSpacing="60%"
+              tabIndex="-1"
+              data-cy="collective-navbar-actions-btn"
+            >
+              <Span css={{ verticalAlign: 'middle' }}>
+                <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
+              </Span>
+            </StyledActionButton>
+          </Flex>
           <DropdownArrow />
           <DropdownContent>
             <Box as="ul" p={0} m={0} minWidth={184}>
@@ -238,7 +268,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               )}
             </Box>
           </DropdownContent>
-        </Dropdown>
+        </ActionsDropdown>
       </Box>
     </Container>
   );
