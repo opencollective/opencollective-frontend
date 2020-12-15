@@ -284,6 +284,7 @@ class CollectivePicker extends React.PureComponent {
       maxWidth,
       width,
       addLoggedInUserAsAdmin,
+      renderNewCollectiveOption,
       ...props
     } = this.props;
     const { createFormCollectiveType, createdCollectives, displayInviteMenu, searchText } = this.state;
@@ -316,7 +317,9 @@ class CollectivePicker extends React.PureComponent {
                   if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
                     return formatOptionLabel(option, context);
                   } else if (option[FLAG_NEW_COLLECTIVE]) {
-                    return (
+                    return renderNewCollectiveOption ? (
+                      renderNewCollectiveOption()
+                    ) : (
                       <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={option.types || types} />
                     );
                   } else if (option[FLAG_INVITE_NEW]) {
@@ -436,6 +439,8 @@ CollectivePicker.propTypes = {
   groupByType: PropTypes.bool,
   /** If true, a permanent option to create a collective will be displayed in the select */
   creatable: PropTypes.bool,
+  /** If creatable is true, this will be used to render the "Create new ..." */
+  renderNewCollectiveOption: PropTypes.node,
   /** If true, a permanent option to invite a new user will be displayed in the select */
   invitable: PropTypes.bool,
   /** If true, logged in user will be added as an admin of the created account */

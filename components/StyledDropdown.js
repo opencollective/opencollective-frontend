@@ -42,11 +42,23 @@ export const DropdownArrow = styled('div')`
   }
 `;
 
-export const Dropdown = styled(({ children, ...props }) => (
-  <div tabIndex={0} onClick={e => e.target.blur()} {...props}>
-    {children}
-  </div>
-))`
+export const Dropdown = styled(({ children, ...props }) => {
+  const ref = React.useRef();
+  return (
+    <div
+      ref={ref}
+      tabIndex={0}
+      {...props}
+      onClick={e => {
+        if (ref.current?.contains(e.target)) {
+          e.target.blur();
+        }
+      }}
+    >
+      {children}
+    </div>
+  );
+})`
   ${props =>
     props.trigger === 'hover'
       ? css`

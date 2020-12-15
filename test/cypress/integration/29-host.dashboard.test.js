@@ -1,5 +1,7 @@
 import { randomSlug } from '../support/faker';
 
+const hasNewNavbar = Cypress.env('NEW_COLLECTIVE_NAVBAR');
+
 describe('host dashboard', () => {
   before(() => {
     cy.signup({ redirect: '/brusselstogetherasbl' });
@@ -9,13 +11,19 @@ describe('host dashboard', () => {
     it('mark pending application approved', () => {
       const collectiveSlug = randomSlug();
 
-      cy.get('[data-cy="host-apply-btn"]:not([disabled]):visible', { timeout: 30000 }).click();
+      if (hasNewNavbar) {
+        cy.getByDataCy('collective-navbar-actions-btn').click();
+        cy.getByDataCy('host-apply-btn').click({ force: true });
+      } else {
+        cy.get('[data-cy="host-apply-btn"]:visible').click();
+      }
+
+      cy.getByDataCy('host-apply-collective-picker').click();
+      cy.getByDataCy('host-apply-new-collective-link').click();
       cy.get(`input[name="name"]`).type('Cavies United');
       cy.get(`input[name="slug"]`).type(`{selectall}${collectiveSlug}`);
       cy.get(`input[name="description"]`).type('We will rule the world with our cute squeaks');
-      // FIXME: more precise selector such as
-      // cy.get('input[name="tos"] [data-cy="custom-checkbox"]').click();
-      cy.get('[data-cy="custom-checkbox"]').click();
+      cy.getByDataCy('checkbox-tos').click();
       cy.wait(300);
       cy.get('button[type="submit"]').click();
       cy.contains('The Cavies United Collective has been created!');

@@ -6,12 +6,11 @@ import { FormattedMessage } from 'react-intl';
 
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 
-import _ApplyToHostBtn from './ApplyToHostBtn';
+import ApplyToHostBtn from './ApplyToHostBtn';
 import Container from './Container';
 import { Box } from './Grid';
 import Link from './Link';
 import StyledButton from './StyledButton';
-import StyledTooltip from './StyledTooltip';
 
 // Dynamic imports
 const AddFundsToOrganizationModal = dynamic(() => import('./AddFundsToOrganizationModal'));
@@ -41,10 +40,6 @@ const CollectiveCallsToAction = ({
   const hostWithinLimit = hostedCollectivesLimit
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
     : true;
-
-  const ApplyToHostBtn = () => (
-    <_ApplyToHostBtn host={collective} disabled={!hostWithinLimit} showConditions={false} minWidth={buttonsMinWidth} />
-  );
 
   let contributeRoute = 'orderCollectiveNew';
   let contributeRouteParams = { collectiveSlug: collective.slug, verb: 'donate' };
@@ -123,26 +118,12 @@ const CollectiveCallsToAction = ({
       )}
       {hasApply && (
         <Box mx={2} my={1}>
-          {hostWithinLimit ? (
-            <ApplyToHostBtn />
-          ) : (
-            <StyledTooltip
-              place="left"
-              content={
-                <FormattedMessage
-                  id="host.hostLimit.warning"
-                  defaultMessage="Host already reached the limit of hosted collectives for its plan. <a>Contact {collectiveName}</a> and let them know you want to apply."
-                  values={{
-                    collectiveName: collective.name,
-                    // eslint-disable-next-line react/display-name
-                    a: chunks => <Link route={`/${collective.slug}/contact`}>{chunks}</Link>,
-                  }}
-                />
-              }
-            >
-              <ApplyToHostBtn />
-            </StyledTooltip>
-          )}
+          <ApplyToHostBtn
+            hostSlug={collective.slug}
+            disabled={!hostWithinLimit}
+            minWidth={buttonsMinWidth}
+            withoutIcon
+          />
         </Box>
       )}
       {addFundsToOrganization && (

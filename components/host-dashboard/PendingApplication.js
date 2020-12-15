@@ -191,16 +191,16 @@ const getSuccessToast = (intl, action, collective, result) => {
   }
 };
 
-const PendingApplication = ({ host, collective, ...props }) => {
+const PendingApplication = ({ host, application, ...props }) => {
   const intl = useIntl();
   const [isDone, setIsDone] = React.useState(false);
   const [latestAction, setLatestAction] = React.useState(null);
   const [showContactModal, setShowContactModal] = React.useState(false);
   const { addToast } = useToasts();
+  const collective = application.account;
   const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
     context: API_V2_CONTEXT,
   });
-  const applyMessage = null; // TODO: Doesn't exist yet
 
   const processApplication = async (action, message, onSuccess) => {
     setIsDone(false);
@@ -320,7 +320,7 @@ const PendingApplication = ({ host, collective, ...props }) => {
               </Span>
               <StyledHr borderColor="black.200" flex="1 1" />
             </Flex>
-            {applyMessage ? (
+            {application.message ? (
               <P
                 as="q"
                 fontSize={['14px', '16px']}
@@ -329,7 +329,7 @@ const PendingApplication = ({ host, collective, ...props }) => {
                 color="black.800"
                 fontWeight="400"
               >
-                {applyMessage}
+                {application.message}
               </P>
             ) : (
               <P color="black.500">
@@ -379,23 +379,26 @@ PendingApplication.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.string,
   }).isRequired,
-  collective: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    name: PropTypes.string,
-    description: PropTypes.string,
-    isApproved: PropTypes.bool,
-    tags: PropTypes.array,
-    type: PropTypes.string,
-    host: PropTypes.shape({
-      id: PropTypes.string,
-    }),
-    admins: PropTypes.shape({
-      totalCount: PropTypes.number,
-      nodes: PropTypes.array,
-    }),
-  }).isRequired,
+  application: PropTypes.shape({
+    message: PropTypes.string,
+    account: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      legacyId: PropTypes.number,
+      slug: PropTypes.string,
+      name: PropTypes.string,
+      description: PropTypes.string,
+      isApproved: PropTypes.bool,
+      tags: PropTypes.array,
+      type: PropTypes.string,
+      host: PropTypes.shape({
+        id: PropTypes.string,
+      }),
+      admins: PropTypes.shape({
+        totalCount: PropTypes.number,
+        nodes: PropTypes.array,
+      }),
+    }).isRequired,
+  }),
 };
 
 export default PendingApplication;

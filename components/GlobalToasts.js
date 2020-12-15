@@ -8,7 +8,7 @@ import Toast from './Toast';
 import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 const UPDATE_INTERVAL = 500; // milliseconds
-const DEFAULT_TOAST_DURATION = 6000; // milliseconds
+const DEFAULT_TOAST_DURATION = 8000; // milliseconds
 
 class GlobalToasts extends PureComponent {
   static propTypes = {
@@ -109,6 +109,7 @@ class GlobalToasts extends PureComponent {
         width="100%"
         onMouseEnter={this.pause}
         onMouseLeave={this.startAfterDelay}
+        zIndex={100000}
       >
         <FlipMove>
           {this.props.toasts.map(toast => (
