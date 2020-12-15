@@ -1,24 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
-import { Field, Form, Formik } from 'formik';
-import { trim } from 'lodash';
+import { Form, Formik } from 'formik';
+import { get, trim } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective.lib';
+import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
+import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 
+import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import Illustration from '../home/HomeIllustration';
+import { getI18nLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInput from '../StyledInput';
-import StyledInputField from '../StyledInputField';
+import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
+import StyledTextarea from '../StyledTextarea';
 import { H1, P } from '../Text';
 
 const BackButton = styled(StyledButton)`
@@ -57,18 +62,6 @@ const messages = defineMessages({
     id: 'create.collective.placeholder',
     defaultMessage: 'Making the world a better place',
   },
-  errorName: {
-    id: 'createCollective.form.error.name',
-    defaultMessage: 'Please use fewer than 50 characters',
-  },
-  errorDescription: {
-    id: 'createCollective.form.error.description',
-    defaultMessage: 'Please use fewer than 160 characters',
-  },
-  errorSlug: {
-    id: 'createCollective.form.error.slug',
-    defaultMessage: 'Please use fewer than 30 characters',
-  },
   errorSlugHyphen: {
     id: 'createCollective.form.error.slug.hyphen',
     defaultMessage: 'Collective slug can not start nor end with hyphen',
@@ -94,61 +87,57 @@ class CreateCollectiveForm extends React.Component {
     router: PropTypes.object.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      tos: false,
-      hostTos: false,
-    };
-  }
-
-  componentDidMount() {
-    const { category, step, hostTos } = this.props.router.query;
-    // first condition is if they are coming from Github stars, second is if they are coming from request manual verification
-    if ((category === 'opensource' && step === 'form') || hostTos) {
-      this.setState({ hostTos: true });
+  hasHostTerms() {
+    if (!this.props.host) {
+      return false;
+    } else if (this.props.host.legacyId === OPENSOURCE_COLLECTIVE_ID) {
+      // Already checked on previous step (Github flow)
+      return false;
+    } else {
+      return Boolean(this.props.host.termsUrl);
     }
   }
 
   render() {
-    const { intl, error, host, loading, github, router } = this.props;
+    const { intl, error, host, loading, github } = this.props;
+    const hasHostTerms = this.hasHostTerms();
 
     const initialValues = {
       name: github ? formatGithubRepoName(github.repo) : '',
       description: '',
       slug: github ? github.repo : '',
+      message: '',
+      tos: false,
+      hostTos: false,
     };
 
     const validate = values => {
-      const errors = {};
+      const errors = requireFields(values, ['name', 'slug', 'description']);
 
-      if (values.name.length > 50) {
-        errors.name = intl.formatMessage(messages.errorName);
-      }
-
-      if (values.slug.length > 30) {
-        errors.slug = intl.formatMessage(messages.errorSlug);
-      }
       if (values.slug !== trim(values.slug, '-')) {
         errors.slug = intl.formatMessage(messages.errorSlugHyphen);
       }
 
-      if (values.description.length > 160) {
-        errors.description = intl.formatMessage(messages.errorDescription);
+      verifyFieldLength(intl, errors, values, 'name', 1, 50);
+      verifyFieldLength(intl, errors, values, 'slug', 1, 30);
+      verifyFieldLength(intl, errors, values, 'description', 1, 160);
+      verifyFieldLength(intl, errors, values, 'message', 0, 3000);
+
+      verifyChecked(errors, values, 'tos');
+      if (hasHostTerms) {
+        verifyChecked(errors, values, 'hostTos');
       }
 
       return errors;
     };
 
     const submit = values => {
-      const { description, name, slug } = values;
-      const { tos, hostTos } = this.state;
-      this.props.onSubmit({ name, description, slug, tos, hostTos });
+      const { description, name, slug, message } = values;
+      this.props.onSubmit({ collective: { name, description, slug }, message });
     };
 
     return (
-      <Grid gridTemplateColumns={['1fr', null, null, '1fr 1fr 1fr']} pt={42}>
+      <Grid gridTemplateColumns={['1fr', null, null, '1fr 576px 1fr']} pt={48}>
         <Container
           display={['none', null, null, 'flex']}
           minHeight="32px"
@@ -161,25 +150,49 @@ class CreateCollectiveForm extends React.Component {
           </BackButton>
         </Container>
         <Box>
-          <Flex flexDirection="column" mb={[2, 4]} px={2}>
-            <Box mb={[2, 3]}>
-              <H1
-                fontSize={['20px', '32px']}
-                lineHeight={['24px', '36px']}
-                fontWeight="bold"
-                textAlign="center"
-                color="black.900"
-                mt={3}
-              >
-                <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-              </H1>
-            </Box>
-            <P fontSize="16px" color="black.600" textAlign="center" mb={2}>
-              <FormattedMessage
-                id="createCollective.subtitle.introduce"
-                defaultMessage="Introduce your Collective to the community."
-              />
-            </P>
+          <Flex flexDirection="column" mb={[2, 4, 48]} px={2} pt={2}>
+            {host ? (
+              <Flex justifyContent="center" alignItems="center">
+                <Box mr={3}>
+                  <Avatar radius={96} collective={host} />
+                </Box>
+                <Box maxWidth={345}>
+                  <H1
+                    fontSize={['20px', '32px']}
+                    lineHeight={['24px', '40px']}
+                    fontWeight="500"
+                    textAlign="left"
+                    color="black.900"
+                  >
+                    <FormattedMessage
+                      id="host.applyTo"
+                      defaultMessage="Apply to {hostName}"
+                      values={{ hostName: host.name }}
+                    />
+                  </H1>
+                </Box>
+              </Flex>
+            ) : (
+              <div>
+                <Box mb={[2, 3]}>
+                  <H1
+                    fontSize={['20px', '32px']}
+                    lineHeight={['24px', '36px']}
+                    fontWeight="bold"
+                    textAlign="center"
+                    color="black.900"
+                  >
+                    <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+                  </H1>
+                </Box>
+                <P fontSize="16px" color="black.600" textAlign="center" mb={2}>
+                  <FormattedMessage
+                    id="createCollective.subtitle.introduce"
+                    defaultMessage="Introduce your Collective to the community."
+                  />
+                </P>
+              </div>
+            )}
           </Flex>
           {error && (
             <Flex alignItems="center" justifyContent="center">
@@ -189,18 +202,17 @@ class CreateCollectiveForm extends React.Component {
             </Flex>
           )}
           <Flex alignItems="center" justifyContent="center">
-            {' '}
             <ContainerWithImage
               mb={[1, 5]}
-              maxWidth={576}
               border={[null, '1px solid #E6E8EB']}
               borderRadius={[0, '8px']}
+              maxWidth={576}
               px={[2, 4]}
-              pb={[0, 50]}
+              pb={[0, 90]}
             >
               <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
                 {formik => {
-                  const { values, handleSubmit, errors, touched, setFieldValue } = formik;
+                  const { values, handleSubmit, touched, setFieldValue } = formik;
 
                   const handleSlugChange = e => {
                     if (!touched.slug) {
@@ -209,26 +221,23 @@ class CreateCollectiveForm extends React.Component {
                   };
 
                   return (
-                    <Form>
-                      <StyledInputField
+                    <Form data-cy="ccf-form">
+                      <StyledInputFormikField
                         name="name"
-                        htmlFor="name"
-                        error={touched.name && errors.name}
+                        htmlFor="collective-name-input"
                         labelProps={LABEL_STYLES}
                         label={intl.formatMessage(messages.nameLabel)}
-                        value={values.name}
                         onChange={handleSlugChange}
                         required
                         mt={4}
                         mb={3}
                         data-cy="ccf-form-name"
                       >
-                        {inputProps => <Field as={StyledInput} {...inputProps} placeholder={placeholders.name} />}
-                      </StyledInputField>
-                      <StyledInputField
+                        {({ field }) => <StyledInput {...field} placeholder={placeholders.name} />}
+                      </StyledInputFormikField>
+                      <StyledInputFormikField
                         name="slug"
-                        htmlFor="slug"
-                        error={touched.slug && errors.slug}
+                        htmlFor="collective-slug-input"
                         labelProps={LABEL_STYLES}
                         label={intl.formatMessage(messages.slugLabel)}
                         value={values.slug}
@@ -237,25 +246,23 @@ class CreateCollectiveForm extends React.Component {
                         mb={2}
                         data-cy="ccf-form-slug"
                       >
-                        {inputProps => (
-                          <Field
-                            onChange={e => {
-                              setFieldValue('slug', e.target.value);
-                            }}
-                            as={StyledInputGroup}
-                            {...inputProps}
+                        {({ field }) => (
+                          <StyledInputGroup
+                            onChange={e => setFieldValue('slug', e.target.value)}
+                            {...field}
                             prepend="opencollective.com/"
                             placeholder={placeholders.slug}
                           />
                         )}
-                      </StyledInputField>
+                      </StyledInputFormikField>
                       {values.name.length > 0 && !touched.slug && (
-                        <P fontSize="10px">{intl.formatMessage(messages.suggestedLabel)}</P>
+                        <P fontSize="10px" color="black.600" fontStyle="italic">
+                          {intl.formatMessage(messages.suggestedLabel)}
+                        </P>
                       )}
-                      <StyledInputField
+                      <StyledInputFormikField
                         name="description"
                         htmlFor="description"
-                        error={touched.description && errors.description}
                         labelProps={LABEL_STYLES}
                         label={intl.formatMessage(messages.descriptionLabel)}
                         value={values.description}
@@ -264,65 +271,85 @@ class CreateCollectiveForm extends React.Component {
                         mb={2}
                         data-cy="ccf-form-description"
                       >
-                        {inputProps => (
-                          <Field
-                            as={StyledInput}
-                            {...inputProps}
-                            placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
-                          />
+                        {({ field }) => (
+                          <StyledInput {...field} placeholder={intl.formatMessage(messages.descriptionPlaceholder)} />
                         )}
-                      </StyledInputField>
+                      </StyledInputFormikField>
                       <P fontSize="11px" color="black.600">
                         {intl.formatMessage(messages.descriptionHint)}
                       </P>
 
-                      <Flex flexDirection="column" mx={1} my={4}>
-                        <StyledCheckbox
-                          name="tos"
+                      {host && (
+                        <StyledInputFormikField
+                          name="message"
+                          htmlFor="apply-create-message"
                           labelProps={LABEL_STYLES}
+                          required={false}
+                          mt={24}
                           label={
-                            <FormattedMessage
-                              id="createcollective.tos.label"
-                              defaultMessage="I agree with the {toslink} of Open Collective."
-                              values={{
-                                toslink: (
-                                  <StyledLink href="/tos" openInNewTab>
-                                    <FormattedMessage id="tos" defaultMessage="terms of service" />
-                                  </StyledLink>
-                                ),
-                              }}
-                            />
-                          }
-                          required
-                          onChange={({ checked }) => {
-                            this.setState({ tos: checked });
-                          }}
-                        />
-                        {!router.query.hostTos && host && host.termsUrl && (
-                          <StyledCheckbox
-                            alignItems="flex-start"
-                            name="hostTos"
-                            labelProps={LABEL_STYLES}
-                            label={
+                            get(host, 'settings.applyMessage') || (
                               <FormattedMessage
-                                id="createcollective.hosttos.label"
-                                defaultMessage="I agree with the the {hosttoslink} of the host that will collect money on behalf of our collective."
-                                values={{
-                                  hosttoslink: (
-                                    <StyledLink href={host.termsUrl} openInNewTab>
-                                      <FormattedMessage id="fiscaltos" defaultMessage="terms of fiscal sponsorship" />
-                                    </StyledLink>
-                                  ),
-                                }}
+                                id="ApplyToHost.WriteMessage"
+                                defaultMessage="Write a message to fiscal host"
                               />
-                            }
-                            required
-                            onChange={({ checked }) => {
-                              this.setState({ hostTos: checked });
-                            }}
-                          />
+                            )
+                          }
+                        >
+                          {({ field }) => (
+                            <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
+                          )}
+                        </StyledInputFormikField>
+                      )}
+
+                      <Box mx={1} my={3}>
+                        <StyledInputFormikField name="tos" required>
+                          {({ field }) => (
+                            <StyledCheckbox
+                              name={field.name}
+                              required={field.required}
+                              checked={field.value}
+                              onChange={({ checked }) => setFieldValue(field.name, checked)}
+                              error={field.error}
+                              label={
+                                <FormattedMessage
+                                  id="createcollective.tos.label"
+                                  defaultMessage="I agree with the {toslink} of Open Collective."
+                                  values={{
+                                    toslink: (
+                                      <StyledLink href="/tos" openInNewTab>
+                                        <FormattedMessage id="tos" defaultMessage="terms of service" />
+                                      </StyledLink>
+                                    ),
+                                  }}
+                                />
+                              }
+                            />
+                          )}
+                        </StyledInputFormikField>
+                        {hasHostTerms && (
+                          <StyledInputFormikField name="hostTos" required mt={2}>
+                            {({ field }) => (
+                              <StyledCheckbox
+                                name={field.name}
+                                required={field.required}
+                                checked={field.value}
+                                onChange={({ checked }) => setFieldValue(field.name, checked)}
+                                error={field.error}
+                                label={
+                                  <FormattedMessage
+                                    id="Host.TOSCheckbox"
+                                    defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of {hostName}"
+                                    values={{
+                                      hostName: host.name,
+                                      TOSLink: getI18nLink({ href: host.termsUrl, openInNewTabNoFollow: true }),
+                                    }}
+                                  />
+                                }
+                              />
+                            )}
+                          </StyledInputFormikField>
                         )}
-                      </Flex>
+                      </Box>
 
                       <Flex justifyContent={['center', 'left']} mb={4}>
                         <StyledButton

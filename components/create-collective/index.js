@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { parseToBoolean } from '../../lib/utils';
 import { Router } from '../../server/pages';
@@ -24,6 +24,7 @@ import CreateOpenSourceCollective from './CreateOpenSourceCollective';
 class CreateCollective extends Component {
   static propTypes = {
     host: PropTypes.object,
+    intl: PropTypes.object,
     LoggedInUser: PropTypes.object, // from withUser
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     router: PropTypes.object.isRequired, // from withRouter
@@ -42,21 +43,7 @@ class CreateCollective extends Component {
     this.createCollective = this.createCollective.bind(this);
   }
 
-  async createCollective(collective) {
-    // check we have agreed to TOS
-    if (!collective.tos) {
-      this.setState({
-        error: 'Please accept the terms of service',
-      });
-      return;
-    }
-    if (this.props.host && this.props.host.termsUrl && !collective.hostTos) {
-      this.setState({
-        error: 'Please accept the terms of fiscal sponsorship',
-      });
-      return;
-    }
-
+  async createCollective({ collective, message }) {
     // set state to loading
     this.setState({ creating: true });
 
@@ -66,8 +53,6 @@ class CreateCollective extends Component {
     if (this.state.githubInfo) {
       collective.githubHandle = this.state.githubInfo.handle;
     }
-    delete collective.tos;
-    delete collective.hostTos;
 
     // try mutation
     try {
@@ -76,6 +61,7 @@ class CreateCollective extends Component {
           collective,
           host: this.props.host ? { slug: this.props.host.slug } : null,
           automateApprovalWithGithub: this.state.githubInfo ? true : false,
+          message,
         },
       });
       const newCollective = res.data.createCollective;
@@ -97,7 +83,7 @@ class CreateCollective extends Component {
         }).then(() => window.scrollTo(0, 0));
       }
     } catch (err) {
-      const errorMsg = getErrorFromGraphqlException(err).message;
+      const errorMsg = i18nGraphqlException(this.props.intl, err);
       this.setState({ error: errorMsg, creating: false });
     }
   }
@@ -182,8 +168,14 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
     $automateApprovalWithGithub: Boolean
+    $message: String
   ) {
-    createCollective(collective: $collective, host: $host, automateApprovalWithGithub: $automateApprovalWithGithub) {
+    createCollective(
+      collective: $collective
+      host: $host
+      automateApprovalWithGithub: $automateApprovalWithGithub
+      message: $message
+    ) {
       id
       name
       slug
@@ -200,4 +192,4 @@ const addCreateCollectiveMutation = graphql(createCollectiveMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-export default withRouter(withUser(addCreateCollectiveMutation(CreateCollective)));
+export default withRouter(withUser(addCreateCollectiveMutation(injectIntl(CreateCollective))));

@@ -3558,7 +3558,7 @@ type Query {
     term: String
 
     """
-    [NON AVAILABLE WITH ALGOLIA] Limit the search to collectives under these hosts
+    Limit the search to collectives under these hosts
     """
     hostCollectiveIds: [Int]
 
@@ -3584,8 +3584,7 @@ type Query {
     offset: Int = 0
 
     """
-    If set to false, an internal query will be used to search the collective rather than Algolia.
-    You **must** set this to false when searching for users/organizations.
+    This flag is now ignored in favor of regular search
     """
     useAlgolia: Boolean = false
   ): CollectiveSearchResults

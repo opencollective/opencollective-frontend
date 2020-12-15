@@ -14,6 +14,7 @@ import Avatar from './Avatar';
 import CollectivePicker from './CollectivePicker';
 import { Box, Flex } from './Grid';
 import HTMLContent from './HTMLContent';
+import { getI18nLink } from './I18nFormatters';
 import Link from './Link';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
@@ -21,7 +22,6 @@ import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledHr from './StyledHr';
 import StyledInputFormikField from './StyledInputFormikField';
-import StyledLink from './StyledLink';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import StyledTextarea from './StyledTextarea';
 import { H1, P } from './Text';
@@ -191,6 +191,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
         </React.Fragment>
       ) : (
         <Formik
+          validateOnBlur={false}
           initialValues={{ ...INITIAL_FORM_VALUES, collective: selectedCollective }}
           validate={values => {
             if (!values.collective && contentRef.current) {
@@ -324,26 +325,22 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                       </StyledInputFormikField>
                     </Box>
                     {host.longDescription && <HTMLContent content={host.longDescription} />}
-                    <StyledInputFormikField name="message">
+                    <StyledInputFormikField
+                      name="message"
+                      htmlFor="apply-host-modal-message"
+                      mt={32}
+                      labelProps={{ fontSize: '13px', lineHeight: '16px', fontWeight: '600', color: 'black.700' }}
+                      label={
+                        get(host, 'settings.applyMessage') || (
+                          <FormattedMessage
+                            id="ApplyToHost.WriteMessage"
+                            defaultMessage="Write a message to fiscal host"
+                          />
+                        )
+                      }
+                    >
                       {({ field }) => (
-                        <Box mt={32}>
-                          <P
-                            fontSize="13px"
-                            lineHeight="16px"
-                            fontWeight="600"
-                            color="black.700"
-                            mb={2}
-                            whiteSpace="pre-wrap"
-                          >
-                            {get(host, 'settings.applyMessage') || (
-                              <FormattedMessage
-                                id="ApplyToHost.WriteMessage"
-                                defaultMessage="Write a message to fiscal host"
-                              />
-                            )}
-                          </P>
-                          <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
-                        </Box>
+                        <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
                       )}
                     </StyledInputFormikField>
                     {host.termsUrl && (
@@ -354,15 +351,11 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                               name="tos"
                               label={
                                 <FormattedMessage
-                                  id="acceptContributions.tos.label"
-                                  defaultMessage="I agree with the {hostTosLink} of {hostName}."
+                                  id="Host.TOSCheckbox"
+                                  defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of {hostName}"
                                   values={{
-                                    hostTosLink: (
-                                      <StyledLink href={host.termsUrl} openInNewTab>
-                                        <FormattedMessage id="tos" defaultMessage="terms of service" />
-                                      </StyledLink>
-                                    ),
                                     hostName: host.name,
+                                    TOSLink: getI18nLink({ href: host.termsUrl, openInNewTabNoFollow: true }),
                                   }}
                                 />
                               }
