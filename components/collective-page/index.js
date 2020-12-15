@@ -210,7 +210,7 @@ class CollectivePage extends Component {
         // Don't display "Add Funds" if it's an Host and you're the Admin
         addFundsToOrganization: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
         // Add Funds for Self Hosted Collectives
-        addFunds: isCollective && isHost,
+        addFunds: isCollective && isHost && isAdmin,
       };
     },
   );
