@@ -1,6 +1,7 @@
 import React, { Fragment, useRef } from 'react';
 import { PropTypes } from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
+import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
 import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
@@ -84,6 +85,29 @@ const CollectiveNameV2 = styled(H1)`
 
   a:not(:hover) {
     color: #313233;
+  }
+`;
+
+const CategoriesContainer = styled(Container)`
+  @media screen and (min-width: 40em) and (max-width: 64em) {
+    border: 1px solid rgba(214, 214, 214, 0.3);
+    border-radius: 0px 0px 0px 8px;
+    box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
+    position: absolute;
+    right: 0;
+    top: 52px;
+    width: 0;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.4s ease-out, visibility 0.4s ease-out, width 0.2s ease-out;
+
+    ${props =>
+      props.isExpanded &&
+      css`
+        width: 400px;
+        visibility: visible;
+        opacity: 1;
+      `}
   }
 `;
 
@@ -198,12 +222,23 @@ const InfosContainer = styled(Container)`
     `}
 `;
 
-/** Displayed on mobile to toggle the menu */
+/** Displayed on mobile & tablet to toggle the menu */
 const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
   cursor: pointer;
   margin-right: 4px;
   flex: 0 0 28px;
-  color: ${themeGet('colors.black.500')};
+  color: #304cdc;
+
+  @media (min-width: 52em) {
+    display: none;
+  }
+`;
+
+const CloseMenuIcon = styled(XCircle).attrs({ size: 28 })`
+  cursor: pointer;
+  margin-right: 4px;
+  flex: 0 0 28px;
+  color: #304cdc;
 
   @media (min-width: 52em) {
     display: none;
@@ -353,7 +388,11 @@ const CollectiveNavbar = ({
         </Box>
         {!onlyInfos && (
           <Box display={['block', 'none']} marginLeft="auto">
-            <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+            {isExpanded ? (
+              <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+            ) : (
+              <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+            )}
           </Box>
         )}
       </InfosContainerV2>
@@ -361,18 +400,17 @@ const CollectiveNavbar = ({
 
       {!onlyInfos && (
         <Fragment>
-          <Container
+          <CategoriesContainer
             ref={navbarRef}
             backgroundColor="#fff"
             display={isExpanded ? 'flex' : ['none', 'flex']}
-            flexDirection={['column', 'row']}
+            flexDirection={['column', null, 'row']}
             flexShrink={2}
             flexGrow={1}
             justifyContent={['space-between', null, 'flex-start']}
-            minWidth={0}
             order={[0, 3, 0]}
-            borderTop={['none', '1px solid #e1e1e1', 'none']}
             overflowX="auto"
+            isExpanded={isExpanded}
           >
             {isLoading ? (
               <LoadingPlaceholder height={43} minWidth={150} mb={2} />
@@ -388,7 +426,7 @@ const CollectiveNavbar = ({
                 />
               ))
             )}
-          </Container>
+          </CategoriesContainer>
 
           {/* CTAs for v2 navbar & admin panel */}
           <Container
@@ -441,6 +479,15 @@ const CollectiveNavbar = ({
                 callsToAction={callsToAction}
                 createNotification={createNotification}
               />
+            )}
+            {!onlyInfos && (
+              <Container display={['none', 'flex', 'none']} alignItems="center">
+                {isExpanded ? (
+                  <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                ) : (
+                  <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                )}
+              </Container>
             )}
           </Container>
         </Fragment>

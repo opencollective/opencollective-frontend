@@ -4,6 +4,7 @@ import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
+import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
@@ -138,9 +139,10 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               tabIndex="-1"
               data-cy="collective-navbar-actions-btn"
             >
-              <Span css={{ verticalAlign: 'middle' }}>
+              <Span css={{ verticalAlign: 'middle', marginRight: '4px' }}>
                 <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
               </Span>
+              <ChevronDown size="14px" />
             </StyledActionButton>
           </Flex>
           <DropdownArrow />
