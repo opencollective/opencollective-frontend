@@ -167,6 +167,19 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.application.description',
         defaultMessage: 'Enable new Collectives to apply to join your Fiscal Host',
       },
+      'application.message.label': {
+        id: 'application.message.label',
+        defaultMessage: 'Apply instructions',
+      },
+      'application.message.description': {
+        id: 'application.message.description',
+        defaultMessage:
+          'Custom instructions displayed above the text box that projects see when applying (1000 characters max)',
+      },
+      'application.message.defaultValue': {
+        id: 'ApplyToHost.WriteMessage',
+        defaultMessage: 'Write a message to fiscal host',
+      },
       'hostFeePercent.label': {
         id: 'HostFee',
         defaultMessage: 'Host fee',
@@ -245,7 +258,6 @@ class EditCollectiveForm extends React.Component {
 
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
-    collective.application = get(collective, 'settings.apply');
 
     const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
     const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
@@ -276,6 +288,10 @@ class EditCollectiveForm extends React.Component {
         } else {
           set(collective, 'settings.GST.number', value);
         }
+      } else if (fieldname === 'application') {
+        set(collective, 'settings.apply', value);
+      } else if (fieldname === 'application.message') {
+        set(collective, 'settings.applyMessage', value);
       } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
         collective[fieldname] = value;
         const endsAt = collective.endsAt;
@@ -717,6 +733,17 @@ class EditCollectiveForm extends React.Component {
             collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.apply),
         },
         {
+          name: 'application.message',
+          className: 'horizontal',
+          type: 'textarea',
+          defaultValue: get(this.state.collective, 'settings.applyMessage'),
+          placeholder: intl.formatMessage(this.messages['application.message.defaultValue']),
+          disabled: !this.state.collective.settings?.apply,
+          maxLength: 1000,
+          when: () =>
+            collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.apply),
+        },
+        {
           name: 'hostFeePercent',
           type: 'number',
           className: 'horizontal',
@@ -796,6 +823,8 @@ class EditCollectiveForm extends React.Component {
                       post={field.post}
                       context={this.state.collective}
                       onChange={value => this.handleChange(field.name, value)}
+                      disabled={field.disabled}
+                      maxLength={field.maxLength}
                     />
                   ))}
                 </div>

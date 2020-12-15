@@ -72,6 +72,8 @@
   "AmountInterval": "{amount} {currencyCode} / {intervalo, seleccionar, mes {mo.} año {yr.}}",
   "AmountIntervalLong": "{amount} {currencyCode} / {intervalo, seleccionar, mes {month} año {year}}",
   "api.error.unreachable": "No se puede acceder a la API. Por favor, inténtalo de nuevo.",
+  "application.message.description": "Custom instructions displayed above the text box that projects see when applying (1000 characters max)",
+  "application.message.label": "Apply instructions",
   "ApplicationMessageModal.Private": "Privado (esto enviará un correo electrónico a los administradores)",
   "ApplicationRejectionReasonModal.Help": "Ayuda a {accountName} a saber por qué rechazaste su solicitud",
   "applications.ApiKeys": "Claves API",

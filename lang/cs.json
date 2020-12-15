@@ -72,6 +72,8 @@
   "AmountInterval": "{amount} {currencyCode} / {interval, vybrat, měsíc {mo.} rok {yr.}}",
   "AmountIntervalLong": "{amount} {currencyCode} / {interval, select, month {month} year {year}}",
   "api.error.unreachable": "Nelze se připojit k API. Zkuste to prosím znovu za pár minut.",
+  "application.message.description": "Custom instructions displayed above the text box that projects see when applying (1000 characters max)",
+  "application.message.label": "Apply instructions",
   "ApplicationMessageModal.Private": "Private (this will send an email to the Collective admins)",
   "ApplicationRejectionReasonModal.Help": "Help {accountName} know why you rejected their application",
   "applications.ApiKeys": "API klíče",
