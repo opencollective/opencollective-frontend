@@ -264,7 +264,6 @@ class Tiers extends React.Component {
         type: 'currency',
         label: intl.formatMessage(this.messages['goal.label']),
         description: intl.formatMessage(this.messages['goal.description']),
-        when: (tier, collective) => ![FUND, PROJECT].includes(collective.type),
       },
       {
         name: '__hasLongDescription',
