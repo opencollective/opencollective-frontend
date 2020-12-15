@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { hasNewNavBar } from '../../../lib/collective-sections';
 import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
@@ -76,13 +77,14 @@ const SectionTransactions = props => {
     refetch({ slug: props.collective.slug, limit: NB_DISPLAYED, hasExpense, hasOrder });
   }, [filter, props.collective.slug, refetch]);
 
-  const { intl, collective } = props;
+  const { intl, collective, router } = props;
   const collectiveHasNoTransactions = !loading && data?.transactions?.totalCount === 0 && filter === FILTERS.ALL;
+  const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
 
   return (
     <Box py={5}>
       <ContainerSectionContent>
-        {!hasNewNavBar(collective) && (
+        {!newNavbarFeatureFlag && (
           <SectionHeader title={Sections.TRANSACTIONS} illustrationSrc={budgetSectionHeaderIcon} />
         )}
         {collectiveHasNoTransactions && (
@@ -162,6 +164,9 @@ SectionTransactions.propTypes = {
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,
+
+  /** @ignore from withRouter */
+  router: PropTypes.object,
 };
 
-export default React.memo(injectIntl(SectionTransactions));
+export default React.memo(withRouter(injectIntl(SectionTransactions)));

@@ -1,22 +1,19 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from '@styled-system/css';
-import { cloneDeep, orderBy, partition, set } from 'lodash';
+import { cloneDeep, get, orderBy, partition, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { getTopContributors } from '../../../lib/collective.lib';
-import { hasNewNavBar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
-import { getEnvVar } from '../../../lib/env-utils';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { canOrderTicketsFromEvent, isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { parseToBoolean } from '../../../lib/utils';
 
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
@@ -102,6 +99,7 @@ class SectionContribute extends React.PureComponent {
     ),
     isAdmin: PropTypes.bool,
     editAccountSettings: PropTypes.func.isRequired,
+    router: PropTypes.object,
   };
 
   state = {
@@ -241,7 +239,7 @@ class SectionContribute extends React.PureComponent {
   });
 
   render() {
-    const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
+    const { collective, tiers, events, connectedCollectives, contributors, isAdmin, router } = this.props;
     const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
@@ -263,6 +261,7 @@ class SectionContribute extends React.PureComponent {
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
     const cannotOrderTickets = (!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin);
+    const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
 
     /*
     cases
@@ -279,7 +278,7 @@ class SectionContribute extends React.PureComponent {
 
     return (
       <Fragment>
-        {!hasNewNavBar(collective) && (
+        {!newNavbarFeatureFlag && (
           <ContainerSectionContent pt={[4, 5]}>
             <SectionHeader
               title={Sections.CONTRIBUTE}
@@ -377,7 +376,7 @@ class SectionContribute extends React.PureComponent {
             )}
 
             {/* Events, for now (til v2 standalone section) */}
-            {hasOtherWaysToContribute && !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
+            {hasOtherWaysToContribute && !newNavbarFeatureFlag && (
               <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
                 {(ref, Chevrons) => (
                   <div>
@@ -439,51 +438,48 @@ class SectionContribute extends React.PureComponent {
             )}
 
             {/* Tickets for type EVENT */}
-            {isEvent &&
-              parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) &&
-              !cannotOrderTickets &&
-              !hideTicketsFromNonAdmins && (
-                <Box mb={4} data-cy="Tickets">
-                  <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-                    {(ref, Chevrons) => (
-                      <div>
-                        <ContainerSectionContent>
-                          <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                            <H3 fontSize="20px" fontWeight="600" color="black.700">
-                              <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
-                            </H3>
-                            <Box m={2} flex="0 0 50px">
-                              <Chevrons />
-                            </Box>
-                          </Flex>
-                        </ContainerSectionContent>
+            {isEvent && newNavbarFeatureFlag && !cannotOrderTickets && !hideTicketsFromNonAdmins && (
+              <Box mb={4} data-cy="Tickets">
+                <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
+                  {(ref, Chevrons) => (
+                    <div>
+                      <ContainerSectionContent>
+                        <Flex justifyContent="space-between" alignItems="center" mb={3}>
+                          <H3 fontSize="20px" fontWeight="600" color="black.700">
+                            <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
+                          </H3>
+                          <Box m={2} flex="0 0 50px">
+                            <Chevrons />
+                          </Box>
+                        </Flex>
+                      </ContainerSectionContent>
 
-                        <ContributeCardsContainer ref={ref}>
-                          {sortedTicketTiers.map(tier => (
-                            <ContributeCardContainer key={tier.id}>
-                              <ContributeTier
-                                collective={collective}
-                                tier={tier}
-                                hideContributors={hasNoContributor}
-                                disableCTA={!collective.isActive}
-                              />
-                            </ContributeCardContainer>
-                          ))}
-                          {isAdmin && (
-                            <ContributeCardContainer minHeight={150}>
-                              <CreateNew
-                                route={`/${collective.parentCollective.slug}/events/${collective.slug}/edit/tickets`}
-                              >
-                                <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
-                              </CreateNew>
-                            </ContributeCardContainer>
-                          )}
-                        </ContributeCardsContainer>
-                      </div>
-                    )}
-                  </HorizontalScroller>
-                </Box>
-              )}
+                      <ContributeCardsContainer ref={ref}>
+                        {sortedTicketTiers.map(tier => (
+                          <ContributeCardContainer key={tier.id}>
+                            <ContributeTier
+                              collective={collective}
+                              tier={tier}
+                              hideContributors={hasNoContributor}
+                              disableCTA={!collective.isActive}
+                            />
+                          </ContributeCardContainer>
+                        ))}
+                        {isAdmin && (
+                          <ContributeCardContainer minHeight={150}>
+                            <CreateNew
+                              route={`/${collective.parentCollective.slug}/events/${collective.slug}/edit/tickets`}
+                            >
+                              <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
+                            </CreateNew>
+                          </ContributeCardContainer>
+                        )}
+                      </ContributeCardsContainer>
+                    </div>
+                  )}
+                </HorizontalScroller>
+              </Box>
+            )}
 
             {/* "View all ways to contribute" button */}
             {!isEvent && (
@@ -497,25 +493,23 @@ class SectionContribute extends React.PureComponent {
             )}
 
             {/* Top contributors, for now (til moved to own widget in v2) */}
-            {!isEvent &&
-              (topOrganizations.length !== 0 || topIndividuals.length !== 0) &&
-              !parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
-                <TopContributorsContainer>
-                  <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
-                    <H4 fontWeight="normal" color="black.700" mb={3}>
-                      <FormattedMessage
-                        id="SectionContribute.TopContributors"
-                        defaultMessage="Top financial contributors"
-                      />
-                    </H4>
-                    <TopContributors
-                      organizations={topOrganizations}
-                      individuals={topIndividuals}
-                      currency={collective.currency}
+            {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && !newNavbarFeatureFlag && (
+              <TopContributorsContainer>
+                <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
+                  <H4 fontWeight="normal" color="black.700" mb={3}>
+                    <FormattedMessage
+                      id="SectionContribute.TopContributors"
+                      defaultMessage="Top financial contributors"
                     />
-                  </Container>
-                </TopContributorsContainer>
-              )}
+                  </H4>
+                  <TopContributors
+                    organizations={topOrganizations}
+                    individuals={topIndividuals}
+                    currency={collective.currency}
+                  />
+                </Container>
+              </TopContributorsContainer>
+            )}
           </Fragment>
         )}
       </Fragment>
@@ -528,4 +522,4 @@ const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-export default addEditAccountSettingMutation(SectionContribute);
+export default withRouter(addEditAccountSettingMutation(SectionContribute));

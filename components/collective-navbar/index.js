@@ -1,19 +1,18 @@
 import React, { Fragment, useRef } from 'react';
 import { PropTypes } from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
-import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
 import { Settings } from '@styled-icons/feather/Settings';
+import { Close } from '@styled-icons/material/Close';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { getEnvVar } from '../../lib/env-utils';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
-import { parseToBoolean } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import { AllSectionsNames, Dimensions } from '../collective-page/_constants';
@@ -30,8 +29,6 @@ import { H1, P } from '../Text';
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu } from './menu';
 import NavBarCategoryDropdown from './NavBarCategoryDropdown';
-
-const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
 
 // Nav v2 styled components
 const MainContainerV2 = styled(Container)`
@@ -234,11 +231,12 @@ const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
   }
 `;
 
-const CloseMenuIcon = styled(XCircle).attrs({ size: 28 })`
+const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
   cursor: pointer;
   margin-right: 4px;
   flex: 0 0 28px;
   color: #304cdc;
+  background: radial-gradient(rgba(72, 95, 211, 0.1) 14px, transparent 3px);
 
   @media (min-width: 52em) {
     display: none;
@@ -272,7 +270,7 @@ const isFeatureAvailable = (collective, feature) => {
   return status === 'ACTIVE' || status === 'AVAILABLE';
 };
 
-const getDefaultCallsToActions = (collective, isAdmin) => {
+const getDefaultCallsToActions = (collective, isAdmin, newNavbarFeatureFlag) => {
   if (!collective) {
     return {};
   }
@@ -280,7 +278,7 @@ const getDefaultCallsToActions = (collective, isAdmin) => {
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
 
-  if (NAV_V2_FEATURE_FLAG) {
+  if (newNavbarFeatureFlag) {
     return {
       hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
       hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
@@ -319,11 +317,13 @@ const CollectiveNavbar = ({
   showBackButton,
   withShadow,
   useAnchorsForCategories,
+  router,
 }) => {
+  const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
-  sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
-  callsToAction = { ...getDefaultCallsToActions(collective, isAdmin), ...callsToAction };
+  sections = sections || getFilteredSectionsForCollective(collective, isAdmin, null, newNavbarFeatureFlag);
+  callsToAction = { ...getDefaultCallsToActions(collective, isAdmin, newNavbarFeatureFlag), ...callsToAction };
   const isEvent = collective?.type === CollectiveType.EVENT;
 
   const navbarRef = useRef();
@@ -333,7 +333,7 @@ const CollectiveNavbar = ({
     }
   });
 
-  return NAV_V2_FEATURE_FLAG ? (
+  return newNavbarFeatureFlag ? (
     // v2
     <MainContainerV2
       flexDirection={['column', 'row']}
@@ -666,6 +666,8 @@ CollectiveNavbar.propTypes = {
   withShadow: PropTypes.bool,
   /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */
   useAnchorsForCategories: PropTypes.bool,
+  /** From withRouter */
+  router: PropTypes.object,
 };
 
 CollectiveNavbar.defaultProps = {
@@ -686,4 +688,4 @@ CollectiveNavbar.defaultProps = {
   },
 };
 
-export default React.memo(CollectiveNavbar);
+export default React.memo(withRouter(CollectiveNavbar));

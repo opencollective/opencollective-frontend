@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
+import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { hasNewNavBar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { GraphQLContext } from '../../../lib/graphql/context';
@@ -44,7 +44,7 @@ export const getBudgetSectionQueryVariables = slug => {
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats, LoggedInUser }) => {
+const SectionBudget = ({ collective, stats, LoggedInUser, router }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
     variables: getBudgetSectionQueryVariables(collective.slug),
     context: API_V2_CONTEXT,
@@ -54,6 +54,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
   const isProject = collective.type === CollectiveType.PROJECT;
+  const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
 
   React.useEffect(() => {
     refetch();
@@ -61,7 +62,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
 
   return (
     <ContainerSectionContent pt={[4, 5]} pb={3}>
-      {!hasNewNavBar(collective) && (
+      {!newNavbarFeatureFlag && (
         <SectionHeader
           title={Sections.BUDGET}
           subtitle={
@@ -211,6 +212,9 @@ SectionBudget.propTypes = {
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,
+
+  /** @ignore from withRouter */
+  router: PropTypes.object,
 };
 
-export default React.memo(withUser(injectIntl(SectionBudget)));
+export default React.memo(withRouter(withUser(injectIntl(SectionBudget))));

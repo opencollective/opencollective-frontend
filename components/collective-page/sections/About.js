@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import dynamic from 'next/dynamic';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { hasNewNavBar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 
 import Container from '../../Container';
@@ -38,15 +39,16 @@ const messages = defineMessages({
 /**
  * About section category with editable description
  */
-const SectionAbout = ({ collective, canEdit, intl }) => {
+const SectionAbout = ({ collective, canEdit, intl, router }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isFund = collective.type === CollectiveType.FUND;
   canEdit = collective.isArchived ? false : canEdit;
+  const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
 
   return (
     <ContainerSectionContent px={2} py={[4, 5]}>
-      {!hasNewNavBar(collective) && <SectionHeader title={Sections.ABOUT} illustrationSrc={aboutSectionHeaderIcon} />}
+      {!newNavbarFeatureFlag && <SectionHeader title={Sections.ABOUT} illustrationSrc={aboutSectionHeaderIcon} />}
 
       <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
         <InlineEditField
@@ -130,6 +132,9 @@ SectionAbout.propTypes = {
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,
+
+  /** @ignore from withRouter */
+  router: PropTypes.object,
 };
 
-export default React.memo(injectIntl(SectionAbout));
+export default React.memo(withRouter(injectIntl(SectionAbout)));

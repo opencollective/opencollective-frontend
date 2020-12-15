@@ -71,7 +71,7 @@ const ActionsDropdown = styled(Dropdown)`
       position: relative;
       box-shadow: none;
       border: none;
-      padding-left: 28px;
+      padding-left: 14px;
     }
   }
 `;
@@ -80,6 +80,12 @@ const StyledActionButton = styled(StyledButton)`
   @media (max-width: 40em) {
     cursor: none;
     pointer-events: none;
+  }
+`;
+
+const StyledChevronDown = styled(ChevronDown)`
+  @media (max-width: 40em) {
+    display: none;
   }
 `;
 
@@ -123,7 +129,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
       <Box px={1}>
         <ActionsDropdown trigger="click">
           <Flex alignItems="center">
-            <Box display={['block', 'none']} width={'33px'} ml={2}>
+            <Box display={['block', 'none']} width={'32px'} ml={2}>
               <StyledHr borderStyle="solid" borderColor="#304CDC" />
             </Box>
             <StyledActionButton
@@ -142,7 +148,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               <Span css={{ verticalAlign: 'middle', marginRight: '4px' }}>
                 <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
               </Span>
-              <ChevronDown size="14px" />
+              <StyledChevronDown size="14px" />
             </StyledActionButton>
           </Flex>
           <DropdownArrow />

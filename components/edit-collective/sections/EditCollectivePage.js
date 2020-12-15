@@ -5,6 +5,7 @@ import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, flatten, get, isEqual, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { useDrag, useDrop } from 'react-dnd';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -18,12 +19,10 @@ import {
 } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
-import { getEnvVar } from '../../../lib/env-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
-import { parseToBoolean } from '../../../lib/utils';
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
@@ -53,8 +52,6 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
 `;
 
 const DRAG_TYPE = DRAG_AND_DROP_TYPES.COLLECTIVE_PAGE_EDIT_SECTION;
-
-const HAS_NEW_NAVBAR = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
 
 const SectionEntryContainer = styled.div`
   display: flex;
@@ -235,13 +232,13 @@ export const isCollectiveSectionEnabled = (collective, section) => {
  * Sections used to be stored as an array of string. This helpers loads and convert them to
  * the new format if necessary.
  */
-const loadSectionsForCollective = collective => {
+const loadSectionsForCollective = (collective, useNewSections) => {
   const collectiveSections = get(collective, 'settings.collectivePage.sections');
   if (collective.settings?.collectivePage?.useNewSections) {
     return collectiveSections;
   }
 
-  const defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive);
+  const defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive, useNewSections);
 
   const transformLegacySection = section => {
     return typeof section === 'string'
@@ -336,8 +333,9 @@ MenuCategory.propTypes = {
   onSectionToggle: PropTypes.func,
 };
 
-const EditCollectivePage = ({ collective }) => {
+const EditCollectivePage = ({ collective, router }) => {
   const intl = useIntl();
+  const HAS_NEW_NAVBAR = get(router, 'query.version') === 'v2';
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
   const [tmpSections, setTmpSections] = React.useState(null);
@@ -355,7 +353,7 @@ const EditCollectivePage = ({ collective }) => {
   // Load sections from fetched collective
   React.useEffect(() => {
     if (data?.account) {
-      const sectionsFromCollective = loadSectionsForCollective(data.account);
+      const sectionsFromCollective = loadSectionsForCollective(data.account, useNewSections);
       if (useNewSections && !data.account.settings?.collectivePage?.useNewSections) {
         const convertedSections = convertSectionsToNewFormat(sectionsFromCollective);
         setSections(convertedSections);
@@ -520,6 +518,7 @@ EditCollectivePage.propTypes = {
     slug: PropTypes.string,
     type: PropTypes.string,
   }),
+  router: PropTypes.object,
 };
 
-export default EditCollectivePage;
+export default withRouter(EditCollectivePage);

@@ -16,14 +16,14 @@ import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../section
 
 import { collectivePageQuery, getCollectivePageQueryVariables } from './queries';
 
-export const preloadCollectivePageGraphlQueries = async (slug, client) => {
+export const preloadCollectivePageGraphlQueries = async (slug, client, hasNewCollectiveNavbar) => {
   const result = await client.query({
     query: collectivePageQuery,
     variables: getCollectivePageQueryVariables(slug),
   });
   const collective = result?.data?.Collective;
   if (collective) {
-    const sections = getFilteredSectionsForCollective(collective);
+    const sections = getFilteredSectionsForCollective(collective, null, null, hasNewCollectiveNavbar);
     const queries = [];
     if (sections.includes('budget')) {
       queries.push(

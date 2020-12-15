@@ -2,14 +2,13 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { space } from 'styled-system';
 
 import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { getEnvVar } from '../../lib/env-utils';
-import { parseToBoolean } from '../../lib/utils';
 
 import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
@@ -39,8 +38,6 @@ import { Sections } from './_constants';
 import CategoryHeader from './CategoryHeader';
 import SectionContainer from './SectionContainer';
 import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
-
-const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
 
 const NavBarContainer = styled.div`
   ${space}
@@ -86,6 +83,7 @@ class CollectivePage extends Component {
     }),
     status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
     refetch: PropTypes.func,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -112,7 +110,8 @@ class CollectivePage extends Component {
   }
 
   getSections = memoizeOne((collective, isAdmin, isHostAdmin) => {
-    return getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
+    const hasNewCollectiveNavbar = get(this.props.router, 'query.version') === 'v2';
+    return getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin, hasNewCollectiveNavbar);
   });
 
   onScroll = throttle(() => {
@@ -135,7 +134,10 @@ class CollectivePage extends Component {
     const breakpoint = window.scrollY + distanceThreshold;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
 
-    if (NAV_V2_FEATURE_FLAG && get(this.props.collective, 'settings.collectivePage.useNewSections')) {
+    if (
+      get(this.props.router, 'query.version') === 'v2' &&
+      get(this.props.collective, 'settings.collectivePage.useNewSections')
+    ) {
       for (let i = sections.length - 1; i >= 0; i--) {
         if (sections[i].type !== 'CATEGORY') {
           continue;
@@ -188,7 +190,7 @@ class CollectivePage extends Component {
       const isEvent = type === CollectiveType.EVENT;
       const isProject = type === CollectiveType.PROJECT;
 
-      if (NAV_V2_FEATURE_FLAG) {
+      if (get(this.props.router.query.version) === 'v2') {
         // The "too many calls to action" issue doesn't stand anymore with the new navbar, so
         // we can let the CollectiveNavbar component in charge of most of the flags, to make sure
         // we display the same thing everywhere. The two flags below should be migrated and this
@@ -354,7 +356,8 @@ class CollectivePage extends Component {
   };
 
   render() {
-    const { collective, host, isAdmin, isRoot, onPrimaryColorChange, LoggedInUser } = this.props;
+    const { collective, host, isAdmin, isRoot, onPrimaryColorChange, LoggedInUser, router } = this.props;
+    const newNavbarFeatureFlag = router?.query?.version === 'v2';
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection, selectedCategory, notification } = this.state;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
@@ -441,7 +444,7 @@ class CollectivePage extends Component {
 
         {isEmpty(sections) ? (
           <SectionEmpty collective={this.props.collective} />
-        ) : NAV_V2_FEATURE_FLAG ? (
+        ) : newNavbarFeatureFlag ? (
           sections.map((entry, entryIdx) =>
             entry.type === 'CATEGORY' ? (
               <Fragment key={`category-${entry.name}`}>
@@ -493,4 +496,4 @@ class CollectivePage extends Component {
   }
 }
 
-export default CollectivePage;
+export default withRouter(CollectivePage);
