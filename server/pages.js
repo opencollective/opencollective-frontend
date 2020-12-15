@@ -72,7 +72,6 @@ pages.add('external-redirect', '/redirect');
 pages.add(
   'create-collective',
   '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
-  'new-create-collective',
 );
 
 // Events and Projects using collective page
