@@ -94,6 +94,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const [submitAddFunds, { error }] = useMutation(addFundsMutation, { context: API_V2_CONTEXT });
   const defaultHostFeePercent = collective.hostFeePercent;
 
+  if (!LoggedInUser) {
+    return null;
+  }
+
   return (
     <StyledModal width="100%" maxWidth={435} {...props}>
       <CollectiveModalHeader collective={collective} />
