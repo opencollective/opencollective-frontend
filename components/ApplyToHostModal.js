@@ -45,6 +45,7 @@ const hostFields = gqlV2/* GraphQL */ `
     termsUrl
     longDescription
     hostFeePercent
+    settings
   }
 `;
 
@@ -326,11 +327,20 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                     <StyledInputFormikField name="message">
                       {({ field }) => (
                         <Box mt={32}>
-                          <P fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700" mb={2}>
-                            <FormattedMessage
-                              id="ApplyToHost.WriteMessage"
-                              defaultMessage="Write a message to fiscal host"
-                            />
+                          <P
+                            fontSize="13px"
+                            lineHeight="16px"
+                            fontWeight="600"
+                            color="black.700"
+                            mb={2}
+                            whiteSpace="pre-wrap"
+                          >
+                            {get(host, 'settings.applyMessage') || (
+                              <FormattedMessage
+                                id="ApplyToHost.WriteMessage"
+                                defaultMessage="Write a message to fiscal host"
+                              />
+                            )}
                           </P>
                           <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
                         </Box>

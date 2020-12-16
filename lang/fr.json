@@ -72,6 +72,8 @@
   "AmountInterval": "{amount} {currencyCode} / {interval, select, month {mois} year {an}}",
   "AmountIntervalLong": "{amount} {currencyCode} / {interval, select, month {mois} year {an}}",
   "api.error.unreachable": "Le site est surchargé pour le moment. Merci de réessayer plus tard.",
+  "application.message.description": "Custom instructions displayed above the text box that projects see when applying (1000 characters max)",
+  "application.message.label": "Apply instructions",
   "ApplicationMessageModal.Private": "Private (this will send an email to the Collective admins)",
   "ApplicationRejectionReasonModal.Help": "Help {accountName} know why you rejected their application",
   "applications.ApiKeys": "Clés API",

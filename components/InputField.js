@@ -235,6 +235,7 @@ class InputField extends React.Component {
             maxLength={field.maxLength}
             value={this.state.value || this.props.defaultValue || ''}
             onChange={event => this.handleChange(event.target.value)}
+            disabled={field.disabled}
           />
         );
         break;

@@ -72,6 +72,8 @@
   "AmountInterval": "{amount} {currencyCode} / {interval, select, month {mo.} year {yr.}}",
   "AmountIntervalLong": "{amount} {currencyCode} / {interval, select, month {month} year {year}}",
   "api.error.unreachable": "Kann die API nicht erreichen. Bitte versuche es in ein paar Minuten erneut.",
+  "application.message.description": "Custom instructions displayed above the text box that projects see when applying (1000 characters max)",
+  "application.message.label": "Apply instructions",
   "ApplicationMessageModal.Private": "Privat (es wird eine E-Mail an die Administratoren dieses Kollektivs gesendet)",
   "ApplicationRejectionReasonModal.Help": "Helfe {accountName} zu verstehen, wieso du die Bewerbung abgelehnt hast",
   "applications.ApiKeys": "API-Schlüssel",

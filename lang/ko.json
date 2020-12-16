@@ -72,6 +72,8 @@
   "AmountInterval": "{amount} {currencyCode} / {interval, select, {yr.} 년 {mo.} 개월}",
   "AmountIntervalLong": "{amount} {currencyCode} / {interval, select, {year}년 {month} 개월}",
   "api.error.unreachable": "API에 연결할 수 없습니다. 잠시 후에 다시 시도해 주십시오.",
+  "application.message.description": "Custom instructions displayed above the text box that projects see when applying (1000 characters max)",
+  "application.message.label": "Apply instructions",
   "ApplicationMessageModal.Private": "Private (this will send an email to the Collective admins)",
   "ApplicationRejectionReasonModal.Help": "Help {accountName} know why you rejected their application",
   "applications.ApiKeys": "API 키",
