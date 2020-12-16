@@ -91,7 +91,7 @@
     "react-swipeable": "5.5.1",
     "react-window": "1.8.6",
     "redis": "3.0.2",
-    "sanitize-html": "1.27.4",
+    "sanitize-html": "2.2.0",
     "slugify": "1.4.6",
     "speakeasy": "2.0.0",
     "styled-components": "5.2.1",
