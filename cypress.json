@@ -6,7 +6,7 @@
   "responseTimeout": 60000,
   "video": false,
   "chromeWebSecurity": false,
-  "blacklistHosts": ["wtfismyip.com"],
+  "blockHosts": ["wtfismyip.com"],
   "env": {
     "MAILDEV_URL": "http://localhost:1080",
     "codeCoverage": {
