@@ -18,7 +18,7 @@
     "@opencollective/taxes": "3.1.0",
     "@popperjs/core": "2.6.0",
     "@sentry/browser": "5.29.0",
-    "@sentry/node": "5.29.0",
+    "@sentry/node": "5.29.1",
     "@styled-icons/boxicons-regular": "10.18.0",
     "@styled-icons/fa-brands": "10.22.0",
     "@styled-icons/fa-solid": "10.22.0",
