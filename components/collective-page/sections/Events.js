@@ -7,7 +7,6 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { hasNewNavBar } from '../../../lib/collective-sections';
 import { isPastEvent } from '../../../lib/events';
 
-import { Sections } from '../_constants';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeCollective from '../../contribute-cards/ContributeCollective';
@@ -17,6 +16,7 @@ import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
+import { Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import SectionHeader from '../SectionHeader';

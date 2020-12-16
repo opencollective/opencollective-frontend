@@ -6,12 +6,12 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 
-// Local imports
-import { Dimensions } from '../_constants';
 import Container from '../../Container';
 import * as ContributorsFilter from '../../ContributorsFilter';
 import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../../ContributorsGrid';
 import { H3, P, Span } from '../../Text';
+// Local imports
+import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 

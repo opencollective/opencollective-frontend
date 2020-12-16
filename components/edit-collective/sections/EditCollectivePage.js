@@ -21,8 +21,8 @@ import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { getEnvVar } from '../../../lib/env-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
+import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 import { parseToBoolean } from '../../../lib/utils';
 
 import { Sections } from '../../collective-page/_constants';

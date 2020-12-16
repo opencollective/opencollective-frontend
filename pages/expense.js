@@ -5,8 +5,8 @@ import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'loda
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';

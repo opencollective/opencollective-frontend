@@ -8,8 +8,8 @@ import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { hasNewNavBar } from '../../../lib/collective-sections';
 import { getTopContributors } from '../../../lib/collective.lib';
+import { hasNewNavBar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getEnvVar } from '../../../lib/env-utils';
@@ -18,7 +18,6 @@ import { canOrderTicketsFromEvent, isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { parseToBoolean } from '../../../lib/utils';
 
-import { Sections } from '../_constants';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
@@ -34,6 +33,7 @@ import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
 import { H3, H4, P } from '../../Text';
+import { Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';

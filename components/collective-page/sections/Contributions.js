@@ -12,7 +12,6 @@ import roles from '../../../lib/constants/roles';
 import { getEnvVar } from '../../../lib/env-utils';
 import { parseToBoolean } from '../../../lib/utils';
 
-import { Dimensions, Sections } from '../_constants';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -22,6 +21,7 @@ import StyledFilters from '../../StyledFilters';
 import { fadeIn } from '../../StyledKeyframes';
 import StyledMembershipCard from '../../StyledMembershipCard';
 import { H3 } from '../../Text';
+import { Dimensions, Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionHeader from '../SectionHeader';
 import SectionTitle from '../SectionTitle';

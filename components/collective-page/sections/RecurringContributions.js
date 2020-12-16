@@ -5,7 +5,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
-import { Dimensions } from '../_constants';
 import Container from '../../Container';
 import { Box } from '../../Grid';
 import I18nFormatters from '../../I18nFormatters';
@@ -16,6 +15,7 @@ import RecurringContributionsContainer from '../../recurring-contributions/Recur
 import StyledFilters from '../../StyledFilters';
 import TemporaryNotification from '../../TemporaryNotification';
 import { P } from '../../Text';
+import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
