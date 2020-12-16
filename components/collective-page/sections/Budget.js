@@ -10,7 +10,6 @@ import { formatCurrency } from '../../../lib/currency-utils';
 import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import { Sections } from '../_constants';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
@@ -22,6 +21,7 @@ import { P, Span } from '../../Text';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionsList from '../../transactions/TransactionsList';
 import { withUser } from '../../UserProvider';
+import { Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionHeader from '../SectionHeader';
 

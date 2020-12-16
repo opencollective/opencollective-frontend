@@ -8,7 +8,6 @@ import { hasNewNavBar } from '../../../lib/collective-sections';
 import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import { Dimensions, Sections } from '../_constants';
 import { Box } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -17,6 +16,7 @@ import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionsList from '../../transactions/TransactionsList';
+import { Dimensions, Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionHeader from '../SectionHeader';
 

@@ -6,7 +6,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { hasNewNavBar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 
-import { Sections } from '../_constants';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import HTMLContent, { isEmptyValue } from '../../HTMLContent';
@@ -15,6 +14,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
+import { Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 import SectionHeader from '../SectionHeader';
