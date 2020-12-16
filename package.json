@@ -11,7 +11,7 @@
     "npm": "6.12.0"
   },
   "dependencies": {
-    "@apollo/client": "3.2.7",
+    "@apollo/client": "3.3.6",
     "@formatjs/intl-relativetimeformat": "8.0.0",
     "@hyperwatch/hyperwatch": "3.8.1",
     "@material-ui/core": "4.11.2",
