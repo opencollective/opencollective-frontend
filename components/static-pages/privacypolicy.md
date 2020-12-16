@@ -86,6 +86,6 @@ Open Collective is GDPR compliant. We are not in the business of selling data to
   </div>
   <div style="display:flex;flex-direction: column;margin-top:1.5em">
     <div style="font-weight:bold;font-size:2.2rem;">Contact Us</div>
-    <div style="display:flex;flex-direction:column;">If you have any questions about this Privacy Policy, please contact us at:  <a href="mailto:support@opencollective.com">support@opencollective.com</a>.</div>
+    <div style="display:flex;flex-direction:column;">If you have any questions about this Privacy Policy, please contact us at:  <a href="mailto:support@opencollective.com">support@opencollective.com</a></div>
   </div>
 </div>
