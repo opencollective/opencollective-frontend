@@ -805,7 +805,6 @@ type CollectiveStatsType {
   ): Int
   yearlyBudget: Int
   yearlyBudgetManaged: Int
-  topExpenses: JSON @deprecated(reason: "[LegacyExpenseFlow] 2020-11-17: Not used anymore")
   topFundingSources: JSON
   activeRecurringContributions: JSON
 }
@@ -1358,10 +1357,7 @@ type Expense implements Transaction {
   updatedAt: DateString
   paymentMethod: PaymentMethodType
   description: String
-  privateMessage: String @deprecated(reason: "Please use transaction.expense.privateMessage")
-  category: String @deprecated(reason: "Please use transaction.expense.category")
   expense: ExpenseType
-  attachment: String @deprecated(reason: "Please use transaction.expense.attachment")
 }
 
 """
@@ -1376,33 +1372,6 @@ type ExpenseAttachedFile {
 }
 
 """
-Input type for ExpenseType
-"""
-input ExpenseInputType {
-  id: Int
-  amount: Int
-  currency: String
-  createdAt: DateString
-  incurredAt: DateString
-  description: String
-  category: String
-  status: String
-  type: String
-
-  """
-  Can be: paypal, other. Also deprecated: donation, manual
-  """
-  payoutMethod: String
-  PayoutMethod: PayoutMethodInput
-  privateMessage: String
-  attachment: String
-  attachments: [ExpenseItemInputType]
-  items: [ExpenseItemInputType]
-  user: UserInputType
-  collective: CollectiveAttributesInputType
-}
-
-"""
 Public fields for an expense item
 """
 type ExpenseItem {
@@ -1414,17 +1383,6 @@ type ExpenseItem {
   deletedAt: IsoDateString
   description: String
   url: String
-}
-
-"""
-Fields for creating or editing an expense item
-"""
-input ExpenseItemInputType {
-  id: Int
-  url: String
-  amount: Int!
-  incurredAt: DateString
-  description: String
 }
 
 """
@@ -1456,21 +1414,6 @@ type ExpensesStatsType {
 }
 
 """
-Possible statuses for an Expense
-"""
-enum ExpenseStatus {
-  DRAFT
-  UNVERIFIED
-  PENDING
-  APPROVED
-  REJECTED
-  PROCESSING
-  ERROR
-  PAID
-  SCHEDULED_FOR_PAYMENT
-}
-
-"""
 This represents an Expense
 """
 type ExpenseType {
@@ -1482,27 +1425,15 @@ type ExpenseType {
   updatedAt: DateString
   incurredAt: DateString
   description: String
-  category: String @deprecated(reason: "2020-04-01 - Please use tags")
   tags: [String]
   status: String
   type: String
-  payoutMethod: String @deprecated(reason: "2020-01-23 - Please use the private field instead.")
   PayoutMethod: PayoutMethod
   privateMessage: String
-  attachment: String
-    @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
-  attachments: [ExpenseItem] @deprecated(reason: "2020-04-09 - Please use items")
   items: [ExpenseItem]
   attachedFiles: [ExpenseAttachedFile!]
-  userTaxFormRequiredBeforePayment: Boolean @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Please use API V2")
   user: UserDetails
   fromCollective: CollectiveInterface
-
-  """
-  Returns the list of comments for this expense, or `null` if user is not allowed to see them
-  """
-  comments(limit: Int, offset: Int): CommentListType
-    @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
   collective: CollectiveInterface
 
   """
@@ -2058,35 +1989,8 @@ type Mutation {
     token: String!
   ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
-  approveExpense(id: Int!): ExpenseType @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
-  unapproveExpense(id: Int!): ExpenseType
-    @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
-  rejectExpense(id: Int!): ExpenseType
-  payExpense(
-    id: Int!
-    paymentProcessorFeeInCollectiveCurrency: Int
-    hostFeeInCollectiveCurrency: Int
-    platformFeeInCollectiveCurrency: Int
-
-    """
-    Force expense with paypal method to be paid manually
-    """
-    forceManual: Boolean
-
-    """
-    2FA code for if the host account has 2FA for payouts turned on.
-    """
-    twoFactorAuthenticatorCode: String
-  ): ExpenseType @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
   markOrderAsPaid(id: Int!): OrderType
   markPendingOrderAsExpired(id: Int!): OrderType
-  createExpense(expense: ExpenseInputType!): ExpenseType
-    @deprecated(reason: "2020-09-17: [LegacyExpenseFlow] Now using GQLV2 for that")
-  editExpense(expense: ExpenseInputType!): ExpenseType
-    @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
-  deleteExpense(id: Int!): ExpenseType @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
-  markExpenseAsUnpaid(id: Int!, processorFeeRefunded: Boolean!): ExpenseType
-    @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Now using GQLV2 for that")
 
   """
   Update a single tier
@@ -2443,33 +2347,6 @@ type Order implements Transaction {
   publicMessage: String
   order: OrderType
   subscription: Subscription
-}
-
-"""
-Properties by which results can be ordered.
-"""
-enum OrderByField {
-  """
-  Order result by creation time.
-  """
-  createdAt
-
-  """
-  Order result by updated time.
-  """
-  updatedAt
-}
-
-"""
-Ordering options
-"""
-input OrderByType {
-  field: OrderByField = createdAt
-
-  """
-  The ordering direction
-  """
-  direction: OrderDirection = DESC
 }
 
 """
@@ -2885,16 +2762,6 @@ type Organization implements CollectiveInterface {
 }
 
 """
-A list of expenses with pagination info
-"""
-type PaginatedExpenses {
-  expenses: [ExpenseType]
-  limit: Int
-  offset: Int
-  total: Int
-}
-
-"""
 A list of PaymentMethod with pagination info
 """
 type PaginatedPaymentMethod {
@@ -3033,14 +2900,6 @@ type PayoutMethod {
   name: String
   isSaved: Boolean
   data: JSON
-}
-
-input PayoutMethodInput {
-  id: Int
-  data: JSON
-  name: String
-  isSaved: Boolean
-  type: PayoutMethodTypeEnum
 }
 
 enum PayoutMethodTypeEnum {
@@ -3400,32 +3259,6 @@ type Query {
     limit: Int
     offset: Int
   ): [OrderType]
-  allExpenses(
-    CollectiveId: Int!
-    includeHostedCollectives: Boolean
-    status: String
-    category: String
-    FromCollectiveId: Int
-    fromCollectiveSlug: String
-    limit: Int
-    offset: Int
-  ): [ExpenseType] @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Please use API V2")
-  expenses(
-    CollectiveId: Int
-    CollectiveSlug: String
-    status: ExpenseStatus
-    category: String
-    FromCollectiveId: Int
-    FromCollectiveSlug: String
-
-    """
-    Defaults to 100
-    """
-    limit: Int = 100
-    offset: Int = 0
-    orderBy: OrderByType = { field: createdAt, direction: DESC }
-  ): PaginatedExpenses @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Please use API V2")
-  Expense(id: Int!): ExpenseType @deprecated(reason: "2020-11-17: [LegacyExpenseFlow] Please use API V2")
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """
@@ -4285,7 +4118,6 @@ type UserDetails {
     """
     includeIncognito: Boolean = true
   ): [Member]
-  paypalEmail: String @deprecated(reason: "2020-01-20 - Payout methods are now attached to collectives")
 
   """
   Returns true if user account is limited (user can't use any feature)
