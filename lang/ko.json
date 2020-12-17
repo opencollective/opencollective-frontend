@@ -1161,6 +1161,7 @@
   "membership.totalDonations": "Total amount contributed",
   "membership.totalDonations.title": "Amount contributed",
   "menu.addFunds": "자금 추가",
+  "menu.addPrepaidBudget": "Add prepaid budget",
   "menu.applications": "애플리케이션",
   "menu.collective.none": "No collectives yet",
   "menu.contributeMoney": "Contribute Money",
