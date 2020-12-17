@@ -109,12 +109,12 @@ const CollectiveSectionEntry = ({
   const [, drop] = useDrop({
     accept: getItemType(parentItem),
     hover: item => onMove(item, index),
-    drop: item => onDrop(item, index),
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
     item: { type: getItemType(parentItem), index, parentItem },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
+    end: onDrop,
   });
 
   drag(drop(ref));
@@ -278,12 +278,12 @@ const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle
   const [, drop] = useDrop({
     accept: getItemType(),
     hover: item => onMove(item, index),
-    drop: item => onDrop(item, index),
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
     item: { type: getItemType(), index },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
+    end: onDrop,
   });
 
   drag(drop(ref));
@@ -372,9 +372,9 @@ const EditCollectivePage = ({ collective }) => {
     }
   };
 
-  const onDrop = (item, hoverIndex) => {
+  const onDrop = () => {
+    setSections(tmpSections);
     setTmpSections(null);
-    setSections(getNewSections(sections, item, hoverIndex, useNewSections));
     setDirty(true);
   };
 
