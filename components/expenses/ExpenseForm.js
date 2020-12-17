@@ -554,7 +554,7 @@ ExpenseFormBody.propTypes = {
       }),
     }),
     settings: PropTypes.object,
-    isApproved: PropTypes.bool.isRequired,
+    isApproved: PropTypes.bool,
   }).isRequired,
 };
 
@@ -638,7 +638,7 @@ ExpenseForm.propTypes = {
       }),
     }),
     settings: PropTypes.object,
-    isApproved: PropTypes.bool.isRequired,
+    isApproved: PropTypes.bool,
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({

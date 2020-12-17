@@ -422,7 +422,7 @@ CollectivePicker.propTypes = {
     }),
   ),
   /** Defines if custom options are listed in the top of the list or the bottom */
-  customOptionsPosition: PropTypes.oneOf(CUSTOM_OPTIONS_POSITION),
+  customOptionsPosition: PropTypes.oneOf(Object.values(CUSTOM_OPTIONS_POSITION)),
   /** Function to sort collectives. Default to sorty by name */
   sortFunc: PropTypes.func,
   /** Called when value changes */
