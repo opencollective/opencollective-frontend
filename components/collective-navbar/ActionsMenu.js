@@ -230,7 +230,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
                     <StyledButton p={ITEM_PADDING} onClick={() => showAddFundsToOrganizationModal(true)} isBorderless>
                       <AttachMoney size="20px" color="#304CDC" />
                       <Span>
-                        <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
+                        <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add prepaid budget" />
                       </Span>
                     </StyledButton>
                   </MenuItem>
