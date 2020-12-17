@@ -272,7 +272,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     disabled={!dirty || !isValid}
                     loading={isSubmitting}
                   >
-                    <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
+                    <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
                   </StyledButton>
                   <StyledButton mx={2} mb={1} minWidth={100} onClick={props.onClose}>
                     <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />

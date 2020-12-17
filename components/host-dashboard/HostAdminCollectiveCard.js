@@ -22,7 +22,7 @@ import CollectiveFeesStructureModal from './CollectiveFeesStructureModal';
 const msg = defineMessages({
   addFunds: {
     id: 'menu.addFunds',
-    defaultMessage: 'Add funds',
+    defaultMessage: 'Add Funds',
   },
   feeStructure: {
     id: 'FeeStructure',

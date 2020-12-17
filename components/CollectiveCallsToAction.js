@@ -13,7 +13,7 @@ import Link from './Link';
 import StyledButton from './StyledButton';
 
 // Dynamic imports
-const AddFundsToOrganizationModal = dynamic(() => import('./AddFundsToOrganizationModal'));
+const AddPrepaidBudgetModal = dynamic(() => import('./AddPrepaidBudgetModal'));
 const AddFundsModal = dynamic(() => import('./host-dashboard/AddFundsModal'));
 
 /**
@@ -29,12 +29,12 @@ const CollectiveCallsToAction = ({
     hasApply,
     hasDashboard,
     hasManageSubscriptions,
-    addFundsToOrganization,
+    addPrepaidBudget,
     addFunds,
   },
   ...props
 }) => {
-  const [hasAddFundsToOrganizationModal, showAddFundsToOrganizationModal] = React.useState(false);
+  const [hasAddPrepaidBudgetModal, showAddPrepaidBudgetModal] = React.useState(false);
   const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
   const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
   const hostWithinLimit = hostedCollectivesLimit
@@ -126,21 +126,21 @@ const CollectiveCallsToAction = ({
           />
         </Box>
       )}
-      {addFundsToOrganization && (
+      {addPrepaidBudget && (
         <Fragment>
           <StyledButton
             buttonSize="small"
             mx={2}
             my={1}
             minWidth={buttonsMinWidth}
-            onClick={() => showAddFundsToOrganizationModal(true)}
+            onClick={() => showAddPrepaidBudgetModal(true)}
           >
-            <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
+            <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
           </StyledButton>
-          <AddFundsToOrganizationModal
+          <AddPrepaidBudgetModal
             collective={collective}
-            show={hasAddFundsToOrganizationModal}
-            setShow={showAddFundsToOrganizationModal}
+            show={hasAddPrepaidBudgetModal}
+            setShow={showAddPrepaidBudgetModal}
           />
         </Fragment>
       )}
@@ -153,7 +153,7 @@ const CollectiveCallsToAction = ({
             minWidth={buttonsMinWidth}
             onClick={() => showAddFundsModal(true)}
           >
-            <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
+            <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
           </StyledButton>
           <AddFundsModal
             show={hasAddFundsModal}
@@ -192,8 +192,8 @@ CollectiveCallsToAction.propTypes = {
     hasDashboard: PropTypes.bool,
     /** Link to edit subscriptions */
     hasManageSubscriptions: PropTypes.bool,
-    /** Link to add funds */
-    addFundsToOrganization: PropTypes.bool,
+    /** Link to add prepaid budget */
+    addPrepaidBudget: PropTypes.bool,
     /** Link to add funds */
     addFunds: PropTypes.bool,
   }).isRequired,
