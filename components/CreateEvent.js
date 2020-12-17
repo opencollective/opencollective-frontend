@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 import dayjs from '../lib/dayjs';
@@ -14,6 +13,8 @@ import Container from './Container';
 import EditEventForm from './EditEventForm';
 import Footer from './Footer';
 import Header from './Header';
+import Link from './Link';
+import StyledButton from './StyledButton';
 import { withUser } from './UserProvider';
 
 class CreateEvent extends React.Component {
@@ -109,9 +110,11 @@ class CreateEvent extends React.Component {
                   />
                 </p>
                 <p>
-                  <Button bsStyle="primary" href={`/signin?next=/${collective.slug}/events/new`}>
-                    <FormattedMessage id="signIn" defaultMessage="Sign In" />
-                  </Button>
+                  <Link route={`/signin?next=/${collective.slug}/events/new`}>
+                    <StyledButton buttonStyle="primary">
+                      <FormattedMessage id="signIn" defaultMessage="Sign In" />
+                    </StyledButton>
+                  </Link>
                 </p>
               </Container>
             )}

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { cloneDeep, get, set } from 'lodash';
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -19,6 +19,7 @@ import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
 import InputFieldPresets from '../../InputFieldPresets';
 import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
 import StyledHr from '../../StyledHr';
 import { H3, H4, P, Span } from '../../Text';
@@ -455,9 +456,9 @@ class Tiers extends React.Component {
 
         <div className="tiers">{this.state.tiers.map(this.renderTier)}</div>
         <Container textAlign="right" marginTop="-10px">
-          <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
+          <StyledButton className="addTier" buttonStyle="primary" onClick={() => this.addTier({})}>
             {intl.formatMessage(this.messages[`${defaultType}.add`])}
-          </Button>
+          </StyledButton>
         </Container>
       </div>
     );

@@ -5,7 +5,6 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { cloneDeep, find, get, set } from 'lodash';
 import { withRouter } from 'next/router';
-import { Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { AccountTypesWithHost, CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
@@ -837,14 +836,15 @@ class EditCollectiveForm extends React.Component {
             {((fields && fields.length > 0) ||
               [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
               <Container className="actions" margin="5rem auto 1rem" textAlign="center">
-                <Button
-                  bsStyle="primary"
+                <StyledButton
+                  buttonStyle="primary"
                   type="submit"
                   onClick={this.handleSubmit}
+                  data-cy="collective-save"
                   disabled={status === 'loading' || !this.state.modified}
                 >
                   {submitBtnLabel}
-                </Button>
+                </StyledButton>
 
                 <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
                   <Link

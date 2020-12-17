@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Radio } from '@material-ui/core';
 import { get, groupBy } from 'lodash';
 import { withRouter } from 'next/router';
-import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -132,12 +131,17 @@ class Host extends React.Component {
           {collective.stats.balance === 0 && (
             <Fragment>
               <p>
-                <Button bsStyle="primary" type="submit" onClick={() => this.changeHost()} className="removeHostBtn">
+                <StyledButton
+                  buttonStyle="primary"
+                  type="submit"
+                  onClick={() => this.changeHost()}
+                  className="removeHostBtn"
+                >
                   <FormattedMessage
                     id="editCollective.selfHost.removeBtn"
                     defaultMessage="Reset Fiscal Host settings"
                   />
-                </Button>
+                </StyledButton>
               </p>
             </Fragment>
           )}
@@ -172,8 +176,8 @@ class Host extends React.Component {
                     />
                   </p>
                   <p>
-                    <Button
-                      bsStyle="primary"
+                    <StyledButton
+                      buttonStyle="primary"
                       type="submit"
                       onClick={() => this.setState({ showModal: true, action: 'Withdraw' })}
                       className="removeHostBtn"
@@ -182,7 +186,7 @@ class Host extends React.Component {
                         id="editCollective.host.cancelApplicationBtn"
                         defaultMessage="Withdraw application"
                       />
-                    </Button>
+                    </StyledButton>
                   </p>
                 </Fragment>
               )}
@@ -226,14 +230,14 @@ class Host extends React.Component {
                   {collective.stats.balance === 0 && (
                     <Fragment>
                       <p>
-                        <Button
-                          bsStyle="primary"
+                        <StyledButton
+                          buttonStyle="primary"
                           type="submit"
                           onClick={() => this.setState({ showModal: true, action: 'Remove' })}
                           className="removeHostBtn"
                         >
                           <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
-                        </Button>
+                        </StyledButton>
                       </p>
                       <Fineprint>
                         <FormattedMessage
@@ -363,12 +367,16 @@ class Host extends React.Component {
               {selectedOption === 'selfHost' && LoggedInUser && (
                 <Flex justifyContent="space-between" alignItems="flex-end" mt={3}>
                   <Box>
-                    <Button bsStyle="primary" type="submit" onClick={() => this.changeHost({ id: collective.id })}>
+                    <StyledButton
+                      buttonStyle="primary"
+                      type="submit"
+                      onClick={() => this.changeHost({ id: collective.id })}
+                    >
                       <FormattedMessage
                         id="host.selfHost.confirm"
                         defaultMessage="Yes, hold money ourselves, no Fiscal Host"
                       />
-                    </Button>
+                    </StyledButton>
                   </Box>
                   {!stripeAccount && (
                     <Box textAlign="right">
