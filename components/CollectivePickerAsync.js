@@ -123,7 +123,7 @@ const CollectivePickerAsync = ({
       onInputChange={newTerm => {
         setTerm(newTerm.trim());
       }}
-      customOptions={!term && emptyCustomOptions}
+      customOptions={!term ? emptyCustomOptions : []}
       {...props}
     />
   );
