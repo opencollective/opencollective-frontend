@@ -73,7 +73,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
         </PrivateInfoColumnHeader>
         <LinkCollective collective={payee}>
           <Flex alignItems="center" fontSize="12px">
-            {payee.isInvite || payee.isNewUser ? (
+            {!payee.slug ? (
               <Avatar
                 name={payee.organization?.name || payee.name}
                 radius={24}
