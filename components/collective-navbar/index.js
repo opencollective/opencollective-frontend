@@ -478,6 +478,7 @@ const CollectiveNavbar = ({
                 collective={collective}
                 callsToAction={callsToAction}
                 createNotification={createNotification}
+                isAdmin={isAdmin}
               />
             )}
             {!onlyInfos && (

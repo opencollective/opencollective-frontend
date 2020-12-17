@@ -8,9 +8,9 @@ import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
-import { get, some } from 'lodash';
+import { get, pickBy, some } from 'lodash';
 import dynamic from 'next/dynamic';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -91,10 +91,12 @@ const StyledChevronDown = styled(ChevronDown)`
 
 const ITEM_PADDING = '11px 14px';
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
+const CollectiveNavbarActionsMenu = ({ collective, callsToAction, isAdmin }) => {
+  const intl = useIntl();
   const hasRequestGrant =
     [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true;
-  const hasActions = hasRequestGrant || some(callsToAction);
+  callsToAction = { ...callsToAction, hasRequestGrant };
+  const hasActions = some(callsToAction);
   const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
   const hostWithinLimit = hostedCollectivesLimit
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
@@ -119,9 +121,105 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
     }
   }
 
+  // test data, remove
+  callsToAction = {
+    hasSubmitExpense: true,
+    hasContact: true,
+    hasApply: false,
+    hasManageSubscriptions: false,
+    hasDashboard: false,
+    hasContribute: false,
+    addFunds: false,
+    addFundsToOrganization: false,
+    hasRequestGrant: false,
+  };
+
+  const CallsToActionMsgs = defineMessages({
+    hasSubmitExpense: {
+      id: 'ExpenseForm.Submit',
+      defaultMessage: 'Submit expense',
+    },
+    hasContact: {
+      id: 'Contact',
+      defaultMessage: 'Contact',
+    },
+    hasManageSubscriptions: {
+      id: 'menu.subscriptions',
+      defaultMessage: 'Manage Contributions',
+    },
+    hasContribute: {
+      id: 'menu.contributeMoney',
+      defaultMessage: 'Contribute Money',
+    },
+    // hasDashboard: {
+    //   id: '',
+    //   defaultMessage: '',
+    // },
+    // addFunds: {
+    //   id: '',
+    //   defaultMessage: '',
+    // },
+    // addFundsToOrganization: {
+    //   id: '',
+    //   defaultMessage: '',
+    // },
+    // hasApply: {
+    //   id: '',
+    //   defaultMessage: '',
+    // },
+    // hasRequestGrant: {
+    //   id: '',
+    //   defaultMessage: '',
+    // },
+  });
+
+  const truthyCallsToAction = pickBy(callsToAction, value => value === true);
+
+  const renderCTAButton = callsToAction => {
+    console.log('ctas keys', Object.keys(callsToAction));
+    return (
+      <Fragment>
+        {Object.keys(callsToAction).map(callToAction => {
+          console.log('cta', callToAction);
+          return (
+            <StyledButton
+              key={callToAction}
+              isBorderless
+              buttonSize="tiny"
+              buttonStyle="secondary"
+              my={2}
+              fontSize="14px"
+              fontWeight="500"
+              textTransform="uppercase"
+              color="#304CDC"
+              letterSpacing="60%"
+            >
+              <Span css={{ verticalAlign: 'middle' }}>{intl.formatMessage(CallsToActionMsgs[callToAction])}</Span>
+            </StyledButton>
+          );
+        })}
+      </Fragment>
+    );
+  };
+
   // Do not render the menu if there are no available CTAs
   if (!hasActions) {
     return null;
+  }
+
+  console.log('truthy CTAs', truthyCallsToAction);
+  console.log('is admin?', isAdmin);
+  console.log('number of CTAS', Object.keys(truthyCallsToAction).length);
+
+  if (
+    (isAdmin && Object.keys(truthyCallsToAction).length === 1) ||
+    (!isAdmin && Object.keys(truthyCallsToAction).length < 3)
+  ) {
+    return (
+      <Container display="flex" alignItems="center" order={[-1, 0]} borderTop={['1px solid #e1e1e1', 'none']}>
+        <Box px={1}>{renderCTAButton(truthyCallsToAction)}</Box>
+      </Container>
+    );
   }
 
   return (
@@ -180,7 +278,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
                   </StyledLink>
                 </MenuItem>
               )}
-              {hasRequestGrant && (
+              {callsToAction.hasRequestGrant && (
                 <MenuItem py={1}>
                   <StyledLink
                     as={Link}
@@ -312,7 +410,7 @@ CollectiveNavbarActionsMenu.propTypes = {
     /** Add prepaid budget to an organization */
     addPrepaidBudget: PropTypes.bool,
   }).isRequired,
-  createNotification: PropTypes.func,
+  isAdmin: PropTypes.bool,
 };
 
 CollectiveNavbarActionsMenu.defaultProps = {
