@@ -35,7 +35,7 @@ const pages = routes()
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit/:section?')
-  .add('editCollective', '/:slug/edit/:section?/:version(v2)?')
+  .add('editCollective', '/:slug/edit/:section?')
   .add('collective-contact', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add(
@@ -156,7 +156,7 @@ pages.add('marketing', '/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricin
 // ----------
 
 // Collective page
-pages.add('collective', '/:slug/:version(v2)?', 'collective-page');
+pages.add('collective', '/:slug', 'collective-page');
 pages.add(
   'collective-with-onboarding',
   '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',

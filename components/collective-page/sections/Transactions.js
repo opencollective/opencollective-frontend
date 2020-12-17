@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -77,9 +77,10 @@ const SectionTransactions = props => {
     refetch({ slug: props.collective.slug, limit: NB_DISPLAYED, hasExpense, hasOrder });
   }, [filter, props.collective.slug, refetch]);
 
-  const { intl, collective, router } = props;
+  const { intl, collective } = props;
   const collectiveHasNoTransactions = !loading && data?.transactions?.totalCount === 0 && filter === FILTERS.ALL;
-  const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
+  const router = useRouter();
+  const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
   return (
     <Box py={5}>
@@ -164,9 +165,6 @@ SectionTransactions.propTypes = {
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,
-
-  /** @ignore from withRouter */
-  router: PropTypes.object,
 };
 
-export default React.memo(withRouter(injectIntl(SectionTransactions)));
+export default React.memo(injectIntl(SectionTransactions));

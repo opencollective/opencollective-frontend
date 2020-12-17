@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get, isEmpty } from 'lodash';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -44,7 +44,7 @@ export const getBudgetSectionQueryVariables = slug => {
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats, LoggedInUser, router }) => {
+const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
     variables: getBudgetSectionQueryVariables(collective.slug),
     context: API_V2_CONTEXT,
@@ -54,7 +54,8 @@ const SectionBudget = ({ collective, stats, LoggedInUser, router }) => {
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
   const isProject = collective.type === CollectiveType.PROJECT;
-  const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
+  const router = useRouter();
+  const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
   React.useEffect(() => {
     refetch();
@@ -212,9 +213,6 @@ SectionBudget.propTypes = {
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,
-
-  /** @ignore from withRouter */
-  router: PropTypes.object,
 };
 
-export default React.memo(withRouter(withUser(injectIntl(SectionBudget))));
+export default React.memo(withUser(injectIntl(SectionBudget)));

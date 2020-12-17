@@ -5,7 +5,7 @@ import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, flatten, get, isEqual, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { useDrag, useDrop } from 'react-dnd';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -333,9 +333,10 @@ MenuCategory.propTypes = {
   onSectionToggle: PropTypes.func,
 };
 
-const EditCollectivePage = ({ collective, router }) => {
+const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
-  const HAS_NEW_NAVBAR = get(router, 'query.version') === 'v2';
+  const router = useRouter();
+  const HAS_NEW_NAVBAR = get(router, 'query.navbarVersion') === 'v2';
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
   const [tmpSections, setTmpSections] = React.useState(null);
@@ -518,7 +519,6 @@ EditCollectivePage.propTypes = {
     slug: PropTypes.string,
     type: PropTypes.string,
   }),
-  router: PropTypes.object,
 };
 
-export default withRouter(EditCollectivePage);
+export default EditCollectivePage;

@@ -5,7 +5,7 @@ import { Settings } from '@styled-icons/feather/Settings';
 import { Close } from '@styled-icons/material/Close';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -317,9 +317,9 @@ const CollectiveNavbar = ({
   showBackButton,
   withShadow,
   useAnchorsForCategories,
-  router,
 }) => {
-  const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
+  const router = useRouter();
+  const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin, null, newNavbarFeatureFlag);
@@ -666,8 +666,6 @@ CollectiveNavbar.propTypes = {
   withShadow: PropTypes.bool,
   /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */
   useAnchorsForCategories: PropTypes.bool,
-  /** From withRouter */
-  router: PropTypes.object,
 };
 
 CollectiveNavbar.defaultProps = {
@@ -688,4 +686,4 @@ CollectiveNavbar.defaultProps = {
   },
 };
 
-export default React.memo(withRouter(CollectiveNavbar));
+export default React.memo(CollectiveNavbar);

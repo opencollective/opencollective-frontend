@@ -70,7 +70,7 @@ class SectionEvents extends React.PureComponent {
     const { collective, events, connectedCollectives, isAdmin, router } = this.props;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
-    const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
+    const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
     return (
       <Fragment>

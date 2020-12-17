@@ -222,7 +222,7 @@ class SectionContributions extends React.PureComponent {
   render() {
     const { collective, data, intl, LoggedInUser, router } = this.props;
     const { nbMemberships, selectedFilter } = this.state;
-    const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
+    const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;

@@ -110,7 +110,7 @@ class CollectivePage extends Component {
   }
 
   getSections = memoizeOne((collective, isAdmin, isHostAdmin) => {
-    const hasNewCollectiveNavbar = get(this.props.router, 'query.version') === 'v2';
+    const hasNewCollectiveNavbar = get(this.props.router, 'query.navbarVersion') === 'v2';
     return getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin, hasNewCollectiveNavbar);
   });
 
@@ -135,9 +135,10 @@ class CollectivePage extends Component {
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
 
     if (
-      get(this.props.router, 'query.version') === 'v2' &&
+      get(this.props.router, 'query.navbarVersion') === 'v2' &&
       get(this.props.collective, 'settings.collectivePage.useNewSections')
     ) {
+      console.log('collective-page/index using new v2');
       for (let i = sections.length - 1; i >= 0; i--) {
         if (sections[i].type !== 'CATEGORY') {
           continue;
@@ -190,7 +191,7 @@ class CollectivePage extends Component {
       const isEvent = type === CollectiveType.EVENT;
       const isProject = type === CollectiveType.PROJECT;
 
-      if (get(this.props.router.query.version) === 'v2') {
+      if (get(this.props.router, 'query.navbarVersion') === 'v2') {
         // The "too many calls to action" issue doesn't stand anymore with the new navbar, so
         // we can let the CollectiveNavbar component in charge of most of the flags, to make sure
         // we display the same thing everywhere. The two flags below should be migrated and this
@@ -357,7 +358,7 @@ class CollectivePage extends Component {
 
   render() {
     const { collective, host, isAdmin, isRoot, onPrimaryColorChange, LoggedInUser, router } = this.props;
-    const newNavbarFeatureFlag = router?.query?.version === 'v2';
+    const newNavbarFeatureFlag = router?.query?.navbarVersion === 'v2';
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection, selectedCategory, notification } = this.state;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);

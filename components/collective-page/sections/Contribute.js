@@ -261,7 +261,7 @@ class SectionContribute extends React.PureComponent {
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
     const cannotOrderTickets = (!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin);
-    const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
+    const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
     /*
     cases

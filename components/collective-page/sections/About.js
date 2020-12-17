@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -39,12 +39,13 @@ const messages = defineMessages({
 /**
  * About section category with editable description
  */
-const SectionAbout = ({ collective, canEdit, intl, router }) => {
+const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isFund = collective.type === CollectiveType.FUND;
   canEdit = collective.isArchived ? false : canEdit;
-  const newNavbarFeatureFlag = get(router, 'query.version') === 'v2';
+  const router = useRouter();
+  const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
   return (
     <ContainerSectionContent px={2} py={[4, 5]}>
@@ -132,9 +133,6 @@ SectionAbout.propTypes = {
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,
-
-  /** @ignore from withRouter */
-  router: PropTypes.object,
 };
 
-export default React.memo(withRouter(injectIntl(SectionAbout)));
+export default React.memo(injectIntl(SectionAbout));
