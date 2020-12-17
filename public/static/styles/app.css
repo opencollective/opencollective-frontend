@@ -100,6 +100,10 @@
        url("../fonts/inter/Inter-BlackItalic.woff") format("woff");
 }
 
+* {
+  box-sizing: border-box;
+}
+
 html {
   --charcoal-grey-two: #373a3d;
   --charcoal-grey-three: #45484c;
@@ -120,11 +124,16 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  color: #333;
+  font-size: 14px;
+}
+
+a {
+  text-decoration: none;
 }
 
 a:hover {
   color: #797d80;
-  text-decoration: none;
 }
 
 summary {
@@ -176,12 +185,15 @@ h1 {
   margin: 40px 0px 20px;
   font-size: 4rem;
   letter-spacing: -1.2px;
-  font-weight: bold;
 }
 
 h2,
 h3 {
   letter-spacing: -0.4px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
 }
 
 .map {
@@ -253,14 +265,6 @@ a {
   }
 }
 
-.col-sm-12 {
-  width: 100%;
-}
-
-.help-block {
-  font-size: 1.2rem;
-}
-
 @media (max-width: 420px) {
   .mobileOnly {
     display: inherit !important;
@@ -269,4 +273,18 @@ a {
 
 #nprogress .spinner {
   display: none;
+}
+
+label {
+  display: inline-block;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.form-control {
+  width: 100%;
+}
+
+button, input, select, textarea {
+  font: inherit;
 }

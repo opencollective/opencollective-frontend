@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormControl } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import CollectivePickerAsync from './CollectivePickerAsync';
+import StyledSelect from './StyledSelect';
 
 const messages = defineMessages({
   addFundsFromHost: {
@@ -57,27 +57,21 @@ class AddFundsSourcePickerForUser extends React.Component {
   }
 
   onChange = async e => {
-    this.props.onChange(e.target.value);
+    this.props.onChange(e);
   };
 
   render() {
     const hosts = this.props.LoggedInUser.hostsUserIsAdminOf();
+    const hostOptions = [
+      { key: 'addfsph-00', value: '' },
+      ...hosts.map(h => {
+        const value = h.legacyId || h.id;
+        return { key: `addfsph-${h.id}`, value: value, label: h.name };
+      }),
+    ];
     return (
       <div>
-        <FormControl
-          id="sourcePicker"
-          name="template"
-          componentClass="select"
-          placeholder="select"
-          onChange={this.onChange}
-        >
-          <option value="" key="addfsph-00" />
-          {hosts.map(h => (
-            <option value={h.legacyId || h.id} key={`addfsph-${h.id}`}>
-              {h.name}
-            </option>
-          ))}
-        </FormControl>
+        <StyledSelect id="sourcePicker" placeholder="select" options={hostOptions} onChange={this.onChange} />
       </div>
     );
   }

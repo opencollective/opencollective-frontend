@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, pick } from 'lodash';
-import { Col, Form, Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 import SmallButton from '../SmallButton';
 
@@ -147,8 +147,8 @@ class EditTwitterAccount extends React.Component {
 
     return (
       <NotificationSettingsContainer key={notificationType}>
-        <Row>
-          <Col sm={12}>
+        <Flex flexWrap="wrap">
+          <Box width={1}>
             <InputField
               type="switch"
               name={`${notificationType}.active`}
@@ -175,8 +175,8 @@ class EditTwitterAccount extends React.Component {
                 onChange={tweet => this.handleChange(notificationType, 'tweet', tweet)}
               />
             )}
-          </Col>
-        </Row>
+          </Box>
+        </Flex>
       </NotificationSettingsContainer>
     );
   }
@@ -184,24 +184,24 @@ class EditTwitterAccount extends React.Component {
   render() {
     return (
       <div className="EditTwitterAccount">
-        <Form horizontal>
+        <form>
           <details>
             <summary>
               <FormattedMessage id="Settings" defaultMessage="Settings" />
             </summary>
             {this.notificationTypes.map(this.renderNotification)}
-            <Row>
-              <Col sm={3} />
-              <Col sm={9}>
+            <Flex flexWrap="wrap">
+              <Box width={[1, 3 / 12]} />
+              <Box width={[1, 9 / 12]}>
                 {this.state.isModified && (
                   <SmallButton className="default" onClick={this.onClick}>
                     <FormattedMessage id="save" defaultMessage="Save" />
                   </SmallButton>
                 )}
-              </Col>
-            </Row>
+              </Box>
+            </Flex>
           </details>
-        </Form>
+        </form>
       </div>
     );
   }

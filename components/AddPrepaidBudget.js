@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { withApollo } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
-import { Col, Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -11,6 +10,7 @@ import { OC_FEE_PERCENT } from '../lib/constants/transactions';
 import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
 
 import { AddFundsSourcePickerForUserWithData } from './AddFundsSourcePicker';
+import { Box, Flex } from './Grid';
 import InputField from './InputField';
 import StyledButton from './StyledButton';
 
@@ -280,114 +280,112 @@ class AddFundsForm extends React.Component {
           {this.fields.map(
             field =>
               (!field.when || field.when(this.state.form)) && (
-                <Row key={`${field.name}.input`}>
-                  <Col sm={12}>
+                <Flex key={`${field.name}.input`} flexWrap="wrap">
+                  <Box width={1}>
                     <InputField
                       {...field}
                       className={`horizontal ${field.className}`}
                       defaultValue={this.state.form[field.name]}
                       onChange={value => this.handleChange('form', field.name, value)}
                     />
-                  </Col>
-                </Row>
+                  </Box>
+                </Flex>
               ),
           )}
-          <Row>
-            <Col sm={12}>
-              <div className="form-group">
-                <label className="col-sm-2 control-label inputField">
-                  <FormattedMessage id="Details" defaultMessage="Details" />
-                </label>
-                <Col sm={10}>
-                  <table className="details">
-                    <tbody>
-                      <tr>
-                        <td>
-                          <FormattedMessage id="addfunds.totalAmount" defaultMessage="Funding amount" />
-                        </td>
-                        <td className="amount">
-                          {formatCurrency(this.state.form.totalAmount, this.props.collective.currency, {
-                            precision: 2,
-                          })}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <FormattedMessage
-                            id="addfunds.hostFees"
-                            defaultMessage="Host fees ({hostFees})"
-                            values={{ hostFees: `${hostFeePercent}%` }}
-                          />
-                        </td>
-                        <td className="amount">{hostFeeAmount}</td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <FormattedMessage
-                            id="addfunds.platformFees"
-                            defaultMessage="Platform fees ({platformFees})"
-                            values={{
-                              platformFees: `${platformFeePercent}%`,
-                            }}
-                          />
-                        </td>
-                        <td className="amount">{platformFeeAmount}</td>
-                      </tr>
-
-                      <tr>
-                        <td colSpan={2}>
-                          <hr size={1} />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <FormattedMessage id="addfunds.netAmount" defaultMessage="Net amount" />
-                        </td>
-                        <td className="amount">{netAmount}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <div>
-                    {showAddFundsToOrgDetails && (
-                      <div className="note">
-                        <FormattedMessage
-                          id="AddFundsForm.PutAside"
-                          defaultMessage="Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees."
-                          values={{ hostFeePercent, hostFeeAmount, platformFeePercent, platformFeeAmount }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="disclaimer">
-                    {this.props.host && (
+          <Flex flexWrap="wrap">
+            <Box width={[1, 2 / 12]}>
+              <label>
+                <FormattedMessage id="Details" defaultMessage="Details" />
+              </label>
+            </Box>
+            <Box width={[1, 10 / 12]}>
+              <table className="details">
+                <tbody>
+                  <tr>
+                    <td>
+                      <FormattedMessage id="addfunds.totalAmount" defaultMessage="Funding amount" />
+                    </td>
+                    <td className="amount">
+                      {formatCurrency(this.state.form.totalAmount, this.props.collective.currency, {
+                        precision: 2,
+                      })}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
                       <FormattedMessage
-                        id="addfunds.disclaimer"
-                        defaultMessage="By clicking below, you agree to set aside {amount} in your bank account on behalf of the collective"
+                        id="addfunds.hostFees"
+                        defaultMessage="Host fees ({hostFees})"
+                        values={{ hostFees: `${hostFeePercent}%` }}
+                      />
+                    </td>
+                    <td className="amount">{hostFeeAmount}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <FormattedMessage
+                        id="addfunds.platformFees"
+                        defaultMessage="Platform fees ({platformFees})"
                         values={{
-                          amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency),
+                          platformFees: `${platformFeePercent}%`,
                         }}
                       />
-                    )}
+                    </td>
+                    <td className="amount">{platformFeeAmount}</td>
+                  </tr>
 
-                    {!this.props.host && (
-                      <FormattedMessage
-                        id="addfunds.disclaimerOrganization"
-                        defaultMessage="By clicking below, you agree to create a pre-paid credit card with the amount of {amount} for this organization"
-                        values={{
-                          amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency),
-                        }}
-                      />
-                    )}
+                  <tr>
+                    <td colSpan={2}>
+                      <hr size={1} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <FormattedMessage id="addfunds.netAmount" defaultMessage="Net amount" />
+                    </td>
+                    <td className="amount">{netAmount}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div>
+                {showAddFundsToOrgDetails && (
+                  <div className="note">
+                    <FormattedMessage
+                      id="AddFundsForm.PutAside"
+                      defaultMessage="Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees."
+                      values={{ hostFeePercent, hostFeeAmount, platformFeePercent, platformFeeAmount }}
+                    />
                   </div>
-                </Col>
+                )}
               </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col xsHidden md={2} />
-            <Col xs={12} md={10} className="actions">
+
+              <div className="disclaimer">
+                {this.props.host && (
+                  <FormattedMessage
+                    id="addfunds.disclaimer"
+                    defaultMessage="By clicking below, you agree to set aside {amount} in your bank account on behalf of the collective"
+                    values={{
+                      amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency),
+                    }}
+                  />
+                )}
+
+                {!this.props.host && (
+                  <FormattedMessage
+                    id="addfunds.disclaimerOrganization"
+                    defaultMessage="By clicking below, you agree to create a pre-paid credit card with the amount of {amount} for this organization"
+                    values={{
+                      amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency),
+                    }}
+                  />
+                )}
+              </div>
+            </Box>
+          </Flex>
+          <Flex flexWrap="wrap" pl={3} pr={3}>
+            <Box width={[1, 2 / 12]} />
+            <Box width={[1, 10 / 12]} className="actions">
               <StyledButton buttonStyle="primary" onClick={this.handleSubmit} loading={loading}>
                 {loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
                 {!loading && <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />}
@@ -395,8 +393,8 @@ class AddFundsForm extends React.Component {
               <StyledButton m={2} onClick={this.props.onCancel}>
                 <FormattedMessage id="form.cancel" defaultMessage="cancel" />
               </StyledButton>
-            </Col>
-          </Row>
+            </Box>
+          </Flex>
         </form>
         <div className="result">
           {this.state.result.success && <div className="success">{this.state.result.success}</div>}

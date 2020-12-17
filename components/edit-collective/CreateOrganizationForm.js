@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
+import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 
 class CreateOrganizationForm extends React.Component {
@@ -44,8 +44,8 @@ class CreateOrganizationForm extends React.Component {
 
     return (
       <section className="organizationDetailsForm">
-        <Row key="organization.name.input">
-          <Col sm={12}>
+        <Flex flexWrap="wrap" key="organization.name.input">
+          <Box width={1}>
             <InputField
               className="horizontal"
               type="text"
@@ -53,10 +53,10 @@ class CreateOrganizationForm extends React.Component {
               label={intl.formatMessage(this.messages['order.organization.name'])}
               onChange={value => this.handleChange('name', value)}
             />
-          </Col>
-        </Row>
-        <Row key="organization.website.input">
-          <Col sm={12}>
+          </Box>
+        </Flex>
+        <Flex flexWrap="wrap" key="organization.website.input">
+          <Box width={1}>
             <InputField
               className="horizontal"
               type="text"
@@ -64,10 +64,10 @@ class CreateOrganizationForm extends React.Component {
               label={intl.formatMessage(this.messages['order.organization.website'])}
               onChange={value => this.handleChange('website', value)}
             />
-          </Col>
-        </Row>
-        <Row key="organization.twitterHandle.input">
-          <Col sm={12}>
+          </Box>
+        </Flex>
+        <Flex flexWrap="wrap" key="organization.twitterHandle.input">
+          <Box width={1}>
             <InputField
               className="horizontal"
               type="text"
@@ -77,8 +77,8 @@ class CreateOrganizationForm extends React.Component {
               help={intl.formatMessage(this.messages['order.organization.twitterHandle.description'])}
               onChange={value => this.handleChange('twitterHandle', value)}
             />
-          </Col>
-        </Row>
+          </Box>
+        </Flex>
       </section>
     );
   }
