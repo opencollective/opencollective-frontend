@@ -19,11 +19,6 @@ const MemberContainer = styled.div`
   float: left;
   position: relative;
 
-  .ORGANIZATION {
-    width: 200px;
-    margin: 1rem;
-  }
-
   .USER {
     margin: 0.5rem 0.25rem;
   }
@@ -34,6 +29,11 @@ const MemberContainer = styled.div`
 
   .small .avatar {
     margin: 0;
+  }
+
+  .ORGANIZATION {
+    width: 200px;
+    margin: 1rem;
   }
 `;
 
