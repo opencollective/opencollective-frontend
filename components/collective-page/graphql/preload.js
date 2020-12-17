@@ -1,4 +1,4 @@
-import { getFilteredSectionsForCollective } from '../../../lib/collective-sections';
+import { getFilteredSectionsForCollective, getSectionsNames } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
@@ -24,8 +24,9 @@ export const preloadCollectivePageGraphlQueries = async (slug, client, hasNewCol
   const collective = result?.data?.Collective;
   if (collective) {
     const sections = getFilteredSectionsForCollective(collective, null, null, hasNewCollectiveNavbar);
+    const sectionsNames = getSectionsNames(sections);
     const queries = [];
-    if (sections.includes('budget')) {
+    if (sectionsNames.includes('budget')) {
       queries.push(
         client.query({
           query: budgetSectionQuery,
@@ -34,7 +35,7 @@ export const preloadCollectivePageGraphlQueries = async (slug, client, hasNewCol
         }),
       );
     }
-    if (sections.includes('contributions')) {
+    if (sectionsNames.includes('contributions')) {
       queries.push(
         client.query({
           query: contributionsSectionQuery,
@@ -42,7 +43,7 @@ export const preloadCollectivePageGraphlQueries = async (slug, client, hasNewCol
         }),
       );
     }
-    if (sections.includes('transactions')) {
+    if (sectionsNames.includes('transactions')) {
       queries.push(
         client.query({
           query: transactionsSectionQuery,
@@ -51,7 +52,7 @@ export const preloadCollectivePageGraphlQueries = async (slug, client, hasNewCol
         }),
       );
     }
-    if (sections.includes('recurring-contributions')) {
+    if (sectionsNames.includes('recurring-contributions')) {
       queries.push(
         client.query({
           query: recurringContributionsQuery,
@@ -60,7 +61,7 @@ export const preloadCollectivePageGraphlQueries = async (slug, client, hasNewCol
         }),
       );
     }
-    if (sections.includes('updates')) {
+    if (sectionsNames.includes('updates')) {
       queries.push(
         client.query({
           query: updatesSectionQuery,
@@ -68,7 +69,7 @@ export const preloadCollectivePageGraphlQueries = async (slug, client, hasNewCol
         }),
       );
     }
-    if (sections.includes('conversations')) {
+    if (sectionsNames.includes('conversations')) {
       queries.push(
         client.query({
           query: conversationsSectionQuery,
