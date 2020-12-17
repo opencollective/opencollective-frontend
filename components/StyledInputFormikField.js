@@ -21,26 +21,28 @@ const StyledInputFormikField = ({ name, validate, children, isFastField, flex, w
     <FieldComponent name={name} validate={validate}>
       {({ field, form, meta }) => (
         <Container flex={flex} width={width} display={display}>
-          <StyledInputField error={meta.error} {...props}>
-            {children({
-              form,
-              meta,
-              field: {
-                ...field,
-                name: name || props.htmlFor,
-                id: props.htmlFor,
-                type: props.inputType,
-                disabled: props.disabled,
-                required: props.required,
-                error: Boolean(meta.touched && meta.error),
-              },
-            })}
+          <StyledInputField error={Boolean(meta.error)} {...props}>
+            <React.Fragment>
+              {children({
+                form,
+                meta,
+                field: {
+                  ...field,
+                  name: name || props.htmlFor,
+                  id: props.htmlFor,
+                  type: props.inputType,
+                  disabled: props.disabled,
+                  required: props.required,
+                  error: Boolean(meta.touched && meta.error),
+                },
+              })}
+              {meta.touched && meta.error && (
+                <P display="block" color="red.500" pt={2} fontSize="10px">
+                  {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
+                </P>
+              )}
+            </React.Fragment>
           </StyledInputField>
-          {meta.touched && meta.error && (
-            <P display="block" color="red.500" pt={2} fontSize="10px">
-              {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
-            </P>
-          )}
         </Container>
       )}
     </FieldComponent>

@@ -4894,6 +4894,11 @@ type Mutation {
     Wether to trigger the automated approval for Open Source collectives with GitHub.
     """
     automateApprovalWithGithub: Boolean = false
+
+    """
+    A message to attach for the host to review the application
+    """
+    message: String
   ): Collective
   createFund(
     """

@@ -15,6 +15,7 @@ const createCollectiveHostQuery = gqlV2/* GraphQL */ `
   query CreateCollectiveHost($slug: String!) {
     host(slug: $slug) {
       id
+      legacyId
       type
       slug
       name
