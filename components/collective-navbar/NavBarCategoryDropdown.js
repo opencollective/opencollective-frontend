@@ -31,7 +31,7 @@ const IconIllustration = styled.img.attrs({ alt: '' })`
   height: 32px;
 `;
 
-const CategoryContainer = styled(StyledLink).attrs({ px: [1, null, 0] })`
+const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
   display: block;
   font-size: 14px;
   line-height: 16px;
@@ -85,7 +85,7 @@ const CategoryContainer = styled(StyledLink).attrs({ px: [1, null, 0] })`
       }
     `}
 
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     border-top: 1px solid #e1e1e1;
     &::after {
       display: none;
@@ -123,7 +123,7 @@ const MenuItem = styled('li')`
 `;
 
 const CategoryDropdown = styled(Dropdown)`
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     ${DropdownArrow} {
       display: none !important;
     }
@@ -152,7 +152,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
   return (
     <CategoryDropdown trigger="hover" tabIndex="-1">
       <CategoryContainer
-        mr={[0, 3]}
+        mr={[0, null, 3]}
         isSelected={isSelected}
         {...getLinkProps(useAnchor, collective, category)}
         onClick={e => {

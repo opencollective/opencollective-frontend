@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { partition } from 'lodash';
+import { get, partition } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { hasNewNavBar } from '../../../lib/collective-sections';
 import { isPastEvent } from '../../../lib/events';
 
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
@@ -47,6 +47,8 @@ class SectionEvents extends React.PureComponent {
     ),
 
     isAdmin: PropTypes.bool.isRequired,
+    /** @ignore from withRouter */
+    router: PropTypes.object,
   };
 
   triageEvents = memoizeOne(events => {
@@ -65,13 +67,14 @@ class SectionEvents extends React.PureComponent {
   };
 
   render() {
-    const { collective, events, connectedCollectives, isAdmin } = this.props;
+    const { collective, events, connectedCollectives, isAdmin, router } = this.props;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
+    const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
     return (
       <Fragment>
-        {!hasNewNavBar(collective) && (
+        {!newNavbarFeatureFlag && (
           <ContainerSectionContent pt={5}>
             <SectionHeader
               title={Sections.EVENTS}
@@ -147,4 +150,4 @@ class SectionEvents extends React.PureComponent {
   }
 }
 
-export default injectIntl(SectionEvents);
+export default withRouter(injectIntl(SectionEvents));

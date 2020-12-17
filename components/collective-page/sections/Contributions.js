@@ -2,15 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { hasNewNavBar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
-import { getEnvVar } from '../../../lib/env-utils';
-import { parseToBoolean } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
@@ -142,6 +141,9 @@ class SectionContributions extends React.PureComponent {
 
     /** @ignore from withIntl */
     intl: PropTypes.object,
+
+    /** @ignore from withRouter */
+    router: PropTypes.object,
   };
 
   state = {
@@ -218,8 +220,9 @@ class SectionContributions extends React.PureComponent {
   };
 
   render() {
-    const { collective, data, intl, LoggedInUser } = this.props;
+    const { collective, data, intl, LoggedInUser, router } = this.props;
     const { nbMemberships, selectedFilter } = this.state;
+    const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
@@ -250,7 +253,7 @@ class SectionContributions extends React.PureComponent {
         {memberOf.length > 0 && (
           <React.Fragment>
             <ContainerSectionContent>
-              {!hasNewNavBar(collective) && (
+              {!newNavbarFeatureFlag && (
                 <SectionHeader
                   title={Sections.CONTRIBUTIONS}
                   subtitle={
@@ -315,9 +318,7 @@ class SectionContributions extends React.PureComponent {
           </React.Fragment>
         )}
 
-        {parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
-          <SectionRecurringContributions slug={collective.slug} LoggedInUser={LoggedInUser} />
-        )}
+        {newNavbarFeatureFlag && <SectionRecurringContributions slug={collective.slug} LoggedInUser={LoggedInUser} />}
 
         {connectedCollectives.length > 0 && (
           <Box mt={5}>
@@ -448,4 +449,4 @@ const addContributionsSectionData = graphql(contributionsSectionQuery, {
   }),
 });
 
-export default React.memo(injectIntl(addContributionsSectionData(SectionContributions)));
+export default React.memo(withRouter(injectIntl(addContributionsSectionData(SectionContributions))));

@@ -2,17 +2,17 @@ import React, { Fragment, useRef } from 'react';
 import { PropTypes } from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Settings } from '@styled-icons/feather/Settings';
+import { Close } from '@styled-icons/material/Close';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { getEnvVar } from '../../lib/env-utils';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
-import { parseToBoolean } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import { AllSectionsNames, Dimensions } from '../collective-page/_constants';
@@ -29,8 +29,6 @@ import { H1, P } from '../Text';
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu } from './menu';
 import NavBarCategoryDropdown from './NavBarCategoryDropdown';
-
-const NAV_V2_FEATURE_FLAG = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
 
 // Nav v2 styled components
 const MainContainerV2 = styled(Container)`
@@ -84,6 +82,29 @@ const CollectiveNameV2 = styled(H1)`
 
   a:not(:hover) {
     color: #313233;
+  }
+`;
+
+const CategoriesContainer = styled(Container)`
+  @media screen and (min-width: 40em) and (max-width: 64em) {
+    border: 1px solid rgba(214, 214, 214, 0.3);
+    border-radius: 0px 0px 0px 8px;
+    box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
+    position: absolute;
+    right: 0;
+    top: 52px;
+    width: 0;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.4s ease-out, visibility 0.4s ease-out, width 0.2s ease-out;
+
+    ${props =>
+      props.isExpanded &&
+      css`
+        width: 400px;
+        visibility: visible;
+        opacity: 1;
+      `}
   }
 `;
 
@@ -198,12 +219,24 @@ const InfosContainer = styled(Container)`
     `}
 `;
 
-/** Displayed on mobile to toggle the menu */
+/** Displayed on mobile & tablet to toggle the menu */
 const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
   cursor: pointer;
   margin-right: 4px;
   flex: 0 0 28px;
-  color: ${themeGet('colors.black.500')};
+  color: #304cdc;
+
+  @media (min-width: 52em) {
+    display: none;
+  }
+`;
+
+const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
+  cursor: pointer;
+  margin-right: 4px;
+  flex: 0 0 28px;
+  color: #304cdc;
+  background: radial-gradient(rgba(72, 95, 211, 0.1) 14px, transparent 3px);
 
   @media (min-width: 52em) {
     display: none;
@@ -237,7 +270,7 @@ const isFeatureAvailable = (collective, feature) => {
   return status === 'ACTIVE' || status === 'AVAILABLE';
 };
 
-const getDefaultCallsToActions = (collective, isAdmin) => {
+const getDefaultCallsToActions = (collective, isAdmin, newNavbarFeatureFlag) => {
   if (!collective) {
     return {};
   }
@@ -245,7 +278,7 @@ const getDefaultCallsToActions = (collective, isAdmin) => {
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
 
-  if (NAV_V2_FEATURE_FLAG) {
+  if (newNavbarFeatureFlag) {
     return {
       hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
       hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
@@ -285,10 +318,12 @@ const CollectiveNavbar = ({
   withShadow,
   useAnchorsForCategories,
 }) => {
+  const router = useRouter();
+  const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
-  sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
-  callsToAction = { ...getDefaultCallsToActions(collective, isAdmin), ...callsToAction };
+  sections = sections || getFilteredSectionsForCollective(collective, isAdmin, null, newNavbarFeatureFlag);
+  callsToAction = { ...getDefaultCallsToActions(collective, isAdmin, newNavbarFeatureFlag), ...callsToAction };
   const isEvent = collective?.type === CollectiveType.EVENT;
 
   const navbarRef = useRef();
@@ -298,7 +333,7 @@ const CollectiveNavbar = ({
     }
   });
 
-  return NAV_V2_FEATURE_FLAG ? (
+  return newNavbarFeatureFlag ? (
     // v2
     <MainContainerV2
       flexDirection={['column', 'row']}
@@ -353,7 +388,11 @@ const CollectiveNavbar = ({
         </Box>
         {!onlyInfos && (
           <Box display={['block', 'none']} marginLeft="auto">
-            <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+            {isExpanded ? (
+              <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+            ) : (
+              <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+            )}
           </Box>
         )}
       </InfosContainerV2>
@@ -361,18 +400,17 @@ const CollectiveNavbar = ({
 
       {!onlyInfos && (
         <Fragment>
-          <Container
+          <CategoriesContainer
             ref={navbarRef}
             backgroundColor="#fff"
             display={isExpanded ? 'flex' : ['none', 'flex']}
-            flexDirection={['column', 'row']}
+            flexDirection={['column', null, 'row']}
             flexShrink={2}
             flexGrow={1}
             justifyContent={['space-between', null, 'flex-start']}
-            minWidth={0}
             order={[0, 3, 0]}
-            borderTop={['none', '1px solid #e1e1e1', 'none']}
             overflowX="auto"
+            isExpanded={isExpanded}
           >
             {isLoading ? (
               <LoadingPlaceholder height={43} minWidth={150} mb={2} />
@@ -388,7 +426,7 @@ const CollectiveNavbar = ({
                 />
               ))
             )}
-          </Container>
+          </CategoriesContainer>
 
           {/* CTAs for v2 navbar & admin panel */}
           <Container
@@ -441,6 +479,15 @@ const CollectiveNavbar = ({
                 callsToAction={callsToAction}
                 createNotification={createNotification}
               />
+            )}
+            {!onlyInfos && (
+              <Container display={['none', 'flex', 'none']} alignItems="center">
+                {isExpanded ? (
+                  <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                ) : (
+                  <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                )}
+              </Container>
             )}
           </Container>
         </Fragment>

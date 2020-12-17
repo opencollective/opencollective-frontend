@@ -4,6 +4,7 @@ import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
+import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
@@ -70,7 +71,7 @@ const ActionsDropdown = styled(Dropdown)`
       position: relative;
       box-shadow: none;
       border: none;
-      padding-left: 28px;
+      padding-left: 14px;
     }
   }
 `;
@@ -79,6 +80,12 @@ const StyledActionButton = styled(StyledButton)`
   @media (max-width: 40em) {
     cursor: none;
     pointer-events: none;
+  }
+`;
+
+const StyledChevronDown = styled(ChevronDown)`
+  @media (max-width: 40em) {
+    display: none;
   }
 `;
 
@@ -122,7 +129,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
       <Box px={1}>
         <ActionsDropdown trigger="click">
           <Flex alignItems="center">
-            <Box display={['block', 'none']} width={'33px'} ml={2}>
+            <Box display={['block', 'none']} width={'32px'} ml={2}>
               <StyledHr borderStyle="solid" borderColor="#304CDC" />
             </Box>
             <StyledActionButton
@@ -138,9 +145,10 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               tabIndex="-1"
               data-cy="collective-navbar-actions-btn"
             >
-              <Span css={{ verticalAlign: 'middle' }}>
+              <Span css={{ verticalAlign: 'middle', marginRight: '4px' }}>
                 <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
               </Span>
+              <StyledChevronDown size="14px" />
             </StyledActionButton>
           </Flex>
           <DropdownArrow />

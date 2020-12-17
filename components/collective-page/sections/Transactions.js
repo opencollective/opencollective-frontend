@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { get } from 'lodash';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { hasNewNavBar } from '../../../lib/collective-sections';
 import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
@@ -78,11 +79,13 @@ const SectionTransactions = props => {
 
   const { intl, collective } = props;
   const collectiveHasNoTransactions = !loading && data?.transactions?.totalCount === 0 && filter === FILTERS.ALL;
+  const router = useRouter();
+  const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
   return (
     <Box py={5}>
       <ContainerSectionContent>
-        {!hasNewNavBar(collective) && (
+        {!newNavbarFeatureFlag && (
           <SectionHeader title={Sections.TRANSACTIONS} illustrationSrc={budgetSectionHeaderIcon} />
         )}
         {collectiveHasNoTransactions && (
