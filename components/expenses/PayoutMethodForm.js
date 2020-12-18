@@ -97,7 +97,6 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
           {({ field, meta }) => (
             <StyledInputField
               name={field.name}
-              type="email"
               error={formatFormErrorMessage(intl, meta.error)}
               label={formatMessage(msg.content)}
               labelFontSize="13px"
