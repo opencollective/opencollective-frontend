@@ -10,6 +10,7 @@ const nextConfig = {
       new webpack.IgnorePlugin(/[\\/]__tests__[\\/]/),
       // Only include our supported locales
       // Set extra environment variables accessible through process.env.*
+
       // Will be replaced by webpack by their values!
       new webpack.EnvironmentPlugin({
         OC_ENV: null,
