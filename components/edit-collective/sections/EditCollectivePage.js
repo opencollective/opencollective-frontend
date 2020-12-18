@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
-import { cloneDeep, flatten, get, isEqual, set, uniqBy } from 'lodash';
+import { cloneDeep, difference, flatten, get, isEqual, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { useDrag, useDrop } from 'react-dnd';
@@ -333,6 +333,34 @@ MenuCategory.propTypes = {
   onSectionToggle: PropTypes.func,
 };
 
+/**
+ * Sections used to be stored as an array of string. This helpers loads and convert them to
+ * the new format if necessary.
+ */
+const loadSectionsForCollectiveV1 = collective => {
+  const collectiveSections = get(collective, 'settings.collectivePage.sections');
+  let defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive);
+
+  if (collective.type === CollectiveType.FUND) {
+    // TODO this is not the right place for this
+    defaultSections = difference(defaultSections, [Sections.GOALS, Sections.CONVERSATIONS]);
+  }
+
+  const transformLegacySection = section => {
+    return typeof section === 'string'
+      ? { section, isEnabled: isCollectiveSectionEnabled(collective, section) }
+      : section;
+  };
+
+  if (collectiveSections) {
+    const existingSections = collectiveSections.map(transformLegacySection);
+    const addedSections = defaultSections.map(section => ({ section, isEnabled: false }));
+    return uniqBy([...existingSections, ...addedSections], 'section');
+  } else {
+    return defaultSections.map(transformLegacySection);
+  }
+};
+
 const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
   const router = useRouter();
@@ -357,9 +385,9 @@ const EditCollectivePage = ({ collective }) => {
       const sectionsFromCollective = loadSectionsForCollective(data.account, useNewSections);
       if (useNewSections && !data.account.settings?.collectivePage?.useNewSections) {
         const convertedSections = convertSectionsToNewFormat(sectionsFromCollective);
-        setSections(convertedSections);
+        setSections(addDefaultSections(convertedSections));
       } else {
-        setSections(addDefaultSections(data.account, sectionsFromCollective));
+        setSections(loadSectionsForCollectiveV1(data.account));
       }
     }
   }, [data?.account]);
