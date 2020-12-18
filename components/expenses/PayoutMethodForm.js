@@ -36,7 +36,9 @@ const msg = defineMessages({
 export const validatePayoutMethod = payoutMethod => {
   const errors = {};
 
-  if (payoutMethod.type === PayoutMethodType.PAYPAL) {
+  if (!payoutMethod || !payoutMethod.type) {
+    set(errors, 'type', createError(ERROR.FORM_FIELD_REQUIRED));
+  } else if (payoutMethod.type === PayoutMethodType.PAYPAL) {
     const email = get(payoutMethod, 'data.email');
     if (!email) {
       set(errors, 'data.email', createError(ERROR.FORM_FIELD_REQUIRED));
