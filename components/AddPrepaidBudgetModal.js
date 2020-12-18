@@ -6,14 +6,12 @@ import { pick } from 'lodash';
 import { Col, Modal, Row } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../lib/constants/collectives';
-
-import AddFundsForm from './AddFundsForm';
+import AddPrepaidBudget from './AddPrepaidBudget';
 import Button from './Button';
 import { withUser } from './UserProvider';
 
-const addFundsToOrgMutation = gql`
-  mutation AddFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
+const addPrepaidBudgetMutation = gql`
+  mutation AddPrepaidBudget($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
     addFundsToOrg(
       totalAmount: $totalAmount
       CollectiveId: $CollectiveId
@@ -25,35 +23,14 @@ const addFundsToOrgMutation = gql`
   }
 `;
 
-const addFundsToCollectiveMutation = gql`
-  mutation addFundsToCollective($order: OrderInputType!) {
-    addFundsToCollective(order: $order) {
-      id
-      fromCollective {
-        id
-        slug
-        name
-      }
-      collective {
-        id
-        stats {
-          id
-          balance
-        }
-      }
-    }
-  }
-`;
-
-const AddFundsModal = ({ LoggedInUser, show, setShow, collective, host }) => {
+const AddPrepaidBudgetModal = ({ LoggedInUser, show, setShow, collective, host }) => {
   const [loading, setLoading] = React.useState(false);
-  const [fundsAdded, setFundsAdded] = React.useState(false);
+  const [prepaidBudgetAdded, setPrepaidBudgetAdded] = React.useState(false);
   const [error, setError] = React.useState(null);
-  const isAddFundsToOrg = collective.type === CollectiveType.ORGANIZATION;
   const close = () => {
     setShow(false);
     setError(null);
-    setFundsAdded(null);
+    setPrepaidBudgetAdded(null);
   };
 
   if (!LoggedInUser) {
@@ -65,10 +42,10 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective, host }) => {
       <Modal.Body>
         <Row>
           <Col sm={12}>
-            {fundsAdded && (
+            {prepaidBudgetAdded && (
               <div>
                 <h1>
-                  <FormattedMessage id="AddFunds.Success" defaultMessage="Funds added successfully" />
+                  <FormattedMessage id="AddPrepaidBudget.Success" defaultMessage="Prepaid budget added successfully" />
                 </h1>
                 <center>
                   <Button className="blue" onClick={close}>
@@ -77,10 +54,10 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective, host }) => {
                 </center>
               </div>
             )}
-            {!fundsAdded && (
-              <Mutation mutation={isAddFundsToOrg ? addFundsToOrgMutation : addFundsToCollectiveMutation}>
+            {!prepaidBudgetAdded && (
+              <Mutation mutation={addPrepaidBudgetMutation}>
                 {addFunds => (
-                  <AddFundsForm
+                  <AddPrepaidBudget
                     LoggedInUser={LoggedInUser}
                     collective={collective}
                     host={host}
@@ -100,27 +77,14 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective, host }) => {
 
                       setLoading(true);
                       try {
-                        if (isAddFundsToOrg) {
-                          await addFunds({
-                            variables: {
-                              ...pick(form, ['totalAmount', 'description']),
-                              CollectiveId: collective.legacyId || collective.id,
-                              HostCollectiveId: Number(form.FromCollectiveId),
-                            },
-                          });
-                        } else {
-                          await addFunds({
-                            variables: {
-                              order: {
-                                ...pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']),
-                                collective: { id: collective.legacyId || collective.id },
-                                fromCollective: { id: Number(form.FromCollectiveId) },
-                              },
-                            },
-                          });
-                        }
-
-                        setFundsAdded(true);
+                        await addFunds({
+                          variables: {
+                            ...pick(form, ['totalAmount', 'description']),
+                            CollectiveId: collective.legacyId || collective.id,
+                            HostCollectiveId: Number(form.FromCollectiveId),
+                          },
+                        });
+                        setPrepaidBudgetAdded(true);
                         setLoading(false);
                         setError(null);
                         return null;
@@ -143,7 +107,7 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective, host }) => {
   );
 };
 
-AddFundsModal.propTypes = {
+AddPrepaidBudgetModal.propTypes = {
   show: PropTypes.bool,
   setShow: PropTypes.func,
   collective: PropTypes.object,
@@ -152,8 +116,8 @@ AddFundsModal.propTypes = {
   LoggedInUser: PropTypes.object,
 };
 
-AddFundsModal.defaultProps = {
+AddPrepaidBudgetModal.defaultProps = {
   show: false,
 };
 
-export default withUser(AddFundsModal);
+export default withUser(AddPrepaidBudgetModal);

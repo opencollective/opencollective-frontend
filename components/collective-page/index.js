@@ -186,7 +186,19 @@ class CollectivePage extends Component {
   };
 
   getCallsToAction = memoizeOne(
-    (type, isHost, isAdmin, isRoot, isAuthenticated, canApply, canContact, isArchived, isActive, isFund) => {
+    (
+      type,
+      isHost,
+      isAdmin,
+      isRoot,
+      isAuthenticated,
+      canApply,
+      canContact,
+      isArchived,
+      isActive,
+      isFund,
+      isHostAdmin,
+    ) => {
       const isCollective = type === CollectiveType.COLLECTIVE;
       const isEvent = type === CollectiveType.EVENT;
       const isProject = type === CollectiveType.PROJECT;
@@ -198,21 +210,20 @@ class CollectivePage extends Component {
         // function removed once we switch the the new navbar as default
         return {
           hasContribute: (isFund || isProject) && isActive,
-          addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
+          addPrepaidBudget: isRoot && type === CollectiveType.ORGANIZATION,
+          addFunds: isHostAdmin,
         };
       }
 
       return {
-        hasContact: !isAdmin && canContact && (!isFund || isAuthenticated),
+        hasContact: !isAdmin && !isHostAdmin && canContact && (!isFund || isAuthenticated),
         hasContribute: (isFund || isProject) && isActive,
         hasSubmitExpense: (isCollective || isFund || isEvent || isProject || (isHost && isActive)) && !isArchived,
         // Don't display Apply if you're the admin (you can go to "Edit Collective" for that)
         hasApply: canApply && !isAdmin,
         hasDashboard: isHost && isAdmin && !isCollective,
         hasManageSubscriptions: isAdmin && !isCollective && !isFund && !isEvent && !isProject,
-        // Don't display "Add Funds" if it's an Host and you're the Admin
-        addFundsToOrganization: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
-        // Add Funds for Self Hosted Collectives
+        addPrepaidBudget: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
         addFunds: isCollective && isHost && isAdmin,
       };
     },
@@ -357,11 +368,11 @@ class CollectivePage extends Component {
   };
 
   render() {
-    const { collective, host, isAdmin, isRoot, onPrimaryColorChange, LoggedInUser, router } = this.props;
+    const { collective, host, isAdmin, isHostAdmin, isRoot, onPrimaryColorChange, LoggedInUser, router } = this.props;
     const newNavbarFeatureFlag = router?.query?.navbarVersion === 'v2';
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection, selectedCategory, notification } = this.state;
-    const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
+    const sections = this.getSections(collective, isAdmin, isHostAdmin);
     const isFund = collective.type === CollectiveType.FUND || settings?.fund === true; // Funds MVP, to refactor
     const isAuthenticated = LoggedInUser ? true : false;
     const callsToAction = this.getCallsToAction(
@@ -375,6 +386,7 @@ class CollectivePage extends Component {
       collective.isArchived,
       isActive,
       isFund,
+      isHostAdmin,
     );
 
     return (

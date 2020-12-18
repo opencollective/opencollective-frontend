@@ -26,7 +26,7 @@ import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
 // Dynamic imports
-const AddFundsToOrganizationModal = dynamic(() => import('../AddFundsToOrganizationModal'));
+const AddPrepaidBudgetModal = dynamic(() => import('../AddPrepaidBudgetModal'));
 const AddFundsModal = dynamic(() => import('../host-dashboard/AddFundsModal'));
 
 //  Styled components
@@ -100,7 +100,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
     : true;
   const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
-  const [hasAddFundsToOrganizationModal, showAddFundsToOrganizationModal] = React.useState(false);
+  const [hasAddPrepaidBudgetModal, showAddPrepaidBudgetModal] = React.useState(false);
 
   let contributeRoute = 'orderCollectiveNew';
   let contributeRouteParams = { collectiveSlug: collective.slug, verb: 'donate' };
@@ -219,7 +219,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
                     <StyledButton p={ITEM_PADDING} onClick={() => showAddFundsModal(true)} isBorderless>
                       <AttachMoney size="20px" color="#304CDC" />
                       <Span>
-                        <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
+                        <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
                       </Span>
                     </StyledButton>
                   </MenuItem>
@@ -232,21 +232,21 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
                   />
                 </Fragment>
               )}
-              {callsToAction.addFundsToOrganization && (
+              {callsToAction.addPrepaidBudget && (
                 <Fragment>
                   <MenuItem py={1}>
-                    <StyledButton p={ITEM_PADDING} onClick={() => showAddFundsToOrganizationModal(true)} isBorderless>
+                    <StyledButton p={ITEM_PADDING} onClick={() => showAddPrepaidBudgetModal(true)} isBorderless>
                       <AttachMoney size="20px" color="#304CDC" />
                       <Span>
-                        <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add prepaid budget" />
+                        <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
                       </Span>
                     </StyledButton>
                   </MenuItem>
-                  <AddFundsToOrganizationModal
+                  <AddPrepaidBudgetModal
                     collective={collective}
-                    show={hasAddFundsToOrganizationModal}
-                    setShow={showAddFundsToOrganizationModal}
-                    onClose={() => showAddFundsToOrganizationModal(null)}
+                    show={hasAddPrepaidBudgetModal}
+                    setShow={showAddPrepaidBudgetModal}
+                    onClose={() => showAddPrepaidBudgetModal(null)}
                   />
                 </Fragment>
               )}
@@ -309,8 +309,8 @@ CollectiveNavbarActionsMenu.propTypes = {
     hasContribute: PropTypes.bool,
     /** Add funds to a collective */
     addFunds: PropTypes.bool,
-    /** Add funds to an organization */
-    addFundsToOrganization: PropTypes.bool,
+    /** Add prepaid budget to an organization */
+    addPrepaidBudget: PropTypes.bool,
   }).isRequired,
   createNotification: PropTypes.func,
 };

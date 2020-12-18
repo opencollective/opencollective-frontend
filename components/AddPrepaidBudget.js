@@ -10,7 +10,7 @@ import { CollectiveType } from '../lib/constants/collectives';
 import { OC_FEE_PERCENT } from '../lib/constants/transactions';
 import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
 
-import { AddFundsSourcePickerForUserWithData, AddFundsSourcePickerWithData } from './AddFundsSourcePicker';
+import { AddFundsSourcePickerForUserWithData } from './AddFundsSourcePicker';
 import InputField from './InputField';
 import StyledButton from './StyledButton';
 
@@ -38,11 +38,6 @@ class AddFundsForm extends React.Component {
   constructor(props) {
     super(props);
     const { intl } = props;
-
-    /* If the component doesn't receive a host property it means that
-       the form will load the hosts from the list of collectives the
-       user is an admin of. See issue #1080 */
-    this.isAddFundsToOrg = !this.props.host;
 
     this.state = {
       form: {
@@ -108,40 +103,11 @@ class AddFundsForm extends React.Component {
       {
         name: 'FromCollectiveId',
         type: 'component',
-        when: () => !this.isAddFundsToOrg,
-        component: AddFundsSourcePickerWithData,
-        options: {
-          host: this.props.host,
-        },
-      },
-      {
-        name: 'FromCollectiveId',
-        type: 'component',
-        when: () => this.isAddFundsToOrg,
         component: AddFundsSourcePickerForUserWithData,
         labelName: 'FromCollectiveId.addfundstoorg.label',
         options: {
           LoggedInUser: this.props.LoggedInUser,
         },
-      },
-      {
-        name: 'hostFeePercent',
-        when: () => !this.isAddFundsToOrg,
-        defaultValue: props.collective.hostFeePercent,
-        step: 0.01,
-        min: 0,
-        max: 100,
-        type: 'number',
-        post: '%',
-      },
-      {
-        name: 'platformFeePercent',
-        type: 'number',
-        post: '%',
-        step: 0.01,
-        min: 0,
-        max: 100,
-        when: () => this.props.LoggedInUser && this.props.LoggedInUser.isRoot() && !this.isAddFundsToOrg,
       },
     ];
 
@@ -236,8 +202,7 @@ class AddFundsForm extends React.Component {
 
     /* We don't need to show these details if there are no amounts
        present yet */
-    const showAddFundsToOrgDetails =
-      this.isAddFundsToOrg && this.state.form.totalAmount > 0 && (hostFeePercent > 0 || platformFeePercent > 0);
+    const showAddFundsToOrgDetails = this.state.form.totalAmount > 0 && (hostFeePercent > 0 || platformFeePercent > 0);
 
     // recompute this value based on new props
     this.totalAmountField.pre = getCurrencySymbol(this.props.collective.currency);
@@ -307,8 +272,8 @@ class AddFundsForm extends React.Component {
         <form onSubmit={e => e.preventDefault()}>
           <h2>
             <FormattedMessage
-              id="addfunds.title"
-              defaultMessage="Add Funds to {collective}"
+              id="addPrepaidBudget.title"
+              defaultMessage="Add Prepaid Budget to {collective}"
               values={{ collective: this.props.collective.name }}
             />
           </h2>
@@ -346,32 +311,29 @@ class AddFundsForm extends React.Component {
                           })}
                         </td>
                       </tr>
-                      {!this.isAddFundsToOrg && (
-                        <tr>
-                          <td>
-                            <FormattedMessage
-                              id="addfunds.hostFees"
-                              defaultMessage="Host fees ({hostFees})"
-                              values={{ hostFees: `${hostFeePercent}%` }}
-                            />
-                          </td>
-                          <td className="amount">{hostFeeAmount}</td>
-                        </tr>
-                      )}
-                      {!this.isAddFundsToOrg && (
-                        <tr>
-                          <td>
-                            <FormattedMessage
-                              id="addfunds.platformFees"
-                              defaultMessage="Platform fees ({platformFees})"
-                              values={{
-                                platformFees: `${platformFeePercent}%`,
-                              }}
-                            />
-                          </td>
-                          <td className="amount">{platformFeeAmount}</td>
-                        </tr>
-                      )}
+                      <tr>
+                        <td>
+                          <FormattedMessage
+                            id="addfunds.hostFees"
+                            defaultMessage="Host fees ({hostFees})"
+                            values={{ hostFees: `${hostFeePercent}%` }}
+                          />
+                        </td>
+                        <td className="amount">{hostFeeAmount}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <FormattedMessage
+                            id="addfunds.platformFees"
+                            defaultMessage="Platform fees ({platformFees})"
+                            values={{
+                              platformFees: `${platformFeePercent}%`,
+                            }}
+                          />
+                        </td>
+                        <td className="amount">{platformFeeAmount}</td>
+                      </tr>
+
                       <tr>
                         <td colSpan={2}>
                           <hr size={1} />
@@ -428,7 +390,7 @@ class AddFundsForm extends React.Component {
             <Col xs={12} md={10} className="actions">
               <StyledButton buttonStyle="primary" onClick={this.handleSubmit} loading={loading}>
                 {loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-                {!loading && <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />}
+                {!loading && <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />}
               </StyledButton>
               <StyledButton m={2} onClick={this.props.onCancel}>
                 <FormattedMessage id="form.cancel" defaultMessage="cancel" />
