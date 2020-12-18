@@ -66,7 +66,7 @@ const PledgedCollectivePage = ({ collective }) => {
     );
   }
 
-  const pledges = [...data.Collective.pledges].reverse();
+  const pledges = [...data.Collective.pledges].reverse().filter(pledge => pledge.fromCollective);
   const pledgeStats = pledges.reduce(
     (stats, { fromCollective, totalAmount }) => {
       stats[fromCollective.type]++;
