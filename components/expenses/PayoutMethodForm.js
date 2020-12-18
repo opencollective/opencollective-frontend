@@ -18,9 +18,9 @@ import StyledTextarea from '../StyledTextarea';
 import PayoutBankInformationForm from './PayoutBankInformationForm';
 
 const msg = defineMessages({
-  email: {
-    id: 'Email',
-    defaultMessage: 'Email',
+  paypalEmail: {
+    id: 'Paypal.Email',
+    defaultMessage: 'PayPal email',
   },
   content: {
     id: 'editCollective.menu.info',
@@ -84,7 +84,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
               name={field.name}
               type="email"
               error={formatFormErrorMessage(intl, meta.error)}
-              label={formatMessage(msg.email)}
+              label={formatMessage(msg.paypalEmail)}
               labelFontSize="13px"
               disabled={!isNew}
               required
