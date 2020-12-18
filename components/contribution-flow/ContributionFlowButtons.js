@@ -74,7 +74,7 @@ class NewContributionFlowButtons extends React.Component {
               {this.getStepLabel(prevStep) || <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />}
             </StyledButton>
           )}
-          {!paypalButtonProps ? (
+          {!paypalButtonProps || nextStep ? (
             <StyledButton
               ml={17}
               minWidth={!nextStep ? 185 : 125}
