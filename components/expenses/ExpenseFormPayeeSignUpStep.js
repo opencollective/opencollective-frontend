@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
-import { first, get, omit } from 'lodash';
+import { first, get, isEmpty, omit } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -12,6 +12,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
+import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex, Grid } from '../Grid';
 import InputTypeCountry from '../InputTypeCountry';
@@ -25,7 +26,7 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledTextarea from '../StyledTextarea';
 import { Span } from '../Text';
 
-import PayoutMethodForm from './PayoutMethodForm';
+import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
 const msg = defineMessages({
@@ -147,15 +148,14 @@ const refreshPayoutProfile = (formik, payoutProfiles) => {
   formik.setFieldValue('payee', payee);
 };
 
-const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, onNext, isOnBehalf }) => {
+const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCancel, onNext }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
-  const stepOneCompleted = isOnBehalf
-    ? values.payee
-    : values.type === expenseTypes.RECEIPT
-    ? values.payoutMethod
-    : values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address;
+  const stepOneCompleted =
+    isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod))) &&
+    (values.type === expenseTypes.RECEIPT ||
+      (values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address));
 
   const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee, collective), [values.payee]);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
@@ -460,12 +460,11 @@ const ExpenseFormPayeeStep = ({ formik, payoutProfiles, collective, onCancel, on
   );
 };
 
-ExpenseFormPayeeStep.propTypes = {
+ExpenseFormPayeeSignUpStep.propTypes = {
   formik: PropTypes.object,
   payoutProfiles: PropTypes.array,
   onCancel: PropTypes.func,
   onNext: PropTypes.func,
-  isOnBehalf: PropTypes.bool,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
@@ -478,4 +477,4 @@ ExpenseFormPayeeStep.propTypes = {
   }).isRequired,
 };
 
-export default ExpenseFormPayeeStep;
+export default ExpenseFormPayeeSignUpStep;
