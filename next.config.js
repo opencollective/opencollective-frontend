@@ -9,7 +9,6 @@ const nextConfig = {
       // Ignore __tests__
       new webpack.IgnorePlugin(/[\\/]__tests__[\\/]/),
       // Only include our supported locales
-      new webpack.ContextReplacementPlugin(/moment[\\/]locale$/, /en|fr|es|ja/),
       // Set extra environment variables accessible through process.env.*
       // Will be replaced by webpack by their values!
       new webpack.EnvironmentPlugin({
