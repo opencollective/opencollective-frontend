@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DateTimePicker from 'react-datetime-picker';
+import DateTimePicker from 'react-datetime-picker/dist/entry.nostyle';
 
 import dayjs from '../lib/dayjs';
 
