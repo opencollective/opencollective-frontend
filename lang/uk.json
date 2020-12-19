@@ -1380,6 +1380,7 @@
   "PayoutMethod.Type.Other": "Інше",
   "PayoutMethod.Type.Paypal": "PayPal",
   "PayoutMethod.Type.ToBeDefined": "To be Defined",
+  "Paypal.Email": "PayPal email",
   "paypal.preApproval.emailWarning": "Warning: the PayPal email for this account just changed from {oldEmail} to {newEmail}. If it's not the change you intended to do, you can click on {refillBalance} and choose a different one",
   "PaypalPreApproval.connected": "Paypal account {paypalEmail} connected on {createdAt, date, long}. The token will expire on {expiryDate, date, long}.",
   "PaypalPreApproval.expired": "Your PayPal pre-approval has expired, please reconnect your account by clicking on {refillBalance}.",
