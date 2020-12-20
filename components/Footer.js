@@ -80,11 +80,11 @@ const messages = defineMessages({
     defaultMessage: 'Join',
   },
   'join.createACollective': {
-    id: 'join.createACollective',
+    id: 'home.create',
     defaultMessage: 'Create a Collective',
   },
   'join.discover': {
-    id: 'join.discover',
+    id: 'menu.discover',
     defaultMessage: 'Discover',
   },
   'join.findAFiscalHost': {
@@ -95,6 +95,10 @@ const messages = defineMessages({
     id: 'join.becomeASponsor',
     defaultMessage: 'Become a sponsor',
   },
+  'join.becomeAHost': {
+    id: 'join.becomeAHost',
+    defaultMessage: 'Become a host',
+  },
   community: {
     id: 'community',
     defaultMessage: 'Community',
@@ -104,7 +108,7 @@ const messages = defineMessages({
     defaultMessage: 'Open Source',
   },
   'community.docsAndHelp': {
-    id: 'community.docsAndHelp',
+    id: 'menu.docs',
     defaultMessage: 'Docs & Help',
   },
   'community.support': {
@@ -116,7 +120,7 @@ const messages = defineMessages({
     defaultMessage: 'Company',
   },
   'company.about': {
-    id: 'company.about',
+    id: 'collective.about.title',
     defaultMessage: 'About',
   },
   'company.blog': {
@@ -150,6 +154,7 @@ const navigation = {
     discover: '/discover',
     findAFiscalHost: '/hosts',
     becomeASponsor: '/become-a-sponsor',
+    becomeAHost: '/become-a-host',
   },
   community: {
     openSource: 'https://github.com/opencollective/opencollective/issues',

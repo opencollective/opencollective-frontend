@@ -28,11 +28,11 @@ const load = async app => {
 
   const lookup = async (req, res, opts, next) => {
     if (!whitelist(req)) {
-      if (!req.identity && req.hyperwatch) {
-        req.identity = await req.hyperwatch.getIdentity();
+      if (!req.identityOrIp && req.hyperwatch) {
+        req.identityOrIp = await req.hyperwatch.getIdentityOrIp();
       }
-      if (req.identity) {
-        opts.lookup = 'identity';
+      if (req.identityOrIp) {
+        opts.lookup = 'identityOrIp';
       } else {
         opts.lookup = 'ip';
       }

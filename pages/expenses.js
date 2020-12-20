@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
@@ -14,16 +15,17 @@ import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
+import { parseAmountRange } from '../components/budget/filters/AmountFilter';
+import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
-import { parseAmountRange } from '../components/expenses/filters/ExpensesAmountFilter';
-import { getDateRangeFromPeriod } from '../components/expenses/filters/ExpensesDateFilter';
 import { expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
@@ -181,6 +183,7 @@ class ExpensePage extends React.Component {
           collective={data.account}
           isLoading={!data.account}
           selected={Sections.BUDGET}
+          selectedCategory={NAVBAR_CATEGORIES.BUDGET}
           callsToAction={{ hasSubmitExpense: data.account && !data.account.isArchived }}
         />
         <Container position="relative" minHeight={[null, 800]}>
@@ -312,9 +315,13 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       name
       currency
       isArchived
+      settings
       expensesTags {
         id
         tag
+      }
+      features {
+        ...NavbarFields
       }
 
       ... on AccountWithContributions {
@@ -385,6 +392,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
   }
 
   ${expensesListFieldsFragment}
+  ${collectiveNavbarFieldsFragment}
 `;
 
 const addExpensesPageData = graphql(expensesPageQuery, {

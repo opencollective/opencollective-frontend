@@ -108,6 +108,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                     fontWeight="normal"
                     value={isNaN(hostFeePercent) ? '' : hostFeePercent}
                     step="0.01"
+                    onClick={() => setSelectedOption(key)}
                     onChange={e => setHostFeePercent(parseFloat(e.target.value))}
                     onBlur={e => {
                       const newValue = clamp(round(parseFloat(e.target.value), 2), 0, 100);

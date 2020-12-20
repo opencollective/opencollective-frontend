@@ -17,7 +17,6 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import Loading from '../Loading';
 import StyledButton from '../StyledButton';
-import StyledLink from '../StyledLink';
 import { P } from '../Text';
 
 import bankAccountIllustration from '../../public/static/images/create-collective/bankAccountIllustration.png';
@@ -46,9 +45,6 @@ const ConnectedAccountCard = styled(Flex)`
 const GreenCheckbox = styled(CheckboxChecked)`
   color: ${themeGet('colors.green.700')};
 `;
-
-const FEES_LINK = 'https://docs.opencollective.com/help/about/pricing';
-const HOST_PLANS_LINK = 'https://opencollective.com/pricing';
 
 class StripeOrBankAccountPicker extends React.Component {
   static propTypes = {
@@ -133,8 +129,8 @@ class StripeOrBankAccountPicker extends React.Component {
                     mt={[2, 3]}
                     mb={3}
                     minWidth={'145px'}
-                    onClick={() => {
-                      addHost(collective, host);
+                    onClick={async () => {
+                      await addHost(collective, host);
                       this.connectStripe();
                     }}
                   >
@@ -145,14 +141,7 @@ class StripeOrBankAccountPicker extends React.Component {
                   <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                     <FormattedMessage
                       id="acceptContributions.stripe.info"
-                      defaultMessage="Automatically accept contributions with credit cards from all over the world. {fees}."
-                      values={{
-                        fees: (
-                          <StyledLink href={FEES_LINK} openInNewTab>
-                            <FormattedMessage id="feesApply" defaultMessage="Fees apply" />
-                          </StyledLink>
-                        ),
-                      }}
+                      defaultMessage="Automatically accept contributions with credit cards from all over the world."
                     />
                   </P>
                 </Box>
@@ -213,14 +202,7 @@ class StripeOrBankAccountPicker extends React.Component {
                   <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                     <FormattedMessage
                       id="acceptContributions.bankAccount.info"
-                      defaultMessage="Manually sync contributions received on your bank account with your Collective's budget. It's free up to $1000. {hostPlans}."
-                      values={{
-                        hostPlans: (
-                          <StyledLink href={HOST_PLANS_LINK} openInNewTab>
-                            <FormattedMessage id="hostPlans" defaultMessage="Host plans" />
-                          </StyledLink>
-                        ),
-                      }}
+                      defaultMessage="Manually sync contributions received on your bank account with your Collective's budget."
                     />
                   </P>
                 </Box>

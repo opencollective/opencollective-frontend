@@ -94,6 +94,7 @@ class TopBarProfileMenu extends React.Component {
   }
 
   componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyPress);
     document.addEventListener('click', this.onClickOutside);
     if (!getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)) {
       this.setState({ loading: false });
@@ -102,7 +103,17 @@ class TopBarProfileMenu extends React.Component {
 
   componentWillUnmount() {
     document.removeEventListener('click', this.onClickOutside);
+    document.removeEventListener('keydown', this.handleEscKey);
   }
+
+  handleKeyPress = event => {
+    const { key, keyCode } = event;
+    if (key === 'Escape' || key === 'Esc' || keyCode === 27) {
+      this.setState({
+        showProfileMenu: false,
+      });
+    }
+  };
 
   logout = () => {
     this.setState({ showProfileMenu: false, status: 'loggingout' });
@@ -223,6 +234,7 @@ class TopBarProfileMenu extends React.Component {
         top={[69, 75]}
         zIndex={3000}
         data-cy="user-menu"
+        css={{ overflow: 'hidden' }}
       >
         <Flex flexDirection={['column', 'row']} maxHeight={['calc(100vh - 68px)', '100%']}>
           <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={3} bg="#F7F8FA">
@@ -231,7 +243,7 @@ class TopBarProfileMenu extends React.Component {
               <P mt={2} color="#313233" fontWeight="500">
                 {LoggedInUser.collective.name}
               </P>
-              <P mt={2} mb={5} color="#9D9FA3">
+              <P mt={2} mb={5} wordBreak="break-all" color="#9D9FA3">
                 {LoggedInUser.email}
               </P>
             </Hide>

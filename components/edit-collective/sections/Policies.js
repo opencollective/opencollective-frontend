@@ -9,20 +9,21 @@ import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { getEnvVar } from '../../../lib/env-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import { parseToBoolean } from '../../../lib/utils';
+import { parseToBoolean, stripHTML } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
-import StyledTextarea from '../../StyledTextarea';
 import { H3, P } from '../../Text';
 
 import { getSettingsQuery } from './EditCollectivePage';
 
-const POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
+const EXPENSE_POLICY_MAX_LENGTH = 16000; // max in database is ~15,500
+const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
 const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
   mutation UpdateFilterCategories($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -60,6 +61,10 @@ const messages = defineMessages({
     defaultMessage:
       'For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.',
   },
+  'contributionPolicy.error': {
+    id: 'collective.contributionPolicy.error',
+    defaultMessage: 'Contribution policy must contain less than {maxLength} characters',
+  },
   'expensePolicy.label': {
     id: 'editCollective.menu.expenses',
     defaultMessage: 'Expenses Policy',
@@ -69,9 +74,13 @@ const messages = defineMessages({
     defaultMessage:
       'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
   },
+  'expensePolicy.error': {
+    id: 'collective.expensePolicy.error',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
+  },
 });
 
-const Policies = ({ collective }) => {
+const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const { formatMessage } = useIntl();
   const [selected, setSelected] = React.useState([]);
   const hasRejectCategoriesFeature =
@@ -142,64 +151,91 @@ const Policies = ({ collective }) => {
         },
       });
     },
+    validate(values) {
+      const errors = {};
+      const contributionPolicyText = stripHTML(values.contributionPolicy);
+      const expensePolicyText = stripHTML(values.expensePolicy);
+
+      if (contributionPolicyText.length > CONTRIBUTION_POLICY_MAX_LENGTH) {
+        errors.contributionPolicy = formatMessage(messages['contributionPolicy.error'], {
+          maxLength: CONTRIBUTION_POLICY_MAX_LENGTH,
+        });
+      }
+      if (expensePolicyText.length > EXPENSE_POLICY_MAX_LENGTH) {
+        errors.expensePolicy = formatMessage(messages['expensePolicy.error'], { maxLength: EXPENSE_POLICY_MAX_LENGTH });
+      }
+      return errors;
+    },
   });
 
   return (
     <Flex flexDirection="column">
       {error && <MessageBoxGraphqlError error={error} />}
-      <H3 mt={2}>
-        <FormattedMessage id="editCollective.menu.policies" defaultMessage="Policies" />
-      </H3>
+      {!showOnlyExpensePolicy && (
+        <H3 mt={2}>
+          <FormattedMessage id="editCollective.menu.policies" defaultMessage="Policies" />
+        </H3>
+      )}
       <form onSubmit={formik.handleSubmit}>
         <Container>
-          <StyledInputField
-            name="contributionPolicy"
-            htmlFor="contributionPolicy"
-            disabled={isSubmittingPolicies}
-            label={formatMessage(messages['contributionPolicy.label'])}
-            labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
-          >
-            {inputProps => (
-              <StyledTextarea
-                {...inputProps}
-                resize="none"
-                maxLength={POLICY_MAX_LENGTH}
-                showCount
-                height={'20rem'}
-                width={1}
-                fontSize="14px"
-                value={formik.values.contributionPolicy}
-                placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
-                onChange={formik.handleChange}
-              />
-            )}
-          </StyledInputField>
-          <P fontSize="14px" color="black.600">
-            <FormattedMessage
-              id="collective.contributionPolicy.description"
-              defaultMessage="All categorized Financial Contributors are manually classified by the Open Collective team. Only contributors that are thought to be abusing are classified with these categories. Financial Contributors with a good reputation should normally not be affected by this setting."
-            />
-          </P>
+          {!showOnlyExpensePolicy && (
+            <Container>
+              <StyledInputField
+                name="contributionPolicy"
+                htmlFor="contributionPolicy"
+                error={formik.errors.contributionPolicy}
+                disabled={isSubmittingPolicies}
+                label={formatMessage(messages['contributionPolicy.label'])}
+                labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+              >
+                {inputProps => (
+                  <RichTextEditor
+                    withBorders
+                    showCount
+                    maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
+                    error={formik.errors.contributionPolicy}
+                    version="simplified"
+                    editorMinHeight="20rem"
+                    id={inputProps.id}
+                    inputName={inputProps.name}
+                    onChange={formik.handleChange}
+                    placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
+                    defaultValue={formik.values.contributionPolicy}
+                    fontSize="14px"
+                  />
+                )}
+              </StyledInputField>
+              <P fontSize="14px" color="black.600">
+                <FormattedMessage
+                  id="collective.contributionPolicy.description"
+                  defaultMessage="All categorized Financial Contributors are manually classified by the Open Collective team. Only contributors that are thought to be abusing are classified with these categories. Financial Contributors with a good reputation should normally not be affected by this setting."
+                />
+              </P>
+            </Container>
+          )}
 
           <StyledInputField
             name="expensePolicy"
             htmlFor="expensePolicy"
+            error={formik.errors.expensePolicy}
             disabled={isSubmittingPolicies}
             label={formatMessage(messages['expensePolicy.label'])}
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
           >
             {inputProps => (
-              <StyledTextarea
-                {...inputProps}
-                resize="none"
-                maxLength={POLICY_MAX_LENGTH}
+              <RichTextEditor
+                withBorders
                 showCount
-                height={'20rem'}
-                width={1}
-                fontSize="14px"
-                value={formik.values.expensePolicy}
-                placeholder={formatMessage(messages['expensePolicy.placeholder'])}
+                maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                error={formik.errors.expensePolicy}
+                version="simplified"
+                editorMinHeight="20rem"
+                id={inputProps.id}
+                inputName={inputProps.name}
                 onChange={formik.handleChange}
+                placeholder={formatMessage(messages['expensePolicy.placeholder'])}
+                defaultValue={formik.values.expensePolicy}
+                fontSize="14px"
               />
             )}
           </StyledInputField>
@@ -258,6 +294,7 @@ Policies.propTypes = {
     id: PropTypes.number,
     slug: PropTypes.string,
   }),
+  showOnlyExpensePolicy: PropTypes.bool,
 };
 
 export default Policies;

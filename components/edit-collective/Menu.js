@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
+import { FEATURES, isFeatureAllowedForCollective } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { Flex } from '../Grid';
 import Link from '../Link';
+
+const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
 const MenuDivider = styled.div`
   margin-top: 34px;
@@ -30,6 +32,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   TIERS: 'tiers',
   VIRTUAL_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
+  PENDING_ORDERS: 'pending-orders',
   TWO_FACTOR_AUTH: 'two-factor-auth',
   ADVANCED: 'advanced', // Last on purpose
   // Host Specific
@@ -49,7 +52,7 @@ const SECTION_LABELS = defineMessages({
   },
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: {
     id: 'editCollective.menu.goals',
-    defaultMessage: 'Collective Goals',
+    defaultMessage: 'Goals',
   },
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: {
     id: 'editCollective.menu.collectivePage',
@@ -92,12 +95,16 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Info',
   },
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: {
-    id: 'editCollective.invoicesAndReceipts',
+    id: 'becomeASponsor.invoiceReceipts',
     defaultMessage: 'Invoices & Receipts',
   },
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: {
     id: 'editCollective.receivingMoney',
     defaultMessage: 'Receiving Money',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: {
+    id: 'PendingBankTransfers',
+    defaultMessage: 'Pending bank transfers',
   },
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: {
     id: 'editCollective.sendingMoney',
@@ -108,7 +115,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Fiscal Hosting',
   },
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: {
-    id: 'editCollective.menu.members',
+    id: 'ContributorsFilter.Core',
     defaultMessage: 'Team',
   },
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: {
@@ -166,45 +173,37 @@ const MenuItem = styled(Link)`
 // Some condition helpers
 const isType = (c, collectiveType) => c.type === collectiveType;
 const isOneOfTypes = (c, ...collectiveTypes) => collectiveTypes.includes(c.type);
-const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollectiveType(c.type, feature);
-const isFund = c => c.type === CollectiveType.FUND || c.settings?.fund === true; // Funds MVP, to refactor
+const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollective(c, feature);
+const isFund = c => c.type === FUND || c.settings?.fund === true; // Funds MVP, to refactor
 const isHost = c => c.isHost === true;
-const isCollective = c => c.type === CollectiveType.COLLECTIVE;
+const isCollective = c => c.type === COLLECTIVE;
 
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isCollective(c) && !isFund(c),
-  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || (isCollective(c) && !isFund(c)),
+  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isCollective(c),
+  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || isCollective(c),
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: c => isFeatureAllowed(c, FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: c => isFeatureAllowed(c, FEATURES.CONVERSATIONS) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.POLICIES]: c => isCollective(c) || isFund(c),
-  [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c) && !isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: c => isCollective(c) || isFund(c),
-  [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c =>
-    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.FUND, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, CollectiveType.ORGANIZATION, CollectiveType.USER),
-  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: c => isOneOfTypes(c, CollectiveType.ORGANIZATION, CollectiveType.USER),
-  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, CollectiveType.EVENT),
+  [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c => isOneOfTypes(c, COLLECTIVE, FUND, ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, ORGANIZATION, USER),
+  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: c => isOneOfTypes(c, ORGANIZATION, USER),
+  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
-    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.FUND, CollectiveType.EVENT, CollectiveType.PROJECT) ||
-    (c.type === CollectiveType.ORGANIZATION && c.isActive),
-  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isType(c, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c =>
-    isOneOfTypes(
-      c,
-      CollectiveType.COLLECTIVE,
-      CollectiveType.ORGANIZATION,
-      CollectiveType.USER,
-      CollectiveType.EVENT,
-    ) && !isFund(c),
+    isOneOfTypes(c, COLLECTIVE, FUND, EVENT, PROJECT) || (c.type === ORGANIZATION && c.isActive),
+  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isType(c, ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c => isOneOfTypes(c, COLLECTIVE, ORGANIZATION, USER, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, CollectiveType.USER),
+  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, USER),
   // Fiscal Host
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: () => false,
 };
@@ -226,7 +225,7 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
     section,
   });
   const displayedSectionsInfos = displayedSections.map(getSectionInfo);
-  const isEvent = collective.type === CollectiveType.EVENT;
+  const isEvent = collective.type === EVENT;
 
   // eslint-disable-next-line react/prop-types
   const renderMenuItem = ({ section, label, isSelected }) => (
@@ -248,7 +247,7 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
   return (
     <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
       {displayedSectionsInfos.map(renderMenuItem)}
-      {['USER', 'ORGANIZATION'].includes(collective.type) && (
+      {(collective.type === ORGANIZATION || (collective.type === USER && collective.isHost)) && (
         <Fragment>
           <MenuDivider />
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING))}
@@ -256,11 +255,15 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
       )}
       {collective.isHost && (
         <Fragment>
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_PLAN))}
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS))}
+          {![USER, ORGANIZATION].includes(collective.type) && <MenuDivider />}
+          {[USER, ORGANIZATION].includes(collective.type) &&
+            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_PLAN))}
+          {[USER, ORGANIZATION].includes(collective.type) &&
+            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
+          {collective.type === COLLECTIVE && renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH))}
         </Fragment>
       )}

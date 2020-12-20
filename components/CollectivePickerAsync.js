@@ -16,7 +16,7 @@ const collectivePickerSearchQuery = gql`
     $limit: Int
     $hostCollectiveIds: [Int]
   ) {
-    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds, useAlgolia: false) {
+    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds) {
       id
       collectives {
         id
@@ -123,7 +123,7 @@ const CollectivePickerAsync = ({
       onInputChange={newTerm => {
         setTerm(newTerm.trim());
       }}
-      customOptions={!term && emptyCustomOptions}
+      customOptions={!term ? emptyCustomOptions : []}
       {...props}
     />
   );

@@ -57,30 +57,22 @@ class Hosts extends React.Component {
       </CoverSmallCTA>
     );
 
-    const description = (
-      <FormattedMessage
-        id="hosts.description"
-        defaultMessage="Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services. {findOutMoreLink}"
-        values={{ findOutMoreLink }}
-      />
-    );
-
     return (
       <Container>
-        <Header
-          title={title}
-          description={description}
-          twitterHandle="opencollect"
-          className={this.state.status}
-          LoggedInUser={LoggedInUser}
-        />
+        <Header title={title} twitterHandle="opencollect" className={this.state.status} LoggedInUser={LoggedInUser} />
 
         <Body>
           <Container mt={2} mb={2}>
             <H1 fontSize={['24px', '40px']} lineHeight={3} fontWeight="bold" textAlign="center" color="black.900">
               {title}
             </H1>
-            <P textAlign="center">{description}</P>
+            <P textAlign="center">
+              <FormattedMessage
+                id="hosts.description"
+                defaultMessage="Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services. {findOutMoreLink}"
+                values={{ findOutMoreLink }}
+              />
+            </P>
           </Container>
 
           <div className="content">

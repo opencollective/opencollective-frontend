@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { Check } from '@styled-icons/fa-solid/Check';
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { isHexColor } from 'validator';
@@ -164,17 +164,16 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                   flex="1 1 50%"
                   loading={loading}
                   disabled={hasError}
-                  onClick={() =>
+                  onClick={() => {
+                    const newSettings = cloneDeep(collective.settings || {});
+                    set(newSettings, colorPath, color);
                     editSettings({
-                      variables: {
-                        id: collective.id,
-                        settings: set(collective.settings, colorPath, color),
-                      },
+                      variables: { id: collective.id, settings: newSettings },
                     }).then(() => {
                       onChange(null);
                       onClose();
-                    })
-                  }
+                    });
+                  }}
                 >
                   <FormattedMessage id="save" defaultMessage="Save" />
                 </StyledButton>

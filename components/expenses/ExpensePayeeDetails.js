@@ -73,7 +73,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
         </PrivateInfoColumnHeader>
         <LinkCollective collective={payee}>
           <Flex alignItems="center" fontSize="12px">
-            {payee.isInvite || payee.isNewUser ? (
+            {!payee.slug ? (
               <Avatar
                 name={payee.organization?.name || payee.name}
                 radius={24}
@@ -135,13 +135,13 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
       {host && (
         <PrivateInfoColumn data-cy="expense-summary-host" borderless={borderless}>
           <PrivateInfoColumnHeader>
-            <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
+            <FormattedMessage id="expense.PayFromFiscalhost" defaultMessage="Pay from Fiscal Host" />
           </PrivateInfoColumnHeader>
           <LinkCollective collective={host}>
             <Flex alignItems="center">
               <Avatar collective={host} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {collective && collective.isApproved ? (
+                {collective && (collective.isApproved || collective.id === host.id) ? (
                   host.name
                 ) : (
                   <FormattedMessage
@@ -208,7 +208,7 @@ ExpensePayeeDetails.propTypes = {
       payee: PropTypes.object,
     }),
     payee: PropTypes.shape({
-      id: PropTypes.string,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       name: PropTypes.string,
       slug: PropTypes.string,
       type: PropTypes.string,
@@ -234,7 +234,8 @@ ExpensePayeeDetails.propTypes = {
   /** Disable border and paiding in styled card, usefull for modals */
   borderless: PropTypes.bool,
   collective: PropTypes.shape({
-    isApproved: PropTypes.bool.isRequired,
+    id: PropTypes.string.isRequired,
+    isApproved: PropTypes.bool,
   }),
 };
 

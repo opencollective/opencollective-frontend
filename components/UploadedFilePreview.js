@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
-import { max } from 'lodash';
+import { endsWith, max } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -91,6 +91,7 @@ const PrivateIconContainer = styled.div`
  */
 const UploadedFilePreview = ({ isPrivate, isLoading, isDownloading, url, size, alt, hasLink, ...props }) => {
   let content = null;
+  const isText = endsWith(url, 'csv') || endsWith(url, 'txt') || endsWith(url, 'pdf');
 
   if (isLoading) {
     content = <LoadingPlaceholder borderRadius={8} />;
@@ -111,6 +112,15 @@ const UploadedFilePreview = ({ isPrivate, isLoading, isDownloading, url, size, a
     );
   } else if (!url) {
     content = <FileText color="#dcdee0" size="60%" />;
+  } else if (isText) {
+    const icon = <FileTextIcon color="#dcdee0" size="60%" />;
+    content = url ? (
+      <StyledLink href={url} key={url} textAlign="center" openInNewTab>
+        {icon}
+      </StyledLink>
+    ) : (
+      icon
+    );
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
     const img = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt} />;

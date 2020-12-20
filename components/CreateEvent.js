@@ -1,19 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import momentTimezone from 'moment-timezone';
-import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
+import dayjs from '../lib/dayjs';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import { Router } from '../server/pages';
 
 import Body from './Body';
-import CollectiveNavbar from './CollectiveNavbar';
+import CollectiveNavbar from './collective-navbar';
 import Container from './Container';
 import EditEventForm from './EditEventForm';
 import Footer from './Footer';
 import Header from './Header';
+import Link from './Link';
+import StyledButton from './StyledButton';
 import { withUser } from './UserProvider';
 
 class CreateEvent extends React.Component {
@@ -26,7 +27,8 @@ class CreateEvent extends React.Component {
 
   constructor(props) {
     super(props);
-    const timezone = momentTimezone.tz.guess();
+    const timezone = dayjs.tz.guess();
+
     this.state = {
       event: {
         parentCollective: props.parentCollective,
@@ -108,9 +110,11 @@ class CreateEvent extends React.Component {
                   />
                 </p>
                 <p>
-                  <Button bsStyle="primary" href={`/signin?next=/${collective.slug}/events/new`}>
-                    <FormattedMessage id="signIn" defaultMessage="Sign In" />
-                  </Button>
+                  <Link route={`/signin?next=/${collective.slug}/events/new`}>
+                    <StyledButton buttonStyle="primary">
+                      <FormattedMessage id="signIn" defaultMessage="Sign In" />
+                    </StyledButton>
+                  </Link>
                 </p>
               </Container>
             )}

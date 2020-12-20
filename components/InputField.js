@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { filter, get, isNil, map } from 'lodash';
 import dynamic from 'next/dynamic';
 import { Checkbox, Col, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'react-bootstrap';
+import styled from 'styled-components';
 
 import { capitalize } from '../lib/utils';
 
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
-import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import StyledInputTags from './StyledInputTags';
 import TimezonePicker from './TimezonePicker';
@@ -73,6 +73,43 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
     );
   }
 }
+
+const InputFieldContainer = styled.div`
+  span.input-group {
+    width: 100%;
+  }
+  .inputField {
+    margin: 1rem 0;
+  }
+  .inputField,
+  .inputField textarea {
+    font-size: 1.6rem;
+  }
+  .horizontal .form-group label {
+    margin-top: 5px;
+  }
+  .form-horizontal .form-group label {
+    padding-top: 3px;
+  }
+  .inputField .checkbox label {
+    width: auto;
+  }
+  .inputField input[type='number'] {
+    text-align: right;
+  }
+  .inputField .currency input[type='number'] {
+    text-align: left;
+  }
+  .inputField .switch {
+    display: flex;
+    align-items: center;
+  }
+  .archiveField {
+    width: 100%;
+    display: flex;
+    padding-top: 20px;
+  }
+`;
 
 class InputField extends React.Component {
   static propTypes = {
@@ -198,6 +235,7 @@ class InputField extends React.Component {
             maxLength={field.maxLength}
             value={this.state.value || this.props.defaultValue || ''}
             onChange={event => this.handleChange(event.target.value)}
+            disabled={field.disabled}
           />
         );
         break;
@@ -353,43 +391,6 @@ class InputField extends React.Component {
         );
         break;
 
-      case 'dropzone':
-        this.input = (
-          <FormGroup>
-            {horizontal && (
-              <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
-                <Col sm={10}>
-                  <InputTypeDropzone
-                    defaultValue={field.defaultValue}
-                    name={field.name}
-                    onChange={event => this.handleChange(event)}
-                    placeholder={field.placeholder}
-                    options={field.options}
-                  />
-                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                </Col>
-              </div>
-            )}
-            {!horizontal && (
-              <div>
-                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <InputTypeDropzone
-                  defaultValue={field.defaultValue}
-                  name={field.name}
-                  onChange={event => this.handleChange(event)}
-                  placeholder={field.placeholder}
-                  options={field.options}
-                />
-                {field.description && <HelpBlock>{field.description}</HelpBlock>}
-              </div>
-            )}
-          </FormGroup>
-        );
-        break;
-
       case 'currency':
         value = value || field.defaultValue;
         value = typeof value === 'number' ? value / 100 : '';
@@ -453,6 +454,7 @@ class InputField extends React.Component {
                 : this.handleChange(event.target.value)
             }
             multiple={field.multiple}
+            disabled={field.disabled}
           >
             {field.options &&
               field.options.map(option => {
@@ -587,47 +589,12 @@ class InputField extends React.Component {
     }
 
     return (
-      <div className={`inputField ${this.props.className} ${this.props.name}`} key={`input-${this.props.name}`}>
-        <style jsx global>
-          {`
-            span.input-group {
-              width: 100%;
-            }
-            .inputField {
-              margin: 1rem 0;
-            }
-            .inputField,
-            .inputField textarea {
-              font-size: 1.6rem;
-            }
-            .horizontal .form-group label {
-              margin-top: 5px;
-            }
-            .form-horizontal .form-group label {
-              padding-top: 3px;
-            }
-            .inputField .checkbox label {
-              width: auto;
-            }
-            .inputField input[type='number'] {
-              text-align: right;
-            }
-            .inputField .currency input[type='number'] {
-              text-align: left;
-            }
-            .inputField .switch {
-              display: flex;
-              align-items: center;
-            }
-            .archiveField {
-              width: 100%;
-              display: flex;
-              padding-top: 20px;
-            }
-          `}
-        </style>
+      <InputFieldContainer
+        className={`inputField ${this.props.className} ${this.props.name}`}
+        key={`input-${this.props.name}`}
+      >
         {this.input}
-      </div>
+      </InputFieldContainer>
     );
   }
 }

@@ -200,6 +200,7 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite ? true : stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
 
   const [step, setStep] = React.useState(stepOneCompleted ? STEPS.EXPENSE : STEPS.PAYEE);
+  // Only true when logged in and drafting the expense
   const isOnBehalf = values.payee?.isInvite;
 
   // When user logs in we set its account as the default payout profile if not yet defined
@@ -210,7 +211,9 @@ const ExpenseFormBody = ({
         isInvite: false,
         isNewUser: true,
       });
-    } else if (!values.payee && loggedInAccount && !isEmpty(payoutProfiles)) {
+    }
+    // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
+    else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
       formik.setFieldValue('payee', first(payoutProfiles));
     }
   }, [payoutProfiles, loggedInAccount]);
@@ -242,7 +245,13 @@ const ExpenseFormBody = ({
         if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host?.transferwise) {
           formValues.payoutMethod = undefined;
         }
-        setValues(formValues);
+        setValues(
+          omit(
+            formValues,
+            // Omit deprecated fields, otherwise it will prevent expense submission
+            ['location', 'privateInfo'],
+          ),
+        );
       }
     }
   }, [formPersister, dirty]);
@@ -545,7 +554,7 @@ ExpenseFormBody.propTypes = {
       }),
     }),
     settings: PropTypes.object,
-    isApproved: PropTypes.bool.isRequired,
+    isApproved: PropTypes.bool,
   }).isRequired,
 };
 
@@ -629,7 +638,7 @@ ExpenseForm.propTypes = {
       }),
     }),
     settings: PropTypes.object,
-    isApproved: PropTypes.bool.isRequired,
+    isApproved: PropTypes.bool,
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({

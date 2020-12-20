@@ -31,12 +31,19 @@ export const collectivePageQuery = gql`
       isIncognito
       isGuest
       hostFeePercent
+      platformFeePercent
       image
       imageUrl(height: 256)
       canApply
       canContact
+      features {
+        ...NavbarFields
+      }
       ordersFromCollective(subscriptionsOnly: true) {
         isSubscriptionActive
+      }
+      memberOf(onlyActiveCollectives: true, limit: 1) {
+        id
       }
       stats {
         id
@@ -254,6 +261,7 @@ export const collectivePageQuery = gql`
 
   ${fragments.updatesFieldsFragment}
   ${fragments.contributorsFieldsFragment}
+  ${fragments.collectiveNavbarFieldsFragment}
 `;
 
 export const getCollectivePageQueryVariables = slug => {

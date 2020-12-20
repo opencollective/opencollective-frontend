@@ -93,7 +93,7 @@ MobileCollectiveInfoStickyBar.propTypes = {
     currency: PropTypes.string.isRequired,
     balance: PropTypes.number.isRequired,
     type: PropTypes.string,
-    isApproved: PropTypes.bool.isRequired,
+    isApproved: PropTypes.bool,
   }),
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,

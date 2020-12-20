@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { size, typography } from 'styled-system';
 
 import StyledSpinner from './StyledSpinner';
@@ -69,6 +69,11 @@ const CheckboxContainer = styled.div`
   /* Show our custom checkbox */
   ${CustomCheckbox} {
     ${size}
+    ${props =>
+      props.error &&
+      css`
+        border-color: ${themeGet('colors.red.500')};
+      `}
   }
 
   /* Hover label / checkbox - only for pointer devices (ignored on touch devices) */
@@ -161,6 +166,7 @@ class StyledCheckbox extends React.Component {
         size={size}
         width={width}
         alignItems={alignItems}
+        data-cy={`checkbox-${name}`}
         {...props}
       >
         <input id={inputId} name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
@@ -204,6 +210,7 @@ StyledCheckbox.propTypes = {
   isLoading: PropTypes.bool,
   /** Default to center */
   alignItems: PropTypes.string,
+  error: PropTypes.any,
 };
 
 export default StyledCheckbox;

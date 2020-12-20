@@ -4,11 +4,12 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
+import Container from './Container';
 import Error from './Error';
 import { Box, Flex } from './Grid';
 import Link from './Link';
-import SectionTitle from './SectionTitle';
 import StyledButton from './StyledButton';
+import { H1, P } from './Text';
 import Updates from './Updates';
 
 class UpdatesWithData extends React.Component {
@@ -49,15 +50,17 @@ class UpdatesWithData extends React.Component {
     return (
       <div className="UpdatesContainer">
         {!compact && (
-          <SectionTitle
-            title={<FormattedMessage id="updates" defaultMessage="Updates" />}
-            subtitle={
+          <Container padding="0.8rem 0">
+            <H1 fontSize="4rem" textAlign="center">
+              <FormattedMessage id="updates" defaultMessage="Updates" />
+            </H1>
+            <P fontSize="1.6rem" textAlign="center" color="#71757a">
               <FormattedMessage
                 id="section.updates.subtitle"
                 defaultMessage="Stay up to dates with our latest activities and progress."
               />
-            }
-          />
+            </P>
+          </Container>
         )}
         {LoggedInUser?.canEditCollective(collective) && (
           <Flex justifyContent="center">

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, Form, Formik } from 'formik';
+import { get } from 'lodash';
 import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
@@ -21,6 +22,7 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledTooltip from '../../StyledTooltip';
 import { H2, H3, P } from '../../Text';
 import { withUser } from '../../UserProvider';
@@ -62,7 +64,11 @@ class SetupTwoFactorAuth extends React.Component {
     intl: PropTypes.object.isRequired,
     /** From graphql query */
     addTwoFactorAuthTokenToIndividual: PropTypes.func.isRequired,
-    data: PropTypes.object,
+    removeTwoFactorAuthTokenFromIndividual: PropTypes.func.isRequired,
+    data: PropTypes.shape({
+      individual: PropTypes.object,
+      loading: PropTypes.bool,
+    }),
     /** From parent component */
     slug: PropTypes.string,
     userEmail: PropTypes.string,
@@ -72,10 +78,12 @@ class SetupTwoFactorAuth extends React.Component {
     super(props);
     this.state = {
       error: null,
-      tokenAdded: null,
+      disablingTwoFactorAuth: false,
+      disableError: null,
     };
 
-    this.submit = this.submit.bind(this);
+    this.enableTwoFactorAuth = this.enableTwoFactorAuth.bind(this);
+    this.disableTwoFactorAuth = this.disableTwoFactorAuth.bind(this);
   }
 
   componentDidMount() {
@@ -99,7 +107,7 @@ class SetupTwoFactorAuth extends React.Component {
     this.setState({ secret, base32: secret.base32, otpauth_url: fullOTPUrl });
   }
 
-  async submit(values) {
+  async enableTwoFactorAuth(values) {
     try {
       // verify QR code
       const { twoFactorAuthenticatorCode } = values;
@@ -131,7 +139,7 @@ class SetupTwoFactorAuth extends React.Component {
           .then(() => {
             confettiFireworks(2000, { zIndex: 3000 });
           });
-        this.setState({ tokenAdded: true, error: null });
+        this.setState({ error: null });
       }
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
@@ -139,9 +147,29 @@ class SetupTwoFactorAuth extends React.Component {
     }
   }
 
+  async disableTwoFactorAuth(values) {
+    try {
+      const { twoFactorAuthenticatorCode } = values;
+      const account = {
+        id: this.props.data.individual.id,
+      };
+
+      await this.props.removeTwoFactorAuthTokenFromIndividual({
+        variables: {
+          account,
+          code: twoFactorAuthenticatorCode,
+        },
+      });
+      this.setState({ disablingTwoFactorAuth: false, error: null });
+    } catch (err) {
+      const errorMsg = getErrorFromGraphqlException(err).message;
+      this.setState({ disableError: errorMsg });
+    }
+  }
+
   render() {
     const { intl, data } = this.props;
-    const { error, tokenAdded, secret, base32, otpauth_url } = this.state;
+    const { error, disableError, secret, base32, otpauth_url, disablingTwoFactorAuth } = this.state;
 
     const { loading } = data;
 
@@ -149,10 +177,14 @@ class SetupTwoFactorAuth extends React.Component {
       return <Loading />;
     }
 
-    const account = data && data.individual;
-    const doesAccountAlreadyHave2FA = tokenAdded || account.hasTwoFactorAuth;
+    const account = get(data, 'individual', null);
+    const doesAccountAlreadyHave2FA = get(account, 'hasTwoFactorAuth', false);
 
-    const initialValues = {
+    const initialSetupFormValues = {
+      twoFactorAuthenticatorCode: '',
+    };
+
+    const initialDisableFormValues = {
       twoFactorAuthenticatorCode: '',
     };
 
@@ -175,17 +207,115 @@ class SetupTwoFactorAuth extends React.Component {
         )}
         <Flex flexDirection="column" my={2}>
           <H2>
-            <FormattedMessage id="TwoFactorAuth.Setup.Title" defaultMessage="Set up two-factor authentication" />
+            {doesAccountAlreadyHave2FA ? (
+              <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
+            ) : (
+              <FormattedMessage id="TwoFactorAuth.Setup.Title" defaultMessage="Set up two-factor authentication" />
+            )}
           </H2>
           {doesAccountAlreadyHave2FA ? (
-            <Flex alignItems="center">
-              <MessageBox type="success" withIcon my={2} data-cy="add-two-factor-auth-success">
-                <FormattedMessage
-                  id="TwoFactorAuth.Setup.AlreadyAdded"
-                  defaultMessage="Two-factor authentication is enabled on this account. Well done! 🎉"
-                />
-              </MessageBox>
-            </Flex>
+            <Fragment>
+              <Flex alignItems="center" mb={3}>
+                <MessageBox type="success" withIcon my={2} data-cy="add-two-factor-auth-success">
+                  <FormattedMessage
+                    id="TwoFactorAuth.Setup.AlreadyAdded"
+                    defaultMessage="Two-factor authentication (2FA) is enabled on this account. Well done! 🎉"
+                  />
+                </MessageBox>
+              </Flex>
+              <Container>
+                <StyledButton
+                  my={1}
+                  minWidth={140}
+                  buttonStyle={'danger'}
+                  onClick={() => this.setState({ disablingTwoFactorAuth: true })}
+                >
+                  <FormattedMessage id="TwoFactorAuth.Disable.Button" defaultMessage="Disable 2FA" />
+                </StyledButton>
+                {disablingTwoFactorAuth && (
+                  <Formik
+                    validate={validate}
+                    initialValues={initialDisableFormValues}
+                    onSubmit={this.disableTwoFactorAuth}
+                  >
+                    {formik => {
+                      const { values, errors, touched, handleSubmit, isSubmitting } = formik;
+
+                      return (
+                        <Modal
+                          show={this.state.disablingTwoFactorAuth}
+                          width="570px"
+                          onClose={() => this.setState({ disablingTwoFactorAuth: false })}
+                        >
+                          <ModalHeader>
+                            <FormattedMessage
+                              id="TwoFactorAuth.Disable.Header"
+                              defaultMessage="Are you sure you want to remove two-factor authentication from your account?"
+                            />
+                          </ModalHeader>
+                          <ModalBody>
+                            <MessageBox type="warning" withIcon my={3}>
+                              <FormattedMessage
+                                id="TwoFactorAuth.Disable.Warning"
+                                defaultMessage="Removing 2FA from your account can make it less secure."
+                              />
+                            </MessageBox>
+                            {disableError && (
+                              <MessageBox type="error" withIcon mb={3}>
+                                {disableError}
+                              </MessageBox>
+                            )}
+                            <P>
+                              <FormattedMessage
+                                id="TwoFactorAuth.Disable.Info"
+                                defaultMessage="If you would like to remove 2FA from your account, you will need to enter the code from your authenticator app one more time."
+                              />
+                            </P>
+                            <Form>
+                              <StyledInputField
+                                name="twoFactorAuthenticatorCode"
+                                htmlFor="twoFactorAuthenticatorCode"
+                                error={touched.twoFactorAuthenticatorCode && errors.twoFactorAuthenticatorCode}
+                                label={intl.formatMessage(messages.inputLabel)}
+                                value={values.twoFactorAuthenticatorCode}
+                                required
+                                mt={2}
+                                mb={3}
+                              >
+                                {inputProps => (
+                                  <Field
+                                    as={StyledInput}
+                                    {...inputProps}
+                                    minWidth={300}
+                                    maxWidth={350}
+                                    minHeight={75}
+                                    fontSize="20px"
+                                    placeholder="123456"
+                                    pattern="[0-9]{6}"
+                                    inputMode="numeric"
+                                    autoFocus
+                                  />
+                                )}
+                              </StyledInputField>
+                            </Form>
+                          </ModalBody>
+                          <ModalFooter>
+                            <Container display="flex" justifyContent="flex-end">
+                              <StyledButton mx={20} onClick={() => this.setState({ disablingTwoFactorAuth: false })}>
+                                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                              </StyledButton>
+                              <StyledButton buttonStyle="danger" loading={isSubmitting} onClick={handleSubmit}>
+                                <FormattedMessage id="actions.continue" defaultMessage="Continue" />
+                              </StyledButton>
+                            </Container>
+                          </ModalFooter>
+                        </Modal>
+                      );
+                    }}
+                  </Formik>
+                )}
+              </Container>
+            </Fragment>
           ) : (
             <Fragment>
               <P>
@@ -234,7 +364,11 @@ class SetupTwoFactorAuth extends React.Component {
                     />
                   </H3>
                   <Container>
-                    <Formik validate={validate} initialValues={initialValues} onSubmit={this.submit}>
+                    <Formik
+                      validate={validate}
+                      initialValues={initialSetupFormValues}
+                      onSubmit={this.enableTwoFactorAuth}
+                    >
                       {formik => {
                         const { values, handleSubmit, errors, touched, isSubmitting } = formik;
 
@@ -255,6 +389,7 @@ class SetupTwoFactorAuth extends React.Component {
                                   as={StyledInput}
                                   {...inputProps}
                                   minWidth={300}
+                                  maxWidth={350}
                                   minHeight={75}
                                   fontSize="20px"
                                   placeholder="123456"
@@ -296,8 +431,8 @@ class SetupTwoFactorAuth extends React.Component {
   }
 }
 
-const twoFactorAuthToAccountMutation = gqlV2/* GraphQL */ `
-  mutation AddTwoFactorAuthToAccount($account: AccountReferenceInput!, $token: String!) {
+const addTwoFactorAuthToIndividualMutation = gqlV2/* GraphQL */ `
+  mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
     addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
       id
       ... on Individual {
@@ -307,10 +442,16 @@ const twoFactorAuthToAccountMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const addTwoFactorAuthToAccountMutation = graphql(twoFactorAuthToAccountMutation, {
-  name: 'addTwoFactorAuthTokenToIndividual',
-  options: { context: API_V2_CONTEXT },
-});
+const removeTwoFactorAuthFromIndividualMutation = gqlV2/* GraphQL */ `
+  mutation RemoveTwoFactorAuthFromIndividual($account: AccountReferenceInput!, $code: String!) {
+    removeTwoFactorAuthTokenFromIndividual(account: $account, code: $code) {
+      id
+      ... on Individual {
+        hasTwoFactorAuth
+      }
+    }
+  }
+`;
 
 const accountHasTwoFactorAuthQuery = gqlV2/* GraphQL */ `
   query AccountHasTwoFactorAuth($slug: String) {
@@ -339,6 +480,16 @@ const addAccountHasTwoFactorAuthData = graphql(accountHasTwoFactorAuthQuery, {
   }),
 });
 
-const addGraphql = compose(addTwoFactorAuthToAccountMutation, addAccountHasTwoFactorAuthData);
+const addGraphql = compose(
+  graphql(addTwoFactorAuthToIndividualMutation, {
+    name: 'addTwoFactorAuthTokenToIndividual',
+    options: { context: API_V2_CONTEXT },
+  }),
+  graphql(removeTwoFactorAuthFromIndividualMutation, {
+    name: 'removeTwoFactorAuthTokenFromIndividual',
+    options: { context: API_V2_CONTEXT },
+  }),
+  addAccountHasTwoFactorAuthData,
+);
 
 export default injectIntl(withUser(addGraphql(SetupTwoFactorAuth)));

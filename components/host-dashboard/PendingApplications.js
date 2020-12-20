@@ -1,24 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
-import { isNil } from 'lodash';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
-import Container from '../Container';
-import { editAccountSettingsMutation } from '../edit-collective/mutations';
 import { Box, Flex } from '../Grid';
-import InputSwitch from '../InputSwitch';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
-import { H1, Span } from '../Text';
+import { H1 } from '../Text';
 
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from './HostAdminCollectiveFilters';
 import PendingApplication, { processApplicationAccountFields } from './PendingApplication';
@@ -44,28 +40,31 @@ const pendingApplicationsQuery = gqlV2/* GraphQL */ `
         limit
         totalCount
         nodes {
-          id
-          legacyId
-          name
-          slug
-          website
-          description
-          type
-          imageUrl(height: 96)
-          createdAt
-          ... on AccountWithHost {
-            ...ProcessHostApplicationFields
-          }
-          admins: members(role: ADMIN) {
-            totalCount
-            nodes {
-              id
-              account {
+          message
+          account {
+            id
+            legacyId
+            name
+            slug
+            website
+            description
+            type
+            imageUrl(height: 96)
+            createdAt
+            ... on AccountWithHost {
+              ...ProcessHostApplicationFields
+            }
+            admins: members(role: ADMIN) {
+              totalCount
+              nodes {
                 id
-                type
-                slug
-                name
-                imageUrl(height: 48)
+                account {
+                  id
+                  type
+                  slug
+                  name
+                  imageUrl(height: 48)
+                }
               }
             }
           }
@@ -96,17 +95,15 @@ const getVariablesFromQuery = query => {
 
 const PendingApplications = ({ hostSlug }) => {
   const { query } = useRouter() || {};
-  const [isAcceptingApplications, setAcceptingApplications] = React.useState(null);
   const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
   const { data, error, loading, variables } = useQuery(pendingApplicationsQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     context: API_V2_CONTEXT,
   });
-  const [submitSetting] = useMutation(editAccountSettingsMutation, { context: API_V2_CONTEXT });
 
   const hostApplications = data?.host?.pendingApplications;
   return (
-    <Box maxWidth={1000} m="0 auto" py={5} px={2}>
+    <Box maxWidth={1000} m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
@@ -138,25 +135,6 @@ const PendingApplications = ({ hostSlug }) => {
         ) : null}
       </Box>
 
-      {data?.host && (
-        <Container borderTop="1px dashed #4E5052" borderBottom="1px dashed #4E5052" py={3} mb={4}>
-          <Flex justifyContent="space-between" alignItems="center">
-            <Span fontSize="14px" fontWeight="700" color="black.900">
-              <FormattedMessage id="PendingApplications.Accepting" defaultMessage="Accepting applications" />
-            </Span>
-            <InputSwitch
-              name="accept-applications"
-              checked={!isNil(isAcceptingApplications) ? isAcceptingApplications : data.host.settings?.apply}
-              onChange={e => {
-                const value = e.target.checked;
-                setAcceptingApplications(value);
-                submitSetting({ variables: { account: { id: data.host.id }, key: 'apply', value } });
-              }}
-            />
-          </Flex>
-        </Container>
-      )}
-
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
 
       {!error && !loading && !hostApplications?.nodes.length ? (
@@ -176,9 +154,9 @@ const PendingApplications = ({ hostSlug }) => {
                   <LoadingPlaceholder height={362} borderRadius="8px" />
                 </Box>
               ))
-            : hostApplications?.nodes.map(account => (
-                <Box key={account.id} mb={24} data-cy="host-application">
-                  <PendingApplication host={data.host} collective={account} />
+            : hostApplications?.nodes.map(application => (
+                <Box key={application.id} mb={24} data-cy="host-application">
+                  <PendingApplication host={data.host} application={application} />
                 </Box>
               ))}
           <Flex mt={5} justifyContent="center">

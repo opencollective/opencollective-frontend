@@ -28,13 +28,13 @@ async function serviceLimiterMiddleware(req, res, next) {
     req.identity = await req.hyperwatch.getIdentity();
   }
   if (serviceLevel < 100) {
-    if (req.identity && nonEssentialRobots.include(req.identity)) {
+    if (req.identity && nonEssentialRobots.includes(req.identity)) {
       onServiceLimited(req, res, next);
       return;
     }
   }
   if (serviceLevel < 50) {
-    if (req.identity && !essentialRobots.include(req.identity)) {
+    if (req.identity && !essentialRobots.includes(req.identity)) {
       onServiceLimited(req, res, next);
       return;
     }

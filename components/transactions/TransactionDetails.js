@@ -92,7 +92,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           {host && (
             <Box>
               <DetailTitle>
-                <FormattedMessage id="Member.Role.FISCAL_HOST" defaultMessage="Fiscal Host" />
+                <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
               </DetailTitle>
               <DetailDescription>
                 <StyledLink as={LinkCollective} collective={host} colorShade={600} />
@@ -151,6 +151,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                     background="transparent"
                     textTransform="capitalize"
                     ml={2}
+                    px="unset"
                   >
                     {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
                     {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}

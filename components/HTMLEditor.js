@@ -1,10 +1,44 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import styled from 'styled-components';
 
 import { upload } from '../lib/api';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
+
+const HTMLEditorContainer = styled.div`
+  .quill {
+    height: auto;
+  }
+  .ql-container {
+    min-height: 20rem;
+    max-height: 35rem;
+    overflow-y: auto;
+    border: 1px solid #dcdee0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .ql-editor {
+    min-height: 20rem;
+    max-height: 35rem;
+  }
+  .ql-toolbar {
+    border: 1px solid #dcdee0;
+    border-radius: 4px;
+  }
+
+  ${props =>
+    props.className === 'small' &&
+    `
+    .quill {
+      height: auto;
+      min-height: 20rem;
+    }
+    .ql-container {
+      height: 15rem;
+    }
+  `}
+`;
 
 /*
  * Simple editor component that takes placeholder text as a prop
@@ -152,40 +186,7 @@ class HTMLEditor extends React.Component {
     }
 
     return (
-      <div className={classNames('HTMLEditor', this.props.className)} data-cy="HTMLEditor">
-        <style jsx>
-          {`
-            .HTMLEditor :global(.quill) {
-              height: auto;
-            }
-            .HTMLEditor :global(.quill) {
-              height: auto;
-            }
-            .HTMLEditor :global(.ql-container) {
-              min-height: 20rem;
-              max-height: 35rem;
-              overflow-y: auto;
-              border: 1px solid #dcdee0;
-              border-radius: 4px;
-              overflow: hidden;
-            }
-            .HTMLEditor :global(.ql-editor) {
-              min-height: 20rem;
-              max-height: 35rem;
-            }
-            .HTMLEditor :global(.ql-toolbar) {
-              border: 1px solid #dcdee0;
-              border-radius: 4px;
-            }
-            .HTMLEditor.small :global(.quill) {
-              height: auto;
-              min-height: 20rem;
-            }
-            .HTMLEditor.small :global(.ql-container) {
-              height: 15rem;
-            }
-          `}
-        </style>
+      <HTMLEditorContainer data-cy="HTMLEditor">
         <this.ReactQuill
           ref={el => (this.reactQuillRef = el)}
           theme="snow"
@@ -197,7 +198,7 @@ class HTMLEditor extends React.Component {
           bounds={'.app'}
           placeholder={this.props.placeholder}
         />
-      </div>
+      </HTMLEditorContainer>
     );
   }
 }

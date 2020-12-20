@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -87,7 +88,16 @@ const MoreFeatures = () => (
           <P fontSize="18px" lineHeight="32px" fontWeight="400" letterSpacing="-0.16px" color="black.600">
             <FormattedMessage
               id="becomeASponsor.backYourStack.description"
-              defaultMessage="Discover your Open Source dependencies and support them."
+              defaultMessage="Discover your Open Source dependencies and support them. {knowMore}"
+              values={{
+                knowMore: (
+                  <Link route="https://backyourstack.com">
+                    <Span color="rgb(220, 95, 125)">
+                      Know more <ArrowRight2 size="18" />
+                    </Span>
+                  </Link>
+                ),
+              }}
             />
           </P>
         </Box>
@@ -117,7 +127,7 @@ const MoreFeatures = () => (
             defaultMessage="We know making the case up the chain is not always easy. For all you heroes inside companies, we put together {resourcesLink}"
             values={{
               resourcesLink: (
-                <Link route="#">
+                <Link route="https://docs.opencollective.com/help/financial-contributors/organizations/sustainer-resources">
                   <Span color="rgb(220, 95, 125)">some resources to help you succeed.</Span>
                 </Link>
               ),

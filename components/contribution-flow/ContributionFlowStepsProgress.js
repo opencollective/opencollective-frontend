@@ -48,7 +48,7 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
 const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency }) => {
   if (step.name === STEPS.PROFILE) {
     if (stepProfile) {
-      const mainInfo = stepProfile.email ?? stepProfile.name;
+      const mainInfo = (stepProfile.id && stepProfile.name) || (stepProfile.email ?? stepProfile.name);
       const fullDescription = [stepProfile.name, stepProfile.email].filter(Boolean).join(' · ');
       return (
         <P title={fullDescription} fontSize="inherit" lineHeight="inherit" truncateOverflow css={{ maxWidth: 150 }}>

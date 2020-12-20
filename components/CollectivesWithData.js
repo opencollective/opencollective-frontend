@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 import CollectiveCard from './CollectiveCard';
 import Container from './Container';
 import Error from './Error';
+import StyledButton from './StyledButton';
 
 const COLLECTIVE_CARDS_PER_PAGE = 10;
 
@@ -84,15 +84,15 @@ class CollectivesWithData extends React.Component {
           margin="1rem 0"
         >
           {collectives.map(collective => (
-            <CollectiveCard key={collective.id} collective={collective} />
+            <CollectiveCard m={1} key={collective.id} collective={collective} />
           ))}
         </Container>
         {collectives.length % 10 === 0 && collectives.length >= limit && (
           <Container margin="1rem" textAlign="center">
-            <Button bsStyle="default" onClick={this.fetchMore}>
+            <StyledButton onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
-            </Button>
+            </StyledButton>
           </Container>
         )}
       </Container>

@@ -1,115 +1,80 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Question } from '@styled-icons/fa-solid/Question';
-import { get } from 'lodash';
+import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
-import ApplyToHostBtnLoggedIn from './ApplyToHostBtnLoggedIn';
+import ApplyToHostModal from './ApplyToHostModal';
+import { getI18nLink } from './I18nFormatters';
 import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledTooltip from './StyledTooltip';
-import { withUser } from './UserProvider';
-
-const IconQuestion = styled(Question).attrs({ size: 18 })`
-  padding: 0.2em;
-  vertical-align: middle;
-  border: 1px solid;
-  border-radius: 1em;
-  border-color: #55a4fb;
-  color: white;
-`;
 
 class ApplyToHostBtn extends React.Component {
   static propTypes = {
-    host: PropTypes.shape({
-      slug: PropTypes.string,
-      hostFeePercent: PropTypes.number,
-      settings: PropTypes.shape({
-        tos: PropTypes.string,
-      }),
-    }).isRequired,
-    LoggedInUser: PropTypes.object,
-    showConditions: PropTypes.bool,
-    buttonStyle: PropTypes.string,
-    buttonSize: PropTypes.string,
+    hostSlug: PropTypes.string.isRequired,
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    disabled: PropTypes.bool,
+    hostWithinLimit: PropTypes.bool,
+    withoutIcon: PropTypes.bool,
+    buttonProps: PropTypes.object,
   };
 
   static defaultProps = {
-    showConditions: true,
-    buttonStyle: 'secondary',
-    buttonSize: 'small',
+    hostWithinLimit: true,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = { showModal: false };
+  }
+
+  renderButton() {
+    const { hostWithinLimit, withoutIcon, buttonProps, minWidth } = this.props;
+    return (
+      <StyledButton
+        buttonStyle="secondary"
+        buttonSize="small"
+        disabled={!hostWithinLimit}
+        onClick={() => this.setState({ showModal: true })}
+        minWidth={minWidth}
+        data-cy="host-apply-btn"
+        {...buttonProps}
+      >
+        {!withoutIcon && <CheckCircle size="20px" color="#304CDC" />}
+        <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+      </StyledButton>
+    );
+  }
+
   render() {
-    const { LoggedInUser, host, showConditions, buttonStyle, buttonSize, minWidth, disabled } = this.props;
+    const { hostSlug, hostWithinLimit } = this.props;
 
     return (
-      <div className="ApplyToHostBtn">
-        <style jsx>
-          {`
-            .hostConditions {
-              margin: 5px;
-              font-size: 11pt;
+      <Fragment>
+        {hostWithinLimit ? (
+          this.renderButton()
+        ) : (
+          <StyledTooltip
+            place="left"
+            content={
+              <FormattedMessage
+                id="host.hostLimit.warning"
+                defaultMessage="Host already reached the limit of hosted collectives for its plan. <a>Contact {collectiveName}</a> and let them know you want to apply."
+                values={{
+                  collectiveName: hostSlug,
+                  a: getI18nLink({ as: Link, route: 'collective-contact', params: { collectiveSlug: hostSlug } }),
+                }}
+              />
             }
-          `}
-        </style>
-        {!LoggedInUser && (
-          <Link route={`/${host.slug}/apply`}>
-            <StyledButton
-              buttonStyle={buttonStyle}
-              buttonSize={buttonSize}
-              disabled={disabled}
-              minWidth={minWidth}
-              data-cy="host-apply-btn-logged-out"
-            >
-              <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
-            </StyledButton>
-          </Link>
+          >
+            {this.renderButton()}
+          </StyledTooltip>
         )}
-        {LoggedInUser && (
-          <ApplyToHostBtnLoggedIn
-            LoggedInUser={LoggedInUser}
-            host={host}
-            disabled={disabled}
-            buttonStyle={buttonStyle}
-            buttonSize={buttonSize}
-            minWidth={minWidth}
-          />
+        {this.state.showModal && (
+          <ApplyToHostModal hostSlug={hostSlug} onClose={() => this.setState({ showModal: false })} />
         )}
-        {showConditions && (
-          <div className="hostConditions">
-            <FormattedMessage
-              id="transaction.hostFeeInHostCurrency"
-              defaultMessage="{percentage} host fee"
-              values={{ percentage: `${host.hostFeePercent || 0}%` }}
-            />
-            &nbsp;
-            <StyledTooltip
-              content={
-                <FormattedMessage
-                  id="host.hostFee.help"
-                  defaultMessage="The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities."
-                />
-              }
-            >
-              <IconQuestion />
-            </StyledTooltip>
-            {get(host, 'settings.tos') && (
-              <span>
-                &nbsp; - &nbsp;
-                <a href={host.settings.tos}>
-                  <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
-                </a>
-              </span>
-            )}
-          </div>
-        )}
-      </div>
+      </Fragment>
     );
   }
 }
 
-export default withUser(ApplyToHostBtn);
+export default ApplyToHostBtn;

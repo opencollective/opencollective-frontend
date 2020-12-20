@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { Lock } from '@styled-icons/feather/Lock';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import Avatar from '../Avatar';
+import Avatar, { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
+import LinkContributor from '../LinkContributor';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
@@ -23,6 +24,9 @@ const messages = defineMessages({
 const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...modalProps }) => {
   const [rejectionReason, setRejectionReason] = useState('');
   const intl = useIntl();
+  const isLegacyAPI = !collective.admins;
+  const admins = collective.admins?.nodes || collective.coreContributors; // compatibility with GQLV1
+  const totalAdminCount = collective.admins?.totalCount || admins.length;
 
   return (
     <Modal onClose={onClose} width="576px" {...modalProps}>
@@ -43,7 +47,7 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
               )}
             </Box>
           </Flex>
-          {collective.admins.totalCount > 0 && (
+          {totalAdminCount > 0 && (
             <Box mt={[3, 0]}>
               <Flex alignItems="center">
                 <Span color="black.500" fontSize="12px" fontWeight="500" letterSpacing="0.06em">
@@ -51,16 +55,22 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
                 </Span>
               </Flex>
               <Flex mt={2} alignItems="center">
-                {collective.admins.nodes.slice(0, 6).map(admin => (
+                {admins.slice(0, 6).map(admin => (
                   <Box key={admin.id} mr={1}>
-                    <LinkCollective collective={admin.account}>
-                      <Avatar collective={admin.account} radius="24px" />
-                    </LinkCollective>
+                    {isLegacyAPI ? (
+                      <LinkContributor contributor={admin}>
+                        <ContributorAvatar contributor={admin} radius="24px" />
+                      </LinkContributor>
+                    ) : (
+                      <LinkCollective collective={admin.account}>
+                        <Avatar collective={admin.account} radius="24px" />
+                      </LinkCollective>
+                    )}
                   </Box>
                 ))}
-                {collective.admins.totalCount > 6 && (
+                {totalAdminCount > 6 && (
                   <Container ml={2} pt="0.7em" fontSize="12px" color="black.600">
-                    + {collective.admins.totalCount - 6}
+                    + {totalAdminCount - 6}
                   </Container>
                 )}
               </Flex>

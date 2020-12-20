@@ -107,7 +107,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         </MessageBox>
       )}
       <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
-        {isEditing ? (
+        {isEditingCover ? (
           <HeroBackgroundEdit collective={collective} onEditCancel={() => editCover(false)} />
         ) : (
           <HeroBackground collective={collective} />
@@ -152,21 +152,23 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             <HeroAvatar collective={collective} isAdmin={isAdmin} handleHeroMessage={handleHeroMessage} />
           </Container>
           {isAdmin && (
-            <Link
-              route={isEvent ? 'editEvent' : 'editCollective'}
-              params={
-                isEvent
-                  ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
-                  : { slug: collective.slug }
-              }
-            >
-              <StyledButton buttonSize="tiny" minWidth={96} my={3} data-cy="edit-collective-btn">
-                <Settings size={14} />
-                <Span ml={1} css={{ verticalAlign: 'middle' }}>
-                  <FormattedMessage id="Settings" defaultMessage="Settings" />
-                </Span>
-              </StyledButton>
-            </Link>
+            <Box>
+              <Link
+                route={isEvent ? 'editEvent' : 'editCollective'}
+                params={
+                  isEvent
+                    ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
+                    : { slug: collective.slug }
+                }
+              >
+                <StyledButton buttonSize="tiny" minWidth={96} my={3} data-cy="edit-collective-btn" tabIndex="-1">
+                  <Settings size={14} />
+                  <Span ml={1} css={{ verticalAlign: 'middle' }}>
+                    <FormattedMessage id="Settings" defaultMessage="Settings" />
+                  </Span>
+                </StyledButton>
+              </Link>
+            </Box>
           )}
           <Box maxWidth={['70%', '60%', null, '40%', '45%']}>
             <H1
@@ -255,7 +257,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                   />
                 </Container>
               )}
-              {host && collective.isApproved && !collective.isHost && (
+              {host && collective.isApproved && host.id !== collective.id && !collective.isHost && (
                 <Fragment>
                   <Container mx={1} color="#969ba3" my={2}>
                     <FormattedMessage
@@ -321,6 +323,21 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                       }}
                     />
                   </Container>
+                  {collective.platformFeePercent > 0 && (
+                    <Container ml={2} mr={3} color="black.500" fontSize="12px">
+                      <FormattedMessage
+                        id="Hero.PlatformFee"
+                        defaultMessage="Platform fee: {fee}"
+                        values={{
+                          fee: (
+                            <DefinedTerm term={Terms.PLATFORM_FEE} color="black.700">
+                              {collective.platformFeePercent || 0}%
+                            </DefinedTerm>
+                          ),
+                        }}
+                      />
+                    </Container>
+                  )}
                 </Fragment>
               )}
             </Flex>
@@ -366,6 +383,7 @@ Hero.propTypes = {
     description: PropTypes.string,
     isHost: PropTypes.bool,
     hostFeePercent: PropTypes.number,
+    platformFeePercent: PropTypes.number,
     tags: PropTypes.arrayOf(PropTypes.string),
     settings: PropTypes.shape({
       tos: PropTypes.string,

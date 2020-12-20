@@ -4,6 +4,7 @@ import { Check } from '@styled-icons/fa-solid/Check';
 import { Info } from '@styled-icons/fa-solid/Info';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { Close } from '@styled-icons/material/Close';
+import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import Container from './Container';
@@ -17,14 +18,14 @@ const StyledToast = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   padding: 24px;
   background: white;
   border-radius: 8px;
   border: 1px solid #efefef;
   opacity: 1;
   /** Above modals */
-  z-index: 4000;
+  z-index: 1000000;
 
   ${props =>
     !props.isClosing &&
@@ -53,6 +54,17 @@ const StyledToast = styled.div`
   }
 `;
 
+const DEFAULT_TITLES = defineMessages({
+  [TOAST_TYPE.SUCCESS]: {
+    id: 'Success',
+    defaultMessage: 'Success',
+  },
+  [TOAST_TYPE.ERROR]: {
+    id: 'Error',
+    defaultMessage: 'Error',
+  },
+});
+
 const getColor = toast => {
   switch (toast.type) {
     case TOAST_TYPE.SUCCESS:
@@ -62,6 +74,10 @@ const getColor = toast => {
     default:
       return 'blue.500';
   }
+};
+
+const getDefaultTitle = (intl, toastType) => {
+  return DEFAULT_TITLES[toastType] ? intl.formatMessage(DEFAULT_TITLES[toastType]) : null;
 };
 
 const getIcon = toast => {
@@ -80,6 +96,7 @@ const getIcon = toast => {
 };
 
 const Toast = ({ toast, timeLeft, onClose }) => {
+  const intl = useIntl();
   const [isClosing, setClosing] = React.useState(false);
   const color = getColor(toast);
   return (
@@ -89,6 +106,7 @@ const Toast = ({ toast, timeLeft, onClose }) => {
           bg={color}
           height={28}
           width={28}
+          minWidth={28}
           borderRadius="50%"
           display="flex"
           justifyContent="center"
@@ -107,7 +125,7 @@ const Toast = ({ toast, timeLeft, onClose }) => {
             letterSpacing="0.06em"
             color="black.800"
           >
-            {toast.title}
+            {toast.title || getDefaultTitle(intl, toast.type)}
           </Span>
           {toast.message && (
             <Span fontSize="12px" lineHeight="16px" fontWeight="500" letterSpacing="0.06em" color="black.600" mt={2}>
@@ -134,7 +152,7 @@ Toast.propTypes = {
   toast: PropTypes.shape({
     id: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.values(TOAST_TYPE)).isRequired,
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
     message: PropTypes.string,
     createdAt: PropTypes.number,
   }).isRequired,

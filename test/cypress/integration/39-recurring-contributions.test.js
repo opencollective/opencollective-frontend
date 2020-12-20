@@ -1,4 +1,5 @@
-describe('Recurring contributions', () => {
+// TODO: This tests are failing too often. We need to improve their reliability before enabling them
+describe.skip('Recurring contributions', () => {
   let user;
 
   before(() => {

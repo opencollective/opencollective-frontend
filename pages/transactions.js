@@ -5,6 +5,7 @@ import { get, mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
@@ -14,12 +15,12 @@ import { addCollectiveCoverData } from '../lib/graphql/queries';
 import { Router } from '../server/pages';
 
 import Body from '../components/Body';
+import { parseAmountRange } from '../components/budget/filters/AmountFilter';
+import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import { parseAmountRange } from '../components/expenses/filters/ExpensesAmountFilter';
-import { getDateRangeFromPeriod } from '../components/expenses/filters/ExpensesDateFilter';
 import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
@@ -180,18 +181,16 @@ class TransactionsPage extends React.Component {
                 collective={collective}
                 isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
                 showEdit
+                selectedCategory={NAVBAR_CATEGORIES.BUDGET}
                 selectedSection={
                   collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS
                 }
-                callsToAction={{
-                  hasSubmitExpense: [CollectiveType.COLLECTIVE, CollectiveType.EVENT].includes(collective.type),
-                }}
               />
             </Container>
             <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
               <Flex justifyContent="space-between">
                 <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
-                  <FormattedMessage id="section.transactions.title" defaultMessage="Transactions" />
+                  <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
                 </H1>
                 <Box p={2} flexGrow={[1, 0]}>
                   <SearchBar

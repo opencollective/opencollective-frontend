@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
-import Markdown from 'react-markdown';
 
 import Collapse from '../Collapse';
 import Container from '../Container';
 import { Box } from '../Grid';
+import HTMLContent from '../HTMLContent';
 import { H5 } from '../Text';
 
 const msg = defineMessages({
@@ -28,13 +28,13 @@ const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
     <Box {...props}>
       <Collapse title={<H5>{formatMessage(msg.policies)}</H5>} defaultIsOpen>
         {host && host.expensePolicy && (
-          <Container fontSize="12px" color="black.800" lineHeight="20px" mb={2}>
-            <Markdown source={host.expensePolicy} />
+          <Container mb={2}>
+            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={host.expensePolicy} />
           </Container>
         )}
-        {collective && collective.expensePolicy && (
-          <Container fontSize="12px" color="black.800" lineHeight="20px">
-            <Markdown source={collective.expensePolicy} />
+        {collective && collective.expensePolicy && collective.id !== host?.id && (
+          <Container>
+            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={collective.expensePolicy} />
           </Container>
         )}
       </Collapse>
@@ -44,9 +44,11 @@ const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
 
 ExpandableExpensePolicies.propTypes = {
   collective: PropTypes.shape({
+    id: PropTypes.string,
     expensePolicy: PropTypes.string,
   }),
   host: PropTypes.shape({
+    id: PropTypes.string,
     expensePolicy: PropTypes.string,
   }),
 };

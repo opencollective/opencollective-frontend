@@ -52,7 +52,7 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class CollectivePage extends React.Component {
-  static async getInitialProps({ client, req, res, query: { slug, status, step, mode } }) {
+  static async getInitialProps({ client, req, res, query: { slug, status, step, mode, navbarVersion } }) {
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
@@ -62,7 +62,8 @@ class CollectivePage extends React.Component {
     // If on server side
     if (req) {
       req.noStyledJsx = true;
-      await preloadCollectivePageGraphlQueries(slug, client);
+      const hasNewCollectiveNavbar = navbarVersion === 'v2';
+      await preloadCollectivePageGraphlQueries(slug, client, hasNewCollectiveNavbar);
       skipDataFromTree = true;
     }
 
@@ -152,6 +153,10 @@ class CollectivePage extends React.Component {
     this.setState({ showOnboardingModal: bool });
   };
 
+  getCanonicalURL(slug) {
+    return `${process.env.WEBSITE_URL}/${slug}`;
+  }
+
   render() {
     const { slug, data, LoggedInUser, status, step, mode } = this.props;
     const { showOnboardingModal } = this.state;
@@ -175,7 +180,7 @@ class CollectivePage extends React.Component {
     const collective = data && data.Collective;
 
     return (
-      <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles smooth={this.state.smooth} />
         {loading ? (
           <Container py={[5, 6]}>
@@ -188,6 +193,7 @@ class CollectivePage extends React.Component {
               host={collective.host}
               status={status}
               LoggedInUser={LoggedInUser}
+              refetch={data.refetch}
             />
             <CollectiveThemeProvider collective={collective}>
               {({ onPrimaryColorChange }) => (

@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { defaultBackgroundImage } from '../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { Router } from '../../server/pages';
 
 import Body from '../Body';
-import CollectiveNavbar from '../CollectiveNavbar';
+import CollectiveNavbar from '../collective-navbar';
 import Footer from '../Footer';
 import Header from '../Header';
 import NotificationBar from '../NotificationBar';
@@ -15,6 +16,22 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import { withUser } from '../UserProvider';
 
 import Form from './Form';
+
+const EditCollectiveContainer = styled.div`
+  .success {
+    color: green;
+  }
+  .error {
+    color: red;
+  }
+  .login {
+    text-align: center;
+  }
+  .actions {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+`;
 
 class EditCollective extends React.Component {
   static propTypes = {
@@ -62,12 +79,10 @@ class EditCollective extends React.Component {
     collective.settings = {
       ...this.props.collective.settings,
       ...collective.settings,
-      apply: collective.application,
       tos: collective.tos,
     };
 
     delete collective.tos;
-    delete collective.application;
 
     this.setState({ status: 'loading' });
 
@@ -118,25 +133,7 @@ class EditCollective extends React.Component {
     }
 
     return (
-      <div className="EditCollective">
-        <style jsx>
-          {`
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-            .login {
-              text-align: center;
-            }
-            .actions {
-              text-align: center;
-              margin-bottom: 5rem;
-            }
-          `}
-        </style>
-
+      <EditCollectiveContainer>
         <Header collective={collective} className={this.state.status} LoggedInUser={LoggedInUser} />
 
         <Body>
@@ -178,7 +175,7 @@ class EditCollective extends React.Component {
           </div>
         </Body>
         <Footer />
-      </div>
+      </EditCollectiveContainer>
     );
   }
 }

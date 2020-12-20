@@ -13,7 +13,7 @@ import { H2, P } from '../../Text';
 const EmptyBalance = ({ collective, LoggedInUser }) => {
   const [modal, setModal] = useState({ type: 'Transfer', show: false, isApproved: false });
 
-  if (!collective.host) {
+  if (!collective.host || collective.host.id === collective.id) {
     return null;
   }
 

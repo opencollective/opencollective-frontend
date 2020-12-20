@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { ORDER_STATUS } from '../lib/constants/order-status';
-
 import StyledTag from './StyledTag';
 
 const getTransactionStatusMsgType = (isRefund, isRefunded, isOrderRejected) => {
@@ -21,34 +19,6 @@ const getTransactionStatusMsgType = (isRefund, isRefunded, isOrderRejected) => {
 };
 
 const msg = defineMessages({
-  [ORDER_STATUS.CANCELLED]: {
-    id: 'order.cancelled',
-    defaultMessage: 'cancelled',
-  },
-  [ORDER_STATUS.ERROR]: {
-    id: 'order.error',
-    defaultMessage: 'error',
-  },
-  [ORDER_STATUS.EXPIRED]: {
-    id: 'order.expired',
-    defaultMessage: 'expired',
-  },
-  [ORDER_STATUS.PENDING]: {
-    id: 'order.pending',
-    defaultMessage: 'pending',
-  },
-  [ORDER_STATUS.NEW]: {
-    id: 'order.new',
-    defaultMessage: 'new',
-  },
-  [ORDER_STATUS.REQUIRE_CLIENT_CONFIRMATION]: {
-    id: 'order.require_client_confirmation',
-    defaultMessage: 'require client confirmation',
-  },
-  [ORDER_STATUS.PLEDGED]: {
-    id: 'order.pledged',
-    defaultMessage: 'pledged',
-  },
   completed: {
     id: 'Order.Status.Completed',
     defaultMessage: 'Completed',

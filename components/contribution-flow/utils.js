@@ -34,18 +34,21 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
 
   let uniquePMs = uniqBy(paymentMethodsOptions, 'id');
 
-  // if ORG filter out 'collective' type payment
-  if (stepProfile.type === CollectiveType.ORGANIZATION) {
-    uniquePMs = uniquePMs.filter(
-      ({ paymentMethod }) => paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_TYPES.ACCOUNT_BALANCE,
-    );
-  }
+  uniquePMs = uniquePMs.filter(
+    ({ paymentMethod }) =>
+      paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_TYPES.ACCOUNT_BALANCE ||
+      collective.host.legacyId === stepProfile.host?.id,
+  );
 
   // prepaid budget: limited to a specific host
   const matchesHostCollectiveIdPrepaid = prepaid => {
     const hostCollectiveLegacyId = get(collective, 'host.legacyId');
     const prepaidLimitedToHostCollectiveIds = get(prepaid, 'limitedToHosts');
-    return find(prepaidLimitedToHostCollectiveIds, { legacyId: hostCollectiveLegacyId });
+    if (prepaidLimitedToHostCollectiveIds?.length) {
+      return find(prepaidLimitedToHostCollectiveIds, { legacyId: hostCollectiveLegacyId });
+    } else {
+      return prepaid.data?.HostCollectiveId && prepaid.data.HostCollectiveId === hostCollectiveLegacyId;
+    }
   };
 
   // gift card: can be limited to a specific host, see limitedToHosts
@@ -56,12 +59,13 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   };
 
   uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
-    const sourceProviderType = paymentMethod.sourcePaymentMethod?.providerType ?? paymentMethod.providerType;
+    const sourcePaymentMethod = paymentMethod.sourcePaymentMethod || paymentMethod;
+    const sourceProviderType = sourcePaymentMethod.providerType;
 
     if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.GIFT_CARD && paymentMethod.limitedToHosts) {
       return matchesHostCollectiveId(paymentMethod);
     } else if (sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.PREPAID_BUDGET) {
-      return matchesHostCollectiveIdPrepaid(paymentMethod);
+      return matchesHostCollectiveIdPrepaid(sourcePaymentMethod);
     } else if (!hostHasStripe && sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD) {
       return false;
     } else {
@@ -133,5 +137,5 @@ export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
 };
 
 export const isAllowedRedirect = host => {
-  return ['octobox.io', 'dotnetfoundation.org'].includes(host);
+  return ['octobox.io', 'dotnetfoundation.org', 'hopin.com'].includes(host);
 };

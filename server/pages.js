@@ -9,8 +9,10 @@ const routes = require('next-routes');
 const pages = routes()
   .add('home', '/', 'index')
   .add('become-a-sponsor', '/become-a-sponsor', 'become-a-sponsor')
+  .add('become-a-host', '/:pageSlug(become-a-host|become-a-fiscal-host)', 'become-a-host')
   .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
-  .add('pricing', '/pricing', 'pricing')
+  .add('pricing', '/pricing')
+  .add('pricing-old', '/pricing-old')
   .add('redeem', '/:collectiveSlug?/redeem/:code?')
   .add('redeemed', '/:collectiveSlug?/redeemed/:code?')
   .add('updatePaymentMethod', '/:collectiveSlug/paymentmethod/:id/update')
@@ -38,7 +40,7 @@ const pages = routes()
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add(
     'host.dashboard',
-    '/:hostCollectiveSlug/dashboard/:view(expenses|expenses-legacy|pending-applications|hosted-collectives|donations)?',
+    '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations)?',
     'host.dashboard',
   )
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions')
@@ -52,19 +54,9 @@ const pages = routes()
     'expense',
   )
   .add(
-    'expense',
-    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/legacy',
-    'expense-legacy',
-  )
-  .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
     'expenses',
-  )
-  .add(
-    'expenses-legacy',
-    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
-    'expenses-legacy',
   )
   .add('orders', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders')
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)')
@@ -80,7 +72,6 @@ pages.add('external-redirect', '/redirect');
 pages.add(
   'create-collective',
   '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
-  'new-create-collective',
 );
 
 // Events and Projects using collective page
@@ -158,11 +149,7 @@ pages.add('applications', '/applications');
 // Marketing Pages
 // ---------------
 
-pages.add(
-  'marketing',
-  '/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|become-a-fiscal-host)',
-  'marketingPage',
-);
+pages.add('marketing', '/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|old-pricing)', 'marketingPage');
 
 // Collective
 // ----------
@@ -176,10 +163,9 @@ pages.add(
 );
 
 // New accept financial contributions flow
-
 pages.add(
   'accept-financial-contributions',
-  '/:slug/accept-financial-contributions/:path(myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
+  '/:slug/accept-financial-contributions/:path(ourselves|myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
 );
 
 // New recurring contributions page

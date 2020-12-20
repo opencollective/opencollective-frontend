@@ -18,9 +18,9 @@ import StyledTextarea from '../StyledTextarea';
 import PayoutBankInformationForm from './PayoutBankInformationForm';
 
 const msg = defineMessages({
-  email: {
-    id: 'Email',
-    defaultMessage: 'Email',
+  paypalEmail: {
+    id: 'Paypal.Email',
+    defaultMessage: 'PayPal email',
   },
   content: {
     id: 'editCollective.menu.info',
@@ -36,7 +36,9 @@ const msg = defineMessages({
 export const validatePayoutMethod = payoutMethod => {
   const errors = {};
 
-  if (payoutMethod.type === PayoutMethodType.PAYPAL) {
+  if (!payoutMethod || !payoutMethod.type) {
+    set(errors, 'type', createError(ERROR.FORM_FIELD_REQUIRED));
+  } else if (payoutMethod.type === PayoutMethodType.PAYPAL) {
     const email = get(payoutMethod, 'data.email');
     if (!email) {
       set(errors, 'data.email', createError(ERROR.FORM_FIELD_REQUIRED));
@@ -82,7 +84,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
               name={field.name}
               type="email"
               error={formatFormErrorMessage(intl, meta.error)}
-              label={formatMessage(msg.email)}
+              label={formatMessage(msg.paypalEmail)}
               labelFontSize="13px"
               disabled={!isNew}
               required
@@ -97,7 +99,6 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
           {({ field, meta }) => (
             <StyledInputField
               name={field.name}
-              type="email"
               error={formatFormErrorMessage(intl, meta.error)}
               label={formatMessage(msg.content)}
               labelFontSize="13px"

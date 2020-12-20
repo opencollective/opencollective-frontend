@@ -19,8 +19,8 @@ import StyledInputField from '../../StyledInputField';
 import { H3, P } from '../../Text';
 import { editCollectiveSettingsMutation } from '../mutations';
 
-import imgPreviewPrompt from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal-prompt.png';
 import imgPreviewModal from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal.png';
+import imgPreviewPrompt from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal-prompt.png';
 
 const messages = defineMessages({
   'rollingLimit.label': {
@@ -28,7 +28,7 @@ const messages = defineMessages({
     defaultMessage: 'Rolling payout limit',
   },
   'rollingLimit.placeholder': {
-    id: 'editCollective.rollingLimit.placeholder',
+    id: 'collective.contributionPolicy.placeholder',
     defaultMessage:
       'For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.',
   },

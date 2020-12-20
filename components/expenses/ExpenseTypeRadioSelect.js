@@ -9,12 +9,12 @@ import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
 
-import grantAnimation from '../../public/static/images/grant-animation.gif';
 import grantIllustration from '../../public/static/images/grant.gif';
-import invoiceIllustrationStatic from '../../public/static/images/invoice-animation-static.jpg';
+import grantAnimation from '../../public/static/images/grant-animation.gif';
 import invoiceIllustration from '../../public/static/images/invoice-animation.gif';
-import receiptIllustrationStatic from '../../public/static/images/receipt-animation-static.jpg';
+import invoiceIllustrationStatic from '../../public/static/images/invoice-animation-static.jpg';
 import receiptIllustration from '../../public/static/images/receipt-animation.gif';
+import receiptIllustrationStatic from '../../public/static/images/receipt-animation-static.jpg';
 
 const ExpenseTypeLabels = defineMessages({
   [expenseTypes.INVOICE]: {

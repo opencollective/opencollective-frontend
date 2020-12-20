@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { partition } from 'lodash';
+import { get, partition } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { isPastEvent } from '../../../lib/events';
 
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeCollective from '../../contribute-cards/ContributeCollective';
 import ContributeEvent from '../../contribute-cards/ContributeEvent';
@@ -14,10 +16,12 @@ import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
-import { H3 } from '../../Text';
+import { Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import SectionHeader from '../SectionHeader';
+
+import eventsSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconEvents.png';
 
 class SectionEvents extends React.PureComponent {
   static propTypes = {
@@ -43,42 +47,54 @@ class SectionEvents extends React.PureComponent {
     ),
 
     isAdmin: PropTypes.bool.isRequired,
-    section: PropTypes.string,
+    /** @ignore from withRouter */
+    router: PropTypes.object,
   };
 
   triageEvents = memoizeOne(events => {
     return partition(events, isPastEvent);
   });
 
+  getContributeCardsScrollDistance = width => {
+    const oneCardScrollDistance = CONTRIBUTE_CARD_WIDTH + CONTRIBUTE_CARD_PADDING_X[0] * 2;
+    if (width <= oneCardScrollDistance * 2) {
+      return oneCardScrollDistance;
+    } else if (width <= oneCardScrollDistance * 4) {
+      return oneCardScrollDistance * 2;
+    } else {
+      return oneCardScrollDistance * 3;
+    }
+  };
+
   render() {
-    const { collective, events, connectedCollectives, isAdmin, section } = this.props;
+    const { collective, events, connectedCollectives, isAdmin, router } = this.props;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
+    const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
     return (
-      <ContainerSectionContent pt={5} pb={3}>
-        <SectionHeader
-          section={section}
-          subtitle={<FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />}
-          info={
-            <FormattedMessage
-              id="section.connect.info"
-              defaultMessage="Start conversations with your community or share updates on how things are going."
+      <Fragment>
+        {!newNavbarFeatureFlag && (
+          <ContainerSectionContent pt={5}>
+            <SectionHeader
+              title={Sections.EVENTS}
+              subtitle={<FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />}
+              info={
+                <FormattedMessage
+                  id="section.events.info"
+                  defaultMessage="Find out where your community is gathering next."
+                />
+              }
+              illustrationSrc={eventsSectionHeaderIcon}
             />
-          }
-        />
+          </ContainerSectionContent>
+        )}
+
         <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
           {(ref, Chevrons) => (
             <div>
               <ContainerSectionContent>
-                <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                  <H3 fontSize="20px" fontWeight="600" color="black.700">
-                    {connectedCollectives.length > 0 ? (
-                      <FormattedMessage id="SectionContribute.MoreWays" defaultMessage="More ways to contribute" />
-                    ) : (
-                      <FormattedMessage id="Events" defaultMessage="Events" />
-                    )}
-                  </H3>
+                <Flex justifyContent="flex-end" alignItems="center" mb={3}>
                   <Box m={2} flex="0 0 50px">
                     <Chevrons />
                   </Box>
@@ -122,14 +138,16 @@ class SectionEvents extends React.PureComponent {
             </div>
           )}
         </HorizontalScroller>
-        <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-          <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
-            <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
-          </StyledButton>
-        </Link>
-      </ContainerSectionContent>
+        <ContainerSectionContent>
+          <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+            <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
+              <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
+            </StyledButton>
+          </Link>
+        </ContainerSectionContent>
+      </Fragment>
     );
   }
 }
 
-export default injectIntl(SectionEvents);
+export default withRouter(injectIntl(SectionEvents));

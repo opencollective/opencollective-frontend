@@ -128,6 +128,8 @@ const StyledInputGroup = ({
           px={2}
           maxHeight="100%"
           error={error}
+          minWidth="0"
+          width="100%"
           {...inputProps}
           onFocus={e => {
             setFocus(true);

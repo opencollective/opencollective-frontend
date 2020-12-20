@@ -77,11 +77,12 @@ describe('Contribution Flow: Order', () => {
         // ---- Step Profile ----
         cy.checkStepsProgress({ enabled: ['details', 'profile'], disabled: 'payment' });
         // Personnal account must be the first entry, and it must be checked
-        cy.contains('[data-cy="ContributionProfile"] > label:first', `${user.firstName} ${user.lastName}`);
+        const userName = `${user.firstName} ${user.lastName}`;
+        cy.contains('[data-cy="ContributionProfile"] > label:first', userName);
         cy.contains('[data-cy="ContributionProfile"] > label:first', user.email);
         cy.get('[data-cy="ContributionProfile"] > label:first input[type=radio]').should('be.checked');
 
-        cy.getByDataCy('progress-step-profile').contains(user.email);
+        cy.getByDataCy('progress-step-profile').contains(userName);
         cy.get('button[data-cy="cf-next-step"]').click();
 
         // ---- Step 3: Payment ----

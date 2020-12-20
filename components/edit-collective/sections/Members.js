@@ -70,18 +70,17 @@ class Members extends React.Component {
     };
     this.messages = defineMessages({
       roleLabel: { id: 'members.role.label', defaultMessage: 'role' },
-      addMember: { id: 'members.add', defaultMessage: 'Add Core Contributor' },
-      removeMember: { id: 'members.remove', defaultMessage: 'Remove Core Contributor' },
+      addMember: { id: 'members.add', defaultMessage: 'Add Team Member' },
+      removeMember: { id: 'members.remove', defaultMessage: 'Remove Team Member' },
       descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
       sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },
       memberPendingDetails: {
         id: 'members.pending.details',
         defaultMessage: 'This member has not approved the invitation to join the collective yet',
       },
-      cantRemoveYourself: {
-        id: 'members.remove.cantRemoveYourself',
-        defaultMessage:
-          'You cannot remove yourself as a Collective admin. If you are the only admin, please add a new one and ask them to remove you.',
+      cantRemoveLast: {
+        id: 'members.remove.cantRemoveLast',
+        defaultMessage: 'The last admin cannot be removed. Please add another admin before doing so.',
       },
       removeConfirm: {
         id: 'members.remove.confirm',
@@ -213,14 +212,14 @@ class Members extends React.Component {
     return !this.state.members.some(m => !m.member);
   }
 
-  renderMember = (member, index) => {
-    const { intl, LoggedInUser } = this.props;
+  renderMember = (member, index, nbAdmins) => {
+    const { intl } = this.props;
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
     const collectiveId = get(member, 'member.id');
     const memberCollective = member.member;
-    const isSelf = memberCollective && memberCollective.id === LoggedInUser.CollectiveId;
     const memberKey = member.id ? `member-${member.id}` : `collective-${collectiveId}`;
+    const isLastAdmin = nbAdmins === 1 && member.role === roles.ADMIN && member.id;
 
     return (
       <Container key={`member-${index}-${memberKey}`} mt={4} pb={4} borderBottom={BORDER} data-cy={`member-${index}`}>
@@ -251,14 +250,14 @@ class Members extends React.Component {
                   </StyledTooltip>
                 </Flex>
               )}
-              {isSelf ? (
-                <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveYourself)}>
+              {isLastAdmin ? (
+                <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveLast)}>
                   <StyledButton my={1} disabled>
                     {intl.formatMessage(this.messages.removeMember)}
                   </StyledButton>
                 </StyledTooltip>
               ) : (
-                <StyledButton my={1} onClick={() => this.removeMember(index)} disabled={isSelf}>
+                <StyledButton my={1} onClick={() => this.removeMember(index)}>
                   {intl.formatMessage(this.messages.removeMember)}
                 </StyledButton>
               )}
@@ -273,7 +272,7 @@ class Members extends React.Component {
                 name={field.name}
                 label={field.label}
                 type={field.type}
-                disabled={typeof field.disabled === 'function' ? field.disabled(member) : field.disabled}
+                disabled={field.name === 'role' ? isLastAdmin : false}
                 defaultValue={get(member, field.name) || field.defaultValue}
                 options={field.options}
                 pre={field.pre}
@@ -299,6 +298,7 @@ class Members extends React.Component {
     const { intl, collective } = this.props;
     const { members, error, isSubmitting, isSubmitted, isTouched } = this.state;
     const isValid = this.validate();
+    const nbAdmins = members.filter(m => m.role === roles.ADMIN && m.id).length;
 
     return (
       <WarnIfUnsavedChanges hasUnsavedChanges={isTouched}>
@@ -316,7 +316,7 @@ class Members extends React.Component {
               </P>
             )}
             <hr />
-            {members.map(this.renderMember)}
+            {members.map((m, idx) => this.renderMember(m, idx, nbAdmins))}
           </div>
           <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>
             <StyledButton onClick={() => this.addMember()} data-cy="add-member-btn">

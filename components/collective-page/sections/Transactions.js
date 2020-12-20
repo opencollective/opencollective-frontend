@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { get } from 'lodash';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import { Dimensions } from '../_constants';
 import { Box } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -16,8 +17,11 @@ import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionsList from '../../transactions/TransactionsList';
+import { Dimensions, Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
-import SectionTitle from '../SectionTitle';
+import SectionHeader from '../SectionHeader';
+
+import budgetSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconBudget.png';
 
 const NB_DISPLAYED = 10;
 const FILTERS = { ALL: 'ALL', EXPENSES: 'EXPENSES', CONTRIBUTIONS: 'CONTRIBUTIONS' };
@@ -75,13 +79,15 @@ const SectionTransactions = props => {
 
   const { intl, collective } = props;
   const collectiveHasNoTransactions = !loading && data?.transactions?.totalCount === 0 && filter === FILTERS.ALL;
+  const router = useRouter();
+  const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
   return (
     <Box py={5}>
       <ContainerSectionContent>
-        <SectionTitle data-cy="section-transactions-title" mb={4} textAlign="left">
-          <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-        </SectionTitle>
+        {!newNavbarFeatureFlag && (
+          <SectionHeader title={Sections.TRANSACTIONS} illustrationSrc={budgetSectionHeaderIcon} />
+        )}
         {collectiveHasNoTransactions && (
           <MessageBox type="info" withIcon>
             <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />

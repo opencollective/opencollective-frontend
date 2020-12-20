@@ -53,7 +53,7 @@ describe('New users profiles', () => {
       cy.get('[data-cy="transaction-item"]')
         .first()
         .get('[data-cy=transaction-details] > span[data-cy=transaction-date]')
-        .contains('11/30/2017');
+        .contains('November 30, 2017');
       cy.get('[data-cy="transaction-item"]').first().get('[data-cy=transaction-amount] > span').eq(0).contains('-');
       cy.get('[data-cy="transaction-item"]')
         .first()

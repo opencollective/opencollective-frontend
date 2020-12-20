@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -11,7 +12,10 @@ import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
 const SectionWrapper = styled(Container)`
-  background: url('/static/images/home/joinus-pink-bg-sm.png');
+  background: ${props =>
+    props.page && props.page === 'becomeAHost'
+      ? `url('/static/images/home/joinus-green-bg-sm.png')`
+      : `url('/static/images/home/joinus-pink-bg-sm.png')`};
   background-size: 100% 100%;
 
   a {
@@ -23,12 +27,18 @@ const SectionWrapper = styled(Container)`
   }
 
   @media screen and (min-width: 64em) {
-    background: url('/static/images/home/joinus-pink-bg-md.png');
+    background: ${props =>
+      props.page && props.page === 'becomeAHost'
+        ? `url('/static/images/home/joinus-green-bg-md.png')`
+        : `url('/static/images/home/joinus-pink-bg-md.png')`};
     background-size: 100% 100%;
   }
 
   @media screen and (min-width: 88em) {
-    background: url('/static/images/home/joinus-pink-bg-lg.png');
+    background: ${props =>
+      props.page && props.page === 'becomeAHost'
+        ? `url('/static/images/home/joinus-green-bg-lg.png')`
+        : `url('/static/images/home/joinus-pink-bg-lg.png')`};
     background-size: 100% 100%;
   }
 `;
@@ -50,8 +60,8 @@ const Wrapper = styled(Container)`
   }
 `;
 
-const JoinUs = () => (
-  <SectionWrapper py={[5, null, null, 4]} width={1}>
+const JoinUs = ({ page }) => (
+  <SectionWrapper py={[5, null, null, 4]} width={1} page={page}>
     <Flex
       mx={[3, 4]}
       flexDirection={['column', null, null, 'row']}
@@ -76,16 +86,23 @@ const JoinUs = () => (
             letterSpacing={['-0.6px', null, null, '-0.8px']}
             color={['black.800', null, null, 'black.900']}
           >
-            <FormattedMessage
-              id="home.joinUsSection.subtitle"
-              defaultMessage="Be part of the new generation of communities."
-            />
+            {page === 'becomeAHost' ? (
+              <FormattedMessage
+                id="becomeAHost.joinUsSection.subtitle"
+                defaultMessage="Open Collective makes fiscal sponsorship shine. Grantees and project participants will love the simplicity and accessibility, and you’ll love the huge reduction of overheads."
+              />
+            ) : (
+              <FormattedMessage
+                id="home.joinUsSection.subtitle"
+                defaultMessage="Be part of the new generation of communities."
+              />
+            )}
           </SectionSubtitle>
         </Box>
       </Box>
 
       <Container ml={[null, null, null, 3, 6]}>
-        <Link route="/create">
+        <Link route={page === 'becomeAHost' ? '/organizations/new' : '/create'}>
           <Wrapper
             color="black.900"
             className="linkWrapper"
@@ -101,7 +118,11 @@ const JoinUs = () => (
                 mb={2}
                 fontWeight="bold"
               >
-                <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+                {page === 'becomeAHost' ? (
+                  <FormattedMessage id="becomeAHost.create" defaultMessage="Join as a Fiscal Host" />
+                ) : (
+                  <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+                )}
               </H3>
               <P fontSize="15px" color="black.700" lineHeight="23px" letterSpacing="-0.12px">
                 <FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />
@@ -124,7 +145,7 @@ const JoinUs = () => (
                 mb={2}
                 fontWeight="bold"
               >
-                <FormattedMessage id="home.joinUsSection.team" defaultMessage="Read our stories" />
+                <FormattedMessage id="ReadOurStories" defaultMessage="Read our stories" />
               </H3>
               <Box width={[null, '460px']}>
                 <P fontSize="15px" lineHeight="23px" letterSpacing="-0.12px" color="black.700" display={[null, 'none']}>
@@ -184,5 +205,9 @@ const JoinUs = () => (
     </Flex>
   </SectionWrapper>
 );
+
+JoinUs.propTypes = {
+  page: PropTypes.string,
+};
 
 export default JoinUs;

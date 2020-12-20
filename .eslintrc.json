@@ -36,7 +36,7 @@
     "react/prop-types": ["error"],
     "react/sort-comp": ["error"],
     // simple-import-sort
-    "simple-import-sort/sort": [
+    "simple-import-sort/imports": [
       "error",
       {
         "groups": [

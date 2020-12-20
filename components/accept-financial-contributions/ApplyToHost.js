@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import StyledTag from '../../components/StyledTag';
 
-import CollectiveNavbar from '../CollectiveNavbar';
+import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';

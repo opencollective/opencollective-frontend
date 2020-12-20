@@ -6,13 +6,15 @@ import { generateNotFoundError } from '../lib/errors';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import Body from '../components/Body';
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import OrderWithData from '../components/expenses/OrderWithData';
 import Footer from '../components/Footer';
+import { Box } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
+import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 class OrderPage extends React.Component {
@@ -92,6 +94,19 @@ class OrderPage extends React.Component {
               showEdit
             />
           </Container>
+
+          <Box textAlign="center" px={2}>
+            <P fontSize="64px" mt={3} mb={4}>
+              🙈️
+            </P>
+            <p>
+              <strong>This page will be removed soon.</strong>
+            </p>
+            You can now manage pending bank transfers from your host dashboard or from your settings (for self-hosted
+            accounts).
+          </Box>
+
+          <hr />
 
           <div className="content">
             <div className=" columns">

@@ -84,7 +84,7 @@ Expense Submitters must only submit requests for payment via the Platform for ex
 
 ## 9. Fees
 
-(a) **Fees to Open Collective.** We collect a fee equal to 5% of all contributions (the "Open Collective Fee") made via the Platform by Financial Contributors. The Open Collective Fee is deducted at the time that a contribution is made to the Host.
+(a) **Fees to Open Collective.** Open Collective is a 0 Fees platform, it relies on Tips. We offer donors to give a tip to our platform so the whole donation amount goes to the collective.
 
 (b) **Fees to Host.** The Host may retain a percentage of all contributions (the "**Host Fee**"). Hosts must disclose this fee to the Collective Administrator and the Financial Contributors on the Collective page.
 

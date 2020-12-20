@@ -62,7 +62,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                   </Span>
                   <br />
                   <LinkCollective collective={host}>
-                    {collective && collective.isApproved ? (
+                    {collective && (collective.isApproved || collective.id === host.id) ? (
                       host.name
                     ) : (
                       <FormattedMessage
@@ -97,12 +97,14 @@ ExpenseInfoSidebar.propTypes = {
 
   /** Must be provided if isLoading is false */
   collective: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     balance: PropTypes.number.isRequired,
     type: PropTypes.string,
-    isApproved: PropTypes.bool.isRequired,
+    isApproved: PropTypes.bool,
   }),
   host: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }),
 };

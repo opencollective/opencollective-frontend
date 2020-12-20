@@ -11,6 +11,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
+import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -118,7 +119,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
 
   return (
-    <StyledModal show onClose={onClose} width="100%" minWidth={280} maxWidth={334}>
+    <StyledModal show onClose={onClose} width="100%" minWidth={280} maxWidth={334} data-cy="pay-expense-modal">
       <ModalHeader>
         <H4 fontSize="20px" fontWeight="700">
           <FormattedMessage id="PayExpenseTitle" defaultMessage="Pay expense" />
@@ -136,6 +137,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
           <StyledButtonSet
             items={['AUTO', 'MANUAL']}
             buttonProps={{ width: '50%' }}
+            buttonPropsBuilder={({ item }) => ({ 'data-cy': `pay-type-${item}` })}
             mt={3}
             selected={formik.values.forceManual ? 'MANUAL' : 'AUTO'}
             customBorderRadius="6px"
@@ -255,7 +257,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
                   SettingsLink: getI18nLink({
                     as: Link,
                     route: 'editCollective',
-                    params: { slug: LoggedInUser.collective.slug },
+                    params: { slug: LoggedInUser.collective.slug, section: EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH },
+                    openInNewTab: true,
                   }),
                 }}
               />

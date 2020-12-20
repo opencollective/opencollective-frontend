@@ -5,11 +5,11 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { cloneDeep, find, get, set } from 'lodash';
 import { withRouter } from 'next/router';
-import { Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { AccountTypesWithHost, CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
 import { Currency } from '../../lib/constants/currency';
+import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 
@@ -18,21 +18,21 @@ import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 import Link from '../Link';
+import OrdersWithData from '../orders/OrdersWithData';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H3 } from '../Text';
 
+// Actions
 import Archive from './actions/Archive';
 import Delete from './actions/Delete';
-// Actions
 import EmptyBalance from './actions/EmptyBalance';
-// Generic Sections
+// Sections
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
 import Conversations from './sections/Conversations';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
-// Fical Host Sections
 import FiscalHosting from './sections/FiscalHosting';
 import Host from './sections/Host';
 import HostPlan from './sections/HostPlan';
@@ -50,6 +50,7 @@ import Tiers from './sections/Tiers';
 import Updates from './sections/Updates';
 import VirtualCards from './sections/VirtualCards';
 import Webhooks from './sections/Webhooks';
+// Other Components
 import EditUserEmailForm from './EditUserEmailForm';
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 
@@ -165,6 +166,19 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.application.description',
         defaultMessage: 'Enable new Collectives to apply to join your Fiscal Host',
       },
+      'application.message.label': {
+        id: 'application.message.label',
+        defaultMessage: 'Apply instructions',
+      },
+      'application.message.description': {
+        id: 'application.message.description',
+        defaultMessage:
+          'Custom instructions displayed above the text box that projects see when applying (1000 characters max)',
+      },
+      'application.message.defaultValue': {
+        id: 'ApplyToHost.WriteMessage',
+        defaultMessage: 'Write a message to fiscal host',
+      },
       'hostFeePercent.label': {
         id: 'HostFee',
         defaultMessage: 'Host fee',
@@ -172,6 +186,14 @@ class EditCollectiveForm extends React.Component {
       'hostFeePercent.description': {
         id: 'collective.hostFeePercent.description',
         defaultMessage: 'Commission on financial contributions to Collectives you fiscally host.',
+      },
+      'hostFeePercent.warning': {
+        id: 'collective.hostFeePercent.warning',
+        defaultMessage: `Open Collective will charge an extra 15% fee on the money raised through Host Fees.`,
+      },
+      'hostFeePercent.warning2': {
+        id: 'newPricing.tab.hostFeeChargeExample',
+        defaultMessage: `If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform.`,
       },
       'location.label': {
         id: 'collective.location.label',
@@ -235,7 +257,6 @@ class EditCollectiveForm extends React.Component {
 
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
-    collective.application = get(collective, 'settings.apply');
 
     const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
     const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
@@ -266,6 +287,10 @@ class EditCollectiveForm extends React.Component {
         } else {
           set(collective, 'settings.GST.number', value);
         }
+      } else if (fieldname === 'application') {
+        set(collective, 'settings.apply', value);
+      } else if (fieldname === 'application.message') {
+        set(collective, 'settings.applyMessage', value);
       } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
         collective[fieldname] = value;
         const endsAt = collective.endsAt;
@@ -360,7 +385,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case EDIT_COLLECTIVE_SECTIONS.MEMBERS:
-        return <Members collective={collective} LoggedInUser={LoggedInUser} />;
+        return <Members collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;
@@ -456,13 +481,23 @@ class EditCollectiveForm extends React.Component {
         return <HostPlan collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS:
-        return null;
+        return <Policies collective={collective} showOnlyExpensePolicy />;
 
       case EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS:
         return <InvoicesReceipts collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS:
+        return (
+          <OrdersWithData
+            accountSlug={collective.slug}
+            status={ORDER_STATUS.PENDING}
+            title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
+            showPlatformTip
+          />
+        );
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
@@ -687,19 +722,25 @@ class EditCollectiveForm extends React.Component {
           when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type),
         },
       ],
-      'expenses-payouts': [
-        {
-          name: 'expensePolicy',
-          type: 'textarea',
-        },
-      ],
       'fiscal-hosting': [
         {
           name: 'application',
           className: 'horizontal',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.apply'),
-          when: () => collective.isHost,
+          when: () =>
+            collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.apply),
+        },
+        {
+          name: 'application.message',
+          className: 'horizontal',
+          type: 'textarea',
+          defaultValue: get(this.state.collective, 'settings.applyMessage'),
+          placeholder: intl.formatMessage(this.messages['application.message.defaultValue']),
+          disabled: !this.state.collective.settings?.apply,
+          maxLength: 1000,
+          when: () =>
+            collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.apply),
         },
         {
           name: 'hostFeePercent',
@@ -707,7 +748,10 @@ class EditCollectiveForm extends React.Component {
           className: 'horizontal',
           post: '%',
           defaultValue: get(this.state.collective, 'hostFeePercent'),
-          when: () => collective.isHost,
+          when: () =>
+            collective.isHost &&
+            ((collective.plan?.name !== 'start-plan-2021' && collective.type === CollectiveType.ORGANIZATION) ||
+              collective.hostFeePercent !== 0),
         },
         {
           name: 'tos',
@@ -715,7 +759,7 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
           className: 'horizontal',
           defaultValue: get(this.state.collective, 'settings.tos'),
-          when: () => collective.isHost,
+          when: () => collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.tos),
         },
       ],
     };
@@ -731,6 +775,12 @@ class EditCollectiveForm extends React.Component {
         if (this.messages[`${field.name}.placeholder`]) {
           field.placeholder = intl.formatMessage(this.messages[`${field.name}.placeholder`]);
         }
+        if (field.name === 'hostFeePercent' && collective.plan.name.includes('2021')) {
+          field.description += ` `;
+          field.description += intl.formatMessage(this.messages[`${field.name}.warning`], collective);
+          field.description += ` `;
+          field.description += intl.formatMessage(this.messages[`${field.name}.warning2`], collective);
+        }
         return field;
       });
     });
@@ -739,66 +789,6 @@ class EditCollectiveForm extends React.Component {
 
     return (
       <div className="EditCollectiveForm">
-        <style jsx>
-          {`
-            :global(.field) {
-              margin: 1rem;
-            }
-            :global(label) {
-              min-width: 150px;
-              display: inline-block;
-              vertical-align: top;
-            }
-            :global(input),
-            select,
-            :global(textarea) {
-              width: 300px;
-              font-size: 1.5rem;
-            }
-
-            .EditCollectiveForm :global(textarea[name='expensePolicy']) {
-              height: 30rem;
-            }
-
-            .actions {
-              margin: 5rem auto 1rem;
-              text-align: center;
-            }
-            .backToProfile {
-              font-size: 1.3rem;
-              margin: 1rem;
-            }
-          `}
-        </style>
-        <style global jsx>
-          {`
-            section#location {
-              margin-top: 0;
-            }
-
-            .image .InputTypeDropzone {
-              width: 100px;
-            }
-
-            .backgroundImage-dropzone {
-              max-width: 500px;
-              overflow: hidden;
-            }
-
-            .user .image-dropzone {
-              width: 64px;
-              height: 64px;
-              border-radius: 50%;
-              overflow: hidden;
-            }
-
-            .menu {
-              text-align: center;
-              margin: 1rem 0 3rem 0;
-            }
-          `}
-        </style>
-
         <Flex flexWrap="wrap">
           <Menu collective={collective} selectedSection={this.getMenuSelectedSection(section)} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
@@ -832,6 +822,8 @@ class EditCollectiveForm extends React.Component {
                       post={field.post}
                       context={this.state.collective}
                       onChange={value => this.handleChange(field.name, value)}
+                      disabled={field.disabled}
+                      maxLength={field.maxLength}
                     />
                   ))}
                 </div>
@@ -843,17 +835,18 @@ class EditCollectiveForm extends React.Component {
 
             {((fields && fields.length > 0) ||
               [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
-              <div className="actions">
-                <Button
-                  bsStyle="primary"
+              <Container className="actions" margin="5rem auto 1rem" textAlign="center">
+                <StyledButton
+                  buttonStyle="primary"
                   type="submit"
                   onClick={this.handleSubmit}
+                  data-cy="collective-save"
                   disabled={status === 'loading' || !this.state.modified}
                 >
                   {submitBtnLabel}
-                </Button>
+                </StyledButton>
 
-                <div className="backToProfile">
+                <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
                   <Link
                     route={isEvent ? 'event' : 'collective'}
                     params={
@@ -868,8 +861,8 @@ class EditCollectiveForm extends React.Component {
                       values={{ type }}
                     />
                   </Link>
-                </div>
-              </div>
+                </Container>
+              </Container>
             )}
 
             {![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&

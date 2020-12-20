@@ -1,7 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
+import Container from './Container';
 import InputField from './InputField';
+
+const InputFieldPresetsContainer = styled.div`
+  .inputField {
+    max-width: 14rem;
+    margin: 0;
+  }
+  .form-group {
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 1rem;
+  }
+`;
 
 class InputFieldPresets extends React.Component {
   static propTypes = {
@@ -53,25 +67,9 @@ class InputFieldPresets extends React.Component {
       values.push(null);
     }
     return (
-      <div className="InputFieldPresets">
-        <style jsx>
-          {`
-            .values {
-              display: flex;
-            }
-            .InputFieldPresets :global(.inputField) {
-              max-width: 14rem;
-              margin: 0;
-            }
-            .InputFieldPresets :global(.form-group) {
-              margin-bottom: 0;
-              margin-left: 0;
-              margin-right: 1rem;
-            }
-          `}
-        </style>
-        <div className="values">{values.map(this.renderSingleInput)}</div>
-      </div>
+      <InputFieldPresetsContainer>
+        <Container display="flex">{values.map(this.renderSingleInput)}</Container>
+      </InputFieldPresetsContainer>
     );
   }
 }

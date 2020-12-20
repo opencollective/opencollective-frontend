@@ -89,10 +89,14 @@ const buildAccountReference = input => {
   return typeof input.id === 'string' ? { id: input.id } : { legacyId: input.id };
 };
 
-const AddFunds = ({ host, collective, ...props }) => {
+const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
   const [submitAddFunds, { error }] = useMutation(addFundsMutation, { context: API_V2_CONTEXT });
   const defaultHostFeePercent = collective.hostFeePercent;
+
+  if (!LoggedInUser) {
+    return null;
+  }
 
   return (
     <StyledModal width="100%" maxWidth={435} {...props}>
@@ -268,7 +272,7 @@ const AddFunds = ({ host, collective, ...props }) => {
                     disabled={!dirty || !isValid}
                     loading={isSubmitting}
                   >
-                    <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
+                    <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
                   </StyledButton>
                   <StyledButton mx={2} mb={1} minWidth={100} onClick={props.onClose}>
                     <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
@@ -283,9 +287,9 @@ const AddFunds = ({ host, collective, ...props }) => {
   );
 };
 
-AddFunds.propTypes = {
+AddFundsModal.propTypes = {
   host: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     legacyId: PropTypes.number,
     currency: PropTypes.string,
     name: PropTypes.string,
@@ -298,4 +302,4 @@ AddFunds.propTypes = {
   onClose: PropTypes.func,
 };
 
-export default AddFunds;
+export default AddFundsModal;

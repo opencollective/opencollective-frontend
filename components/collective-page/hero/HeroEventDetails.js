@@ -2,9 +2,9 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Clock } from '@styled-icons/feather/Clock';
 import { MapPin } from '@styled-icons/feather/MapPin';
-import moment from 'moment';
-import momentTimezone from 'moment-timezone';
 import { FormattedDate, FormattedMessage, FormattedTime } from 'react-intl';
+
+import dayjs from '../../../lib/dayjs';
 
 import Link from '../../Link';
 import StyledTooltip from '../../StyledTooltip';
@@ -41,7 +41,7 @@ const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
           <FormattedTime {...FormattedTimeProps(endsAt, timezone)} />{' '}
         </Fragment>
       )}
-      (UTC{moment().tz(timezone).format('Z')})
+      (UTC{dayjs().tz(timezone).format('Z')})
     </Fragment>
   );
 };
@@ -66,8 +66,8 @@ class HeroEventDetails extends React.Component {
 
   isNotLocalTimeZone() {
     if (this.props.collective.timezone) {
-      const eventTimezone = moment().tz(this.props.collective.timezone).format('Z');
-      const browserTimezone = moment().tz(momentTimezone.tz.guess()).format('Z');
+      const eventTimezone = dayjs().tz(this.props.collective.timezone).format('Z');
+      const browserTimezone = dayjs().tz(dayjs.tz.guess()).format('Z');
       return eventTimezone !== browserTimezone;
     }
   }
@@ -76,8 +76,8 @@ class HeroEventDetails extends React.Component {
     if (!endsAt) {
       return true;
     }
-    const tzStartsAt = moment.tz(new Date(startsAt), timezone);
-    const tzEndsAt = moment.tz(new Date(endsAt), timezone);
+    const tzStartsAt = dayjs.tz(new Date(startsAt), timezone);
+    const tzEndsAt = dayjs.tz(new Date(endsAt), timezone);
     return tzStartsAt.isSame(tzEndsAt, 'day');
   }
 
@@ -102,8 +102,8 @@ class HeroEventDetails extends React.Component {
                       <Timerange
                         startsAt={startsAt}
                         endsAt={endsAt}
-                        timezone={moment.tz.guess()}
-                        isSameDay={this.isSameDay(startsAt, endsAt, moment.tz.guess())}
+                        timezone={dayjs.tz.guess()}
+                        isSameDay={this.isSameDay(startsAt, endsAt, dayjs.tz.guess())}
                       />{' '}
                       (<FormattedMessage id="EventCover.LocalTime" defaultMessage="Your Time" />)
                     </Fragment>
