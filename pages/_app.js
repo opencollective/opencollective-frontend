@@ -15,7 +15,7 @@ import StripeProviderSSR from '../components/StripeProvider';
 import UserProvider from '../components/UserProvider';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'react-datetime-picker/dist/DateTimePicker.css'
+import 'react-datetime-picker/dist/DateTimePicker.css';
 import 'nprogress/nprogress.css';
 import 'react-quill/dist/quill.snow.css';
 import 'trix/dist/trix.css';
