@@ -1,7 +1,7 @@
 import propTypes from '@styled-system/prop-types';
 import themeGet from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { border, flex, layout, shadow, space } from 'styled-system';
+import { border, display, flex, layout, shadow, space } from 'styled-system';
 
 /**
  * An horizontal line. Control the color and size using border properties.
@@ -17,6 +17,7 @@ const StyledHr = styled.hr`
   ${layout}
   ${shadow}
   ${border}
+  ${display}
 `;
 
 StyledHr.propTypes = {

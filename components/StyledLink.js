@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
-import { border, color, layout, space, typography } from 'styled-system';
+import { background, border, color, layout, space, typography } from 'styled-system';
 
 import { textDecoration, whiteSpace } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
@@ -59,6 +59,7 @@ const StyledLink = styled.a.attrs(props => {
 
   ${buttonStyle}
   ${buttonSize}
+  ${background}
 
   &[disabled] {
     pointer-events: none;
