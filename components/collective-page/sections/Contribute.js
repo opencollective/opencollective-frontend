@@ -331,9 +331,11 @@ class SectionContribute extends React.PureComponent {
                     <div>
                       <ContainerSectionContent>
                         <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                          <H3 fontSize="20px" fontWeight="600" color="black.700">
-                            <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
-                          </H3>
+                          {hasOtherWaysToContribute && !newNavbarFeatureFlag && (
+                            <H3 fontSize="20px" fontWeight="600" color="black.700">
+                              <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
+                            </H3>
+                          )}
                           <Box m={2} flex="0 0 50px">
                             <Chevrons />
                           </Box>

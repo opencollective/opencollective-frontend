@@ -134,11 +134,7 @@ class CollectivePage extends Component {
     const breakpoint = window.scrollY + distanceThreshold;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
 
-    if (
-      get(this.props.router, 'query.navbarVersion') === 'v2' &&
-      get(this.props.collective, 'settings.collectivePage.useNewSections')
-    ) {
-      console.log('collective-page/index using new v2');
+    if (get(this.props.router, 'query.navbarVersion') === 'v2') {
       for (let i = sections.length - 1; i >= 0; i--) {
         if (sections[i].type !== 'CATEGORY') {
           continue;
@@ -234,6 +230,7 @@ class CollectivePage extends Component {
   };
 
   renderSection(section) {
+    const hasNewCollectiveNavbar = get(this.props.router, 'query.navbarVersion') === 'v2';
     switch (section) {
       case Sections.UPDATES:
         return (
@@ -293,6 +290,7 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             projects={this.props.projects}
             isAdmin={this.props.isAdmin}
+            showTitle={!hasNewCollectiveNavbar}
           />
         );
       case Sections.BUDGET:
@@ -466,6 +464,7 @@ class CollectivePage extends Component {
                   ref={categoryRef => (this.sectionCategoriesRefs[entry.name] = categoryRef)}
                   collective={collective}
                   category={entry.name}
+                  isAdmin={isAdmin}
                 />
                 {entry.sections.map((section, idx) => (
                   <SectionContainer

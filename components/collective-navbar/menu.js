@@ -61,6 +61,8 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
         title: intl.formatMessage(titles.CONTRIBUTE),
       });
     }
+  } else if (category === NAVBAR_CATEGORIES.CONTRIBUTIONS) {
+    addSectionLink(intl, links, collective, sections, Sections.CONTRIBUTIONS);
   } else if (category === NAVBAR_CATEGORIES.BUDGET) {
     // Budget
     links.push({
