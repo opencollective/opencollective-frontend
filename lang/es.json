@@ -780,6 +780,7 @@
   "Events": "Eventos",
   "events": "my events",
   "events.create.login": "Necesitas ser un colaborador de este colective para crear un evento.",
+  "EventsAndProjects": "Events and projects",
   "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "ExpandDescription": "Read full description",
   "Expense.Activity.Approved": "Gasto aprobado",
