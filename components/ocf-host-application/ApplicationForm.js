@@ -1,10 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Lock } from '@styled-icons/boxicons-solid/Lock';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { useFormik } from 'formik';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import { createError, ERROR } from '../../lib/errors';
+import { formatFormErrorMessage } from '../../lib/form-utils';
 
 import Container from '../Container';
 import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
@@ -15,6 +19,7 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
+import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
@@ -23,8 +28,120 @@ import { H1, H4, P } from '../Text';
 
 import OCFPrimaryButton from './OCFPrimaryButton';
 
-const ApplicationForm = () => {
-  const formik = useFormik({
+const messages = defineMessages({
+  locationLabel: {
+    id: 'OCFHostApplication.location.label',
+    defaultMessage: 'Your Location',
+  },
+  nameLabel: {
+    id: 'OCFHostApplication.name.label',
+    defaultMessage: 'Your Name',
+  },
+  emailLabel: {
+    id: 'OCFHostApplication.email.label',
+    defaultMessage: 'Your email address',
+  },
+  initiativeNameLabel: {
+    id: 'OCFHostApplication.initiativeName.label',
+    defaultMessage: 'What is the name of your initiative?',
+  },
+  slugLabel: {
+    id: 'OCFHostApplication.slug.label',
+    defaultMessage: 'What URL would you like?',
+  },
+  initiativeDurationLabel: {
+    id: 'OCFHostApplication.initiativeDuration.label',
+    defaultMessage: 'How long has your initiative been running?',
+  },
+  totalAmountRaisedLabel: {
+    id: 'OCFHostApplication.totalAmountRaised.label',
+    defaultMessage: 'If you have begun fundraising, how much money have you raised so far?',
+  },
+  totalAmountToBeRaisedLabel: {
+    id: 'OCFHostApplication.totalAmountToBeRaised.label',
+    defaultMessage: 'How much money do you want to fundraise?',
+  },
+  expectedFundingPartnerLabel: {
+    id: 'OCFHostApplication.expectedFundingPartner.label',
+    defaultMessage: 'Who do you expect to fund you?',
+  },
+  initiativeDescriptionLabel: {
+    id: 'OCFHostApplication.initiativeDescription.label',
+    defaultMessage: 'What does your initiative do?',
+  },
+  missionImpactExplanationLabel: {
+    id: 'OCFHostApplication.missionImpactExplanation.label',
+    defaultMessage: 'Please explain how your initiative furthers one or more of our mission impact areas:',
+  },
+  websiteAndSocialLinksLabel: {
+    id: 'OCFHostApplication.websiteAndSocialLinks.label',
+    defaultMessage: 'Website and / or social media links:',
+  },
+  additionalInfoLabel: {
+    id: 'OCFHostApplication.additionalInfoLabel.label',
+    defaultMessage: 'Anything you would like to add?',
+  },
+});
+
+const validate = values => {
+  const errors = {};
+  if (!values.location) {
+    errors.location = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  if (!values.name) {
+    errors.name = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  if (!values.initiativeName) {
+    errors.initiativeName = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  if (!values.slug) {
+    errors.slug = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  if (!values.initiativeDuration) {
+    errors.initiativeDuration = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  if (!values.totalAmountRaised) {
+    errors.totalAmountRaised = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  if (!values.totalAmountToBeRaised) {
+    errors.totalAmountToBeRaised = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  if (!values.expectedFundingPartner) {
+    errors.expectedFundingPartner = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  if (!values.initiativeDescription) {
+    errors.initiativeDescription = createError(ERROR.FORM_FIELD_REQUIRED);
+  } else if (values.initiativeDescription.length < 250) {
+    errors.initiativeDescription = createError(ERROR.FORM_FIELD_MIN_LENGTH);
+  }
+
+  if (!values.missionImpactExplanation) {
+    errors.missionImpactExplanation = createError(ERROR.FORM_FIELD_REQUIRED);
+  } else if (values.missionImpactExplanation.length < 250) {
+    errors.missionImpactExplanation = createError(ERROR.FORM_FIELD_MIN_LENGTH);
+  }
+
+  if (!values.websiteAndSocialLinks) {
+    errors.websiteAndSocialLinks = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  if (!values.additionalInfo) {
+    errors.additionalInfo = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+  return errors;
+};
+
+const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
+  const intl = useIntl();
+  const { values, handleSubmit, errors, getFieldProps, setValues, touched, setFieldValue } = useFormik({
     initialValues: {
       location: '',
       name: '',
@@ -32,16 +149,28 @@ const ApplicationForm = () => {
       initiativeName: '',
       slug: '',
       initiativeDuration: '',
-      totalAmountRaised: '',
-      totalAmountToBeRaised: '',
-      expectedFundingPartners: '',
+      totalAmountRaised: 0,
+      totalAmountToBeRaised: 0,
+      expectedFundingPartner: '',
       initiativeDescription: '',
       missionImpactExplanation: '',
       websiteAndSocialLinks: '',
-      others: '',
+      additionalInfo: '',
+      checkedTermsOfServiceOC: false,
+      checkedTermsOfServiceOCF: false,
     },
-    onSubmit: values => {},
+    validate,
+    onSubmit: values => {
+      console.log(values);
+    },
   });
+
+  if (!loadingLoggedInUser && LoggedInUser && !values.name && !values.email) {
+    setValues({
+      name: LoggedInUser.collective.name,
+      email: LoggedInUser.email,
+    });
+  }
 
   return (
     <React.Fragment>
@@ -74,7 +203,7 @@ const ApplicationForm = () => {
         </Flex>
       </Flex>
       <Flex flexDirection={['column', 'row']} alignItems={['center', 'flex-start']} justifyContent="center">
-        <Flex flexDirection="column" alignItems="center" justifyContent="center" as="form">
+        <Flex flexDirection="column" alignItems="center" justifyContent="center" as="form" onSubmit={handleSubmit}>
           <Container
             justifyContent="center"
             flexDirection="column"
@@ -110,37 +239,61 @@ const ApplicationForm = () => {
             </Box>
             <Box width={['256px', '234px', '324px']} my={3}>
               <StyledInputField
-                label="Your Location"
-                htmlFor="location"
+                label={intl.formatMessage(messages.locationLabel)}
                 labelFontSize="13px"
                 labelColor="#4E5052"
                 labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                error={touched.location && formatFormErrorMessage(intl, errors.location)}
               >
-                {inputProps => <StyledInput type="text" placeholder="Walnut, CA" {...inputProps} px="7px" />}
+                {inputProps => (
+                  <StyledInput
+                    type="text"
+                    placeholder="Walnut, CA"
+                    {...inputProps}
+                    px="7px"
+                    {...getFieldProps('location')}
+                  />
+                )}
               </StyledInputField>
             </Box>
             <Flex flexDirection={['column', 'row']}>
               <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
                 <StyledInputField
-                  label="Your Name"
-                  htmlFor="name"
+                  label={intl.formatMessage(messages.nameLabel)}
                   labelFontSize="13px"
                   labelColor="#4E5052"
                   labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                  disabled={!!LoggedInUser}
+                  error={touched.name && formatFormErrorMessage(intl, errors.name)}
                 >
-                  {inputProps => <StyledInput type="text" placeholder="Thomas Anderson" {...inputProps} px="7px" />}
+                  {inputProps => (
+                    <StyledInput
+                      type="text"
+                      placeholder="Thomas Anderson"
+                      px="7px"
+                      {...inputProps}
+                      {...getFieldProps('name')}
+                    />
+                  )}
                 </StyledInputField>
               </Box>
               <Box width={['256px', '234px', '324px']} my={2}>
                 <StyledInputField
-                  label="Your email address"
-                  htmlFor="name"
+                  label={intl.formatMessage(messages.emailLabel)}
                   labelFontSize="13px"
                   labelColor="#4E5052"
                   labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                  disabled={!!LoggedInUser}
+                  error={touched.email && formatFormErrorMessage(intl, errors.email)}
                 >
                   {inputProps => (
-                    <StyledInput type="email" placeholder="tanderson@gmail.com" {...inputProps} px="7px" />
+                    <StyledInput
+                      type="email"
+                      placeholder="tanderson@gmail.com"
+                      px="7px"
+                      {...inputProps}
+                      {...getFieldProps('email')}
+                    />
                   )}
                 </StyledInputField>
                 <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
@@ -154,22 +307,30 @@ const ApplicationForm = () => {
             <Flex flexDirection={['column', 'row']}>
               <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
                 <StyledInputField
-                  label="What is the name of your initiative?"
-                  htmlFor="Initiative"
+                  label={intl.formatMessage(messages.initiativeNameLabel)}
                   labelFontSize="13px"
                   labelColor="#4E5052"
                   labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                  error={touched.initiativeName && formatFormErrorMessage(intl, errors.initiativeName)}
                 >
-                  {inputProps => <StyledInput type="text" placeholder="Agora Collective" {...inputProps} px="7px" />}
+                  {inputProps => (
+                    <StyledInput
+                      type="text"
+                      placeholder="Agora Collective"
+                      px="7px"
+                      {...inputProps}
+                      {...getFieldProps('initiativeName')}
+                    />
+                  )}
                 </StyledInputField>
               </Box>
               <Box width={['256px', '234px', '324px']} my={2}>
                 <StyledInputField
-                  label="What URL would you like?"
-                  htmlFor="Slug"
+                  label={intl.formatMessage(messages.slugLabel)}
                   labelFontSize="13px"
                   labelColor="#4E5052"
                   labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                  error={touched.slug && formatFormErrorMessage(intl, errors.slug)}
                 >
                   {inputProps => (
                     <StyledInputGroup
@@ -179,6 +340,7 @@ const ApplicationForm = () => {
                       {...inputProps}
                       px="7px"
                       prependProps={{ color: '#9D9FA3', fontSize: '13px', lineHeight: '16px' }}
+                      {...getFieldProps('slug')}
                     />
                   )}
                 </StyledInputField>
@@ -193,31 +355,40 @@ const ApplicationForm = () => {
             <Flex flexDirection={['column', 'row']}>
               <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
                 <StyledInputField
-                  label="How long has your initiative been running?"
-                  htmlFor="initiative duration"
+                  label={intl.formatMessage(messages.initiativeDurationLabel)}
                   labelFontSize="13px"
                   labelColor="#4E5052"
                   labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                  error={touched.initiativeDuration && formatFormErrorMessage(intl, errors.initiativeDuration)}
                 >
                   {inputProps => (
-                    <StyledInput type="text" placeholder="New initiatives are welcome!" {...inputProps} px="7px" />
+                    <StyledInput
+                      type="text"
+                      placeholder="New initiatives are welcome!"
+                      {...inputProps}
+                      px="7px"
+                      {...getFieldProps('initiativeDuration')}
+                    />
                   )}
                 </StyledInputField>
               </Box>
               <Box width={['256px', '234px', '324px']} my={2}>
                 <StyledInputField
-                  label="If you have begun fundraising, how much money have you raised so far?"
-                  htmlFor="Total money raised"
+                  label={intl.formatMessage(messages.totalAmountRaisedLabel)}
                   labelFontSize="13px"
                   labelColor="#4E5052"
                   labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                  error={touched.totalAmountRaised && formatFormErrorMessage(intl, errors.totalAmountRaised)}
                 >
                   {inputProps => (
-                    <StyledInput
+                    <StyledInputAmount
                       type="text"
                       placeholder="It's fine if you're just starting out."
                       {...inputProps}
                       px="7px"
+                      currency="USD"
+                      {...getFieldProps('totalAmountRaised')}
+                      onChange={value => setFieldValue('totalAmountRaised', value)}
                     />
                   )}
                 </StyledInputField>
@@ -232,38 +403,52 @@ const ApplicationForm = () => {
             <Flex flexDirection={['column', 'row']}>
               <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
                 <StyledInputField
-                  label="How much money do you want to fundraise?"
-                  htmlFor="initiative duration"
+                  label={intl.formatMessage(messages.totalAmountToBeRaisedLabel)}
                   labelFontSize="13px"
                   labelColor="#4E5052"
                   labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                  error={touched.totalAmountToBeRaised && formatFormErrorMessage(intl, errors.totalAmountToBeRaised)}
                 >
                   {inputProps => (
-                    <StyledInput type="text" placeholder="Be as ambitious as you want." {...inputProps} px="7px" />
+                    <StyledInputAmount
+                      type="text"
+                      placeholder="Be as ambitious as you want."
+                      currency="USD"
+                      {...inputProps}
+                      px="7px"
+                      {...getFieldProps('totalAmountToBeRaised')}
+                      onChange={value => setFieldValue('totalAmountToBeRaised', value)}
+                    />
                   )}
                 </StyledInputField>
               </Box>
               <Box width={['256px', '234px', '324px']} my={2}>
                 <StyledInputField
-                  label="Who do you expect to fund you?"
-                  htmlFor="Expected funding partner"
+                  label={intl.formatMessage(messages.expectedFundingPartnerLabel)}
                   labelFontSize="13px"
                   labelColor="#4E5052"
                   labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                  error={touched.expectedFundingPartner && formatFormErrorMessage(intl, errors.expectedFundingPartner)}
                 >
                   {inputProps => (
-                    <StyledInput type="text" placeholder="An idea of your ideal partners." {...inputProps} px="7px" />
+                    <StyledInput
+                      type="text"
+                      placeholder="An idea of your ideal partners."
+                      {...inputProps}
+                      px="7px"
+                      {...getFieldProps('expectedFundingPartner')}
+                    />
                   )}
                 </StyledInputField>
               </Box>
             </Flex>
             <Box width={['256px', '484px', '663px']} my={2}>
               <StyledInputField
-                label="What does your initiative do?"
-                htmlFor="Initiative description"
+                label={intl.formatMessage(messages.initiativeDescriptionLabel)}
                 labelFontSize="13px"
                 labelColor="#4E5052"
                 labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                error={touched.initiativeDescription && formatFormErrorMessage(intl, errors.initiativeDescription)}
               >
                 {inputProps => (
                   <StyledTextarea
@@ -273,6 +458,7 @@ const ApplicationForm = () => {
             organizations to figure out what the 
             best flavor sandwich is."
                     {...inputProps}
+                    {...getFieldProps('initiativeDescription')}
                     px="7px"
                   />
                 )}
@@ -286,11 +472,13 @@ const ApplicationForm = () => {
             </Box>
             <Box width={['256px', '484px', '663px']} my={2}>
               <StyledInputField
-                label="Please explain how your initiative furthers one or more of our mission impact areas:"
-                htmlFor="Mission furthering description"
+                label={intl.formatMessage(messages.missionImpactExplanationLabel)}
                 labelFontSize="13px"
                 labelColor="#4E5052"
                 labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                error={
+                  touched.missionImpactExplanation && formatFormErrorMessage(intl, errors.missionImpactExplanation)
+                }
               >
                 {inputProps => (
                   <StyledTextarea
@@ -301,6 +489,7 @@ const ApplicationForm = () => {
               building a strong community around our 
               love of sandwiches."
                     {...inputProps}
+                    {...getFieldProps('missionImpactExplanation')}
                     px="7px"
                   />
                 )}
@@ -314,14 +503,14 @@ const ApplicationForm = () => {
             </Box>
             <Box width={['256px', '484px', '663px']} my={2}>
               <StyledInputField
-                label="Website and / or social media links:"
-                htmlFor="Website and / or social media links"
+                label={intl.formatMessage(messages.websiteAndSocialLinksLabel)}
                 labelFontSize="13px"
                 labelColor="#4E5052"
                 labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                error={touched.websiteAndSocialLinks && formatFormErrorMessage(intl, errors.websiteAndSocialLinks)}
               >
                 {inputProps => (
-                  <StyledInput type="text" placeholder="An idea of your ideal partners." {...inputProps} px="7px" />
+                  <StyledTextarea type="text" {...inputProps} px="7px" {...getFieldProps('websiteAndSocialLinks')} />
                 )}
               </StyledInputField>
               <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
@@ -333,17 +522,18 @@ const ApplicationForm = () => {
             </Box>
             <Box width={['256px', '484px', '663px']} my={2}>
               <StyledInputField
-                label="Anything you would like to add?"
-                htmlFor="Additional description"
+                label={intl.formatMessage(messages.additionalInfoLabel)}
                 labelFontSize="13px"
                 labelColor="#4E5052"
                 labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                error={touched.additionalInfo && formatFormErrorMessage(intl, errors.additionalInfo)}
               >
                 {inputProps => (
                   <StyledTextarea
                     placeholder="What else do we need to know about 
               your initiative?"
                     {...inputProps}
+                    {...getFieldProps('additionalInfo')}
                     px="7px"
                   />
                 )}
@@ -364,8 +554,8 @@ const ApplicationForm = () => {
                   name="TOSAgreement"
                   background="#396C6F"
                   size="16px"
-                  checked={true}
-                  onChange={({ checked }) => {}}
+                  {...getFieldProps('checkedTermsOfServiceOC')}
+                  checked={values.checkedTermsOfServiceOC}
                 />
               </Box>
               <P ml={2} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
@@ -387,11 +577,10 @@ const ApplicationForm = () => {
             >
               <Box mr={3}>
                 <StyledCheckbox
-                  name="TOSAgreement"
                   background="#396C6F"
                   size="16px"
-                  checked={true}
-                  onChange={({ checked }) => {}}
+                  {...getFieldProps('checkedTermsOfServiceOCF')}
+                  checked={values.checkedTermsOfServiceOCF}
                 />
               </Box>
               <P ml={2} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
@@ -424,7 +613,7 @@ const ApplicationForm = () => {
                 />
               </StyledButton>
             </Link>
-            <OCFPrimaryButton width={['286px', '120px']}>
+            <OCFPrimaryButton width={['286px', '120px']} type="submit">
               <FormattedMessage
                 id="OCFHostApplication.applyBtn"
                 defaultMessage="Apply {arrowRight}"
@@ -442,6 +631,11 @@ const ApplicationForm = () => {
       </Flex>
     </React.Fragment>
   );
+};
+
+ApplicationForm.propTypes = {
+  loadingLoggedInUser: PropTypes.bool,
+  LoggedInUser: PropTypes.object,
 };
 
 export default ApplicationForm;
