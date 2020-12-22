@@ -201,6 +201,18 @@ const MenuLinkContainer = styled.div`
   }
 `;
 
+/** Displayed on mobile & tablet to toggle the menu */
+const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
+  cursor: pointer;
+  margin-right: 4px;
+  flex: 0 0 28px;
+  color: #304cdc;
+
+  @media (min-width: 64em) {
+    display: none;
+  }
+`;
+
 const InfosContainer = styled(Container)`
   padding: 14px 30px;
   display: flex;
@@ -215,6 +227,12 @@ const InfosContainer = styled(Container)`
     padding: 10px 16px;
   }
 
+  @media (min-width: 52em) {
+    ${ExpandMenuIcon} {
+      display: none;
+    }
+  }
+
   /** Hidden state */
   ${props =>
     props.isHidden &&
@@ -223,18 +241,6 @@ const InfosContainer = styled(Container)`
       opacity: 0;
       transform: translateY(-20px);
     `}
-`;
-
-/** Displayed on mobile & tablet to toggle the menu */
-const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
-  cursor: pointer;
-  margin-right: 4px;
-  flex: 0 0 28px;
-  color: #304cdc;
-
-  @media (min-width: 64em) {
-    display: none;
-  }
 `;
 
 const CloseMenuIcon = styled(Close).attrs({ size: 28 })`

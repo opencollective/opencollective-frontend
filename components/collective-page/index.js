@@ -45,7 +45,6 @@ const NavBarContainer = styled.div`
   top: 0;
   z-index: 999;
   background: white;
-  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
 `;
 
 /**
