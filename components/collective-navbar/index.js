@@ -151,7 +151,7 @@ const MenuLink = styled.a`
     text-decoration: none;
   }
 
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     padding: 16px;
   }
 `;
@@ -177,7 +177,7 @@ const MenuLinkContainer = styled.div`
       ${MenuLink} {
         color: #090a0a;
       }
-      @media (min-width: 52em) {
+      @media (min-width: 64em) {
         &::after {
           width: 100%;
           float: left;
@@ -188,16 +188,28 @@ const MenuLinkContainer = styled.div`
   ${props =>
     props.mobileOnly &&
     css`
-      @media (min-width: 52em) {
+      @media (min-width: 64em) {
         display: none;
       }
     `}
 
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     border-top: 1px solid #e1e1e1;
     &::after {
       display: none;
     }
+  }
+`;
+
+/** Displayed on mobile & tablet to toggle the menu */
+const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
+  cursor: pointer;
+  margin-right: 4px;
+  flex: 0 0 28px;
+  color: #304cdc;
+
+  @media (min-width: 64em) {
+    display: none;
   }
 `;
 
@@ -211,8 +223,14 @@ const InfosContainer = styled(Container)`
   transform: translateY(0);
   transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out;
 
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     padding: 10px 16px;
+  }
+
+  @media (min-width: 52em) {
+    ${ExpandMenuIcon} {
+      display: none;
+    }
   }
 
   /** Hidden state */
@@ -225,18 +243,6 @@ const InfosContainer = styled(Container)`
     `}
 `;
 
-/** Displayed on mobile & tablet to toggle the menu */
-const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
-  cursor: pointer;
-  margin-right: 4px;
-  flex: 0 0 28px;
-  color: #304cdc;
-
-  @media (min-width: 52em) {
-    display: none;
-  }
-`;
-
 const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
   cursor: pointer;
   margin-right: 4px;
@@ -244,7 +250,7 @@ const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
   color: #304cdc;
   background: radial-gradient(rgba(72, 95, 211, 0.1) 14px, transparent 3px);
 
-  @media (min-width: 52em) {
+  @media (min-width: 64em) {
     display: none;
   }
 `;
@@ -263,7 +269,7 @@ const CollectiveName = styled.h1`
     color: #313233;
   }
 
-  @media (min-width: 52em) {
+  @media (min-width: 64em) {
     text-align: center;
   }
 `;
@@ -411,7 +417,7 @@ const CollectiveNavbar = ({
             ref={navbarRef}
             backgroundColor="#fff"
             display={isExpanded ? 'flex' : ['none', 'flex']}
-            flexDirection={['column', null, 'row']}
+            flexDirection={['column', null, null, 'row']}
             flexShrink={2}
             flexGrow={1}
             justifyContent={['space-between', null, 'flex-start']}
@@ -489,7 +495,7 @@ const CollectiveNavbar = ({
               />
             )}
             {!onlyInfos && (
-              <Container display={['none', 'flex', 'none']} alignItems="center">
+              <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
                 {isExpanded ? (
                   <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
                 ) : (

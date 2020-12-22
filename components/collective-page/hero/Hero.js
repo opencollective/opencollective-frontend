@@ -78,7 +78,7 @@ const StyledShortDescription = styled.h2`
 /**
  * Collective's page Hero/Banner/Cover component.
  */
-const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, intl }) => {
+const Hero = ({ collective, host, isAdmin, hasNewNavbar, onPrimaryColorChange, callsToAction, intl }) => {
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
   const [message, showMessage] = React.useState(null);
@@ -350,15 +350,17 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           )}
 
           {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
-          <CollectiveCallsToAction
-            display={['flex', null, 'none']}
-            flexWrap="wrap"
-            mt={3}
-            width="100%"
-            collective={collective}
-            callsToAction={callsToAction}
-            buttonsMinWidth={140}
-          />
+          {!hasNewNavbar && (
+            <CollectiveCallsToAction
+              display={['flex', null, 'none']}
+              flexWrap="wrap"
+              mt={3}
+              width="100%"
+              collective={collective}
+              callsToAction={callsToAction}
+              buttonsMinWidth={140}
+            />
+          )}
         </ContainerSectionContent>
       </Container>
     </Fragment>
@@ -419,6 +421,8 @@ Hero.propTypes = {
 
   /** Define if we need to display special actions like the "Edit collective" button */
   isAdmin: PropTypes.bool,
+
+  hasNewNavbar: PropTypes.bool,
 
   /** @ignore */
   intl: PropTypes.object,
