@@ -422,6 +422,7 @@ class CollectivePage extends Component {
           isAdmin={isAdmin}
           callsToAction={callsToAction}
           onPrimaryColorChange={onPrimaryColorChange}
+          hasNewNavbar={newNavbarFeatureFlag}
         />
         <NavBarContainer mt={[0, -30]} ref={this.navbarRef}>
           <CollectiveNavbar
