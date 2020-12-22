@@ -780,6 +780,7 @@
   "Events": "Ereignisse",
   "events": "meine Veranstaltungen",
   "events.create.login": "Du musst als Haupt-Mitwirkender dieses Kollektivs eingeloggt sein, um eine Veranstaltung erstellen zu können.",
+  "EventsAndProjects": "Events and projects",
   "ExepenseAttachments.count": "{count, plural, one {# Anhang} other {# Anhänge}}",
   "ExpandDescription": "Vollständige Beschreibung lesen",
   "Expense.Activity.Approved": "Ausgabe bestätigt",
