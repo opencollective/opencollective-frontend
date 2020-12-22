@@ -57,11 +57,12 @@ const MenuItem = styled('li')`
 `;
 
 const ActionsDropdown = styled(Dropdown)`
-  @media screen and (min-width: 40em) and (max-width: 64em) {
+  @media screen and (min-width: 40em) and (max-width: 88em) {
     ${DropdownContent} {
-      right: 1em;
+      right: 50px;
     }
   }
+
   @media (max-width: 40em) {
     ${DropdownArrow} {
       display: none !important;

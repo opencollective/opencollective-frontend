@@ -72,7 +72,7 @@ const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
       color: #090a0a;
       font-weight: 500;
 
-      @media (min-width: 52em) {
+      @media (min-width: 64em) {
         &::after {
           width: 100%;
           margin: 0 auto;
@@ -84,12 +84,12 @@ const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
   ${props =>
     props.mobileOnly &&
     css`
-      @media (min-width: 52em) {
+      @media (min-width: 64em) {
         display: none;
       }
     `}
 
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     border-top: 1px solid #e1e1e1;
     &::after {
       display: none;
@@ -127,7 +127,7 @@ const MenuItem = styled('li')`
 `;
 
 const CategoryDropdown = styled(Dropdown)`
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     ${DropdownArrow} {
       display: none !important;
     }
@@ -166,7 +166,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
           }
         }}
       >
-        <Flex pt="15px" pb="14px" px={[3, 0]}>
+        <Flex pt="15px" pb="14px" px={[3, 1, 3, 1]}>
           <Flex alignItems="center" mr={2}>
             <IconIllustration src={CATEGORY_ICON[category] || CATEGORY_ICON.CONTRIBUTE} />
           </Flex>
