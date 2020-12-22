@@ -780,6 +780,7 @@
   "Events": "Événements",
   "events": "mes événements",
   "events.create.login": "Vous devez vous identifier en tant qu'administrateur de ce collectif pour pouvoir créer un événement.",
+  "EventsAndProjects": "Events and projects",
   "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "ExpandDescription": "Voir la description complète",
   "Expense.Activity.Approved": "Dépense approuvée",
