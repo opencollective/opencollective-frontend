@@ -118,7 +118,11 @@ const CategoriesContainer = styled(Container)`
 /** Main container for the entire component */
 const MainContainer = styled.div`
   background: white;
-  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
+  ${props =>
+    props.withShadow &&
+    css`
+      box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
+    `}
 
   /** Everything's inside cannot be larger than max section width */
   & > * {
@@ -509,7 +513,7 @@ const CollectiveNavbar = ({
     </MainContainerV2>
   ) : (
     // v1
-    <MainContainer>
+    <MainContainer withShadow={withShadow}>
       {/** Collective infos */}
       <InfosContainer isHidden={hideInfos} isAnimated={isAnimated}>
         <Flex alignItems="center" flex="1 1 80%" css={{ minWidth: 0 /** For text-overflow */ }}>
