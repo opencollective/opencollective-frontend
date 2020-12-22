@@ -25,8 +25,6 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import SectionHeader from '../SectionHeader';
 import SectionTitle from '../SectionTitle';
 
-import SectionRecurringContributions from './RecurringContributions';
-
 import contributeSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconContribute.png';
 
 const FILTERS = {
@@ -137,8 +135,6 @@ class SectionContributions extends React.PureComponent {
       }),
     }),
 
-    LoggedInUser: PropTypes.object,
-
     /** @ignore from withIntl */
     intl: PropTypes.object,
 
@@ -220,7 +216,7 @@ class SectionContributions extends React.PureComponent {
   };
 
   render() {
-    const { collective, data, intl, LoggedInUser, router } = this.props;
+    const { collective, data, intl, router } = this.props;
     const { nbMemberships, selectedFilter } = this.state;
     const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
@@ -317,8 +313,6 @@ class SectionContributions extends React.PureComponent {
             )}
           </React.Fragment>
         )}
-
-        {newNavbarFeatureFlag && <SectionRecurringContributions slug={collective.slug} LoggedInUser={LoggedInUser} />}
 
         {connectedCollectives.length > 0 && (
           <Box mt={5}>

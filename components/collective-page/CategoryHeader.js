@@ -37,7 +37,7 @@ const TypeIllustration = styled.img.attrs({ alt: '' })`
   height: 48px;
 `;
 
-const getCategoryData = (intl, collective, category) => {
+const getCategoryData = (intl, collective, category, isAdmin) => {
   switch (category) {
     case NAVBAR_CATEGORIES.ABOUT:
       return {
@@ -95,12 +95,28 @@ const getCategoryData = (intl, collective, category) => {
     case NAVBAR_CATEGORIES.EVENTS:
       return {
         img: eventsSectionHeaderIcon,
-        title: i18nNavbarCategory(intl, category),
-        subtitle: <FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />,
-        info: (
+        title: i18nNavbarCategory(intl, category, {
+          hasProjects: collective.type === 'FUND',
+          hasEvents: collective.type !== 'FUND',
+        }),
+        subtitle: isAdmin && (
+          <FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />
+        ),
+        info: collective.type !== 'FUND' && (
           <FormattedMessage
             id="section.events.info"
             defaultMessage="Find out where your community is gathering next."
+          />
+        ),
+      };
+    case NAVBAR_CATEGORIES.CONTRIBUTIONS:
+      return {
+        img: eventsSectionHeaderIcon,
+        title: i18nNavbarCategory(intl, category),
+        subtitle: (
+          <FormattedMessage
+            id="CollectivePage.SectionContributions.Subtitle"
+            defaultMessage="How we are supporting other Collectives."
           />
         ),
       };
@@ -109,9 +125,9 @@ const getCategoryData = (intl, collective, category) => {
   }
 };
 
-const CategoryHeader = React.forwardRef(({ collective, category, ...props }, ref) => {
+const CategoryHeader = React.forwardRef(({ collective, category, isAdmin, ...props }, ref) => {
   const intl = useIntl();
-  const data = getCategoryData(intl, collective, category);
+  const data = getCategoryData(intl, collective, category, isAdmin);
   if (!data) {
     return null;
   }
@@ -135,7 +151,7 @@ const CategoryHeader = React.forwardRef(({ collective, category, ...props }, ref
         <StyledHr flex="1" borderStyle="solid" borderColor="black.300" mt={1} />
       </Flex>
       {data.subtitle && (
-        <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
+        <Flex mb={2} justifyContent="space-between" alignItems="center" flexWrap="wrap">
           <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
             {data.subtitle}
           </P>
@@ -150,6 +166,7 @@ CategoryHeader.displayName = 'CategoryHeader';
 CategoryHeader.propTypes = {
   category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)),
   collective: PropTypes.object,
+  isAdmin: PropTypes.bool,
 };
 
 export default CategoryHeader;

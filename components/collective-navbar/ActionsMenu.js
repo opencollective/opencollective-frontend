@@ -133,6 +133,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               <StyledHr borderStyle="solid" borderColor="#304CDC" />
             </Box>
             <StyledActionButton
+              type="button"
               isBorderless
               buttonSize="tiny"
               buttonStyle="secondary"
@@ -143,6 +144,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               color="#304CDC"
               letterSpacing="60%"
               tabIndex="-1"
+              whiteSpace="nowrap"
               data-cy="collective-navbar-actions-btn"
             >
               <Span css={{ verticalAlign: 'middle', marginRight: '4px' }}>

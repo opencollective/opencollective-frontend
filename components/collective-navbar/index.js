@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
+import { maxWidth } from 'styled-system';
 
 import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -74,11 +75,16 @@ const InfosContainerV2 = styled(Container)`
 
 const CollectiveNameV2 = styled(H1)`
   letter-spacing: -0.8px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  min-width: 0;
-  text-decoration: none;
+
+  a {
+    ${maxWidth}
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
+    text-decoration: none;
+  }
 
   a:not(:hover) {
     color: #313233;
@@ -251,10 +257,7 @@ const CollectiveName = styled.h1`
   text-align: center;
   letter-spacing: -1px;
   font-weight: bold;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  min-width: 0;
+  max-width: 50%;
 
   a:not(:hover) {
     color: #313233;
@@ -329,7 +332,11 @@ const CollectiveNavbar = ({
   const navbarRef = useRef();
   useGlobalBlur(navbarRef, outside => {
     if (!outside) {
-      setTimeout(() => setExpanded(false), 200);
+      setTimeout(() => {
+        if (isExpanded) {
+          setExpanded(false);
+        }
+      }, 200);
     }
   });
 
@@ -337,7 +344,6 @@ const CollectiveNavbar = ({
     // v2
     <MainContainerV2
       flexDirection={['column', 'row']}
-      flexWrap={['nowrap', 'wrap']}
       px={[0, Dimensions.PADDING_X[1]]}
       mx="auto"
       mt={onlyInfos ? 0 : '50px'}
@@ -378,6 +384,7 @@ const CollectiveNavbar = ({
             textAlign="center"
             fontWeight="500"
             color="black.800"
+            maxWidth={[200, 280, 500]}
           >
             {isLoading ? (
               <LoadingPlaceholder height={14} minWidth={100} />
@@ -466,6 +473,7 @@ const CollectiveNavbar = ({
                       fontSize="14px"
                       lineHeight="16px"
                       letterSpacing="60%"
+                      whiteSpace="nowrap"
                     >
                       <FormattedMessage id="AdminPanel" defaultMessage="Admin Panel" />
                     </P>
