@@ -40,7 +40,7 @@ class ExportImages extends React.Component {
           {
             name: 'Tier badge',
             url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen`,
-            code: `<img src="https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen" />`,
+            code: `<img alt="open collective badge" src="https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen" />`,
             options: [
               {
                 name: 'label',
@@ -179,7 +179,7 @@ class ExportImages extends React.Component {
             {`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
           </StyledLink>
         </div>
-        <img src={`https://opencollective.com/${collective.slug}/tiers/badge.svg`} />
+        <img alt="open collective badge" src={`https://opencollective.com/${collective.slug}/tiers/badge.svg`} />
       </div>
     );
   }

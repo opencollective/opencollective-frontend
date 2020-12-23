@@ -100,10 +100,6 @@
        url("../fonts/inter/Inter-BlackItalic.woff") format("woff");
 }
 
-* {
-  box-sizing: border-box;
-}
-
 html {
   --charcoal-grey-two: #373a3d;
   --charcoal-grey-three: #45484c;
@@ -124,12 +120,6 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  color: #333;
-  font-size: 14px;
-}
-
-a {
-  text-decoration: none;
 }
 
 a:hover {
@@ -190,10 +180,6 @@ h1 {
 h2,
 h3 {
   letter-spacing: -0.4px;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 500;
 }
 
 .map {
@@ -275,10 +261,27 @@ a {
   display: none;
 }
 
+/* START: Legacy Bootstrap styles, added for retro-compatibility */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  color: #333;
+  font-size: 14px;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+}
+
 label {
   display: inline-block;
   font-weight: 700;
-  white-space: nowrap;
 }
 
 .form-control {
@@ -288,3 +291,30 @@ label {
 button, input, select, textarea {
   font: inherit;
 }
+
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+th {
+  text-align: left;
+}
+
+/* END: Legacy Bootstrap styles, added for retro-compatibility */

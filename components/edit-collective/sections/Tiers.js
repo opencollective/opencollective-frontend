@@ -351,7 +351,7 @@ class Tiers extends React.Component {
 
     return (
       <Container margin="3rem 0" className={`tier ${tier.slug}`} key={key}>
-        <Container textAlign="right" fontSize="1.3rem">
+        <Container textAlign="right" fontSize="1.3rem" pr={1}>
           <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>
             {intl.formatMessage(this.messages[`${this.defaultType}.remove`])}
           </a>

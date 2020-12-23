@@ -40,12 +40,12 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
 
   if (className && className.match(/horizontal/)) {
     return (
-      <Flex wrap="flexWrap" p={1}>
+      <Flex flexWrap="wrap" p={1}>
         <Box width={[1, 2 / 12]}>
           <label>{label}</label>
         </Box>
         <Box width={[1, 10 / 12]}>
-          <StyledInputGroup height="3rem" prepend={pre} append={post} success={validationState} {...inputProps} />
+          <StyledInputGroup prepend={pre} append={post} success={validationState} {...inputProps} />
           {after && <div className="after">{after}</div>}
           {button && <StyledButton>{button}</StyledButton>}
           {help && <HelpBlock>{help}</HelpBlock>}
@@ -61,7 +61,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
           </Box>
         )}
         <Box width={1}>
-          <StyledInputGroup prepend={pre} append={post} height="3rem" success={validationState} {...inputProps} />
+          <StyledInputGroup prepend={pre} append={post} success={validationState} {...inputProps} />
           {button && <StyledButton>{button}</StyledButton>}
         </Box>
         {help && <HelpBlock>{help}</HelpBlock>}
@@ -71,39 +71,18 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
 }
 
 const InputFieldContainer = styled.div`
-  span.input-group {
-    width: 100%;
+  input {
+    padding: 6px 12px;
   }
-  .inputField {
-    margin: 1rem 0;
-  }
-  .inputField,
-  .inputField textarea {
-    font-size: 1.6rem;
-  }
-  .horizontal .form-group label {
+
+  label {
     margin-top: 5px;
+    margin-bottom: 5px;
   }
-  .form-horizontal .form-group label {
-    padding-top: 3px;
-  }
-  .inputField .checkbox label {
-    width: auto;
-  }
-  .inputField input[type='number'] {
-    text-align: right;
-  }
-  .inputField .currency input[type='number'] {
-    text-align: left;
-  }
-  .inputField .switch {
-    display: flex;
-    align-items: center;
-  }
-  .archiveField {
-    width: 100%;
-    display: flex;
-    padding-top: 20px;
+
+  .horizontal label {
+    padding-right: 15px;
+    padding-left: 15px;
   }
 `;
 
@@ -498,7 +477,6 @@ class InputField extends React.Component {
         let defaultValue;
         if (field.defaultValue) {
           let defaultOption;
-          console.log(field.options);
           if (field.options[0].value !== undefined) {
             defaultOption = field.options.find(option => option.value === field.defaultValue);
             defaultValue = defaultOption;

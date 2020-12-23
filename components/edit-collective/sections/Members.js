@@ -224,7 +224,7 @@ class Members extends React.Component {
       <Container key={`member-${index}-${memberKey}`} mt={4} pb={4} borderBottom={BORDER} data-cy={`member-${index}`}>
         <ResetGlobalStyles>
           <Flex mt={2} flexWrap="wrap">
-            <div className="col-sm-2" />
+            <Box width={[1, 2 / 12]} />
             <Flex flex="1" justifyContent="space-between" alignItems="center" flexWrap="wrap" mb={2}>
               <Box ml={1} my={1}>
                 <CollectivePickerAsync

@@ -56,10 +56,6 @@ class AddFundsSourcePickerForUser extends React.Component {
     this.state = { loading: true };
   }
 
-  onChange = async e => {
-    this.props.onChange(e);
-  };
-
   render() {
     const hosts = this.props.LoggedInUser.hostsUserIsAdminOf();
     const hostOptions = [
@@ -71,7 +67,7 @@ class AddFundsSourcePickerForUser extends React.Component {
     ];
     return (
       <div>
-        <StyledSelect id="sourcePicker" placeholder="select" options={hostOptions} onChange={this.onChange} />
+        <StyledSelect id="sourcePicker" placeholder="select" options={hostOptions} onChange={this.props.onChange} />
       </div>
     );
   }
