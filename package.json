@@ -64,7 +64,7 @@
     "lodash": "4.17.20",
     "memoize-one": "5.1.1",
     "moment": "2.29.1",
-    "next": "10.0.3",
+    "next": "10.0.4",
     "next-routes": "1.4.2",
     "node-fetch": "2.6.1",
     "nprogress": "0.2.0",
