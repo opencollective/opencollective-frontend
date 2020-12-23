@@ -178,7 +178,7 @@ class ExpensePage extends React.Component {
     }
 
     return (
-      <Page collective={data.account} {...this.getPageMetaData(data.account)} withoutGlobalStyles>
+      <Page collective={data.account} {...this.getPageMetaData(data.account)}>
         <CollectiveNavbar
           collective={data.account}
           isLoading={!data.account}

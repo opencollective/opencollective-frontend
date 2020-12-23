@@ -277,7 +277,7 @@ class CreateExpensePage extends React.Component {
     const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
 
     return (
-      <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page collective={collective} {...this.getPageMetaData(collective)}>
         <React.Fragment>
           <CollectiveNavbar collective={collective} isLoading={!collective} />
           <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>

@@ -57,11 +57,12 @@ const MenuItem = styled('li')`
 `;
 
 const ActionsDropdown = styled(Dropdown)`
-  @media screen and (min-width: 40em) and (max-width: 64em) {
+  @media screen and (min-width: 40em) and (max-width: 88em) {
     ${DropdownContent} {
-      right: 1em;
+      right: 50px;
     }
   }
+
   @media (max-width: 40em) {
     ${DropdownArrow} {
       display: none !important;
@@ -133,6 +134,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               <StyledHr borderStyle="solid" borderColor="#304CDC" />
             </Box>
             <StyledActionButton
+              type="button"
               isBorderless
               buttonSize="tiny"
               buttonStyle="secondary"
@@ -143,6 +145,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               color="#304CDC"
               letterSpacing="60%"
               tabIndex="-1"
+              whiteSpace="nowrap"
               data-cy="collective-navbar-actions-btn"
             >
               <Span css={{ verticalAlign: 'middle', marginRight: '4px' }}>
@@ -312,7 +315,6 @@ CollectiveNavbarActionsMenu.propTypes = {
     /** Add prepaid budget to an organization */
     addPrepaidBudget: PropTypes.bool,
   }).isRequired,
-  createNotification: PropTypes.func,
 };
 
 CollectiveNavbarActionsMenu.defaultProps = {

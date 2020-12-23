@@ -273,7 +273,7 @@ class ConversationPage extends React.Component {
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
     const canDelete = canEdit || (LoggedInUser && LoggedInUser.canEditCollective(collective));
     return (
-      <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page collective={collective} {...this.getPageMetaData(collective)}>
         {data.loading ? (
           <Container borderTop="1px solid #E8E9EB">
             <Loading />

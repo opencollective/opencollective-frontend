@@ -277,11 +277,7 @@ class NewContributionFlowPage extends React.Component {
       return <ErrorPage error={error} />;
     }
 
-    return (
-      <Page withoutGlobalStyles {...this.getPageMetadata()}>
-        {this.renderPageContent()}
-      </Page>
-    );
+    return <Page {...this.getPageMetadata()}>{this.renderPageContent()}</Page>;
   }
 }
 

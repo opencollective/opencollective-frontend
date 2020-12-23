@@ -261,6 +261,30 @@ a {
   display: none;
 }
 
+/** @deprecated These legacy styles from `Body.js` should be removed */
+.content {
+  max-width: 1260px;
+  padding: 2rem 30px;
+  margin: 0 auto;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+@media (max-width: 420px) {
+  .content {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.content h3 {
+  font-size: 1.7rem;
+}
+
+.content p {
+  text-overflow: ellipsis;
+  margin: 1.5rem 0;
+}
+
 /* START: Legacy Bootstrap styles, added for retro-compatibility */
 * {
   box-sizing: border-box;
