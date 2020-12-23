@@ -5,14 +5,17 @@ import { withApollo } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { Col, Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { OC_FEE_PERCENT } from '../lib/constants/transactions';
 import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
 
 import { AddFundsSourcePickerForUserWithData } from './AddFundsSourcePicker';
+import Container from './Container';
 import InputField from './InputField';
 import StyledButton from './StyledButton';
+import { H2 } from './Text';
 
 const addFundsHostQuery = gql`
   query AddFundsHost($CollectiveId: Int) {
@@ -20,6 +23,20 @@ const addFundsHostQuery = gql`
       id
       hostFeePercent
     }
+  }
+`;
+
+const TableContainer = styled.table`
+  margin: 0.5rem 0 1rem 0;
+  width: 100%;
+
+  hr {
+    margin: 0.5rem 0;
+    color: black;
+  }
+
+  td.amount {
+    text-align: right;
   }
 `;
 
@@ -208,75 +225,15 @@ class AddFundsForm extends React.Component {
     this.totalAmountField.pre = getCurrencySymbol(this.props.collective.currency);
 
     return (
-      <div className="AddFundsForm">
-        <style jsx>
-          {`
-            h2 {
-              margin: 3rem 0 3rem 0;
-              font-size: 2rem;
-            }
-            .AddFundsForm {
-              max-width: 700px;
-              margin: 0 auto;
-            }
-            .paymentDetails {
-              overflow: hidden;
-            }
-            .AddFundsForm :global(.tier) {
-              margin: 0 0 1rem 0;
-            }
-            label {
-              max-width: 100%;
-              padding-right: 1rem;
-            }
-            .result {
-              margin-top: 3rem;
-            }
-            .result div {
-              width: 100%;
-            }
-            .error {
-              color: red;
-              font-weight: bold;
-            }
-            .value {
-              padding-top: 7px;
-              display: inline-block;
-            }
-            .details {
-              margin: 0.5rem 0 1rem 0;
-              width: 100%;
-            }
-            hr {
-              margin: 0.5rem 0;
-              color: black;
-            }
-            td.amount {
-              text-align: right;
-            }
-            .disclaimer {
-              font-size: 1.2rem;
-            }
-            .note {
-              padding: 8px 0;
-            }
-          `}
-        </style>
-        <style jsx global>
-          {`
-            .AddFundsForm .actions .btn {
-              margin-right: 0.5rem;
-            }
-          `}
-        </style>
+      <Container maxWidth="700px" margin="0 auto">
         <form onSubmit={e => e.preventDefault()}>
-          <h2>
+          <H2 fontSize="2rem">
             <FormattedMessage
               id="addPrepaidBudget.title"
               defaultMessage="Add Prepaid Budget to {collective}"
               values={{ collective: this.props.collective.name }}
             />
-          </h2>
+          </H2>
           {this.fields.map(
             field =>
               (!field.when || field.when(this.state.form)) && (
@@ -299,7 +256,7 @@ class AddFundsForm extends React.Component {
                   <FormattedMessage id="Details" defaultMessage="Details" />
                 </label>
                 <Col sm={10}>
-                  <table className="details">
+                  <TableContainer>
                     <tbody>
                       <tr>
                         <td>
@@ -346,21 +303,21 @@ class AddFundsForm extends React.Component {
                         <td className="amount">{netAmount}</td>
                       </tr>
                     </tbody>
-                  </table>
+                  </TableContainer>
 
                   <div>
                     {showAddFundsToOrgDetails && (
-                      <div className="note">
+                      <Container padding="8px 0">
                         <FormattedMessage
                           id="AddFundsForm.PutAside"
                           defaultMessage="Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees."
                           values={{ hostFeePercent, hostFeeAmount, platformFeePercent, platformFeeAmount }}
                         />
-                      </div>
+                      </Container>
                     )}
                   </div>
 
-                  <div className="disclaimer">
+                  <Container fontSize="1.2rem">
                     {this.props.host && (
                       <FormattedMessage
                         id="addfunds.disclaimer"
@@ -380,7 +337,7 @@ class AddFundsForm extends React.Component {
                         }}
                       />
                     )}
-                  </div>
+                  </Container>
                 </Col>
               </div>
             </Col>
@@ -398,11 +355,15 @@ class AddFundsForm extends React.Component {
             </Col>
           </Row>
         </form>
-        <div className="result">
-          {this.state.result.success && <div className="success">{this.state.result.success}</div>}
-          {this.state.result.error && <div className="error">{this.state.result.error}</div>}
-        </div>
-      </div>
+        <Container marginTop="3rem">
+          {this.state.result.success && <Container width="100%">{this.state.result.success}</Container>}
+          {this.state.result.error && (
+            <Container width="100%" color="red" fontWeight="bold">
+              {this.state.result.error}
+            </Container>
+          )}
+        </Container>
+      </Container>
     );
   }
 }
