@@ -315,7 +315,6 @@ CollectiveNavbarActionsMenu.propTypes = {
     /** Add prepaid budget to an organization */
     addPrepaidBudget: PropTypes.bool,
   }).isRequired,
-  createNotification: PropTypes.func,
 };
 
 CollectiveNavbarActionsMenu.defaultProps = {
