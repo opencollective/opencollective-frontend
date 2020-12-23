@@ -102,7 +102,7 @@ class CollectiveContact extends React.Component {
 
     const collective = data && data.Collective;
     return (
-      <AuthenticatedPage {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <AuthenticatedPage {...this.getPageMetaData(collective)}>
         {() =>
           data.loading ? (
             <Loading />

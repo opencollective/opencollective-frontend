@@ -417,7 +417,7 @@ class ExpensePage extends React.Component {
     const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
 
     return (
-      <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>
+      <Page collective={collective} {...this.getPageMetaData(expense)}>
         {createSuccess && !successMessageDismissed && (
           <TemporaryNotification onDismiss={this.onSuccessMsgDismiss}>
             <FormattedMessage

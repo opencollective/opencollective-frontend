@@ -21,7 +21,6 @@ const Page = ({
   showSearch,
   menuItems,
   canonicalURL,
-  withoutGlobalStyles,
   collective,
 }) => {
   if (data.error) {
@@ -43,9 +42,7 @@ const Page = ({
         collective={collective}
         menuItems={menuItems}
       />
-      <Body withoutGlobalStyles={withoutGlobalStyles}>
-        {typeof children === 'function' ? children(childProps) : children}
-      </Body>
+      <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       <Footer />
     </Fragment>
   );
@@ -64,7 +61,6 @@ Page.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.shape({}),
   showSearch: PropTypes.bool,
-  withoutGlobalStyles: PropTypes.bool,
   noRobots: PropTypes.bool,
   title: PropTypes.string,
   twitterHandle: PropTypes.string,

@@ -141,7 +141,7 @@ class HostDashboardPage extends React.Component {
     const canEdit = LoggedInUser && host && LoggedInUser.canEditCollective(host);
 
     return (
-      <Page collective={host} title={host.name || 'Host Dashboard'} withoutGlobalStyles={!['donations'].includes(view)}>
+      <Page collective={host} title={host.name || 'Host Dashboard'}>
         {data.Collective && (
           <Container>
             <CollectiveNavbar collective={host} isAdmin={canEdit} showEdit onlyInfos={true} />
