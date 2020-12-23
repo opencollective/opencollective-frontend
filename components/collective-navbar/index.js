@@ -326,7 +326,6 @@ const CollectiveNavbar = ({
   hideInfos,
   onlyInfos,
   isAnimated,
-  createNotification,
   showBackButton,
   withShadow,
   useAnchorsForCategories,
@@ -491,13 +490,7 @@ const CollectiveNavbar = ({
                 </Link>
               </Flex>
             )}
-            {!isLoading && (
-              <CollectiveNavbarActionsMenu
-                collective={collective}
-                callsToAction={callsToAction}
-                createNotification={createNotification}
-              />
-            )}
+            {!isLoading && <CollectiveNavbarActionsMenu collective={collective} callsToAction={callsToAction} />}
             {!onlyInfos && (
               <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
                 {isExpanded ? (
@@ -679,7 +672,6 @@ CollectiveNavbar.propTypes = {
   isAnimated: PropTypes.bool,
   /** Set this to true to make the component smaller in height */
   isSmall: PropTypes.bool,
-  createNotification: PropTypes.func,
   showBackButton: PropTypes.bool,
   withShadow: PropTypes.bool,
   /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */
