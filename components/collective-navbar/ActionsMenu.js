@@ -8,10 +8,10 @@ import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
-import { get, some } from 'lodash';
+import { get, pickBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
@@ -25,6 +25,8 @@ import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
+import { NAVBAR_ACTION_TYPE } from './menu';
+
 // Dynamic imports
 const AddPrepaidBudgetModal = dynamic(() => import('../AddPrepaidBudgetModal'));
 const AddFundsModal = dynamic(() => import('../host-dashboard/AddFundsModal'));
@@ -35,8 +37,8 @@ const MenuItem = styled('li')`
   align-items: center;
 
   &,
-  & > a,
-  & > button {
+  a,
+  button {
     width: 100%;
     text-align: left;
     font-style: normal;
@@ -49,11 +51,29 @@ const MenuItem = styled('li')`
     &:not(:hover) {
       color: #313233;
     }
+
+    &:focus {
+      box-shadow: none;
+      outline: none;
+      text-decoration: underline;
+    }
+
+    &:disabled {
+      color: #8c8c8c;
+    }
   }
 
   svg {
     margin-right: 8px;
   }
+
+  ${props =>
+    props.isHiddenOnMobile &&
+    css`
+      @media screen and (min-width: 40em) {
+        display: none;
+      }
+    `}
 `;
 
 const ActionsDropdown = styled(Dropdown)`
@@ -92,36 +112,56 @@ const StyledChevronDown = styled(ChevronDown)`
 
 const ITEM_PADDING = '11px 14px';
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
-  const hasRequestGrant =
-    [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true;
-  const hasActions = hasRequestGrant || some(callsToAction);
-  const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
-  const hostWithinLimit = hostedCollectivesLimit
-    ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
-    : true;
-  const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
-  const [hasAddPrepaidBudgetModal, showAddPrepaidBudgetModal] = React.useState(false);
-
-  let contributeRoute = 'orderCollectiveNew';
-  let contributeRouteParams = { collectiveSlug: collective.slug, verb: 'donate' };
+export const getContributeRoute = collective => {
+  let route = 'orderCollectiveNew';
+  let params = { collectiveSlug: collective.slug, verb: 'donate' };
   if (collective.settings?.disableCustomContributions) {
     if (collective.tiers && collective.tiers.length > 0) {
       const tier = collective.tiers[0];
-      contributeRoute = 'orderCollectiveTierNew';
-      contributeRouteParams = {
+      route = 'orderCollectiveTierNew';
+      params = {
         collectiveSlug: collective.slug,
         verb: 'contribute',
         tierSlug: tier.slug,
         tierId: tier.id,
       };
     } else {
-      callsToAction.hasContribute = false;
+      return null;
     }
   }
+  return { route, params };
+};
+
+const checkEmptyActions = (callsToActions, hiddenAction, hasRequestGrant) => {
+  // At the moment this one is not display as a main CTA
+  if (hasRequestGrant) {
+    return false;
+  }
+
+  const enabledCtas = Object.keys(pickBy(callsToActions, Boolean));
+  if (enabledCtas.length > 1) {
+    return false;
+  } else if (enabledCtas.length === 1 && hiddenAction) {
+    return enabledCtas[0] === hiddenAction;
+  } else {
+    return true;
+  }
+};
+
+const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile }) => {
+  const hasRequestGrant =
+    [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true;
+  const isEmpty = checkEmptyActions(callsToAction, hiddenActionForNonMobile, hasRequestGrant);
+  const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
+  const hostWithinLimit = hostedCollectivesLimit
+    ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
+    : true;
+  const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
+  const [hasAddPrepaidBudgetModal, showAddPrepaidBudgetModal] = React.useState(false);
+  const contributeRoute = getContributeRoute(collective);
 
   // Do not render the menu if there are no available CTAs
-  if (!hasActions) {
+  if (isEmpty) {
     return null;
   }
 
@@ -158,7 +198,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
           <DropdownContent>
             <Box as="ul" p={0} m={0} minWidth={184}>
               {callsToAction.hasDashboard && (
-                <MenuItem>
+                <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
                   <StyledLink
                     as={Link}
                     route="host.dashboard"
@@ -171,7 +211,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
                 </MenuItem>
               )}
               {callsToAction.hasSubmitExpense && (
-                <MenuItem>
+                <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
                   <StyledLink
                     as={Link}
                     route="create-expense"
@@ -192,11 +232,12 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
                     p={ITEM_PADDING}
                   >
                     <MoneyCheckAlt size="20px" color="#304CDC" />
+                    <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
                   </StyledLink>
                 </MenuItem>
               )}
               {callsToAction.hasManageSubscriptions && (
-                <MenuItem>
+                <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
                   <StyledLink
                     as={Link}
                     route="recurring-contributions"
@@ -208,9 +249,9 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
                   </StyledLink>
                 </MenuItem>
               )}
-              {callsToAction.hasContribute && (
-                <MenuItem py={1}>
-                  <StyledLink as={Link} route={contributeRoute} params={contributeRouteParams} p={ITEM_PADDING}>
+              {callsToAction.hasContribute && contributeRoute && (
+                <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTRIBUTE}>
+                  <StyledLink as={Link} {...contributeRoute} p={ITEM_PADDING}>
                     <Planet size="20px" color="#304CDC" />
                     <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
                   </StyledLink>
@@ -218,7 +259,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               )}
               {callsToAction.addFunds && (
                 <Fragment>
-                  <MenuItem py={1}>
+                  <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
                     <StyledButton p={ITEM_PADDING} onClick={() => showAddFundsModal(true)} isBorderless>
                       <AttachMoney size="20px" color="#304CDC" />
                       <Span>
@@ -237,7 +278,10 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               )}
               {callsToAction.addPrepaidBudget && (
                 <Fragment>
-                  <MenuItem py={1}>
+                  <MenuItem
+                    py={1}
+                    isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET}
+                  >
                     <StyledButton p={ITEM_PADDING} onClick={() => showAddPrepaidBudgetModal(true)} isBorderless>
                       <AttachMoney size="20px" color="#304CDC" />
                       <Span>
@@ -254,7 +298,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
                 </Fragment>
               )}
               {callsToAction.hasContact && (
-                <MenuItem py={1}>
+                <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
                   <StyledLink
                     as={Link}
                     route="collective-contact"
@@ -268,7 +312,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction }) => {
               )}
               {callsToAction.hasApply && (
                 <React.Fragment>
-                  <MenuItem py={1}>
+                  <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
                     <ApplyToHostBtn
                       hostSlug={collective.slug}
                       hostWithinLimit={hostWithinLimit}
@@ -315,6 +359,7 @@ CollectiveNavbarActionsMenu.propTypes = {
     /** Add prepaid budget to an organization */
     addPrepaidBudget: PropTypes.bool,
   }).isRequired,
+  hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
 };
 
 CollectiveNavbarActionsMenu.defaultProps = {

@@ -16,6 +16,7 @@ class ApplyToHostBtn extends React.Component {
     hostWithinLimit: PropTypes.bool,
     withoutIcon: PropTypes.bool,
     buttonProps: PropTypes.object,
+    buttonRenderer: PropTypes.func,
   };
 
   static defaultProps = {
@@ -28,7 +29,26 @@ class ApplyToHostBtn extends React.Component {
   }
 
   renderButton() {
-    const { hostWithinLimit, withoutIcon, buttonProps, minWidth } = this.props;
+    const { buttonRenderer, hostWithinLimit, withoutIcon, buttonProps, minWidth } = this.props;
+
+    if (buttonRenderer) {
+      return buttonRenderer({
+        disabled: !hostWithinLimit,
+        onClick: () => this.setState({ showModal: true }),
+        'data-cy': 'host-apply-btn',
+        ...buttonProps,
+        children: (
+          <React.Fragment>
+            {!withoutIcon && <CheckCircle size="1.2em" />}
+            {!withoutIcon && ' '}
+            <span>
+              <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+            </span>
+          </React.Fragment>
+        ),
+      });
+    }
+
     return (
       <StyledButton
         buttonStyle="secondary"
