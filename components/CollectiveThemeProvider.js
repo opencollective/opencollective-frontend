@@ -59,6 +59,7 @@ export default class CollectiveThemeProvider extends React.PureComponent {
             200: adjustLuminance(0.72),
             100: adjustLuminance(0.78),
             50: adjustLuminance(0.97),
+            base: primaryColor,
           },
         },
       });
