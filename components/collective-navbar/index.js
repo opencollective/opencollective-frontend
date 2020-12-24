@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
+import { maxWidth } from 'styled-system';
 
 import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -74,11 +75,16 @@ const InfosContainerV2 = styled(Container)`
 
 const CollectiveNameV2 = styled(H1)`
   letter-spacing: -0.8px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  min-width: 0;
-  text-decoration: none;
+
+  a {
+    ${maxWidth}
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
+    text-decoration: none;
+  }
 
   a:not(:hover) {
     color: #313233;
@@ -112,7 +118,11 @@ const CategoriesContainer = styled(Container)`
 /** Main container for the entire component */
 const MainContainer = styled.div`
   background: white;
-  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
+  ${props =>
+    props.withShadow &&
+    css`
+      box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
+    `}
 
   /** Everything's inside cannot be larger than max section width */
   & > * {
@@ -145,7 +155,7 @@ const MenuLink = styled.a`
     text-decoration: none;
   }
 
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     padding: 16px;
   }
 `;
@@ -171,7 +181,7 @@ const MenuLinkContainer = styled.div`
       ${MenuLink} {
         color: #090a0a;
       }
-      @media (min-width: 52em) {
+      @media (min-width: 64em) {
         &::after {
           width: 100%;
           float: left;
@@ -182,16 +192,28 @@ const MenuLinkContainer = styled.div`
   ${props =>
     props.mobileOnly &&
     css`
-      @media (min-width: 52em) {
+      @media (min-width: 64em) {
         display: none;
       }
     `}
 
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     border-top: 1px solid #e1e1e1;
     &::after {
       display: none;
     }
+  }
+`;
+
+/** Displayed on mobile & tablet to toggle the menu */
+const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
+  cursor: pointer;
+  margin-right: 4px;
+  flex: 0 0 28px;
+  color: #304cdc;
+
+  @media (min-width: 64em) {
+    display: none;
   }
 `;
 
@@ -205,8 +227,14 @@ const InfosContainer = styled(Container)`
   transform: translateY(0);
   transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out;
 
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     padding: 10px 16px;
+  }
+
+  @media (min-width: 52em) {
+    ${ExpandMenuIcon} {
+      display: none;
+    }
   }
 
   /** Hidden state */
@@ -219,18 +247,6 @@ const InfosContainer = styled(Container)`
     `}
 `;
 
-/** Displayed on mobile & tablet to toggle the menu */
-const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
-  cursor: pointer;
-  margin-right: 4px;
-  flex: 0 0 28px;
-  color: #304cdc;
-
-  @media (min-width: 52em) {
-    display: none;
-  }
-`;
-
 const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
   cursor: pointer;
   margin-right: 4px;
@@ -238,7 +254,7 @@ const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
   color: #304cdc;
   background: radial-gradient(rgba(72, 95, 211, 0.1) 14px, transparent 3px);
 
-  @media (min-width: 52em) {
+  @media (min-width: 64em) {
     display: none;
   }
 `;
@@ -251,16 +267,13 @@ const CollectiveName = styled.h1`
   text-align: center;
   letter-spacing: -1px;
   font-weight: bold;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  min-width: 0;
+  max-width: 50%;
 
   a:not(:hover) {
     color: #313233;
   }
 
-  @media (min-width: 52em) {
+  @media (min-width: 64em) {
     text-align: center;
   }
 `;
@@ -313,7 +326,6 @@ const CollectiveNavbar = ({
   hideInfos,
   onlyInfos,
   isAnimated,
-  createNotification,
   showBackButton,
   withShadow,
   useAnchorsForCategories,
@@ -329,7 +341,11 @@ const CollectiveNavbar = ({
   const navbarRef = useRef();
   useGlobalBlur(navbarRef, outside => {
     if (!outside) {
-      setTimeout(() => setExpanded(false), 200);
+      setTimeout(() => {
+        if (isExpanded) {
+          setExpanded(false);
+        }
+      }, 200);
     }
   });
 
@@ -337,7 +353,6 @@ const CollectiveNavbar = ({
     // v2
     <MainContainerV2
       flexDirection={['column', 'row']}
-      flexWrap={['nowrap', 'wrap']}
       px={[0, Dimensions.PADDING_X[1]]}
       mx="auto"
       mt={onlyInfos ? 0 : '50px'}
@@ -378,6 +393,7 @@ const CollectiveNavbar = ({
             textAlign="center"
             fontWeight="500"
             color="black.800"
+            maxWidth={[200, 280, 500]}
           >
             {isLoading ? (
               <LoadingPlaceholder height={14} minWidth={100} />
@@ -404,7 +420,7 @@ const CollectiveNavbar = ({
             ref={navbarRef}
             backgroundColor="#fff"
             display={isExpanded ? 'flex' : ['none', 'flex']}
-            flexDirection={['column', null, 'row']}
+            flexDirection={['column', null, null, 'row']}
             flexShrink={2}
             flexGrow={1}
             justifyContent={['space-between', null, 'flex-start']}
@@ -466,6 +482,7 @@ const CollectiveNavbar = ({
                       fontSize="14px"
                       lineHeight="16px"
                       letterSpacing="60%"
+                      whiteSpace="nowrap"
                     >
                       <FormattedMessage id="AdminPanel" defaultMessage="Admin Panel" />
                     </P>
@@ -473,15 +490,9 @@ const CollectiveNavbar = ({
                 </Link>
               </Flex>
             )}
-            {!isLoading && (
-              <CollectiveNavbarActionsMenu
-                collective={collective}
-                callsToAction={callsToAction}
-                createNotification={createNotification}
-              />
-            )}
+            {!isLoading && <CollectiveNavbarActionsMenu collective={collective} callsToAction={callsToAction} />}
             {!onlyInfos && (
-              <Container display={['none', 'flex', 'none']} alignItems="center">
+              <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
                 {isExpanded ? (
                   <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
                 ) : (
@@ -495,7 +506,7 @@ const CollectiveNavbar = ({
     </MainContainerV2>
   ) : (
     // v1
-    <MainContainer>
+    <MainContainer withShadow={withShadow}>
       {/** Collective infos */}
       <InfosContainer isHidden={hideInfos} isAnimated={isAnimated}>
         <Flex alignItems="center" flex="1 1 80%" css={{ minWidth: 0 /** For text-overflow */ }}>
@@ -661,7 +672,6 @@ CollectiveNavbar.propTypes = {
   isAnimated: PropTypes.bool,
   /** Set this to true to make the component smaller in height */
   isSmall: PropTypes.bool,
-  createNotification: PropTypes.func,
   showBackButton: PropTypes.bool,
   withShadow: PropTypes.bool,
   /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */

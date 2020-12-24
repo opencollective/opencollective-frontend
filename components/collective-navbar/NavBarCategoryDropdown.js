@@ -23,6 +23,7 @@ const CATEGORY_ICON = {
   BUDGET: budgetNavbarIcon,
   CONNECT: connectNavbarIcon,
   CONTRIBUTE: contributeNavbarIcon,
+  CONTRIBUTIONS: contributeNavbarIcon,
   EVENTS: eventsNavbarIcon,
 };
 
@@ -33,6 +34,7 @@ const IconIllustration = styled.img.attrs({ alt: '' })`
 
 const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
   display: block;
+  width: 100%;
   font-size: 14px;
   line-height: 16px;
   text-decoration: none;
@@ -56,11 +58,12 @@ const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
   &::after {
     content: '';
     display: block;
-    width: 0;
+    width: 0%;
     height: 3px;
     background: ${themeGet('colors.primary.500')};
-    transition: width 0.2s;
-    float: right;
+    transition: width 0.3s;
+    float: center;
+    opacity: 0;
   }
 
   ${props =>
@@ -69,10 +72,11 @@ const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
       color: #090a0a;
       font-weight: 500;
 
-      @media (min-width: 52em) {
+      @media (min-width: 64em) {
         &::after {
-          width: 75%;
+          width: 100%;
           margin: 0 auto;
+          opacity: 1;
         }
       }
     `}
@@ -80,12 +84,12 @@ const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
   ${props =>
     props.mobileOnly &&
     css`
-      @media (min-width: 52em) {
+      @media (min-width: 64em) {
         display: none;
       }
     `}
 
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     border-top: 1px solid #e1e1e1;
     &::after {
       display: none;
@@ -123,7 +127,7 @@ const MenuItem = styled('li')`
 `;
 
 const CategoryDropdown = styled(Dropdown)`
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     ${DropdownArrow} {
       display: none !important;
     }
@@ -162,11 +166,16 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
           }
         }}
       >
-        <Flex py="10px" px={[3, 0]}>
+        <Flex pt="15px" pb="14px" px={[3, 1, 3, 1]}>
           <Flex alignItems="center" mr={2}>
             <IconIllustration src={CATEGORY_ICON[category] || CATEGORY_ICON.CONTRIBUTE} />
           </Flex>
-          <Flex alignItems="center">{i18nNavbarCategory(intl, category)}</Flex>
+          <Flex alignItems="center">
+            {i18nNavbarCategory(intl, category, {
+              hasProjects: collective.type === 'FUND',
+              hasEvents: collective.type !== 'FUND',
+            })}
+          </Flex>
         </Flex>
       </CategoryContainer>
       {displayedLinks.length > 0 && (
@@ -193,6 +202,7 @@ NavBarCategoryDropdown.propTypes = {
   category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
   collective: PropTypes.shape({
     slug: PropTypes.string,
+    type: PropTypes.string,
   }).isRequired,
   isSelected: PropTypes.bool,
   useAnchor: PropTypes.bool,

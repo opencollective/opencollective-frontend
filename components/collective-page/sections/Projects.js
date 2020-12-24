@@ -30,6 +30,7 @@ class SectionProjects extends React.PureComponent {
       isActive: PropTypes.bool,
     }),
     isAdmin: PropTypes.bool,
+    showTitle: PropTypes.bool,
   };
 
   getContributeCardsScrollDistance(width) {
@@ -44,36 +45,45 @@ class SectionProjects extends React.PureComponent {
   }
 
   render() {
-    const { collective, projects, isAdmin } = this.props;
+    const { collective, projects, isAdmin, showTitle } = this.props;
 
     if ((projects.length === 0 || !collective.isActive) && !isAdmin) {
       return null;
     }
 
     return (
-      <Box pt={[4, 5]} data-cy="Projects">
-        <ContainerSectionContent>
-          <SectionTitle>
-            <FormattedMessage id="CollectivePage.SectionProjects.Title" defaultMessage="Projects" />
-          </SectionTitle>
-        </ContainerSectionContent>
+      <Box pt={showTitle ? [4, 5] : [2, 3]} data-cy="Projects">
+        {showTitle && (
+          <ContainerSectionContent>
+            <SectionTitle>
+              <FormattedMessage id="CollectivePage.SectionProjects.Title" defaultMessage="Projects" />
+            </SectionTitle>
+          </ContainerSectionContent>
+        )}
 
         <Box mb={4}>
           <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
             {(ref, Chevrons) => (
               <div>
-                <ContainerSectionContent>
-                  <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                    <Box m={2} flex="0 0 50px">
-                      <Chevrons />
-                    </Box>
-                  </Flex>
-                </ContainerSectionContent>
+                {projects.length > 1 && (
+                  <ContainerSectionContent>
+                    <Flex justifyContent="space-between" alignItems="center" mb={3}>
+                      <Box m={2} flex="0 0 50px">
+                        <Chevrons />
+                      </Box>
+                    </Flex>
+                  </ContainerSectionContent>
+                )}
 
                 <ContributeCardsContainer ref={ref}>
                   {projects.map(project => (
                     <Box key={project.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeProject collective={collective} project={project} disableCTA={!project.isActive} />
+                      <ContributeProject
+                        collective={collective}
+                        project={project}
+                        disableCTA={!project.isActive}
+                        hideContributors={!projects.some(project => project.contributors.length)}
+                      />
                     </Box>
                   ))}
                   {isAdmin && (

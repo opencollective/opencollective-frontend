@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { get, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { space } from 'styled-system';
 
@@ -12,7 +11,6 @@ import { CollectiveType } from '../../lib/constants/collectives';
 
 import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
-import TemporaryNotification from '../TemporaryNotification';
 
 import Hero from './hero/Hero';
 import SectionAbout from './sections/About';
@@ -92,12 +90,7 @@ class CollectivePage extends Component {
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
     this.sectionCategoriesRefs = {}; // This will store a map of category => ref
     this.navbarRef = React.createRef();
-    this.state = {
-      isFixed: false,
-      selectedSection: null,
-      selectedCategory: null,
-      notification: false,
-    };
+    this.state = { isFixed: false, selectedSection: null, selectedCategory: null };
   }
 
   componentDidMount() {
@@ -134,11 +127,7 @@ class CollectivePage extends Component {
     const breakpoint = window.scrollY + distanceThreshold;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
 
-    if (
-      get(this.props.router, 'query.navbarVersion') === 'v2' &&
-      get(this.props.collective, 'settings.collectivePage.useNewSections')
-    ) {
-      console.log('collective-page/index using new v2');
+    if (get(this.props.router, 'query.navbarVersion') === 'v2') {
       for (let i = sections.length - 1; i >= 0; i--) {
         if (sections[i].type !== 'CATEGORY') {
           continue;
@@ -234,6 +223,7 @@ class CollectivePage extends Component {
   };
 
   renderSection(section) {
+    const hasNewCollectiveNavbar = get(this.props.router, 'query.navbarVersion') === 'v2';
     switch (section) {
       case Sections.UPDATES:
         return (
@@ -293,6 +283,7 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             projects={this.props.projects}
             isAdmin={this.props.isAdmin}
+            showTitle={!hasNewCollectiveNavbar}
           />
         );
       case Sections.BUDGET:
@@ -355,23 +346,11 @@ class CollectivePage extends Component {
     }
   }
 
-  createNotification = (type, message) => {
-    this.setState({ notification: { type, message } });
-    window.scrollTo(0, 0);
-  };
-
-  dismissNotification = () => {
-    this.setState(state => ({
-      ...state,
-      notification: false,
-    }));
-  };
-
   render() {
     const { collective, host, isAdmin, isHostAdmin, isRoot, onPrimaryColorChange, LoggedInUser, router } = this.props;
     const newNavbarFeatureFlag = router?.query?.navbarVersion === 'v2';
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
-    const { isFixed, selectedSection, selectedCategory, notification } = this.state;
+    const { isFixed, selectedSection, selectedCategory } = this.state;
     const sections = this.getSections(collective, isAdmin, isHostAdmin);
     const isFund = collective.type === CollectiveType.FUND || settings?.fund === true; // Funds MVP, to refactor
     const isAuthenticated = LoggedInUser ? true : false;
@@ -395,35 +374,13 @@ class CollectivePage extends Component {
         css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
         data-cy="collective-page-main"
       >
-        {notification && (
-          <TemporaryNotification onDismiss={this.dismissNotification} type={notification.type}>
-            {notification.type === 'error' ? (
-              <FormattedMessage
-                id="ApplyToHost.error"
-                defaultMessage="An error occurred while applying to {hostName} with {collectiveName}."
-                values={{
-                  hostName: collective.name,
-                  collectiveName: notification.message,
-                }}
-              />
-            ) : (
-              <FormattedMessage
-                id="ApplyToHost.success"
-                defaultMessage="{collectiveName} has applied to be hosted by {hostName}."
-                values={{
-                  hostName: collective.name,
-                  collectiveName: notification.message,
-                }}
-              />
-            )}
-          </TemporaryNotification>
-        )}
         <Hero
           collective={collective}
           host={host}
           isAdmin={isAdmin}
           callsToAction={callsToAction}
           onPrimaryColorChange={onPrimaryColorChange}
+          hasNewNavbar={newNavbarFeatureFlag}
         />
         <NavBarContainer mt={[0, -30]} ref={this.navbarRef}>
           <CollectiveNavbar
@@ -451,7 +408,6 @@ class CollectivePage extends Component {
                 {label}
               </a>
             )}
-            createNotification={this.createNotification}
           />
         </NavBarContainer>
 
@@ -466,6 +422,7 @@ class CollectivePage extends Component {
                   ref={categoryRef => (this.sectionCategoriesRefs[entry.name] = categoryRef)}
                   collective={collective}
                   category={entry.name}
+                  isAdmin={isAdmin}
                 />
                 {entry.sections.map((section, idx) => (
                   <SectionContainer

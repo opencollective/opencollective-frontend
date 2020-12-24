@@ -43,15 +43,20 @@ export const DropdownArrow = styled('div')`
 `;
 
 export const Dropdown = styled(({ children, ...props }) => {
-  const ref = React.useRef();
+  const [isDisplayed, setDisplayed] = React.useState(false);
   return (
     <div
-      ref={ref}
       tabIndex={0}
       {...props}
+      onFocus={() => setTimeout(() => setDisplayed(true), 50)}
+      onBlur={() => setDisplayed(false)}
       onClick={e => {
-        if (ref.current?.contains(e.target)) {
-          e.target.blur();
+        if (isDisplayed) {
+          if (document.activeElement?.contains(e.target)) {
+            document.activeElement.blur();
+          } else {
+            e.target.blur();
+          }
         }
       }}
     >

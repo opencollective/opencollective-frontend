@@ -94,7 +94,7 @@ class CreateConversationPage extends React.Component {
 
     const collective = data && data.account;
     return (
-      <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page collective={collective} {...this.getPageMetaData(collective)}>
         {data.loading ? (
           <Container borderTop="1px solid #E8E9EB">
             <Loading />

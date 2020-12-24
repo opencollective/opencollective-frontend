@@ -180,7 +180,7 @@ class CollectivePage extends React.Component {
     const collective = data && data.Collective;
 
     return (
-      <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)}>
         <GlobalStyles smooth={this.state.smooth} />
         {loading ? (
           <Container py={[5, 6]}>

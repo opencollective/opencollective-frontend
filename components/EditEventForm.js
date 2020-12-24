@@ -183,6 +183,7 @@ class EditEventForm extends React.Component {
                   label="Timezone"
                   selectedTimezone={this.state.event.timezone}
                   onChange={this.handleTimezoneChange}
+                  mb={2}
                 />
               ) : (
                 <InputField

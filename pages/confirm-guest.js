@@ -140,7 +140,7 @@ const ConfirmGuestPage = () => {
   }, []);
 
   return (
-    <Page title={intl.formatMessage(MESSAGES.pageTitle)} withoutGlobalStyles>
+    <Page title={intl.formatMessage(MESSAGES.pageTitle)}>
       <Container
         display="flex"
         py={[5, 6, 150]}
