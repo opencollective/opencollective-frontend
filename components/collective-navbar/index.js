@@ -1,8 +1,12 @@
 import React, { Fragment, useRef } from 'react';
 import { PropTypes } from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
+import { Planet } from '@styled-icons/boxicons-regular/Planet';
+import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { Settings } from '@styled-icons/feather/Settings';
 import { Close } from '@styled-icons/material/Close';
+import { Dashboard } from '@styled-icons/material/Dashboard';
+import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
@@ -15,6 +19,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
 
+import ApplyToHostBtn from '../ApplyToHostBtn';
 import Avatar from '../Avatar';
 import { AllSectionsNames, Dimensions } from '../collective-page/_constants';
 import CollectiveCallsToAction from '../CollectiveCallsToAction';
@@ -25,10 +30,10 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledRoundButton from '../StyledRoundButton';
-import { H1, P } from '../Text';
+import { H1, Span } from '../Text';
 
-import CollectiveNavbarActionsMenu from './ActionsMenu';
-import { getNavBarMenu } from './menu';
+import CollectiveNavbarActionsMenu, { getContributeRoute } from './ActionsMenu';
+import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown from './NavBarCategoryDropdown';
 
 // Nav v2 styled components
@@ -309,6 +314,128 @@ const getDefaultCallsToActions = (collective, isAdmin, newNavbarFeatureFlag) => 
 };
 
 /**
+ * Returns the main call to action that should be displayed as a button outside of the action menu.
+ * This code could be factorized with `ActionsMenu.js`, as we want to have the same icons/actions/labels
+ * here and there.
+ */
+const getMainAction = (collective, isAdmin, callsToAction) => {
+  if (!collective || !callsToAction) {
+    return null;
+  }
+
+  // Order of the condition defines main call to action: first match gets displayed
+  if (callsToAction.hasDashboard) {
+    return {
+      type: NAVBAR_ACTION_TYPE.DASHBOARD,
+      component: (
+        <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+          <MainActionBtn>
+            <Dashboard size="1em" />
+            <Span ml={2}>
+              <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+            </Span>
+          </MainActionBtn>
+        </Link>
+      ),
+    };
+  } else if (!isAdmin && callsToAction.hasContribute && getContributeRoute(collective)) {
+    return {
+      type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
+      component: (
+        <Link {...getContributeRoute(collective)}>
+          <MainActionBtn>
+            <Planet size="1em" />
+            <Span ml={2}>
+              <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
+            </Span>
+          </MainActionBtn>
+        </Link>
+      ),
+    };
+  } else if (!isAdmin && callsToAction.hasApply) {
+    return {
+      type: NAVBAR_ACTION_TYPE.APPLY,
+      component: (
+        <ApplyToHostBtn
+          hostSlug={collective.slug}
+          buttonRenderer={props => <MainActionBtn {...props} />}
+          hostWithinLimit={false} // TODO
+        />
+      ),
+    };
+  } else if (callsToAction.hasSubmitExpense) {
+    return {
+      type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
+      component: (
+        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
+          <MainActionBtn>
+            <Receipt size="1em" />
+            <Span ml={2}>
+              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+            </Span>
+          </MainActionBtn>
+        </Link>
+      ),
+    };
+  } else if (callsToAction.hasManageSubscriptions) {
+    return {
+      type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
+      component: (
+        <Link route="recurring-contributions" params={{ slug: collective.slug }}>
+          <MainActionBtn>
+            <Stack size="1em" />
+            <Span ml={2}>
+              <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+            </Span>
+          </MainActionBtn>
+        </Link>
+      ),
+    };
+  } else if (!isAdmin && callsToAction.hasContact) {
+    return {
+      type: NAVBAR_ACTION_TYPE.CONTACT,
+      component: (
+        <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+          <MainActionBtn>
+            <Dashboard size="20px" />
+            <Span ml={2}>
+              <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+            </Span>
+          </MainActionBtn>
+        </Link>
+      ),
+    };
+  } else {
+    return null;
+  }
+};
+
+const MainActionBtn = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  background: rgba(72, 95, 211, 0.1);
+  border-radius: 8px;
+  border: none;
+  color: #304cdc;
+
+  &:hover {
+    background: rgba(72, 95, 211, 0.12);
+  }
+
+  &:active {
+    background: rgba(72, 95, 211, 0.2);
+    color: #304cdc;
+  }
+
+  span {
+    vertical-align: middle;
+  }
+`;
+
+/**
  * The NavBar that displays all the individual sections.
  */
 const CollectiveNavbar = ({
@@ -336,15 +463,13 @@ const CollectiveNavbar = ({
   const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin, null, newNavbarFeatureFlag);
   callsToAction = { ...getDefaultCallsToActions(collective, isAdmin, newNavbarFeatureFlag), ...callsToAction };
-  const isEvent = collective?.type === CollectiveType.EVENT;
-
+  const mainAction = getMainAction(collective, isAdmin, callsToAction);
   const navbarRef = useRef();
+
   useGlobalBlur(navbarRef, outside => {
-    if (!outside) {
+    if (!outside && isExpanded) {
       setTimeout(() => {
-        if (isExpanded) {
-          setExpanded(false);
-        }
+        setExpanded(false);
       }, 200);
     }
   });
@@ -453,44 +578,18 @@ const CollectiveNavbar = ({
             backgroundColor="#fff"
             zIndex={1}
           >
-            {isAdmin && (
-              <Flex flexDirection={['column', 'row']} alignItems={['stretch', 'center']}>
-                <Link
-                  width="100%"
-                  route={isEvent ? 'editEvent' : 'editCollective'}
-                  textDecoration="none"
-                  params={
-                    isEvent
-                      ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
-                      : { slug: collective.slug }
-                  }
-                >
-                  <Container
-                    display="flex"
-                    flexGrow={1}
-                    alignItems="center"
-                    borderRadius={[0, 8]}
-                    background="rgba(72, 95, 211, 0.1)"
-                    px={[4, 3]}
-                    py={[3, 1]}
-                  >
-                    <Settings size={20} color="rgb(48, 76, 220)" />
-                    <P
-                      ml={[2, 1]}
-                      textTransform="uppercase"
-                      color="rgb(48, 76, 220)"
-                      fontSize="14px"
-                      lineHeight="16px"
-                      letterSpacing="60%"
-                      whiteSpace="nowrap"
-                    >
-                      <FormattedMessage id="AdminPanel" defaultMessage="Admin Panel" />
-                    </P>
-                  </Container>
-                </Link>
-              </Flex>
+            {mainAction && (
+              <Container display={['none', 'flex']} alignItems="center">
+                {mainAction.component}
+              </Container>
             )}
-            {!isLoading && <CollectiveNavbarActionsMenu collective={collective} callsToAction={callsToAction} />}
+            {!isLoading && (
+              <CollectiveNavbarActionsMenu
+                collective={collective}
+                callsToAction={callsToAction}
+                hiddenActionForNonMobile={mainAction?.type}
+              />
+            )}
             {!onlyInfos && (
               <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
                 {isExpanded ? (

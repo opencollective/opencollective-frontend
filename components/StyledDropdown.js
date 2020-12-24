@@ -49,7 +49,7 @@ export const Dropdown = styled(({ children, ...props }) => {
       tabIndex={0}
       {...props}
       onFocus={() => setTimeout(() => setDisplayed(true), 50)}
-      onBlur={() => setDisplayed(false)}
+      onBlur={() => setTimeout(() => setDisplayed(false), 50)}
       onClick={e => {
         if (isDisplayed) {
           if (document.activeElement?.contains(e.target)) {

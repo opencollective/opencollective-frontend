@@ -6,6 +6,17 @@ import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
 
 import { Sections } from '../collective-page/_constants';
 
+export const NAVBAR_ACTION_TYPE = {
+  SUBMIT_EXPENSE: 'hasSubmitExpense',
+  DASHBOARD: 'hasDashboard',
+  APPLY: 'hasApply',
+  CONTACT: 'hasContact',
+  ADD_PREPAID_BUDGET: 'addPrepaidBudget',
+  ADD_FUNDS: 'addFunds',
+  CONTRIBUTE: 'hasContribute',
+  MANAGE_SUBSCRIPTIONS: 'hasManageSubscriptions',
+};
+
 const titles = defineMessages({
   CONTRIBUTE: {
     id: 'Contribute.allWays',
