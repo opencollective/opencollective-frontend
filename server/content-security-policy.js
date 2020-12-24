@@ -15,6 +15,7 @@ const COMMON_DIRECTIVES = {
     'data:',
     't.paypal.com',
     'opencollective.com', // for widgets on /edit/export
+    'blob:', // For upload images previews
   ],
   workerSrc: [
     SELF,
