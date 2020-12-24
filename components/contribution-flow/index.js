@@ -275,9 +275,7 @@ class ContributionFlow extends React.Component {
     } else {
       currentPath = `${currentPath}?`;
     }
-    // add 'emailRedirect' to the query so we can load the Payment step when
-    // the user comes back from signing up to make a recurring contribution
-    currentPath = `${currentPath.replace('profile', 'payment')}&emailRedirect=true`;
+
     return encodeURIComponent(currentPath);
   }
 
@@ -702,6 +700,7 @@ class ContributionFlow extends React.Component {
                         collective={collective}
                         stepDetails={stepDetails}
                         stepSummary={stepSummary}
+                        stepPayment={stepPayment}
                       />
                     </Box>
                     <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />
