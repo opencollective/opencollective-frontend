@@ -55,7 +55,7 @@ class Members extends React.Component {
       loading: PropTypes.bool,
       error: PropTypes.any,
       refetch: PropTypes.func.isRequired,
-      data: PropTypes.object,
+      Collective: PropTypes.object,
     }),
   };
 
@@ -366,6 +366,23 @@ class Members extends React.Component {
           {getErrorFromGraphqlException(data.error).message}
         </MessageBox>
       );
+    } else if (data.Collective?.parentCollective) {
+      const parent = data.Collective.parentCollective;
+      return (
+        <MessageBox type="info" withIcon>
+          <FormattedMessage
+            id="Members.DefinedInParent"
+            defaultMessage="The team for this profile is defined in {parentName}'s settings"
+            values={{
+              parentName: (
+                <Link route="editCollective" params={{ slug: parent.slug, section: 'members' }}>
+                  {parent.name}
+                </Link>
+              ),
+            }}
+          />
+        </MessageBox>
+      );
     } else {
       return this.renderForm();
     }
@@ -396,6 +413,12 @@ const coreContributorsQuery = gql`
   query CoreContributors($collectiveId: Int!) {
     Collective(id: $collectiveId) {
       id
+      parentCollective {
+        id
+        slug
+        type
+        name
+      }
       members(roles: ["ADMIN", "MEMBER", "ACCOUNTANT"]) {
         ...MemberFields
       }

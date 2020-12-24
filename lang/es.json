@@ -1146,6 +1146,7 @@
   "MemberInvitations.none": "No hay invitaciones pendientes",
   "MemberInvitations.title": "Invitaciones pendientes",
   "members.add": "Add Team Member",
+  "Members.DefinedInParent": "The team for this profile is defined in {parentName}'s settings",
   "members.edit.description": "Nota: Sólo los administradores de los Colectivos pueden editar este Colectivo y aprobar o rechazar gastos.",
   "members.pending.details": "Este miembro todavía no ha aprobado la invitación para unirse al colectivo",
   "members.remove": "Remove Team Member",
