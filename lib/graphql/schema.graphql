@@ -3693,6 +3693,12 @@ type Tier {
   Returns true if the tier has a long description
   """
   hasLongDescription: Boolean
+    @deprecated(reason: "2020-12-24: This field is being deprecated in favor of useStandalonePage")
+
+  """
+  Returns true if the tier has its standalone page activated
+  """
+  useStandalonePage: Boolean
 
   """
   Link to a video (YouTube, Vimeo).
@@ -3748,6 +3754,11 @@ input TierInputType {
   A long, html-formatted description.
   """
   longDescription: String
+
+  """
+  Whether this tier has a standalone page
+  """
+  useStandalonePage: Boolean
 
   """
   Link to a video (YouTube, Vimeo).

@@ -202,7 +202,6 @@ const contributePageQuery = gql`
         name
         slug
         description
-        hasLongDescription
         goal
         interval
         currency

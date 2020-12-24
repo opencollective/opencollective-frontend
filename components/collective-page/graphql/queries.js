@@ -98,7 +98,7 @@ export const collectivePageQuery = gql`
         name
         slug
         description
-        hasLongDescription
+        useStandalonePage
         goal
         interval
         currency
