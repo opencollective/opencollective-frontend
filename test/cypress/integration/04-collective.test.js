@@ -61,7 +61,7 @@ describe('Collective page', () => {
       cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-main-color-btn]').click();
       cy.get('[data-cy=collective-color-picker-card] [data-cy=collective-color-picker-options-btn]:first').click();
       cy.get('[data-cy=collective-color-picker-save-btn]').then($saveBtn => {
-        cy.wrap($saveBtn).should('have.css', 'background-color', 'rgb(193, 40, 34)');
+        cy.wrap($saveBtn).should('have.css', 'background-color', 'rgb(191, 40, 33)');
         cy.wrap($saveBtn).click();
       });
     });

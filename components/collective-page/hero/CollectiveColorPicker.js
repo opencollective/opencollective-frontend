@@ -45,7 +45,7 @@ const PRESET_COLORS = [
 const validateColor = value => isHexColor(value) && value.length === 7;
 
 const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
-  const color = theme.colors.primary[500];
+  const color = theme.colors.primary.base || theme.colors.primary[500];
   const [textValue, setTextValue] = React.useState(color.replace('#', ''));
   const [showError, setShowError] = React.useState(false);
   const hasError = !validateColor(`#${textValue}`);
