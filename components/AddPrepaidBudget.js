@@ -307,13 +307,13 @@ class AddFundsForm extends React.Component {
 
               <div>
                 {showAddFundsToOrgDetails && (
-                      <Container padding="8px 0">
+                  <Container padding="8px 0">
                     <FormattedMessage
                       id="AddFundsForm.PutAside"
                       defaultMessage="Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees."
                       values={{ hostFeePercent, hostFeeAmount, platformFeePercent, platformFeeAmount }}
                     />
-                      </Container>
+                  </Container>
                 )}
               </div>
 
