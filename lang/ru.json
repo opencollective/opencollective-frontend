@@ -1146,6 +1146,7 @@
   "MemberInvitations.none": "No pending invitations",
   "MemberInvitations.title": "Pending invitations",
   "members.add": "Add Team Member",
+  "Members.DefinedInParent": "The team for this profile is defined in {parentName}'s settings",
   "members.edit.description": "Примечание: Только Администраторы Коллектива могут редактировать этот Коллектив и одобрять или отклонять расходы.",
   "members.pending.details": "This member has not approved the invitation to join the collective yet",
   "members.remove": "Remove Team Member",
