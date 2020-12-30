@@ -25,7 +25,7 @@
   "acceptContributions.picker.subtitle": "Chi deterrà denaro per conto del Collettivo?",
   "acceptContributions.stripe.info": "Accetta automaticamente i contributi con carte di credito da tutto il mondo.",
   "acceptContributions.stripeConnected": "Stripe connesso",
-  "acceptContributions.success.hostSettings": "Fiscal Host Settings",
+  "acceptContributions.success.hostSettings": "Impostazioni Fiscali Dell'Organizzazione",
   "acceptContributions.success.hostSettingsInfo": "You can manage your Fiscal Host settings — like adding more payment methods — from your Fiscal Host Organization's profile. {takeMeThere}.",
   "acceptContributions.success.nowAcceptingContributions": "Congratulations! {collective} is now accepting financial contributions.",
   "acceptContributions.success.toConsider": "A few more things you should consider:",
