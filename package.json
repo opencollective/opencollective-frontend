@@ -71,7 +71,7 @@
     "payment": "2.4.0",
     "polished": "4.0.5",
     "prop-types": "15.7.2",
-    "qrcode.react": "1.0.0",
+    "qrcode.react": "1.0.1",
     "react": "16.14.0",
     "react-bootstrap": "0.33.1",
     "react-datetime": "3.0.4",
