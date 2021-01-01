@@ -1264,7 +1264,7 @@
   "onboarding.contact.placeholder": "Escribe el nombre de quien quiere invitar",
   "onboarding.contact.social": "Tell your contributors how to reach your Collective through social media.",
   "onboarding.contact.website": "¿Tiene un sitio web?",
-  "onboarding.error.github": "Por favor, introduzca un manejador de GitHub válido.",
+  "onboarding.error.github": "Please enter a valid GitHub URL.",
   "onboarding.error.twitter": "Por favor, introduzca un manejador de Twitter válido.",
   "onboarding.error.website": "Por favor, introduzca una URL válida.",
   "onboarding.success.header": "¡Bienvenido a su nuevo Colectivo!",

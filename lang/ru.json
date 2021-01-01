@@ -1264,7 +1264,7 @@
   "onboarding.contact.placeholder": "Введите имя человека, которого вы хотите пригласить",
   "onboarding.contact.social": "Tell your contributors how to reach your Collective through social media.",
   "onboarding.contact.website": "Do you have a website?",
-  "onboarding.error.github": "Пожалуйста, введите действительное имя пользователя GitHub.",
+  "onboarding.error.github": "Please enter a valid GitHub URL.",
   "onboarding.error.twitter": "Пожалуйста, введите действительное имя пользователя на Twitter.",
   "onboarding.error.website": "Please enter a valid URL.",
   "onboarding.success.header": "Добро пожаловать в ваш новый Коллектив!",

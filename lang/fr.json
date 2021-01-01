@@ -1264,7 +1264,7 @@
   "onboarding.contact.placeholder": "Entrez le nom de la personne que vous souhaitez inviter",
   "onboarding.contact.social": "Dites à vos contributeurs comment vous trouver sur les réseaux sociaux.",
   "onboarding.contact.website": "Avez-vous un site web ?",
-  "onboarding.error.github": "Veuillez entrer un identifiant GitHub valide.",
+  "onboarding.error.github": "Please enter a valid GitHub URL.",
   "onboarding.error.twitter": "Veuillez entrer un identifiant Twitter valide.",
   "onboarding.error.website": "Veuillez entrer une URL valide.",
   "onboarding.success.header": "Bienvenue dans votre nouveau Collectif !",
