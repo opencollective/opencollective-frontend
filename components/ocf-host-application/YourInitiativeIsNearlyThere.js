@@ -17,6 +17,24 @@ const Link = styled(StyledLink)`
   font-weight: 400;
 `;
 
+const VisitDocumentationLink = styled(StyledLink)`
+  background: linear-gradient(180deg, #4f7d7f 0%, #396c6f 100%);
+  border-color: transparent;
+  white-space: nowrap;
+  color: #ffffff;
+  &:focus {
+    border: solid 2px #90f0bd;
+    background: linear-gradient(to bottom, #7a9899, #527d80 99%);
+  }
+  &:active {
+    background: linear-gradient(to bottom, #7a9899, #527d80 99%);
+  }
+  &:hover {
+    border-color: transparent;
+    background: linear-gradient(to bottom, #7a9899, #527d80 99%);
+  }
+`;
+
 const YourInitiativeIsNearlyThere = () => (
   <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
     <Flex flexDirection={'column'} alignItems="center" justifyContent="center" mb={[null, 3]}>
@@ -149,12 +167,11 @@ const YourInitiativeIsNearlyThere = () => (
           </Box>
         </Container>
       </Container>
-      <StyledLink
+      <VisitDocumentationLink
         my="40px"
         href="https://docs.opencollective.foundation/"
         width={['286px', '215px']}
         buttonStyle="primary"
-        background="linear-gradient(180deg, #4f7d7f 0%, #396c6f 100%)"
         borderColor="transparent"
         buttonSize="medium"
         openInNewTab
@@ -166,7 +183,7 @@ const YourInitiativeIsNearlyThere = () => (
             arrowRight: <ArrowRight2 size="14px" />,
           }}
         />
-      </StyledLink>
+      </VisitDocumentationLink>
     </Flex>
   </Flex>
 );

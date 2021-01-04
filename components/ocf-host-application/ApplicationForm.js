@@ -1,32 +1,56 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/client';
 import { Lock } from '@styled-icons/boxicons-solid/Lock';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
-import { useFormik } from 'formik';
+import { Form, Formik } from 'formik';
+import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { createError, ERROR } from '../../lib/errors';
-import { formatFormErrorMessage } from '../../lib/form-utils';
+import { suggestSlug } from '../../lib/collective.lib';
+import { i18nGraphqlException } from '../../lib/errors';
+import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { Router } from '../../server/pages';
 
 import Container from '../Container';
 import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
 import Link from '../Link';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
-import StyledInputField from '../StyledInputField';
+import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P } from '../Text';
 
 import OCFPrimaryButton from './OCFPrimaryButton';
+
+const createCollectiveMutation = gqlV2/* GraphQL */ `
+  mutation CreateCollective(
+    $collective: CollectiveCreateInput!
+    $host: AccountReferenceInput
+    $user: UserCreateInput
+    $message: String
+  ) {
+    createCollective(collective: $collective, host: $host, user: $user, message: $message) {
+      id
+      slug
+      host {
+        id
+        slug
+      }
+    }
+  }
+`;
 
 const messages = defineMessages({
   locationLabel: {
@@ -83,94 +107,84 @@ const messages = defineMessages({
   },
 });
 
-const validate = values => {
-  const errors = {};
-  if (!values.location) {
-    errors.location = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!values.name) {
-    errors.name = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!values.initiativeName) {
-    errors.initiativeName = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!values.slug) {
-    errors.slug = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!values.initiativeDuration) {
-    errors.initiativeDuration = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!values.totalAmountRaised) {
-    errors.totalAmountRaised = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!values.totalAmountToBeRaised) {
-    errors.totalAmountToBeRaised = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!values.expectedFundingPartner) {
-    errors.expectedFundingPartner = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!values.initiativeDescription) {
-    errors.initiativeDescription = createError(ERROR.FORM_FIELD_REQUIRED);
-  } else if (values.initiativeDescription.length < 250) {
-    errors.initiativeDescription = createError(ERROR.FORM_FIELD_MIN_LENGTH);
-  }
-
-  if (!values.missionImpactExplanation) {
-    errors.missionImpactExplanation = createError(ERROR.FORM_FIELD_REQUIRED);
-  } else if (values.missionImpactExplanation.length < 250) {
-    errors.missionImpactExplanation = createError(ERROR.FORM_FIELD_MIN_LENGTH);
-  }
-
-  if (!values.websiteAndSocialLinks) {
-    errors.websiteAndSocialLinks = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!values.additionalInfo) {
-    errors.additionalInfo = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-  return errors;
+const initialValues = {
+  location: '',
+  name: '',
+  email: '',
+  initiativeName: '',
+  slug: '',
+  initiativeDuration: '',
+  totalAmountRaised: '',
+  totalAmountToBeRaised: '',
+  expectedFundingPartner: '',
+  initiativeDescription: '',
+  missionImpactExplanation: '',
+  websiteAndSocialLinks: '',
+  additionalInfo: '',
+  termsOfServiceOC: false,
+  termsOfServiceOCF: false,
 };
 
 const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
   const intl = useIntl();
-  const { values, handleSubmit, errors, getFieldProps, setValues, touched, setFieldValue } = useFormik({
-    initialValues: {
-      location: '',
-      name: '',
-      email: '',
-      initiativeName: '',
-      slug: '',
-      initiativeDuration: '',
-      totalAmountRaised: 0,
-      totalAmountToBeRaised: 0,
-      expectedFundingPartner: '',
-      initiativeDescription: '',
-      missionImpactExplanation: '',
-      websiteAndSocialLinks: '',
-      additionalInfo: '',
-      checkedTermsOfServiceOC: false,
-      checkedTermsOfServiceOCF: false,
-    },
-    validate,
-    onSubmit: values => {
-      console.log(values);
-    },
+  const [createCollective, { loading: submitting, error }] = useMutation(createCollectiveMutation, {
+    context: API_V2_CONTEXT,
   });
 
-  if (!loadingLoggedInUser && LoggedInUser && !values.name && !values.email) {
-    setValues({
-      name: LoggedInUser.collective.name,
-      email: LoggedInUser.email,
-    });
-  }
+  const validate = values => {
+    const errors = requireFields(values, [
+      'location',
+      'name',
+      'email',
+      'initiativeName',
+      'slug',
+      'initiativeDuration',
+      'totalAmountRaised',
+      'totalAmountToBeRaised',
+      'expectedFundingPartner',
+      'initiativeDescription',
+      'missionImpactExplanation',
+      'websiteAndSocialLinks',
+      'additionalInfo',
+    ]);
+
+    verifyFieldLength(intl, errors, values, 'name', 1, 50);
+    verifyFieldLength(intl, errors, values, 'slug', 1, 30);
+    verifyFieldLength(intl, errors, values, 'initiativeDescription', 1, 250);
+    verifyFieldLength(intl, errors, values, 'missionImpactExplanation', 1, 250);
+
+    verifyChecked(errors, values, 'termsOfServiceOCF');
+    verifyChecked(errors, values, 'termsOfServiceOC');
+
+    return errors;
+  };
+  const submit = async values => {
+    const variables = {
+      collective: {
+        name: values.initiativeName,
+        slug: values.slug,
+        description: values.initiativeDescription,
+        data: pick(
+          values,
+          'initiativeDuration',
+          'totalAmountRaised',
+          'totalAmountToBeRaised',
+          'expectedFundingPartner',
+          'initiativeDescription',
+          'missionImpactExplanation',
+          'websiteAndSocialLinks',
+          'additionalInfo',
+          'location',
+        ),
+      },
+      host: { slug: 'foundation' },
+      user: pick(values, 'name', 'email'),
+    };
+    const response = await createCollective({ variables });
+    if (response.data.createCollective) {
+      await Router.pushRoute('/ocf/apply/success');
+    }
+  };
 
   return (
     <React.Fragment>
@@ -203,426 +217,475 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
         </Flex>
       </Flex>
       <Flex flexDirection={['column', 'row']} alignItems={['center', 'flex-start']} justifyContent="center">
-        <Flex flexDirection="column" alignItems="center" justifyContent="center" as="form" onSubmit={handleSubmit}>
-          <Container
-            justifyContent="center"
-            flexDirection="column"
-            alignItems={['center', 'flex-start']}
-            mb={4}
-            mt={[3, 0]}
-            border="1px solid #DCDEE0"
-            padding="32px 16px"
-            display="flex"
-            borderRadius="8px"
-            mr={['36px', null, null, null, '102px']}
-          >
-            <Box width={['256px', '484px', '664px']}>
-              <Container display="flex" alignItems="center" justifyContent="space-between">
-                <H4 fontSize="16px" lineHeight="24px" color="black.900" mb={2}>
-                  <FormattedMessage
-                    id="OCFHostApplication.applicationForm.title"
-                    defaultMessage="About you and your initiative {padlock} {questionMark}"
-                    values={{
-                      padlock: <Lock size="12px" color="#9D9FA3" />,
-                      questionMark: <Question size="13px" color="#DADADA" />,
-                    }}
-                  />
-                </H4>
-                <StyledHr display={['none', 'flex']} width={[null, '219px', '383px']} />
-              </Container>
-              <P fontSize="12px" lineHeight="16px" color="black.600">
-                <FormattedMessage
-                  id="OCFHostApplication.applicationForm.instruction"
-                  defaultMessage="All fields are mandatory."
-                />
-              </P>
-            </Box>
-            <Box width={['256px', '234px', '324px']} my={3}>
-              <StyledInputField
-                label={intl.formatMessage(messages.locationLabel)}
-                labelFontSize="13px"
-                labelColor="#4E5052"
-                labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                error={touched.location && formatFormErrorMessage(intl, errors.location)}
-              >
-                {inputProps => (
-                  <StyledInput
-                    type="text"
-                    placeholder="Walnut, CA"
-                    {...inputProps}
-                    px="7px"
-                    {...getFieldProps('location')}
-                  />
-                )}
-              </StyledInputField>
-            </Box>
-            <Flex flexDirection={['column', 'row']}>
-              <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
-                <StyledInputField
-                  label={intl.formatMessage(messages.nameLabel)}
-                  labelFontSize="13px"
-                  labelColor="#4E5052"
-                  labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                  disabled={!!LoggedInUser}
-                  error={touched.name && formatFormErrorMessage(intl, errors.name)}
-                >
-                  {inputProps => (
-                    <StyledInput
-                      type="text"
-                      placeholder="Thomas Anderson"
-                      px="7px"
-                      {...inputProps}
-                      {...getFieldProps('name')}
-                    />
-                  )}
-                </StyledInputField>
-              </Box>
-              <Box width={['256px', '234px', '324px']} my={2}>
-                <StyledInputField
-                  label={intl.formatMessage(messages.emailLabel)}
-                  labelFontSize="13px"
-                  labelColor="#4E5052"
-                  labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                  disabled={!!LoggedInUser}
-                  error={touched.email && formatFormErrorMessage(intl, errors.email)}
-                >
-                  {inputProps => (
-                    <StyledInput
-                      type="email"
-                      placeholder="tanderson@gmail.com"
-                      px="7px"
-                      {...inputProps}
-                      {...getFieldProps('email')}
-                    />
-                  )}
-                </StyledInputField>
-                <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                  <FormattedMessage
-                    id="OCFHostApplication.applicationForm.emailInstruction"
-                    defaultMessage="We will use this email to create your account."
-                  />
-                </P>
-              </Box>
+        <Flex flexDirection="column" alignItems="center" justifyContent="center">
+          {error && (
+            <Flex alignItems="center" justifyContent="center">
+              <MessageBox type="error" withIcon mb={[1, 3]}>
+                {i18nGraphqlException(intl, error)}
+              </MessageBox>
             </Flex>
-            <Flex flexDirection={['column', 'row']}>
-              <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
-                <StyledInputField
-                  label={intl.formatMessage(messages.initiativeNameLabel)}
-                  labelFontSize="13px"
-                  labelColor="#4E5052"
-                  labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                  error={touched.initiativeName && formatFormErrorMessage(intl, errors.initiativeName)}
-                >
-                  {inputProps => (
-                    <StyledInput
-                      type="text"
-                      placeholder="Agora Collective"
-                      px="7px"
-                      {...inputProps}
-                      {...getFieldProps('initiativeName')}
-                    />
-                  )}
-                </StyledInputField>
-              </Box>
-              <Box width={['256px', '234px', '324px']} my={2}>
-                <StyledInputField
-                  label={intl.formatMessage(messages.slugLabel)}
-                  labelFontSize="13px"
-                  labelColor="#4E5052"
-                  labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                  error={touched.slug && formatFormErrorMessage(intl, errors.slug)}
-                >
-                  {inputProps => (
-                    <StyledInputGroup
-                      prepend="opencollective.com/"
-                      type="url"
-                      placeholder="agora"
-                      {...inputProps}
-                      px="7px"
-                      prependProps={{ color: '#9D9FA3', fontSize: '13px', lineHeight: '16px' }}
-                      {...getFieldProps('slug')}
-                    />
-                  )}
-                </StyledInputField>
-                <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                  <FormattedMessage
-                    id="OCFHostApplication.applicationForm.slugInstruction"
-                    defaultMessage="Suggested"
-                  />
-                </P>
-              </Box>
-            </Flex>
-            <Flex flexDirection={['column', 'row']}>
-              <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
-                <StyledInputField
-                  label={intl.formatMessage(messages.initiativeDurationLabel)}
-                  labelFontSize="13px"
-                  labelColor="#4E5052"
-                  labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                  error={touched.initiativeDuration && formatFormErrorMessage(intl, errors.initiativeDuration)}
-                >
-                  {inputProps => (
-                    <StyledInput
-                      type="text"
-                      placeholder="New initiatives are welcome!"
-                      {...inputProps}
-                      px="7px"
-                      {...getFieldProps('initiativeDuration')}
-                    />
-                  )}
-                </StyledInputField>
-              </Box>
-              <Box width={['256px', '234px', '324px']} my={2}>
-                <StyledInputField
-                  label={intl.formatMessage(messages.totalAmountRaisedLabel)}
-                  labelFontSize="13px"
-                  labelColor="#4E5052"
-                  labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                  error={touched.totalAmountRaised && formatFormErrorMessage(intl, errors.totalAmountRaised)}
-                >
-                  {inputProps => (
-                    <StyledInputAmount
-                      type="text"
-                      placeholder="It's fine if you're just starting out."
-                      {...inputProps}
-                      px="7px"
-                      currency="USD"
-                      {...getFieldProps('totalAmountRaised')}
-                      onChange={value => setFieldValue('totalAmountRaised', value)}
-                    />
-                  )}
-                </StyledInputField>
-                <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                  <FormattedMessage
-                    id="OCFHostApplication.applicationForm.totalAmountRaisedInstruction"
-                    defaultMessage="If you haven't please type 0."
-                  />
-                </P>
-              </Box>
-            </Flex>
-            <Flex flexDirection={['column', 'row']}>
-              <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
-                <StyledInputField
-                  label={intl.formatMessage(messages.totalAmountToBeRaisedLabel)}
-                  labelFontSize="13px"
-                  labelColor="#4E5052"
-                  labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                  error={touched.totalAmountToBeRaised && formatFormErrorMessage(intl, errors.totalAmountToBeRaised)}
-                >
-                  {inputProps => (
-                    <StyledInputAmount
-                      type="text"
-                      placeholder="Be as ambitious as you want."
-                      currency="USD"
-                      {...inputProps}
-                      px="7px"
-                      {...getFieldProps('totalAmountToBeRaised')}
-                      onChange={value => setFieldValue('totalAmountToBeRaised', value)}
-                    />
-                  )}
-                </StyledInputField>
-              </Box>
-              <Box width={['256px', '234px', '324px']} my={2}>
-                <StyledInputField
-                  label={intl.formatMessage(messages.expectedFundingPartnerLabel)}
-                  labelFontSize="13px"
-                  labelColor="#4E5052"
-                  labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                  error={touched.expectedFundingPartner && formatFormErrorMessage(intl, errors.expectedFundingPartner)}
-                >
-                  {inputProps => (
-                    <StyledInput
-                      type="text"
-                      placeholder="An idea of your ideal partners."
-                      {...inputProps}
-                      px="7px"
-                      {...getFieldProps('expectedFundingPartner')}
-                    />
-                  )}
-                </StyledInputField>
-              </Box>
-            </Flex>
-            <Box width={['256px', '484px', '663px']} my={2}>
-              <StyledInputField
-                label={intl.formatMessage(messages.initiativeDescriptionLabel)}
-                labelFontSize="13px"
-                labelColor="#4E5052"
-                labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                error={touched.initiativeDescription && formatFormErrorMessage(intl, errors.initiativeDescription)}
-              >
-                {inputProps => (
-                  <StyledTextarea
-                    placeholder="We make sandwiches and give them to 
+          )}
+          <Formik initialValues={initialValues} onSubmit={submit} validate={validate}>
+            {formik => {
+              const { values, touched, setFieldValue, setValues, handleSubmit } = formik;
+
+              const handleSlugChange = e => {
+                if (!touched.slug) {
+                  setFieldValue('slug', suggestSlug(e.target.value));
+                }
+              };
+
+              if (!loadingLoggedInUser && LoggedInUser && !values.name && !values.email) {
+                setValues({
+                  ...values,
+                  name: LoggedInUser.collective.name,
+                  email: LoggedInUser.email,
+                });
+              }
+
+              return (
+                <Form>
+                  <Container
+                    justifyContent="center"
+                    flexDirection="column"
+                    alignItems={['center', 'flex-start']}
+                    mb={4}
+                    mt={[3, 0]}
+                    border="1px solid #DCDEE0"
+                    padding="32px 16px"
+                    display="flex"
+                    borderRadius="8px"
+                    mr={['36px', null, null, null, '102px']}
+                  >
+                    <Box width={['256px', '484px', '664px']}>
+                      <Container display="flex" alignItems="center" justifyContent="space-between">
+                        <H4 fontSize="16px" lineHeight="24px" color="black.900" mb={2}>
+                          <FormattedMessage
+                            id="OCFHostApplication.applicationForm.title"
+                            defaultMessage="About you and your initiative {padlock} {questionMark}"
+                            values={{
+                              padlock: <Lock size="12px" color="#9D9FA3" />,
+                              questionMark: <Question size="13px" color="#DADADA" />,
+                            }}
+                          />
+                        </H4>
+                        <StyledHr display={['none', 'flex']} width={[null, '219px', '383px']} />
+                      </Container>
+                      <P fontSize="12px" lineHeight="16px" color="black.600">
+                        <FormattedMessage
+                          id="OCFHostApplication.applicationForm.instruction"
+                          defaultMessage="All fields are mandatory."
+                        />
+                      </P>
+                    </Box>
+                    <Box width={['256px', '234px', '324px']}>
+                      <StyledInputFormikField
+                        label={intl.formatMessage(messages.locationLabel)}
+                        labelFontSize="13px"
+                        labelColor="#4E5052"
+                        labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                        required
+                        htmlFor="location"
+                        name="location"
+                        my={3}
+                      >
+                        {({ field }) => <StyledInput {...field} type="text" placeholder="Walnut, CA" px="7px" />}
+                      </StyledInputFormikField>
+                    </Box>
+                    <Flex flexDirection={['column', 'row']}>
+                      <Box mr={[null, 3]}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.nameLabel)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          disabled={!!LoggedInUser}
+                          name="name"
+                          htmlFor="name"
+                          width={['256px', '234px', '324px']}
+                          my={2}
+                          required
+                        >
+                          {({ field }) => <StyledInput type="text" placeholder="Thomas Anderson" px="7px" {...field} />}
+                        </StyledInputFormikField>
+                      </Box>
+                      <Box my={2}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.emailLabel)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          disabled={!!LoggedInUser}
+                          name="email"
+                          htmlFor="email"
+                          width={['256px', '234px', '324px']}
+                          required
+                        >
+                          {({ field }) => (
+                            <StyledInput type="email" placeholder="tanderson@gmail.com" px="7px" {...field} />
+                          )}
+                        </StyledInputFormikField>
+                        <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                          <FormattedMessage
+                            id="OCFHostApplication.applicationForm.emailInstruction"
+                            defaultMessage="We will use this email to create your account."
+                          />
+                        </P>
+                      </Box>
+                    </Flex>
+                    <Flex flexDirection={['column', 'row']}>
+                      <Box my={2} mr={[null, 3]}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.initiativeNameLabel)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          name="initiativeName"
+                          htmlFor="initiativeName"
+                          required
+                          onChange={handleSlugChange}
+                          width={['256px', '234px', '324px']}
+                        >
+                          {({ field }) => (
+                            <StyledInput type="text" placeholder="Agora Collective" px="7px" {...field} />
+                          )}
+                        </StyledInputFormikField>
+                      </Box>
+                      <Box width={['256px', '234px', '324px']} my={2}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.slugLabel)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          name="slug"
+                          htmlFor="slug"
+                          required
+                        >
+                          {({ field }) => (
+                            <StyledInputGroup
+                              prepend="opencollective.com/"
+                              type="url"
+                              placeholder="agora"
+                              {...field}
+                              onChange={e => setFieldValue('slug', e.target.value)}
+                              px="7px"
+                              prependProps={{ color: '#9D9FA3', fontSize: '13px', lineHeight: '16px' }}
+                            />
+                          )}
+                        </StyledInputFormikField>
+                        <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                          <FormattedMessage
+                            id="OCFHostApplication.applicationForm.slugInstruction"
+                            defaultMessage="Suggested"
+                          />
+                        </P>
+                      </Box>
+                    </Flex>
+                    <Flex flexDirection={['column', 'row']}>
+                      <Box mr={[null, 3]}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.initiativeDurationLabel)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          name="initiativeDuration"
+                          htmlFor="initiativeDuration"
+                          required
+                          width={['256px', '234px', '324px']}
+                          my={2}
+                        >
+                          {({ field }) => (
+                            <StyledInput type="text" placeholder="New initiatives are welcome!" {...field} px="7px" />
+                          )}
+                        </StyledInputFormikField>
+                      </Box>
+                      <Box width={['256px', '234px', '324px']} my={2}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.totalAmountRaisedLabel)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          name="totalAmountRaised"
+                          htmlFor="totalAmountRaised"
+                          required
+                        >
+                          {({ form, field }) => (
+                            <StyledInputAmount
+                              id={field.id}
+                              currency="USD"
+                              px="7px"
+                              placeholder="It's fine if you're just starting out."
+                              error={field.error}
+                              value={field.value}
+                              maxWidth="100%"
+                              onChange={value => form.setFieldValue(field.name, value)}
+                              onBlur={() => form.setFieldTouched(field.name, true)}
+                            />
+                          )}
+                        </StyledInputFormikField>
+                        <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                          <FormattedMessage
+                            id="OCFHostApplication.applicationForm.totalAmountRaisedInstruction"
+                            defaultMessage="If you haven't please type 0."
+                          />
+                        </P>
+                      </Box>
+                    </Flex>
+                    <Flex flexDirection={['column', 'row']}>
+                      <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.totalAmountToBeRaisedLabel)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          name="totalAmountToBeRaised"
+                          htmlFor="totalAmountToBeRaised"
+                          required
+                        >
+                          {({ field, form }) => (
+                            <StyledInputAmount
+                              id={field.id}
+                              placeholder="Be as ambitious as you want."
+                              currency="USD"
+                              px="7px"
+                              error={field.error}
+                              value={field.value}
+                              maxWidth="100%"
+                              onChange={value => form.setFieldValue(field.name, value)}
+                              onBlur={() => form.setFieldTouched(field.name, true)}
+                            />
+                          )}
+                        </StyledInputFormikField>
+                      </Box>
+                      <Box width={['256px', '234px', '324px']} my={2}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.expectedFundingPartnerLabel)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          name="expectedFundingPartner"
+                          htmlFor="expectedFundingPartner"
+                          required
+                        >
+                          {({ field }) => (
+                            <StyledInput
+                              type="text"
+                              placeholder="An idea of your ideal partners."
+                              {...field}
+                              px="7px"
+                            />
+                          )}
+                        </StyledInputFormikField>
+                      </Box>
+                    </Flex>
+                    <Box width={['256px', '484px', '663px']} my={2}>
+                      <StyledInputFormikField
+                        label={intl.formatMessage(messages.initiativeDescriptionLabel)}
+                        labelFontSize="13px"
+                        labelColor="#4E5052"
+                        labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                        name="initiativeDescription"
+                        htmlFor="initiativeDescription"
+                        required
+                      >
+                        {({ field }) => (
+                          <StyledTextarea
+                            placeholder="We make sandwiches and give them to 
             our neighbors in an outdoor community 
             fridge. We collaborate with other 
             organizations to figure out what the 
             best flavor sandwich is."
-                    {...inputProps}
-                    {...getFieldProps('initiativeDescription')}
-                    px="7px"
-                  />
-                )}
-              </StyledInputField>
-              <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                <FormattedMessage
-                  id="OCFHostApplication.applicationForm.whatDoesInitiativeDoInstruction"
-                  defaultMessage="Write a short description of your organization (250 characters max)"
-                />
-              </P>
-            </Box>
-            <Box width={['256px', '484px', '663px']} my={2}>
-              <StyledInputField
-                label={intl.formatMessage(messages.missionImpactExplanationLabel)}
-                labelFontSize="13px"
-                labelColor="#4E5052"
-                labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                error={
-                  touched.missionImpactExplanation && formatFormErrorMessage(intl, errors.missionImpactExplanation)
-                }
-              >
-                {inputProps => (
-                  <StyledTextarea
-                    placeholder="We create a positive social impact and 
+                            {...field}
+                            px="7px"
+                          />
+                        )}
+                      </StyledInputFormikField>
+                      <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                        <FormattedMessage
+                          id="OCFHostApplication.applicationForm.whatDoesInitiativeDoInstruction"
+                          defaultMessage="Write a short description of your organization (250 characters max)"
+                        />
+                      </P>
+                    </Box>
+                    <Box width={['256px', '484px', '663px']} my={2}>
+                      <StyledInputFormikField
+                        label={intl.formatMessage(messages.missionImpactExplanationLabel)}
+                        labelFontSize="13px"
+                        labelColor="#4E5052"
+                        labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                        name="missionImpactExplanation"
+                        htmlFor="missionImpactExplanation"
+                        required
+                      >
+                        {({ field }) => (
+                          <StyledTextarea
+                            placeholder="We create a positive social impact and 
               combat community deterioration by 
               providing access to the best 
               sandwiches to our neighbors and 
               building a strong community around our 
               love of sandwiches."
-                    {...inputProps}
-                    {...getFieldProps('missionImpactExplanation')}
-                    px="7px"
-                  />
-                )}
-              </StyledInputField>
-              <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                <FormattedMessage
-                  id="OCFHostApplication.applicationForm.missionInstruction"
-                  defaultMessage="Check the sidebar for more info (250 characters max)"
-                />
-              </P>
-            </Box>
-            <Box width={['256px', '484px', '663px']} my={2}>
-              <StyledInputField
-                label={intl.formatMessage(messages.websiteAndSocialLinksLabel)}
-                labelFontSize="13px"
-                labelColor="#4E5052"
-                labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                error={touched.websiteAndSocialLinks && formatFormErrorMessage(intl, errors.websiteAndSocialLinks)}
-              >
-                {inputProps => (
-                  <StyledTextarea type="text" {...inputProps} px="7px" {...getFieldProps('websiteAndSocialLinks')} />
-                )}
-              </StyledInputField>
-              <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                <FormattedMessage
-                  id="OCFHostApplication.applicationForm.websiteInstruction"
-                  defaultMessage="If you have something to send us please upload it to a storage service (Dropbox, Drive) and paste the sharing link here."
-                />
-              </P>
-            </Box>
-            <Box width={['256px', '484px', '663px']} my={2}>
-              <StyledInputField
-                label={intl.formatMessage(messages.additionalInfoLabel)}
-                labelFontSize="13px"
-                labelColor="#4E5052"
-                labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                error={touched.additionalInfo && formatFormErrorMessage(intl, errors.additionalInfo)}
-              >
-                {inputProps => (
-                  <StyledTextarea
-                    placeholder="What else do we need to know about 
+                            {...field}
+                            px="7px"
+                          />
+                        )}
+                      </StyledInputFormikField>
+                      <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                        <FormattedMessage
+                          id="OCFHostApplication.applicationForm.missionInstruction"
+                          defaultMessage="Check the sidebar for more info (250 characters max)"
+                        />
+                      </P>
+                    </Box>
+                    <Box width={['256px', '484px', '663px']} my={2}>
+                      <StyledInputFormikField
+                        label={intl.formatMessage(messages.websiteAndSocialLinksLabel)}
+                        labelFontSize="13px"
+                        labelColor="#4E5052"
+                        labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                        name="websiteAndSocialLinks"
+                        htmlFor="websiteAndSocialLinks"
+                        required
+                      >
+                        {({ field }) => <StyledTextarea type="text" {...field} px="7px" />}
+                      </StyledInputFormikField>
+                      <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                        <FormattedMessage
+                          id="OCFHostApplication.applicationForm.websiteInstruction"
+                          defaultMessage="If you have something to send us please upload it to a storage service (Dropbox, Drive) and paste the sharing link here."
+                        />
+                      </P>
+                    </Box>
+                    <Box width={['256px', '484px', '663px']} my={2}>
+                      <StyledInputFormikField
+                        label={intl.formatMessage(messages.additionalInfoLabel)}
+                        labelFontSize="13px"
+                        labelColor="#4E5052"
+                        labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                        name="additionalInfo"
+                        htmlFor="additionalInfo"
+                        required
+                      >
+                        {({ field }) => (
+                          <StyledTextarea
+                            placeholder="What else do we need to know about 
               your initiative?"
-                    {...inputProps}
-                    {...getFieldProps('additionalInfo')}
-                    px="7px"
-                  />
-                )}
-              </StyledInputField>
-            </Box>
-            <Box width={['256px', '484px', '663px']} mb={2} mt="40px">
-              <StyledHr />
-            </Box>
-            <Container
-              width={['256px', '484px', '663px']}
-              display="flex"
-              alignSelf="flex-start"
-              alignItems="center"
-              my={2}
-            >
-              <Box mr={3}>
-                <StyledCheckbox
-                  name="TOSAgreement"
-                  background="#396C6F"
-                  size="16px"
-                  {...getFieldProps('checkedTermsOfServiceOC')}
-                  checked={values.checkedTermsOfServiceOC}
-                />
-              </Box>
-              <P ml={2} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
-                <FormattedMessage
-                  id="OCFHostApplication.applicationForm.OCTermsCheckbox"
-                  defaultMessage="I agree with the {tosLink} of Open Collective."
-                  values={{
-                    tosLink: <StyledLink href="#">terms of service</StyledLink>,
-                  }}
-                />
-              </P>
-            </Container>
-            <Container
-              width={['256px', '484px', '663px']}
-              display="flex"
-              alignSelf="flex-start"
-              alignItems="center"
-              my={2}
-            >
-              <Box mr={3}>
-                <StyledCheckbox
-                  background="#396C6F"
-                  size="16px"
-                  {...getFieldProps('checkedTermsOfServiceOCF')}
-                  checked={values.checkedTermsOfServiceOCF}
-                />
-              </Box>
-              <P ml={2} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
-                <FormattedMessage
-                  id="OCFHostApplication.applicationForm.OCFTermsCheckbox"
-                  defaultMessage="I have read and agree with the {tosLink} of OCF."
-                  values={{
-                    tosLink: <StyledLink href="#">terms of fiscal sponsorship</StyledLink>,
-                  }}
-                />
-              </P>
-            </Container>
-          </Container>
-          <Flex
-            flexDirection={['column', 'row']}
-            alignItems="center"
-            alignSelf={[null, 'flex-start']}
-            justifyContent="center"
-            mb="40px"
-            mt={[null, 3]}
-          >
-            <Link route="/ocf/apply/fees">
-              <StyledButton mb={[3, 0]} width={['286px', '120px']} mr={[null, 3]}>
-                <FormattedMessage
-                  id="OCFHostApplication.backBtn"
-                  defaultMessage="{arrowLeft} Back"
-                  values={{
-                    arrowLeft: <ArrowLeft2 size="14px" />,
-                  }}
-                />
-              </StyledButton>
-            </Link>
-            <OCFPrimaryButton width={['286px', '120px']} type="submit">
-              <FormattedMessage
-                id="OCFHostApplication.applyBtn"
-                defaultMessage="Apply {arrowRight}"
-                values={{
-                  arrowRight: <ArrowRight2 size="14px" />,
-                }}
-              />
-            </OCFPrimaryButton>
-          </Flex>
+                            {...field}
+                            px="7px"
+                          />
+                        )}
+                      </StyledInputFormikField>
+                    </Box>
+                    <Box width={['256px', '484px', '663px']} mb={2} mt="40px">
+                      <StyledHr />
+                    </Box>
+                    <Container
+                      width={['256px', '484px', '663px']}
+                      display="flex"
+                      alignSelf="flex-start"
+                      alignItems="center"
+                      my={2}
+                    >
+                      <Box mr={3}>
+                        <StyledInputFormikField name="termsOfServiceOC" required>
+                          {({ field }) => (
+                            <StyledCheckbox
+                              background="#396C6F"
+                              size="16px"
+                              name={field.name}
+                              required={field.required}
+                              checked={field.value}
+                              onChange={({ checked }) => setFieldValue(field.name, checked)}
+                              error={field.error}
+                              label={
+                                <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
+                                  <FormattedMessage
+                                    id="OCFHostApplication.applicationForm.OCTermsCheckbox"
+                                    defaultMessage="I agree with the {tosLink} of Open Collective."
+                                    values={{
+                                      tosLink: <StyledLink href="#">terms of service</StyledLink>,
+                                    }}
+                                  />
+                                </P>
+                              }
+                            />
+                          )}
+                        </StyledInputFormikField>
+                      </Box>
+                    </Container>
+                    <Container
+                      width={['256px', '484px', '663px']}
+                      display="flex"
+                      alignSelf="flex-start"
+                      alignItems="center"
+                      my={2}
+                    >
+                      <Box mr={3}>
+                        <StyledInputFormikField name="termsOfServiceOCF" required>
+                          {({ field }) => (
+                            <StyledCheckbox
+                              background="#396C6F"
+                              size="16px"
+                              name={field.name}
+                              required={field.required}
+                              checked={field.value}
+                              onChange={({ checked }) => setFieldValue(field.name, checked)}
+                              error={field.error}
+                              label={
+                                <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
+                                  <FormattedMessage
+                                    id="OCFHostApplication.applicationForm.OCFTermsCheckbox"
+                                    defaultMessage="I have read and agree with the {tosLink} of OCF."
+                                    values={{
+                                      tosLink: <StyledLink href="#">terms of fiscal sponsorship</StyledLink>,
+                                    }}
+                                  />
+                                </P>
+                              }
+                            />
+                          )}
+                        </StyledInputFormikField>
+                      </Box>
+                    </Container>
+                  </Container>
+                  <Flex
+                    flexDirection={['column', 'row']}
+                    alignItems="center"
+                    alignSelf={[null, 'flex-start']}
+                    justifyContent="center"
+                    mb="40px"
+                    mt={[null, 3]}
+                  >
+                    <Link route="/ocf/apply/fees">
+                      <StyledButton mb={[3, 0]} width={['286px', '120px']} mr={[null, 3]}>
+                        <FormattedMessage
+                          id="OCFHostApplication.backBtn"
+                          defaultMessage="{arrowLeft} Back"
+                          values={{
+                            arrowLeft: <ArrowLeft2 size="14px" />,
+                          }}
+                        />
+                      </StyledButton>
+                    </Link>
+                    <OCFPrimaryButton
+                      width={['286px', '120px']}
+                      type="submit"
+                      onSubmit={handleSubmit}
+                      loading={submitting}
+                    >
+                      <FormattedMessage
+                        id="OCFHostApplication.applyBtn"
+                        defaultMessage="Apply {arrowRight}"
+                        values={{
+                          arrowRight: <ArrowRight2 size="14px" />,
+                        }}
+                      />
+                    </OCFPrimaryButton>
+                  </Flex>
+                </Form>
+              );
+            }}
+          </Formik>
         </Flex>
         <Flex flexDirection="column" alignItems="center" justifyContent="center">
           <StyledHr width="1px" solid />
