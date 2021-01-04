@@ -41,7 +41,7 @@
     "copy-to-clipboard": "3.3.1",
     "cross-fetch": "3.0.6",
     "currency-symbol-map": "4.0.4",
-    "dayjs": "1.9.8",
+    "dayjs": "1.10.1",
     "debug": "4.3.1",
     "dotenv": "8.2.0",
     "draft-js": "0.11.7",
