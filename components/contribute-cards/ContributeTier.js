@@ -8,6 +8,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, getPrecisionFromAmount } from '../../lib/currency-utils';
 import { isPastEvent } from '../../lib/events';
 import { isTierExpired } from '../../lib/tier-utils';
+import { capitalize } from '../../lib/utils';
 
 import CollapsableText from '../CollapsableText';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -84,7 +85,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
     <Contribute
       route={route}
       routeParams={routeParams}
-      title={tier.name}
+      title={capitalize(tier.name)}
       type={tierType}
       buttonText={tier.button}
       contributors={tier.contributors}

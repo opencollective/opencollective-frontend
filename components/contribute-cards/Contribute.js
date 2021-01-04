@@ -4,7 +4,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
-import { capitalize } from '../../lib/utils';
 
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
@@ -177,7 +176,7 @@ const ContributeCard = ({
       <Flex px={3} py={3} flexDirection="column" justifyContent="space-between" flex="1">
         <Flex flexDirection="column" flex="1 1">
           <P fontSize="20px" mt={1} mb={2} fontWeight="bold" data-cy="contribute-title">
-            {capitalize(title)}
+            {title}
           </P>
           <Description data-cy="contribute-description">{children}</Description>
         </Flex>
