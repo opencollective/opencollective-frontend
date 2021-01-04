@@ -108,19 +108,18 @@ class NewContributionFlowSuccess extends React.Component {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
-    router: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     data: PropTypes.object,
   };
 
   renderCallsToAction = () => {
-    const { LoggedInUser, router, data } = this.props;
+    const { LoggedInUser, data } = this.props;
     const callsToAction = [SUCCESS_CTA_TYPE.NEWSLETTER];
 
     if (!LoggedInUser) {
       // all guest transactions
       callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
-    } else if (LoggedInUser && !router.query.emailRedirect) {
+    } else if (LoggedInUser) {
       // all other logged in recurring/one time contributions
       callsToAction.unshift(SUCCESS_CTA_TYPE.BLOG);
     }

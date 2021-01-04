@@ -54,7 +54,14 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
         providerType
         sourcePaymentMethod {
           id
+          name
+          data
+          type
+          expiryDate
           providerType
+          balance {
+            currency
+          }
           limitedToHosts {
             id
             legacyId

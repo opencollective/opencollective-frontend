@@ -130,7 +130,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
           defaultMessage="Your name and contribution will be public."
         />
       </P>
-      <StepProfileInfoMessage amount={totalAmount} />
+      <StepProfileInfoMessage amount={totalAmount} interval={stepDetails.interval} />
       {stepDetails.interval && (
         <P color="black.500" fontSize="12px" my={3} data-cy="join-conditions">
           <FormattedMessage
