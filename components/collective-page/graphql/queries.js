@@ -98,7 +98,6 @@ export const collectivePageQuery = gql`
         name
         slug
         description
-        useStandalonePage
         goal
         interval
         currency
