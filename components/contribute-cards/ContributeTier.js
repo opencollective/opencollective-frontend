@@ -9,6 +9,7 @@ import { formatCurrency, getPrecisionFromAmount } from '../../lib/currency-utils
 import { isPastEvent } from '../../lib/events';
 import { isTierExpired } from '../../lib/tier-utils';
 
+import CollapsableText from '../CollapsableText';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
@@ -55,8 +56,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const canContributeToCollective = collective.isActive && !isPastEvent(collective);
   const isDisabled = !canContributeToCollective || tierIsExpired || hasNoneLeft;
 
-  let description;
-  let isTruncated = false;
+  let description = tier.description;
   if (!tier.description) {
     description = intl.formatMessage(messages.fallbackDescription, {
       minAmount: minAmount || 0,
@@ -64,11 +64,6 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
       minAmountWithCurrency: minAmount && formatCurrency(minAmount, currency),
       interval: tier.interval,
     });
-  } else if (tier.description.length > 100) {
-    description = truncate(tier.description, { length: 100 });
-    isTruncated = true;
-  } else {
-    description = tier.description;
   }
 
   let route, routeParams;
@@ -154,22 +149,26 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
               />
             </P>
           )}
-          <P mb={4} lineHeight="20px">
-            {description}{' '}
-            {(isTruncated || tier.hasLongDescription) && (
-              <StyledLink
-                as={Link}
-                whiteSpace="nowrap"
-                route="tier"
-                params={{
-                  collectiveSlug: collective.slug,
-                  verb: 'contribute',
-                  tierSlug: tier.slug,
-                  tierId: tier.id,
-                }}
-              >
-                <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
-              </StyledLink>
+          <P mb={4} lineHeight="22px">
+            {tier.useStandalonePage ? (
+              <React.Fragment>
+                {truncate(description, { length: 150 })}{' '}
+                <StyledLink
+                  as={Link}
+                  whiteSpace="nowrap"
+                  route="tier"
+                  params={{
+                    collectiveSlug: collective.slug,
+                    verb: 'contribute',
+                    tierSlug: tier.slug,
+                    tierId: tier.id,
+                  }}
+                >
+                  <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+                </StyledLink>
+              </React.Fragment>
+            ) : (
+              <CollapsableText text={description} maxLength={150} />
             )}
           </P>
         </div>
@@ -211,7 +210,7 @@ ContributeTier.propTypes = {
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
     currency: PropTypes.string,
-    hasLongDescription: PropTypes.bool,
+    useStandalonePage: PropTypes.bool,
     interval: PropTypes.string,
     amountType: PropTypes.string,
     endsAt: PropTypes.string,
