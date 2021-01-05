@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 export const DropdownContent = styled.div`
@@ -42,11 +42,47 @@ export const DropdownArrow = styled('div')`
   }
 `;
 
-export const Dropdown = styled(({ children, ...props }) => {
+/**
+ * Accessible, CSS-first dropdown.
+ *
+ * When using `click` as a `trigger` you must pass a function as `children` and
+ * make sure you pass down the `triggerProps` and `dropdownProps`.
+ */
+export const Dropdown = styled(({ children, trigger, ...props }) => {
+  const dropdownRef = useRef();
   const [isDisplayed, setDisplayed] = React.useState(false);
+
+  if (typeof children === 'function' && trigger === 'click') {
+    return (
+      <div {...props} data-expanded={isDisplayed}>
+        {children({
+          isDisplayed,
+          triggerProps: {
+            onClick: () => setDisplayed(!isDisplayed),
+            onBlur: () => {
+              if (isDisplayed) {
+                setTimeout(() => {
+                  if (!document.activeElement || !dropdownRef.current?.contains(document.activeElement)) {
+                    setDisplayed(false);
+                  }
+                }, 50);
+              }
+            },
+          },
+          dropdownProps: {
+            ref: dropdownRef,
+            onBlur: () => setTimeout(() => setDisplayed(false), 50),
+            onClick: () => setTimeout(() => setDisplayed(false), 50),
+          },
+        })}
+      </div>
+    );
+  }
+
   return (
     <div
       tabIndex={0}
+      trigger={trigger}
       {...props}
       onFocus={() => setTimeout(() => setDisplayed(true), 50)}
       onBlur={() => setTimeout(() => setDisplayed(false), 50)}
@@ -76,9 +112,7 @@ export const Dropdown = styled(({ children, ...props }) => {
           }
         `
       : css`
-          &:active,
-          &:focus,
-          &:focus-within {
+          &[data-expanded='true'] {
             ${DropdownContent}, ${DropdownArrow} {
               display: block;
             }

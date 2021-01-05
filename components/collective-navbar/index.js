@@ -329,7 +329,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
         <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
-          <MainActionBtn>
+          <MainActionBtn tabIndex="-1">
             <Dashboard size="1em" />
             <Span ml={2}>
               <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
@@ -343,7 +343,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
         <Link {...getContributeRoute(collective)}>
-          <MainActionBtn>
+          <MainActionBtn tabIndex="-1">
             <Planet size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
@@ -368,7 +368,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
         <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
-          <MainActionBtn>
+          <MainActionBtn tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
@@ -382,7 +382,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
         <Link route="recurring-contributions" params={{ slug: collective.slug }}>
-          <MainActionBtn>
+          <MainActionBtn tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
@@ -396,7 +396,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
         <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
-          <MainActionBtn>
+          <MainActionBtn tabIndex="-1">
             <Dashboard size="20px" />
             <Span ml={2}>
               <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
