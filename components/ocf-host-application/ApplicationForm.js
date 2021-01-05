@@ -10,6 +10,7 @@ import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '../../lib/collective.lib';
+import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -177,7 +178,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
           'location',
         ),
       },
-      host: { slug: 'foundation' },
+      host: { legacyId: OPENCOLLECTIVE_FOUNDATION_ID },
       user: pick(values, 'name', 'email'),
     };
     const response = await createCollective({ variables });
