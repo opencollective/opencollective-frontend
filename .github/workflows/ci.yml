@@ -66,10 +66,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
-      # - name: Setup node
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: '12.x'
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
 
       - name: Restore node_modules
         uses: actions/cache@v1
@@ -103,10 +103,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
-      # - name: Setup node
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: '12.x'
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
 
       - name: Restore node_modules
         uses: actions/cache@v1
@@ -140,10 +140,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
-      # - name: Setup node
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: '12.x'
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
 
       - name: Restore node_modules
         uses: actions/cache@v1
@@ -177,10 +177,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
-      # - name: Setup node
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: '12.x'
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
 
       - name: Restore node_modules
         uses: actions/cache@v1
@@ -230,10 +230,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
-      # - name: Setup node
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: '12.x'
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
 
       - name: Restore node_modules
         uses: actions/cache@v1
