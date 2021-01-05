@@ -384,7 +384,7 @@ const EditCollectivePage = ({ collective }) => {
     if (data?.account) {
       const sectionsFromCollective = loadSectionsForCollective(data.account, useNewSections);
       if (useNewSections && !data.account.settings?.collectivePage?.useNewSections) {
-        const convertedSections = convertSectionsToNewFormat(sectionsFromCollective);
+        const convertedSections = convertSectionsToNewFormat(sectionsFromCollective, data.account.type);
         setSections(addDefaultSections(convertedSections));
       } else {
         setSections(loadSectionsForCollectiveV1(data.account));
