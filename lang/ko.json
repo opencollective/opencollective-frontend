@@ -1512,7 +1512,7 @@
   "Saving": "Saving...",
   "Search": "검색",
   "search.ifYouDontSee": "If you don't see the collective you're looking for:",
-  "search.noResult": "No collectives found matching your query: \"{query}\"",
+  "search.noResult": "Your search did not match any result",
   "search.OpenCollective": "Open Collective 검색...",
   "search.placeholder": "검색...",
   "searchFilter.all": "View all",

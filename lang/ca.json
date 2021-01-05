@@ -1512,7 +1512,7 @@
   "Saving": "Saving...",
   "Search": "Cerca",
   "search.ifYouDontSee": "If you don't see the collective you're looking for:",
-  "search.noResult": "No collectives found matching your query: \"{query}\"",
+  "search.noResult": "Your search did not match any result",
   "search.OpenCollective": "Search Open Collective...",
   "search.placeholder": "Search...",
   "searchFilter.all": "View all",
