@@ -11,7 +11,7 @@ import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
@@ -42,6 +42,14 @@ const MainContainerV2 = styled(Container)`
   display: flex;
   justify-content: flex-start;
   overflow-y: auto;
+`;
+
+const HideScroll = createGlobalStyle`
+  @media (max-width: 64em) {
+    body {
+      overflow: hidden;
+    }
+  }
 `;
 
 const AvatarBox = styled(Box)`
@@ -485,6 +493,7 @@ const CollectiveNavbar = ({
       boxShadow={withShadow ? ' 0px 6px 10px -5px rgba(214, 214, 214, 0.5)' : 'none'}
       maxHeight="100vh"
     >
+      {isExpanded && <HideScroll />}
       {/** Collective info */}
       <InfosContainerV2
         isHidden={hideInfos}
