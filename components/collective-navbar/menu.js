@@ -72,6 +72,9 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
         title: intl.formatMessage(titles.CONTRIBUTE),
       });
     }
+
+    addSectionLink(intl, links, collective, sections, Sections.EVENTS);
+    addSectionLink(intl, links, collective, sections, Sections.PROJECTS);
   } else if (category === NAVBAR_CATEGORIES.CONTRIBUTIONS) {
     addSectionLink(intl, links, collective, sections, Sections.CONTRIBUTIONS);
   } else if (category === NAVBAR_CATEGORIES.BUDGET) {
@@ -105,9 +108,6 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
         title: intl.formatMessage(titles.CONVERSATIONS),
       });
     }
-  } else if (category === NAVBAR_CATEGORIES.EVENTS) {
-    addSectionLink(intl, links, collective, sections, Sections.EVENTS);
-    addSectionLink(intl, links, collective, sections, Sections.PROJECTS);
   }
 
   return links;

@@ -1,8 +1,7 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { get, partition } from 'lodash';
+import { partition } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { isPastEvent } from '../../../lib/events';
@@ -16,12 +15,8 @@ import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
-import { Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
-import SectionHeader from '../SectionHeader';
-
-import eventsSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconEvents.png';
 
 class SectionEvents extends React.PureComponent {
   static propTypes = {
@@ -47,8 +42,6 @@ class SectionEvents extends React.PureComponent {
     ),
 
     isAdmin: PropTypes.bool.isRequired,
-    /** @ignore from withRouter */
-    router: PropTypes.object,
   };
 
   triageEvents = memoizeOne(events => {
@@ -67,29 +60,12 @@ class SectionEvents extends React.PureComponent {
   };
 
   render() {
-    const { collective, events, connectedCollectives, isAdmin, router } = this.props;
+    const { collective, events, connectedCollectives, isAdmin } = this.props;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
-    const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
 
     return (
-      <Fragment>
-        {!newNavbarFeatureFlag && (
-          <ContainerSectionContent pt={5}>
-            <SectionHeader
-              title={Sections.EVENTS}
-              subtitle={<FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />}
-              info={
-                <FormattedMessage
-                  id="section.events.info"
-                  defaultMessage="Find out where your community is gathering next."
-                />
-              }
-              illustrationSrc={eventsSectionHeaderIcon}
-            />
-          </ContainerSectionContent>
-        )}
-
+      <Box pt={4}>
         <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
           {(ref, Chevrons) => (
             <div>
@@ -145,9 +121,9 @@ class SectionEvents extends React.PureComponent {
             </StyledButton>
           </Link>
         </ContainerSectionContent>
-      </Fragment>
+      </Box>
     );
   }
 }
 
-export default withRouter(injectIntl(SectionEvents));
+export default injectIntl(SectionEvents);

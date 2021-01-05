@@ -364,11 +364,10 @@ const loadSectionsForCollectiveV1 = collective => {
 const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
   const router = useRouter();
-  const HAS_NEW_NAVBAR = get(router, 'query.navbarVersion') === 'v2';
+  const useNewSections = get(router, 'query.navbarVersion') === 'v2';
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
   const [tmpSections, setTmpSections] = React.useState(null);
-  const useNewSections = HAS_NEW_NAVBAR;
 
   const { loading, data } = useQuery(getSettingsQuery, {
     variables: { slug: collective.slug },
@@ -385,7 +384,7 @@ const EditCollectivePage = ({ collective }) => {
       const sectionsFromCollective = loadSectionsForCollective(data.account, useNewSections);
       if (useNewSections && !data.account.settings?.collectivePage?.useNewSections) {
         const convertedSections = convertSectionsToNewFormat(sectionsFromCollective, data.account.type);
-        setSections(addDefaultSections(convertedSections));
+        setSections(addDefaultSections(data.account, convertedSections));
       } else {
         setSections(loadSectionsForCollectiveV1(data.account));
       }
@@ -414,7 +413,7 @@ const EditCollectivePage = ({ collective }) => {
     setDirty(true);
   };
 
-  if (!HAS_NEW_NAVBAR && get(data, 'account.settings.collectivePage.useNewSections')) {
+  if (!useNewSections && get(data, 'account.settings.collectivePage.useNewSections')) {
     return (
       <MessageBox type="warning" withIcon>
         This page has been temporarily disabled for this account.
