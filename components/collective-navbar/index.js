@@ -361,13 +361,14 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
       ),
     };
   } else if (!isAdmin && callsToAction.hasApply) {
+    const plan = collective.plan || {};
     return {
       type: NAVBAR_ACTION_TYPE.APPLY,
       component: (
         <ApplyToHostBtn
           hostSlug={collective.slug}
           buttonRenderer={props => <MainActionBtn {...props} />}
-          hostWithinLimit={false} // TODO
+          hostWithinLimit={!plan.hostedCollectivesLimit || plan.hostedCollectives < plan.hostedCollectivesLimit}
         />
       ),
     };
