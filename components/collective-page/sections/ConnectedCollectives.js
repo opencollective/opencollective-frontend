@@ -11,6 +11,10 @@ import ContainerSectionContent from '../ContainerSectionContent';
  * Connected collectives section for the About section category
  */
 const SectionConnectedCollectives = ({ connectedCollectives }) => {
+  if (!connectedCollectives?.length) {
+    return null;
+  }
+
   return (
     <ContainerSectionContent py={[3, 4]}>
       <Container width="100%" margin="0 auto">
