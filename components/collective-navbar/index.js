@@ -14,7 +14,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { maxWidth } from 'styled-system';
 
-import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
+import { getFilteredSectionsForCollective, hasNewNavbar, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
@@ -467,7 +467,7 @@ const CollectiveNavbar = ({
   useAnchorsForCategories,
 }) => {
   const router = useRouter();
-  const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
+  const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin, null, newNavbarFeatureFlag);
