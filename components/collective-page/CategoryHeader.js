@@ -20,7 +20,6 @@ import aboutSectionHeaderIcon from '../../public/static/images/collective-naviga
 import budgetSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveSectionHeaderIconBudget.png';
 import connectSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveSectionHeaderIconConnect.png';
 import contributeSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveSectionHeaderIconContribute.png';
-import eventsSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveSectionHeaderIconEvents.png';
 
 const ContainerWithMaxWidth = styled(Container).attrs({
   maxWidth: Dimensions.MAX_SECTION_WIDTH,
@@ -37,7 +36,7 @@ const TypeIllustration = styled.img.attrs({ alt: '' })`
   height: 48px;
 `;
 
-const getCategoryData = (intl, collective, category, isAdmin) => {
+const getCategoryData = (intl, collective, category) => {
   switch (category) {
     case NAVBAR_CATEGORIES.ABOUT:
       return {
@@ -92,26 +91,9 @@ const getCategoryData = (intl, collective, category, isAdmin) => {
           />
         ),
       };
-    case NAVBAR_CATEGORIES.EVENTS:
-      return {
-        img: eventsSectionHeaderIcon,
-        title: i18nNavbarCategory(intl, category, {
-          hasProjects: collective.type === 'FUND',
-          hasEvents: collective.type !== 'FUND',
-        }),
-        subtitle: isAdmin && (
-          <FormattedMessage id="section.events.subtitle" defaultMessage="Create and manage events" />
-        ),
-        info: collective.type !== 'FUND' && (
-          <FormattedMessage
-            id="section.events.info"
-            defaultMessage="Find out where your community is gathering next."
-          />
-        ),
-      };
     case NAVBAR_CATEGORIES.CONTRIBUTIONS:
       return {
-        img: eventsSectionHeaderIcon,
+        img: contributeSectionHeaderIcon,
         title: i18nNavbarCategory(intl, category),
         subtitle: (
           <FormattedMessage

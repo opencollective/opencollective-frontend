@@ -170,12 +170,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
           <Flex alignItems="center" mr={2}>
             <IconIllustration src={CATEGORY_ICON[category] || CATEGORY_ICON.CONTRIBUTE} />
           </Flex>
-          <Flex alignItems="center">
-            {i18nNavbarCategory(intl, category, {
-              hasProjects: collective.type === 'FUND',
-              hasEvents: collective.type !== 'FUND',
-            })}
-          </Flex>
+          <Flex alignItems="center">{i18nNavbarCategory(intl, category)}</Flex>
         </Flex>
       </CategoryContainer>
       {displayedLinks.length > 0 && (
