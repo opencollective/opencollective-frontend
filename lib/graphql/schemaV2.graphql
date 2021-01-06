@@ -994,6 +994,7 @@ Describes the features enabled and available for this collective
 type CollectiveFeatures {
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
+  TRANSACTIONS: CollectiveFeatureStatus
   EVENTS: CollectiveFeatureStatus
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
@@ -1008,7 +1009,6 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
-  TRANSACTIONS: CollectiveFeatureStatus
   CROSS_CURRENCY_MANUAL_TRANSACTIONS: CollectiveFeatureStatus
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
@@ -1082,6 +1082,7 @@ input CommentCreateInput {
   expense: ExpenseReferenceInput
   ExpenseId: Int
   ConversationId: String
+  update: UpdateReferenceInput
 }
 
 input CommentReferenceInput {
@@ -4695,6 +4696,8 @@ type Individual implements Account {
   hasTwoFactorAuth: Boolean
 }
 
+scalar IsoDateString
+
 """
 ISO-8601 date
 """
@@ -5458,6 +5461,11 @@ type Mutation {
     """
     message: String
   ): Member!
+  createUpdate(update: UpdateCreateInput!): Update!
+  editUpdate(update: UpdateUpdateInput!): Update!
+  publishUpdate(id: String!, notificationAudience: UpdateAudienceType!): Update!
+  unpublishUpdate(id: String!): Update!
+  deleteUpdate(id: String!): Update!
 }
 
 input NewAccountOrganizationInput {
@@ -6787,6 +6795,17 @@ type Query {
     """
     includeIncognitoTransactions: Boolean! = false
   ): TransactionCollection
+  update(
+    """
+    Public identifier
+    """
+    id: String
+
+    """
+    The update slug identifying the update
+    """
+    updateSlug: String
+  ): Update
   loggedInAccount: Account
 }
 
@@ -7048,6 +7067,11 @@ type Update {
   tags: [String]
   fromAccount: Account
   account: Account
+
+  """
+  List the comments for this update. Not backed by a loader, don't use this in lists.
+  """
+  comments(limit: Int, offset: Int): CommentCollection!
 }
 
 """
@@ -7078,6 +7102,38 @@ type UpdateCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Update]
+}
+
+"""
+Input type for UpdateType
+"""
+input UpdateCreateInput {
+  title: String!
+  isPrivate: Boolean
+  makePublicOn: IsoDateString
+  html: String
+  fromAccount: AccountReferenceInput
+  account: AccountReferenceInput!
+}
+
+input UpdateReferenceInput {
+  """
+  The public id identifying the update
+  """
+  id: String
+}
+
+"""
+Input type for UpdateType
+"""
+input UpdateUpdateInput {
+  id: String!
+  slug: String
+  title: String
+  isPrivate: Boolean
+  makePublicOn: ISODateTime
+  html: String
+  fromAccount: AccountReferenceInput
 }
 
 """
