@@ -2,21 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledCheckbox from '../StyledCheckbox';
-import StyledLink from '../StyledLink';
 import { H1, H5, P } from '../Text';
 
 import OCFPrimaryButton from './OCFPrimaryButton';
-
-const ExternalLink = styled(StyledLink)`
-  text-decoration: underline !important;
-`;
 
 const TermsOfFiscalSponsorship = ({ checked, onChecked }) => (
   <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
@@ -74,28 +69,21 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => (
         <FormattedMessage
           id="OCFHostApplication.readInfoGuideAndTOS"
           values={{
-            infoGuideLink: (
-              <ExternalLink
-                href="https://docs.opencollective.foundation/about/fiscal-sponsorship-info-guide"
-                color="#396C6F"
-                textDecoration="underline"
-                openInNewTab
-              >
-                Info guide
-              </ExternalLink>
-            ),
-            termsAndCondition: (
-              <ExternalLink
-                href="https://docs.google.com/document/u/2/d/e/2PACX-1vQ_fs7IOojAHaMBKYtaJetlTXJZLnJ7flIWkwxUSQtTkWUMtwFYC2ssb-ooBnT-Ldl6wbVhNQiCkSms/pub"
-                color="#396C6F"
-                textDecoration="underline"
-                openInNewTab
-              >
-                Terms and Conditions
-              </ExternalLink>
-            ),
+            InfoGuideLink: getI18nLink({
+              color: '#396C6F',
+              textDecoration: 'underline',
+              openInNewTab: true,
+              href: 'https://docs.opencollective.foundation/about/fiscal-sponsorship-info-guide',
+            }),
+            TOSLink: getI18nLink({
+              color: '#396C6F',
+              textDecoration: 'underline',
+              openInNewTab: true,
+              href:
+                'https://docs.google.com/document/u/2/d/e/2PACX-1vQ_fs7IOojAHaMBKYtaJetlTXJZLnJ7flIWkwxUSQtTkWUMtwFYC2ssb-ooBnT-Ldl6wbVhNQiCkSms/pub',
+            }),
           }}
-          defaultMessage="Please take a moment to read our {infoGuideLink} and {termsAndCondition} before applying, we want to make this process as easy for you as possible, that's why you will need to know a couple of things to have the best possible experience."
+          defaultMessage="Please take a moment to read our <InfoGuideLink>Info guide</InfoGuideLink> and <TOSLink>Terms and Conditions</TOSLink> before applying, we want to make this process as easy for you as possible, that's why you will need to know a couple of things to have the best possible experience."
         />
       </P>
       <Container display="flex" alignSelf="flex-start" alignItems="center" mb={4} mt={2}>
@@ -111,27 +99,22 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => (
         <P ml={2} fontSize="12px" lineHeight="18px" fontWeight="400">
           <FormattedMessage
             id="OCFHostApplication.tosCheckBoxLabel"
-            defaultMessage="I agree with the {tosLink}."
+            defaultMessage="I agree with the <TOSLink>terms of fiscal sponsorship</TOSLink>."
             values={{
-              tosLink: (
-                <StyledLink href="#" color="#396C6F">
-                  terms of fiscal sponsorship
-                </StyledLink>
-              ),
+              TOSLink: getI18nLink({
+                href: 'https://docs.opencollective.foundation/about/our-terms-and-conditions',
+                openInNewTabNoFollow: true,
+              }),
             }}
           />
         </P>
       </Container>
     </Box>
-    <Link route="/ocf/apply/fees">
+    <Link route="/foundation/apply/fees">
       <OCFPrimaryButton mb="40px" width={['286px', '100px']} disabled={!checked}>
-        <FormattedMessage
-          id="OCFHostApplication.nextBtn"
-          defaultMessage="Next {arrowRight}"
-          values={{
-            arrowRight: <ArrowRight2 size="14px" />,
-          }}
-        />
+        <FormattedMessage id="OCFHostApplication.nextBtn" defaultMessage="Next" />
+        &nbsp;
+        <ArrowRight2 size="14px" />
       </OCFPrimaryButton>
     </Link>
   </Flex>

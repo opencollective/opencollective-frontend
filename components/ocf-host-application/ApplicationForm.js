@@ -6,7 +6,6 @@ import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
-import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '../../lib/collective.lib';
@@ -20,6 +19,7 @@ import Container from '../Container';
 import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -109,19 +109,25 @@ const messages = defineMessages({
 });
 
 const initialValues = {
-  location: '',
-  name: '',
-  email: '',
-  initiativeName: '',
-  slug: '',
-  initiativeDuration: '',
-  totalAmountRaised: '',
-  totalAmountToBeRaised: '',
-  expectedFundingPartner: '',
-  initiativeDescription: '',
-  missionImpactExplanation: '',
-  websiteAndSocialLinks: '',
-  additionalInfo: '',
+  user: {
+    name: '',
+    email: '',
+  },
+  collective: {
+    name: '',
+    slug: '',
+    description: '',
+    applicationData: {
+      location: '',
+      initiativeDuration: '',
+      totalAmountRaised: 0,
+      totalAmountToBeRaised: 0,
+      expectedFundingPartner: '',
+      missionImpactExplanation: '',
+      websiteAndSocialLinks: '',
+      additionalInfo: '',
+    },
+  },
   termsOfServiceOC: false,
   termsOfServiceOCF: false,
 };
@@ -134,56 +140,37 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
 
   const validate = values => {
     const errors = requireFields(values, [
-      'location',
-      'name',
-      'email',
-      'initiativeName',
-      'slug',
-      'initiativeDuration',
-      'totalAmountRaised',
-      'totalAmountToBeRaised',
-      'expectedFundingPartner',
-      'initiativeDescription',
-      'missionImpactExplanation',
-      'websiteAndSocialLinks',
-      'additionalInfo',
+      'user.name',
+      'user.email',
+      'collective.name',
+      'collective.slug',
+      'collective.description',
+      'collective.applicationData.location',
+      'collective.applicationData.initiativeDuration',
+      'collective.applicationData.expectedFundingPartner',
+      'collective.applicationData.missionImpactExplanation',
+      'collective.applicationData.websiteAndSocialLinks',
+      'collective.applicationData.additionalInfo',
     ]);
 
-    verifyFieldLength(intl, errors, values, 'name', 1, 50);
-    verifyFieldLength(intl, errors, values, 'slug', 1, 30);
-    verifyFieldLength(intl, errors, values, 'initiativeDescription', 1, 250);
-    verifyFieldLength(intl, errors, values, 'missionImpactExplanation', 1, 250);
+    verifyFieldLength(intl, errors, values, 'collective.name', 1, 50);
+    verifyFieldLength(intl, errors, values, 'collective.slug', 1, 30);
+    verifyFieldLength(intl, errors, values, 'collective.description', 1, 250);
+    verifyFieldLength(intl, errors, values, 'collective.applicationData.missionImpactExplanation', 1, 250);
 
     verifyChecked(errors, values, 'termsOfServiceOCF');
     verifyChecked(errors, values, 'termsOfServiceOC');
-
     return errors;
   };
-  const submit = async values => {
+  const submit = async ({ user, collective }) => {
     const variables = {
-      collective: {
-        name: values.initiativeName,
-        slug: values.slug,
-        description: values.initiativeDescription,
-        data: pick(
-          values,
-          'initiativeDuration',
-          'totalAmountRaised',
-          'totalAmountToBeRaised',
-          'expectedFundingPartner',
-          'initiativeDescription',
-          'missionImpactExplanation',
-          'websiteAndSocialLinks',
-          'additionalInfo',
-          'location',
-        ),
-      },
+      collective,
       host: { legacyId: OPENCOLLECTIVE_FOUNDATION_ID },
-      user: pick(values, 'name', 'email'),
+      user,
     };
     const response = await createCollective({ variables });
     if (response.data.createCollective) {
-      await Router.pushRoute('/ocf/apply/success');
+      await Router.pushRoute('/foundation/apply/success');
     }
   };
 
@@ -232,15 +219,17 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
 
               const handleSlugChange = e => {
                 if (!touched.slug) {
-                  setFieldValue('slug', suggestSlug(e.target.value));
+                  setFieldValue('collective.slug', suggestSlug(e.target.value));
                 }
               };
 
               if (!loadingLoggedInUser && LoggedInUser && !values.name && !values.email) {
                 setValues({
                   ...values,
-                  name: LoggedInUser.collective.name,
-                  email: LoggedInUser.email,
+                  user: {
+                    name: LoggedInUser.collective.name,
+                    email: LoggedInUser.email,
+                  },
                 });
               }
 
@@ -256,7 +245,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                     padding="32px 16px"
                     display="flex"
                     borderRadius="8px"
-                    mr={['36px', null, null, null, '102px']}
+                    mr={[null, '36px', null, null, '102px']}
                   >
                     <Box width={['256px', '484px', '664px']}>
                       <Container display="flex" alignItems="center" justifyContent="space-between">
@@ -287,7 +276,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
                         required
                         htmlFor="location"
-                        name="location"
+                        name="collective.applicationData.location"
                         my={3}
                       >
                         {({ field }) => <StyledInput {...field} type="text" placeholder="Walnut, CA" px="7px" />}
@@ -301,7 +290,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
                           disabled={!!LoggedInUser}
-                          name="name"
+                          name="user.name"
                           htmlFor="name"
                           width={['256px', '234px', '324px']}
                           my={2}
@@ -317,7 +306,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
                           disabled={!!LoggedInUser}
-                          name="email"
+                          name="user.email"
                           htmlFor="email"
                           width={['256px', '234px', '324px']}
                           required
@@ -341,7 +330,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="initiativeName"
+                          name="collective.name"
                           htmlFor="initiativeName"
                           required
                           onChange={handleSlugChange}
@@ -358,7 +347,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="slug"
+                          name="collective.slug"
                           htmlFor="slug"
                           required
                         >
@@ -389,7 +378,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="initiativeDuration"
+                          name="collective.applicationData.initiativeDuration"
                           htmlFor="initiativeDuration"
                           required
                           width={['256px', '234px', '324px']}
@@ -406,9 +395,8 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="totalAmountRaised"
+                          name="collective.applicationData.totalAmountRaised"
                           htmlFor="totalAmountRaised"
-                          required
                         >
                           {({ form, field }) => (
                             <StyledInputAmount
@@ -439,7 +427,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="totalAmountToBeRaised"
+                          name="collective.applicationData.totalAmountToBeRaised"
                           htmlFor="totalAmountToBeRaised"
                           required
                         >
@@ -464,7 +452,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="expectedFundingPartner"
+                          name="collective.applicationData.expectedFundingPartner"
                           htmlFor="expectedFundingPartner"
                           required
                         >
@@ -485,7 +473,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                        name="initiativeDescription"
+                        name="collective.description"
                         htmlFor="initiativeDescription"
                         required
                       >
@@ -514,7 +502,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                        name="missionImpactExplanation"
+                        name="collective.applicationData.missionImpactExplanation"
                         htmlFor="missionImpactExplanation"
                         required
                       >
@@ -544,7 +532,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                        name="websiteAndSocialLinks"
+                        name="collective.applicationData.websiteAndSocialLinks"
                         htmlFor="websiteAndSocialLinks"
                         required
                       >
@@ -563,7 +551,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                        name="additionalInfo"
+                        name="collective.applicationData.additionalInfo"
                         htmlFor="additionalInfo"
                         required
                       >
@@ -601,10 +589,14 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                               label={
                                 <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
                                   <FormattedMessage
-                                    id="OCFHostApplication.applicationForm.OCTermsCheckbox"
-                                    defaultMessage="I agree with the {tosLink} of Open Collective."
+                                    id="createcollective.tos.label"
+                                    defaultMessage="I agree with the {toslink} of Open Collective."
                                     values={{
-                                      tosLink: <StyledLink href="#">terms of service</StyledLink>,
+                                      toslink: (
+                                        <StyledLink href="/tos" openInNewTab>
+                                          <FormattedMessage id="tos" defaultMessage="terms of service" />
+                                        </StyledLink>
+                                      ),
                                     }}
                                   />
                                 </P>
@@ -635,10 +627,13 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                               label={
                                 <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
                                   <FormattedMessage
-                                    id="OCFHostApplication.applicationForm.OCFTermsCheckbox"
-                                    defaultMessage="I have read and agree with the {tosLink} of OCF."
+                                    id="AgreeWithHostTOS"
+                                    defaultMessage="I have read and agree with the <TOSLink>terms of service</TOSLink> of fiscal sponsorship."
                                     values={{
-                                      tosLink: <StyledLink href="#">terms of fiscal sponsorship</StyledLink>,
+                                      TOSLink: getI18nLink({
+                                        href: 'https://docs.opencollective.foundation/about/our-terms-and-conditions',
+                                        openInNewTabNoFollow: true,
+                                      }),
                                     }}
                                   />
                                 </P>
@@ -657,15 +652,11 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                     mb="40px"
                     mt={[null, 3]}
                   >
-                    <Link route="/ocf/apply/fees">
+                    <Link route="/foundation/apply/fees">
                       <StyledButton mb={[3, 0]} width={['286px', '120px']} mr={[null, 3]}>
-                        <FormattedMessage
-                          id="OCFHostApplication.backBtn"
-                          defaultMessage="{arrowLeft} Back"
-                          values={{
-                            arrowLeft: <ArrowLeft2 size="14px" />,
-                          }}
-                        />
+                        <ArrowLeft2 size="14px" />
+                        &nbsp;
+                        <FormattedMessage id="Back" defaultMessage="Back" />
                       </StyledButton>
                     </Link>
                     <OCFPrimaryButton
@@ -674,13 +665,9 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                       onSubmit={handleSubmit}
                       loading={submitting}
                     >
-                      <FormattedMessage
-                        id="OCFHostApplication.applyBtn"
-                        defaultMessage="Apply {arrowRight}"
-                        values={{
-                          arrowRight: <ArrowRight2 size="14px" />,
-                        }}
-                      />
+                      <FormattedMessage id="OCFHostApplication.applyBtn" defaultMessage="Apply" />
+                      &nbsp;
+                      <ArrowRight2 size="14px" />
                     </OCFPrimaryButton>
                   </Flex>
                 </Form>

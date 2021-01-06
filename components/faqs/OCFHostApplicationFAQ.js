@@ -7,10 +7,6 @@ import StyledLink from '../StyledLink';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
 
-/**
- * FAQ associated to the `CreateProfile` component. Explains differences between
- * account types (perso. vs org.) as well as incognito contributions.
- */
 const OCFHostApplicationFAQ = props => (
   <FAQ withBorderLeft withNewButtons {...props}>
     <Entry>
@@ -61,7 +57,7 @@ const OCFHostApplicationFAQ = props => (
         fontWeight="500"
         openInNewTab
       >
-        More Info <ArrowRight2 size="13px" />
+        <FormattedMessage id="moreInfo" defaultMessage="More info" /> <ArrowRight2 size="13px" />
       </StyledLink>
     </Box>
   </FAQ>

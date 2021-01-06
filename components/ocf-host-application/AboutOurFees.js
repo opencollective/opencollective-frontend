@@ -6,8 +6,10 @@ import { FormattedMessage } from 'react-intl';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
+import I18nFormatters from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import { H1, P } from '../Text';
 
 import OCFPrimaryButton from './OCFPrimaryButton';
@@ -87,10 +89,11 @@ const AboutOurFees = () => (
           <FormattedMessage id="OCFHostApplication.bankTransfer" defaultMessage="Bank Transfer or Check" />
         </P>
         <Box width="201px">
+          **
           <P textAlign="center" color="black.600" fontSize="13px" lineHeight="16px">
             <FormattedMessage
               id="OCFHostApplication.bankTransfer.description"
-              defaultMessage="**Based on amount raised"
+              defaultMessage="Based on amount raised"
             />
           </P>
         </Box>
@@ -101,43 +104,42 @@ const AboutOurFees = () => (
         <P fontSize="12px" lineHeight="18px" color="#050505" mb="24px">
           <FormattedMessage
             id="OCFHostApplication.aboutOurFees.note"
-            defaultMessage="*Third-party payment processors (like Stripe and Paypal) charge separate fees on each transaction made using their service. Learn more here."
+            defaultMessage="*Third-party payment processors (like Stripe and Paypal) charge separate fees on each transaction made using their service. {learMore}."
+            values={{
+              learMore: (
+                <StyledLink
+                  color="#396C6F"
+                  href="https://docs.opencollective.foundation/how-it-works/fees"
+                  openInNewTab
+                >
+                  Learn more here
+                </StyledLink>
+              ),
+            }}
           />
         </P>
         <P fontSize="12px" lineHeight="18px" color="#050505">
           <FormattedMessage
             id="OCFHostApplication.aboutOurFees.otherFees"
-            defaultMessage="{boldEightPercent} Up to 500k raised. {boldSixPercent} Up to 1 Million raised. {boldFourPercent} Over a Million raised"
-            values={{
-              boldEightPercent: <strong>**8%</strong>,
-              boldSixPercent: <strong>- 6%</strong>,
-              boldFourPercent: <strong>- 4%</strong>,
-            }}
+            defaultMessage="<strong>**8%</strong> Up to 500k raised. <strong>- 6%</strong> Up to 1 Million raised. <strong>- 4%</strong> Over a Million raised"
+            values={I18nFormatters}
           />
         </P>
       </Box>
     </Flex>
     <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center" mb="40px" mt={[null, '48px']}>
-      <Link route="/ocf/apply/fees">
+      <Link route="/foundation/apply/fees">
         <StyledButton mb={[3, 0]} width={['286px', '100px']} mr={[null, 3]}>
-          <FormattedMessage
-            id="OCFHostApplication.backBtn"
-            defaultMessage="{arrowLeft} Back"
-            values={{
-              arrowLeft: <ArrowLeft2 size="14px" />,
-            }}
-          />
+          <ArrowLeft2 size="14px" />
+          &nbsp;
+          <FormattedMessage id="Back" defaultMessage="Back" />
         </StyledButton>
       </Link>
-      <Link route="/ocf/apply/form">
+      <Link route="/foundation/apply/form">
         <OCFPrimaryButton width={['286px', '100px']}>
-          <FormattedMessage
-            id="OCFHostApplication.nextBtn"
-            defaultMessage="Next {arrowRight}"
-            values={{
-              arrowRight: <ArrowRight2 size="14px" />,
-            }}
-          />
+          <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+          &nbsp;
+          <ArrowRight2 size="14px" />
         </OCFPrimaryButton>
       </Link>
     </Flex>
