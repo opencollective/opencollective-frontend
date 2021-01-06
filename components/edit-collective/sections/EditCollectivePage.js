@@ -16,6 +16,7 @@ import {
   convertSectionsToNewFormat,
   getDefaultSectionsForCollective,
   getSectionPath,
+  hasNewNavbar,
 } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
@@ -364,7 +365,7 @@ const loadSectionsForCollectiveV1 = collective => {
 const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
   const router = useRouter();
-  const useNewSections = get(router, 'query.navbarVersion') === 'v2';
+  const useNewSections = hasNewNavbar(get(router, 'query.navbarVersion'));
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
   const [tmpSections, setTmpSections] = React.useState(null);

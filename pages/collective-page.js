@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { createGlobalStyle } from 'styled-components';
 
+import { hasNewNavbar } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 
 import CollectivePageContent from '../components/collective-page';
@@ -62,7 +63,7 @@ class CollectivePage extends React.Component {
     // If on server side
     if (req) {
       req.noStyledJsx = true;
-      const hasNewCollectiveNavbar = navbarVersion === 'v2';
+      const hasNewCollectiveNavbar = hasNewNavbar(navbarVersion);
       await preloadCollectivePageGraphlQueries(slug, client, hasNewCollectiveNavbar);
       skipDataFromTree = true;
     }

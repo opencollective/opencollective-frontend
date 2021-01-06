@@ -9,6 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { getTopContributors } from '../../../lib/collective.lib';
+import { hasNewNavbar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
@@ -261,7 +262,7 @@ class SectionContribute extends React.PureComponent {
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
     const cannotOrderTickets = (!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin);
-    const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
+    const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
 
     /*
     cases
