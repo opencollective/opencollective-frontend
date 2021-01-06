@@ -1512,7 +1512,7 @@
   "Saving": "Sauvegarde en cours...",
   "Search": "Rechercher",
   "search.ifYouDontSee": "Si vous ne voyez pas le collectif que vous cherchez :",
-  "search.noResult": "Aucun collectif trouvé correspondant à votre requête : \"{query}\"",
+  "search.noResult": "Your search did not match any result",
   "search.OpenCollective": "Rechercher sur Open Collective...",
   "search.placeholder": "Rechercher...",
   "searchFilter.all": "View all",

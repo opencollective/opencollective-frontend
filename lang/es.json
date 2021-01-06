@@ -1512,7 +1512,7 @@
   "Saving": "Saving...",
   "Search": "Buscar",
   "search.ifYouDontSee": "Si no ve el colectivo que está buscando:",
-  "search.noResult": "No se han encontrado colectivos que coincidan con su consulta: \"{query}\"",
+  "search.noResult": "Your search did not match any result",
   "search.OpenCollective": "Search Open Collective...",
   "search.placeholder": "Search...",
   "searchFilter.all": "View all",

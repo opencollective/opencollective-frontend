@@ -194,11 +194,7 @@ class SearchPage extends React.Component {
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                 <P my={4}>
                   <em>
-                    <FormattedMessage
-                      id="search.noResult"
-                      defaultMessage='No collectives found matching your query: "{query}"'
-                      values={{ query: term }}
-                    />
+                    <FormattedMessage id="search.noResult" defaultMessage="Your search did not match any result" />
                   </em>
                 </P>
                 {
