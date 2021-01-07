@@ -31,6 +31,23 @@ export const isEmptyValue = value => {
 
 const getFirstSentenceFromHTML = html => html.split?.(/<\/?\w+>/).filter(a => a.length)[0] || '';
 
+const sanitizerOptions = {
+  allowedAttributes: {
+    ...sanitizeHtml.defaults.allowedAttributes,
+    a: ['href', 'rel', 'target'],
+  },
+  transformTags: {
+    a: (tagName, attribs = {}) => ({
+      tagName: 'a',
+      attribs: {
+        ...attribs,
+        rel: 'noopener noreferrer nofollow',
+        target: '_blank',
+      },
+    }),
+  },
+};
+
 const ReadFullLink = styled.a`
   cursor: pointer;
   font-size: 12px;
@@ -57,7 +74,8 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
   if (!content) {
     return <div {...props} />;
   }
-  let __html = sanitize ? sanitizeHtml(content) : content;
+
+  let __html = sanitize ? sanitizeHtml(content, sanitizerOptions) : content;
 
   if (collapsable && !isOpen) {
     __html = getFirstSentenceFromHTML(__html);

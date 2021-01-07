@@ -107,7 +107,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                 </Flex>
               );
             } else {
-              return <HTMLContent content={value} data-cy="longDescription" />;
+              return <HTMLContent content={value} data-cy="longDescription" sanitize />;
             }
           }}
         </InlineEditField>
