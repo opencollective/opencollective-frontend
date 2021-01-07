@@ -337,7 +337,6 @@ const paymentMethodsQuery = gql`
         addedFundsLimit
         bankTransfers
         bankTransfersLimit
-        hostDashboard
         hostedCollectives
         hostedCollectivesLimit
         manualPayments

@@ -36,7 +36,6 @@ const hostQuery = gqlV2/* GraphQL */ `
         addedFundsLimit
         bankTransfers
         bankTransfersLimit
-        hostDashboard
         hostedCollectives
         hostedCollectivesLimit
         manualPayments

@@ -702,7 +702,7 @@ const CollectiveNavbar = ({
                   </MenuLink>
                 </MenuLinkContainer>
               )}
-              {callsToAction.hasDashboard && collective.plan.hostDashboard && (
+              {callsToAction.hasDashboard && (
                 <MenuLinkContainer mobileOnly>
                   <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
                     <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />

@@ -214,7 +214,6 @@ export const collectivePageQuery = gql`
         ...UpdatesFields
       }
       plan {
-        hostDashboard
         hostedCollectives
         hostedCollectivesLimit
       }
