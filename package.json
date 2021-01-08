@@ -73,7 +73,7 @@
     "prop-types": "15.7.2",
     "qrcode.react": "1.0.1",
     "react": "16.14.0",
-    "react-bootstrap": "0.33.1",
+    "react-bootstrap": "1.4.3",
     "react-datetime": "3.0.4",
     "react-dnd": "11.1.1",
     "react-dnd-html5-backend": "11.1.1",
