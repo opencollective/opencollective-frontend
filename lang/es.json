@@ -1261,7 +1261,7 @@
   "OCF.description": "For US charity initiatives",
   "OCFHostApplication.aboutOurFees": "About our fees",
   "OCFHostApplication.aboutOurFees.description": "In order to support you better, we use the Open Collective Platform to manage your initiative.",
-  "OCFHostApplication.aboutOurFees.note": "*Third-party payment processors (like Stripe and Paypal) charge separate fees on each transaction made using their service. {learMore}.",
+  "OCFHostApplication.aboutOurFees.note": "*Third-party payment processors (like Stripe and Paypal) charge separate fees on each transaction made using their service. <LearnMoreLink>Learn more here</LearnMoreLink>.",
   "OCFHostApplication.aboutOurFees.otherFees": "<strong>**8%</strong> Up to 500k raised. <strong>- 6%</strong> Up to 1 Million raised. <strong>- 4%</strong> Over a Million raised",
   "OCFHostApplication.additionalInfoLabel.label": "Anything you would like to add?",
   "OCFHostApplication.applicationForm.description": "Grantees and project participants will love the simplicity and accessibility, and you’ll love how much your overhead is reduced.",
