@@ -2,6 +2,7 @@ import React from 'react';
 
 import StyledLink from './StyledLink';
 
+// eslint-disable-next-line react/display-name
 export const getI18nLink = linkProps => chunks => <StyledLink {...linkProps}>{chunks}</StyledLink>;
 export const I18nBold = chunks => <strong>{chunks}</strong>;
 export const I18nItalic = chunks => <i>{chunks}</i>;
