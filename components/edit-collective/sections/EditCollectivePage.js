@@ -38,8 +38,9 @@ import StyledCard from '../../StyledCard';
 import StyledHr from '../../StyledHr';
 import StyledSelect from '../../StyledSelect';
 import StyledTooltip from '../../StyledTooltip';
-import { H3, P, Span } from '../../Text';
+import { P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
+import SettingsTitle from '../SettingsTitle';
 
 export const getSettingsQuery = gqlV2/* GraphQL */ `
   query GetSettingsForEditCollectivePage($slug: String!) {
@@ -58,7 +59,7 @@ const SectionEntryContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
+  padding: 4px 16px;
 
   ${props =>
     props.isDragging &&
@@ -425,18 +426,17 @@ const EditCollectivePage = ({ collective }) => {
   const displayedSections = tmpSections || sections;
   return (
     <DndProviderHTML5Backend>
-      <H3>
-        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Page sections" />
-      </H3>
-      <Box mb={3}>
-        <P color="black.600">
+      <SettingsTitle
+        subtitle={
           <FormattedMessage
             id="EditCollectivePage.SectionsDescription"
             defaultMessage="In this section you can use drag and drop to reorder the Profile Page sections."
           />
-        </P>
-      </Box>
-      <Flex flexWrap="wrap">
+        }
+      >
+        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Page sections" />
+      </SettingsTitle>
+      <Flex flexWrap="wrap" mt={4}>
         <Box width="100%" maxWidth={436}>
           {loading || !displayedSections ? (
             <LoadingPlaceholder height={400} />

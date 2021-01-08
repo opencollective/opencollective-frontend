@@ -22,11 +22,12 @@ import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
-import StyledHr from '../../StyledHr';
 import StyledLink from '../../StyledLink';
-import { H3, H4, P, Span } from '../../Text';
+import { P, Span } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
 
 import { editCollectiveSettingsMutation } from './../mutations';
+import SettingsSectionTitle from './SettingsSectionTitle';
 
 const { FUND, PROJECT, EVENT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
@@ -427,13 +428,12 @@ class Tiers extends React.Component {
 
     return (
       <div className="EditTiers">
-        <H3>{this.props.title}</H3>
-        <StyledHr my={4} borderColor="black.200" />
+        <SettingsTitle mb={50}>{this.props.title}</SettingsTitle>
         {displayCustomContributionsSettings && (
           <React.Fragment>
-            <H4 mb={3}>
+            <SettingsSectionTitle>
               <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
-            </H4>
+            </SettingsSectionTitle>
             <Mutation mutation={editCollectiveSettingsMutation}>
               {(editSettings, { loading }) => (
                 <Flex flexWrap="wrap">
@@ -467,10 +467,9 @@ class Tiers extends React.Component {
                 </Flex>
               )}
             </Mutation>
-            <StyledHr my={4} borderColor="black.200" />
-            <H4 mb={3}>
+            <SettingsSectionTitle mt={50}>
               <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />
-            </H4>
+            </SettingsSectionTitle>
           </React.Fragment>
         )}
 

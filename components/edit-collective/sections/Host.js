@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Radio } from '@material-ui/core';
 import { get, groupBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -16,16 +15,18 @@ import { Box, Flex } from '../../Grid';
 import HostsWithData from '../../HostsWithData';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
+import StyledInput from '../../StyledInput';
+import StyledLink from '../../StyledLink';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
-import { H3, P } from '../../Text';
+import { H4, P } from '../../Text';
 import CreateHostFormWithData from '../CreateHostFormWithData';
 import EditConnectedAccount from '../EditConnectedAccount';
+import SettingsTitle from '../SettingsTitle';
 
-const Option = styled.div`
-  h2 {
-    margin: 10px 0px 5px 0px;
-    font-weight: bold;
-  }
+const OptionLabel = styled.label`
+  display: block;
+  font-weight: bold;
+  cursor: pointer;
 `;
 
 const Fineprint = styled.div`
@@ -313,17 +314,21 @@ class Host extends React.Component {
 
     return (
       <EditCollectiveHostSection>
-        <H3 mb={4}>
+        <SettingsTitle>
+          <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
+        </SettingsTitle>
+        <H4 fontSize="15px" mb={3}>
           <FormattedMessage
             id="acceptContributions.picker.subtitle"
             defaultMessage="Who will hold money on behalf of the Collective?"
           />
-        </H3>
-
-        <Option id="noHost">
+        </H4>
+        <div id="noHost">
           <Flex>
-            <Box width="50px" mr={2}>
-              <Radio
+            <Box flex="0 0 35px" mr={2} pl={2}>
+              <StyledInput
+                type="radio"
+                name="host-radio"
                 id="host-radio-noHost"
                 checked={selectedOption === 'noHost'}
                 onChange={() => this.updateSelectedOption('noHost')}
@@ -331,23 +336,23 @@ class Host extends React.Component {
               />
             </Box>
             <Box mb={4}>
-              <h2>
-                <label htmlFor="host-radio-noHost">
-                  <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No one" />
-                </label>
-              </h2>
+              <OptionLabel htmlFor="host-radio-noHost">
+                <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No one" />
+              </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
                 defaultMessage="You can't receive financial contributions or use the budget features. You can still edit your profile page, submit expenses to be paid later, and post updates."
               />
             </Box>
           </Flex>
-        </Option>
+        </div>
 
-        <Option id="selfHost">
+        <div id="selfHost">
           <Flex>
-            <Box width="50px" mr={2}>
-              <Radio
+            <Box flex="0 0 35px" mr={2} pl={2}>
+              <StyledInput
+                type="radio"
+                name="host-radio"
                 id="host-radio-selfHost"
                 checked={selectedOption === 'selfHost'}
                 onChange={() => this.updateSelectedOption('selfHost')}
@@ -355,11 +360,9 @@ class Host extends React.Component {
               />
             </Box>
             <Box mb={4}>
-              <h2>
-                <label htmlFor="host-radio-selfHost">
-                  <FormattedMessage id="collective.edit.host.selfHost.title" defaultMessage="Ourselves" />
-                </label>
-              </h2>
+              <OptionLabel htmlFor="host-radio-selfHost">
+                <FormattedMessage id="collective.edit.host.selfHost.title" defaultMessage="Ourselves" />
+              </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.selfHost.description"
                 defaultMessage="No Fiscal Host, simply connect a bank account. You will be responsible for accounting, taxes, payments, and liability."
@@ -393,24 +396,24 @@ class Host extends React.Component {
               )}
             </Box>
           </Flex>
-        </Option>
+        </div>
 
-        <Option id="ownHost">
+        <div id="ownHost">
           <Flex>
-            <Box width="50px" mr={2}>
-              <Radio
+            <Box flex="0 0 35px" mr={2} pl={2}>
+              <StyledInput
+                type="radio"
                 id="host-radio-ownHost"
+                name="host-radio"
                 checked={selectedOption === 'ownHost'}
                 onChange={() => this.updateSelectedOption('ownHost')}
                 className="hostRadio"
               />
             </Box>
             <Box mb={4}>
-              <h2>
-                <label htmlFor="host-radio-ownHost">
-                  <FormattedMessage id="collective.edit.host.useOwn.title" defaultMessage="Our organization" />
-                </label>
-              </h2>
+              <OptionLabel htmlFor="host-radio-ownHost">
+                <FormattedMessage id="collective.edit.host.useOwn.title" defaultMessage="Our organization" />
+              </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.useOwn.description"
                 defaultMessage="Use an organization you own as Fiscal Host so you can host multiple collectives. The organization will be responsible for their accounting, taxes, payments, and liability."
@@ -429,12 +432,14 @@ class Host extends React.Component {
               )}
             </Box>
           </Flex>
-        </Option>
+        </div>
 
-        <Option id="findHost">
+        <div id="findHost">
           <Flex>
-            <Box width="50px" mr={2}>
-              <Radio
+            <Box flex="0 0 35px" mr={2} pl={2}>
+              <StyledInput
+                type="radio"
+                name="host-radio"
                 id="host-radio-findHost"
                 checked={selectedOption === 'findHost'}
                 onChange={() => this.updateSelectedOption('findHost')}
@@ -442,33 +447,31 @@ class Host extends React.Component {
               />
             </Box>
             <Box mb={4}>
-              <h2>
-                <label htmlFor="host-radio-findHost">
-                  <FormattedMessage
-                    id="collective.edit.host.findHost.title"
-                    defaultMessage="Apply to an existing Fiscal Host"
-                  />
-                </label>
-              </h2>
+              <OptionLabel htmlFor="host-radio-findHost">
+                <FormattedMessage
+                  id="collective.edit.host.findHost.title"
+                  defaultMessage="Apply to an existing Fiscal Host"
+                />
+              </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.findHost.description"
                 defaultMessage="You won't need to hold funds yourself, or set up a legal entity and bank account for your project. The Fiscal Host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the Host's page before confirming)."
               />
               {selectedOption === 'findHost' && (
                 <div>
-                  <Container display="flex" alignItems="baseline">
-                    <h3>
+                  <Container display="flex" alignItems="baseline" mt={2}>
+                    <H4 fontSize="13px" mr={2}>
                       <FormattedMessage
                         id="collective.edit.host.suggestedHosts.title"
                         defaultMessage="Suggested hosts"
                       />
-                    </h3>
-                    <Link route="/hosts">
+                    </H4>
+                    <StyledLink as={Link} fontSize="13px" route="/hosts">
                       <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all Fiscal Hosts" />
-                    </Link>
+                    </StyledLink>
                   </Container>
                   {collective.tags && collective.tags.length > 0 && (
-                    <Container color="#666f80" fontSize="1.5rem">
+                    <Container color="#666f80" fontSize="12px">
                       <FormattedMessage
                         id="collective.edit.host.suggestedHosts.description"
                         defaultMessage="Based on the tags ({tags})"
@@ -492,7 +495,7 @@ class Host extends React.Component {
               )}
             </Box>
           </Flex>
-        </Option>
+        </div>
       </EditCollectiveHostSection>
     );
   }

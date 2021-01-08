@@ -12,6 +12,7 @@ import GiftCard from './icons/GiftCard';
 import Avatar from './Avatar';
 import { Box, Flex } from './Grid';
 import Link from './Link';
+import StyledButton from './StyledButton';
 import { Span } from './Text';
 
 const DetailsColumnHeader = styled.span`
@@ -153,7 +154,7 @@ class VirtualCardDetails extends React.Component {
     const { isConfirmed, collective, balance, currency, data } = this.props.virtualCard;
 
     return (
-      <Flex className="vc-details">
+      <Flex data-cy="vc-details">
         {/* Avatar column */}
         <Box mr="20px">
           {isConfirmed ? (
@@ -172,20 +173,27 @@ class VirtualCardDetails extends React.Component {
             <VirtualCardStatus isConfirmed={isConfirmed} collective={collective} data={data} />
           </Box>
           <Box color={this.props.theme.colors.black[500]} fontSize="0.9em">
-            <Flex>
+            <Flex alignItems="center">
               <FormattedMessage
                 id="virtualCards.balance"
                 defaultMessage="Balance: {balance}"
                 values={{ balance: formatCurrency(balance, currency) }}
               />
               <Box mx={1}>|</Box>
-              <a onClick={() => this.toggleExpended()}>
+              <StyledButton
+                isBorderless
+                buttonSize="tiny"
+                buttonStyle="secondary"
+                fontSize="11px"
+                onClick={() => this.toggleExpended()}
+                px={1}
+              >
                 {this.state.expended ? (
                   <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
                 ) : (
                   <FormattedMessage id="viewDetails" defaultMessage="View Details" />
                 )}
-              </a>
+              </StyledButton>
             </Flex>
           </Box>
           {this.state.expended && this.renderDetails()}

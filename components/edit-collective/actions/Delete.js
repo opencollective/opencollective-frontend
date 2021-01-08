@@ -10,8 +10,9 @@ import { Router } from '../../../server/pages';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
-import { H2, P } from '../../Text';
+import { P } from '../../Text';
 import { withUser } from '../../UserProvider';
+import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
 const deleteCollectiveMutation = gql`
   mutation DeleteCollective($id: Int!) {
@@ -56,8 +57,8 @@ const DeleteCollective = ({ collective, ...props }) => {
   const closeModal = () => setShowModal(false);
 
   return (
-    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
-      <H2>
+    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={50}>
+      <SettingsSectionTitle>
         <FormattedMessage
           id="collective.delete.title"
           defaultMessage={
@@ -65,8 +66,8 @@ const DeleteCollective = ({ collective, ...props }) => {
           }
           values={{ type: collective.type }}
         />
-      </H2>
-      <P>
+      </SettingsSectionTitle>
+      <P mb={3}>
         <FormattedMessage
           id="collective.delete.description"
           defaultMessage={
@@ -75,11 +76,16 @@ const DeleteCollective = ({ collective, ...props }) => {
           values={{ type: collective.type }}
         />
       </P>
-      {error && <P color="#ff5252">{error}</P>}
+      {error && (
+        <P my={3} color="#ff5252">
+          {error}
+        </P>
+      )}
       <StyledButton
         onClick={() => setShowModal(true)}
         loading={deleting}
         disabled={collective.isHost || !collective.isDeletable}
+        mb={2}
       >
         <FormattedMessage
           id="collective.delete.title"
@@ -90,7 +96,7 @@ const DeleteCollective = ({ collective, ...props }) => {
         />
       </StyledButton>
       {collective.isHost && (
-        <P color="rgb(224, 183, 0)">
+        <P color="rgb(224, 183, 0)" my={1}>
           <FormattedMessage
             id="collective.delete.isHost"
             defaultMessage={
@@ -103,7 +109,7 @@ const DeleteCollective = ({ collective, ...props }) => {
       {!collective.isDeletable &&
         collective.type !== CollectiveType.EVENT &&
         collective.type !== CollectiveType.PROJECT && (
-          <P color="rgb(224, 183, 0)">
+          <P color="rgb(224, 183, 0)" my={1}>
             <FormattedMessage
               id="collective.delete.isNotDeletable-message"
               defaultMessage={
@@ -115,7 +121,7 @@ const DeleteCollective = ({ collective, ...props }) => {
         )}
       {!collective.isDeletable &&
         (collective.type === CollectiveType.EVENT || collective.type === CollectiveType.PROJECT) && (
-          <P color="rgb(224, 183, 0)">
+          <P color="rgb(224, 183, 0)" my={1}>
             <FormattedMessage
               id="collective.event.delete.isNotDeletable-message"
               defaultMessage={

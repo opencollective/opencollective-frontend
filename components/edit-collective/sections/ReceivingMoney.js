@@ -6,7 +6,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';
 
-import { H3 } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
 
 import BankTransfer from './BankTransfer';
 import ConnectedAccounts from './ConnectedAccounts';
@@ -37,9 +37,9 @@ class ReceivingMoney extends React.Component {
       <Fragment>
         {!this.state.hideTopsection && (
           <React.Fragment>
-            <H3>
+            <SettingsTitle mb={4}>
               <FormattedMessage id="editCollective.receivingMoney" defaultMessage="Receiving Money" />
-            </H3>
+            </SettingsTitle>
             <ConnectedAccounts
               collective={this.props.collective}
               connectedAccounts={this.props.collective.connectedAccounts}

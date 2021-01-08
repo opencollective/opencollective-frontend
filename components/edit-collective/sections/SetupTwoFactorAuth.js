@@ -24,8 +24,9 @@ import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledTooltip from '../../StyledTooltip';
-import { H2, H3, P } from '../../Text';
+import { H3, P } from '../../Text';
 import { withUser } from '../../UserProvider';
+import SettingsTitle from '../SettingsTitle';
 
 const messages = defineMessages({
   errorWrongLength: {
@@ -56,6 +57,11 @@ const content = () => (
 const TokenBox = styled(Box)`
   overflow-wrap: break-word;
   word-wrap: break-word;
+`;
+
+const Code = styled.code`
+  background: ${props => props.theme.colors.black[100]};
+  color: ${props => props.theme.colors.black[700]};
 `;
 
 class SetupTwoFactorAuth extends React.Component {
@@ -200,23 +206,23 @@ class SetupTwoFactorAuth extends React.Component {
 
     return (
       <Flex flexDirection="column">
+        <SettingsTitle>
+          {doesAccountAlreadyHave2FA ? (
+            <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
+          ) : (
+            <FormattedMessage id="TwoFactorAuth.Setup.Title" defaultMessage="Set up two-factor authentication" />
+          )}
+        </SettingsTitle>
         {error && (
           <MessageBox type="error" withIcon my={2} data-cy="add-two-factor-auth-error">
             {error}
           </MessageBox>
         )}
-        <Flex flexDirection="column" my={2}>
-          <H2>
-            {doesAccountAlreadyHave2FA ? (
-              <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
-            ) : (
-              <FormattedMessage id="TwoFactorAuth.Setup.Title" defaultMessage="Set up two-factor authentication" />
-            )}
-          </H2>
+        <Flex flexDirection="column">
           {doesAccountAlreadyHave2FA ? (
             <Fragment>
               <Flex alignItems="center" mb={3}>
-                <MessageBox type="success" withIcon my={2} data-cy="add-two-factor-auth-success">
+                <MessageBox type="success" withIcon data-cy="add-two-factor-auth-success">
                   <FormattedMessage
                     id="TwoFactorAuth.Setup.AlreadyAdded"
                     defaultMessage="Two-factor authentication (2FA) is enabled on this account. Well done! 🎉"
@@ -326,8 +332,8 @@ class SetupTwoFactorAuth extends React.Component {
               </P>
               <Container>
                 <Box>
-                  <Flex alignItems="center">
-                    <H3 mr={1}>
+                  <Flex alignItems="center" mt={3}>
+                    <H3 fontSize="15px" mr={1}>
                       <FormattedMessage
                         id="TwoFactorAuth.Setup.StepOne"
                         defaultMessage="Step one: scan this QR code with an authenticator app"
@@ -346,7 +352,7 @@ class SetupTwoFactorAuth extends React.Component {
                             id="TwoFactorAuth.Setup.ManualEntry"
                             defaultMessage="Manual entry: {token}"
                             values={{
-                              token: base32,
+                              token: <Code>{base32}</Code>,
                             }}
                           />
                         </P>
@@ -356,8 +362,8 @@ class SetupTwoFactorAuth extends React.Component {
                     <LoadingPlaceholder height={256} width={256} />
                   )}
                 </Box>
-                <Box>
-                  <H3>
+                <Box mt={3}>
+                  <H3 fontSize="15px">
                     <FormattedMessage
                       id="TwoFactorAuth.Setup.StepTwo"
                       defaultMessage="Step two: enter the code from your authentication app"
@@ -390,8 +396,9 @@ class SetupTwoFactorAuth extends React.Component {
                                   {...inputProps}
                                   minWidth={300}
                                   maxWidth={350}
-                                  minHeight={75}
+                                  minHeight={60}
                                   fontSize="20px"
+                                  lineHeight="28px"
                                   placeholder="123456"
                                   pattern="[0-9]{6}"
                                   inputMode="numeric"

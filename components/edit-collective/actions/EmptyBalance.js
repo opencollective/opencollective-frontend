@@ -8,7 +8,8 @@ import Container from '../../Container';
 import SendMoneyToCollectiveBtn from '../../SendMoneyToCollectiveBtn';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
-import { H2, P } from '../../Text';
+import { P } from '../../Text';
+import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
 const EmptyBalance = ({ collective, LoggedInUser }) => {
   const [modal, setModal] = useState({ type: 'Transfer', show: false, isApproved: false });
@@ -24,8 +25,8 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
   const closeModal = () => setModal({ ...modal, show: false, isApproved: false });
 
   return (
-    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={2}>
-      <H2>
+    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={50}>
+      <SettingsSectionTitle>
         <FormattedMessage
           id="collective.balance.title"
           defaultMessage={
@@ -33,8 +34,8 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
           }
           values={{ type: collective.type }}
         />
-      </H2>
-      <P>
+      </SettingsSectionTitle>
+      <P mb={2} lineHeight="16px" fontSize="14px">
         <FormattedMessage
           id="collective.balance.description"
           defaultMessage={
@@ -44,7 +45,7 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
         />
       </P>
       {!collective.host.hostCollective && (
-        <P color="rgb(224, 183, 0)">
+        <P color="rgb(224, 183, 0)" my={2}>
           <FormattedMessage
             id="collective.balance.notAvailable"
             defaultMessage={

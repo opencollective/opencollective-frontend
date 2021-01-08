@@ -156,7 +156,7 @@ const MenuItem = styled(Link)`
   display: block;
   border-radius: 5px;
   padding: 5px 10px;
-  color: #888;
+  color: #4e5052;
   cursor: pointer;
   &:hover,
   a:hover {
@@ -167,6 +167,7 @@ const MenuItem = styled(Link)`
     css`
       background-color: #eee;
       color: black;
+      font-weight: 500;
     `};
 `;
 

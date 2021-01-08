@@ -14,8 +14,9 @@ import { Flex } from '../../Grid';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledCheckbox from '../../StyledCheckbox';
-import { H3, P } from '../../Text';
+import { P } from '../../Text';
 import { editCollectiveSettingsMutation } from '../mutations';
+import SettingsTitle from '../SettingsTitle';
 
 import imgPreviewReplies from '../../../public/static/images/conversations/conversation-replies-preview.png';
 import imgPreviewThread from '../../../public/static/images/conversations/conversations-list-preview.png';
@@ -43,6 +44,7 @@ const ScreenshotPreview = styled.div`
   height: 240px;
   border: 1px solid #ececec;
   border-radius: 16px;
+  min-width: 42%;
 
   img {
     max-height: 100%;
@@ -59,7 +61,7 @@ const Conversations = ({ collective }) => {
 
   return (
     <Container>
-      <H3>{formatMessage(messages.title)}</H3>
+      <SettingsTitle>{formatMessage(messages.title)}</SettingsTitle>
       <Flex mb={2} flexWrap="wrap" justifyContent="center">
         <Container mr={3} pr={3} flex="1 1" minWidth={300} maxWidth={700} borderRight={[null, '1px solid #dcdee0']}>
           <P wordBreak="break-word">

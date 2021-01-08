@@ -6,9 +6,13 @@ import { exportMembers } from '../../../lib/export_file';
 
 import Container from '../../Container';
 import ExportImages from '../../ExportImages';
+import { Box } from '../../Grid';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
-import { P } from '../../Text';
+import { H4, P } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
+
+import SettingsSectionTitle from './SettingsSectionTitle';
 
 class Export extends React.Component {
   static propTypes = {
@@ -25,34 +29,35 @@ class Export extends React.Component {
 
     return (
       <div>
-        <h1>
+        <SettingsTitle mb={4}>
+          <FormattedMessage id="editCollective.menu.export" defaultMessage="Export" />
+        </SettingsTitle>
+        <SettingsSectionTitle>
           <FormattedMessage id="export.widget.title" defaultMessage="Widget" />
-        </h1>
-        <Container as="pre" fontSize="11px">
+        </SettingsSectionTitle>
+        <Container as="pre" fontSize="11px" whiteSpace="pre-wrap" mb={4}>
           {widgetCode}
         </Container>
-
-        <ExportImages collective={collective} />
-
-        <h1>
+        <Box my={4}>
+          <ExportImages collective={collective} />
+        </Box>
+        <SettingsSectionTitle mt={4}>
           <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-        </h1>
-        <P textAlign="center">
+        </SettingsSectionTitle>
+        <P mb={2}>
           <FormattedMessage
             id="ExportContributors.Description"
             defaultMessage="Export your contributors data in {format} format"
             values={{ format: 'CSV' }}
           />
         </P>
-        <Container textAlign="center">
-          <StyledButton onClick={async () => await exportMembers(collective.slug)}>
-            <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-          </StyledButton>
-        </Container>
+        <StyledButton onClick={async () => await exportMembers(collective.slug)}>
+          <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+        </StyledButton>
 
-        <h1>
+        <SettingsSectionTitle mt={4}>
           <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'JSON' }} />
-        </h1>
+        </SettingsSectionTitle>
         <p>
           <FormattedMessage
             id="ExportContributors.Description"
@@ -67,7 +72,7 @@ class Export extends React.Component {
               defaultMessage="All contributors: {link}"
               values={{
                 link: (
-                  <StyledLink display="block" href={`/${collective.slug}/members/all.json`}>
+                  <StyledLink href={`/${collective.slug}/members/all.json`}>
                     https://opencollective.com/
                     {collective.slug}
                     /members/all.json
@@ -82,7 +87,7 @@ class Export extends React.Component {
               defaultMessage="Only individuals: {link}"
               values={{
                 link: (
-                  <StyledLink display="block" href={`/${collective.slug}/members/users.json`}>
+                  <StyledLink href={`/${collective.slug}/members/users.json`}>
                     https://opencollective.com/
                     {collective.slug}
                     /members/users.json
@@ -97,7 +102,7 @@ class Export extends React.Component {
               defaultMessage="Only organizations: {link}"
               values={{
                 link: (
-                  <StyledLink display="block" href={`/${collective.slug}/members/organizations.json`}>
+                  <StyledLink href={`/${collective.slug}/members/organizations.json`}>
                     https://opencollective.com/
                     {collective.slug}
                     /members/organizations.json
@@ -108,9 +113,9 @@ class Export extends React.Component {
           </li>
         </ul>
 
-        <h2>
+        <H4 fontSize="14px" fontWeight="500">
           <FormattedMessage id="export.json.parameters.title" defaultMessage="Parameters" />
-        </h2>
+        </H4>
         <Container as="table" fontSize="14px" mb={3} width="100%" css={{ borderSpacing: 16 }}>
           <tbody>
             <tr>

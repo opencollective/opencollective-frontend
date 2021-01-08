@@ -4,8 +4,10 @@ import { groupBy } from 'lodash';
 
 import { capitalize } from '../../../lib/utils';
 
-import { H4 } from '../../Text';
+import { Box } from '../../Grid';
 import EditConnectedAccount from '../EditConnectedAccount';
+
+import SettingsSectionTitle from './SettingsSectionTitle';
 
 const ConnectedAccounts = props => {
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
@@ -22,14 +24,14 @@ const ConnectedAccounts = props => {
   return (
     <div className="EditConnectedAccounts">
       {services.map(service => (
-        <div key={`connect-${service}`}>
-          <H4 mt={2}>{capitalize(service)}</H4>
+        <Box key={`connect-${service}`} mb={4}>
+          <SettingsSectionTitle>{capitalize(service)}</SettingsSectionTitle>
           <EditConnectedAccount
             collective={props.collective}
             service={service}
             connectedAccount={connectedAccountsByService[service] && connectedAccountsByService[service][0]}
           />
-        </div>
+        </Box>
       ))}
     </div>
   );

@@ -28,7 +28,6 @@ import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
-import { H3, P } from './Text';
 
 const MIN_AMOUNT = 500;
 const MAX_AMOUNT = 100000000;
@@ -150,9 +149,9 @@ const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   return (
     <RadioButtonContainer data-name={name} onClick={onClick}>
       <Box className="radio-btn">{icon}</Box>
-      <H3 textAlign="center" px={2} style={{ marginTop: 8 }}>
+      <label textAlign="center" px={2} style={{ marginTop: 8, cursor: 'pointer' }}>
         {children}
-      </H3>
+      </label>
     </RadioButtonContainer>
   );
 };
@@ -342,19 +341,8 @@ class CreateVirtualCardsForm extends Component {
 
   renderEmailFields() {
     const { submitting, errors, multiEmailsInitialState } = this.state;
-    const { collectiveSettings } = this.props;
     return (
       <Box>
-        <P>
-          <FormattedMessage
-            id="VirtualCard.Limitinfo"
-            defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
-            values={{
-              SupportLink: I18nSupportLink,
-              limit: get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100,
-            }}
-          />
-        </P>
         <Flex flexDirection="column" mb="2em">
           <label style={{ width: '100%' }}>
             <Flex flexDirection="column">
@@ -407,25 +395,17 @@ class CreateVirtualCardsForm extends Component {
     const virtualCardsMaxDailyCount = get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100;
     return (
       <Container display="flex" flexDirection="column" width={1} justifyContent="center">
-        <P>
-          <FormattedMessage
-            id="VirtualCard.Limitinfo"
-            defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
-            values={{
-              SupportLink: I18nSupportLink,
-              limit: virtualCardsMaxDailyCount,
-            }}
-          />
-        </P>
-        <Flex justifyContent="center" mt={4} mb={3}>
-          <H3 mr="1em">
+        <Flex justifyContent="center" mt={3} mb={4} alignItems="center">
+          <label htmlFor="virtualcard-numberOfVirtualCards">
             <FormattedMessage id="virtualCards.create.number" defaultMessage="Number of gift cards" />
-          </H3>
+          </label>
           <StyledInput
             id="virtualcard-numberOfVirtualCards"
+            name="virtualcard-numberOfVirtualCards"
             type="number"
             step="1"
             min="1"
+            ml={3}
             max={virtualCardsMaxDailyCount}
             maxWidth="6.5em"
             onChange={e => this.onChange('numberOfVirtualCards', e.target.value)}
@@ -459,7 +439,7 @@ class CreateVirtualCardsForm extends Component {
   });
 
   render() {
-    const { data, intl, collectiveSlug, currency } = this.props;
+    const { data, intl, collectiveSlug, currency, collectiveSettings } = this.props;
     const { submitting, values, createdVirtualCards, serverError, deliverType } = this.state;
     const loading = get(data, 'loading');
     const error = get(data, 'error');
@@ -610,6 +590,17 @@ class CreateVirtualCardsForm extends Component {
               <FormattedMessage id="virtualCards.create.generateCodes" defaultMessage="I'll send the codes myself" />
             </RadioButtonWithLabel>
           </DeliverTypeRadioSelector>
+
+          <MessageBox type="info" fontSize="13px" withIcon mb={4}>
+            <FormattedMessage
+              id="VirtualCard.Limitinfo"
+              defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
+              values={{
+                SupportLink: I18nSupportLink,
+                limit: get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100,
+              }}
+            />
+          </MessageBox>
 
           {/* Show different fields based on deliver type */}
           {deliverType === 'email' && this.renderEmailFields()}

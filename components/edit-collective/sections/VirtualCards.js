@@ -19,6 +19,7 @@ import StyledButtonSet from '../../StyledButtonSet';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
 import VirtualCardDetails from '../../VirtualCardDetails';
+import SettingsTitle from '../SettingsTitle';
 
 const messages = defineMessages({
   notBatched: {
@@ -71,7 +72,8 @@ class VirtualCards extends React.Component {
         mt={[4, 0]}
         items={['all', 'redeemed', 'pending']}
         selected={selected}
-        buttonProps={{ p: 0 }}
+        buttonProps={{ p: 1 }}
+        display="block"
       >
         {({ item, isSelected }) => (
           <Link route="editCollective" params={{ ...this.props.router.query, filter: item, offset: 0 }}>
@@ -127,52 +129,66 @@ class VirtualCards extends React.Component {
     const [batchesOptions, selectedOption] = this.getBatchesOptions(batches, get(data, 'variables.batch'), intl);
 
     return (
-      <Box mt={3}>
-        <Flex mb={4} flexDirection={['column-reverse', 'row']} justifyContent="space-between" flexWrap="wrap">
-          {this.renderFilters(onlyConfirmed)}
-          <Flex justifyContent="center">
-            <Link route="editCollective" params={{ slug: collectiveSlug, section: 'gift-cards-create' }}>
-              <StyledButton buttonStyle="primary" buttonSize="medium">
-                <Add size="1em" />
-                {'  '}
-                <FormattedMessage id="virtualCards.create" defaultMessage="Create gift cards" />
-              </StyledButton>
-            </Link>
-          </Flex>
-        </Flex>
-        {batchesOptions.length > 1 && (
+      <div>
+        <SettingsTitle>
+          <FormattedMessage id="editCollective.menu.virtualCards" defaultMessage="Gift Cards" />
+        </SettingsTitle>
+        <Box mt={4}>
           <Box mb={4}>
-            <StyledSelect
-              options={batchesOptions}
-              onChange={({ value }) => Router.pushRoute('editCollective', { ...this.props.router.query, batch: value })}
-              defaultValue={selectedOption}
-            />
+            <Flex
+              mb={3}
+              flexDirection={['column-reverse', 'row']}
+              justifyContent="space-between"
+              alignItems="center"
+              flexWrap="wrap"
+            >
+              {this.renderFilters(onlyConfirmed)}
+              <Flex justifyContent="center">
+                <Link route="editCollective" params={{ slug: collectiveSlug, section: 'gift-cards-create' }}>
+                  <StyledButton buttonStyle="primary" buttonSize="medium">
+                    <Add size="1em" />
+                    {'  '}
+                    <FormattedMessage id="virtualCards.create" defaultMessage="Create gift cards" />
+                  </StyledButton>
+                </Link>
+              </Flex>
+            </Flex>
+            {batchesOptions.length > 1 && (
+              <Box mb={3}>
+                <StyledSelect
+                  options={batchesOptions}
+                  onChange={({ value }) =>
+                    Router.pushRoute('editCollective', { ...this.props.router.query, batch: value })
+                  }
+                  defaultValue={selectedOption}
+                />
+              </Box>
+            )}
           </Box>
-        )}
-        <hr />
-        {data.loading ? (
-          <Loading />
-        ) : (
-          <div data-cy="virtualcards-list">
-            {paymentMethods.length === 0 && (
-              <Flex justifyContent="center" mt="4em">
-                {this.renderNoVirtualCardMessage(onlyConfirmed)}
-              </Flex>
-            )}
-            {paymentMethods.map(v => (
-              <div key={v.id}>
-                <VirtualCardDetails virtualCard={v} collectiveSlug={this.props.collectiveSlug} />
-                {v !== lastVirtualCard && <hr />}
-              </div>
-            ))}
-            {total > limit && (
-              <Flex className="vc-pagination" justifyContent="center" mt={4}>
-                <Pagination offset={offset} total={total} limit={limit} />
-              </Flex>
-            )}
-          </div>
-        )}
-      </Box>
+          {data.loading ? (
+            <Loading />
+          ) : (
+            <div data-cy="virtualcards-list">
+              {paymentMethods.length === 0 && (
+                <Flex justifyContent="center" mt="4em">
+                  {this.renderNoVirtualCardMessage(onlyConfirmed)}
+                </Flex>
+              )}
+              {paymentMethods.map(v => (
+                <div key={v.id}>
+                  <VirtualCardDetails virtualCard={v} collectiveSlug={this.props.collectiveSlug} />
+                  {v !== lastVirtualCard && <hr />}
+                </div>
+              ))}
+              {total > limit && (
+                <Flex className="vc-pagination" justifyContent="center" mt={4}>
+                  <Pagination offset={offset} total={total} limit={limit} />
+                </Flex>
+              )}
+            </div>
+          )}
+        </Box>
+      </div>
     );
   }
 }

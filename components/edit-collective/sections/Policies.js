@@ -19,8 +19,10 @@ import StyledButton from '../../StyledButton';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { H3, P } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
 
 import { getSettingsQuery } from './EditCollectivePage';
+import SettingsSectionTitle from './SettingsSectionTitle';
 
 const EXPENSE_POLICY_MAX_LENGTH = 16000; // max in database is ~15,500
 const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
@@ -170,23 +172,25 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
 
   return (
     <Flex flexDirection="column">
-      {error && <MessageBoxGraphqlError error={error} />}
       {!showOnlyExpensePolicy && (
-        <H3 mt={2}>
+        <SettingsTitle>
           <FormattedMessage id="editCollective.menu.policies" defaultMessage="Policies" />
-        </H3>
+        </SettingsTitle>
       )}
+      {error && <MessageBoxGraphqlError error={error} />}
       <form onSubmit={formik.handleSubmit}>
         <Container>
           {!showOnlyExpensePolicy && (
-            <Container>
+            <Container mb={4}>
               <StyledInputField
                 name="contributionPolicy"
                 htmlFor="contributionPolicy"
                 error={formik.errors.contributionPolicy}
                 disabled={isSubmittingPolicies}
-                label={formatMessage(messages['contributionPolicy.label'])}
                 labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+                label={
+                  <SettingsSectionTitle>{formatMessage(messages['contributionPolicy.label'])}</SettingsSectionTitle>
+                }
               >
                 {inputProps => (
                   <RichTextEditor
@@ -196,6 +200,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                     error={formik.errors.contributionPolicy}
                     version="simplified"
                     editorMinHeight="20rem"
+                    editorMaxHeight={500}
                     id={inputProps.id}
                     inputName={inputProps.name}
                     onChange={formik.handleChange}
@@ -205,7 +210,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                   />
                 )}
               </StyledInputField>
-              <P fontSize="14px" color="black.600">
+              <P fontSize="14px" lineHeight="18px" color="black.600" mt={2}>
                 <FormattedMessage
                   id="collective.contributionPolicy.description"
                   defaultMessage="All categorized Financial Contributors are manually classified by the Open Collective team. Only contributors that are thought to be abusing are classified with these categories. Financial Contributors with a good reputation should normally not be affected by this setting."
@@ -219,8 +224,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             htmlFor="expensePolicy"
             error={formik.errors.expensePolicy}
             disabled={isSubmittingPolicies}
-            label={formatMessage(messages['expensePolicy.label'])}
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+            label={<SettingsSectionTitle>{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>}
           >
             {inputProps => (
               <RichTextEditor
@@ -230,16 +235,18 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 error={formik.errors.expensePolicy}
                 version="simplified"
                 editorMinHeight="20rem"
+                editorMaxHeight={500}
                 id={inputProps.id}
                 inputName={inputProps.name}
                 onChange={formik.handleChange}
                 placeholder={formatMessage(messages['expensePolicy.placeholder'])}
                 defaultValue={formik.values.expensePolicy}
                 fontSize="14px"
+                maxHeight={600}
               />
             )}
           </StyledInputField>
-          <P fontSize="14px" color="black.600">
+          <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
               id="collective.expensePolicy.description"
               defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
