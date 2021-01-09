@@ -6,10 +6,9 @@ import { FormattedMessage } from 'react-intl';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
-import I18nFormatters from '../I18nFormatters';
+import I18nFormatters, { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
-import StyledLink from '../StyledLink';
 import { H1, P } from '../Text';
 
 import OCFPrimaryButton from './OCFPrimaryButton';
@@ -89,8 +88,8 @@ const AboutOurFees = () => (
           <FormattedMessage id="OCFHostApplication.bankTransfer" defaultMessage="Bank Transfer or Check" />
         </P>
         <Box width="201px">
-          **
           <P textAlign="center" color="black.600" fontSize="13px" lineHeight="16px">
+            **
             <FormattedMessage
               id="OCFHostApplication.bankTransfer.description"
               defaultMessage="Based on amount raised"
@@ -104,17 +103,13 @@ const AboutOurFees = () => (
         <P fontSize="12px" lineHeight="18px" color="#050505" mb="24px">
           <FormattedMessage
             id="OCFHostApplication.aboutOurFees.note"
-            defaultMessage="*Third-party payment processors (like Stripe and Paypal) charge separate fees on each transaction made using their service. {learMore}."
+            defaultMessage="*Third-party payment processors (like Stripe and Paypal) charge separate fees on each transaction made using their service. <LearnMoreLink>Learn more here</LearnMoreLink>."
             values={{
-              learMore: (
-                <StyledLink
-                  color="#396C6F"
-                  href="https://docs.opencollective.foundation/how-it-works/fees"
-                  openInNewTab
-                >
-                  Learn more here
-                </StyledLink>
-              ),
+              LearnMoreLink: getI18nLink({
+                openInNewTab: true,
+                color: '#396C6F',
+                href: 'https://docs.opencollective.foundation/how-it-works/fees',
+              }),
             }}
           />
         </P>
@@ -128,7 +123,7 @@ const AboutOurFees = () => (
       </Box>
     </Flex>
     <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center" mb="40px" mt={[null, '48px']}>
-      <Link route="/foundation/apply/fees">
+      <Link route="/foundation/apply/intro">
         <StyledButton mb={[3, 0]} width={['286px', '100px']} mr={[null, 3]}>
           <ArrowLeft2 size="14px" />
           &nbsp;

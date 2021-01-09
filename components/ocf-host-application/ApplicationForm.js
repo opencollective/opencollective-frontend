@@ -11,7 +11,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { suggestSlug } from '../../lib/collective.lib';
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
+import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
@@ -39,10 +39,17 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
   mutation CreateCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
-    $user: UserCreateInput
+    $user: IndividualCreateInput
     $message: String
+    $applicationData: JSON
   ) {
-    createCollective(collective: $collective, host: $host, user: $user, message: $message) {
+    createCollective(
+      collective: $collective
+      host: $host
+      user: $user
+      message: $message
+      applicationData: $applicationData
+    ) {
       id
       slug
       host {
@@ -117,16 +124,16 @@ const initialValues = {
     name: '',
     slug: '',
     description: '',
-    applicationData: {
-      location: '',
-      initiativeDuration: '',
-      totalAmountRaised: 0,
-      totalAmountToBeRaised: 0,
-      expectedFundingPartner: '',
-      missionImpactExplanation: '',
-      websiteAndSocialLinks: '',
-      additionalInfo: '',
-    },
+  },
+  applicationData: {
+    location: '',
+    initiativeDuration: '',
+    totalAmountRaised: 0,
+    totalAmountToBeRaised: 0,
+    expectedFundingPartner: '',
+    missionImpactExplanation: '',
+    websiteAndSocialLinks: '',
+    additionalInfo: '',
   },
   termsOfServiceOC: false,
   termsOfServiceOCF: false,
@@ -145,28 +152,31 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
       'collective.name',
       'collective.slug',
       'collective.description',
-      'collective.applicationData.location',
-      'collective.applicationData.initiativeDuration',
-      'collective.applicationData.expectedFundingPartner',
-      'collective.applicationData.missionImpactExplanation',
-      'collective.applicationData.websiteAndSocialLinks',
-      'collective.applicationData.additionalInfo',
+      'applicationData.location',
+      'applicationData.initiativeDuration',
+      'applicationData.expectedFundingPartner',
+      'applicationData.missionImpactExplanation',
+      'applicationData.websiteAndSocialLinks',
+      'applicationData.additionalInfo',
     ]);
+
+    verifyEmailPattern(errors, values, 'user.email');
 
     verifyFieldLength(intl, errors, values, 'collective.name', 1, 50);
     verifyFieldLength(intl, errors, values, 'collective.slug', 1, 30);
     verifyFieldLength(intl, errors, values, 'collective.description', 1, 250);
-    verifyFieldLength(intl, errors, values, 'collective.applicationData.missionImpactExplanation', 1, 250);
+    verifyFieldLength(intl, errors, values, 'applicationData.missionImpactExplanation', 1, 250);
 
     verifyChecked(errors, values, 'termsOfServiceOCF');
     verifyChecked(errors, values, 'termsOfServiceOC');
     return errors;
   };
-  const submit = async ({ user, collective }) => {
+  const submit = async ({ user, collective, applicationData }) => {
     const variables = {
       collective,
       host: { legacyId: OPENCOLLECTIVE_FOUNDATION_ID },
       user,
+      applicationData,
     };
     const response = await createCollective({ variables });
     if (response.data.createCollective) {
@@ -223,7 +233,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                 }
               };
 
-              if (!loadingLoggedInUser && LoggedInUser && !values.name && !values.email) {
+              if (!loadingLoggedInUser && LoggedInUser && !values.user.name && !values.user.email) {
                 setValues({
                   ...values,
                   user: {
@@ -276,7 +286,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
                         required
                         htmlFor="location"
-                        name="collective.applicationData.location"
+                        name="applicationData.location"
                         my={3}
                       >
                         {({ field }) => <StyledInput {...field} type="text" placeholder="Walnut, CA" px="7px" />}
@@ -308,6 +318,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           disabled={!!LoggedInUser}
                           name="user.email"
                           htmlFor="email"
+                          type="email"
                           width={['256px', '234px', '324px']}
                           required
                         >
@@ -357,7 +368,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                               type="url"
                               placeholder="agora"
                               {...field}
-                              onChange={e => setFieldValue('slug', e.target.value)}
+                              onChange={e => setFieldValue('collective.slug', e.target.value)}
                               px="7px"
                               prependProps={{ color: '#9D9FA3', fontSize: '13px', lineHeight: '16px' }}
                             />
@@ -378,7 +389,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="collective.applicationData.initiativeDuration"
+                          name="applicationData.initiativeDuration"
                           htmlFor="initiativeDuration"
                           required
                           width={['256px', '234px', '324px']}
@@ -395,7 +406,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="collective.applicationData.totalAmountRaised"
+                          name="applicationData.totalAmountRaised"
                           htmlFor="totalAmountRaised"
                         >
                           {({ form, field }) => (
@@ -427,7 +438,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="collective.applicationData.totalAmountToBeRaised"
+                          name="applicationData.totalAmountToBeRaised"
                           htmlFor="totalAmountToBeRaised"
                           required
                         >
@@ -452,7 +463,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="collective.applicationData.expectedFundingPartner"
+                          name="applicationData.expectedFundingPartner"
                           htmlFor="expectedFundingPartner"
                           required
                         >
@@ -502,7 +513,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                        name="collective.applicationData.missionImpactExplanation"
+                        name="applicationData.missionImpactExplanation"
                         htmlFor="missionImpactExplanation"
                         required
                       >
@@ -532,7 +543,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                        name="collective.applicationData.websiteAndSocialLinks"
+                        name="applicationData.websiteAndSocialLinks"
                         htmlFor="websiteAndSocialLinks"
                         required
                       >
@@ -551,7 +562,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                        name="collective.applicationData.additionalInfo"
+                        name="applicationData.additionalInfo"
                         htmlFor="additionalInfo"
                         required
                       >
