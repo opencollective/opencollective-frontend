@@ -6,6 +6,7 @@ import { defineMessages, useIntl } from 'react-intl';
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import formatMemberRole from '../lib/i18n/member-role';
+import { Router } from '../server/pages';
 
 import Avatar from './Avatar';
 import { Flex } from './Grid';
@@ -52,7 +53,7 @@ const replyToMemberInvitationMutation = gql`
  * A card with actions for users to accept or decline an invitation to join the members
  * of a collective.
  */
-const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUser }) => {
+const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUser, redirectOnAccept }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const [accepted, setAccepted] = React.useState();
@@ -66,6 +67,9 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
     setAccepted(accept);
     await sendReplyToInvitation({ variables: { id: invitation.id, accept } });
     await refetchLoggedInUser();
+    if (accept && redirectOnAccept) {
+      await Router.pushRoute(`/${invitation.collective.slug}`);
+    }
     setSubmitting(false);
   };
 
@@ -141,10 +145,12 @@ ReplyToMemberInvitationCard.propTypes = {
     role: PropTypes.oneOf(Object.values(roles)),
     collective: PropTypes.shape({
       name: PropTypes.string,
+      slug: PropTypes.string,
     }),
   }),
   /** @ignore form withUser */
   refetchLoggedInUser: PropTypes.func,
+  redirectOnAccept: PropTypes.bool,
 };
 
 export default withUser(ReplyToMemberInvitationCard);

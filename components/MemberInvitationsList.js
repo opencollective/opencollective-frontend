@@ -33,7 +33,11 @@ const MemberInvitationsList = ({ invitations, selectedInvitationId }) => {
     <Flex flexDirection="column" alignItems="center">
       {invitations.map(invitation => (
         <Box key={invitation.id} mb={5}>
-          <ReplyToMemberInvitationCard invitation={invitation} isSelected={invitation.id === selectedInvitationId} />
+          <ReplyToMemberInvitationCard
+            invitation={invitation}
+            isSelected={invitation.id === selectedInvitationId}
+            redirectOnAccept={invitations.length === 1}
+          />
         </Box>
       ))}
     </Flex>
