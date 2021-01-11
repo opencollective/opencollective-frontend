@@ -434,6 +434,7 @@
   "ContributeCard.BtnViewEvent": "View Event",
   "ContributeCard.ReadMore": "もっと見る",
   "ContributeCard.SeeCollective": "View Collective",
+  "ContributeCard.SeeMore": "See More",
   "ContributeDetails.faq.frequency.content": "You will be charged today, and then on the 1st of each month (for monthly contributions) or the 1st of the same month next year (for yearly contributions). Note: To prevent you from being charged twice in a short time frame, if you contribute after the 15th of a given month, the next charge will not be the 1st of next month but the month after.",
   "ContributeDetails.faq.frequency.title": "When will I be billed next time?",
   "ContributeDetails.faq.isIncognito.content": "あなたが匿名として貢献することを選択した場合、あなたの財政的な貢献は匿名寄付として公開され、公開プロフィールにリンクされません。しかし、透明性とKYC規制 (Know Your Customer) に準拠するために、財政ホストとcollectiveの管理者は、個人情報を含むすべての資金提供者のリストをエクスポートすることができます。",
