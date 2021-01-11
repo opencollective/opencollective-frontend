@@ -248,7 +248,9 @@ class CreateExpensePage extends React.Component {
           account =>
             [USER, ORGANIZATION].includes(account.type) ||
             // Same Host
-            (account.isActive && this.props.data?.account?.host?.id === account.host?.id),
+            (account.isActive && this.props.data?.account?.host?.id === account.host?.id) ||
+            // Self-hosted Collectives
+            (account.isActive && account.id === account.host?.id),
         );
       return [loggedInAccount, ...accountsAdminOf];
     }
