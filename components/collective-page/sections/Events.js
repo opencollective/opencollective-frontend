@@ -64,7 +64,7 @@ class SectionEvents extends React.PureComponent {
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
 
-    if (events?.length && !isAdmin) {
+    if (!events?.length && !isAdmin) {
       return null;
     }
 
@@ -118,7 +118,7 @@ class SectionEvents extends React.PureComponent {
             </div>
           )}
         </HorizontalScroller>
-        {events?.length && (
+        {Boolean(events?.length) && (
           <ContainerSectionContent>
             <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
               <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
