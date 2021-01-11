@@ -124,6 +124,8 @@ const getContributeCTA = type => {
       return <FormattedMessage id="ContributeCard.BtnViewEvent" defaultMessage="View Event" />;
     case ContributionTypes.CHILD_COLLECTIVE:
       return <FormattedMessage id="ContributeCard.SeeCollective" defaultMessage="View Collective" />;
+    case ContributionTypes.PROJECT:
+      return <FormattedMessage id="ContributeCard.SeeMore" defaultMessage="See More" />;
     default:
       return <FormattedMessage id="Contribute" defaultMessage="Contribute" />;
   }
