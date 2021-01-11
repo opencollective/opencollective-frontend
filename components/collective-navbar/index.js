@@ -300,7 +300,7 @@ const getDefaultCallsToActions = (collective, isAdmin, newNavbarFeatureFlag) => 
       hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
       hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
       hasSubmitExpense: isFeatureAvailable(collective, 'RECEIVE_EXPENSES'),
-      hasManageSubscriptions: isAdmin && isFeatureAvailable(collective, 'RECURRING_CONTRIBUTIONS'),
+      hasManageSubscriptions: isAdmin && get(collective.features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
       hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     };
   }
