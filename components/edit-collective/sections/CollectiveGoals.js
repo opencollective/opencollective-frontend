@@ -18,7 +18,7 @@ import StyledInputField from '../../StyledInputField';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
-import { H3, P } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
 
 const BORDER = '1px solid #efefef';
 
@@ -231,16 +231,17 @@ class CollectiveGoals extends React.Component {
     return (
       <Container>
         <Container borderBottom={BORDER} mb={4} pb={4}>
-          <H3>
+          <SettingsTitle
+            subtitle={
+              <FormattedMessage
+                id="EditGoals.Instructions"
+                defaultMessage="You can define custom goals to share an overview of your financial plan with your community and to track your progress. They will be sent in the emails sent to your contributors. You can choose to display them on your collective page by checking the box below."
+              />
+            }
+          >
             <FormattedMessage id="Goals" defaultMessage="Goals" />
-          </H3>
-          <P>
-            <FormattedMessage
-              id="EditGoals.Instructions"
-              defaultMessage="You can define custom goals to share an overview of your financial plan with your community and to track your progress. They will be sent in the emails sent to your contributors. You can choose to display them on your collective page by checking the box below."
-            />
-          </P>
-          <Container>
+          </SettingsTitle>
+          <Container mt={4}>
             <StyledCheckbox
               name="show-on-collective-page"
               label={intl.formatMessage(this.messages.showToggle)}

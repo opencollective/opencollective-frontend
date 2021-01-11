@@ -22,6 +22,7 @@ import StyledHr from '../../StyledHr';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import { Span } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
 
 const messages = defineMessages({
   'webhooks.url.label': {
@@ -236,10 +237,9 @@ class Webhooks extends React.Component {
 
     return (
       <div>
-        <h2>
+        <SettingsTitle>
           <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
-        </h2>
-        <StyledHr borderColor="black.300" />
+        </SettingsTitle>
 
         <div>{webhooks.map(this.renderWebhook)}</div>
 

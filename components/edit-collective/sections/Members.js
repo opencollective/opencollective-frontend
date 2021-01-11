@@ -25,8 +25,8 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
-import { H3, P } from '../../Text';
 import WarnIfUnsavedChanges from '../../WarnIfUnsavedChanges';
+import SettingsTitle from '../SettingsTitle';
 
 /**
  * This pages sets some global styles that are causing troubles in new components. This
@@ -304,18 +304,18 @@ class Members extends React.Component {
       <WarnIfUnsavedChanges hasUnsavedChanges={isTouched}>
         <div className="EditMembers">
           <div className="members">
-            <H3>
+            <SettingsTitle
+              subtitle={
+                collective.type === 'COLLECTIVE' && (
+                  <FormattedMessage
+                    id="members.edit.description"
+                    defaultMessage="Note: Only Collective Admins can edit this Collective and approve or reject expenses."
+                  />
+                )
+              }
+            >
               <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Team" />
-            </H3>
-            {collective.type === 'COLLECTIVE' && (
-              <P>
-                <FormattedMessage
-                  id="members.edit.description"
-                  defaultMessage="Note: Only Collective Admins can edit this Collective and approve or reject expenses."
-                />
-              </P>
-            )}
-            <hr />
+            </SettingsTitle>
             {members.map((m, idx) => this.renderMember(m, idx, nbAdmins))}
           </div>
           <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>

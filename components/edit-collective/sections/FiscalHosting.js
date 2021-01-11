@@ -9,7 +9,9 @@ import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKe
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
-import { H2, P } from '../../Text';
+import { P } from '../../Text';
+
+import SettingsSectionTitle from './SettingsSectionTitle';
 
 const activateCollectiveAsHostMutation = gql`
   mutation ActivateCollectiveAsHost($id: Int!) {
@@ -175,13 +177,13 @@ const FiscalHosting = ({ collective }) => {
       )}
 
       {isHostAccount && (
-        <H2>
-          <FormattedMessage id="DeactivateFiscalhost" defaultMessage={'Deactivating as host'} />
-        </H2>
+        <SettingsSectionTitle>
+          <FormattedMessage id="DeactivateFiscalhost" defaultMessage="Deactivating as host" />
+        </SettingsSectionTitle>
       )}
 
       {isHostAccount && (
-        <P>
+        <P mb={2}>
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.hostAccount.deactivate.description"
@@ -199,6 +201,7 @@ const FiscalHosting = ({ collective }) => {
           onClick={() => setActivateAsHostModal({ type: 'Activate', show: true })}
           loading={activateAsHostStatus.processing}
           disabled={false}
+          mb={2}
         >
           <FormattedMessage id="collective.activateAsHost" defaultMessage={'Activate as Host'} />
         </StyledButton>
@@ -209,13 +212,14 @@ const FiscalHosting = ({ collective }) => {
           onClick={() => setActivateAsHostModal({ type: 'Deactivate', show: true })}
           loading={activateAsHostStatus.processing}
           disabled={collective.plan.hostedCollectives > 0}
+          mb={2}
         >
           <FormattedMessage id="host.deactivate" defaultMessage={'Deactivate as Host'} />
         </StyledButton>
       )}
 
       {collective.plan.hostedCollectives > 0 && (
-        <P color="rgb(224, 183, 0)">
+        <P color="rgb(224, 183, 0)" my={1}>
           <FormattedMessage
             values={{ hostedCollectives: collective.plan.hostedCollectives }}
             id="collective.hostAccount.deactivate.isHost"
@@ -290,13 +294,13 @@ const FiscalHosting = ({ collective }) => {
       {isHostAccount && (
         <Fragment>
           {!isBudgetActive && collective.type === 'ORGANIZATION' && (
-            <H2>
-              <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage={'Activate Host Budget'} />
-            </H2>
+            <SettingsSectionTitle mt={4}>
+              <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
+            </SettingsSectionTitle>
           )}
 
           {isBudgetActive && (
-            <P>
+            <P mb={2}>
               <FormattedMessage
                 id="FiscalHosting.budget.deactivate.description"
                 defaultMessage={
@@ -307,7 +311,7 @@ const FiscalHosting = ({ collective }) => {
           )}
 
           {!isBudgetActive && collective.type === 'ORGANIZATION' && (
-            <P>
+            <P mb={2}>
               <FormattedMessage
                 id="FiscalHosting.budget.activate.description"
                 defaultMessage={
@@ -323,6 +327,7 @@ const FiscalHosting = ({ collective }) => {
             <StyledButton
               onClick={() => setActivateBudgetModal({ type: 'Activate', show: true })}
               loading={activateBudgetStatus.processing}
+              mb={2}
             >
               <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage={'Activate Host Budget'} />
             </StyledButton>

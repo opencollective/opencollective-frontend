@@ -38,7 +38,7 @@ describe('Virtual cards admin', () => {
 
     // Links should also be added to gift cards list
     cy.contains('a[href$="/edit/gift-cards"]', 'Go back to gift cards list').click();
-    cy.get('.vc-details').should($virtualCards => {
+    cy.getByDataCy('vc-details').should($virtualCards => {
       expect($virtualCards).to.have.length(paginationSize);
     });
 

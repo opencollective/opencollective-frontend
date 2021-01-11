@@ -21,7 +21,6 @@ import Link from '../Link';
 import OrdersWithData from '../orders/OrdersWithData';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
-import { H3 } from '../Text';
 
 // Actions
 import Archive from './actions/Archive';
@@ -53,6 +52,7 @@ import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
+import SettingsTitle from './SettingsTitle';
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -365,7 +365,14 @@ class EditCollectiveForm extends React.Component {
         return <EditCollectivePage collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS:
-        return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
+        return (
+          <div>
+            <SettingsTitle mb={4}>
+              <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
+            </SettingsTitle>
+            <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
+          </div>
+        );
 
       case EDIT_COLLECTIVE_SECTIONS.UPDATES:
         return <Updates collective={collective} />;
@@ -424,7 +431,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <Flex mt={3} flexDirection="column">
             <Container
-              mb={5}
+              mb={4}
               pb={4}
               borderBottom="1px solid #E8E9EB"
               display="flex"
@@ -463,6 +470,9 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
         return (
           <Box>
+            <SettingsTitle mb={4}>
+              <FormattedMessage id="Account.AdvancedSettings" defaultMessage="Advanced settings" />
+            </SettingsTitle>
             {collective.type === CollectiveType.USER && <EditUserEmailForm />}
             {(collective.type === CollectiveType.COLLECTIVE || collective.type === CollectiveType.FUND) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
@@ -793,14 +803,14 @@ class EditCollectiveForm extends React.Component {
           <Menu collective={collective} selectedSection={this.getMenuSelectedSection(section)} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
             {section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && (
-              <H3>
+              <SettingsTitle>
                 <FormattedMessage id="editCollective.fiscalHosting" defaultMessage={'Fiscal Hosting'} />
-              </H3>
+              </SettingsTitle>
             )}
             {section === EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS && (
-              <H3>
+              <SettingsTitle>
                 <FormattedMessage id="editCollective.expensesPayouts" defaultMessage={'Expenses & Payouts'} />
-              </H3>
+              </SettingsTitle>
             )}
             {fields && fields.length > 0 && (
               <div className="FormInputs">
