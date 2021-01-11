@@ -434,6 +434,7 @@
   "ContributeCard.BtnViewEvent": "Voir l'Événement",
   "ContributeCard.ReadMore": "Voir plus",
   "ContributeCard.SeeCollective": "Voir le Collectif",
+  "ContributeCard.SeeMore": "See More",
   "ContributeDetails.faq.frequency.content": "Vous serez débité aujourd’hui, puis le 1er de chaque mois (pour les contributions mensuelles) ou le 1er du même mois chaque année (pour les abonnements annuels). Note : pour évitez que vous soyez débité deux fois dans une courte période, le deuxième prélèvement sera délayé d'un mois si vous contribuez après le 15.",
   "ContributeDetails.faq.frequency.title": "Quand serais-je facturé la prochaine fois ?",
   "ContributeDetails.faq.isIncognito.content": "Si vous choisissez de contribuer en \"incognito\", votre contribution financière apparaîtra publiquement comme un don privé qui ne sera pas lié à votre profil public. Afin d'être en conformité avec les réglementations KYC regulations (Know Your Customer), l'hôte fiscal et les administrateurs du collectifs peuvent toutefois exporter une liste de toutes les contributions financières avec vos information personnelles.",

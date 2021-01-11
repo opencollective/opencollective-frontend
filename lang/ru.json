@@ -434,6 +434,7 @@
   "ContributeCard.BtnViewEvent": "Просмотр Мероприятия",
   "ContributeCard.ReadMore": "Узнать больше",
   "ContributeCard.SeeCollective": "Просмотреть Коллектив",
+  "ContributeCard.SeeMore": "See More",
   "ContributeDetails.faq.frequency.content": "С Вас будет взиматься плата сегодня, а затем 1 числа каждого месяца (для ежемесячных вкладов) или 1 числа, того же месяца следующего года (для ежегодных вкладов). Примечание: чтобы не допустить двойной платы за короткий промежуток времени, если вы вносите свой вклад после 15 числа данного месяца, следующее снятие будет не 1-го числа следующего месяца, а через месяц.",
   "ContributeDetails.faq.frequency.title": "Когда с меня спишут средства в следующий раз?",
   "ContributeDetails.faq.isIncognito.content": "If you chose to contribute as \"incognito\", your financial contribution will show up publicly as an incognito donation and it won't link to your public profile. However, in the effort of being transparent and compliant with KYC regulations (Know Your Customer), the fiscal host and the administrators of the collective can export a list of all the financial contributors with their personal information.",
