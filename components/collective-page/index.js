@@ -391,7 +391,7 @@ class CollectivePage extends Component {
             selectedCategory={selectedCategory}
             onCollectiveClick={this.onCollectiveClick}
             callsToAction={callsToAction}
-            hideInfos={!isFixed}
+            hideInfosOnDesktop={!isFixed}
             isAnimated={true}
             onSectionClick={this.onSectionClick}
             showBackButton={false}

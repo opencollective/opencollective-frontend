@@ -11,7 +11,7 @@ import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { getFilteredSectionsForCollective, hasNewNavbar, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
@@ -44,14 +44,6 @@ const MainContainerV2 = styled(Container)`
   overflow-y: auto;
 `;
 
-const HideScroll = createGlobalStyle`
-  @media (max-width: 64em) {
-    body {
-      overflow: hidden;
-    }
-  }
-`;
-
 const AvatarBox = styled(Box)`
   position: relative;
 
@@ -69,21 +61,20 @@ const AvatarBox = styled(Box)`
 `;
 
 const InfosContainerV2 = styled(Container)`
-  width: 1;
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(0);
-  transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out, width 0.1s ease-in-out;
+  [data-hide='false'] {
+    width: 1;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out, width 0.1s ease-in-out;
+  }
 
-  /** Hidden state */
-  ${props =>
-    props.isHidden &&
-    css`
-      width: 0;
-      visibility: hidden;
-      opacity: 0;
-      transform: translateX(-20px);
-    `}
+  [data-hide='true'] {
+    width: 0;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(-20px);
+  }
 `;
 
 const CollectiveNameV2 = styled(H1)`
@@ -309,7 +300,7 @@ const getDefaultCallsToActions = (collective, isAdmin, newNavbarFeatureFlag) => 
       hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
       hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
       hasSubmitExpense: isFeatureAvailable(collective, 'RECEIVE_EXPENSES'),
-      hasManageSubscriptions: isAdmin && isFeatureAvailable(collective, 'RECURRING_CONTRIBUTIONS'),
+      hasManageSubscriptions: isAdmin && get(collective.features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
       hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     };
   }
@@ -459,7 +450,7 @@ const CollectiveNavbar = ({
   callsToAction,
   onCollectiveClick,
   onSectionClick,
-  hideInfos,
+  hideInfosOnDesktop,
   onlyInfos,
   isAnimated,
   showBackButton,
@@ -494,49 +485,42 @@ const CollectiveNavbar = ({
       boxShadow={withShadow ? ' 0px 6px 10px -5px rgba(214, 214, 214, 0.5)' : 'none'}
       maxHeight="100vh"
     >
-      {isExpanded && <HideScroll />}
       {/** Collective info */}
-      <InfosContainerV2
-        isHidden={hideInfos}
-        isAnimated={isAnimated}
-        mr={[0, 2]}
-        display="flex"
-        alignItems="center"
-        px={[3, 0]}
-        py={[2, 1]}
-      >
-        {showBackButton && (
-          <Box display={['none', 'block']} mr={2}>
-            <StyledButton px={1} isBorderless onClick={() => window && window.history.back()}>
-              &larr;
-            </StyledButton>
+      <InfosContainerV2 isAnimated={isAnimated} mr={[0, 2]} display="flex" alignItems="center" px={[3, 0]} py={[2, 1]}>
+        <Flex alignItems="center" data-hide={hideInfosOnDesktop}>
+          {showBackButton && (
+            <Box display={['none', 'block']} mr={2}>
+              <StyledButton px={1} isBorderless onClick={() => window.history.back()}>
+                &larr;
+              </StyledButton>
+            </Box>
+          )}
+          <AvatarBox>
+            <LinkCollective collective={collective} onClick={onCollectiveClick}>
+              <Container borderRadius="25%" mr={2}>
+                <Avatar collective={collective} radius={40} />
+              </Container>
+            </LinkCollective>
+          </AvatarBox>
+          <Box display={['block', null, null, onlyInfos ? 'block' : 'none']}>
+            <CollectiveNameV2
+              mx={2}
+              py={2}
+              fontSize={['16px', '20px']}
+              lineHeight={['24px', '28px']}
+              textAlign="center"
+              fontWeight="500"
+              color="black.800"
+              maxWidth={[200, 280, 500]}
+            >
+              {isLoading ? (
+                <LoadingPlaceholder height={14} minWidth={100} />
+              ) : (
+                <LinkCollective collective={collective} onClick={onCollectiveClick} />
+              )}
+            </CollectiveNameV2>
           </Box>
-        )}
-        <AvatarBox>
-          <LinkCollective collective={collective} onClick={onCollectiveClick}>
-            <Container borderRadius="25%" mr={2}>
-              <Avatar collective={collective} radius={40} />
-            </Container>
-          </LinkCollective>
-        </AvatarBox>
-        <Box display={['block', null, null, onlyInfos ? 'block' : 'none']}>
-          <CollectiveNameV2
-            mx={2}
-            py={2}
-            fontSize={['16px', '20px']}
-            lineHeight={['24px', '28px']}
-            textAlign="center"
-            fontWeight="500"
-            color="black.800"
-            maxWidth={[200, 280, 500]}
-          >
-            {isLoading ? (
-              <LoadingPlaceholder height={14} minWidth={100} />
-            ) : (
-              <LinkCollective collective={collective} onClick={onCollectiveClick} />
-            )}
-          </CollectiveNameV2>
-        </Box>
+        </Flex>
         {!onlyInfos && (
           <Box display={['block', 'none']} marginLeft="auto">
             {isExpanded ? (
@@ -617,7 +601,7 @@ const CollectiveNavbar = ({
     // v1
     <MainContainer withShadow={withShadow}>
       {/** Collective infos */}
-      <InfosContainer isHidden={hideInfos} isAnimated={isAnimated}>
+      <InfosContainer isHidden={hideInfosOnDesktop} isAnimated={isAnimated}>
         <Flex alignItems="center" flex="1 1 80%" css={{ minWidth: 0 /** For text-overflow */ }}>
           <LinkCollective collective={collective} onClick={onCollectiveClick}>
             <Container borderRadius="25%" mr={2}>
@@ -772,7 +756,7 @@ CollectiveNavbar.propTypes = {
   selected: PropTypes.oneOf(AllSectionsNames),
   selectedCategory: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)),
   /** If true, the collective infos (avatar + name) will be hidden with css `visibility` */
-  hideInfos: PropTypes.bool,
+  hideInfosOnDesktop: PropTypes.bool,
   /** If true, the CTAs will be hidden on mobile */
   hideButtonsOnMobile: PropTypes.bool,
   /** If true, the Navbar items and buttons will be skipped  */
@@ -788,7 +772,7 @@ CollectiveNavbar.propTypes = {
 };
 
 CollectiveNavbar.defaultProps = {
-  hideInfos: false,
+  hideInfosOnDesktop: false,
   isAnimated: false,
   onlyInfos: false,
   callsToAction: {},

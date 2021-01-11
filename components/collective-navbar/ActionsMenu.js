@@ -132,26 +132,12 @@ export const getContributeRoute = collective => {
   return { route, params };
 };
 
-const checkEmptyActions = (callsToActions, hiddenAction, hasRequestGrant) => {
-  // At the moment this one is not display as a main CTA
-  if (hasRequestGrant) {
-    return false;
-  }
-
-  const enabledCtas = Object.keys(pickBy(callsToActions, Boolean));
-  if (enabledCtas.length > 1) {
-    return false;
-  } else if (enabledCtas.length === 1 && hiddenAction) {
-    return enabledCtas[0] === hiddenAction;
-  } else {
-    return true;
-  }
-};
-
 const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile }) => {
   const hasRequestGrant =
     [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true;
-  const isEmpty = checkEmptyActions(callsToAction, hiddenActionForNonMobile, hasRequestGrant);
+  const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
+  const isEmpty = !hasRequestGrant && enabledCTAs.length < 1;
+  const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
   const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
   const hostWithinLimit = hostedCollectivesLimit
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
@@ -166,7 +152,12 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
   }
 
   return (
-    <Container display="flex" alignItems="center" order={[-1, 0]} borderTop={['1px solid #e1e1e1', 'none']}>
+    <Container
+      display={hasOnlyOneHiddenCTA ? ['flex', 'none'] : 'flex'}
+      alignItems="center"
+      order={[-1, 0]}
+      borderTop={['1px solid #e1e1e1', 'none']}
+    >
       <Box px={1}>
         <ActionsDropdown trigger="click">
           {({ triggerProps, dropdownProps }) => (

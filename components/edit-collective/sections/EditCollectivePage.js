@@ -384,9 +384,13 @@ const EditCollectivePage = ({ collective }) => {
   React.useEffect(() => {
     if (data?.account) {
       const sectionsFromCollective = loadSectionsForCollective(data.account, useNewSections);
-      if (useNewSections && !data.account.settings?.collectivePage?.useNewSections) {
-        const convertedSections = convertSectionsToNewFormat(sectionsFromCollective, data.account.type);
-        setSections(addDefaultSections(data.account, convertedSections));
+      if (useNewSections) {
+        if (!data.account.settings?.collectivePage?.useNewSections) {
+          const convertedSections = convertSectionsToNewFormat(sectionsFromCollective, data.account.type);
+          setSections(addDefaultSections(data.account, convertedSections));
+        } else {
+          setSections(addDefaultSections(data.account, sectionsFromCollective));
+        }
       } else {
         setSections(loadSectionsForCollectiveV1(data.account));
       }
