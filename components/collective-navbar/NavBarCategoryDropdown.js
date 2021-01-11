@@ -51,7 +51,6 @@ const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
   }
 
   &:hover {
-    color: ${themeGet('colors.primary.400')};
     text-decoration: none;
   }
 
@@ -119,6 +118,10 @@ const MenuItem = styled('li')`
     line-height: 16px;
     letter-spacing: -0.4px;
     outline: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
 
     &:not(:hover) {
       color: #313233;

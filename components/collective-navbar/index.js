@@ -1,14 +1,16 @@
 import React, { Fragment, useRef } from 'react';
 import { PropTypes } from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
+import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
+import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { Settings } from '@styled-icons/feather/Settings';
 import { Close } from '@styled-icons/material/Close';
 import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
-import { get } from 'lodash';
+import { get, pickBy, without } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -214,7 +216,18 @@ const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
   cursor: pointer;
   margin-right: 4px;
   flex: 0 0 28px;
-  color: #304cdc;
+  color: ${themeGet('colors.primary.600')};
+
+  &:hover {
+    background: radial-gradient(transparent 14px, white 3px),
+      linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+      linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
+  }
+
+  &:active {
+    background: radial-gradient(${themeGet('colors.primary.600')} 14px, white 3px);
+    color: ${themeGet('colors.white.full')};
+  }
 
   @media (min-width: 64em) {
     display: none;
@@ -255,8 +268,18 @@ const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
   cursor: pointer;
   margin-right: 4px;
   flex: 0 0 28px;
-  color: #304cdc;
-  background: radial-gradient(rgba(72, 95, 211, 0.1) 14px, transparent 3px);
+  color: ${themeGet('colors.primary.600')};
+
+  &:hover {
+    background: radial-gradient(transparent 14px, white 3px),
+      linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+      linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
+  }
+
+  &:active {
+    background: radial-gradient(${themeGet('colors.primary.600')} 14px, white 3px);
+    color: ${themeGet('colors.white.full')};
+  }
 
   @media (min-width: 64em) {
     display: none;
@@ -294,6 +317,7 @@ const getDefaultCallsToActions = (collective, isAdmin, newNavbarFeatureFlag) => 
 
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
+  const isFund = collective.type === CollectiveType.FUND;
 
   if (newNavbarFeatureFlag) {
     return {
@@ -302,6 +326,7 @@ const getDefaultCallsToActions = (collective, isAdmin, newNavbarFeatureFlag) => 
       hasSubmitExpense: isFeatureAvailable(collective, 'RECEIVE_EXPENSES'),
       hasManageSubscriptions: isAdmin && get(collective.features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
       hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
+      hasRequestGrant: isFund || get(collective.settings, 'fundingRequest') === true,
     };
   }
 
@@ -313,9 +338,8 @@ const getDefaultCallsToActions = (collective, isAdmin, newNavbarFeatureFlag) => 
 };
 
 /**
- * Returns the main call to action that should be displayed as a button outside of the action menu.
- * This code could be factorized with `ActionsMenu.js`, as we want to have the same icons/actions/labels
- * here and there.
+ * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
+ * Returns the second CTA that should be displayed as a button in ActionsMenu.js if only 2 CTAs.
  */
 const getMainAction = (collective, isAdmin, callsToAction) => {
   if (!collective || !callsToAction) {
@@ -323,7 +347,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
   }
 
   // Order of the condition defines main call to action: first match gets displayed
-  if (callsToAction.hasDashboard) {
+  if (callsToAction.includes('hasDashboard')) {
     return {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
@@ -337,7 +361,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
         </Link>
       ),
     };
-  } else if (!isAdmin && callsToAction.hasContribute && getContributeRoute(collective)) {
+  } else if (!isAdmin && callsToAction.includes('hasContribute') && getContributeRoute(collective)) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
@@ -351,7 +375,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
         </Link>
       ),
     };
-  } else if (!isAdmin && callsToAction.hasApply) {
+  } else if (!isAdmin && callsToAction.includes('hasApply')) {
     const plan = collective.plan || {};
     return {
       type: NAVBAR_ACTION_TYPE.APPLY,
@@ -363,7 +387,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
         />
       ),
     };
-  } else if (callsToAction.hasSubmitExpense) {
+  } else if (callsToAction.includes('hasSubmitExpense')) {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
@@ -377,7 +401,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
         </Link>
       ),
     };
-  } else if (callsToAction.hasManageSubscriptions) {
+  } else if (callsToAction.includes('hasManageSubscriptions')) {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
@@ -391,15 +415,44 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
         </Link>
       ),
     };
-  } else if (!isAdmin && callsToAction.hasContact) {
+  } else if (!isAdmin && callsToAction.includes('hasContact')) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
-        <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+        <Link route="collective-contact" params={{ collectiveSlug: collective.slug }}>
           <MainActionBtn tabIndex="-1">
-            <Dashboard size="20px" />
+            <Envelope size="1em" />
             <Span ml={2}>
-              <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+              <FormattedMessage id="Contact" defaultMessage="Contact" />
+            </Span>
+          </MainActionBtn>
+        </Link>
+      ),
+    };
+  }
+  // CTAs after this line are called when figuring out the second CTA if there are only 2.
+  // TO DO: Need to add addFunds and addPrepaidBudget CTAs.
+  else if (callsToAction.includes('hasApply')) {
+    const plan = collective.plan || {};
+    return {
+      type: NAVBAR_ACTION_TYPE.APPLY,
+      component: (
+        <ApplyToHostBtn
+          hostSlug={collective.slug}
+          buttonRenderer={props => <MainActionBtn {...props} />}
+          hostWithinLimit={!plan.hostedCollectivesLimit || plan.hostedCollectives < plan.hostedCollectivesLimit}
+        />
+      ),
+    };
+  } else if (callsToAction.includes('hasRequestGrant')) {
+    return {
+      type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
+      component: (
+        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
+          <MainActionBtn tabIndex="-1">
+            <MoneyCheckAlt size="1em" />
+            <Span ml={2}>
+              <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
             </Span>
           </MainActionBtn>
         </Link>
@@ -410,24 +463,32 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
   }
 };
 
-const MainActionBtn = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
+export const MainActionBtn = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
   font-weight: 500;
   font-size: 14px;
   line-height: 16px;
   padding: 5px 10px;
   text-transform: uppercase;
-  background: rgba(72, 95, 211, 0.1);
+  background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+    linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
   border-radius: 8px;
-  border: none;
-  color: #304cdc;
+  border: 2px solid white;
+  color: ${themeGet('colors.primary.600')};
+
+  &:focus {
+    border: 2px solid #050505;
+  }
 
   &:hover {
-    background: rgba(72, 95, 211, 0.12);
+    background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+      linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
+    border: 2px solid white;
   }
 
   &:active {
-    background: rgba(72, 95, 211, 0.2);
-    color: #304cdc;
+    background: ${themeGet('colors.primary.600')};
+    color: ${themeGet('colors.white.full')};
+    border: 2px solid white;
   }
 
   span {
@@ -463,7 +524,9 @@ const CollectiveNavbar = ({
   const [isExpanded, setExpanded] = React.useState(false);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin, null, newNavbarFeatureFlag);
   callsToAction = { ...getDefaultCallsToActions(collective, isAdmin, newNavbarFeatureFlag), ...callsToAction };
-  const mainAction = getMainAction(collective, isAdmin, callsToAction);
+  const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
+  const mainAction = getMainAction(collective, isAdmin, actionsArray);
+  const secondAction = getMainAction(collective, isAdmin, without(actionsArray, mainAction?.type));
   const navbarRef = useRef();
 
   useGlobalBlur(navbarRef, outside => {
@@ -567,7 +630,7 @@ const CollectiveNavbar = ({
             )}
           </CategoriesContainer>
 
-          {/* CTAs for v2 navbar & admin panel */}
+          {/* CTAs for v2 navbar */}
           <Container
             display={isExpanded ? 'flex' : ['none', 'flex']}
             flexDirection={['column', 'row']}
@@ -586,6 +649,7 @@ const CollectiveNavbar = ({
                 collective={collective}
                 callsToAction={callsToAction}
                 hiddenActionForNonMobile={mainAction?.type}
+                secondAction={secondAction}
               />
             )}
             {!onlyInfos && (
