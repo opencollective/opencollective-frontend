@@ -64,6 +64,10 @@ class SectionEvents extends React.PureComponent {
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
 
+    if (events?.length && !isAdmin) {
+      return null;
+    }
+
     return (
       <Box pt={4}>
         <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
@@ -114,13 +118,15 @@ class SectionEvents extends React.PureComponent {
             </div>
           )}
         </HorizontalScroller>
-        <ContainerSectionContent>
-          <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-            <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
-              <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
-            </StyledButton>
-          </Link>
-        </ContainerSectionContent>
+        {events?.length && (
+          <ContainerSectionContent>
+            <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+              <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
+                <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
+              </StyledButton>
+            </Link>
+          </ContainerSectionContent>
+        )}
       </Box>
     );
   }
