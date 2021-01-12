@@ -4,7 +4,7 @@ import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { groupBy, uniq } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
@@ -18,7 +18,8 @@ import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import StyledHr from '../../StyledHr';
 import StyledSelect from '../../StyledSelect';
-import { H2, H3, P, Span } from '../../Text';
+import { H3, P, Span } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
 
 const HostName = styled(P)`
   margin: 0 !important;
@@ -101,8 +102,8 @@ const ReceiptCard = ({ ...props }) => (
       <Avatar collective={props.host} borderRadius="16px" mr={3} size="48px" />
       <Box>
         <HostName
-          fontSize={['13px', '17px']}
-          lineHeight={['20px', '24px']}
+          fontSize={['13px', '16px']}
+          lineHeight={['20px', '28px']}
           letterSpacing={[null, '-0.16px']}
           color="black.900"
           fontWeight="500"
@@ -177,13 +178,14 @@ const Receipts = ({ invoices }) => {
     const dateMonth = dayjs.utc(`${byMonthYear[monthYear][0].year}-${byMonthYear[monthYear][0].month}`, 'YYYY-M');
     const dateFrom = dateMonth.toISOString();
     const dateTo = dateMonth.endOf('month').toISOString();
+    const [month, year] = monthYear.split('-');
 
     return (
       <Flex key={monthYear} flexDirection="column">
-        <Flex alignItems="center" justifyContent="space-between">
-          <H3 fontSize="16px" lineHeight="24px" color="black.900">{`${dateMonth.format('MMMM')} ${dateMonth.format(
-            'YYYY',
-          )}`}</H3>
+        <Flex alignItems="center" justifyContent="space-between" mt={3}>
+          <H3 fontSize="16px" lineHeight="24px" color="black.900">
+            <FormattedDate value={new Date(year, month)} month="long" year="numeric" />
+          </H3>
           <StyledHr width={['60%', '80%']} borderStyle="solid" borderColor="#C4C7CC" />
         </Flex>
         {byMonthYear[monthYear].map((invoice, index) => (
@@ -222,22 +224,20 @@ const PaymentReceipts = ({ collective }) => {
 
   return (
     <Flex flexDirection="column">
-      <Box mb={4}>
-        <H2 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px" color="black.900">
-          <FormattedMessage
-            id="paymentReceipts.section.title"
-            defaultMessage="Monthly payment receipts per fiscal host"
-          />
-        </H2>
-        <P fontSize="14px" lineHeight="21px" fontWeight="400" letterSpacing="-0.1px" color="black.700">
+      <SettingsTitle
+        subtitle={
           <FormattedMessage
             id="paymentReceipts.section.description"
             defaultMessage="Check the consolidated invoices for your contributions here."
           />
-        </P>
-      </Box>
-      <StyledHr mb="24px" borderStyle="dashed" borderColor="#4E5052" width={1} />
-      <Box>
+        }
+      >
+        <FormattedMessage
+          id="paymentReceipts.section.title"
+          defaultMessage="Monthly payment receipts per fiscal host"
+        />
+      </SettingsTitle>
+      <Box mt={4}>
         <P
           fontSize="9px"
           lineHeight="12px"

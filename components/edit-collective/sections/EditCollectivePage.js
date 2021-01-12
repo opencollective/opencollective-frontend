@@ -16,6 +16,7 @@ import {
   convertSectionsToNewFormat,
   getDefaultSectionsForCollective,
   getSectionPath,
+  hasNewNavbar,
 } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
@@ -37,8 +38,9 @@ import StyledCard from '../../StyledCard';
 import StyledHr from '../../StyledHr';
 import StyledSelect from '../../StyledSelect';
 import StyledTooltip from '../../StyledTooltip';
-import { H3, P, Span } from '../../Text';
+import { P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
+import SettingsTitle from '../SettingsTitle';
 
 export const getSettingsQuery = gqlV2/* GraphQL */ `
   query GetSettingsForEditCollectivePage($slug: String!) {
@@ -57,7 +59,7 @@ const SectionEntryContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
+  padding: 4px 16px;
 
   ${props =>
     props.isDragging &&
@@ -364,11 +366,10 @@ const loadSectionsForCollectiveV1 = collective => {
 const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
   const router = useRouter();
-  const HAS_NEW_NAVBAR = get(router, 'query.navbarVersion') === 'v2';
+  const useNewSections = hasNewNavbar(get(router, 'query.navbarVersion'));
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
   const [tmpSections, setTmpSections] = React.useState(null);
-  const useNewSections = HAS_NEW_NAVBAR;
 
   const { loading, data } = useQuery(getSettingsQuery, {
     variables: { slug: collective.slug },
@@ -383,9 +384,13 @@ const EditCollectivePage = ({ collective }) => {
   React.useEffect(() => {
     if (data?.account) {
       const sectionsFromCollective = loadSectionsForCollective(data.account, useNewSections);
-      if (useNewSections && !data.account.settings?.collectivePage?.useNewSections) {
-        const convertedSections = convertSectionsToNewFormat(sectionsFromCollective);
-        setSections(addDefaultSections(convertedSections));
+      if (useNewSections) {
+        if (!data.account.settings?.collectivePage?.useNewSections) {
+          const convertedSections = convertSectionsToNewFormat(sectionsFromCollective, data.account.type);
+          setSections(addDefaultSections(data.account, convertedSections));
+        } else {
+          setSections(addDefaultSections(data.account, sectionsFromCollective));
+        }
       } else {
         setSections(loadSectionsForCollectiveV1(data.account));
       }
@@ -414,7 +419,7 @@ const EditCollectivePage = ({ collective }) => {
     setDirty(true);
   };
 
-  if (!HAS_NEW_NAVBAR && get(data, 'account.settings.collectivePage.useNewSections')) {
+  if (!useNewSections && get(data, 'account.settings.collectivePage.useNewSections')) {
     return (
       <MessageBox type="warning" withIcon>
         This page has been temporarily disabled for this account.
@@ -425,18 +430,17 @@ const EditCollectivePage = ({ collective }) => {
   const displayedSections = tmpSections || sections;
   return (
     <DndProviderHTML5Backend>
-      <H3>
-        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Page sections" />
-      </H3>
-      <Box mb={3}>
-        <P color="black.600">
+      <SettingsTitle
+        subtitle={
           <FormattedMessage
             id="EditCollectivePage.SectionsDescription"
             defaultMessage="In this section you can use drag and drop to reorder the Profile Page sections."
           />
-        </P>
-      </Box>
-      <Flex flexWrap="wrap">
+        }
+      >
+        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Page sections" />
+      </SettingsTitle>
+      <Flex flexWrap="wrap" mt={4}>
         <Box width="100%" maxWidth={436}>
           {loading || !displayedSections ? (
             <LoadingPlaceholder height={400} />

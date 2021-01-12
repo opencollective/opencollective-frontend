@@ -9,7 +9,8 @@ import Container from '../../Container';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
-import { H2, P } from '../../Text';
+import { P } from '../../Text';
+import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
 const archiveCollectiveMutation = gql`
   mutation ArchiveCollective($id: Int!) {
@@ -80,8 +81,8 @@ const ArchiveCollective = ({ collective }) => {
   const closeModal = () => setModal({ ...modal, show: false });
 
   return (
-    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
-      <H2>
+    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={50}>
+      <SettingsSectionTitle>
         <FormattedMessage
           id="collective.archive.title"
           defaultMessage={
@@ -89,9 +90,9 @@ const ArchiveCollective = ({ collective }) => {
           }
           values={{ type: collective.type }}
         />
-      </H2>
+      </SettingsSectionTitle>
       {!isArchived && (
-        <P>
+        <P mb={3} lineHeight="16px" fontSize="14px">
           <FormattedMessage
             id="collective.archive.description"
             defaultMessage={
@@ -108,12 +109,17 @@ const ArchiveCollective = ({ collective }) => {
           )}
         </P>
       )}
-      {error && <P color="#ff5252">{error}</P>}
+      {error && (
+        <P my={3} color="#ff5252">
+          {error}
+        </P>
+      )}
       {!isArchived && (
         <StyledButton
           onClick={() => setModal({ type: 'Archive', show: true })}
           loading={processing}
           disabled={collective.isHost || hasBalance ? true : false}
+          mb={2}
         >
           <FormattedMessage
             id="collective.archive.title"
@@ -125,7 +131,7 @@ const ArchiveCollective = ({ collective }) => {
         </StyledButton>
       )}
       {!isArchived && hasBalance && (
-        <P color="rgb(224, 183, 0)">
+        <P color="rgb(224, 183, 0)" my={1}>
           <FormattedMessage
             id="collective.archive.availableBalance"
             defaultMessage={
@@ -136,7 +142,7 @@ const ArchiveCollective = ({ collective }) => {
         </P>
       )}
       {!isArchived && collective.isHost && (
-        <P color="rgb(224, 183, 0)">
+        <P color="rgb(224, 183, 0)" my={1}>
           <FormattedMessage
             id="collective.archive.isHost"
             defaultMessage={

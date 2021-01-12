@@ -17,13 +17,16 @@ import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
 import InputFieldPresets from '../../InputFieldPresets';
+import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
-import StyledHr from '../../StyledHr';
-import { H3, H4, P, Span } from '../../Text';
+import StyledLink from '../../StyledLink';
+import { P, Span } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
 
 import { editCollectiveSettingsMutation } from './../mutations';
+import SettingsSectionTitle from './SettingsSectionTitle';
 
 const { FUND, PROJECT, EVENT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
@@ -169,10 +172,13 @@ class Tiers extends React.Component {
         id: 'tier.customContributions.label',
         defaultMessage: 'Enable custom contributions',
       },
-      forceLongDescription: {
-        id: 'tier.forceLongDescription',
-        defaultMessage:
-          'The standalone tier page, represented by the "Read more" link, will be enabled automatically if you write a short description longer than 100 characters or if you\'ve already set a long description. You can use this switch to force the display of the page.',
+      standalonePage: {
+        id: 'tier.standalonePage',
+        defaultMessage: 'Standalone page',
+      },
+      standalonePageDescription: {
+        id: 'tier.standalonePageDescription',
+        defaultMessage: 'Whether to enable the <link>standalone</link> page for this tier',
       },
     });
 
@@ -266,11 +272,30 @@ class Tiers extends React.Component {
         description: intl.formatMessage(this.messages['goal.description']),
       },
       {
-        name: '__hasLongDescription',
+        name: 'useStandalonePage',
         type: 'switch',
-        label: 'Force standalone page',
-        description: intl.formatMessage(this.messages.forceLongDescription),
+        label: intl.formatMessage(this.messages.standalonePage),
         when: (tier, collective) => ![FUND, PROJECT].includes(collective.type),
+        description: (tier, collective) =>
+          intl.formatMessage(this.messages.standalonePageDescription, {
+            link: function StandaloneTierPageLink(...msg) {
+              if (!tier.id) {
+                return msg;
+              } else {
+                const collectiveSlug = collective.slug;
+                return (
+                  <StyledLink
+                    as={Link}
+                    openInNewTab
+                    route="tier"
+                    params={{ collectiveSlug, verb: 'contribute', tierSlug: tier.slug, tierId: tier.id }}
+                  >
+                    {msg}
+                  </StyledLink>
+                );
+              }
+            },
+          }),
       },
     ];
   }
@@ -280,12 +305,6 @@ class Tiers extends React.Component {
 
     if (fieldname === 'interval' && value === 'onetime') {
       value = null;
-    } else if (fieldname === '__hasLongDescription') {
-      if (value) {
-        // Setting a string with an empty line for the description will activate the page
-        fieldname = 'longDescription';
-        value = tiers[index].longDescription || '<br/>';
-      }
     }
 
     tiers[index] = {
@@ -366,13 +385,15 @@ class Tiers extends React.Component {
                     name={field.name}
                     label={this.renderLabel(field, Boolean(taxes.length))}
                     component={field.component}
-                    description={field.description}
                     type={field.type}
                     defaultValue={defaultValues[field.name]}
                     options={field.options}
                     pre={field.pre}
                     placeholder={field.placeholder}
                     onChange={value => this.editTier(index, field.name, value)}
+                    description={
+                      typeof field.description === 'function' ? field.description(tier, collective) : field.description
+                    }
                   />
                   {field.name === 'type' &&
                     taxes.map(({ type, percentage }) => (
@@ -406,13 +427,12 @@ class Tiers extends React.Component {
 
     return (
       <div className="EditTiers">
-        <H3>{this.props.title}</H3>
-        <StyledHr my={4} borderColor="black.200" />
+        <SettingsTitle mb={50}>{this.props.title}</SettingsTitle>
         {displayCustomContributionsSettings && (
           <React.Fragment>
-            <H4 mb={3}>
+            <SettingsSectionTitle>
               <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
-            </H4>
+            </SettingsSectionTitle>
             <Mutation mutation={editCollectiveSettingsMutation}>
               {(editSettings, { loading }) => (
                 <Flex flexWrap="wrap">
@@ -446,10 +466,9 @@ class Tiers extends React.Component {
                 </Flex>
               )}
             </Mutation>
-            <StyledHr my={4} borderColor="black.200" />
-            <H4 mb={3}>
+            <SettingsSectionTitle mt={50}>
               <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />
-            </H4>
+            </SettingsSectionTitle>
           </React.Fragment>
         )}
 

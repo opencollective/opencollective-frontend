@@ -88,7 +88,7 @@ const learningChannels = [
   {
     id: 'openFinances',
     name: 'Open Finances',
-    link: 'https://opencollective.com/opencollectiveinc',
+    link: 'https://opencollective.com/opencollective',
     desktopItemOrder: 5,
   },
   {

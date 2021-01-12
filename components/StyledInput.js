@@ -56,6 +56,10 @@ const StyledInput = styled.input`
     }
   }}
 
+  &[type=radio] {
+    cursor: pointer;
+  }
+
   &:disabled {
     background-color: ${themeGet('colors.black.50')};
     cursor: not-allowed;

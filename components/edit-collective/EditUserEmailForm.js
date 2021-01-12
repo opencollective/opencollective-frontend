@@ -10,7 +10,9 @@ import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
-import { H2, Span } from '../Text';
+import { Span } from '../Text';
+
+import SettingsSectionTitle from './sections/SettingsSectionTitle';
 
 class EditUserEmailForm extends React.Component {
   static propTypes = {
@@ -69,10 +71,10 @@ class EditUserEmailForm extends React.Component {
     const isDone = step === 'already-sent' || step === 'success';
 
     return (
-      <Box mb={4} data-cy="EditUserEmailForm">
-        <H2>
+      <Box mb={50} data-cy="EditUserEmailForm">
+        <SettingsSectionTitle>
           <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
-        </H2>
+        </SettingsSectionTitle>
         <Flex flexWrap="wrap">
           <StyledInput
             name="email"
@@ -144,7 +146,7 @@ class EditUserEmailForm extends React.Component {
         )}
         {isDone && (
           <Box>
-            <MessageBox display="inline-block" type="success" withIcon mt={2}>
+            <MessageBox display="inline-block" type="success" fontSize="12px" withIcon mt={2}>
               <FormattedMessage
                 id="EditUserEmailForm.success"
                 defaultMessage="An email with a confirmation link has been sent to {email}."

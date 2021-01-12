@@ -85,7 +85,6 @@ class EditCollective extends React.Component {
     delete collective.tos;
 
     this.setState({ status: 'loading' });
-
     try {
       const response = await this.props.editCollective(collective);
       const updatedCollective = response.data.editCollective;

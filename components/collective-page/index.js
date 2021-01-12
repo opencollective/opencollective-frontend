@@ -6,7 +6,7 @@ import { withRouter } from 'next/router';
 import styled from 'styled-components';
 import { space } from 'styled-system';
 
-import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
+import { getFilteredSectionsForCollective, hasNewNavbar } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import CollectiveNavbar from '../collective-navbar';
@@ -103,7 +103,7 @@ class CollectivePage extends Component {
   }
 
   getSections = memoizeOne((collective, isAdmin, isHostAdmin) => {
-    const hasNewCollectiveNavbar = get(this.props.router, 'query.navbarVersion') === 'v2';
+    const hasNewCollectiveNavbar = hasNewNavbar(get(this.props.router, 'query.navbarVersion'));
     return getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin, hasNewCollectiveNavbar);
   });
 
@@ -127,7 +127,7 @@ class CollectivePage extends Component {
     const breakpoint = window.scrollY + distanceThreshold;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
 
-    if (get(this.props.router, 'query.navbarVersion') === 'v2') {
+    if (hasNewNavbar(get(this.props.router, 'query.navbarVersion'))) {
       for (let i = sections.length - 1; i >= 0; i--) {
         if (sections[i].type !== 'CATEGORY') {
           continue;
@@ -192,7 +192,7 @@ class CollectivePage extends Component {
       const isEvent = type === CollectiveType.EVENT;
       const isProject = type === CollectiveType.PROJECT;
 
-      if (get(this.props.router, 'query.navbarVersion') === 'v2') {
+      if (hasNewNavbar(get(this.props.router, 'query.navbarVersion'))) {
         // The "too many calls to action" issue doesn't stand anymore with the new navbar, so
         // we can let the CollectiveNavbar component in charge of most of the flags, to make sure
         // we display the same thing everywhere. The two flags below should be migrated and this
@@ -223,7 +223,7 @@ class CollectivePage extends Component {
   };
 
   renderSection(section) {
-    const hasNewCollectiveNavbar = get(this.props.router, 'query.navbarVersion') === 'v2';
+    const hasNewCollectiveNavbar = hasNewNavbar(get(this.props.router, 'query.navbarVersion'));
     switch (section) {
       case Sections.UPDATES:
         return (
@@ -348,7 +348,7 @@ class CollectivePage extends Component {
 
   render() {
     const { collective, host, isAdmin, isHostAdmin, isRoot, onPrimaryColorChange, LoggedInUser, router } = this.props;
-    const newNavbarFeatureFlag = router?.query?.navbarVersion === 'v2';
+    const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection, selectedCategory } = this.state;
     const sections = this.getSections(collective, isAdmin, isHostAdmin);
@@ -391,7 +391,7 @@ class CollectivePage extends Component {
             selectedCategory={selectedCategory}
             onCollectiveClick={this.onCollectiveClick}
             callsToAction={callsToAction}
-            hideInfos={!isFixed}
+            hideInfosOnDesktop={!isFixed}
             isAnimated={true}
             onSectionClick={this.onSectionClick}
             showBackButton={false}

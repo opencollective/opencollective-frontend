@@ -6,6 +6,17 @@ import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
 
 import { Sections } from '../collective-page/_constants';
 
+export const NAVBAR_ACTION_TYPE = {
+  SUBMIT_EXPENSE: 'hasSubmitExpense',
+  DASHBOARD: 'hasDashboard',
+  APPLY: 'hasApply',
+  CONTACT: 'hasContact',
+  ADD_PREPAID_BUDGET: 'addPrepaidBudget',
+  ADD_FUNDS: 'addFunds',
+  CONTRIBUTE: 'hasContribute',
+  MANAGE_SUBSCRIPTIONS: 'hasManageSubscriptions',
+};
+
 const titles = defineMessages({
   CONTRIBUTE: {
     id: 'Contribute.allWays',
@@ -61,6 +72,9 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
         title: intl.formatMessage(titles.CONTRIBUTE),
       });
     }
+
+    addSectionLink(intl, links, collective, sections, Sections.EVENTS);
+    addSectionLink(intl, links, collective, sections, Sections.PROJECTS);
   } else if (category === NAVBAR_CATEGORIES.CONTRIBUTIONS) {
     addSectionLink(intl, links, collective, sections, Sections.CONTRIBUTIONS);
   } else if (category === NAVBAR_CATEGORIES.BUDGET) {
@@ -94,9 +108,6 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
         title: intl.formatMessage(titles.CONVERSATIONS),
       });
     }
-  } else if (category === NAVBAR_CATEGORIES.EVENTS) {
-    addSectionLink(intl, links, collective, sections, Sections.EVENTS);
-    addSectionLink(intl, links, collective, sections, Sections.PROJECTS);
   }
 
   return links;

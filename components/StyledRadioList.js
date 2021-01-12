@@ -30,8 +30,10 @@ const RadioInput = styled.input`
   ${size}
   &[type='radio'] {
     margin: 0;
+    cursor: pointer;
     &:focus {
-      box-shadow: 0px 0px 5px 0px ${props => props.theme.colors.primary[500]};
+      outline: none;
+      filter: drop-shadow(0px 0px 4px ${props => props.theme.colors.primary[500]});
     }
   }
 `;

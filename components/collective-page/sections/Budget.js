@@ -5,6 +5,7 @@ import { get, isEmpty } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { hasNewNavbar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { GraphQLContext } from '../../../lib/graphql/context';
@@ -55,7 +56,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const isFund = collective.type === CollectiveType.FUND;
   const isProject = collective.type === CollectiveType.PROJECT;
   const router = useRouter();
-  const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
+  const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
 
   React.useEffect(() => {
     refetch();

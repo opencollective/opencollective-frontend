@@ -276,13 +276,8 @@ a {
   }
 }
 
-.content h3 {
-  font-size: 1.7rem;
-}
-
 .content p {
   text-overflow: ellipsis;
-  margin: 1.5rem 0;
 }
 
 /* START: Legacy Bootstrap styles, added for retro-compatibility */

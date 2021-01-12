@@ -8,6 +8,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { hasNewNavbar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 
@@ -218,7 +219,7 @@ class SectionContributions extends React.PureComponent {
   render() {
     const { collective, data, intl, router } = this.props;
     const { nbMemberships, selectedFilter } = this.state;
-    const newNavbarFeatureFlag = get(router, 'query.navbarVersion') === 'v2';
+    const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
 
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;

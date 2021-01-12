@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import SettingsSectionTitle from './edit-collective/sections/SettingsSectionTitle';
 import Container from './Container';
 import { Box } from './Grid';
 import InputField from './InputField';
 import StyledLink from './StyledLink';
+import { Label } from './Text';
 
 const ParameterColumnHeader = styled.th`
   font-size: 12px;
@@ -58,7 +60,7 @@ class ExportImages extends React.Component {
           {
             name: 'Financial contributors widget',
             url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36`,
-            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600"></object>`,
+            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600" style="max-width: 100%;"></object>`,
             options: [
               {
                 name: 'width',
@@ -99,9 +101,9 @@ class ExportImages extends React.Component {
 
     return (
       <div>
-        <h1>
-          <FormattedMessage id="export.images.title" defaultMessage="Export images" />
-        </h1>
+        <SettingsSectionTitle>
+          <FormattedMessage id="export.images.title" defaultMessage="Export tiers images" />
+        </SettingsSectionTitle>
         <p>
           <FormattedMessage
             id="ExportImages.Title"
@@ -117,11 +119,12 @@ class ExportImages extends React.Component {
           />
         </div>
         {tier && (
-          <div>
+          <ul>
             {tier.images.map(image => (
-              <Container key={image.name} mb={4}>
-                <label>{image.name}</label>
+              <Container as="li" key={image.name} mb={4}>
+                <Label fontWeight="500">{image.name}</Label>
                 <div
+                  style={{ maxWidth: '100%', overflowY: 'auto' }}
                   dangerouslySetInnerHTML={{
                     __html: image.code,
                   }}
@@ -131,7 +134,7 @@ class ExportImages extends React.Component {
                     {image.url}
                   </StyledLink>
                 </Box>
-                <Container as="pre" fontSize="11px" maxWidth={880}>
+                <Container as="pre" whiteSpace="pre-wrap" fontSize="11px" maxWidth={880}>
                   {image.code}
                 </Container>
                 <Container fontSize="14px" mt={3}>
@@ -163,22 +166,20 @@ class ExportImages extends React.Component {
                 </Container>
               </Container>
             ))}
-          </div>
+          </ul>
         )}
-        <hr />
-        <label>
+        <SettingsSectionTitle mt={4}>
           <FormattedMessage id="ExportImages.AllFinancial" defaultMessage="All financial contributors badge" />
-        </label>
-        <div>
+        </SettingsSectionTitle>
+        <Box mb={2}>
           <StyledLink
             fontSize="14px"
             openInNewTab
             href={`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
-            target="_blank"
           >
             {`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
           </StyledLink>
-        </div>
+        </Box>
         <img alt="open collective badge" src={`https://opencollective.com/${collective.slug}/tiers/badge.svg`} />
       </div>
     );

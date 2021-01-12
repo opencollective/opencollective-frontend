@@ -109,7 +109,7 @@ const CollectiveCallsToAction = ({
           </StyledButton>
         </Link>
       )}
-      {hasDashboard && collective.plan.hostDashboard && (
+      {hasDashboard && (
         <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
           <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />

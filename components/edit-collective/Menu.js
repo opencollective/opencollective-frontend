@@ -156,7 +156,7 @@ const MenuItem = styled(Link)`
   display: block;
   border-radius: 5px;
   padding: 5px 10px;
-  color: #888;
+  color: #4e5052;
   cursor: pointer;
   &:hover,
   a:hover {
@@ -167,6 +167,7 @@ const MenuItem = styled(Link)`
     css`
       background-color: #eee;
       color: black;
+      font-weight: 500;
     `};
 `;
 
@@ -187,7 +188,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.POLICIES]: c => isCollective(c) || isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: c => isCollective(c) || isFund(c),
-  [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c => isOneOfTypes(c, COLLECTIVE, FUND, ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c => isOneOfTypes(c, COLLECTIVE, FUND, ORGANIZATION, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, ORGANIZATION, USER),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: c => isOneOfTypes(c, ORGANIZATION, USER),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, EVENT),

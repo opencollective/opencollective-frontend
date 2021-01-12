@@ -12,8 +12,11 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledTextarea from '../../StyledTextarea';
-import { H3, H4, P } from '../../Text';
+import { P } from '../../Text';
 import { editCollectiveSettingsMutation } from '../mutations';
+import SettingsTitle from '../SettingsTitle';
+
+import SettingsSectionTitle from './SettingsSectionTitle';
 
 import imgInvoiceTitlePreview from '../../../public/static/images/invoice-title-preview.jpg';
 
@@ -43,12 +46,12 @@ const InvoicesReceipts = ({ collective }) => {
 
   return (
     <Container>
-      <H3>
+      <SettingsTitle>
         <FormattedMessage id="becomeASponsor.invoiceReceipts" defaultMessage="Invoices & Receipts" />
-      </H3>
-      <H4 mt={2}>
+      </SettingsTitle>
+      <SettingsSectionTitle>
         <FormattedMessage id="EditHostInvoice.receiptsSettings" defaultMessage="Receipt Settings" />
-      </H4>
+      </SettingsSectionTitle>
       <P>
         <FormattedMessage
           id="EditHostInvoice.Receipt.Instructions"
@@ -109,7 +112,7 @@ const InvoicesReceipts = ({ collective }) => {
           </StyledButton>
         </Flex>
         <Box mt={3} maxWidth={400}>
-          <img src={imgInvoiceTitlePreview} alt="" />
+          <img src={imgInvoiceTitlePreview} alt="" style={{ maxWidth: 400 }} />
         </Box>
       </Flex>
     </Container>

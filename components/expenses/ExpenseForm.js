@@ -273,7 +273,9 @@ const ExpenseFormBody = ({
         value={values.type}
         options={{
           fundingRequest:
-            [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true,
+            [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
+            collective.settings?.fundingRequest === true ||
+            collective.host?.settings?.fundingRequest === true,
         }}
       />
       {values.type && (

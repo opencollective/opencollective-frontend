@@ -30,6 +30,7 @@ const TrixEditorContainer = styled.div`
     margin-top: 8px;
     padding-top: 8px;
     outline-offset: 0.5em;
+    overflow-y: auto;
 
     // Outline (only when there's no border)
     ${props =>
@@ -51,7 +52,11 @@ const TrixEditorContainer = styled.div`
       display: none;
     }
 
-    ${props => css({ minHeight: props.editorMinHeight })}
+    ${props =>
+      css({
+        minHeight: props.editorMinHeight,
+        maxHeight: props.editorMaxHeight,
+      })}
   }
 
   trix-toolbar {
@@ -182,6 +187,7 @@ export default class RichTextEditor extends React.Component {
     toolbarOffsetY: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
     /** Min height for the full component */
     editorMinHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    editorMaxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
     /** If truthy, will display a red outline */
     error: PropTypes.any,
     'data-cy': PropTypes.string,
@@ -404,10 +410,14 @@ export default class RichTextEditor extends React.Component {
       version,
       showCount,
       maxLength,
+      editorMaxHeight,
     } = this.props;
 
     return !this.state.id ? (
-      <LoadingPlaceholder height={editorMinHeight ? editorMinHeight + 56 : 200} />
+      <LoadingPlaceholder
+        maxHeight={editorMaxHeight ? editorMaxHeight + 56 : undefined}
+        height={editorMinHeight ? editorMinHeight + 56 : 200}
+      />
     ) : (
       <TrixEditorContainer
         withStickyToolbar={withStickyToolbar}
@@ -415,6 +425,7 @@ export default class RichTextEditor extends React.Component {
         toolbarOffsetY={toolbarOffsetY}
         toolbarBackgroundColor={toolbarBackgroundColor}
         editorMinHeight={editorMinHeight}
+        editorMaxHeight={editorMaxHeight}
         withBorders={withBorders}
         version={version}
         isDisabled={disabled}

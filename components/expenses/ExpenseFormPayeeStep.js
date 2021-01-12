@@ -81,7 +81,7 @@ const getPayoutMethodsFromPayee = payee => {
 
   // If the Payee is in the "Collective" family (Collective, Fund, Event, Project)
   // Then the Account Balance should be its only option
-  if (payee && AccountTypesWithHost.includes(payee.type)) {
+  if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
     filteredPms = filteredPms.filter(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE);
   }
 
@@ -114,7 +114,7 @@ const ExpenseFormPayeeStep = ({
       (values.type === expenseTypes.RECEIPT ||
         (values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address));
 
-  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee, collective), [values.payee]);
+  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee), [values.payee]);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const requiresAddress =

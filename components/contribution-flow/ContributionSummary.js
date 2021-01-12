@@ -1,15 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { color, typography } from 'styled-system';
 
 import { getNextChargeDate } from '../../lib/date-utils';
+import getPaymentMethodFees from '../../lib/fees';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { Box } from '../Grid';
 import StyledHr from '../StyledHr';
+import StyledLink from '../StyledLink';
+import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 
 import { getTotalAmount } from './utils';
@@ -26,7 +31,6 @@ const AmountLine = styled.div`
 `;
 
 const Label = styled(Span)`
-  font-weight: 500;
   margin-right: 4px;
   color: inherit;
   flex: 0 1 70%;
@@ -34,13 +38,21 @@ const Label = styled(Span)`
   word-break: break-word;
 `;
 
-const Amount = styled.span`
+Label.defaultProps = {
+  fontWeight: 400,
+};
+
+const Amount = styled(Span)`
   flex: 1 1 30%;
   text-align: right;
 `;
 
-const ContributionSummary = ({ collective, stepDetails, stepSummary }) => {
+const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment }) => {
   const intl = useIntl();
+  const totalAmount = getTotalAmount(stepDetails, stepSummary);
+  const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, collective.currency);
+  const platformContribution = stepDetails.platformContribution || 0;
+
   return (
     <Container fontSize="12px">
       <P fontWeight="500" fontSize="inherit" mb={3}>
@@ -84,7 +96,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary }) => {
               </Amount>
             </AmountLine>
           )}
-          {Boolean(stepDetails.platformContribution) && (
+          {Boolean(platformContribution) && (
             <AmountLine color="black.700">
               <Label>
                 <FormattedMessage
@@ -95,7 +107,55 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary }) => {
               </Label>
               <Amount>
                 <FormattedMoneyAmount
-                  amount={stepDetails.platformContribution}
+                  amount={platformContribution}
+                  currency={collective.currency}
+                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
+                />
+              </Amount>
+            </AmountLine>
+          )}
+          {Boolean(pmFeeInfo.fee) && (
+            <AmountLine color="black.700">
+              <Label>
+                <FormattedMessage
+                  id="PaymentProviderFees.Label"
+                  defaultMessage="{providerName} fees"
+                  values={{ providerName: pmFeeInfo.name }}
+                />
+              </Label>
+              <Amount>
+                {!pmFeeInfo.isExact && (
+                  <Box display="inline-block" mr={1} verticalAlign="text-bottom">
+                    <StyledTooltip
+                      verticalAlign="top"
+                      content={
+                        <Span>
+                          <FormattedMessage
+                            id="Fees.ApproximationDisclaimer"
+                            defaultMessage="This amount could vary due to currency exchange or other payment processor fees that we cannot predict."
+                          />
+                          {pmFeeInfo.aboutURL && (
+                            <React.Fragment>
+                              <br />
+                              <br />
+                              <StyledLink href={pmFeeInfo.aboutURL} openInNewTab>
+                                <FormattedMessage
+                                  id="LearnMoreAboutServiceFees"
+                                  defaultMessage="Learn more about {service} fees"
+                                  values={{ service: pmFeeInfo.name }}
+                                />
+                              </StyledLink>
+                            </React.Fragment>
+                          )}
+                        </Span>
+                      }
+                    >
+                      <InfoCircle size="16px" color="#76777A" />
+                    </StyledTooltip>
+                  </Box>
+                )}
+                <FormattedMoneyAmount
+                  amount={pmFeeInfo.fee}
                   currency={collective.currency}
                   amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 />
@@ -107,17 +167,31 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary }) => {
 
       <StyledHr borderColor="black.500" my={1} />
       <AmountLine color="black.800" fontWeight="500">
-        <Label>
+        <Label fontWeight="500">
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700">
-          <FormattedMoneyAmount
-            amount={getTotalAmount(stepDetails, stepSummary)}
-            currency={collective.currency}
-            amountStyles={null}
-          />
+          <FormattedMoneyAmount amount={totalAmount} currency={collective.currency} amountStyles={null} />
         </Amount>
       </AmountLine>
+      {Boolean(pmFeeInfo.fee) && (
+        <AmountLine color="black.700">
+          <Label>
+            <FormattedMessage
+              id="NetAmountFor"
+              defaultMessage="Net amount for {name}"
+              values={{ name: collective.name }}
+            />
+          </Label>
+          <Amount>
+            <FormattedMoneyAmount
+              amount={totalAmount - pmFeeInfo.fee - platformContribution}
+              currency={collective.currency}
+              amountStyles={null}
+            />
+          </Amount>
+        </AmountLine>
+      )}
       <StyledHr borderColor="black.500" my={1} />
       {stepDetails?.interval && (
         <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
@@ -146,6 +220,7 @@ ContributionSummary.propTypes = {
   collective: PropTypes.object,
   stepDetails: PropTypes.object,
   stepSummary: PropTypes.object,
+  stepPayment: PropTypes.object,
 };
 
 export default ContributionSummary;
