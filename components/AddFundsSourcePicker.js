@@ -59,7 +59,6 @@ class AddFundsSourcePickerForUser extends React.Component {
   render() {
     const hosts = this.props.LoggedInUser.hostsUserIsAdminOf();
     const hostOptions = [
-      { key: 'addfsph-00', value: '' },
       ...hosts.map(h => {
         const value = h.legacyId || h.id;
         return { key: `addfsph-${h.id}`, value: value, label: h.name };
@@ -67,7 +66,7 @@ class AddFundsSourcePickerForUser extends React.Component {
     ];
     return (
       <div>
-        <StyledSelect id="sourcePicker" placeholder="select" options={hostOptions} onChange={this.props.onChange} />
+        <StyledSelect id="sourcePicker" placeholder="Select" options={hostOptions} isSearchable={false} onChange={this.props.onChange} />
       </div>
     );
   }
