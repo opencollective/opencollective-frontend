@@ -66,7 +66,13 @@ class AddFundsSourcePickerForUser extends React.Component {
     ];
     return (
       <div>
-        <StyledSelect id="sourcePicker" placeholder="Select" options={hostOptions} isSearchable={false} onChange={this.props.onChange} />
+        <StyledSelect
+          id="sourcePicker"
+          placeholder="Select"
+          options={hostOptions}
+          isSearchable={false}
+          onChange={this.props.onChange}
+        />
       </div>
     );
   }
