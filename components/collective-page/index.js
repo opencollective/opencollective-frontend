@@ -270,12 +270,7 @@ class CollectivePage extends Component {
         return <SectionContributions collective={this.props.collective} LoggedInUser={this.props.LoggedInUser} />;
       case Sections.EVENTS:
         return (
-          <SectionEvents
-            collective={this.props.collective}
-            events={this.props.events}
-            connectedCollectives={this.props.connectedCollectives}
-            isAdmin={this.props.isAdmin}
-          />
+          <SectionEvents collective={this.props.collective} events={this.props.events} isAdmin={this.props.isAdmin} />
         );
       case Sections.PROJECTS:
         return (
@@ -333,7 +328,12 @@ class CollectivePage extends Component {
           />
         );
       case Sections.CONNECTED_COLLECTIVES:
-        return <SectionConnectedCollectives connectedCollectives={this.props.connectedCollectives} />;
+        return (
+          <SectionConnectedCollectives
+            collective={this.props.collective}
+            connectedCollectives={this.props.connectedCollectives}
+          />
+        );
       case Sections.TOP_FINANCIAL_CONTRIBUTORS:
         return (
           <SectionTopFinancialContributors
