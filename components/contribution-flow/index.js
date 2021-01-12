@@ -31,6 +31,7 @@ import MessageBox from '../MessageBox';
 import Steps from '../Steps';
 import { withUser } from '../UserProvider';
 
+import { orderResponseFragment } from './graphql/fragments';
 import { STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
@@ -93,10 +94,13 @@ class ContributionFlow extends React.Component {
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
+    isEmbed: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
     verb: PropTypes.string,
     contributeAs: PropTypes.string,
+    defaultEmail: PropTypes.string,
+    defaultName: PropTypes.string,
     /** @ignore from withUser */
     refetchLoggedInUser: PropTypes.func,
     /** @ignore from withUser */
@@ -351,14 +355,22 @@ class ContributionFlow extends React.Component {
 
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, routeParams = {}) => {
-    const { collective, tier } = this.props;
+    const { collective, tier, isEmbed } = this.props;
 
     const params = {
       verb: this.props.verb || 'donate',
       collectiveSlug: collective.slug,
       step: stepName === 'details' ? undefined : stepName,
       interval: this.props.fixedInterval || undefined,
-      ...pick(this.props, ['interval', 'description', 'redirect', 'contributeAs']),
+      ...pick(this.props, [
+        'interval',
+        'description',
+        'redirect',
+        'contributeAs',
+        'defaultEmail',
+        'defaultName',
+        'useTheme',
+      ]),
       ...routeParams,
     };
 
@@ -378,6 +390,10 @@ class ContributionFlow extends React.Component {
     } else if (params.verb === 'contribute' || params.verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       params.verb = 'donate';
+    }
+
+    if (isEmbed) {
+      route = tier ? 'embed-contribution-flow-tier' : 'embed-contribution-flow';
     }
 
     // Reset errors if any
@@ -534,7 +550,7 @@ class ContributionFlow extends React.Component {
   };
 
   render() {
-    const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails } = this.props;
+    const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails, isEmbed } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
 
     const currency = tier?.amount.currency || collective.currency;
@@ -626,11 +642,14 @@ class ContributionFlow extends React.Component {
                     showFeesOnTop={this.canHaveFeesOnTop()}
                     onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
                     defaultProfileSlug={this.props.contributeAs}
+                    defaultEmail={this.props.defaultEmail}
+                    defaultName={this.props.defaultName}
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     onSignInClick={() => this.setState({ showSignIn: true })}
+                    isEmbed={isEmbed}
                   />
 
-                  <Box mt={[4, 5]}>
+                  <Box mt={40}>
                     <ContributionFlowButtons
                       goNext={goNext}
                       goBack={goBack}
@@ -667,95 +686,6 @@ class ContributionFlow extends React.Component {
     );
   }
 }
-
-const orderSuccessHostFragment = gqlV2/* GraphQL */ `
-  fragment OrderSuccessHostFragment on Host {
-    id
-    slug
-    settings
-    bankAccount {
-      id
-      name
-      data
-      type
-    }
-  }
-`;
-
-export const orderSuccessFragment = gqlV2/* GraphQL */ `
-  fragment OrderSuccessFragment on Order {
-    id
-    legacyId
-    status
-    frequency
-    amount {
-      value
-      currency
-    }
-    platformContributionAmount {
-      value
-    }
-    tier {
-      id
-      name
-    }
-    membership {
-      id
-      publicMessage
-    }
-    fromAccount {
-      id
-      name
-      ... on Individual {
-        isGuest
-      }
-    }
-    toAccount {
-      id
-      name
-      slug
-      tags
-      type
-      isHost
-      ... on AccountWithContributions {
-        contributors {
-          totalCount
-        }
-      }
-      ... on AccountWithHost {
-        host {
-          ...OrderSuccessHostFragment
-        }
-      }
-      ... on Organization {
-        host {
-          ...OrderSuccessHostFragment
-          ... on AccountWithContributions {
-            contributors {
-              totalCount
-            }
-          }
-        }
-      }
-    }
-  }
-  ${orderSuccessHostFragment}
-`;
-
-const orderResponseFragment = gqlV2/* GraphQL */ `
-  fragment OrderResponseFragment on OrderWithPayment {
-    guestToken
-    order {
-      ...OrderSuccessFragment
-    }
-    stripeError {
-      message
-      account
-      response
-    }
-  }
-  ${orderSuccessFragment}
-`;
 
 const addCreateOrderMutation = graphql(
   gqlV2/* GraphQL */ `

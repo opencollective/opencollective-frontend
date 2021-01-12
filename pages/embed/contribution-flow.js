@@ -3,36 +3,44 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
+import { isEmail } from 'validator';
 
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
-import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { floatAmountToCents } from '../lib/math';
-import { compose, parseToBoolean } from '../lib/utils';
+import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { floatAmountToCents } from '../../lib/math';
+import { compose, parseToBoolean } from '../../lib/utils';
 
-import Container from '../components/Container';
-import { STEPS } from '../components/contribution-flow/constants';
-import ContributionBlocker, { getContributionBlocker } from '../components/contribution-flow/ContributionBlocker';
-import ContributionFlowSuccess from '../components/contribution-flow/ContributionFlowSuccess';
+import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
+import Container from '../../components/Container';
+import { STEPS } from '../../components/contribution-flow/constants';
+import ContributionBlocker, { getContributionBlocker } from '../../components/contribution-flow/ContributionBlocker';
+import ContributionFlowSuccess from '../../components/contribution-flow/ContributionFlowSuccess';
 import {
   contributionFlowAccountQuery,
   contributionFlowAccountWithTierQuery,
-} from '../components/contribution-flow/graphql/queries';
-import ContributionFlowContainer from '../components/contribution-flow/index';
-import { getContributionFlowMetadata } from '../components/contribution-flow/utils';
-import ErrorPage from '../components/ErrorPage';
-import Loading from '../components/Loading';
-import Page from '../components/Page';
-import { withStripeLoader } from '../components/StripeProvider';
-import { withUser } from '../components/UserProvider';
+} from '../../components/contribution-flow/graphql/queries';
+import ContributionFlowContainer from '../../components/contribution-flow/index';
+import { getContributionFlowMetadata } from '../../components/contribution-flow/utils';
+import EmbeddedPage from '../../components/EmbeddedPage';
+import ErrorPage from '../../components/ErrorPage';
+import { Box } from '../../components/Grid';
+import Loading from '../../components/Loading';
+import MessageBox from '../../components/MessageBox';
+import { withStripeLoader } from '../../components/StripeProvider';
+import { withUser } from '../../components/UserProvider';
 
 class NewContributionFlowPage extends React.Component {
-  static getInitialProps({ query }) {
+  static getInitialProps({ query, res }) {
     // Whitelist interval
     if (['monthly', 'yearly'].includes(query.interval)) {
       query.interval = query.interval.replace('ly', '');
     } else if (!['month', 'year'].includes(query.interval)) {
       query.interval = null;
+    }
+
+    if (res) {
+      res.removeHeader('X-Frame-Options');
     }
 
     if (query.data) {
@@ -62,6 +70,9 @@ class NewContributionFlowPage extends React.Component {
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
+      defaultEmail: query.defaultEmail && isEmail(query.defaultEmail) ? query.defaultEmail : null,
+      defaultName: query.defaultName,
+      useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
     };
   }
 
@@ -77,6 +88,8 @@ class NewContributionFlowPage extends React.Component {
     tierId: PropTypes.number,
     customData: PropTypes.object,
     contributeAs: PropTypes.string,
+    defaultEmail: PropTypes.string,
+    defaultName: PropTypes.string,
     skipStepDetails: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -88,6 +101,7 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    useTheme: PropTypes.bool,
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -113,7 +127,10 @@ class NewContributionFlowPage extends React.Component {
 
   getPageMetadata() {
     const { intl, data } = this.props;
-    return getContributionFlowMetadata(intl, data?.account, data?.tier);
+    return {
+      ...getContributionFlowMetadata(intl, data?.account, data?.tier),
+      canonicalURL: null,
+    };
   }
 
   renderPageContent() {
@@ -132,40 +149,56 @@ class NewContributionFlowPage extends React.Component {
     if (contributionBLocker) {
       return <ContributionBlocker blocker={contributionBLocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} />;
+      return <ContributionFlowSuccess collective={account} isEmbed />;
+    } else if (!get(data.account, 'settings.beta.embedContributionFlow')) {
+      return (
+        <MessageBox type="info" withIcon m={4}>
+          Embedded contribution flow feature is not enabled for this account
+        </MessageBox>
+      );
     } else {
       return (
-        <ContributionFlowContainer
-          collective={account}
-          host={account.host}
-          tier={tier}
-          step={step}
-          verb={this.props.verb}
-          redirect={this.props.redirect}
-          description={this.props.description}
-          defaultQuantity={this.props.quantity}
-          fixedInterval={this.props.interval}
-          fixedAmount={this.props.totalAmount}
-          platformContribution={this.props.platformContribution}
-          customData={this.props.customData}
-          skipStepDetails={this.props.skipStepDetails}
-          contributeAs={this.props.contributeAs}
-        />
+        <Box height="100%" pt={3}>
+          <ContributionFlowContainer
+            isEmbed
+            useTheme={this.props.useTheme}
+            collective={account}
+            host={account.host}
+            tier={tier}
+            step={step}
+            verb={this.props.verb}
+            redirect={this.props.redirect}
+            description={this.props.description}
+            defaultQuantity={this.props.quantity}
+            fixedInterval={this.props.interval}
+            fixedAmount={this.props.totalAmount}
+            platformContribution={this.props.platformContribution}
+            customData={this.props.customData}
+            skipStepDetails={this.props.skipStepDetails}
+            contributeAs={this.props.contributeAs}
+            defaultEmail={this.props.defaultEmail}
+            defaultName={this.props.defaultName}
+          />
+        </Box>
       );
     }
   }
 
   render() {
-    const { data } = this.props;
+    const { data, useTheme } = this.props;
     if (!data.loading && !data.account) {
       const error = data.error
         ? getErrorFromGraphqlException(data.error)
         : generateNotFoundError(this.props.collectiveSlug);
 
       return <ErrorPage error={error} />;
+    } else {
+      return (
+        <CollectiveThemeProvider collective={useTheme ? data.account : null}>
+          <EmbeddedPage>{this.renderPageContent()}</EmbeddedPage>
+        </CollectiveThemeProvider>
+      );
     }
-
-    return <Page {...this.getPageMetadata()}>{this.renderPageContent()}</Page>;
   }
 }
 
