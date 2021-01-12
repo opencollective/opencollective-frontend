@@ -8,13 +8,13 @@ import { isPastEvent } from '../../../lib/events';
 
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
-import ContributeCollective from '../../contribute-cards/ContributeCollective';
 import ContributeEvent from '../../contribute-cards/ContributeEvent';
 import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
+import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 
@@ -32,15 +32,6 @@ class SectionEvents extends React.PureComponent {
         contributors: PropTypes.arrayOf(PropTypes.object),
       }),
     ),
-    connectedCollectives: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        collective: PropTypes.shape({
-          id: PropTypes.number.isRequired,
-        }),
-      }),
-    ),
-
     isAdmin: PropTypes.bool.isRequired,
   };
 
@@ -60,7 +51,7 @@ class SectionEvents extends React.PureComponent {
   };
 
   render() {
-    const { collective, events, connectedCollectives, isAdmin } = this.props;
+    const { collective, events, isAdmin } = this.props;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const [pastEvents, upcomingEvents] = this.triageEvents(events);
 
@@ -69,12 +60,15 @@ class SectionEvents extends React.PureComponent {
     }
 
     return (
-      <Box pt={4}>
+      <Box pt={[4, 5]}>
         <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
           {(ref, Chevrons) => (
             <div>
-              <ContainerSectionContent>
-                <Flex justifyContent="flex-end" alignItems="center" mb={3}>
+              <ContainerSectionContent pb={3}>
+                <Flex justifyContent="space-between" alignItems="center">
+                  <H3 fontSize="20px" fontWeight="600" color="black.700">
+                    <FormattedMessage id="Events" defaultMessage="Events" />
+                  </H3>
                   <Box m={2} flex="0 0 50px">
                     <Chevrons />
                   </Box>
@@ -97,11 +91,6 @@ class SectionEvents extends React.PureComponent {
                       hideContributors={hasNoContributorForEvents}
                       disableCTA={!collective.isActive || !event.isActive}
                     />
-                  </Box>
-                ))}
-                {connectedCollectives.map(({ id, collective }) => (
-                  <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
-                    <ContributeCollective collective={collective} />
                   </Box>
                 ))}
                 {pastEvents.map(event => (

@@ -53,6 +53,7 @@ export const contributorsFieldsFragment = gql`
  */
 export const collectiveNavbarFieldsFragment = gql`
   fragment NavbarFields on CollectiveFeatures {
+    CONNECTED_ACCOUNTS
     RECEIVE_FINANCIAL_CONTRIBUTIONS
     RECURRING_CONTRIBUTIONS
     EVENTS

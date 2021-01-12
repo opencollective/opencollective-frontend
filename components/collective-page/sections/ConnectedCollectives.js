@@ -1,40 +1,79 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
-import Container from '../../Container';
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
+import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeCollective from '../../contribute-cards/ContributeCollective';
-import { H2 } from '../../Text';
+import { Box, Flex } from '../../Grid';
+import HorizontalScroller from '../../HorizontalScroller';
+import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
+import ContributeCardsContainer from '../ContributeCardsContainer';
 
-/**
- * Connected collectives section for the About section category
- */
-const SectionConnectedCollectives = ({ connectedCollectives }) => {
-  if (!connectedCollectives?.length) {
-    return null;
+class ConnectedCollectives extends React.PureComponent {
+  static propTypes = {
+    /** Collective */
+    collective: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      isActive: PropTypes.bool,
+    }).isRequired,
+    connectedCollectives: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        contributors: PropTypes.arrayOf(PropTypes.object),
+      }),
+    ),
+  };
+
+  getContributeCardsScrollDistance = width => {
+    const oneCardScrollDistance = CONTRIBUTE_CARD_WIDTH + CONTRIBUTE_CARD_PADDING_X[0] * 2;
+    if (width <= oneCardScrollDistance * 2) {
+      return oneCardScrollDistance;
+    } else if (width <= oneCardScrollDistance * 4) {
+      return oneCardScrollDistance * 2;
+    } else {
+      return oneCardScrollDistance * 3;
+    }
+  };
+
+  render() {
+    const { connectedCollectives } = this.props;
+
+    if (!connectedCollectives?.length) {
+      return null;
+    }
+
+    return (
+      <Box pt={[4, 5]}>
+        <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
+          {(ref, Chevrons) => (
+            <div>
+              <ContainerSectionContent pb={3}>
+                <Flex justifyContent="space-between" alignItems="center">
+                  <H3 fontSize="20px" fontWeight="600" color="black.700">
+                    <FormattedMessage id="ConnectedCollectives" defaultMessage="Connected collectives" />
+                  </H3>
+                  <Box m={2} flex="0 0 50px">
+                    <Chevrons />
+                  </Box>
+                </Flex>
+              </ContainerSectionContent>
+
+              <ContributeCardsContainer ref={ref}>
+                {connectedCollectives.map(({ id, collective }) => (
+                  <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
+                    <ContributeCollective collective={collective} />
+                  </Box>
+                ))}
+              </ContributeCardsContainer>
+            </div>
+          )}
+        </HorizontalScroller>
+      </Box>
+    );
   }
+}
 
-  return (
-    <ContainerSectionContent py={[3, 4]}>
-      <Container width="100%" margin="0 auto">
-        <H2 textAlign="center" fontSize="20px" lineHeight="28px" fontWeight="500" color="black.700" mb={4}>
-          <FormattedMessage id="ConnectedCollectives" defaultMessage="Connected collectives" />
-        </H2>
-        <Container display="flex" flexWrap="wrap" justifyContent="space-evenly" py={2}>
-          {connectedCollectives.map(({ id, collective }) => (
-            <Container key={id} px={3}>
-              <ContributeCollective collective={collective} />
-            </Container>
-          ))}
-        </Container>
-      </Container>
-    </ContainerSectionContent>
-  );
-};
-
-SectionConnectedCollectives.propTypes = {
-  connectedCollectives: PropTypes.array,
-};
-
-export default React.memo(SectionConnectedCollectives);
+export default injectIntl(ConnectedCollectives);
