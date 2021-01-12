@@ -128,7 +128,7 @@ class CreateFundForm extends React.Component {
                 values={{
                   faqLink: (
                     <StyledLink href="https://docs.opencollective.foundation/" openInNewTab>
-                      <FormattedMessage id="createFund.subtitle.faq" defaultMessage="FAQs here." />
+                      <FormattedMessage id="createFund.subtitle.faq" defaultMessage="FAQ here." />
                     </StyledLink>
                   ),
                 }}
