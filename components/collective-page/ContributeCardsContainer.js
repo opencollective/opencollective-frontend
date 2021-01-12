@@ -16,7 +16,10 @@ const ContributeCardsContainer = styled.div`
     !props.disableScrollSnapping &&
     css`
       scroll-behavior: smooth;
-      scroll-snap-type: x mandatory;
+      /* smartphones, touchscreens */
+      @media (hover: none) {
+        scroll-snap-type: x mandatory;
+      }
     `}
 
   ${CustomScrollbarCSS}
