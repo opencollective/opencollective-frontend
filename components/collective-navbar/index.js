@@ -490,9 +490,13 @@ const CollectiveNavbar = ({
         <Flex alignItems="center" data-hide={hideInfosOnDesktop}>
           {showBackButton && (
             <Box display={['none', 'block']} mr={2}>
-              <StyledButton px={1} isBorderless onClick={() => window.history.back()}>
-                &larr;
-              </StyledButton>
+              {collective && (
+                <Link route="collective" params={{ slug: collective.slug }}>
+                  <StyledButton px={1} isBorderless>
+                    &larr;
+                  </StyledButton>
+                </Link>
+              )}
             </Box>
           )}
           <AvatarBox>
