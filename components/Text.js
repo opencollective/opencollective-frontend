@@ -28,7 +28,7 @@ export const P = styled.p.attrs(props => ({
 P.defaultProps = {
   fontSize: '14px',
   letterSpacing: '-0.4px',
-  lineHeight: '1.1em',
+  lineHeight: '1.15em',
 };
 
 export const Span = P.withComponent('span');
