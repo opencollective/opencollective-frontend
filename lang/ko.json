@@ -742,6 +742,7 @@
   "emptyBalance": "Empty Balance",
   "EmptyCollectivePage": "{collective} is now working on its public profile, and don't have anything to show, yet. Meanwhile, there are dozens of Collectives you can discover, take a look!",
   "Error": "Error",
+  "Error.AccountEmailAlreadyExists": "An account already exists for this email, please <SignInLink>sign in</SignInLink>.",
   "Error.BadCollectiveType": "이 프로필 유형은 지원되지 않습니다",
   "error.code.invalid": "유효하지 않은 기프트카드 코드",
   "error.contactSupport": "지원에 문의",
