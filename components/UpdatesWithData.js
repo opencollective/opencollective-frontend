@@ -50,28 +50,28 @@ class UpdatesWithData extends React.Component {
     return (
       <div className="UpdatesContainer">
         {!compact && (
-          <Container padding="0.8rem 0">
-            <H1 fontSize="4rem" textAlign="center">
-              <FormattedMessage id="updates" defaultMessage="Updates" />
-            </H1>
-            <P fontSize="1.6rem" textAlign="center" color="#71757a">
-              <FormattedMessage
-                id="section.updates.subtitle"
-                defaultMessage="Stay up to dates with our latest activities and progress."
-              />
-            </P>
-          </Container>
-        )}
-        {LoggedInUser?.canEditCollective(collective) && (
-          <Flex justifyContent="center">
-            <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
-              <StyledButton buttonStyle="primary" buttonSize="small">
-                <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
-              </StyledButton>
-            </Link>
+          <Flex flexWrap="wrap" alignItems="center" pr={2} justifyContent="space-between">
+            <Container padding="0.8rem 0" my={4}>
+              <H1 fontSize="40px" fontWeight="normal" textAlign="left" mb={2}>
+                <FormattedMessage id="updates" defaultMessage="Updates" />
+              </H1>
+              <P color="black.700" css={{ flex: '0 1 70%' }}>
+                <FormattedMessage
+                  id="section.updates.subtitle"
+                  defaultMessage="Stay up to dates with our latest activities and progress."
+                />
+              </P>
+            </Container>
+            {LoggedInUser?.canEditCollective(collective) && (
+              <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+                <StyledButton buttonStyle="primary" m={2}>
+                  <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
+                </StyledButton>
+              </Link>
+            )}
           </Flex>
         )}
-        <Box my={5}>
+        <Box mt={4} mb={5}>
           <Updates
             collective={collective}
             updates={updates}

@@ -19,16 +19,16 @@ import Link from './Link';
 import LinkCollective from './LinkCollective';
 import MessageBox from './MessageBox';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
+import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
 import StyledTag from './StyledTag';
 import StyledTooltip from './StyledTooltip';
-import { H3 } from './Text';
+import { H5 } from './Text';
 import UpdateTextWithData from './UpdateTextWithData';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;
   min-height: 100px;
-  border: 1px solid #e6e8eb;
   padding: 20px;
 
   ${borders}
@@ -57,11 +57,6 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
   color: #71757a;
   display: flex;
   align-items: center;
-`;
-
-const ViewUpdatesLink = styled(Link)`
-  margin-top: 20px;
-  color: #71757a;
 `;
 
 class StyledUpdate extends Component {
@@ -206,17 +201,11 @@ class StyledUpdate extends Component {
     if (mode === 'summary') {
       return (
         <Link route={`/${collective.slug}/updates/${update.slug}`}>
-          <H3 data-cy="updateTitle" color="#090A0A" lineHeight="22px">
-            {update.title}
-          </H3>
+          <H5 data-cy="updateTitle">{update.title}</H5>
         </Link>
       );
     } else {
-      return (
-        <H3 data-cy="updateTitle" color="#090A0A" lineHeight="22px">
-          {update.title}
-        </H3>
-      );
+      return <H5 data-cy="updateTitle">{update.title}</H5>;
     }
   }
 
@@ -312,11 +301,11 @@ class StyledUpdate extends Component {
           {mode === 'edit' && this.renderEditUpdateForm()}
         </UpdateWrapper>
         {update.publishedAt && mode === 'details' && (
-          <Container my={4}>
-            <ViewUpdatesLink route={`/${collective.slug}/updates`}>
-              {intl.formatMessage(this.messages['viewLatestUpdates'])}
-            </ViewUpdatesLink>
-          </Container>
+          <Flex my={4} justifyContent={['center', 'flex-start']}>
+            <Link route={`/${collective.slug}/updates`}>
+              <StyledButton ml={[0, 5]}>{intl.formatMessage(this.messages['viewLatestUpdates'])}</StyledButton>
+            </Link>
+          </Flex>
         )}
       </React.Fragment>
     );

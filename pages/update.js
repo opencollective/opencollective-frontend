@@ -9,6 +9,7 @@ import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
+import { Box } from '../components/Grid';
 import Header from '../components/Header';
 import UpdateWithData from '../components/UpdateWithData';
 import { withUser } from '../components/UserProvider';
@@ -46,14 +47,14 @@ class UpdatePage extends React.Component {
             selectedCategory={NAVBAR_CATEGORIES.CONNECT}
           />
 
-          <div className="content">
+          <Box className="content" py={4}>
             <UpdateWithData
               collectiveSlug={collective.slug}
               updateSlug={updateSlug}
               editable={true}
               LoggedInUser={LoggedInUser}
             />
-          </div>
+          </Box>
         </Body>
 
         <Footer />

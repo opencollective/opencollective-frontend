@@ -65,7 +65,7 @@ class Updates extends React.Component {
 
     return (
       <div className="Updates">
-        <Container position="relative">
+        <Container position="relative" border="1px solid #e6e8eb" borderRadius={5}>
           {this.state.loading && (
             <LoadingContainer>
               <FormattedMessage id="loading" defaultMessage="loading" />
@@ -77,7 +77,7 @@ class Updates extends React.Component {
                 update={update}
                 collective={collective}
                 compact={true}
-                borderTop={index === 0 ? undefined : 'none'}
+                borderTop={index !== 0 ? '1px solid #e6e8eb' : 'none'}
               />
             </Container>
           ))}
