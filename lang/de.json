@@ -742,6 +742,7 @@
   "emptyBalance": "Leeres Guthaben",
   "EmptyCollectivePage": "{collective} is now working on its public profile, and don't have anything to show, yet. Meanwhile, there are dozens of Collectives you can discover, take a look!",
   "Error": "Fehler",
+  "Error.AccountEmailAlreadyExists": "An account already exists for this email, please <SignInLink>sign in</SignInLink>.",
   "Error.BadCollectiveType": "This profile type is not supported",
   "error.code.invalid": "Invalid Gift Card code",
   "error.contactSupport": "Contact support",

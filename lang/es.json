@@ -742,6 +742,7 @@
   "emptyBalance": "Empty Balance",
   "EmptyCollectivePage": "{collective} is now working on its public profile, and don't have anything to show, yet. Meanwhile, there are dozens of Collectives you can discover, take a look!",
   "Error": "Error",
+  "Error.AccountEmailAlreadyExists": "An account already exists for this email, please <SignInLink>sign in</SignInLink>.",
   "Error.BadCollectiveType": "Este tipo de perfil no es compatible",
   "error.code.invalid": "Invalid gift card code",
   "error.contactSupport": "Contactar con el soporte",
