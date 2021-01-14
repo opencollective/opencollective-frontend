@@ -176,7 +176,7 @@ export default class FAQ extends Component {
       <Container {...props}>
         {title !== null && (
           <P fontWeight="bold" mb={1} color="black.900" {...titleProps}>
-            {title || <FormattedMessage id="FAQs" defaultMessage="FAQ's" />}
+            {title || <FormattedMessage id="FAQ" defaultMessage="FAQ" />}
           </P>
         )}
         <EntryContainer withBorderLeft={withBorderLeft} withNewButtons={withNewButtons}>
