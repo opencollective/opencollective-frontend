@@ -181,6 +181,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
     const response = await createCollective({ variables });
     if (response.data.createCollective) {
       await Router.pushRoute('/foundation/apply/success');
+      window.scrollTo(0, 0);
     }
   };
 

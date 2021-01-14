@@ -94,20 +94,22 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => (
             size="16px"
             checked={checked}
             onChange={({ checked }) => onChecked(checked)}
+            label={
+              <P ml={1} fontSize="12px" lineHeight="18px" fontWeight="400">
+                <FormattedMessage
+                  id="OCFHostApplication.tosCheckBoxLabel"
+                  defaultMessage="I agree with the <TOSLink>terms of fiscal sponsorship</TOSLink>."
+                  values={{
+                    TOSLink: getI18nLink({
+                      href: 'https://docs.opencollective.foundation/about/our-terms-and-conditions',
+                      openInNewTabNoFollow: true,
+                    }),
+                  }}
+                />
+              </P>
+            }
           />
         </Box>
-        <P ml={2} fontSize="12px" lineHeight="18px" fontWeight="400">
-          <FormattedMessage
-            id="OCFHostApplication.tosCheckBoxLabel"
-            defaultMessage="I agree with the <TOSLink>terms of fiscal sponsorship</TOSLink>."
-            values={{
-              TOSLink: getI18nLink({
-                href: 'https://docs.opencollective.foundation/about/our-terms-and-conditions',
-                openInNewTabNoFollow: true,
-              }),
-            }}
-          />
-        </P>
       </Container>
     </Box>
     <Link route="/foundation/apply/fees">

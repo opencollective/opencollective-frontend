@@ -50,7 +50,7 @@ const OCFHostApplicationFAQ = props => (
     </Entry>
     <Box mt={3}>
       <StyledLink
-        href="https://docs.opencollective.foundation/faqs/untitled"
+        href="https://docs.opencollective.foundation/faqs/general-faqs"
         background="#F5FAFF"
         padding="8px 16px"
         borderRadius="100px"
