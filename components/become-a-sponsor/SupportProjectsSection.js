@@ -104,7 +104,7 @@ const SupportProjects = () => (
           />
         </SponsorBoxShadowWrapper>
       </Link>
-      <Link route="/trivago">
+      <Link route="/salesforce">
         <SponsorBoxShadowWrapper
           size={['48px', '55px', '77px', null, '84px']}
           right={['4.93%', '0']}

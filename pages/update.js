@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import Body from '../components/Body';
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
+import { Box } from '../components/Grid';
 import Header from '../components/Header';
 import UpdateWithData from '../components/UpdateWithData';
 import { withUser } from '../components/UserProvider';
@@ -42,16 +44,17 @@ class UpdatePage extends React.Component {
             collective={collective}
             isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
             selected={Sections.UPDATES}
+            selectedCategory={NAVBAR_CATEGORIES.CONNECT}
           />
 
-          <div className="content">
+          <Box className="content" py={4}>
             <UpdateWithData
               collectiveSlug={collective.slug}
               updateSlug={updateSlug}
               editable={true}
               LoggedInUser={LoggedInUser}
             />
-          </div>
+          </Box>
         </Body>
 
         <Footer />

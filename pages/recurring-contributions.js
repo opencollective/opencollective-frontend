@@ -8,9 +8,9 @@ import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
+import CollectiveNavbar from '../components/collective-navbar';
 import { Dimensions } from '../components/collective-page/_constants';
 import SectionTitle from '../components/collective-page/SectionTitle';
-import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import { Box } from '../components/Grid';

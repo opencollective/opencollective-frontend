@@ -5,24 +5,25 @@ import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, difference, flatten, get, isEqual, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { useRouter } from 'next/router';
 import { useDrag, useDrop } from 'react-dnd';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import {
+  addDefaultSections,
   convertSectionsToNewFormat,
-  filterSectionsByData,
   getDefaultSectionsForCollective,
+  getSectionPath,
+  hasNewNavbar,
 } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
-import { getEnvVar } from '../../../lib/env-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
-import { parseToBoolean } from '../../../lib/utils';
+import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
@@ -37,8 +38,9 @@ import StyledCard from '../../StyledCard';
 import StyledHr from '../../StyledHr';
 import StyledSelect from '../../StyledSelect';
 import StyledTooltip from '../../StyledTooltip';
-import { H3, P, Span } from '../../Text';
+import { P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
+import SettingsTitle from '../SettingsTitle';
 
 export const getSettingsQuery = gqlV2/* GraphQL */ `
   query GetSettingsForEditCollectivePage($slug: String!) {
@@ -53,13 +55,11 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
 
 const DRAG_TYPE = DRAG_AND_DROP_TYPES.COLLECTIVE_PAGE_EDIT_SECTION;
 
-const HAS_NEW_NAVBAR = parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR'));
-
 const SectionEntryContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
+  padding: 4px 16px;
 
   ${props =>
     props.isDragging &&
@@ -101,18 +101,19 @@ const CollectiveSectionEntry = ({
   fontWeight,
   hasData,
   showMissingDataWarning,
+  showDragIcon,
 }) => {
   const intl = useIntl();
   const ref = React.useRef(null);
   const [, drop] = useDrop({
     accept: getItemType(parentItem),
     hover: item => onMove(item, index),
-    drop: item => onDrop(item, index),
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
     item: { type: getItemType(parentItem), index, parentItem },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
+    end: onDrop,
   });
 
   drag(drop(ref));
@@ -152,9 +153,11 @@ const CollectiveSectionEntry = ({
 
   return (
     <SectionEntryContainer ref={preview} isDragging={isDragging}>
-      <Container mr={3} cursor="move" ref={ref}>
-        <DragIndicator size={14} />
-      </Container>
+      {showDragIcon && (
+        <Container mr={3} cursor="move" ref={ref}>
+          <DragIndicator size={14} />
+        </Container>
+      )}
       <P fontSize="14px" fontWeight={fontWeight || '500'} css={{ flex: '1' }}>
         {i18nCollectivePageSection(intl, section)}
       </P>
@@ -210,6 +213,7 @@ CollectiveSectionEntry.propTypes = {
   fontWeight: PropTypes.string,
   hasData: PropTypes.bool,
   showMissingDataWarning: PropTypes.bool,
+  showDragIcon: PropTypes.bool,
   parentItem: PropTypes.object,
 };
 
@@ -230,17 +234,13 @@ export const isCollectiveSectionEnabled = (collective, section) => {
  * Sections used to be stored as an array of string. This helpers loads and convert them to
  * the new format if necessary.
  */
-const loadSectionsForCollective = collective => {
+const loadSectionsForCollective = (collective, useNewSections) => {
   const collectiveSections = get(collective, 'settings.collectivePage.sections');
   if (collective.settings?.collectivePage?.useNewSections) {
     return collectiveSections;
   }
 
-  let defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive);
-
-  if (collective.type === CollectiveType.FUND) {
-    defaultSections = difference(defaultSections, [Sections.GOALS, Sections.CONVERSATIONS]);
-  }
+  const defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive, useNewSections);
 
   const transformLegacySection = section => {
     return typeof section === 'string'
@@ -271,18 +271,18 @@ const getNewSections = memoizeOne((sections, item, toIndex, useNewSections) => {
   return newSections;
 });
 
-const MenuCategory = ({ item, index, collective, sectionsWithData, onMove, onDrop, onSectionToggle }) => {
+const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle }) => {
   const intl = useIntl();
   const ref = React.useRef(null);
   const [, drop] = useDrop({
     accept: getItemType(),
     hover: item => onMove(item, index),
-    drop: item => onDrop(item, index),
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
     item: { type: getItemType(), index },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
+    end: onDrop,
   });
 
   drag(drop(ref));
@@ -314,10 +314,10 @@ const MenuCategory = ({ item, index, collective, sectionsWithData, onMove, onDro
               isEnabled={section.isEnabled}
               collectiveType={collective.type}
               restrictedTo={section.restrictedTo}
-              hasData={sectionsWithData.includes(section.name)}
               onMove={onMove}
               onDrop={onDrop}
               onSectionToggle={onSectionToggle}
+              showDragIcon={item.sections.length > 1}
             />
           </Container>
         ))}
@@ -330,19 +330,46 @@ MenuCategory.propTypes = {
   item: PropTypes.object,
   index: PropTypes.number,
   collective: PropTypes.object,
-  sectionsWithData: PropTypes.array,
   onMove: PropTypes.func,
   onDrop: PropTypes.func,
   onSectionToggle: PropTypes.func,
 };
 
+/**
+ * Sections used to be stored as an array of string. This helpers loads and convert them to
+ * the new format if necessary.
+ */
+const loadSectionsForCollectiveV1 = collective => {
+  const collectiveSections = get(collective, 'settings.collectivePage.sections');
+  let defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive);
+
+  if (collective.type === CollectiveType.FUND) {
+    // TODO this is not the right place for this
+    defaultSections = difference(defaultSections, [Sections.GOALS, Sections.CONVERSATIONS]);
+  }
+
+  const transformLegacySection = section => {
+    return typeof section === 'string'
+      ? { section, isEnabled: isCollectiveSectionEnabled(collective, section) }
+      : section;
+  };
+
+  if (collectiveSections) {
+    const existingSections = collectiveSections.map(transformLegacySection);
+    const addedSections = defaultSections.map(section => ({ section, isEnabled: false }));
+    return uniqBy([...existingSections, ...addedSections], 'section');
+  } else {
+    return defaultSections.map(transformLegacySection);
+  }
+};
+
 const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
+  const router = useRouter();
+  const useNewSections = hasNewNavbar(get(router, 'query.navbarVersion'));
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
   const [tmpSections, setTmpSections] = React.useState(null);
-  const [sectionsWithData, setSectionsWithData] = React.useState([]);
-  const useNewSections = HAS_NEW_NAVBAR;
 
   const { loading, data } = useQuery(getSettingsQuery, {
     variables: { slug: collective.slug },
@@ -356,19 +383,17 @@ const EditCollectivePage = ({ collective }) => {
   // Load sections from fetched collective
   React.useEffect(() => {
     if (data?.account) {
-      const sectionsFromCollective = loadSectionsForCollective(data.account);
-      if (useNewSections && !data.account.settings?.collectivePage?.useNewSections) {
-        const convertedSections = convertSectionsToNewFormat(sectionsFromCollective);
-        setSections(convertedSections);
+      const sectionsFromCollective = loadSectionsForCollective(data.account, useNewSections);
+      if (useNewSections) {
+        if (!data.account.settings?.collectivePage?.useNewSections) {
+          const convertedSections = convertSectionsToNewFormat(sectionsFromCollective, data.account.type);
+          setSections(addDefaultSections(data.account, convertedSections));
+        } else {
+          setSections(addDefaultSections(data.account, sectionsFromCollective));
+        }
       } else {
-        setSections(sectionsFromCollective);
+        setSections(loadSectionsForCollectiveV1(data.account));
       }
-      setSectionsWithData(
-        filterSectionsByData(
-          sectionsFromCollective.map(({ section }) => section),
-          collective,
-        ),
-      );
     }
   }, [data?.account]);
 
@@ -379,22 +404,22 @@ const EditCollectivePage = ({ collective }) => {
     }
   };
 
-  const onDrop = (item, hoverIndex) => {
+  const onDrop = () => {
+    setSections(tmpSections);
     setTmpSections(null);
-    setSections(getNewSections(sections, item, hoverIndex, useNewSections));
     setDirty(true);
   };
 
   const onSectionToggle = (selectedSection, isEnabled, restrictedTo) => {
-    const sectionIdx = sections.findIndex(({ section }) => section === selectedSection);
     const newSections = cloneDeep(sections);
-    set(newSections, `${sectionIdx}.isEnabled`, isEnabled);
-    set(newSections, `${sectionIdx}.restrictedTo`, restrictedTo);
+    const sectionPath = getSectionPath(sections, selectedSection);
+    set(newSections, `${sectionPath}.isEnabled`, isEnabled);
+    set(newSections, `${sectionPath}.restrictedTo`, restrictedTo);
     setSections(newSections);
     setDirty(true);
   };
 
-  if (!HAS_NEW_NAVBAR && get(data, 'account.settings.collectivePage.useNewSections')) {
+  if (!useNewSections && get(data, 'account.settings.collectivePage.useNewSections')) {
     return (
       <MessageBox type="warning" withIcon>
         This page has been temporarily disabled for this account.
@@ -405,18 +430,17 @@ const EditCollectivePage = ({ collective }) => {
   const displayedSections = tmpSections || sections;
   return (
     <DndProviderHTML5Backend>
-      <H3>
-        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Page sections" />
-      </H3>
-      <Box mb={3}>
-        <P color="black.600">
+      <SettingsTitle
+        subtitle={
           <FormattedMessage
             id="EditCollectivePage.SectionsDescription"
             defaultMessage="In this section you can use drag and drop to reorder the Profile Page sections."
           />
-        </P>
-      </Box>
-      <Flex flexWrap="wrap">
+        }
+      >
+        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Page sections" />
+      </SettingsTitle>
+      <Flex flexWrap="wrap" mt={4}>
         <Box width="100%" maxWidth={436}>
           {loading || !displayedSections ? (
             <LoadingPlaceholder height={400} />
@@ -432,7 +456,6 @@ const EditCollectivePage = ({ collective }) => {
                             item={item}
                             index={index}
                             collective={collective}
-                            sectionsWithData={sectionsWithData}
                             onMove={onMove}
                             onDrop={onDrop}
                             onSectionToggle={onSectionToggle}
@@ -445,11 +468,11 @@ const EditCollectivePage = ({ collective }) => {
                             isEnabled={item.isEnabled}
                             collectiveType={collective.type}
                             restrictedTo={item.restrictedTo}
-                            hasData={sectionsWithData.includes(item.name)}
                             onMove={onMove}
                             onDrop={onDrop}
                             onSectionToggle={onSectionToggle}
                             fontWeight="bold"
+                            showDragIcon
                           />
                         ) : null}
                       </React.Fragment>
@@ -462,10 +485,10 @@ const EditCollectivePage = ({ collective }) => {
                           isEnabled={isEnabled}
                           collectiveType={collective.type}
                           restrictedTo={restrictedTo}
-                          hasData={sectionsWithData.includes(section)}
                           onMove={onMove}
                           onDrop={onDrop}
                           onSectionToggle={onSectionToggle}
+                          showDragIcon
                         />
                         {index !== displayedSections.length - 1 && <StyledHr borderColor="black.200" />}
                       </React.Fragment>

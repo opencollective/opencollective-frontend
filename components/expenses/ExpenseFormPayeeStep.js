@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
-import { first, get, omit, partition, pick } from 'lodash';
+import { first, get, isEmpty, omit, partition, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
@@ -9,6 +9,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
+import { flattenObjectDeep } from '../../lib/utils';
 
 import CollectivePicker, {
   CUSTOM_OPTIONS_POSITION,
@@ -23,7 +24,7 @@ import StyledHr from '../StyledHr';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
 
-import PayoutMethodForm from './PayoutMethodForm';
+import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
 const msg = defineMessages({
@@ -80,7 +81,7 @@ const getPayoutMethodsFromPayee = payee => {
 
   // If the Payee is in the "Collective" family (Collective, Fund, Event, Project)
   // Then the Account Balance should be its only option
-  if (payee && AccountTypesWithHost.includes(payee.type)) {
+  if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
     filteredPms = filteredPms.filter(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE);
   }
 
@@ -109,10 +110,11 @@ const ExpenseFormPayeeStep = ({
   const { values, errors } = formik;
   const stepOneCompleted = isOnBehalf
     ? values.payee
-    : values.type === expenseTypes.RECEIPT
-    ? values.payoutMethod
-    : values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address;
-  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee, collective), [values.payee]);
+    : isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod))) &&
+      (values.type === expenseTypes.RECEIPT ||
+        (values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address));
+
+  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee), [values.payee]);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const requiresAddress =
@@ -144,15 +146,15 @@ const ExpenseFormPayeeStep = ({
           collective={values.payee}
           onChange={({ value }) => {
             if (value) {
-              const isExistingProfile = payoutProfiles.some(p => p.slug === value.slug);
+              const existingProfile = payoutProfiles.find(p => p.slug === value.slug);
               const isNewlyCreatedProfile = value.members?.some(
                 m => m.role === 'ADMIN' && m.member.slug === loggedInAccount.slug,
               );
 
-              const payee =
-                value.slug && (isExistingProfile || isNewlyCreatedProfile)
-                  ? value
-                  : { ...pick(value, ['id', 'name', 'slug', 'email']), isInvite: true };
+              const payee = existingProfile || {
+                ...pick(value, ['id', 'name', 'slug', 'email']),
+                isInvite: !isNewlyCreatedProfile,
+              };
 
               if (isNewlyCreatedProfile) {
                 payee.payoutMethods = [];

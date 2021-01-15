@@ -14,8 +14,9 @@ import { Flex } from '../../Grid';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledCheckbox from '../../StyledCheckbox';
-import { H3, P } from '../../Text';
+import { P } from '../../Text';
 import { editCollectiveSettingsMutation } from '../mutations';
+import SettingsTitle from '../SettingsTitle';
 
 import imgPreviewList from '../../../public/static/images/updates/updates-list-preview.png';
 import imgPreviewNewUpdate from '../../../public/static/images/updates/updates-new-preview.png';
@@ -28,7 +29,12 @@ const messages = defineMessages({
   mainDescription: {
     id: 'EditCollective.Updates.description',
     defaultMessage:
-      'Updates is a way to keep your community posted on your progress. They are sent by email to all you contributors and followers. Once enabled, a new "Updates" section will be added to your profile page and a dedicated page will be created on {updatesLink}.',
+      'Updates are a way to keep your community posted on your progress. They are sent by email to all you contributors and followers. Once enabled, a new "Updates" section will be added to your profile page and a dedicated page will be created on {updatesLink}.',
+  },
+  mainDescriptionHost: {
+    id: 'EditCollective.Updates.descriptionHost',
+    defaultMessage:
+      'Updates are a way to keep your community posted on your progress. They are sent by email to admins of your Collectives and to your team members and contributors. Once enabled, a new "Updates" section will be added to your profile page and a dedicated page will be created on {updatesLink}.',
   },
   checkboxLabel: {
     id: 'EditCollective.Updates.checkbox',
@@ -43,6 +49,7 @@ const ScreenshotPreview = styled.div`
   height: 240px;
   border: 1px solid #ececec;
   border-radius: 16px;
+  min-width: 42%;
 
   img {
     max-height: 100%;
@@ -59,11 +66,11 @@ const Updates = ({ collective }) => {
 
   return (
     <Container>
-      <H3>{formatMessage(messages.title)}</H3>
+      <SettingsTitle>{formatMessage(messages.title)}</SettingsTitle>
       <Flex mb={2} flexWrap="wrap" justifyContent="center">
         <Container mr={3} pr={3} flex="1 1" minWidth={300} maxWidth={700} borderRight={[null, '1px solid #dcdee0']}>
           <P wordBreak="break-word">
-            {formatMessage(messages.mainDescription, {
+            {formatMessage(!collective.isHost ? messages.mainDescription : messages.mainDescriptionHost, {
               updatesLink: (
                 <Link key="updatesLink" route="updates" params={{ collectiveSlug: collective.slug }}>
                   {process.env.WEBSITE_URL}/{collective.slug}/updates
@@ -112,6 +119,7 @@ Updates.propTypes = {
     id: PropTypes.number.isRequired,
     settings: PropTypes.object,
     slug: PropTypes.string.isRequired,
+    isHost: PropTypes.boolean,
   }).isRequired,
 };
 

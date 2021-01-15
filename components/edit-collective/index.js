@@ -8,7 +8,7 @@ import { getErrorFromGraphqlException } from '../../lib/errors';
 import { Router } from '../../server/pages';
 
 import Body from '../Body';
-import CollectiveNavbar from '../CollectiveNavbar';
+import CollectiveNavbar from '../collective-navbar';
 import Footer from '../Footer';
 import Header from '../Header';
 import NotificationBar from '../NotificationBar';
@@ -79,15 +79,12 @@ class EditCollective extends React.Component {
     collective.settings = {
       ...this.props.collective.settings,
       ...collective.settings,
-      apply: collective.application,
       tos: collective.tos,
     };
 
     delete collective.tos;
-    delete collective.application;
 
     this.setState({ status: 'loading' });
-
     try {
       const response = await this.props.editCollective(collective);
       const updatedCollective = response.data.editCollective;

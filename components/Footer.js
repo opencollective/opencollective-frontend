@@ -95,6 +95,10 @@ const messages = defineMessages({
     id: 'join.becomeASponsor',
     defaultMessage: 'Become a sponsor',
   },
+  'join.becomeAHost': {
+    id: 'join.becomeAHost',
+    defaultMessage: 'Become a host',
+  },
   community: {
     id: 'community',
     defaultMessage: 'Community',
@@ -150,6 +154,7 @@ const navigation = {
     discover: '/discover',
     findAFiscalHost: '/hosts',
     becomeASponsor: '/become-a-sponsor',
+    becomeAHost: '/become-a-host',
   },
   community: {
     openSource: 'https://github.com/opencollective/opencollective/issues',

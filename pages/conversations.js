@@ -6,12 +6,14 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ConversationsList from '../components/conversations/ConversationsList';
@@ -123,7 +125,7 @@ class ConversationsPage extends React.Component {
     }
 
     return (
-      <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page collective={collective} {...this.getPageMetaData(collective)}>
         {!dataIsReady && data.loading ? (
           <Container borderTop="1px solid #E8E9EB">
             <Loading />
@@ -131,7 +133,11 @@ class ConversationsPage extends React.Component {
         ) : (
           <CollectiveThemeProvider collective={collective}>
             <Container borderTop="1px solid #E8E9EB" data-cy="page-conversations">
-              <CollectiveNavbar collective={collective} selected={Sections.CONVERSATIONS} />
+              <CollectiveNavbar
+                collective={collective}
+                selected={Sections.CONVERSATIONS}
+                selectedCategory={NAVBAR_CATEGORIES.CONNECT}
+              />
               <Container py={[4, 5]} px={[2, 3, 4]}>
                 <Container maxWidth={1200} m="0 auto">
                   <H1 fontSize="40px" fontWeight="normal" textAlign="left" mb={2}>
@@ -219,9 +225,13 @@ const conversationsPageQuery = gqlV2/* GraphQL */ `
       ... on Collective {
         isApproved
       }
+      features {
+        ...NavbarFields
+      }
     }
   }
   ${conversationListFragment}
+  ${collectiveNavbarFieldsFragment}
 `;
 
 const addConversationsPageData = graphql(conversationsPageQuery, {

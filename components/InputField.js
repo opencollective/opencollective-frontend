@@ -9,7 +9,6 @@ import { capitalize } from '../lib/utils';
 
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
-import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import StyledInputTags from './StyledInputTags';
 import TimezonePicker from './TimezonePicker';
@@ -236,6 +235,7 @@ class InputField extends React.Component {
             maxLength={field.maxLength}
             value={this.state.value || this.props.defaultValue || ''}
             onChange={event => this.handleChange(event.target.value)}
+            disabled={field.disabled}
           />
         );
         break;
@@ -383,43 +383,6 @@ class InputField extends React.Component {
                   value={field.value}
                   defaultValue={field.defaultValue}
                   onChange={this.handleChange}
-                />
-                {field.description && <HelpBlock>{field.description}</HelpBlock>}
-              </div>
-            )}
-          </FormGroup>
-        );
-        break;
-
-      case 'dropzone':
-        this.input = (
-          <FormGroup>
-            {horizontal && (
-              <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
-                <Col sm={10}>
-                  <InputTypeDropzone
-                    defaultValue={field.defaultValue}
-                    name={field.name}
-                    onChange={event => this.handleChange(event)}
-                    placeholder={field.placeholder}
-                    options={field.options}
-                  />
-                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                </Col>
-              </div>
-            )}
-            {!horizontal && (
-              <div>
-                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <InputTypeDropzone
-                  defaultValue={field.defaultValue}
-                  name={field.name}
-                  onChange={event => this.handleChange(event)}
-                  placeholder={field.placeholder}
-                  options={field.options}
                 />
                 {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>

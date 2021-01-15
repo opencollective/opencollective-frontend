@@ -16,11 +16,12 @@ import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
 import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
-import { H3, P } from '../../Text';
+import { P } from '../../Text';
 import { editCollectiveSettingsMutation } from '../mutations';
+import SettingsTitle from '../SettingsTitle';
 
-import imgPreviewPrompt from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal-prompt.png';
 import imgPreviewModal from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal.png';
+import imgPreviewPrompt from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal-prompt.png';
 
 const messages = defineMessages({
   'rollingLimit.label': {
@@ -74,9 +75,9 @@ const HostTwoFactorAuth = ({ collective }) => {
   return (
     <Flex flexDirection="column">
       <Container>
-        <H3>
+        <SettingsTitle>
           <FormattedMessage id="TwoFactorAuth.Setup.Title" defaultMessage="Set up two-factor authentication" />
-        </H3>
+        </SettingsTitle>
         <Flex mb={2} flexWrap="wrap" justifyContent="center">
           <Container mr={3} pr={3} flex="1 1" minWidth={300} maxWidth={700} borderRight={[null, '1px solid #dcdee0']}>
             <P wordBreak="break-word">

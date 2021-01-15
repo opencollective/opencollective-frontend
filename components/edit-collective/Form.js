@@ -5,7 +5,6 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { cloneDeep, find, get, set } from 'lodash';
 import { withRouter } from 'next/router';
-import { Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { AccountTypesWithHost, CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
@@ -22,19 +21,17 @@ import Link from '../Link';
 import OrdersWithData from '../orders/OrdersWithData';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
-import { H3 } from '../Text';
 
+// Actions
 import Archive from './actions/Archive';
 import Delete from './actions/Delete';
-// Actions
 import EmptyBalance from './actions/EmptyBalance';
-// Generic Sections
+// Sections
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
 import Conversations from './sections/Conversations';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
-// Fical Host Sections
 import FiscalHosting from './sections/FiscalHosting';
 import Host from './sections/Host';
 import HostPlan from './sections/HostPlan';
@@ -52,8 +49,10 @@ import Tiers from './sections/Tiers';
 import Updates from './sections/Updates';
 import VirtualCards from './sections/VirtualCards';
 import Webhooks from './sections/Webhooks';
+// Other Components
 import EditUserEmailForm from './EditUserEmailForm';
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
+import SettingsTitle from './SettingsTitle';
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -167,6 +166,19 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.application.description',
         defaultMessage: 'Enable new Collectives to apply to join your Fiscal Host',
       },
+      'application.message.label': {
+        id: 'application.message.label',
+        defaultMessage: 'Apply instructions',
+      },
+      'application.message.description': {
+        id: 'application.message.description',
+        defaultMessage:
+          'Custom instructions displayed above the text box that projects see when applying (1000 characters max)',
+      },
+      'application.message.defaultValue': {
+        id: 'ApplyToHost.WriteMessage',
+        defaultMessage: 'Write a message to fiscal host',
+      },
       'hostFeePercent.label': {
         id: 'HostFee',
         defaultMessage: 'Host fee',
@@ -245,7 +257,6 @@ class EditCollectiveForm extends React.Component {
 
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
-    collective.application = get(collective, 'settings.apply');
 
     const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
     const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
@@ -276,6 +287,10 @@ class EditCollectiveForm extends React.Component {
         } else {
           set(collective, 'settings.GST.number', value);
         }
+      } else if (fieldname === 'application') {
+        set(collective, 'settings.apply', value);
+      } else if (fieldname === 'application.message') {
+        set(collective, 'settings.applyMessage', value);
       } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
         collective[fieldname] = value;
         const endsAt = collective.endsAt;
@@ -350,7 +365,14 @@ class EditCollectiveForm extends React.Component {
         return <EditCollectivePage collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS:
-        return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
+        return (
+          <div>
+            <SettingsTitle mb={4}>
+              <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
+            </SettingsTitle>
+            <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
+          </div>
+        );
 
       case EDIT_COLLECTIVE_SECTIONS.UPDATES:
         return <Updates collective={collective} />;
@@ -409,7 +431,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <Flex mt={3} flexDirection="column">
             <Container
-              mb={5}
+              mb={4}
               pb={4}
               borderBottom="1px solid #E8E9EB"
               display="flex"
@@ -448,6 +470,9 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
         return (
           <Box>
+            <SettingsTitle mb={4}>
+              <FormattedMessage id="Account.AdvancedSettings" defaultMessage="Advanced settings" />
+            </SettingsTitle>
             {collective.type === CollectiveType.USER && <EditUserEmailForm />}
             {(collective.type === CollectiveType.COLLECTIVE || collective.type === CollectiveType.FUND) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
@@ -466,7 +491,7 @@ class EditCollectiveForm extends React.Component {
         return <HostPlan collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS:
-        return null;
+        return <Policies collective={collective} showOnlyExpensePolicy />;
 
       case EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS:
         return <InvoicesReceipts collective={collective} />;
@@ -480,6 +505,7 @@ class EditCollectiveForm extends React.Component {
             accountSlug={collective.slug}
             status={ORDER_STATUS.PENDING}
             title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
+            showPlatformTip
           />
         );
 
@@ -706,18 +732,23 @@ class EditCollectiveForm extends React.Component {
           when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type),
         },
       ],
-      'expenses-payouts': [
-        {
-          name: 'expensePolicy',
-          type: 'textarea',
-        },
-      ],
       'fiscal-hosting': [
         {
           name: 'application',
           className: 'horizontal',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.apply'),
+          when: () =>
+            collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.apply),
+        },
+        {
+          name: 'application.message',
+          className: 'horizontal',
+          type: 'textarea',
+          defaultValue: get(this.state.collective, 'settings.applyMessage'),
+          placeholder: intl.formatMessage(this.messages['application.message.defaultValue']),
+          disabled: !this.state.collective.settings?.apply,
+          maxLength: 1000,
           when: () =>
             collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.apply),
         },
@@ -772,14 +803,14 @@ class EditCollectiveForm extends React.Component {
           <Menu collective={collective} selectedSection={this.getMenuSelectedSection(section)} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
             {section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && (
-              <H3>
+              <SettingsTitle>
                 <FormattedMessage id="editCollective.fiscalHosting" defaultMessage={'Fiscal Hosting'} />
-              </H3>
+              </SettingsTitle>
             )}
             {section === EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS && (
-              <H3>
+              <SettingsTitle>
                 <FormattedMessage id="editCollective.expensesPayouts" defaultMessage={'Expenses & Payouts'} />
-              </H3>
+              </SettingsTitle>
             )}
             {fields && fields.length > 0 && (
               <div className="FormInputs">
@@ -801,6 +832,8 @@ class EditCollectiveForm extends React.Component {
                       post={field.post}
                       context={this.state.collective}
                       onChange={value => this.handleChange(field.name, value)}
+                      disabled={field.disabled}
+                      maxLength={field.maxLength}
                     />
                   ))}
                 </div>
@@ -813,14 +846,15 @@ class EditCollectiveForm extends React.Component {
             {((fields && fields.length > 0) ||
               [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
               <Container className="actions" margin="5rem auto 1rem" textAlign="center">
-                <Button
-                  bsStyle="primary"
+                <StyledButton
+                  buttonStyle="primary"
                   type="submit"
                   onClick={this.handleSubmit}
+                  data-cy="collective-save"
                   disabled={status === 'loading' || !this.state.modified}
                 >
                   {submitBtnLabel}
-                </Button>
+                </StyledButton>
 
                 <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
                   <Link

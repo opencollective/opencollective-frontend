@@ -129,8 +129,8 @@ class StripeOrBankAccountPicker extends React.Component {
                     mt={[2, 3]}
                     mb={3}
                     minWidth={'145px'}
-                    onClick={() => {
-                      addHost(collective, host);
+                    onClick={async () => {
+                      await addHost(collective, host);
                       this.connectStripe();
                     }}
                   >

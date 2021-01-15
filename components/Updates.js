@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import colors from '../lib/constants/colors';
 
 import Container from './Container';
+import StyledButton from './StyledButton';
 import StyledUpdate from './StyledUpdate';
 
 const LoadingContainer = styled.div`
@@ -65,7 +65,7 @@ class Updates extends React.Component {
 
     return (
       <div className="Updates">
-        <Container position="relative">
+        <Container position="relative" border="1px solid #e6e8eb" borderRadius={5}>
           {this.state.loading && (
             <LoadingContainer>
               <FormattedMessage id="loading" defaultMessage="loading" />
@@ -77,7 +77,7 @@ class Updates extends React.Component {
                 update={update}
                 collective={collective}
                 compact={true}
-                borderTop={index === 0 ? undefined : 'none'}
+                borderTop={index !== 0 ? '1px solid #e6e8eb' : 'none'}
               />
             </Container>
           ))}
@@ -88,10 +88,10 @@ class Updates extends React.Component {
           )}
           {updates.length >= 10 && updates.length % 10 === 0 && (
             <Container margin="1rem" textAlign="center">
-              <Button bsStyle="default" onClick={this.fetchMore}>
+              <StyledButton onClick={this.fetchMore}>
                 {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
                 {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
-              </Button>
+              </StyledButton>
             </Container>
           )}
         </Container>

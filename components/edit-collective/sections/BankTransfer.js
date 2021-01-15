@@ -14,8 +14,10 @@ import PayoutBankInformationForm from '../../expenses/PayoutBankInformationForm'
 import { Box, Flex } from '../../Grid';
 import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
-import { H3, H4, P } from '../../Text';
+import { H3, P } from '../../Text';
 import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
+
+import SettingsSectionTitle from './SettingsSectionTitle';
 
 const { TW_API_COLLECTIVE_SLUG } = process.env;
 
@@ -36,7 +38,6 @@ const hostQuery = gqlV2/* GraphQL */ `
         addedFundsLimit
         bankTransfers
         bankTransfersLimit
-        hostDashboard
         hostedCollectives
         hostedCollectivesLimit
         manualPayments
@@ -112,9 +113,9 @@ const BankTransfer = props => {
     <Flex className="EditPaymentMethods" flexDirection="column">
       {showEditManualPaymentMethod && (
         <Fragment>
-          <H4 mt={2}>
+          <SettingsSectionTitle>
             <FormattedMessage id="editCollective.receivingMoney.bankTransfers" defaultMessage="Bank Transfers" />
-          </H4>
+          </SettingsSectionTitle>
 
           <Box>
             <Container fontSize="12px" mt={2} color="black.600" textAlign="left">

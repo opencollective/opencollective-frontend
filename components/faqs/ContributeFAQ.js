@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import Markdown from 'react-markdown';
 
 import { Box } from '../Grid';
+import HTMLContent from '../HTMLContent';
 import { getI18nLink } from '../I18nFormatters';
 import StyledLink from '../StyledLink';
 
@@ -41,7 +41,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
           />
         </Title>
         <Content>
-          <Markdown source={collective.contributionPolicy} />
+          <HTMLContent fontSize="13px" content={collective.contributionPolicy} />
         </Content>
       </Entry>
     )}

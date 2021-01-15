@@ -71,7 +71,7 @@ describe('edit collective', () => {
     cy.get('.githubHandle.inputField input').type('{selectall}@AwesomeHandle');
     cy.get('.website.inputField input').type('{selectall}opencollective.com');
     cy.wait(500);
-    cy.get('.actions > .btn').click(); // save changes
+    cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
@@ -109,8 +109,8 @@ describe('edit collective', () => {
       maxQuantity: 10,
     });
     cy.wait(500);
-    cy.get('.actions > .btn').click(); // save changes
-    cy.contains('.actions > .btn', 'Saved');
+    cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
+    cy.contains('.actions > [data-cy="collective-save"]', 'Saved');
     cy.get('.backToProfile a').click(); // back to profile
     const tierCardSelector = '[data-cy="admin-contribute-cards"] [data-cy="contribute-card-tier"]';
     cy.disableSmoothScroll();
@@ -130,8 +130,8 @@ describe('edit collective', () => {
     cy.get('.EditTiers .tier').last().find('.removeTier').click();
     cy.get('.EditTiers .tier').last().find('.removeTier').click();
     cy.wait(500);
-    cy.get('.actions > .btn').click(); // save changes
-    cy.contains('.actions > .btn', 'Saved');
+    cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
+    cy.contains('.actions > [data-cy="collective-save"]', 'Saved');
     cy.get('.backToProfile a').click(); // back to profile
     cy.get(tierCardSelector).should('have.length', 2);
   });

@@ -10,7 +10,6 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { withUser } from '../components/UserProvider';
 
-import becomeAFiscalHostStyle from '!css-loader!../public/become-a-fiscal-host-page/stylesheets/styles.css'; // eslint-disable-line
 import giftCardPageStyle from '!css-loader!../public/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
 import holidayGiftCardPageStyle from '!css-loader!../public/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
 import howItWorksPageStyle from '!css-loader!../public/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
@@ -32,11 +31,6 @@ const PAGES = {
     pageContents: importAll(require.context('../public/gift-cards-page', false, /\.(html)$/)),
     css: giftCardPageStyle,
     className: 'mkt-page-how-it-works',
-  },
-  'become-a-fiscal-host': {
-    pageContents: importAll(require.context('../public/become-a-fiscal-host-page', false, /\.(html)$/)),
-    css: becomeAFiscalHostStyle,
-    className: 'mkt-page-become-a-fiscal-host',
   },
 };
 

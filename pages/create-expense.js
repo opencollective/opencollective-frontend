@@ -15,7 +15,7 @@ import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
@@ -248,7 +248,9 @@ class CreateExpensePage extends React.Component {
           account =>
             [USER, ORGANIZATION].includes(account.type) ||
             // Same Host
-            (account.isActive && this.props.data?.account?.host?.id === account.host?.id),
+            (account.isActive && this.props.data?.account?.host?.id === account.host?.id) ||
+            // Self-hosted Collectives
+            (account.isActive && account.id === account.host?.id),
         );
       return [loggedInAccount, ...accountsAdminOf];
     }
@@ -277,7 +279,7 @@ class CreateExpensePage extends React.Component {
     const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
 
     return (
-      <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page collective={collective} {...this.getPageMetaData(collective)}>
         <React.Fragment>
           <CollectiveNavbar collective={collective} isLoading={!collective} />
           <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>

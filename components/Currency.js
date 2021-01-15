@@ -14,6 +14,9 @@ import { Span } from './Text';
 const Currency = ({ abbreviate, currency, precision, value, ...styles }) => {
   if (precision === 'auto') {
     precision = value % 100 === 0 ? 0 : 2;
+  } else if (precision < 2 && value < 100) {
+    // Force precision if number is < $1 to never display $0 for small amounts
+    precision = 2;
   }
 
   if (abbreviate) {

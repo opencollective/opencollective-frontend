@@ -11,7 +11,9 @@ import { editCollectivePageQuery } from '../../../lib/graphql/queries';
 
 import Button from '../../Button';
 import StyledTooltip from '../../StyledTooltip';
-import { H3 } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
+
+import SettingsSectionTitle from './SettingsSectionTitle';
 
 const LimitsInfoCircle = styled(InfoCircle)`
   vertical-align: baseline;
@@ -195,9 +197,9 @@ const HostPlan = props => {
 
   return (
     <div>
-      <H3>
+      <SettingsTitle>
         <FormattedMessage id="Host.Plan" defaultMessage="Host Plan" />
-      </H3>
+      </SettingsTitle>
 
       <PlanGrid>
         {true && (
@@ -306,9 +308,9 @@ const HostPlan = props => {
         </Plan>
       </PlanGrid>
 
-      <h3>
+      <SettingsSectionTitle mt={3}>
         <FormattedMessage id="collective.hostSettings.currentPlan.title" defaultMessage="Limits and Usage" />
-      </h3>
+      </SettingsSectionTitle>
 
       <ul>
         <li>

@@ -17,7 +17,8 @@ import { withUser } from '../UserProvider';
 
 const ContributorCardWithTier = ({ contribution, ...props }) => {
   const collective = contribution.toAccount;
-  const contributors = collective.isHost ? collective.host.contributors : collective.contributors;
+  const contributors =
+    collective.isHost && collective.host.contributors ? collective.host.contributors : collective.contributors;
   const pendingOrder = contribution.status === ORDER_STATUS.PENDING;
   return (
     <StyledCollectiveCard

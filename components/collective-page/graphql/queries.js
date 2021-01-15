@@ -98,7 +98,7 @@ export const collectivePageQuery = gql`
         name
         slug
         description
-        hasLongDescription
+        useStandalonePage
         goal
         interval
         currency
@@ -214,7 +214,6 @@ export const collectivePageQuery = gql`
         ...UpdatesFields
       }
       plan {
-        hostDashboard
         hostedCollectives
         hostedCollectivesLimit
       }

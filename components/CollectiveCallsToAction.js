@@ -6,15 +6,15 @@ import { FormattedMessage } from 'react-intl';
 
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 
-import _ApplyToHostBtn from './ApplyToHostBtn';
+import ApplyToHostBtn from './ApplyToHostBtn';
 import Container from './Container';
 import { Box } from './Grid';
 import Link from './Link';
 import StyledButton from './StyledButton';
-import StyledTooltip from './StyledTooltip';
 
 // Dynamic imports
-const AddFundsModal = dynamic(() => import('./AddFundsModal'));
+const AddPrepaidBudgetModal = dynamic(() => import('./AddPrepaidBudgetModal'));
+const AddFundsModal = dynamic(() => import('./host-dashboard/AddFundsModal'));
 
 /**
  * Show call to actions as buttons for the collective.
@@ -29,19 +29,17 @@ const CollectiveCallsToAction = ({
     hasApply,
     hasDashboard,
     hasManageSubscriptions,
+    addPrepaidBudget,
     addFunds,
   },
   ...props
 }) => {
+  const [hasAddPrepaidBudgetModal, showAddPrepaidBudgetModal] = React.useState(false);
   const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
   const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
   const hostWithinLimit = hostedCollectivesLimit
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
     : true;
-
-  const ApplyToHostBtn = () => (
-    <_ApplyToHostBtn host={collective} disabled={!hostWithinLimit} showConditions={false} minWidth={buttonsMinWidth} />
-  );
 
   let contributeRoute = 'orderCollectiveNew';
   let contributeRouteParams = { collectiveSlug: collective.slug, verb: 'donate' };
@@ -111,7 +109,7 @@ const CollectiveCallsToAction = ({
           </StyledButton>
         </Link>
       )}
-      {hasDashboard && collective.plan.hostDashboard && (
+      {hasDashboard && (
         <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
           <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
@@ -120,27 +118,31 @@ const CollectiveCallsToAction = ({
       )}
       {hasApply && (
         <Box mx={2} my={1}>
-          {hostWithinLimit ? (
-            <ApplyToHostBtn />
-          ) : (
-            <StyledTooltip
-              place="left"
-              content={
-                <FormattedMessage
-                  id="host.hostLimit.warning"
-                  defaultMessage="Host already reached the limit of hosted collectives for its plan. <a>Contact {collectiveName}</a> and let them know you want to apply."
-                  values={{
-                    collectiveName: collective.name,
-                    // eslint-disable-next-line react/display-name
-                    a: chunks => <Link route={`/${collective.slug}/contact`}>{chunks}</Link>,
-                  }}
-                />
-              }
-            >
-              <ApplyToHostBtn />
-            </StyledTooltip>
-          )}
+          <ApplyToHostBtn
+            hostSlug={collective.slug}
+            disabled={!hostWithinLimit}
+            minWidth={buttonsMinWidth}
+            withoutIcon
+          />
         </Box>
+      )}
+      {addPrepaidBudget && (
+        <Fragment>
+          <StyledButton
+            buttonSize="small"
+            mx={2}
+            my={1}
+            minWidth={buttonsMinWidth}
+            onClick={() => showAddPrepaidBudgetModal(true)}
+          >
+            <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
+          </StyledButton>
+          <AddPrepaidBudgetModal
+            collective={collective}
+            show={hasAddPrepaidBudgetModal}
+            setShow={showAddPrepaidBudgetModal}
+          />
+        </Fragment>
       )}
       {addFunds && (
         <Fragment>
@@ -151,9 +153,14 @@ const CollectiveCallsToAction = ({
             minWidth={buttonsMinWidth}
             onClick={() => showAddFundsModal(true)}
           >
-            <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
+            <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
           </StyledButton>
-          <AddFundsModal collective={collective} show={hasAddFundsModal} setShow={showAddFundsModal} />
+          <AddFundsModal
+            show={hasAddFundsModal}
+            collective={collective}
+            host={collective}
+            onClose={() => showAddFundsModal(null)}
+          />
         </Fragment>
       )}
     </Container>
@@ -185,6 +192,8 @@ CollectiveCallsToAction.propTypes = {
     hasDashboard: PropTypes.bool,
     /** Link to edit subscriptions */
     hasManageSubscriptions: PropTypes.bool,
+    /** Link to add prepaid budget */
+    addPrepaidBudget: PropTypes.bool,
     /** Link to add funds */
     addFunds: PropTypes.bool,
   }).isRequired,

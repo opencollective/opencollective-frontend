@@ -197,7 +197,7 @@ const JoinGuestPage = () => {
   const { LoggedInUser } = useUser();
 
   return (
-    <Page title={intl.formatMessage(MESSAGES.pageTitle, { service: 'Open Collective' })} withoutGlobalStyles>
+    <Page title={intl.formatMessage(MESSAGES.pageTitle, { service: 'Open Collective' })}>
       <Container
         display="flex"
         py={[5, 6, 150]}

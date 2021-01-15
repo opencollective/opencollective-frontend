@@ -30,8 +30,13 @@ export default class CollectiveThemeProvider extends React.PureComponent {
    * Ensures that the constrast is at least 7/1, as recommended by the [W3c](https://webaim.org/articles/contrast)
    */
   adjustColorContrast = color => {
-    const contrastAdjustment = (getContrast(color, '#fff') - 7) / 21;
-    return contrastAdjustment > 0 ? darken(contrastAdjustment, color) : color;
+    const contrast = getContrast(color, '#fff');
+    if (contrast >= 7) {
+      return color;
+    } else {
+      const contrastDiff = (7 - contrast) / 21;
+      return darken(contrastDiff, color);
+    }
   };
 
   getTheme = memoizeOne(primaryColor => {
@@ -59,6 +64,7 @@ export default class CollectiveThemeProvider extends React.PureComponent {
             200: adjustLuminance(0.72),
             100: adjustLuminance(0.78),
             50: adjustLuminance(0.97),
+            base: primaryColor,
           },
         },
       });

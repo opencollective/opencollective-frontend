@@ -5,12 +5,14 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
@@ -92,7 +94,7 @@ class CreateConversationPage extends React.Component {
 
     const collective = data && data.account;
     return (
-      <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page collective={collective} {...this.getPageMetaData(collective)}>
         {data.loading ? (
           <Container borderTop="1px solid #E8E9EB">
             <Loading />
@@ -100,7 +102,11 @@ class CreateConversationPage extends React.Component {
         ) : (
           <CollectiveThemeProvider collective={collective}>
             <Container borderTop="1px solid #E8E9EB">
-              <CollectiveNavbar collective={collective} selected={Sections.CONVERSATIONS} />
+              <CollectiveNavbar
+                collective={collective}
+                selected={Sections.CONVERSATIONS}
+                selectedCategory={NAVBAR_CATEGORIES.CONNECT}
+              />
               <Container position="relative">
                 {!loadingLoggedInUser && !LoggedInUser && (
                   <ContainerOverlay>
@@ -145,12 +151,16 @@ const createConversationPageQuery = gqlV2/* GraphQL */ `
         id
         tag
       }
+      features {
+        ...NavbarFields
+      }
 
       ... on AccountWithHost {
         isApproved
       }
     }
   }
+  ${collectiveNavbarFieldsFragment}
 `;
 
 const addCreateConversationPageData = graphql(createConversationPageQuery, {

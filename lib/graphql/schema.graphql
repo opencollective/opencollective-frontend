@@ -360,11 +360,13 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
+  TRANSACTIONS: CollectiveFeatureStatus
   CROSS_CURRENCY_MANUAL_TRANSACTIONS: CollectiveFeatureStatus
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
+  CONNECTED_ACCOUNTS: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -3557,7 +3559,7 @@ type Query {
     term: String
 
     """
-    [NON AVAILABLE WITH ALGOLIA] Limit the search to collectives under these hosts
+    Limit the search to collectives under these hosts
     """
     hostCollectiveIds: [Int]
 
@@ -3583,8 +3585,7 @@ type Query {
     offset: Int = 0
 
     """
-    If set to false, an internal query will be used to search the collective rather than Algolia.
-    You **must** set this to false when searching for users/organizations.
+    This flag is now ignored in favor of regular search
     """
     useAlgolia: Boolean = false
   ): CollectiveSearchResults
@@ -3692,6 +3693,12 @@ type Tier {
   Returns true if the tier has a long description
   """
   hasLongDescription: Boolean
+    @deprecated(reason: "2020-12-24: This field is being deprecated in favor of useStandalonePage")
+
+  """
+  Returns true if the tier has its standalone page activated
+  """
+  useStandalonePage: Boolean
 
   """
   Link to a video (YouTube, Vimeo).
@@ -3747,6 +3754,11 @@ input TierInputType {
   A long, html-formatted description.
   """
   longDescription: String
+
+  """
+  Whether this tier has a standalone page
+  """
+  useStandalonePage: Boolean
 
   """
   Link to a video (YouTube, Vimeo).

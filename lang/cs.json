@@ -219,7 +219,7 @@
   "collective.contributionPolicy.placeholder": "For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.",
   "collective.country.label": "Země",
   "collective.create": "Create collective",
-  "collective.create.button": "Vytvořit kolektiv",
+  "collective.create.button": "Create Collective",
   "collective.create.connectedAccounts.paypal.description": "Connect a PayPal account to pay expenses with one click. For instructions on how to connect to PayPal, please, <a>read our documentation</a>.",
   "collective.create.connectedAccounts.stripe.description": "Připojte Stripe účet a začněte přijímat finanční příspěvky.",
   "collective.create.connectedAccounts.transferwise.description": "Připojte se k TransferWise účtu pro platbu výdajů jedním kliknutím.",

@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { Dimensions } from '../_constants';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
+import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 
 const OutlineContainer = styled(Container)`

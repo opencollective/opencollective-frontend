@@ -44,7 +44,7 @@ const Label = styled.span`
 const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMethod, currency }) => {
   const platformFee = amount * (platformFeePercent / 100);
   const hostFee = amount * ((hostFeePercent || 0) / 100);
-  const pmFeeInfo = getPaymentMethodFees(paymentMethod, amount);
+  const pmFeeInfo = getPaymentMethodFees(paymentMethod, amount, currency);
   const netAmountForCollective = amount - platformFee - hostFee - pmFeeInfo.fee;
 
   return (

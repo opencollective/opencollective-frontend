@@ -78,7 +78,7 @@ const StyledShortDescription = styled.h2`
 /**
  * Collective's page Hero/Banner/Cover component.
  */
-const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, intl }) => {
+const Hero = ({ collective, host, isAdmin, hasNewNavbar, onPrimaryColorChange, callsToAction, intl }) => {
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
   const [message, showMessage] = React.useState(null);
@@ -107,7 +107,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         </MessageBox>
       )}
       <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
-        {isEditing ? (
+        {isEditingCover ? (
           <HeroBackgroundEdit collective={collective} onEditCancel={() => editCover(false)} />
         ) : (
           <HeroBackground collective={collective} />
@@ -152,21 +152,23 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             <HeroAvatar collective={collective} isAdmin={isAdmin} handleHeroMessage={handleHeroMessage} />
           </Container>
           {isAdmin && (
-            <Link
-              route={isEvent ? 'editEvent' : 'editCollective'}
-              params={
-                isEvent
-                  ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
-                  : { slug: collective.slug }
-              }
-            >
-              <StyledButton buttonSize="tiny" minWidth={96} my={3} data-cy="edit-collective-btn">
-                <Settings size={14} />
-                <Span ml={1} css={{ verticalAlign: 'middle' }}>
-                  <FormattedMessage id="Settings" defaultMessage="Settings" />
-                </Span>
-              </StyledButton>
-            </Link>
+            <Box>
+              <Link
+                route={isEvent ? 'editEvent' : 'editCollective'}
+                params={
+                  isEvent
+                    ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
+                    : { slug: collective.slug }
+                }
+              >
+                <StyledButton buttonSize="tiny" minWidth={96} my={3} data-cy="edit-collective-btn" tabIndex="-1">
+                  <Settings size={14} />
+                  <Span ml={1} css={{ verticalAlign: 'middle' }}>
+                    <FormattedMessage id="Settings" defaultMessage="Settings" />
+                  </Span>
+                </StyledButton>
+              </Link>
+            </Box>
           )}
           <Box maxWidth={['70%', '60%', null, '40%', '45%']}>
             <H1
@@ -255,7 +257,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                   />
                 </Container>
               )}
-              {host && collective.isApproved && !collective.isHost && (
+              {host && collective.isApproved && host.id !== collective.id && !collective.isHost && (
                 <Fragment>
                   <Container mx={1} color="#969ba3" my={2}>
                     <FormattedMessage
@@ -348,15 +350,17 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           )}
 
           {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
-          <CollectiveCallsToAction
-            display={['flex', null, 'none']}
-            flexWrap="wrap"
-            mt={3}
-            width="100%"
-            collective={collective}
-            callsToAction={callsToAction}
-            buttonsMinWidth={140}
-          />
+          {!hasNewNavbar && (
+            <CollectiveCallsToAction
+              display={['flex', null, 'none']}
+              flexWrap="wrap"
+              mt={3}
+              width="100%"
+              collective={collective}
+              callsToAction={callsToAction}
+              buttonsMinWidth={140}
+            />
+          )}
         </ContainerSectionContent>
       </Container>
     </Fragment>
@@ -417,6 +421,8 @@ Hero.propTypes = {
 
   /** Define if we need to display special actions like the "Edit collective" button */
   isAdmin: PropTypes.bool,
+
+  hasNewNavbar: PropTypes.bool,
 
   /** @ignore */
   intl: PropTypes.object,

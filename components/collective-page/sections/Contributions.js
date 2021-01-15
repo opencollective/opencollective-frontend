@@ -2,16 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { hasNewNavbar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
-import { getEnvVar } from '../../../lib/env-utils';
-import { parseToBoolean } from '../../../lib/utils';
 
-import { Dimensions, Sections } from '../_constants';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -21,11 +21,10 @@ import StyledFilters from '../../StyledFilters';
 import { fadeIn } from '../../StyledKeyframes';
 import StyledMembershipCard from '../../StyledMembershipCard';
 import { H3 } from '../../Text';
+import { Dimensions, Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionHeader from '../SectionHeader';
 import SectionTitle from '../SectionTitle';
-
-import SectionRecurringContributions from './RecurringContributions';
 
 import contributeSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconContribute.png';
 
@@ -137,10 +136,11 @@ class SectionContributions extends React.PureComponent {
       }),
     }),
 
-    LoggedInUser: PropTypes.object,
-
     /** @ignore from withIntl */
     intl: PropTypes.object,
+
+    /** @ignore from withRouter */
+    router: PropTypes.object,
   };
 
   state = {
@@ -217,8 +217,9 @@ class SectionContributions extends React.PureComponent {
   };
 
   render() {
-    const { collective, data, intl, LoggedInUser } = this.props;
+    const { collective, data, intl, router } = this.props;
     const { nbMemberships, selectedFilter } = this.state;
+    const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
 
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
@@ -249,16 +250,18 @@ class SectionContributions extends React.PureComponent {
         {memberOf.length > 0 && (
           <React.Fragment>
             <ContainerSectionContent>
-              <SectionHeader
-                title={Sections.CONTRIBUTIONS}
-                subtitle={
-                  <FormattedMessage
-                    id="CollectivePage.SectionContributions.Subtitle"
-                    defaultMessage="How we are supporting other Collectives."
-                  />
-                }
-                illustrationSrc={contributeSectionHeaderIcon}
-              />
+              {!newNavbarFeatureFlag && (
+                <SectionHeader
+                  title={Sections.CONTRIBUTIONS}
+                  subtitle={
+                    <FormattedMessage
+                      id="CollectivePage.SectionContributions.Subtitle"
+                      defaultMessage="How we are supporting other Collectives."
+                    />
+                  }
+                  illustrationSrc={contributeSectionHeaderIcon}
+                />
+              )}
               {data.Collective.stats.collectives.hosted > 0 && (
                 <H3 fontSize="20px" fontWeight="500" color="black.600">
                   <FormattedMessage
@@ -310,10 +313,6 @@ class SectionContributions extends React.PureComponent {
               </Flex>
             )}
           </React.Fragment>
-        )}
-
-        {parseToBoolean(getEnvVar('NEW_COLLECTIVE_NAVBAR')) && (
-          <SectionRecurringContributions slug={collective.slug} LoggedInUser={LoggedInUser} />
         )}
 
         {connectedCollectives.length > 0 && (
@@ -445,4 +444,4 @@ const addContributionsSectionData = graphql(contributionsSectionQuery, {
   }),
 });
 
-export default React.memo(injectIntl(addContributionsSectionData(SectionContributions)));
+export default React.memo(withRouter(injectIntl(addContributionsSectionData(SectionContributions))));

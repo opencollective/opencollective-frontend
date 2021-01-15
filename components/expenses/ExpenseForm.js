@@ -213,7 +213,7 @@ const ExpenseFormBody = ({
       });
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
-    else if (!isOnBehalf && loggedInAccount && !isEmpty(payoutProfiles)) {
+    else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
       formik.setFieldValue('payee', first(payoutProfiles));
     }
   }, [payoutProfiles, loggedInAccount]);
@@ -273,7 +273,9 @@ const ExpenseFormBody = ({
         value={values.type}
         options={{
           fundingRequest:
-            [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true,
+            [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
+            collective.settings?.fundingRequest === true ||
+            collective.host?.settings?.fundingRequest === true,
         }}
       />
       {values.type && (
@@ -554,7 +556,7 @@ ExpenseFormBody.propTypes = {
       }),
     }),
     settings: PropTypes.object,
-    isApproved: PropTypes.bool.isRequired,
+    isApproved: PropTypes.bool,
   }).isRequired,
 };
 
@@ -638,7 +640,7 @@ ExpenseForm.propTypes = {
       }),
     }),
     settings: PropTypes.object,
-    isApproved: PropTypes.bool.isRequired,
+    isApproved: PropTypes.bool,
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({

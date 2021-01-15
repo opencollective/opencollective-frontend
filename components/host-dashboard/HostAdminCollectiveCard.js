@@ -16,13 +16,13 @@ import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
 import { P, Span } from '../Text';
 
-import AddFunds from './AddFundsModal';
+import AddFundsModal from './AddFundsModal';
 import CollectiveFeesStructureModal from './CollectiveFeesStructureModal';
 
 const msg = defineMessages({
   addFunds: {
     id: 'menu.addFunds',
-    defaultMessage: 'Add funds',
+    defaultMessage: 'Add Funds',
   },
   feeStructure: {
     id: 'FeeStructure',
@@ -132,7 +132,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
         </Container>
       </Box>
       {currentModal === 'addFunds' && (
-        <AddFunds show collective={collective} host={host} onClose={() => setCurrentModal(null)} />
+        <AddFundsModal show collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
       {currentModal === 'feesStructure' && (
         <CollectiveFeesStructureModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />

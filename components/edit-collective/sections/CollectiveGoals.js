@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, sortBy } from 'lodash';
-import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -19,7 +18,7 @@ import StyledInputField from '../../StyledInputField';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
-import { H3, P } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
 
 const BORDER = '1px solid #efefef';
 
@@ -167,7 +166,7 @@ class CollectiveGoals extends React.Component {
 
     return (
       <Container mt={4} pb={4} borderBottom={BORDER} key={`goal-${index}-${goal.key}`}>
-        <Form>
+        <form>
           <Box mb={4}>
             <StyledInputField name={this.fields[0].name} label={this.fields[0].label}>
               <StyledInput
@@ -215,7 +214,7 @@ class CollectiveGoals extends React.Component {
               />
             </StyledInputField>
           </Box>
-        </Form>
+        </form>
         <Container className="goalActions" textAlign="right">
           <StyledButton isBorderless={true} buttonStyle="dangerSecondary" onClick={() => this.removeGoal(index)}>
             {intl.formatMessage(this.messages.remove)}
@@ -232,16 +231,17 @@ class CollectiveGoals extends React.Component {
     return (
       <Container>
         <Container borderBottom={BORDER} mb={4} pb={4}>
-          <H3>
+          <SettingsTitle
+            subtitle={
+              <FormattedMessage
+                id="EditGoals.Instructions"
+                defaultMessage="You can define custom goals to share an overview of your financial plan with your community and to track your progress. They will be sent in the emails sent to your contributors. You can choose to display them on your collective page by checking the box below."
+              />
+            }
+          >
             <FormattedMessage id="Goals" defaultMessage="Goals" />
-          </H3>
-          <P>
-            <FormattedMessage
-              id="EditGoals.Instructions"
-              defaultMessage="You can define custom goals to share an overview of your financial plan with your community and to track your progress. They will be sent in the emails sent to your contributors. You can choose to display them on your collective page by checking the box below."
-            />
-          </P>
-          <Container>
+          </SettingsTitle>
+          <Container mt={4}>
             <StyledCheckbox
               name="show-on-collective-page"
               label={intl.formatMessage(this.messages.showToggle)}

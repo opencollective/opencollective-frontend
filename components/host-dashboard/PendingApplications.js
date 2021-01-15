@@ -40,28 +40,31 @@ const pendingApplicationsQuery = gqlV2/* GraphQL */ `
         limit
         totalCount
         nodes {
-          id
-          legacyId
-          name
-          slug
-          website
-          description
-          type
-          imageUrl(height: 96)
-          createdAt
-          ... on AccountWithHost {
-            ...ProcessHostApplicationFields
-          }
-          admins: members(role: ADMIN) {
-            totalCount
-            nodes {
-              id
-              account {
+          message
+          account {
+            id
+            legacyId
+            name
+            slug
+            website
+            description
+            type
+            imageUrl(height: 96)
+            createdAt
+            ... on AccountWithHost {
+              ...ProcessHostApplicationFields
+            }
+            admins: members(role: ADMIN) {
+              totalCount
+              nodes {
                 id
-                type
-                slug
-                name
-                imageUrl(height: 48)
+                account {
+                  id
+                  type
+                  slug
+                  name
+                  imageUrl(height: 48)
+                }
               }
             }
           }
@@ -151,9 +154,9 @@ const PendingApplications = ({ hostSlug }) => {
                   <LoadingPlaceholder height={362} borderRadius="8px" />
                 </Box>
               ))
-            : hostApplications?.nodes.map(account => (
-                <Box key={account.id} mb={24} data-cy="host-application">
-                  <PendingApplication host={data.host} collective={account} />
+            : hostApplications?.nodes.map(application => (
+                <Box key={application.id} mb={24} data-cy="host-application">
+                  <PendingApplication host={data.host} application={application} />
                 </Box>
               ))}
           <Flex mt={5} justifyContent="center">

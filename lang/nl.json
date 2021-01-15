@@ -219,7 +219,7 @@
   "collective.contributionPolicy.placeholder": "For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.",
   "collective.country.label": "Land",
   "collective.create": "Create collective",
-  "collective.create.button": "Maak Collectief aan",
+  "collective.create.button": "Create Collective",
   "collective.create.connectedAccounts.paypal.description": "Connect a PayPal account to pay expenses with one click. For instructions on how to connect to PayPal, please, <a>read our documentation</a>.",
   "collective.create.connectedAccounts.stripe.description": "Koppel een Stripe account om te starten met het accepteren van financiële bijdragen.",
   "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TransferWise, please, <a>read our documentation</a>.",

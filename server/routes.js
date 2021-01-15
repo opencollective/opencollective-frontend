@@ -89,8 +89,9 @@ module.exports = (expressApp, nextApp) => {
    * (out of 'production' environment)
    */
   app.get('/robots.txt', (req, res) => {
+    const hostname = req.get('original-hostname') || req.hostname;
     res.setHeader('Content-Type', 'text/plain');
-    if (process.env.OC_ENV !== 'production' || process.env.ROBOTS_DISALLOW) {
+    if (hostname !== 'opencollective.com') {
       res.send('User-agent: *\nDisallow: /');
     } else {
       res.send('User-agent: *\nAllow: /');

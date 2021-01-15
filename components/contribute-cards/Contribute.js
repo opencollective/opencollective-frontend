@@ -124,6 +124,8 @@ const getContributeCTA = type => {
       return <FormattedMessage id="ContributeCard.BtnViewEvent" defaultMessage="View Event" />;
     case ContributionTypes.CHILD_COLLECTIVE:
       return <FormattedMessage id="ContributeCard.SeeCollective" defaultMessage="View Collective" />;
+    case ContributionTypes.PROJECT:
+      return <FormattedMessage id="ContributeCard.SeeMore" defaultMessage="See More" />;
     default:
       return <FormattedMessage id="Contribute" defaultMessage="Contribute" />;
   }
@@ -175,7 +177,7 @@ const ContributeCard = ({
       </CoverImage>
       <Flex px={3} py={3} flexDirection="column" justifyContent="space-between" flex="1">
         <Flex flexDirection="column" flex="1 1">
-          <P fontSize="20px" mt={1} mb={2} fontWeight="bold" textTransform="capitalize" data-cy="contribute-title">
+          <P fontSize="20px" mt={1} mb={2} fontWeight="bold" data-cy="contribute-title">
             {title}
           </P>
           <Description data-cy="contribute-description">{children}</Description>

@@ -219,7 +219,7 @@
   "collective.contributionPolicy.placeholder": "Por ejemplo: de qué tipo de colaboradores (como casinos) no deseas donaciones, o bajo qué circunstancias puede permitir ciertas donaciones, etc.",
   "collective.country.label": "País",
   "collective.create": "Crear un Colectivo",
-  "collective.create.button": "Crear Colectivo",
+  "collective.create.button": "Create Collective",
   "collective.create.connectedAccounts.paypal.description": "Conecte una cuenta de PayPal para pagar los gastos con un solo clic. Para obtener instrucciones sobre cómo conectarse a PayPal, por favor, <a>lea nuestra documentación</a>.",
   "collective.create.connectedAccounts.stripe.description": "Conectar una cuenta de Stripe para comenzar a recibir donaciones.",
   "collective.create.connectedAccounts.transferwise.description": "Conecte una cuenta de TransferWise para pagar los gastos con un solo clic. Para obtener instrucciones sobre cómo conectarse a TransferWise, por favor, <a>lea nuestra documentación</a>.",

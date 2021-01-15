@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import { Dimensions, Sections } from '../_constants';
 import { Box } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -16,10 +15,9 @@ import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionsList from '../../transactions/TransactionsList';
+import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
-import SectionHeader from '../SectionHeader';
-
-import budgetSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconBudget.png';
+import SectionTitle from '../SectionTitle';
 
 const NB_DISPLAYED = 10;
 const FILTERS = { ALL: 'ALL', EXPENSES: 'EXPENSES', CONTRIBUTIONS: 'CONTRIBUTIONS' };
@@ -81,7 +79,9 @@ const SectionTransactions = props => {
   return (
     <Box py={5}>
       <ContainerSectionContent>
-        <SectionHeader title={Sections.TRANSACTIONS} illustrationSrc={budgetSectionHeaderIcon} />
+        <SectionTitle data-cy="section-transactions-title" mb={4} textAlign="left">
+          <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
+        </SectionTitle>
         {collectiveHasNoTransactions && (
           <MessageBox type="info" withIcon>
             <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />

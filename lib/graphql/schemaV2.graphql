@@ -93,6 +93,16 @@ interface Account {
     role: [MemberRole]
 
     """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: [AccountType]
@@ -564,6 +574,11 @@ type Bot implements Account {
     isApproved: Boolean
 
     """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -778,6 +793,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     isApproved: Boolean
 
     """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -988,11 +1008,13 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
+  TRANSACTIONS: CollectiveFeatureStatus
   CROSS_CURRENCY_MANUAL_TRANSACTIONS: CollectiveFeatureStatus
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
+  CONNECTED_ACCOUNTS: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -1174,8 +1196,8 @@ enum ConnectedAccountService {
   stripe
   github
   twitter
-  meetup
   transferwise
+  meetup @deprecated(reason: "Not using this service anymore")
 }
 
 enum ContributionFrequency {
@@ -2893,6 +2915,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     isApproved: Boolean
 
     """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -3760,6 +3787,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     isApproved: Boolean
 
     """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -4051,6 +4083,11 @@ type Host implements Account & AccountWithContributions {
     isApproved: Boolean
 
     """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -4266,7 +4303,40 @@ type Host implements Account & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-  ): AccountCollection!
+  ): HostApplicationCollection!
+}
+
+type HostApplication {
+  id: String!
+
+  """
+  The account who applied to this host
+  """
+  account: Account!
+
+  """
+  The date on which the item was created
+  """
+  createdAt: DateTime!
+  status: HostApplicationStatus
+  message: String
+}
+
+"""
+A collection of "HostApplication"
+"""
+type HostApplicationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [HostApplication]
+}
+
+enum HostApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
 }
 
 """
@@ -4331,7 +4401,7 @@ type HostMetrics {
   """
   Amount in host fee shared with the platform
   """
-  hostFeeCharge: Amount
+  hostFeeShare: Amount
 
   """
   Total amount managed on behalf of hosted collectives
@@ -4341,7 +4411,7 @@ type HostMetrics {
   """
   Host fee sharing percent
   """
-  hostFeeChargePercent: Int
+  hostFeeSharePercent: Int
 }
 
 """
@@ -4497,6 +4567,11 @@ type Individual implements Account {
     Filter on (un)approved collectives
     """
     isApproved: Boolean
+
+    """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -4820,6 +4895,11 @@ type Mutation {
     Wether to trigger the automated approval for Open Source collectives with GitHub.
     """
     automateApprovalWithGithub: Boolean = false
+
+    """
+    A message to attach for the host to review the application
+    """
+    message: String
   ): Collective
   createFund(
     """
@@ -4832,6 +4912,12 @@ type Mutation {
     """
     host: AccountReferenceInput
   ): Fund
+  createOrganization(
+    """
+    Information about the organization to create (name, slug, description, website, ...)
+    """
+    organization: OrganizationCreateInput!
+  ): Organization
   createProject(
     """
     Information about the Project to create (name, slug, description, tags, settings)
@@ -5041,6 +5127,26 @@ type Mutation {
   ): Expense!
 
   """
+  Apply to an host with a collective
+  """
+  applyToHost(
+    """
+    Account applying to the host.
+    """
+    collective: AccountReferenceInput!
+
+    """
+    Host to apply to.
+    """
+    host: AccountReferenceInput!
+
+    """
+    A message to attach for the host to review the application
+    """
+    message: String
+  ): Collective!
+
+  """
   Reply to a host application
   """
   processHostApplication(
@@ -5121,11 +5227,11 @@ type Mutation {
   ): Individual!
 
   """
-  Add 2FA to the Account if it does not have it
+  Remove 2FA from the Account if it has been enabled
   """
   removeTwoFactorAuthTokenFromIndividual(
     """
-    Account that will have 2FA added to it
+    Account that will have 2FA removed from it
     """
     account: AccountReferenceInput!
 
@@ -5149,21 +5255,6 @@ type Mutation {
     """
     plan: String!
   ): Host!
-
-  """
-  Apply to an host with a collective
-  """
-  applyToHost(
-    """
-    Account applying to the host.
-    """
-    collective: AccountReferenceInput!
-
-    """
-    Host to apply to.
-    """
-    host: AccountReferenceInput!
-  ): Collective!
 
   """
   Sends an email for guest to confirm their emails and create their Open Collective account
@@ -5686,6 +5777,11 @@ type Organization implements Account & AccountWithContributions {
     isApproved: Boolean
 
     """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -5848,6 +5944,14 @@ type Organization implements Account & AccountWithContributions {
   If the organization if a host account, this will return the matchig Host object
   """
   host: Host
+}
+
+input OrganizationCreateInput {
+  name: String!
+  slug: String!
+  description: String!
+  website: String
+  settings: JSON
 }
 
 """
@@ -6032,7 +6136,7 @@ type ProcessHostApplicationResponse {
   """
   The account that applied to the host
   """
-  account: Account!
+  account: Collective!
 
   """
   When sending a public message, this field will have the info about the conversation created
@@ -6130,6 +6234,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     Filter on (un)approved collectives
     """
     isApproved: Boolean
+
+    """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.

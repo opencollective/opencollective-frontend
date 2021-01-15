@@ -25,8 +25,9 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
-import { H3, P } from '../../Text';
+import { withUser } from '../../UserProvider';
 import WarnIfUnsavedChanges from '../../WarnIfUnsavedChanges';
+import SettingsTitle from '../SettingsTitle';
 
 /**
  * This pages sets some global styles that are causing troubles in new components. This
@@ -46,6 +47,7 @@ class Members extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
+    refetchLoggedInUser: PropTypes.func.isRequired,
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
@@ -55,7 +57,7 @@ class Members extends React.Component {
       loading: PropTypes.bool,
       error: PropTypes.any,
       refetch: PropTypes.func.isRequired,
-      data: PropTypes.object,
+      Collective: PropTypes.object,
     }),
   };
 
@@ -201,6 +203,7 @@ class Members extends React.Component {
         },
       });
       await this.props.data.refetch();
+      await this.props.refetchLoggedInUser();
       this.setState({ isSubmitting: false, isSubmitted: true, isTouched: false });
     } catch (e) {
       this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
@@ -304,18 +307,18 @@ class Members extends React.Component {
       <WarnIfUnsavedChanges hasUnsavedChanges={isTouched}>
         <div className="EditMembers">
           <div className="members">
-            <H3>
+            <SettingsTitle
+              subtitle={
+                collective.type === 'COLLECTIVE' && (
+                  <FormattedMessage
+                    id="members.edit.description"
+                    defaultMessage="Note: Only Collective Admins can edit this Collective and approve or reject expenses."
+                  />
+                )
+              }
+            >
               <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Team" />
-            </H3>
-            {collective.type === 'COLLECTIVE' && (
-              <P>
-                <FormattedMessage
-                  id="members.edit.description"
-                  defaultMessage="Note: Only Collective Admins can edit this Collective and approve or reject expenses."
-                />
-              </P>
-            )}
-            <hr />
+            </SettingsTitle>
             {members.map((m, idx) => this.renderMember(m, idx, nbAdmins))}
           </div>
           <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>
@@ -366,6 +369,23 @@ class Members extends React.Component {
           {getErrorFromGraphqlException(data.error).message}
         </MessageBox>
       );
+    } else if (data.Collective?.parentCollective) {
+      const parent = data.Collective.parentCollective;
+      return (
+        <MessageBox type="info" withIcon>
+          <FormattedMessage
+            id="Members.DefinedInParent"
+            defaultMessage="The team for this profile is defined in {parentName}'s settings"
+            values={{
+              parentName: (
+                <Link route="editCollective" params={{ slug: parent.slug, section: 'members' }}>
+                  {parent.name}
+                </Link>
+              ),
+            }}
+          />
+        </MessageBox>
+      );
     } else {
       return this.renderForm();
     }
@@ -396,6 +416,12 @@ const coreContributorsQuery = gql`
   query CoreContributors($collectiveId: Int!) {
     Collective(id: $collectiveId) {
       id
+      parentCollective {
+        id
+        slug
+        type
+        name
+      }
       members(roles: ["ADMIN", "MEMBER", "ACCOUNTANT"]) {
         ...MemberFields
       }
@@ -446,4 +472,4 @@ const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
 
 const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation);
 
-export default injectIntl(addGraphql(Members));
+export default injectIntl(addGraphql(withUser(Members)));

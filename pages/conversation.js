@@ -6,12 +6,14 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import Comment from '../components/conversations/Comment';
@@ -47,6 +49,9 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
       settings
       imageUrl
       twitterHandle
+      features {
+        ...NavbarFields
+      }
       conversationsTags {
         id
         tag
@@ -83,6 +88,7 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
     }
   }
   ${commentFieldsFragment}
+  ${collectiveNavbarFieldsFragment}
 `;
 
 const editConversationMutation = gqlV2/* GraphQL */ `
@@ -267,7 +273,7 @@ class ConversationPage extends React.Component {
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
     const canDelete = canEdit || (LoggedInUser && LoggedInUser.canEditCollective(collective));
     return (
-      <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page collective={collective} {...this.getPageMetaData(collective)}>
         {data.loading ? (
           <Container borderTop="1px solid #E8E9EB">
             <Loading />
@@ -275,7 +281,11 @@ class ConversationPage extends React.Component {
         ) : (
           <CollectiveThemeProvider collective={collective}>
             <Container borderTop="1px solid #E8E9EB" data-cy="conversation-page">
-              <CollectiveNavbar collective={collective} selected={Sections.CONVERSATIONS} />
+              <CollectiveNavbar
+                collective={collective}
+                selected={Sections.CONVERSATIONS}
+                selectedCategory={NAVBAR_CATEGORIES.CONNECT}
+              />
               <Box maxWidth={1160} m="0 auto" px={2} py={[4, 5]}>
                 <StyledLink as={Link} color="black.600" route="conversations" params={{ collectiveSlug }}>
                   &larr; <FormattedMessage id="Conversations.GoBack" defaultMessage="Back to conversations" />

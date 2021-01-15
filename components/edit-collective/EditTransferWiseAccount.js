@@ -80,7 +80,7 @@ const EditTransferWiseAccount = props => {
   if (!connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
-        <P lineHeight="0" fontSize="12px" color="black.600" fontWeight="normal">
+        <P fontSize="13px" color="black.700" fontWeight="normal" mb={3}>
           <FormattedMessage
             id="collective.create.connectedAccounts.transferwise.description"
             defaultMessage="Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TransferWise, please, <a>read our documentation</a>."
@@ -113,7 +113,7 @@ const EditTransferWiseAccount = props => {
   } else {
     return (
       <React.Fragment>
-        <P lineHeight="0">
+        <P my={1}>
           <FormattedMessage
             id="collective.connectedAccounts.transferwise.connected"
             defaultMessage="TransferWise account connected on {updatedAt, date, short}"
@@ -122,7 +122,7 @@ const EditTransferWiseAccount = props => {
             }}
           />
         </P>
-        <P lineHeight="0">
+        <P my={1}>
           <StyledButton type="submit" buttonSize="tiny" loading={isDeleting} onClick={handleDelete}>
             <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
           </StyledButton>

@@ -34,12 +34,11 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
 
   let uniquePMs = uniqBy(paymentMethodsOptions, 'id');
 
-  // if ORG filter out 'collective' type payment
-  if (stepProfile.type === CollectiveType.ORGANIZATION) {
-    uniquePMs = uniquePMs.filter(
-      ({ paymentMethod }) => paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_TYPES.ACCOUNT_BALANCE,
-    );
-  }
+  uniquePMs = uniquePMs.filter(
+    ({ paymentMethod }) =>
+      paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_TYPES.ACCOUNT_BALANCE ||
+      collective.host.legacyId === stepProfile.host?.id,
+  );
 
   // prepaid budget: limited to a specific host
   const matchesHostCollectiveIdPrepaid = prepaid => {
