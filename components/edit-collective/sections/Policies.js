@@ -18,7 +18,7 @@ import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
-import { H3, P } from '../../Text';
+import { P } from '../../Text';
 import SettingsTitle from '../SettingsTitle';
 
 import { getSettingsQuery } from './EditCollectivePage';
@@ -255,10 +255,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
         </Container>
         {hasRejectCategoriesFeature && (
           <Container>
-            <H3 mt={2}>
+            <SettingsSectionTitle mt={4}>
               <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
-            </H3>
-            <P>
+            </SettingsSectionTitle>
+            <P mb={2}>
               <FormattedMessage
                 id="editCollective.rejectCategories.description"
                 defaultMessage="Select which categories of contributor, if any, you do not wish to receive any contributions from. This will automatically prevent them from being able to become a sponsor of your Collective."
@@ -277,7 +277,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             />
           </Container>
         )}
-        <Flex my={3} alignItems="center" justifyContent="center">
+        <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
           <StyledButton
             buttonStyle="primary"
             mx={2}
