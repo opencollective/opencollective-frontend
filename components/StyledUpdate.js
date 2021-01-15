@@ -264,7 +264,7 @@ class StyledUpdate extends Component {
     const { collective, update } = this.props;
 
     return (
-      <Container display="flex" flexDirection="column" flex="1 1" maxWidth="55em" flexWrap="wrap">
+      <Container display="flex" flexDirection="column" flex="1 1" maxWidth="1200px" flexWrap="wrap">
         {this.renderUpdateMeta(update, true)}
         <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
       </Container>

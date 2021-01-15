@@ -73,19 +73,25 @@ class UpdateWithData extends React.Component {
           LoggedInUser={LoggedInUser}
           compact={false}
         />
-        {comments.length > 0 && (
-          <Box mb={3} pt={3}>
-            <Thread collective={collective} items={comments} onCommentDeleted={this.onCommentDeleted} />
+        {update.userCanSeeUpdate && (
+          <Box pl={[0, 5]}>
+            {comments.length > 0 && (
+              <Box mb={3} pt={3} maxWidth={800}>
+                <Thread collective={collective} items={comments} onCommentDeleted={this.onCommentDeleted} />
+              </Box>
+            )}
+            {update.publishedAt && (
+              <Flex mt="40px" maxWidth={800}>
+                <Box display={['none', null, 'block']} flex="0 0" p={3}>
+                  <CommentIcon size={24} color="lightgrey" />
+                </Box>
+                <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                  <CommentForm id="new-update" UpdateId={update.id} onSuccess={this.onCommentAdded} />
+                </Box>
+              </Flex>
+            )}
           </Box>
         )}
-        <Flex mt="40px">
-          <Box display={['none', null, 'block']} flex="0 0" p={3}>
-            <CommentIcon size={24} color="lightgrey" />
-          </Box>
-          <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
-            <CommentForm id="new-update" UpdateId={update.id} onSuccess={this.onCommentAdded} />
-          </Box>
-        </Flex>
       </div>
     );
   }
