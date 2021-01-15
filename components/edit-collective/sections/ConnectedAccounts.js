@@ -30,6 +30,7 @@ const ConnectedAccounts = props => {
             collective={props.collective}
             service={service}
             connectedAccount={connectedAccountsByService[service] && connectedAccountsByService[service][0]}
+            variation={props.variation}
           />
         </Box>
       ))}
@@ -42,6 +43,7 @@ ConnectedAccounts.propTypes = {
   connectedAccounts: PropTypes.arrayOf(PropTypes.object),
   editMode: PropTypes.bool,
   services: PropTypes.arrayOf(PropTypes.string),
+  variation: PropTypes.oneOf(['SENDING', 'RECEIVING']),
 };
 
 export default ConnectedAccounts;

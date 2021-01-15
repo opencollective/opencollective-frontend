@@ -23,6 +23,7 @@ class EditConnectedAccount extends React.Component {
     intl: PropTypes.object.isRequired,
     service: PropTypes.string,
     connectedAccount: PropTypes.object,
+    variation: PropTypes.bool,
   };
 
   constructor(props) {
@@ -127,7 +128,7 @@ class EditConnectedAccount extends React.Component {
   }
 
   render() {
-    const { intl, service, collective } = this.props;
+    const { intl, service, collective, variation } = this.props;
     const { connectedAccount } = this.state;
 
     let vars = {};
@@ -146,7 +147,14 @@ class EditConnectedAccount extends React.Component {
         <EditTransferWiseAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />
       );
     } else if (service === 'paypal') {
-      return <EditPayPalAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />;
+      return (
+        <EditPayPalAccount
+          collective={collective}
+          connectedAccount={this.props.connectedAccount}
+          variation={variation}
+          intl={intl}
+        />
+      );
     }
 
     return (
