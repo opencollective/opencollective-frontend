@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
 import { get } from 'lodash';
@@ -8,6 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { borders } from 'styled-system';
 
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose, formatDate } from '../lib/utils';
 import { Router } from '../server/pages';
 
@@ -264,7 +264,7 @@ class StyledUpdate extends Component {
     const { collective, update } = this.props;
 
     return (
-      <Container display="flex" flexDirection="column" flex="1 1" maxWidth="55em" flexWrap="wrap">
+      <Container display="flex" flexDirection="column" flex="1 1" maxWidth="1200px" flexWrap="wrap">
         {this.renderUpdateMeta(update, true)}
         <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
       </Container>
@@ -312,8 +312,8 @@ class StyledUpdate extends Component {
   }
 }
 
-const editUpdateMutation = gql`
-  mutation EditUpdate($update: UpdateAttributesInputType!) {
+const editUpdateMutation = gqlV2/* GraphQL */ `
+  mutation EditUpdate($update: UpdateUpdateInput!) {
     editUpdate(update: $update) {
       id
       updatedAt
@@ -325,8 +325,8 @@ const editUpdateMutation = gql`
   }
 `;
 
-const deleteUpdateMutation = gql`
-  mutation DeleteUpdate($id: Int!) {
+const deleteUpdateMutation = gqlV2/* GraphQL */ `
+  mutation DeleteUpdate($id: String!) {
     deleteUpdate(id: $id) {
       id
     }
@@ -335,10 +335,16 @@ const deleteUpdateMutation = gql`
 
 const addEditUpdateMutation = graphql(editUpdateMutation, {
   name: 'editUpdate',
+  options: {
+    context: API_V2_CONTEXT,
+  },
 });
 
 const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
   name: 'deleteUpdate',
+  options: {
+    context: API_V2_CONTEXT,
+  },
 });
 
 const addGraphql = compose(addEditUpdateMutation, addDeleteUpdateMutation);

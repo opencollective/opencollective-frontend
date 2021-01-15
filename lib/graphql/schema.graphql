@@ -346,6 +346,7 @@ Describes the features enabled and available for this collective
 type CollectiveFeatures {
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
+  TRANSACTIONS: CollectiveFeatureStatus
   EVENTS: CollectiveFeatureStatus
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
@@ -360,7 +361,6 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
-  TRANSACTIONS: CollectiveFeatureStatus
   CROSS_CURRENCY_MANUAL_TRANSACTIONS: CollectiveFeatureStatus
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
@@ -2112,7 +2112,7 @@ type Mutation {
     @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
   confirmOrder(order: ConfirmOrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
-  createUpdate(update: UpdateInputType!): UpdateType
+  createUpdate(update: UpdateInputType!): UpdateType @deprecated(reason: "This endpoint has been moved to GQLV2")
   editUpdate(update: UpdateAttributesInputType!): UpdateType
   publishUpdate(id: Int!, notificationAudience: UpdateAudienceTypeEnum!): UpdateType
   unpublishUpdate(id: Int!): UpdateType

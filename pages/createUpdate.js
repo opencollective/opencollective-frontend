@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 import { compose } from '../lib/utils';
 import { Router } from '../server/pages';
@@ -63,7 +63,7 @@ class CreateUpdatePage extends React.Component {
       data: { Collective },
     } = this.props;
     try {
-      update.collective = { id: Collective.id };
+      update.account = { legacyId: Collective.id };
       const res = await this.props.createUpdate({ variables: { update } });
       this.setState({ isModified: false });
       return Router.pushRoute(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
@@ -148,8 +148,8 @@ class CreateUpdatePage extends React.Component {
   }
 }
 
-const createUpdateMutation = gql`
-  mutation CreateUpdate($update: UpdateInputType!) {
+const createUpdateMutation = gqlV2/* GraphQL */ `
+  mutation CreateUpdate($update: UpdateCreateInput!) {
     createUpdate(update: $update) {
       id
       slug
@@ -160,19 +160,17 @@ const createUpdateMutation = gql`
       publishedAt
       updatedAt
       tags
-      image
       isPrivate
       makePublicOn
-      collective {
+      account {
         id
         slug
       }
-      fromCollective {
+      fromAccount {
         id
         type
         name
         slug
-        image
       }
     }
   }
@@ -180,6 +178,9 @@ const createUpdateMutation = gql`
 
 const addCreateUpdateMutation = graphql(createUpdateMutation, {
   name: 'createUpdate',
+  options: {
+    context: API_V2_CONTEXT,
+  },
 });
 
 const addGraphql = compose(addCollectiveCoverData, addCreateUpdateMutation);

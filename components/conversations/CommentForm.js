@@ -57,7 +57,7 @@ const isAutoFocused = id => {
 const mutationOptions = { context: API_V2_CONTEXT };
 
 /** A small helper to make the form work with params from both API V1 & V2 */
-const prepareCommentParams = (html, conversationId, expenseId) => {
+const prepareCommentParams = (html, conversationId, expenseId, updateId) => {
   const comment = { html };
   if (conversationId) {
     comment.ConversationId = conversationId;
@@ -67,6 +67,13 @@ const prepareCommentParams = (html, conversationId, expenseId) => {
       comment.expense.id = expenseId;
     } else {
       comment.expense.legacyId = expenseId;
+    }
+  } else if (updateId) {
+    comment.update = {};
+    if (typeof updateId === 'string') {
+      comment.update.id = updateId;
+    } else {
+      comment.update.legacyId = updateId;
     }
   }
   return comment;
@@ -80,6 +87,7 @@ const CommentForm = ({
   id,
   ConversationId,
   ExpenseId,
+  UpdateId,
   onSuccess,
   router,
   loadingLoggedInUser,
@@ -99,7 +107,7 @@ const CommentForm = ({
     if (!html) {
       setValidationError(createError(ERROR.FORM_FIELD_REQUIRED));
     } else {
-      const comment = prepareCommentParams(html, ConversationId, ExpenseId);
+      const comment = prepareCommentParams(html, ConversationId, ExpenseId, UpdateId);
       const response = await createComment({ variables: { comment } });
       setResetValue(response.data.createComment.id);
       if (onSuccess) {
@@ -171,6 +179,8 @@ CommentForm.propTypes = {
   ConversationId: PropTypes.string,
   /** If commenting on an expense */
   ExpenseId: PropTypes.string,
+  /** If commenting on an update */
+  UpdateId: PropTypes.string,
   /** Called when the comment is created successfully */
   onSuccess: PropTypes.func,
   /** disable the inputs */
