@@ -65,6 +65,7 @@ const StyledButtonSet = ({
         onClick={onChange && (() => onChange(item))}
         className={item === selected ? 'selected' : undefined}
         disabled={disabled}
+        aria-pressed={item === selected}
         type="button"
         py="8px"
         customBorderRadius={customBorderRadius}

@@ -52,6 +52,8 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           items={[null, INTERVALS.month, INTERVALS.year]}
           selected={data?.interval || null}
           buttonProps={{ px: 2, py: '5px' }}
+          role="group"
+          aria-label="Amount types"
           onChange={interval => {
             if (tier) {
               setTemporaryInterval(interval);
@@ -91,7 +93,6 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
                 type="number"
                 currency={collective.currency}
                 value={data?.amount || null}
-                placeholder="---"
                 width={1}
                 min={minAmount}
                 currencyDisplay="full"
