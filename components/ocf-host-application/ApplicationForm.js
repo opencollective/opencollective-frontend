@@ -29,7 +29,6 @@ import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
-import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P } from '../Text';
 
@@ -109,10 +108,6 @@ const messages = defineMessages({
     id: 'OCFHostApplication.websiteAndSocialLinks.label',
     defaultMessage: 'Website and / or social media links:',
   },
-  additionalInfoLabel: {
-    id: 'OCFHostApplication.additionalInfoLabel.label',
-    defaultMessage: 'Anything you would like to add?',
-  },
 });
 
 const initialValues = {
@@ -133,10 +128,8 @@ const initialValues = {
     expectedFundingPartner: '',
     missionImpactExplanation: '',
     websiteAndSocialLinks: '',
-    additionalInfo: '',
   },
   termsOfServiceOC: false,
-  termsOfServiceOCF: false,
 };
 
 const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
@@ -157,7 +150,6 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
       'applicationData.expectedFundingPartner',
       'applicationData.missionImpactExplanation',
       'applicationData.websiteAndSocialLinks',
-      'applicationData.additionalInfo',
     ]);
 
     verifyEmailPattern(errors, values, 'user.email');
@@ -167,7 +159,6 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
     verifyFieldLength(intl, errors, values, 'collective.description', 1, 250);
     verifyFieldLength(intl, errors, values, 'applicationData.missionImpactExplanation', 1, 250);
 
-    verifyChecked(errors, values, 'termsOfServiceOCF');
     verifyChecked(errors, values, 'termsOfServiceOC');
     return errors;
   };
@@ -557,26 +548,6 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                         />
                       </P>
                     </Box>
-                    <Box width={['256px', '484px', '663px']} my={2}>
-                      <StyledInputFormikField
-                        label={intl.formatMessage(messages.additionalInfoLabel)}
-                        labelFontSize="13px"
-                        labelColor="#4E5052"
-                        labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                        name="applicationData.additionalInfo"
-                        htmlFor="additionalInfo"
-                        required
-                      >
-                        {({ field }) => (
-                          <StyledTextarea
-                            placeholder="What else do we need to know about 
-              your initiative?"
-                            {...field}
-                            px="7px"
-                          />
-                        )}
-                      </StyledInputFormikField>
-                    </Box>
                     <Box width={['256px', '484px', '663px']} mb={2} mt="40px">
                       <StyledHr />
                     </Box>
@@ -601,50 +572,12 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                               label={
                                 <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
                                   <FormattedMessage
-                                    id="createcollective.tos.label"
-                                    defaultMessage="I agree with the {toslink} of Open Collective."
-                                    values={{
-                                      toslink: (
-                                        <StyledLink href="/tos" openInNewTab>
-                                          <FormattedMessage id="tos" defaultMessage="terms of service" />
-                                        </StyledLink>
-                                      ),
-                                    }}
-                                  />
-                                </P>
-                              }
-                            />
-                          )}
-                        </StyledInputFormikField>
-                      </Box>
-                    </Container>
-                    <Container
-                      width={['256px', '484px', '663px']}
-                      display="flex"
-                      alignSelf="flex-start"
-                      alignItems="center"
-                      my={2}
-                    >
-                      <Box mr={3}>
-                        <StyledInputFormikField name="termsOfServiceOCF" required>
-                          {({ field }) => (
-                            <StyledCheckbox
-                              background="#396C6F"
-                              size="16px"
-                              name={field.name}
-                              required={field.required}
-                              checked={field.value}
-                              onChange={({ checked }) => setFieldValue(field.name, checked)}
-                              error={field.error}
-                              label={
-                                <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
-                                  <FormattedMessage
-                                    id="AgreeWithHostTOS"
-                                    defaultMessage="I have read and agree with the <TOSLink>terms of service</TOSLink> of fiscal sponsorship."
+                                    id="OC.tos.label"
+                                    defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective."
                                     values={{
                                       TOSLink: getI18nLink({
-                                        href: 'https://docs.opencollective.foundation/about/our-terms-and-conditions',
-                                        openInNewTabNoFollow: true,
+                                        href: '/tos',
+                                        openInNewTab: true,
                                       }),
                                     }}
                                   />
