@@ -44,6 +44,7 @@ class ReceivingMoney extends React.Component {
               collective={this.props.collective}
               connectedAccounts={this.props.collective.connectedAccounts}
               services={services}
+              variation="RECEIVING"
             />
           </React.Fragment>
         )}
