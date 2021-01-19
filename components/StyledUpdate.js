@@ -33,6 +33,10 @@ const UpdateWrapper = styled(Flex)`
 
   ${borders}
 
+  img {
+    max-width: 100%;
+  }
+
   @media (max-width: 600px) {
     max-width: 100%;
   }
