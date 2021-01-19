@@ -6805,6 +6805,16 @@ type Query {
     The update slug identifying the update
     """
     updateSlug: String
+
+    """
+    The update slug identifying the update
+    """
+    slug: String
+
+    """
+    When fetching by slug, an account must be provided
+    """
+    account: AccountReferenceInput
   ): Update
   loggedInAccount: Account
 }
@@ -7071,7 +7081,7 @@ type Update {
   """
   List the comments for this update. Not backed by a loader, don't use this in lists.
   """
-  comments(limit: Int, offset: Int): CommentCollection!
+  comments(limit: Int, offset: Int): CommentCollection
 }
 
 """
