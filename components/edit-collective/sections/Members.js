@@ -24,6 +24,7 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
+import { withUser } from '../../UserProvider';
 import WarnIfUnsavedChanges from '../../WarnIfUnsavedChanges';
 import SettingsTitle from '../SettingsTitle';
 
@@ -45,6 +46,7 @@ class Members extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
+    refetchLoggedInUser: PropTypes.func.isRequired,
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
@@ -200,6 +202,7 @@ class Members extends React.Component {
         },
       });
       await this.props.data.refetch();
+      await this.props.refetchLoggedInUser();
       this.setState({ isSubmitting: false, isSubmitted: true, isTouched: false });
     } catch (e) {
       this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
@@ -468,4 +471,4 @@ const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
 
 const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation);
 
-export default injectIntl(addGraphql(Members));
+export default injectIntl(addGraphql(withUser(Members)));

@@ -211,7 +211,12 @@ class EditUpdateForm extends React.Component {
               disabled={this.state.loading}
             >
               {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-              {!this.state.loading && <FormattedMessage id="update.new.preview" defaultMessage="Preview Update" />}
+              {!this.state.loading &&
+                (this.props.update?.publishedAt ? (
+                  <FormattedMessage id="save" defaultMessage="Save" />
+                ) : (
+                  <FormattedMessage id="update.new.preview" defaultMessage="Preview Update" />
+                ))}
             </StyledButton>
           </ActionButtonWrapper>
 

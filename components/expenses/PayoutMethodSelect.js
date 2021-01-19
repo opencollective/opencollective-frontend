@@ -194,12 +194,12 @@ class PayoutMethodSelect extends React.Component {
     title: this.getPayoutMethodTitle(pm),
   });
 
-  getOptions = memoizeOne(payoutMethods => {
+  getOptions = memoizeOne((payoutMethods, payee) => {
     const groupedPms = groupBy(payoutMethods, 'type');
-    const payeeIsSelfHosted = this.props.payee.id == this.props.payee.host?.id;
+    const payeeIsSelfHosted = payee.id == payee.host?.id;
     const payeeIsCollectiveFamilyType =
-      this.props.payee &&
-      AccountTypesWithHost.includes(this.props.payee.type) &&
+      payee &&
+      AccountTypesWithHost.includes(payee.type) &&
       this.props.collective.host?.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE);
 
     // If the Account is of the "Collective" family, account balance should be the only option
@@ -211,7 +211,7 @@ class PayoutMethodSelect extends React.Component {
             if (
               type === PayoutMethodType.ACCOUNT_BALANCE &&
               this.props.collective.host?.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
-              this.props.payee?.host?.id != this.props.collective.host?.id
+              payee?.host?.id != this.props.collective.host?.id
             ) {
               return false;
             } else {
@@ -245,7 +245,7 @@ class PayoutMethodSelect extends React.Component {
         <StyledSelect
           data-cy="payout-method-select"
           {...props}
-          options={this.getOptions(payoutMethods)}
+          options={this.getOptions(payoutMethods, props.payee)}
           defaultValue={defaultPayoutMethod ? this.getOptionFromPayoutMethod(defaultPayoutMethod) : undefined}
           value={typeof value === 'undefined' ? undefined : value}
           formatOptionLabel={this.formatOptionLabel}

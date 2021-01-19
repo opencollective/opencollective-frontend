@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
 import Container from './Container';
@@ -28,7 +28,7 @@ const StyledPublishUpdateBtn = styled.div`
 
 class PublishUpdateBtn extends React.Component {
   static propTypes = {
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     publishUpdate: PropTypes.func,
     data: PropTypes.object,
   };
@@ -52,7 +52,7 @@ class PublishUpdateBtn extends React.Component {
   }
 
   render() {
-    const update = this.props.data.Update;
+    const update = this.props.data.update;
     const isLoading = this.props.data.loading;
     const isHost = get(update, 'collective.isHost');
     const backers = get(update, 'collective.stats.backers.all');
@@ -148,8 +148,8 @@ class PublishUpdateBtn extends React.Component {
   }
 }
 
-const publishUpdateMutation = gql`
-  mutation PublishUpdate($id: Int!, $notificationAudience: UpdateAudienceTypeEnum!) {
+const publishUpdateMutation = gqlV2/* GraphQL */ `
+  mutation PublishUpdate($id: String!, $notificationAudience: UpdateAudienceType!) {
     publishUpdate(id: $id, notificationAudience: $notificationAudience) {
       id
       publishedAt
@@ -158,31 +158,29 @@ const publishUpdateMutation = gql`
   }
 `;
 
-const updateQuery = gql`
-  query Update($id: Int!) {
-    Update(id: $id) {
+const updateQuery = gqlV2/* GraphQL */ `
+  query Update($id: String!) {
+    update(id: $id) {
       id
-      collective {
+      account {
         id
         isHost
-        stats {
-          id
-          backers {
-            all
-          }
-          collectives {
-            hosted
-          }
-        }
       }
     }
   }
 `;
 
-const addUpdateData = graphql(updateQuery);
+const addUpdateData = graphql(updateQuery, {
+  options: {
+    context: API_V2_CONTEXT,
+  },
+});
 
 const addPublishUpdateMutation = graphql(publishUpdateMutation, {
   name: 'publishUpdate',
+  options: {
+    context: API_V2_CONTEXT,
+  },
 });
 
 const addGraphql = compose(addPublishUpdateMutation, addUpdateData);

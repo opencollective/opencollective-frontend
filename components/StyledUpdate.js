@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
 import { get } from 'lodash';
@@ -8,6 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { borders } from 'styled-system';
 
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose, formatDate } from '../lib/utils';
 import { Router } from '../server/pages';
 
@@ -19,16 +19,16 @@ import Link from './Link';
 import LinkCollective from './LinkCollective';
 import MessageBox from './MessageBox';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
+import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
 import StyledTag from './StyledTag';
 import StyledTooltip from './StyledTooltip';
-import { H3 } from './Text';
+import { H5 } from './Text';
 import UpdateTextWithData from './UpdateTextWithData';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;
   min-height: 100px;
-  border: 1px solid #e6e8eb;
   padding: 20px;
 
   ${borders}
@@ -57,11 +57,6 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
   color: #71757a;
   display: flex;
   align-items: center;
-`;
-
-const ViewUpdatesLink = styled(Link)`
-  margin-top: 20px;
-  color: #71757a;
 `;
 
 class StyledUpdate extends Component {
@@ -206,17 +201,11 @@ class StyledUpdate extends Component {
     if (mode === 'summary') {
       return (
         <Link route={`/${collective.slug}/updates/${update.slug}`}>
-          <H3 data-cy="updateTitle" color="#090A0A" lineHeight="22px">
-            {update.title}
-          </H3>
+          <H5 data-cy="updateTitle">{update.title}</H5>
         </Link>
       );
     } else {
-      return (
-        <H3 data-cy="updateTitle" color="#090A0A" lineHeight="22px">
-          {update.title}
-        </H3>
-      );
+      return <H5 data-cy="updateTitle">{update.title}</H5>;
     }
   }
 
@@ -275,7 +264,7 @@ class StyledUpdate extends Component {
     const { collective, update } = this.props;
 
     return (
-      <Container display="flex" flexDirection="column" flex="1 1" maxWidth="55em" flexWrap="wrap">
+      <Container display="flex" flexDirection="column" flex="1 1" maxWidth="1200px" flexWrap="wrap">
         {this.renderUpdateMeta(update, true)}
         <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
       </Container>
@@ -312,19 +301,19 @@ class StyledUpdate extends Component {
           {mode === 'edit' && this.renderEditUpdateForm()}
         </UpdateWrapper>
         {update.publishedAt && mode === 'details' && (
-          <Container my={4}>
-            <ViewUpdatesLink route={`/${collective.slug}/updates`}>
-              {intl.formatMessage(this.messages['viewLatestUpdates'])}
-            </ViewUpdatesLink>
-          </Container>
+          <Flex my={4} justifyContent={['center', 'flex-start']}>
+            <Link route={`/${collective.slug}/updates`}>
+              <StyledButton ml={[0, 5]}>{intl.formatMessage(this.messages['viewLatestUpdates'])}</StyledButton>
+            </Link>
+          </Flex>
         )}
       </React.Fragment>
     );
   }
 }
 
-const editUpdateMutation = gql`
-  mutation EditUpdate($update: UpdateAttributesInputType!) {
+const editUpdateMutation = gqlV2/* GraphQL */ `
+  mutation EditUpdate($update: UpdateUpdateInput!) {
     editUpdate(update: $update) {
       id
       updatedAt
@@ -336,8 +325,8 @@ const editUpdateMutation = gql`
   }
 `;
 
-const deleteUpdateMutation = gql`
-  mutation DeleteUpdate($id: Int!) {
+const deleteUpdateMutation = gqlV2/* GraphQL */ `
+  mutation DeleteUpdate($id: String!) {
     deleteUpdate(id: $id) {
       id
     }
@@ -346,10 +335,16 @@ const deleteUpdateMutation = gql`
 
 const addEditUpdateMutation = graphql(editUpdateMutation, {
   name: 'editUpdate',
+  options: {
+    context: API_V2_CONTEXT,
+  },
 });
 
 const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
   name: 'deleteUpdate',
+  options: {
+    context: API_V2_CONTEXT,
+  },
 });
 
 const addGraphql = compose(addEditUpdateMutation, addDeleteUpdateMutation);
