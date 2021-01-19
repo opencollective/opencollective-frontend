@@ -120,7 +120,7 @@ const updateQuery = gqlV2/* GraphQL */ `
         isApproved
       }
     }
-    update(updateSlug: $updateSlug) {
+    update(slug: $updateSlug, account: { slug: $collectiveSlug }) {
       id
       title
       createdAt
