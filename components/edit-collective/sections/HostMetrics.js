@@ -1,0 +1,162 @@
+import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/client';
+import { FormattedMessage, injectIntl } from 'react-intl';
+
+import { formatValueAsCurrency } from '../../../lib/currency-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+
+import Container from '../../Container';
+import { Box } from '../../Grid';
+import Loading from '../../Loading';
+import StyledCard from '../../StyledCard';
+import { P, Span } from '../../Text';
+import SettingsTitle from '../SettingsTitle';
+
+const metricsQuery = gqlV2/* GraphQL */ `
+  query HostMetricsQuery($slug: String) {
+    host(slug: $slug) {
+      id
+      slug
+      hostMetrics {
+        hostFees {
+          value
+          currency
+        }
+        platformFees {
+          value
+          currency
+        }
+        pendingPlatformFees {
+          value
+          currency
+        }
+        platformTips {
+          value
+          currency
+        }
+        pendingPlatformTips {
+          value
+          currency
+        }
+        hostFeeShare {
+          value
+          currency
+        }
+        totalMoneyManaged {
+          value
+          currency
+        }
+        hostFeeSharePercent
+      }
+    }
+  }
+`;
+
+const HostMetrics = props => {
+  const { loading, data } = useQuery(metricsQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug: props.collective.slug },
+  });
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  return (
+    <Fragment>
+      <SettingsTitle>
+        <FormattedMessage id="Host.Metrics" defaultMessage="Host Metrics" />
+      </SettingsTitle>
+
+      <Box>
+        <P>
+          <FormattedMessage
+            id="Host.Metrics.Description"
+            defaultMessage="Host Metrics showing up-to-date values. Pending fees are invoiced at the beginning of every subsequent month."
+          />
+        </P>
+        <StyledCard display="flex" width="100%" flexDirection={['column']} my={2}>
+          <Container background="#F5F7FA">
+            <Box flex="1" py={16} px={4}>
+              <P fontSize="10px" textTransform="uppercase" color="black.700">
+                <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
+              </P>
+              <P fontSize="20px" mt={1}>
+                {formatValueAsCurrency(data.host.hostMetrics.totalMoneyManaged)}{' '}
+                <Span color="black.400">{data.host.hostMetrics.totalMoneyManaged.currency}</Span>
+              </P>
+            </Box>
+          </Container>
+          <Box flex="1" py={16} px={4}>
+            <P fontSize="10px" textTransform="uppercase" color="black.700">
+              <FormattedMessage id="Host.Metrics.HostFees" defaultMessage="Host Fees" />
+            </P>
+            <P fontSize="20px" mt={1}>
+              {formatValueAsCurrency(data.host.hostMetrics.hostFees)}{' '}
+              <Span color="black.400">{data.host.hostMetrics.hostFees.currency}</Span>
+            </P>
+          </Box>
+          <Box flex="1" py={16} px={4}>
+            <P fontSize="10px" textTransform="uppercase" color="black.700">
+              <FormattedMessage id="Host.Metrics.PlatformFees" defaultMessage="Platform Fees" />
+            </P>
+            <P fontSize="20px" mt={1}>
+              {formatValueAsCurrency(data.host.hostMetrics.platformFees)}{' '}
+              <Span color="black.400">{data.host.hostMetrics.platformFees.currency}</Span>
+            </P>
+          </Box>
+          <Box flex="1" py={16} px={4}>
+            <P fontSize="10px" textTransform="uppercase" color="black.700">
+              <FormattedMessage id="Host.Metrics.PendingPlatformFees" defaultMessage="Pending Platform Fees" />
+            </P>
+            <P fontSize="20px" mt={1}>
+              {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformFees)}{' '}
+              <Span color="black.400">{data.host.hostMetrics.pendingPlatformFees.currency}</Span>
+            </P>
+          </Box>
+          <Box flex="1" py={16} px={4}>
+            <P fontSize="10px" textTransform="uppercase" color="black.700">
+              <FormattedMessage id="Host.Metrics.PlatformTips" defaultMessage="Platform Tips" />
+            </P>
+            <P fontSize="20px" mt={1}>
+              {formatValueAsCurrency(data.host.hostMetrics.platformTips)}{' '}
+              <Span color="black.400">{data.host.hostMetrics.platformTips.currency}</Span>
+            </P>
+          </Box>
+          <Box flex="1" py={16} px={4}>
+            <P fontSize="10px" textTransform="uppercase" color="black.700">
+              <FormattedMessage id="Host.Metrics.PendingPlatformTips" defaultMessage="Pending Platform Tips" />
+            </P>
+            <P fontSize="20px" mt={1}>
+              {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformTips)}{' '}
+              <Span color="black.400">{data.host.hostMetrics.pendingPlatformTips.currency}</Span>
+            </P>
+          </Box>
+          <Box flex="1" py={16} px={4}>
+            <P fontSize="10px" textTransform="uppercase" color="black.700">
+              <FormattedMessage
+                id="Host.Metrics.HostFeeShare"
+                defaultMessage="Host Fee Share ({pct}% over collected host fee)"
+                values={{ pct: data.host.hostMetrics.hostFeeSharePercent }}
+              />
+            </P>
+            <P fontSize="20px" mt={1}>
+              {formatValueAsCurrency(data.host.hostMetrics.hostFeeShare)}{' '}
+              <Span color="black.400">{data.host.hostMetrics.hostFeeShare.currency}</Span>
+            </P>
+          </Box>
+        </StyledCard>
+      </Box>
+    </Fragment>
+  );
+};
+
+HostMetrics.propTypes = {
+  collective: PropTypes.shape({
+    slug: PropTypes.string,
+  }),
+  hideTopsection: PropTypes.func.isRequired,
+};
+
+export default injectIntl(HostMetrics);
