@@ -17,6 +17,7 @@ import EditUpdateForm from './EditUpdateForm';
 import { Box, Flex } from './Grid';
 import Link from './Link';
 import LinkCollective from './LinkCollective';
+import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import StyledButton from './StyledButton';
@@ -24,7 +25,6 @@ import StyledHr from './StyledHr';
 import StyledTag from './StyledTag';
 import StyledTooltip from './StyledTooltip';
 import { H5 } from './Text';
-import UpdateTextWithData from './UpdateTextWithData';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;
@@ -71,6 +71,7 @@ class StyledUpdate extends Component {
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    isReloadingData: PropTypes.object,
     editUpdate: PropTypes.func.isRequired,
     deleteUpdate: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
@@ -129,6 +130,7 @@ class StyledUpdate extends Component {
   renderUpdateMeta(update, editable) {
     const { intl } = this.props;
     const { mode } = this.state;
+    const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
       <Container display="flex" alignItems="Baseline" color="#969BA3" data-cy="meta" flexWrap="wrap">
@@ -156,7 +158,7 @@ class StyledUpdate extends Component {
                 }),
                 author: (
                   <Box as="span" mr={2} fontSize="12px">
-                    <LinkCollective collective={update.fromCollective} />
+                    <LinkCollective collective={fromAccount} />
                   </Box>
                 ),
               }}
@@ -171,7 +173,7 @@ class StyledUpdate extends Component {
                 date: formatDate(update.createdAt),
                 author: (
                   <Box as="span" mr={2} fontSize="12px">
-                    <LinkCollective collective={update.fromCollective} />
+                    <LinkCollective collective={fromAccount} />
                   </Box>
                 ),
               }}
@@ -214,8 +216,7 @@ class StyledUpdate extends Component {
   }
 
   renderSummary(update) {
-    const { collective } = this.props;
-
+    const { collective, isReloadingData } = this.props;
     return (
       <React.Fragment>
         {update.userCanSeeUpdate && (
@@ -228,7 +229,7 @@ class StyledUpdate extends Component {
             dangerouslySetInnerHTML={{ __html: update.summary }}
           />
         )}
-        {!update.userCanSeeUpdate && (
+        {!update.userCanSeeUpdate && !isReloadingData && (
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
               id="update.private.cannot_view_message"
@@ -242,15 +243,15 @@ class StyledUpdate extends Component {
   }
 
   renderFullContent() {
-    const { update, collective, LoggedInUser } = this.props;
+    const { update, collective, LoggedInUser, isReloadingData } = this.props;
     const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
 
     return (
       <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]}>
         <StyledHr mt={3} mb={4} borderColor="black.100" />
-        {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
-        {!update.html && <UpdateTextWithData id={update.id} />}
-        {!update.userCanSeeUpdate && (
+        {update.html ? (
+          <div dangerouslySetInnerHTML={{ __html: update.html }} />
+        ) : !update.userCanSeeUpdate && !isReloadingData ? (
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
               id="update.private.cannot_view_message"
@@ -258,7 +259,9 @@ class StyledUpdate extends Component {
               values={{ collective: collective.name }}
             />
           </PrivateUpdateMesgBox>
-        )}
+        ) : isReloadingData ? (
+          <LoadingPlaceholder height={300} />
+        ) : null}
         {canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
       </Container>
     );
@@ -280,6 +283,7 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
     const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
     const editable = !compact && props.editable && canEditUpdate;
+    const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
       <React.Fragment>
@@ -288,8 +292,8 @@ class StyledUpdate extends Component {
             <Container width="100%">
               <Flex mb={2}>
                 <Container mr={20}>
-                  <LinkCollective collective={update.fromCollective}>
-                    <Avatar collective={update.fromCollective} radius={40} />
+                  <LinkCollective collective={fromAccount}>
+                    <Avatar collective={fromAccount} radius={40} />
                   </LinkCollective>
                 </Container>
                 <Box>

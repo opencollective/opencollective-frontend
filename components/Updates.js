@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import colors from '../lib/constants/colors';
-
 import Container from './Container';
 import StyledButton from './StyledButton';
 import StyledUpdate from './StyledUpdate';
@@ -82,7 +80,7 @@ class Updates extends React.Component {
             </Container>
           ))}
           {updates.length === 0 && (
-            <Container color={colors.darkgray}>
+            <Container color="black.700" p={4}>
               <FormattedMessage id="updates.empty" defaultMessage="No updates" />
             </Container>
           )}

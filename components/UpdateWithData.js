@@ -12,6 +12,7 @@ import { commentFieldsFragment } from './conversations/graphql';
 import Thread from './conversations/Thread';
 import CommentIcon from './icons/CommentIcon';
 import { Box, Flex } from './Grid';
+import Loading from './Loading';
 import NotFound from './NotFound';
 import StyledUpdate from './StyledUpdate';
 import { withUser } from './UserProvider';
@@ -24,11 +25,29 @@ class UpdateWithData extends React.Component {
     client: PropTypes.object,
     updateSlug: PropTypes.string,
     collectiveSlug: PropTypes.string,
+    /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
+    this.state = { isReloadingData: false };
+  }
+
+  async componentDidUpdate(oldProps) {
+    if (
+      oldProps.LoggedInUser !== this.props.LoggedInUser &&
+      !get(this.props.data, 'update.userCanSeeUpdate') &&
+      !this.state.isReloadingData
+    ) {
+      this.setState({ isReloadingData: true });
+      try {
+        await this.props.data.refetch();
+      } finally {
+        this.setState({ isReloadingData: false });
+      }
+    }
   }
 
   clonePageQueryCacheData() {
@@ -56,7 +75,7 @@ class UpdateWithData extends React.Component {
     const collective = data && data.account;
     const comments = get(data, 'update.comments.nodes', []);
     if (data.loading) {
-      return <div />;
+      return <Loading />;
     }
     const update = data.update;
     if (!update) {
@@ -72,6 +91,7 @@ class UpdateWithData extends React.Component {
           editable={editable}
           LoggedInUser={LoggedInUser}
           compact={false}
+          isReloadingData={this.state.isReloadingData}
         />
         {update.userCanSeeUpdate && (
           <Box pl={[0, 5]}>
@@ -133,11 +153,13 @@ const updateQuery = gqlV2/* GraphQL */ `
         id
         slug
         type
+        name
       }
       fromAccount {
         id
         slug
         type
+        name
       }
       comments {
         nodes {
