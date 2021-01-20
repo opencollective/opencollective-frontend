@@ -1731,6 +1731,7 @@
   "TopContributors.Organizations": "组织",
   "tos": "服务条款",
   "TOSAndPrivacyPolicyAgreement": "我同意 Open Collective 的 {toslink} 和 {privacylink}。",
+  "TOTAL": "TOTAL",
   "TotalAmount": "总金额",
   "TotalAmountWithoutFee": "总金额 (不包括服务费)",
   "TotalDonatedSince": "{totalDonated} since {date}",
