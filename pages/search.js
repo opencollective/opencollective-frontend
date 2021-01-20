@@ -5,7 +5,6 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
 import { isNil } from 'lodash';
 import { withRouter } from 'next/router';
-import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -22,10 +21,11 @@ import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
 import StyledFilters from '../components/StyledFilters';
+import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
-import { P } from '../components/Text';
+import { H1, P } from '../components/Text';
 
-const SearchInput = styled(FormControl)`
+const SearchInput = styled(StyledInput)`
   &&& {
     border: none;
     border-bottom: 2px solid ${colors.blue};
@@ -33,7 +33,14 @@ const SearchInput = styled(FormControl)`
     box-shadow: none;
     display: block;
     height: 3.4rem;
+    width: 100%;
     padding: 0;
+    font-size: 18px;
+  }
+
+  &::placeholder {
+    color: #999;
+    opacity: 1;
   }
 `;
 
@@ -148,17 +155,15 @@ class SearchPage extends React.Component {
         <Container mx="auto" px={3} py={[4, 5]} width={[1, 0.85]} maxWidth={1200}>
           <Box width={1}>
             <form method="GET" onSubmit={this.refetch}>
-              <FormGroup controlId="search" bsSize="large">
-                <ControlLabel className="h1">
-                  <FormattedMessage id="search.OpenCollective" defaultMessage="Search Open Collective..." />
-                </ControlLabel>
-                <Flex alignItems="flex-end" my={3}>
-                  <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
-                  <SearchButton type="submit">
-                    <Search size="1em" />
-                  </SearchButton>
-                </Flex>
-              </FormGroup>
+              <H1 fontSize="36px" fontWeight="500">
+                <FormattedMessage id="search.OpenCollective" defaultMessage="Search Open Collective..." />
+              </H1>
+              <Flex alignItems="flex-end" my={3}>
+                <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
+                <SearchButton type="submit">
+                  <Search size="1em" />
+                </SearchButton>
+              </Flex>
             </form>
           </Box>
           {term && (

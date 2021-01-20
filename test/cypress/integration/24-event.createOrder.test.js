@@ -16,7 +16,8 @@ describe('event.createOrder page', () => {
     cy.visit(`${collectiveSlug}/edit`);
     cy.contains('[data-cy="country-select"]', 'Please select your country').click();
     cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
-    cy.get('select[name="VAT"]').select('OWN');
+    cy.getByDataCy('VAT').click();
+    cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
     cy.contains('button', 'Save').click();
     cy.contains('Saved');
 

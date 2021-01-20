@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { cloneDeep, get, set } from 'lodash';
-import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -371,12 +370,12 @@ class Tiers extends React.Component {
 
     return (
       <Container margin="3rem 0" className={`tier ${tier.slug}`} key={key}>
-        <Container textAlign="right" fontSize="1.3rem">
+        <Container textAlign="right" fontSize="1.3rem" pr={1}>
           <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>
             {intl.formatMessage(this.messages[`${this.defaultType}.remove`])}
           </a>
         </Container>
-        <Form horizontal>
+        <form>
           {this.fields.map(
             field =>
               (!field.when || field.when(defaultValues, collective)) && (
@@ -416,7 +415,7 @@ class Tiers extends React.Component {
                 </Box>
               ),
           )}
-        </Form>
+        </form>
       </Container>
     );
   }

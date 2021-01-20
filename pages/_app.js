@@ -14,7 +14,6 @@ import withData from '../lib/withData';
 import StripeProviderSSR from '../components/StripeProvider';
 import UserProvider from '../components/UserProvider';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
 import 'nprogress/nprogress.css';
 import 'react-datetime/css/react-datetime.css';
 import 'react-quill/dist/quill.snow.css';

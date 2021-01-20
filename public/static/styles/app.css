@@ -124,7 +124,6 @@ body {
 
 a:hover {
   color: #797d80;
-  text-decoration: none;
 }
 
 summary {
@@ -176,7 +175,6 @@ h1 {
   margin: 40px 0px 20px;
   font-size: 4rem;
   letter-spacing: -1.2px;
-  font-weight: bold;
 }
 
 h2,
@@ -253,14 +251,6 @@ a {
   }
 }
 
-.col-sm-12 {
-  width: 100%;
-}
-
-.help-block {
-  font-size: 1.2rem;
-}
-
 @media (max-width: 420px) {
   .mobileOnly {
     display: inherit !important;
@@ -289,3 +279,61 @@ a {
 .content p {
   text-overflow: ellipsis;
 }
+
+/* START: Legacy Bootstrap styles, added for retro-compatibility */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  color: #333;
+  font-size: 14px;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+}
+
+label {
+  display: inline-block;
+  font-weight: 700;
+}
+
+.form-control {
+  width: 100%;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+th {
+  text-align: left;
+}
+
+/* END: Legacy Bootstrap styles, added for retro-compatibility */

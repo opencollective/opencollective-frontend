@@ -4,7 +4,6 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit, update } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -228,7 +227,7 @@ class Members extends React.Component {
       <Container key={`member-${index}-${memberKey}`} mt={4} pb={4} borderBottom={BORDER} data-cy={`member-${index}`}>
         <ResetGlobalStyles>
           <Flex mt={2} flexWrap="wrap">
-            <div className="col-sm-2" />
+            <Box width={[1, 2 / 12]} />
             <Flex flex="1" justifyContent="space-between" alignItems="center" flexWrap="wrap" mb={2}>
               <Box ml={1} my={1}>
                 <CollectivePickerAsync
@@ -267,7 +266,7 @@ class Members extends React.Component {
             </Flex>
           </Flex>
         </ResetGlobalStyles>
-        <Form horizontal>
+        <form>
           {this.fields.map(field => (
             <React.Fragment key={field.name}>
               <InputField
@@ -283,7 +282,7 @@ class Members extends React.Component {
                 onChange={value => this.editMember(index, field.name, value)}
               />
               {field.name === 'role' && hasRoleDescription(member.role) && (
-                <Flex mb={3} mt={-2}>
+                <Flex mb={3}>
                   <Box flex="0 1" flexBasis={['0%', '17.5%']} />
                   <Container flex="1 1" fontSize="12px" color="black.600" fontStyle="italic">
                     <MemberRoleDescription role={member.role} />
@@ -292,7 +291,7 @@ class Members extends React.Component {
               )}
             </React.Fragment>
           ))}
-        </Form>
+        </form>
       </Container>
     );
   };

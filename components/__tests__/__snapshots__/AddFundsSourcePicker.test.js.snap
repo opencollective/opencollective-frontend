@@ -505,38 +505,139 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
 `;
 
 exports[`AddFundsSourcePickerForUser component render host options 1`] = `
+.c0 {
+  font-size: 14px;
+}
+
 <div>
-  <select
-    className="form-control"
+  <div
+    className="c0 css-2b097c-container"
+    data-cy="select"
     id="sourcePicker"
-    name="template"
-    onChange={[Function]}
-    placeholder="select"
+    onKeyDown={[Function]}
   >
-    <option
-      value=""
-    />
-    <option
-      value="host-id"
+    <div
+      className=" css-sfspwo-control"
+      onMouseDown={[Function]}
+      onTouchEnd={[Function]}
     >
-      Example Host
-    </option>
-  </select>
+      <div
+        className=" css-g1d714-ValueContainer"
+      >
+        <div
+          className=" css-1wa3eu0-placeholder"
+        >
+          Select
+        </div>
+        <input
+          aria-autocomplete="list"
+          className="css-62g3xt-dummyInput"
+          disabled={false}
+          id="react-select-7-input"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          readOnly={true}
+          tabIndex="0"
+          value=""
+        />
+      </div>
+      <div
+        className=" css-1hb7zxy-IndicatorsContainer"
+      >
+        <span
+          className=" css-1xjgjl1-IndicatorSeparator"
+        />
+        <div
+          aria-hidden="true"
+          className=" css-tlfecz-indicatorContainer"
+          onMouseDown={[Function]}
+          onTouchEnd={[Function]}
+        >
+          <svg
+            aria-hidden="true"
+            className="css-6q0nyr-Svg"
+            focusable="false"
+            height={20}
+            viewBox="0 0 20 20"
+            width={20}
+          >
+            <path
+              d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 `;
 
 exports[`AddFundsSourcePickerForUser component renders default options 1`] = `
+.c0 {
+  font-size: 14px;
+}
+
 <div>
-  <select
-    className="form-control"
+  <div
+    className="c0 css-2b097c-container"
+    data-cy="select"
     id="sourcePicker"
-    name="template"
-    onChange={[Function]}
-    placeholder="select"
+    onKeyDown={[Function]}
   >
-    <option
-      value=""
-    />
-  </select>
+    <div
+      className=" css-sfspwo-control"
+      onMouseDown={[Function]}
+      onTouchEnd={[Function]}
+    >
+      <div
+        className=" css-g1d714-ValueContainer"
+      >
+        <div
+          className=" css-1wa3eu0-placeholder"
+        >
+          Select
+        </div>
+        <input
+          aria-autocomplete="list"
+          className="css-62g3xt-dummyInput"
+          disabled={false}
+          id="react-select-6-input"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          readOnly={true}
+          tabIndex="0"
+          value=""
+        />
+      </div>
+      <div
+        className=" css-1hb7zxy-IndicatorsContainer"
+      >
+        <span
+          className=" css-1xjgjl1-IndicatorSeparator"
+        />
+        <div
+          aria-hidden="true"
+          className=" css-tlfecz-indicatorContainer"
+          onMouseDown={[Function]}
+          onTouchEnd={[Function]}
+        >
+          <svg
+            aria-hidden="true"
+            className="css-6q0nyr-Svg"
+            focusable="false"
+            height={20}
+            viewBox="0 0 20 20"
+            width={20}
+          >
+            <path
+              d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 `;

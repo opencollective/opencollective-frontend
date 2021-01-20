@@ -1,16 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { filter, get, isNil, map } from 'lodash';
+import { get, isNil } from 'lodash';
 import dynamic from 'next/dynamic';
-import { Checkbox, Col, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'react-bootstrap';
 import styled from 'styled-components';
 
 import { capitalize } from '../lib/utils';
 
+import { Box, Flex } from './Grid';
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
 import InputTypeLocation from './InputTypeLocation';
+import StyledButton from './StyledButton';
+import StyledCheckbox from './StyledCheckbox';
+import StyledInputGroup from './StyledInputGroup';
 import StyledInputTags from './StyledInputTags';
+import StyledSelect from './StyledSelect';
+import StyledTextarea from './StyledTextarea';
 import TimezonePicker from './TimezonePicker';
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
@@ -24,91 +29,66 @@ if (process.env.DYNAMIC_IMPORT) {
   DateTime = require('./DateTime').default;
 }
 
-function FieldGroup({ controlId, label, help, pre, post, after, button, className, ...props }) {
+function FieldGroup({ label, help, pre, post, after, button, className, ...props }) {
   const validationState = props.validationState === 'error' ? 'error' : null;
   delete props.validationState;
 
   props.key = props.key || props.name;
 
   const inputProps = { ...props };
-  delete inputProps.controlId;
+  delete inputProps.children;
 
   if (className && className.match(/horizontal/)) {
     return (
-      <FormGroup controlId={controlId} validationState={validationState} className={className}>
-        <Col componentClass={ControlLabel} sm={2}>
-          {label}
-        </Col>
-        <Col sm={10}>
-          <InputGroup>
-            {pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
-            <FormControl {...inputProps} />
-            {post && <InputGroup.Addon>{post}</InputGroup.Addon>}
-            {after && <div className="after">{after}</div>}
-            {validationState && <FormControl.Feedback />}
-            {button && <InputGroup.Button>{button}</InputGroup.Button>}
-          </InputGroup>
+      <Flex flexWrap="wrap" p={1}>
+        <Box width={[1, 2 / 12]}>
+          <label>{label}</label>
+        </Box>
+        <Box width={[1, 10 / 12]}>
+          <StyledInputGroup prepend={pre} append={post} success={validationState} {...inputProps} />
+          {after && <div className="after">{after}</div>}
+          {button && <StyledButton>{button}</StyledButton>}
           {help && <HelpBlock>{help}</HelpBlock>}
-        </Col>
-      </FormGroup>
+        </Box>
+      </Flex>
     );
   } else {
     return (
-      <FormGroup controlId={controlId} validationState={validationState} className={className}>
-        {label && <ControlLabel>{label}</ControlLabel>}
-        {(pre || button) && (
-          <InputGroup>
-            {pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
-            <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
-            {post && <InputGroup.Addon>{post}</InputGroup.Addon>}
-            {validationState && <FormControl.Feedback />}
-            {button && <InputGroup.Button>{button}</InputGroup.Button>}
-          </InputGroup>
+      <Flex flexWrap="wrap" p={1}>
+        {label && (
+          <Box width={1}>
+            <label>{label}</label>
+          </Box>
         )}
-        {!pre && !post && !button && (
-          <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
-        )}
+        <Box width={1}>
+          <StyledInputGroup prepend={pre} append={post} success={validationState} {...inputProps} />
+          {button && <StyledButton>{button}</StyledButton>}
+        </Box>
         {help && <HelpBlock>{help}</HelpBlock>}
-      </FormGroup>
+      </Flex>
     );
   }
 }
 
 const InputFieldContainer = styled.div`
-  span.input-group {
-    width: 100%;
+  input {
+    padding: 6px 12px;
   }
-  .inputField {
-    margin: 1rem 0;
-  }
-  .inputField,
-  .inputField textarea {
-    font-size: 1.6rem;
-  }
-  .horizontal .form-group label {
+
+  label {
     margin-top: 5px;
+    margin-bottom: 5px;
   }
-  .form-horizontal .form-group label {
-    padding-top: 3px;
+
+  .horizontal label {
+    padding-right: 15px;
+    padding-left: 15px;
   }
-  .inputField .checkbox label {
-    width: auto;
-  }
-  .inputField input[type='number'] {
-    text-align: right;
-  }
-  .inputField .currency input[type='number'] {
-    text-align: left;
-  }
-  .inputField .switch {
-    display: flex;
-    align-items: center;
-  }
-  .archiveField {
-    width: 100%;
-    display: flex;
-    padding-top: 20px;
-  }
+`;
+
+const HelpBlock = styled(Box)`
+  color: #737373;
+  font-size: 1.2rem;
 `;
 
 class InputField extends React.Component {
@@ -224,68 +204,103 @@ class InputField extends React.Component {
           }
         }
         this.input = (
-          <FieldGroup
-            label={capitalize(field.label)}
-            componentClass="textarea"
-            className={field.className}
-            placeholder={this.props.placeholder}
-            name={field.name}
-            help={field.description}
-            after={after}
-            maxLength={field.maxLength}
-            value={this.state.value || this.props.defaultValue || ''}
-            onChange={event => this.handleChange(event.target.value)}
-            disabled={field.disabled}
-          />
+          <div>
+            {horizontal && (
+              <Flex flexWrap="wrap" p={1}>
+                <Box width={[1, 2 / 12]}>
+                  <label>{capitalize(field.label)}</label>
+                </Box>
+                <Box width={[1, 10 / 12]}>
+                  <StyledTextarea
+                    width="100%"
+                    className={field.className}
+                    onChange={event => this.handleChange(event.target.value)}
+                    placeholder={this.props.placeholder}
+                    value={this.state.value || this.props.defaultValue || ''}
+                    maxLength={field.maxLength}
+                  />
+                  {after && <div className="after">{after}</div>}
+                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                </Box>
+              </Flex>
+            )}
+            {!horizontal && (
+              <Flex flexWrap="wrap" p={1}>
+                {field.label && (
+                  <Box width={1}>
+                    <label>{`${capitalize(field.label)}`}</label>
+                  </Box>
+                )}
+                <Box width={1}>
+                  <StyledTextarea
+                    width="100%"
+                    className={field.className}
+                    onChange={event => this.handleChange(event.target.value)}
+                    placeholder={this.props.placeholder}
+                    value={this.state.value || this.props.defaultValue || ''}
+                    maxLength={field.maxLength}
+                  />
+                  {after && <div className="after">{after}</div>}
+                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                </Box>
+              </Flex>
+            )}
+          </div>
         );
         break;
       }
 
       case 'tags':
         this.input = (
-          <FormGroup>
+          <div>
             {horizontal && (
-              <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
-                <Col sm={10}>
+              <Flex flexWrap="wrap" p={1}>
+                <Box width={[1, 2 / 12]}>
+                  <label>{capitalize(field.label)}</label>
+                </Box>
+                <Box width={[1, 2 / 12]}>
                   <StyledInputTags
                     {...field}
                     renderUpdatedTags
                     onChange={entries => field.onChange(entries.map(e => e.value))}
                   />
-                </Col>
-              </div>
+                </Box>
+              </Flex>
             )}
             {!horizontal && (
-              <div>
-                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                <StyledInputTags
-                  {...field}
-                  renderUpdatedTags
-                  onChange={entries => field.onChange(entries.map(e => e.value))}
-                />
-              </div>
+              <Flex flexWrap="wrap" p={1}>
+                {field.label && (
+                  <Box width={1}>
+                    <label>{`${capitalize(field.label)}`}</label>
+                  </Box>
+                )}
+                {field.description && <HelpBlock p={1}>{field.description}</HelpBlock>}
+                <Box width={1}>
+                  <StyledInputTags
+                    {...field}
+                    renderUpdatedTags
+                    onChange={entries => field.onChange(entries.map(e => e.value))}
+                  />
+                </Box>
+              </Flex>
             )}
-          </FormGroup>
+          </div>
         );
         break;
 
       case 'date':
       case 'datetime': {
-        const timeFormat = field.type === 'date' ? false : true;
+        const timeFormat = field.type !== 'date';
         const { closeOnSelect } = this.props;
 
         this.input = (
-          <FormGroup>
+          <div>
             {horizontal && (
-              <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
-                <Col sm={10}>
+              <Flex flexWrap="wrap" p={1}>
+                <Box width={[1, 2 / 12]}>
+                  <label>{capitalize(field.label)}</label>
+                </Box>
+                <Box width={[1, 10 / 12]}>
                   <DateTime
                     name={field.name}
                     timeFormat={field.timeFormat || timeFormat}
@@ -295,99 +310,123 @@ class InputField extends React.Component {
                     onChange={date => (date.toISOString ? this.handleChange(date.toISOString()) : false)}
                     closeOnSelect={closeOnSelect}
                   />
-                </Col>
-              </div>
+                </Box>
+              </Flex>
             )}
             {!horizontal && (
-              <div>
-                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <DateTime
-                  name={field.name}
-                  timeFormat={field.timeFormat || timeFormat}
-                  date={this.state.value || field.defaultValue}
-                  timezone={context.timezone || 'utc'}
-                  isValidDate={field.validate}
-                  onChange={date => (date.toISOString ? this.handleChange(date.toISOString()) : false)}
-                  closeOnSelect={closeOnSelect}
-                />
-                {field.description && <HelpBlock>{field.description}</HelpBlock>}
-              </div>
+              <Flex flexWrap="wrap" p={1}>
+                {field.label && (
+                  <Box width={1}>
+                    <label>{`${capitalize(field.label)}`}</label>
+                  </Box>
+                )}
+                <Box width={1}>
+                  <DateTime
+                    name={field.name}
+                    timeFormat={field.timeFormat || timeFormat}
+                    date={this.state.value || field.defaultValue}
+                    timezone={context.timezone || 'utc'}
+                    isValidDate={field.validate}
+                    onChange={date => (date.toISOString ? this.handleChange(date.toISOString()) : false)}
+                    closeOnSelect={closeOnSelect}
+                  />
+                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                </Box>
+              </Flex>
             )}
-          </FormGroup>
+          </div>
         );
         break;
       }
 
       case 'component':
         this.input = (
-          <FormGroup>
+          <div>
             {horizontal && (
-              <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
-                <Col sm={10}>
+              <Flex flexWrap="wrap" p={1}>
+                <Box width={[1, 2 / 12]}>
+                  <label>{capitalize(field.label)}</label>
+                </Box>
+                <Box width={[1, 10 / 12]}>
                   <field.component onChange={this.handleChange} {...field} {...field.options} />
-                </Col>
-              </div>
+                </Box>
+              </Flex>
             )}
             {!horizontal && (
-              <div>
-                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <field.component onChange={this.handleChange} {...field} {...field.options} />
-                {field.description && <HelpBlock>{field.description}</HelpBlock>}
-              </div>
+              <Flex flexWrap="wrap" p={1}>
+                {field.label && (
+                  <Box width={1}>
+                    <label>{`${capitalize(field.label)}`}</label>
+                  </Box>
+                )}
+                <Box width={1}>
+                  <field.component onChange={this.handleChange} {...field} {...field.options} />
+                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                </Box>
+              </Flex>
             )}
-          </FormGroup>
+          </div>
         );
         break;
 
       case 'location':
         this.input = (
-          <FormGroup>
-            {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-            <InputTypeLocation
-              value={this.state.value || field.defaultValue}
-              onChange={event => this.handleChange(event)}
-              placeholder={field.placeholder}
-              options={field.options}
-            />
-            {field.description && <HelpBlock>{field.description}</HelpBlock>}
-          </FormGroup>
+          <Flex flexWrap="wrap" p={1}>
+            {field.label && (
+              <Box width={1}>
+                <label>{`${capitalize(field.label)}`}</label>
+              </Box>
+            )}
+            <Box width={1}>
+              <InputTypeLocation
+                value={this.state.value || field.defaultValue}
+                onChange={event => this.handleChange(event)}
+                placeholder={field.placeholder}
+                options={field.options}
+              />
+              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+            </Box>
+          </Flex>
         );
         break;
 
       case 'country':
         this.input = (
-          <FormGroup>
+          <div>
             {horizontal && (
-              <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
-                <Col sm={10}>
+              <Flex flexWrap="wrap" p={1}>
+                <Box width={[1, 2 / 12]}>
+                  <label>{capitalize(field.label)}</label>
+                </Box>
+                <Box width={[1, 10 / 12]}>
                   <InputTypeCountry
                     name={field.name}
                     value={field.value}
                     defaultValue={field.defaultValue}
                     onChange={this.handleChange}
                   />
-                </Col>
-              </div>
+                </Box>
+              </Flex>
             )}
             {!horizontal && (
-              <div>
-                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <InputTypeCountry
-                  name={field.name}
-                  value={field.value}
-                  defaultValue={field.defaultValue}
-                  onChange={this.handleChange}
-                />
-                {field.description && <HelpBlock>{field.description}</HelpBlock>}
-              </div>
+              <Flex flexWrap="wrap" p={1}>
+                {field.label && (
+                  <Box width={1}>
+                    <label>{`${capitalize(field.label)}`}</label>
+                  </Box>
+                )}
+                <Box width={1}>
+                  <InputTypeCountry
+                    name={field.name}
+                    value={field.value}
+                    defaultValue={field.defaultValue}
+                    onChange={this.handleChange}
+                  />
+                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                </Box>
+              </Flex>
             )}
-          </FormGroup>
+          </div>
         );
         break;
 
@@ -435,103 +474,166 @@ class InputField extends React.Component {
         const firstOptionValue =
           field.options[0].value !== undefined ? field.options[0].value : Object.keys(field.options[0])[0];
 
-        this.input = (
-          <FieldGroup
-            key={`${field.name}-${firstOptionValue}`} // make sure we instantiate a new component if first value changes
-            componentClass="select"
-            type={field.type}
+        let defaultValue;
+        if (field.defaultValue) {
+          let defaultOption;
+          if (field.options[0].value !== undefined) {
+            defaultOption = field.options.find(option => option.value === field.defaultValue);
+            defaultValue = defaultOption;
+          } else {
+            defaultOption = field.options.find(option => Object.keys(option)[0] === field.defaultValue);
+            defaultValue = {
+              key: Object.keys(defaultOption)[0],
+              value: Object.keys(defaultOption)[0],
+              label: Object.values(defaultOption)[0],
+            };
+          }
+        } else {
+          if (field.options[0].value !== undefined) {
+            defaultValue = {
+              key: field.options[0].value,
+              value: field.options[0].value,
+              label: field.options[0].label,
+            };
+          } else {
+            defaultValue = {
+              key: Object.keys(field.options[0])[0],
+              value: Object.keys(field.options[0])[0],
+              label: Object.values(field.options[0])[0],
+            };
+          }
+        }
+
+        const StyledSelectComponent = (
+          <StyledSelect
             name={field.name}
-            label={field.label && `${capitalize(field.label)}`}
-            help={field.description}
+            data-cy={field.name}
+            type="select"
+            key={`${field.name}-${firstOptionValue}`} // make sure we instantiate a new component if first value changes
             placeholder={field.placeholder}
             className={field.className}
-            autoFocus={field.focus}
-            defaultValue={field.defaultValue || firstOptionValue}
-            value={field.value}
-            onChange={event =>
-              field.multiple
-                ? this.handleChange(map(filter(event.target.options, 'selected'), 'value'))
-                : this.handleChange(event.target.value)
-            }
-            multiple={field.multiple}
+            defaultValue={defaultValue}
             disabled={field.disabled}
-          >
-            {field.options &&
+            options={
+              field.options &&
               field.options.map(option => {
                 const value = option.value !== undefined ? option.value : Object.keys(option)[0];
                 const label = option.label || option[value];
-                return (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                );
-              })}
-          </FieldGroup>
+                return { key: value, value: value, label: label };
+              })
+            }
+            onChange={option => {
+              this.handleChange(option.value);
+            }}
+          />
+        );
+
+        this.input = (
+          <div>
+            {horizontal && (
+              <div>
+                <Flex flexWrap="wrap" p={1}>
+                  <Box width={[1, 2 / 12]}>
+                    <label>{capitalize(field.label)}</label>
+                  </Box>
+                  <Box width={[1, 10 / 12]}>{StyledSelectComponent}</Box>
+                </Flex>
+                {field.description && (
+                  <Flex flexWrap="wrap" p={1}>
+                    <Box width={[1, 2 / 12]} />
+                    <Box width={[1, 10 / 12]}>
+                      <HelpBlock>{field.description}</HelpBlock>
+                    </Box>
+                  </Flex>
+                )}
+              </div>
+            )}
+            {!horizontal && (
+              <Flex flexWrap="wrap" p={1}>
+                {field.label && (
+                  <Box width={1}>
+                    <label>{`${capitalize(field.label)}`}</label>
+                  </Box>
+                )}
+                <Box width={1}>
+                  {StyledSelectComponent}
+                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                </Box>
+              </Flex>
+            )}
+          </div>
         );
         break;
       }
 
       case 'checkbox':
         this.input = (
-          <FormGroup controlId={field.name}>
+          <div>
             {horizontal && (
               <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
-                <Col sm={10}>
-                  <Checkbox
-                    defaultChecked={field.defaultValue}
-                    onChange={event => this.handleChange(event.target.checked)}
-                  >
-                    {field.description}
-                  </Checkbox>
-                </Col>
+                <Flex flexWrap="wrap" p={1}>
+                  <Box width={[1, 2 / 12]}>
+                    <label>{capitalize(field.label)}</label>
+                  </Box>
+                  <Box width={[1, 10 / 12]}>
+                    <StyledCheckbox
+                      name="input-checkbox"
+                      defaultChecked={field.defaultValue}
+                      onChange={event => this.handleChange(event.target.checked)}
+                      label={field.description}
+                    />
+                  </Box>
+                </Flex>
                 {field.help && (
-                  <Col sm={10} smOffset={2}>
-                    <HelpBlock>{field.help}</HelpBlock>
-                  </Col>
+                  <Flex flexWrap="wrap" p={1}>
+                    <Box width={[1, 2 / 12]} />
+                    <Box width={[1, 10 / 12]}>
+                      <HelpBlock>{field.help}</HelpBlock>
+                    </Box>
+                  </Flex>
                 )}
               </div>
             )}
             {!horizontal && (
-              <div>
-                {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
-                <Checkbox
-                  defaultChecked={field.defaultValue}
-                  onChange={event => this.handleChange(event.target.checked)}
-                >
-                  {field.description}
-                </Checkbox>
-              </div>
+              <Flex flexWrap="wrap" p={1}>
+                <Box width={1}>
+                  <StyledCheckbox
+                    name="input-checkbox"
+                    defaultChecked={field.defaultValue}
+                    onChange={event => this.handleChange(event.target.checked)}
+                    label={field.description}
+                  />
+                  {field.help && <HelpBlock>{field.help}</HelpBlock>}
+                </Box>
+              </Flex>
             )}
-          </FormGroup>
+          </div>
         );
         break;
 
       case 'switch':
         this.input = (
-          <FormGroup controlId={field.name} help={field.description}>
+          <div>
             {horizontal && (
-              <React.Fragment>
+              <Flex flexWrap="wrap" p={1}>
                 {field.label && (
-                  <Col componentClass={ControlLabel} sm={2}>
-                    {capitalize(field.label)}
-                  </Col>
+                  <Box width={[1, 2 / 12]}>
+                    <label>{capitalize(field.label)}</label>
+                  </Box>
                 )}
-                <Col sm={10}>
+                <Box width={[1, 10 / 12]}>
                   <InputSwitch
                     name={field.name}
                     defaultChecked={field.defaultValue}
                     onChange={event => this.handleChange(event.target.checked)}
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                </Col>
-              </React.Fragment>
+                </Box>
+              </Flex>
             )}
             {!horizontal && (
               <React.Fragment>
-                {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
+                {field.label && <label>{capitalize(field.label)}</label>}
                 <div className="switch">
                   <InputSwitch
                     name={field.name}
@@ -542,14 +644,14 @@ class InputField extends React.Component {
                 </div>
               </React.Fragment>
             )}
-          </FormGroup>
+          </div>
         );
         break;
 
       case 'html':
         this.input = (
           <div>
-            {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
+            {field.label && <label>{capitalize(field.label)}</label>}
             <HTMLEditor
               value={this.props.value}
               defaultValue={field.defaultValue}

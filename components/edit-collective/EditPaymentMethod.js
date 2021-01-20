@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCurrencySymbol } from '../../lib/currency-utils';
@@ -163,7 +162,7 @@ class EditPaymentMethod extends React.Component {
         </Flex>
 
         {this.props.hasMonthlyLimitPerMember && (
-          <Row>
+          <Flex flexWrap="wrap">
             <InputField
               className="horizontal"
               label={capitalize(intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.label']))}
@@ -176,7 +175,7 @@ class EditPaymentMethod extends React.Component {
               disabled={isSaving}
               options={{ step: 1 }}
             />
-          </Row>
+          </Flex>
         )}
       </div>
     );
