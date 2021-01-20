@@ -17,6 +17,7 @@ import EditUpdateForm from './EditUpdateForm';
 import { Box, Flex } from './Grid';
 import Link from './Link';
 import LinkCollective from './LinkCollective';
+import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import StyledButton from './StyledButton';
@@ -24,7 +25,6 @@ import StyledHr from './StyledHr';
 import StyledTag from './StyledTag';
 import StyledTooltip from './StyledTooltip';
 import { H5 } from './Text';
-import UpdateTextWithData from './UpdateTextWithData';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;
@@ -67,6 +67,7 @@ class StyledUpdate extends Component {
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    isReloadingData: PropTypes.object,
     editUpdate: PropTypes.func.isRequired,
     deleteUpdate: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
@@ -210,8 +211,7 @@ class StyledUpdate extends Component {
   }
 
   renderSummary(update) {
-    const { collective } = this.props;
-
+    const { collective, isReloadingData } = this.props;
     return (
       <React.Fragment>
         {update.userCanSeeUpdate && (
@@ -224,7 +224,7 @@ class StyledUpdate extends Component {
             dangerouslySetInnerHTML={{ __html: update.summary }}
           />
         )}
-        {!update.userCanSeeUpdate && (
+        {!update.userCanSeeUpdate && !isReloadingData && (
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
               id="update.private.cannot_view_message"
@@ -238,15 +238,15 @@ class StyledUpdate extends Component {
   }
 
   renderFullContent() {
-    const { update, collective, LoggedInUser } = this.props;
+    const { update, collective, LoggedInUser, isReloadingData } = this.props;
     const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
 
     return (
       <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]}>
         <StyledHr mt={3} mb={4} borderColor="black.100" />
-        {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
-        {!update.html && <UpdateTextWithData id={update.id} />}
-        {!update.userCanSeeUpdate && (
+        {update.html ? (
+          <div dangerouslySetInnerHTML={{ __html: update.html }} />
+        ) : !update.userCanSeeUpdate && !isReloadingData ? (
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
               id="update.private.cannot_view_message"
@@ -254,7 +254,9 @@ class StyledUpdate extends Component {
               values={{ collective: collective.name }}
             />
           </PrivateUpdateMesgBox>
-        )}
+        ) : isReloadingData ? (
+          <LoadingPlaceholder height={300} />
+        ) : null}
         {canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
       </Container>
     );

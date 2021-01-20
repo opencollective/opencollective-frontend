@@ -11,7 +11,7 @@ import { compose } from '../lib/utils';
 import Container from './Container';
 import StyledButton from './StyledButton';
 import StyledSelect from './StyledSelect';
-import { H5, Span } from './Text';
+import { Label, Span } from './Text';
 
 const Notice = styled.div`
   color: #525866;
@@ -54,9 +54,9 @@ class PublishUpdateBtn extends React.Component {
   render() {
     const update = this.props.data.update;
     const isLoading = this.props.data.loading;
-    const isHost = get(update, 'collective.isHost');
-    const backers = get(update, 'collective.stats.backers.all');
-    const hostedCollectives = get(update, 'collective.stats.collectives.hosted');
+    const isHost = get(update, 'account.isHost');
+    const backers = get(update, 'account.totalFinancialContributors');
+    const hostedCollectives = get(update, 'account.totalHostedCollectives');
 
     const options = [
       {
@@ -118,10 +118,11 @@ class PublishUpdateBtn extends React.Component {
         <Container mt="4" mb="5" display="flex" flexDirection="column" alignItems="left" width="100%" maxWidth={400}>
           {isHost && (
             <Span>
-              <H5>
+              <Label htmlFor="whoToNotify" mb={2}>
                 <FormattedMessage id="update.publish.notify.selection" defaultMessage="Select who should be notified" />
-              </H5>
+              </Label>
               <StyledSelect
+                inputId="whoToNotify"
                 options={options}
                 defaultValue={options[0]}
                 onChange={selected => this.handleNotificationChange(selected)}
@@ -165,6 +166,12 @@ const updateQuery = gqlV2/* GraphQL */ `
       account {
         id
         isHost
+        ... on AccountWithContributions {
+          totalFinancialContributors
+        }
+        ... on Host {
+          totalHostedCollectives
+        }
       }
     }
   }
