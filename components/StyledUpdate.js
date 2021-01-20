@@ -126,6 +126,7 @@ class StyledUpdate extends Component {
   renderUpdateMeta(update, editable) {
     const { intl } = this.props;
     const { mode } = this.state;
+    const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
       <Container display="flex" alignItems="Baseline" color="#969BA3" data-cy="meta" flexWrap="wrap">
@@ -153,7 +154,7 @@ class StyledUpdate extends Component {
                 }),
                 author: (
                   <Box as="span" mr={2} fontSize="12px">
-                    <LinkCollective collective={update.fromCollective} />
+                    <LinkCollective collective={fromAccount} />
                   </Box>
                 ),
               }}
@@ -168,7 +169,7 @@ class StyledUpdate extends Component {
                 date: formatDate(update.createdAt),
                 author: (
                   <Box as="span" mr={2} fontSize="12px">
-                    <LinkCollective collective={update.fromCollective} />
+                    <LinkCollective collective={fromAccount} />
                   </Box>
                 ),
               }}
@@ -278,6 +279,7 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
     const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
     const editable = !compact && props.editable && canEditUpdate;
+    const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
       <React.Fragment>
@@ -286,8 +288,8 @@ class StyledUpdate extends Component {
             <Container width="100%">
               <Flex mb={2}>
                 <Container mr={20}>
-                  <LinkCollective collective={update.fromCollective}>
-                    <Avatar collective={update.fromCollective} radius={40} />
+                  <LinkCollective collective={fromAccount}>
+                    <Avatar collective={fromAccount} radius={40} />
                   </LinkCollective>
                 </Container>
                 <Box>

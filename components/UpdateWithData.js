@@ -153,11 +153,13 @@ const updateQuery = gqlV2/* GraphQL */ `
         id
         slug
         type
+        name
       }
       fromAccount {
         id
         slug
         type
+        name
       }
       comments {
         nodes {
