@@ -44,11 +44,14 @@ const transformResultInCSV = json => {
     `Net Amount (${collectiveCurrency})`,
     'Subscription Interval',
     'Order Date',
+    'Tags',
   ].join(',');
 
   const lines = json.map(i => {
     const profile = `http://opencollective.com/${i.fromCollective.slug}`;
     const subscriptionInterval = i.subscription ? i.subscription.interval : 'one time';
+    const expenseTags = i.expense && i.expense.tags ? i.expense.tags.join(', ') : '';
+
     return [
       q(i.description) /* Transaction Description */,
       q(i.fromCollective.name) /* User Name  */,
@@ -63,6 +66,7 @@ const transformResultInCSV = json => {
       f(i.netAmountInCollectiveCurrency) /* Net Amount */,
       q(subscriptionInterval) /* Interval of subscription */,
       q(new Date(i.createdAt).toISOString()) /* Order Date */,
+      q(expenseTags) /* Tags */,
     ].join(',');
   });
 
