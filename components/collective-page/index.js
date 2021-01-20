@@ -368,6 +368,8 @@ class CollectivePage extends Component {
       isHostAdmin,
     );
 
+    console.log('sections', sections);
+
     return (
       <Container
         position="relative"
