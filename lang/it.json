@@ -1305,7 +1305,7 @@
   "OCFHostApplication.weAreAFund": "We are a fund",
   "OCFHostApplication.websiteAndSocialLinks.label": "Website and / or social media links:",
   "OCFHostApplication.yourInitiativeIsNearlyThere": "Your initiative is nearly there!",
-  "OCFHostApplication.yourInitiativeIsNearlyThere.description": "IWe just need to undertake a short internal process to include your initiative in our operations.\n            {lineBreak}{lineBreak}\n            In the meantime, you can use these useful links.",
+  "OCFHostApplication.yourInitiativeIsNearlyThere.description": "We just need to undertake a short internal process to include your initiative in our operations.\n            {lineBreak}{lineBreak}\n            In the meantime, you can use these useful links.",
   "oldPricing.title": "I nostri vecchi prezzi",
   "onboarding.admins.caption": "Admins can modify the Collective page and approve expenses.",
   "onboarding.admins.header": "Add administrators",

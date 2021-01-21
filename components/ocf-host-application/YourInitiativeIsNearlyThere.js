@@ -61,7 +61,7 @@ const YourInitiativeIsNearlyThere = () => (
         <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.600">
           <FormattedMessage
             id="OCFHostApplication.yourInitiativeIsNearlyThere.description"
-            defaultMessage="IWe just need to undertake a short internal process to include your initiative in our operations.
+            defaultMessage="We just need to undertake a short internal process to include your initiative in our operations.
             {lineBreak}{lineBreak}
             In the meantime, you can use these useful links."
             values={{
