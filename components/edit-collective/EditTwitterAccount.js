@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
-import SmallButton from '../SmallButton';
+import StyledButton from '../StyledButton';
 
 const NotificationSettingsContainer = styled.div`
   label {
@@ -194,9 +194,9 @@ class EditTwitterAccount extends React.Component {
               <Box width={[1, 3 / 12]} />
               <Box width={[1, 9 / 12]}>
                 {this.state.isModified && (
-                  <SmallButton className="default" onClick={this.onClick}>
+                  <StyledButton buttonSize="small" onClick={this.onClick}>
                     <FormattedMessage id="save" defaultMessage="Save" />
-                  </SmallButton>
+                  </StyledButton>
                 )}
               </Box>
             </Flex>

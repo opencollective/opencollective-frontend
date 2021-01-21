@@ -11,7 +11,6 @@ import { compose } from '../lib/utils';
 import { Router } from '../server/pages';
 
 import Body from '../components/Body';
-import Button from '../components/Button';
 import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
 import EditUpdateForm from '../components/EditUpdateForm';
@@ -21,6 +20,7 @@ import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
+import StyledButton from '../components/StyledButton';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
@@ -116,9 +116,9 @@ class CreateUpdatePage extends React.Component {
                     />
                   </p>
                   <p>
-                    <Button className="blue" href={`/signin?next=/${collective.slug}/updates/new`}>
+                    <StyledButton buttonStyle="primary" href={`/signin?next=/${collective.slug}/updates/new`}>
                       <FormattedMessage id="signIn" defaultMessage="Sign In" />
-                    </Button>
+                    </StyledButton>
                   </p>
                 </div>
               )}
