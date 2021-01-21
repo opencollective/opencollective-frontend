@@ -263,7 +263,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         </MenuItem>
                         <AddFundsModal
                           collective={collective}
-                          host={collective}
+                          host={collective.host}
                           show={hasAddFundsModal}
                           setShow={showAddFundsModal}
                           onClose={() => showAddFundsModal(null)}
@@ -335,6 +335,9 @@ CollectiveNavbarActionsMenu.propTypes = {
     type: PropTypes.string,
     settings: PropTypes.object,
     tiers: PropTypes.array,
+    host: PropTypes.shape({
+      hostFees: PropTypes.bool,
+    }),
   }),
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */

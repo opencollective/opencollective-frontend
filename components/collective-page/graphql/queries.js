@@ -89,6 +89,10 @@ export const collectivePageQuery = gql`
         slug
         type
         settings
+        plan {
+          id
+          hostFees
+        }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
         ...ContributorsFields
@@ -217,6 +221,7 @@ export const collectivePageQuery = gql`
         ...UpdatesFields
       }
       plan {
+        id
         hostedCollectives
         hostedCollectivesLimit
       }

@@ -1046,7 +1046,7 @@ type Comment {
   id: String
   createdAt: DateTime
   html: String
-  markdown: String
+  markdown: String @deprecated(reason: "2020-01-25: Use html")
   fromAccount: Account
   account: Account
 
@@ -4425,6 +4425,11 @@ type HostMetrics {
 The name of the current plan and its characteristics.
 """
 type HostPlan {
+  """
+  The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
+  """
+  id: String
+
   """
   The name of the plan
   """
