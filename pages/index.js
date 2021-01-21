@@ -47,7 +47,6 @@ HomePage.getInitialProps = ({ req, res }) => {
 
   // If on server side
   if (req) {
-    req.noStyledJsx = true;
     skipDataFromTree = true;
   }
 
