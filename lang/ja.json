@@ -1731,6 +1731,7 @@
   "TopContributors.Organizations": "Organizations",
   "tos": "terms of service",
   "TOSAndPrivacyPolicyAgreement": "I agree with the {toslink} and {privacylink} of Open Collective.",
+  "TOTAL": "TOTAL",
   "TotalAmount": "Total amount",
   "TotalAmountWithoutFee": "Total amount (without fees)",
   "TotalDonatedSince": "{totalDonated} since {date}",

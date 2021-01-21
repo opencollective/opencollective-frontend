@@ -1731,6 +1731,7 @@
   "TopContributors.Organizations": "Organisations",
   "tos": "conditions d'utilisation",
   "TOSAndPrivacyPolicyAgreement": "J'accepte les {toslink} et {privacylink} d'Open Collective.",
+  "TOTAL": "TOTAL",
   "TotalAmount": "Montant total",
   "TotalAmountWithoutFee": "Montant total (sans frais)",
   "TotalDonatedSince": "{totalDonated} depuis {date}",

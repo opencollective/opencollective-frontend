@@ -1,8 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { sumBy } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import ExpenseBudgetItem from '../budget/ExpenseBudgetItem';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 
 const ExpenseContainer = styled.div`
@@ -11,6 +15,16 @@ const ExpenseContainer = styled.div`
     css`
       border-top: 1px solid #e6e8eb;
     `}
+`;
+
+const FooterContainer = styled.div`
+  padding: 16px 27px;
+  border-top: 1px solid #e6e8eb;
+`;
+
+const FooterLabel = styled.span`
+  font-size: 15px;
+  margin-right: 5px;
 `;
 
 const ExpensesList = ({
@@ -31,6 +45,8 @@ const ExpensesList = ({
     return null;
   }
 
+  const totalAmount = sumBy(expenses, 'amount');
+
   return (
     <StyledCard>
       {expenses.map((expense, idx) => (
@@ -49,6 +65,22 @@ const ExpensesList = ({
           />
         </ExpenseContainer>
       ))}
+      {!isLoading && (
+        <FooterContainer>
+          <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
+            <Flex my={2} mr={[3, 0]} minWidth={100} justifyContent="flex-end" data-cy="transaction-amount">
+              <React.Fragment>
+                <FooterLabel color="black.500">
+                  <FormattedMessage id="TOTAL" defaultMessage="TOTAL" />
+                </FooterLabel>
+                <FooterLabel color="black.500">
+                  <FormattedMoneyAmount amount={totalAmount} currency={collective?.currency} precision={2} />
+                </FooterLabel>
+              </React.Fragment>
+            </Flex>
+          </Flex>
+        </FooterContainer>
+      )}
     </StyledCard>
   );
 };
@@ -69,6 +101,7 @@ ExpensesList.propTypes = {
     parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
+    currency: PropTypes.string,
   }),
   expenses: PropTypes.arrayOf(
     PropTypes.shape({
@@ -76,6 +109,7 @@ ExpensesList.propTypes = {
       legacyId: PropTypes.number.isRequired,
     }),
   ),
+  totalAmount: PropTypes.number,
 };
 
 ExpensesList.defaultProps = {

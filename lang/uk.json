@@ -1731,6 +1731,7 @@
   "TopContributors.Organizations": "Організації",
   "tos": "умови користування",
   "TOSAndPrivacyPolicyAgreement": "I agree with the {toslink} and {privacylink} of Open Collective.",
+  "TOTAL": "TOTAL",
   "TotalAmount": "Загальна сума",
   "TotalAmountWithoutFee": "Загальна сума (без плати за послуги)",
   "TotalDonatedSince": "{totalDonated} з {date}",
