@@ -4694,6 +4694,11 @@ type Individual implements Account {
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
+
+  """
+  If user is a host account, this will return the matching Host object
+  """
+  host: Host
 }
 
 scalar IsoDateString
@@ -5949,7 +5954,7 @@ type Organization implements Account & AccountWithContributions {
   email: String
 
   """
-  If the organization if a host account, this will return the matchig Host object
+  If the organization if a host account, this will return the matching Host object
   """
   host: Host
 }
