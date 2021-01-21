@@ -11,19 +11,21 @@ import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import { Span } from './Text';
 
-export const InviteCollectiveDropdownOption = ({ onClick }) => (
+export const InviteCollectiveDropdownOption = ({ onClick, isSearching }) => (
   <Flex flexDirection="column">
-    <Flex mb="16px">
-      <img width="48px" height="48px" src="/static/images/magnifier.png" />
-      <Box ml="16px">
-        <Span fontSize="12px" fontWeight="700" color="black.800">
-          <FormattedMessage
-            id="CollectivePicker.InviteMenu.Description"
-            defaultMessage="The person or organization you are looking for is not on Open Collective yet."
-          />
-        </Span>
-      </Box>
-    </Flex>
+    {isSearching && (
+      <Flex mb="16px">
+        <img width="48px" height="48px" src="/static/images/magnifier.png" />
+        <Box ml="16px">
+          <Span fontSize="12px" fontWeight="700" color="black.800">
+            <FormattedMessage
+              id="CollectivePicker.InviteMenu.Description"
+              defaultMessage="The person or organization you are looking for is not on Open Collective yet."
+            />
+          </Span>
+        </Box>
+      </Flex>
+    )}
     <StyledButton borderRadius="14px" onClick={onClick}>
       <Flex alignItems="center">
         <PlusCircle size={24} />
@@ -40,6 +42,7 @@ export const InviteCollectiveDropdownOption = ({ onClick }) => (
 
 InviteCollectiveDropdownOption.propTypes = {
   onClick: PropTypes.func.isRequired,
+  isSearching: PropTypes.bool,
 };
 
 export const InviteCollectiveForm = ({ onCancel, onSave }) => {
