@@ -110,29 +110,7 @@ const messages = defineMessages({
   },
 });
 
-const initialValues = {
-  user: {
-    name: '',
-    email: '',
-  },
-  collective: {
-    name: '',
-    slug: '',
-    description: '',
-  },
-  applicationData: {
-    location: '',
-    initiativeDuration: '',
-    totalAmountRaised: 0,
-    totalAmountToBeRaised: 0,
-    expectedFundingPartner: '',
-    missionImpactExplanation: '',
-    websiteAndSocialLinks: '',
-  },
-  termsOfServiceOC: false,
-};
-
-const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
+const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, setInitialValues }) => {
   const intl = useIntl();
   const [createCollective, { loading: submitting, error }] = useMutation(createCollectiveMutation, {
     context: API_V2_CONTEXT,
@@ -175,6 +153,11 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
       window.scrollTo(0, 0);
     }
   };
+
+  if (error) {
+    // Scroll the user to the top in order to see the error message
+    window.scrollTo(0, 0);
+  }
 
   return (
     <React.Fragment>
@@ -598,7 +581,13 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
                     mt={[null, 3]}
                   >
                     <Link route="/foundation/apply/fees">
-                      <StyledButton mb={[3, 0]} width={['286px', '120px']} mr={[null, 3]}>
+                      <StyledButton
+                        type="button"
+                        mb={[3, 0]}
+                        width={['286px', '120px']}
+                        mr={[null, 3]}
+                        onClick={() => setInitialValues({ ...initialValues, ...values })}
+                      >
                         <ArrowLeft2 size="14px" />
                         &nbsp;
                         <FormattedMessage id="Back" defaultMessage="Back" />
@@ -632,6 +621,8 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser }) => {
 ApplicationForm.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.object,
+  initialValues: PropTypes.object,
+  setInitialValues: PropTypes.func,
 };
 
 export default ApplicationForm;

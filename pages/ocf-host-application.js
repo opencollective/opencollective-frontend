@@ -9,8 +9,31 @@ import YourInitiativeIsNearlyThere from '../components/ocf-host-application/Your
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
+const formValues = {
+  user: {
+    name: '',
+    email: '',
+  },
+  collective: {
+    name: '',
+    slug: '',
+    description: '',
+  },
+  applicationData: {
+    location: '',
+    initiativeDuration: '',
+    totalAmountRaised: 0,
+    totalAmountToBeRaised: 0,
+    expectedFundingPartner: '',
+    missionImpactExplanation: '',
+    websiteAndSocialLinks: '',
+  },
+  termsOfServiceOC: false,
+};
+
 const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
   const [checkedTermsOfFiscalSponsorship, setCheckedTermsOfFiscalSponsorship] = useState(false);
+  const [initialValues, setInitialValues] = useState(formValues);
   const router = useRouter();
   const step = router.query.step || 'intro';
 
@@ -23,7 +46,14 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
         />
       )}
       {step === 'fees' && <AboutOurFees />}
-      {step === 'form' && <ApplicationForm loadingLoggedInUser={loadingLoggedInUser} LoggedInUser={LoggedInUser} />}
+      {step === 'form' && (
+        <ApplicationForm
+          initialValues={initialValues}
+          setInitialValues={setInitialValues}
+          loadingLoggedInUser={loadingLoggedInUser}
+          LoggedInUser={LoggedInUser}
+        />
+      )}
       {step === 'success' && <YourInitiativeIsNearlyThere />}
     </Page>
   );
