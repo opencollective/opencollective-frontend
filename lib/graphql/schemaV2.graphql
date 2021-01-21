@@ -4702,6 +4702,10 @@ type Individual implements Account {
 }
 
 scalar IsoDateString
+input IndividualCreateInput {
+  name: String!
+  email: String!
+}
 
 """
 ISO-8601 date
@@ -4900,6 +4904,11 @@ type Mutation {
     host: AccountReferenceInput
 
     """
+    User information to create along with the collective
+    """
+    user: IndividualCreateInput
+
+    """
     Wether to trigger the automated approval for Open Source collectives with GitHub.
     """
     automateApprovalWithGithub: Boolean = false
@@ -4908,6 +4917,11 @@ type Mutation {
     A message to attach for the host to review the application
     """
     message: String
+
+    """
+    Further information about collective applying to host
+    """
+    applicationData: JSON
   ): Collective
   createFund(
     """
