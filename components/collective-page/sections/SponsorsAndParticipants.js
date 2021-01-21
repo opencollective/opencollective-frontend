@@ -82,7 +82,7 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
   }, [LoggedInUser]);
 
   return (
-    <Box pt={[4, 5]}>
+    <Box pb={4}>
       {sponsors.length > 0 && (
         <ContainerSectionContent pt={[4, 5]}>
           <SectionTitle textAlign="center">

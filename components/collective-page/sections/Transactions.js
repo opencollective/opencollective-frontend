@@ -79,7 +79,13 @@ const SectionTransactions = props => {
   return (
     <Box pb={4}>
       <ContainerSectionContent>
-        <SectionTitle data-cy="section-transactions-title" mb={4} textAlign="left">
+        <SectionTitle
+          data-cy="section-transactions-title"
+          mb={4}
+          textAlign="left"
+          fontSize={['20px', '24px', '32px']}
+          color="black.700"
+        >
           <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
         </SectionTitle>
         {collectiveHasNoTransactions && (
@@ -102,7 +108,7 @@ const SectionTransactions = props => {
       )}
 
       {!collectiveHasNoTransactions && (
-        <ContainerSectionContent>
+        <ContainerSectionContent pt={3}>
           {loading ? (
             <LoadingPlaceholder height={600} borderRadius={8} />
           ) : (

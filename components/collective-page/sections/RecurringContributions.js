@@ -141,14 +141,14 @@ class SectionRecurringContributions extends React.Component {
           </TemporaryNotification>
         )}
         <ContainerSectionContent>
-          <SectionTitle textAlign="left" mb={1}>
+          <SectionTitle textAlign="left" mb={4} fontSize={['20px', '24px', '32px']} color="black.700">
             <FormattedMessage
               id="CollectivePage.SectionRecurringContributions.Title"
               defaultMessage="Recurring Contributions"
             />
           </SectionTitle>
         </ContainerSectionContent>
-        <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+        <Box mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
           <StyledFilters
             filters={filters}
             getLabel={key => intl.formatMessage(I18nFilters[key])}

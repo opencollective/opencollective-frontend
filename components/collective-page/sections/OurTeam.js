@@ -16,6 +16,8 @@ const COLLECTIVE_CARD_HEIGHT = 190;
  */
 const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
   const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
+  console.log('collective type', collective.type);
+  console.log('collective coreContributors', coreContributors);
 
   return (
     <ContainerSectionContent py={[3, 4]}>
@@ -47,6 +49,9 @@ SectionOurTeam.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.number.isRequired,
     currency: PropTypes.string,
+    parentCollective: PropTypes.shape({
+      coreContributors: PropTypes.array.isRequired,
+    }),
   }).isRequired,
 
   coreContributors: PropTypes.array.isRequired,

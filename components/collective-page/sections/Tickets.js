@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import css from '@styled-system/css';
-import { orderBy } from 'lodash';
+import { get, orderBy } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { hasNewNavbar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 
@@ -49,6 +51,7 @@ class SectionTickets extends React.PureComponent {
       }),
     ),
     isAdmin: PropTypes.bool,
+    router: PropTypes.object,
   };
 
   hasContributors = memoizeOne(contributors => {
@@ -75,9 +78,14 @@ class SectionTickets extends React.PureComponent {
   }
 
   render() {
-    const { collective, tiers, contributors, isAdmin } = this.props;
+    const { collective, tiers, contributors, isAdmin, router } = this.props;
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTiers = this.sortTiers(this.filterTickets(tiers));
+    const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
+
+    if (newNavbarFeatureFlag) {
+      return null;
+    }
 
     if ((sortedTiers.length === 0 || !collective.isActive) && !isAdmin) {
       return null;
@@ -86,7 +94,7 @@ class SectionTickets extends React.PureComponent {
     return (
       <Box pt={[4, 5]} data-cy="Tickets">
         <ContainerSectionContent>
-          <SectionTitle>
+          <SectionTitle fontSize={['20px', '24px', '32px']} color="black.700">
             <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
           </SectionTitle>
         </ContainerSectionContent>
@@ -131,4 +139,4 @@ class SectionTickets extends React.PureComponent {
   }
 }
 
-export default SectionTickets;
+export default withRouter(SectionTickets);

@@ -115,7 +115,7 @@ class SectionUpdates extends React.PureComponent {
 
     return (
       <ContainerSectionContent pb={4}>
-        <SectionTitle mb={24}>
+        <SectionTitle fontSize={['20px', '24px', '32px']} color="black.700" mb={24}>
           <FormattedMessage
             id="CollectivePage.SectionUpdates.Title"
             defaultMessage="What's new with {collectiveName}"

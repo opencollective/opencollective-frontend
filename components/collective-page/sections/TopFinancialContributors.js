@@ -27,7 +27,7 @@ const SectionTopFinancialContributors = ({ collective, financialContributors }) 
   return (
     <Fragment>
       {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
-        <ContainerSectionContent>
+        <ContainerSectionContent pb={4}>
           <TopContributorsContainer>
             <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
               <H4 fontWeight="500" color="black.900" mb={3}>

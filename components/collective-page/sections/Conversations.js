@@ -56,7 +56,7 @@ class SectionConversations extends React.PureComponent {
 
     return (
       <ContainerSectionContent pb={4}>
-        <SectionTitle mb={24}>
+        <SectionTitle fontSize={['20px', '24px', '32px']} color="black.700" mb={24}>
           <FormattedMessage id="conversations" defaultMessage="Conversations" />
         </SectionTitle>
         <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">

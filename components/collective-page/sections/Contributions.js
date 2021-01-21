@@ -263,7 +263,7 @@ class SectionContributions extends React.PureComponent {
                 />
               )}
               {data.Collective.stats.collectives.hosted > 0 && (
-                <H3 fontSize="20px" fontWeight="500" color="black.600">
+                <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
                   <FormattedMessage
                     id="organization.collective.memberOf.collective.host.title"
                     values={{ n: data.Collective.stats.collectives.hosted }}
@@ -318,7 +318,7 @@ class SectionContributions extends React.PureComponent {
         {connectedCollectives.length > 0 && (
           <Box mt={5}>
             <ContainerSectionContent>
-              <SectionTitle textAlign="left" mb={4}>
+              <SectionTitle textAlign="left" mb={4} fontSize={['20px', '24px', '32px']} color="black.700">
                 {isOrganization ? (
                   <FormattedMessage
                     id="CP.Contributions.PartOfOrg"

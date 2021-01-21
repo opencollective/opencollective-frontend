@@ -60,13 +60,13 @@ class SectionEvents extends React.PureComponent {
     }
 
     return (
-      <Box pt={[4, 5]}>
+      <Box pb={4}>
         <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
           {(ref, Chevrons) => (
             <div>
               <ContainerSectionContent pb={3}>
                 <Flex justifyContent="space-between" alignItems="center">
-                  <H3 fontSize="20px" fontWeight="600" color="black.700">
+                  <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
                     <FormattedMessage id="Events" defaultMessage="Events" />
                   </H3>
                   <Box m={2} flex="0 0 50px">
