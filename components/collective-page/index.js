@@ -323,7 +323,11 @@ class CollectivePage extends Component {
         return (
           <SectionOurTeam
             collective={this.props.collective}
-            coreContributors={this.props.coreContributors}
+            coreContributors={
+              this.props.collective.type === 'EVENT'
+                ? this.props.collective.parentCollective.coreContributors
+                : this.props.coreContributors
+            }
             LoggedInUser={this.props.LoggedInUser}
           />
         );
