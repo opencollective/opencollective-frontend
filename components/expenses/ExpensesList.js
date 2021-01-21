@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { sumBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -40,16 +41,11 @@ const ExpensesList = ({
 }) => {
   expenses = !isLoading ? expenses : [...new Array(nbPlaceholders)];
 
-  let totalAmount = 0;
-  if (!isLoading) {
-    expenses.map(expense => {
-      totalAmount += expense.amount;
-    });
-  }
-
   if (!expenses?.length) {
     return null;
   }
+
+  const totalAmount = sumBy(expenses, 'amount');
 
   return (
     <StyledCard>
