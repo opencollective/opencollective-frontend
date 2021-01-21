@@ -110,7 +110,7 @@ class SectionRecurringContributions extends React.Component {
     const recurringContributions = collective && collective.orders;
 
     return (
-      <Box pt={5} pb={3}>
+      <Box pb={4}>
         {notification && (
           <TemporaryNotification
             onDismiss={this.dismissNotification}

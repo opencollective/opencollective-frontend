@@ -114,7 +114,7 @@ class SectionUpdates extends React.PureComponent {
     }
 
     return (
-      <ContainerSectionContent pt={5} pb={3}>
+      <ContainerSectionContent pb={4}>
         <SectionTitle mb={24}>
           <FormattedMessage
             id="CollectivePage.SectionUpdates.Title"
@@ -122,16 +122,16 @@ class SectionUpdates extends React.PureComponent {
             values={{ collectiveName: collective.name }}
           />
         </SectionTitle>
-        <Flex mb={3} justifyContent="space-between" alignItems="center" flexWrap="wrap">
-          <P color="black.700" my={2} mr={2}>
+        <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
+          <P color="black.700" my={2} css={{ flex: '1 0 50%', maxWidth: 700 }}>
             <FormattedMessage
               id="section.updates.subtitle"
-              defaultMessage="Stay up to dates with our latest activities and progress."
+              defaultMessage="Stay up to date with our latest activities and progress."
             />
           </P>
           {isAdmin && (
             <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
-              <StyledButton data-cy="create-new-update-btn" buttonStyle="primary">
+              <StyledButton data-cy="create-new-update-btn" buttonStyle="primary" my={[2, 0]}>
                 <Span fontSize="16px" fontWeight="bold" mr={2}>
                   +
                 </Span>
@@ -142,7 +142,7 @@ class SectionUpdates extends React.PureComponent {
         </Flex>
         {isEmpty(updates) ? (
           <div>
-            <MessageBox my={5} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="14px">
+            <MessageBox my={[3, 5]} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="14px">
               <FormattedMessage
                 id="SectionUpdates.PostFirst"
                 defaultMessage="Use this section to promote your actions and keep your community up-to-date."
@@ -150,103 +150,105 @@ class SectionUpdates extends React.PureComponent {
             </MessageBox>
           </div>
         ) : (
-          <StyledCard data-cy="updatesList">
-            {updates.map((update, idx) => (
-              <Container
-                key={update.id}
-                p={24}
-                display="flex"
-                justifyContent="space-between"
-                borderBottom={idx === updates.length - 1 ? undefined : '1px solid #e6e8eb'}
-              >
-                <Flex>
-                  <Box mr={3}>
-                    <LinkCollective collective={update.fromCollective}>
-                      <Avatar collective={update.fromCollective} radius={40} />
-                    </LinkCollective>
-                  </Box>
-                  <Flex flexDirection="column" justifyContent="space-between">
-                    <Link route="update" params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}>
-                      <P color="black.900" fontWeight="600" mb={2}>
-                        {update.title}
-                      </P>
-                    </Link>
-                    {update.userCanSeeUpdate ? (
-                      <Container>
-                        <HTMLContent style={{ display: 'inline' }} content={update.summary} />
-                        {` `}
-                        <StyledLink
-                          as={Link}
-                          fontSize="12px"
-                          route="update"
-                          params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}
-                        >
-                          <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
-                        </StyledLink>
-                      </Container>
-                    ) : (
-                      <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
-                        <FormattedMessage
-                          id="update.private.cannot_view_message"
-                          defaultMessage="Become a backer of {collective} to see this update"
-                          values={{ collective: collective.name }}
-                        />
-                      </PrivateUpdateMesgBox>
-                    )}
-                    <Container color="black.400" mt={2} fontSize="12px">
-                      {update.isPrivate && (
-                        <StyledTooltip
-                          content={() => (
-                            <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
-                          )}
-                        >
-                          <Box mr={1}>
-                            <Lock
-                              data-tip
-                              data-for="privateLockText"
-                              data-cy="privateIcon"
-                              size={12}
-                              cursor="pointer"
-                            />
-                          </Box>
-                        </StyledTooltip>
-                      )}
-                      {update.publishedAt ? (
-                        <FormattedMessage
-                          id="update.publishedAtBy"
-                          defaultMessage="Published on {date} by {author}"
-                          values={{
-                            date: formatDate(update.publishedAt, {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric',
-                            }),
-                            author: <LinkCollective collective={update.fromCollective} />,
-                          }}
-                        />
+          <Box mt={[3, 5]} mb={[3, 4]}>
+            <StyledCard data-cy="updatesList">
+              {updates.map((update, idx) => (
+                <Container
+                  key={update.id}
+                  p={24}
+                  display="flex"
+                  justifyContent="space-between"
+                  borderBottom={idx === updates.length - 1 ? undefined : '1px solid #e6e8eb'}
+                >
+                  <Flex>
+                    <Box mr={3}>
+                      <LinkCollective collective={update.fromCollective}>
+                        <Avatar collective={update.fromCollective} radius={40} />
+                      </LinkCollective>
+                    </Box>
+                    <Flex flexDirection="column" justifyContent="space-between">
+                      <Link route="update" params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}>
+                        <P color="black.900" fontWeight="600" mb={2}>
+                          {update.title}
+                        </P>
+                      </Link>
+                      {update.userCanSeeUpdate ? (
+                        <Container>
+                          <HTMLContent style={{ display: 'inline' }} content={update.summary} />
+                          {` `}
+                          <StyledLink
+                            as={Link}
+                            fontSize="12px"
+                            route="update"
+                            params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}
+                          >
+                            <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+                          </StyledLink>
+                        </Container>
                       ) : (
-                        <FormattedMessage
-                          id="update.createdAtBy"
-                          defaultMessage={'Created on {date} (draft) by {author}'}
-                          values={{
-                            date: formatDate(update.createdAt),
-                            author: <LinkCollective collective={update.fromCollective} />,
-                          }}
-                        />
+                        <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
+                          <FormattedMessage
+                            id="update.private.cannot_view_message"
+                            defaultMessage="Become a backer of {collective} to see this update"
+                            values={{ collective: collective.name }}
+                          />
+                        </PrivateUpdateMesgBox>
                       )}
-                    </Container>
+                      <Container color="black.400" mt={2} fontSize="12px">
+                        {update.isPrivate && (
+                          <StyledTooltip
+                            content={() => (
+                              <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
+                            )}
+                          >
+                            <Box mr={1}>
+                              <Lock
+                                data-tip
+                                data-for="privateLockText"
+                                data-cy="privateIcon"
+                                size={12}
+                                cursor="pointer"
+                              />
+                            </Box>
+                          </StyledTooltip>
+                        )}
+                        {update.publishedAt ? (
+                          <FormattedMessage
+                            id="update.publishedAtBy"
+                            defaultMessage="Published on {date} by {author}"
+                            values={{
+                              date: formatDate(update.publishedAt, {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric',
+                              }),
+                              author: <LinkCollective collective={update.fromCollective} />,
+                            }}
+                          />
+                        ) : (
+                          <FormattedMessage
+                            id="update.createdAtBy"
+                            defaultMessage={'Created on {date} (draft) by {author}'}
+                            values={{
+                              date: formatDate(update.createdAt),
+                              author: <LinkCollective collective={update.fromCollective} />,
+                            }}
+                          />
+                        )}
+                      </Container>
+                    </Flex>
                   </Flex>
-                </Flex>
-              </Container>
-            ))}
-          </StyledCard>
-        )}
-        {updates.length > 0 && (
-          <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="14px">
-              <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
-            </StyledButton>
-          </Link>
+                </Container>
+              ))}
+            </StyledCard>
+            {updates.length > 0 && (
+              <Link route="updates" params={{ collectiveSlug: collective.slug }}>
+                <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="14px">
+                  <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
+                </StyledButton>
+              </Link>
+            )}
+          </Box>
         )}
       </ContainerSectionContent>
     );

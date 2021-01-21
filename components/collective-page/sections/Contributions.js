@@ -246,7 +246,7 @@ class SectionContributions extends React.PureComponent {
     const sortedMemberships = this.sortMemberships(memberships);
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     return (
-      <Box pt={5} pb={3}>
+      <Box pb={4}>
         {memberOf.length > 0 && (
           <React.Fragment>
             <ContainerSectionContent>

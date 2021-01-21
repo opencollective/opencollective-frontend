@@ -77,7 +77,7 @@ const SectionTransactions = props => {
   const collectiveHasNoTransactions = !loading && data?.transactions?.totalCount === 0 && filter === FILTERS.ALL;
 
   return (
-    <Box py={5}>
+    <Box pb={4}>
       <ContainerSectionContent>
         <SectionTitle data-cy="section-transactions-title" mb={4} textAlign="left">
           <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />

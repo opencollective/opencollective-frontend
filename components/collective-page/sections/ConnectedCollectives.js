@@ -46,7 +46,7 @@ class ConnectedCollectives extends React.PureComponent {
     }
 
     return (
-      <Box pt={[4, 5]}>
+      <Box pb={4}>
         <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
           {(ref, Chevrons) => (
             <div>
