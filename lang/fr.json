@@ -669,7 +669,7 @@
   "Edit": "Éditer",
   "EditCollective.Conversations.checkbox": "Activer les conversations",
   "EditCollective.Conversations.description": "Les conversations sont un moyen pour les gens de publier des messages publics auxquels n'importe qui peut répondre. Une fois activé, une nouvelle section \"Conversations\" sera ajoutée à votre page Collective et une page dédiée sera créée sur {conversationsLink}.",
-  "editCollective.expensesPayouts": "Dépenses & Remboursements",
+  "editCollective.expensesPayouts": "Policies",
   "editCollective.fiscalHosting": "Hébergement Fiscal",
   "EditCollective.GSTNumber": "Numéro GST",
   "editCollective.host.balance": "Il détient actuellement {balance} au nom de {type, select, COLLECTIVE {votre Collectif} FUND {votre Fonds}}.",

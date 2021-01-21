@@ -321,6 +321,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     }
     ... on Organization {
       platformFeePercent
+      contributionPolicy
       platformContributionAvailable
       host {
         ...ContributionFlowHostFields

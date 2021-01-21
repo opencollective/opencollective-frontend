@@ -669,7 +669,7 @@
   "Edit": "Редактировать",
   "EditCollective.Conversations.checkbox": "Включить обсуждения",
   "EditCollective.Conversations.description": "Обсуждения - это способ для людей отправлять публичные сообщения, на которые может ответить каждый. После включения на вашу страницу Коллектива будет добавлен новый раздел \"Обсуждения\", а выделенная страница будет создана на {conversationsLink}.",
-  "editCollective.expensesPayouts": "Расходы & Выплаты",
+  "editCollective.expensesPayouts": "Policies",
   "editCollective.fiscalHosting": "Фискальное Представительство",
   "EditCollective.GSTNumber": "GST number",
   "editCollective.host.balance": "It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund}}.",

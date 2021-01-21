@@ -669,7 +669,7 @@
   "Edit": "Bearbeiten",
   "EditCollective.Conversations.checkbox": "Unterhaltungen aktivieren",
   "EditCollective.Conversations.description": "Conversations is a way for people to post public messages that anyone can reply to. Once enabled, a new \"Conversations\" section will be added to your Collective page and a dedicated page will be created on {conversationsLink}.",
-  "editCollective.expensesPayouts": "Ausgaben & Auszahlungen",
+  "editCollective.expensesPayouts": "Policies",
   "editCollective.fiscalHosting": "Finanzträger",
   "EditCollective.GSTNumber": "GST number",
   "editCollective.host.balance": "It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund}}.",
