@@ -56,7 +56,7 @@ class PublishUpdateBtn extends React.Component {
     const isLoading = this.props.data.loading;
     const isHost = get(update, 'account.isHost');
     const backers = get(update, 'account.totalFinancialContributors');
-    const hostedCollectives = get(update, 'account.totalHostedCollectives');
+    const hostedCollectives = get(update, 'account.host.totalHostedCollectives');
 
     const options = [
       {
@@ -169,8 +169,18 @@ const updateQuery = gqlV2/* GraphQL */ `
         ... on AccountWithContributions {
           totalFinancialContributors
         }
-        ... on Host {
-          totalHostedCollectives
+        ... on Organization {
+          totalFinancialContributors
+          host {
+            id
+            totalHostedCollectives
+          }
+        }
+        ... on Individual {
+          host {
+            id
+            totalHostedCollectives
+          }
         }
       }
     }
