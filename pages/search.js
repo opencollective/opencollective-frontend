@@ -12,7 +12,6 @@ import colors from '../lib/constants/colors';
 import { parseToBoolean } from '../lib/utils';
 import { Link, Router } from '../server/pages';
 
-import Button from '../components/Button';
 import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -20,6 +19,7 @@ import { Box, Flex } from '../components/Grid';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
+import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
@@ -44,11 +44,12 @@ const SearchInput = styled(StyledInput)`
   }
 `;
 
-const SearchButton = styled(Button).attrs({
-  className: 'blue',
+const SearchButton = styled(StyledButton).attrs({
+  buttonStyle: 'primary',
+  buttonSize: 'small',
 })`
   && {
-    padding: 0 2rem;
+    padding: 0.5rem 2rem;
   }
 `;
 

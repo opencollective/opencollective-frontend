@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { editCollectivePageQuery } from '../../../lib/graphql/queries';
 
-import Button from '../../Button';
+import StyledButton from '../../StyledButton';
 import StyledTooltip from '../../StyledTooltip';
 import SettingsTitle from '../SettingsTitle';
 
@@ -149,12 +149,12 @@ const NewPlanFeatures = ({ collective, plan, label, loading, editHostPlan, hostF
           </li>
         </ul>
       </PlanFeatures>
-      <Button
+      <StyledButton
         disabled={loading || collective.plan.name === plan}
         onClick={() => editHostPlan({ variables: { account: { slug: collective.slug }, plan: plan } })}
       >
         {loading ? '...' : collective.plan.name === plan ? 'Activated' : 'Activate'}
-      </Button>
+      </StyledButton>
       {collective.plan.name === plan && <DisabledMessage>Current plan.</DisabledMessage>}
     </Plan>
   );
@@ -202,51 +202,44 @@ const HostPlan = props => {
       </SettingsTitle>
 
       <PlanGrid>
-        {true && (
-          <Plan active={collective.plan.name === 'default'}>
-            <PlanName>Default Plan (old)</PlanName>
-            <PlanFeatures>
-              <ul>
-                <li>
-                  <FormattedMessage
-                    id="Host.Plan.PlatformTips.sometimes"
-                    defaultMessage="5% Platform Fees or Platform Tips"
-                  />
-                </li>
-                <li>
-                  <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fee" />
-                  .&nbsp;
-                  <FormattedMessage
-                    id="Host.Plan.RevenueCharge.no"
-                    defaultMessage="No charge on revenue made through it."
-                  />
-                </li>
-                <li>
-                  <FormattedMessage id="Host.Plan.AddedFunds.limited" defaultMessage="Up to $1000 added funds" />
-                </li>
-                <li>
-                  <FormattedMessage id="Host.Plan.BankTransfers.limited" defaultMessage="Up to $1000 bank transfers" />
-                </li>
-                <li>
-                  <FormattedMessage
-                    id="Host.Plan.TransferwisePayouts.limited"
-                    defaultMessage="Up to $1000 payouts with TransferWise"
-                  />
-                </li>
-                <li>
-                  <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimal revenue." />
-                </li>
-              </ul>
-            </PlanFeatures>
-            <Button
-              disabled={true}
-              onClick={() => editHostPlan({ variables: { account: { slug: collective.slug }, plan: 'default' } })}
-            >
-              Deprecated
-            </Button>
-            {collective.plan.name === 'default' && <DisabledMessage>Current plan.</DisabledMessage>}
-          </Plan>
-        )}
+        <Plan active={collective.plan.name === 'default'}>
+          <PlanName>Default Plan (old)</PlanName>
+          <PlanFeatures>
+            <ul>
+              <li>
+                <FormattedMessage
+                  id="Host.Plan.PlatformTips.sometimes"
+                  defaultMessage="5% Platform Fees or Platform Tips"
+                />
+              </li>
+              <li>
+                <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fee" />
+                .&nbsp;
+                <FormattedMessage
+                  id="Host.Plan.RevenueCharge.no"
+                  defaultMessage="No charge on revenue made through it."
+                />
+              </li>
+              <li>
+                <FormattedMessage id="Host.Plan.AddedFunds.limited" defaultMessage="Up to $1000 added funds" />
+              </li>
+              <li>
+                <FormattedMessage id="Host.Plan.BankTransfers.limited" defaultMessage="Up to $1000 bank transfers" />
+              </li>
+              <li>
+                <FormattedMessage
+                  id="Host.Plan.TransferwisePayouts.limited"
+                  defaultMessage="Up to $1000 payouts with TransferWise"
+                />
+              </li>
+              <li>
+                <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimal revenue." />
+              </li>
+            </ul>
+          </PlanFeatures>
+          <StyledButton disabled={true}>Deprecated</StyledButton>
+          {collective.plan.name === 'default' && <DisabledMessage>Current plan.</DisabledMessage>}
+        </Plan>
 
         <NewPlanFeatures
           collective={collective}
@@ -304,7 +297,7 @@ const HostPlan = props => {
               </li>
             </ul>
           </PlanFeatures>
-          <Button href="/support">Contact Us</Button>
+          <StyledButton href="/support">Contact Us</StyledButton>
         </Plan>
       </PlanGrid>
 

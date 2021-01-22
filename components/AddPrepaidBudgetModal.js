@@ -6,8 +6,8 @@ import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import AddPrepaidBudget from './AddPrepaidBudget';
-import Button from './Button';
 import { Box, Flex } from './Grid';
+import StyledButton from './StyledButton';
 import StyledModal, { ModalBody } from './StyledModal';
 import { withUser } from './UserProvider';
 
@@ -49,9 +49,9 @@ const AddPrepaidBudgetModal = ({ LoggedInUser, show, setShow, collective, host }
                   <FormattedMessage id="AddPrepaidBudget.Success" defaultMessage="Prepaid budget added successfully" />
                 </h1>
                 <center>
-                  <Button className="blue" onClick={close}>
+                  <StyledButton buttonStyle="primary" onClick={close}>
                     Ok
-                  </Button>
+                  </StyledButton>
                 </center>
               </div>
             )}
