@@ -92,14 +92,6 @@ class EditPaymentMethod extends React.Component {
 
     return (
       <div className="EditPaymentMethod">
-        <style global jsx>
-          {`
-            .monthlyLimitPerMember input {
-              width: 10rem !important;
-            }
-          `}
-        </style>
-
         <Flex flexDirection={['column-reverse', null, 'row']}>
           <Flex alignItems="center" css={{ flexGrow: 1 }}>
             <Box minWidth="150px" as="label" className="control-label">
