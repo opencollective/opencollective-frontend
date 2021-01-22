@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
 import { FormattedMessage } from 'react-intl';
 
+import { Router } from '../server/pages';
+
 import ApplyToHostModal from './ApplyToHostModal';
 import { getI18nLink } from './I18nFormatters';
 import Link from './Link';
@@ -29,12 +31,23 @@ class ApplyToHostBtn extends React.Component {
   }
 
   renderButton() {
-    const { buttonRenderer, hostWithinLimit, withoutIcon, buttonProps, minWidth } = this.props;
+    const { buttonRenderer, hostWithinLimit, withoutIcon, buttonProps, minWidth, hostSlug } = this.props;
+
+    const apply = () => {
+      if (hostSlug === 'foundation') {
+        Router.pushRoute('ocf-host-application', {
+          step: 'intro',
+        });
+        return;
+      }
+
+      this.setState({ showModal: true });
+    };
 
     if (buttonRenderer) {
       return buttonRenderer({
         disabled: !hostWithinLimit,
-        onClick: () => this.setState({ showModal: true }),
+        onClick: apply,
         'data-cy': 'host-apply-btn',
         ...buttonProps,
         children: (
@@ -42,7 +55,11 @@ class ApplyToHostBtn extends React.Component {
             {!withoutIcon && <CheckCircle size="1.2em" />}
             {!withoutIcon && ' '}
             <span>
-              <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+              {hostSlug === 'foundation' ? (
+                <FormattedMessage id="menu.applyWithYourInitiative" defaultMessage="Apply with your initiative" />
+              ) : (
+                <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+              )}
             </span>
           </React.Fragment>
         ),
@@ -54,13 +71,17 @@ class ApplyToHostBtn extends React.Component {
         buttonStyle="secondary"
         buttonSize="small"
         disabled={!hostWithinLimit}
-        onClick={() => this.setState({ showModal: true })}
+        onClick={apply}
         minWidth={minWidth}
         data-cy="host-apply-btn"
         {...buttonProps}
       >
         {!withoutIcon && <CheckCircle size="20px" color="#304CDC" />}
-        <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+        {hostSlug === 'foundation' ? (
+          <FormattedMessage id="menu.applyWithYourInitiative" defaultMessage="Apply with your initiative" />
+        ) : (
+          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+        )}
       </StyledButton>
     );
   }
