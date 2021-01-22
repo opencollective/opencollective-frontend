@@ -63,7 +63,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   }, [LoggedInUser]);
 
   return (
-    <ContainerSectionContent pt={[4, 5]} pb={3}>
+    <ContainerSectionContent pb={4}>
       {!newNavbarFeatureFlag && (
         <SectionHeader
           title={Sections.BUDGET}

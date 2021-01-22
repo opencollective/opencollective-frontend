@@ -11,8 +11,8 @@ import SectionTitle from '../SectionTitle';
 
 const Location = ({ collective: event }) =>
   isEmptyCollectiveLocation(event) ? null : (
-    <Box pt={[4, 5]}>
-      <ContainerSectionContent pt={[4, 5]}>
+    <Box pb={4}>
+      <ContainerSectionContent pb={4}>
         <SectionTitle textAlign="center">
           <FormattedMessage id="SectionLocation.Title" defaultMessage="Location" />
         </SectionTitle>

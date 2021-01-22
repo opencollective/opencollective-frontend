@@ -79,6 +79,9 @@ export const collectivePageQuery = gql`
         backgroundImageUrl
         twitterHandle
         type
+        coreContributors: contributors(roles: [ADMIN, MEMBER]) {
+          ...ContributorsFields
+        }
       }
       host {
         id

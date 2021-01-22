@@ -303,7 +303,7 @@ class SectionContribute extends React.PureComponent {
 
         {/* "Start accepting financial contributions" for admins */}
         {isAdmin && !hasHost && !isHost && (
-          <ContainerSectionContent pt={5} pb={3}>
+          <ContainerSectionContent py={4}>
             <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
               <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
                 <FormattedMessage
@@ -326,14 +326,14 @@ class SectionContribute extends React.PureComponent {
           <Fragment>
             {/* Financial contributions tiers */}
             {hasContribute && (
-              <Box mb={4} data-cy="financial-contributions">
+              <Box pb={4} data-cy="financial-contributions">
                 <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
                   {(ref, Chevrons) => (
                     <div>
                       <ContainerSectionContent>
                         <Flex justifyContent="space-between" alignItems="center" mb={3}>
                           {hasOtherWaysToContribute && !newNavbarFeatureFlag && (
-                            <H3 fontSize="20px" fontWeight="600" color="black.700">
+                            <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
                               <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
                             </H3>
                           )}
@@ -442,7 +442,7 @@ class SectionContribute extends React.PureComponent {
 
             {/* Tickets for type EVENT */}
             {isEvent && newNavbarFeatureFlag && !cannotOrderTickets && !hideTicketsFromNonAdmins && (
-              <Box mb={4} data-cy="Tickets">
+              <Box pb={4} data-cy="Tickets">
                 <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
                   {(ref, Chevrons) => (
                     <div>
@@ -486,7 +486,7 @@ class SectionContribute extends React.PureComponent {
 
             {/* "View all ways to contribute" button */}
             {!isEvent && (
-              <ContainerSectionContent>
+              <ContainerSectionContent pb={4}>
                 <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
                   <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →

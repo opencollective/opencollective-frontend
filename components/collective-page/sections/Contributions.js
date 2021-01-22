@@ -246,7 +246,7 @@ class SectionContributions extends React.PureComponent {
     const sortedMemberships = this.sortMemberships(memberships);
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     return (
-      <Box pt={5} pb={3}>
+      <Box pb={4}>
         {memberOf.length > 0 && (
           <React.Fragment>
             <ContainerSectionContent>
@@ -263,7 +263,7 @@ class SectionContributions extends React.PureComponent {
                 />
               )}
               {data.Collective.stats.collectives.hosted > 0 && (
-                <H3 fontSize="20px" fontWeight="500" color="black.600">
+                <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
                   <FormattedMessage
                     id="organization.collective.memberOf.collective.host.title"
                     values={{ n: data.Collective.stats.collectives.hosted }}
@@ -318,7 +318,7 @@ class SectionContributions extends React.PureComponent {
         {connectedCollectives.length > 0 && (
           <Box mt={5}>
             <ContainerSectionContent>
-              <SectionTitle textAlign="left" mb={4}>
+              <SectionTitle textAlign="left" mb={4} fontSize={['20px', '24px', '32px']} color="black.700">
                 {isOrganization ? (
                   <FormattedMessage
                     id="CP.Contributions.PartOfOrg"

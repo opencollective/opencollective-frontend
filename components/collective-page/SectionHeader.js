@@ -18,7 +18,9 @@ import SectionTitle from './SectionTitle';
 const ContainerWithMaxWidth = styled(Container).attrs({
   maxWidth: Dimensions.MAX_SECTION_WIDTH,
   m: '0 auto',
-})``;
+})`
+  padding-top: 64px;
+`;
 
 const TypeIllustration = styled.img.attrs({ alt: '' })`
   width: 48px;

@@ -49,7 +49,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
   const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
 
   return (
-    <ContainerSectionContent px={2} py={[4, 5]}>
+    <ContainerSectionContent px={2} pb={4}>
       {!newNavbarFeatureFlag && <SectionHeader title={Sections.ABOUT} illustrationSrc={aboutSectionHeaderIcon} />}
 
       <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>

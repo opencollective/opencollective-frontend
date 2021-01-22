@@ -58,7 +58,7 @@ class UpdatesWithData extends React.Component {
               <P color="black.700" css={{ flex: '0 1 70%' }}>
                 <FormattedMessage
                   id="section.updates.subtitle"
-                  defaultMessage="Stay up to dates with our latest activities and progress."
+                  defaultMessage="Stay up to date with our latest activities and progress."
                 />
               </P>
             </Container>

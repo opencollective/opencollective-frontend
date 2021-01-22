@@ -10,6 +10,7 @@ import ConversationsList from '../../conversations/ConversationsList';
 import { conversationListFragment } from '../../conversations/graphql';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { P, Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
@@ -54,19 +55,19 @@ class SectionConversations extends React.PureComponent {
     const conversations = get(data, 'account.conversations', {});
 
     return (
-      <ContainerSectionContent pt={5} pb={3}>
-        <SectionTitle mb={24}>
+      <ContainerSectionContent pb={4}>
+        <SectionTitle fontSize={['20px', '24px', '32px']} color="black.700" mb={24}>
           <FormattedMessage id="conversations" defaultMessage="Conversations" />
         </SectionTitle>
         <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
-          <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
+          <P color="black.700" my={2} css={{ flex: '1 0 50%', maxWidth: 700 }}>
             <FormattedMessage
               id="conversations.subtitle"
               defaultMessage="Let’s get the ball rolling! This is where things get planned and sometimes this is where things get done. Ask questions, thank people for their efforts, and contribute your skills to the service of the community."
             />
           </P>
           <Link route="create-conversation" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton buttonStyle="primary">
+            <StyledButton buttonStyle="primary" my={[2, 0]}>
               <Span fontSize="16px" fontWeight="bold" mr={2}>
                 +
               </Span>
@@ -75,15 +76,16 @@ class SectionConversations extends React.PureComponent {
           </Link>
         </Flex>
         {isEmpty(conversations.nodes) ? (
-          <Box my={5}>
-            <Link route="create-conversation" params={{ collectiveSlug: collective.slug }}>
-              <StyledButton buttonStyle="primary" buttonSize="large">
-                <FormattedMessage id="conversations.createFirst" defaultMessage="Start a new conversation" />
-              </StyledButton>
-            </Link>
-          </Box>
+          <div>
+            <MessageBox my={[3, 5]} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="14px">
+              <FormattedMessage
+                id="SectionConversations.PostFirst"
+                defaultMessage="Use this section to get your community involved in the conversation."
+              />
+            </MessageBox>
+          </div>
         ) : (
-          <Box>
+          <Box mt={[3, 5]} mb={[3, 4]}>
             <ConversationsList collectiveSlug={collective.slug} conversations={conversations.nodes} />
             {conversations.totalCount > 3 && (
               <Link route="conversations" params={{ collectiveSlug: collective.slug }}>

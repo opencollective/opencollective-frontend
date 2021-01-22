@@ -47,6 +47,9 @@ SectionOurTeam.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.number.isRequired,
     currency: PropTypes.string,
+    parentCollective: PropTypes.shape({
+      coreContributors: PropTypes.array.isRequired,
+    }),
   }).isRequired,
 
   coreContributors: PropTypes.array.isRequired,
