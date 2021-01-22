@@ -38,7 +38,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   // Host Specific
   FISCAL_HOSTING: 'fiscal-hosting',
   HOST_PLAN: 'host-plan',
-  EXPENSES_PAYOUTS: 'policies',
+  EXPENSES_PAYOUTS: 'expense-and-contribution-policies',
   INVOICES_RECEIPTS: 'invoices-receipts',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
@@ -218,6 +218,8 @@ const shouldDisplaySection = (collective, section) => {
  * Displays the menu for the edit collective page
  */
 const EditCollectiveMenu = ({ collective, selectedSection }) => {
+  console.log(collective);
+
   const { formatMessage } = useIntl();
   const allSections = Object.values(EDIT_COLLECTIVE_SECTIONS);
   const displayedSections = allSections.filter(section => shouldDisplaySection(collective, section));
