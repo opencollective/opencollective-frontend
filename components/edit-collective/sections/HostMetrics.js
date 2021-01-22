@@ -86,6 +86,12 @@ const HostMetrics = props => {
                 {formatValueAsCurrency(data.host.hostMetrics.totalMoneyManaged)}{' '}
                 <Span color="black.400">{data.host.hostMetrics.totalMoneyManaged.currency}</Span>
               </P>
+              <P fontSize="10px">
+                <FormattedMessage
+                  id="Host.Metrics.TotalMoneyManages.description"
+                  defaultMessage="Total amount held on your bank account for yourself and on behalf of the hosted Collectives."
+                />
+              </P>
             </Box>
           </Container>
           <Box flex="1" py={16} px={4}>
@@ -96,6 +102,12 @@ const HostMetrics = props => {
               {formatValueAsCurrency(data.host.hostMetrics.hostFees)}{' '}
               <Span color="black.400">{data.host.hostMetrics.hostFees.currency}</Span>
             </P>
+            <P fontSize="10px">
+              <FormattedMessage
+                id="Host.Metrics.HostFees.description"
+                defaultMessage="Total Host Fees collected by you since the first day of the month. They will be added to your budget at the end of the month."
+              />
+            </P>
           </Box>
           <Box flex="1" py={16} px={4}>
             <P fontSize="10px" textTransform="uppercase" color="black.700">
@@ -104,6 +116,12 @@ const HostMetrics = props => {
             <P fontSize="20px" mt={1}>
               {formatValueAsCurrency(data.host.hostMetrics.platformFees)}{' '}
               <Span color="black.400">{data.host.hostMetrics.platformFees.currency}</Span>
+            </P>
+            <P fontSize="10px">
+              <FormattedMessage
+                id="Host.Metrics.PlatformFees.description"
+                defaultMessage="Total Platform Fees generated for Open Collective since the first day of the month."
+              />
             </P>
           </Box>
           <Box flex="1" py={16} px={4}>
@@ -114,6 +132,12 @@ const HostMetrics = props => {
               {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformFees)}{' '}
               <Span color="black.400">{data.host.hostMetrics.pendingPlatformFees.currency}</Span>
             </P>
+            <P fontSize="10px">
+              <FormattedMessage
+                id="Host.Metrics.PendingPlatformFees.description"
+                defaultMessage="Total Platform Fees collected for Open Collective since the first day of the month. They will be returned through an invoice from Open Collective at the end of the month."
+              />
+            </P>
           </Box>
           <Box flex="1" py={16} px={4}>
             <P fontSize="10px" textTransform="uppercase" color="black.700">
@@ -122,6 +146,12 @@ const HostMetrics = props => {
             <P fontSize="20px" mt={1}>
               {formatValueAsCurrency(data.host.hostMetrics.platformTips)}{' '}
               <Span color="black.400">{data.host.hostMetrics.platformTips.currency}</Span>
+            </P>
+            <P fontSize="10px">
+              <FormattedMessage
+                id="Host.Metrics.PlatformTips.description"
+                defaultMessage="Total Platform Tips genereated for Open Collective since the first day of the month."
+              />
             </P>
           </Box>
           <Box flex="1" py={16} px={4}>
@@ -132,18 +162,30 @@ const HostMetrics = props => {
               {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformTips)}{' '}
               <Span color="black.400">{data.host.hostMetrics.pendingPlatformTips.currency}</Span>
             </P>
+            <P fontSize="10px">
+              <FormattedMessage
+                id="Host.Metrics.PendingPlatformTips.description"
+                defaultMessage="Total Platform Tips collected for Open Collective since the first day of the month. They will be returned through an invoice from Open Collective at the end of the month."
+              />
+            </P>
           </Box>
           <Box flex="1" py={16} px={4}>
             <P fontSize="10px" textTransform="uppercase" color="black.700">
               <FormattedMessage
                 id="Host.Metrics.HostFeeShare"
-                defaultMessage="Host Fee Share ({pct}% over collected host fee)"
+                defaultMessage="Host Fee Share ({pct}% over collected host fees)"
                 values={{ pct: data.host.hostMetrics.hostFeeSharePercent }}
               />
             </P>
             <P fontSize="20px" mt={1}>
               {formatValueAsCurrency(data.host.hostMetrics.hostFeeShare)}{' '}
               <Span color="black.400">{data.host.hostMetrics.hostFeeShare.currency}</Span>
+            </P>
+            <P fontSize="10px">
+              <FormattedMessage
+                id="Host.Metrics.hostFeeShare.description"
+                defaultMessage="Host Fees you are sharing this month with Open Collective as part of your Host Plan."
+              />
             </P>
           </Box>
         </StyledCard>
