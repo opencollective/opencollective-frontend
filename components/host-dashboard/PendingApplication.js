@@ -11,6 +11,7 @@ import { padding } from 'styled-system';
 import { getCollectiveMainTag } from '../../lib/collective.lib';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
 import { CustomScrollbarCSS } from '../../lib/styled-components-shared-styles';
 
 import Avatar from '../Avatar';
@@ -320,7 +321,7 @@ const PendingApplication = ({ host, application, ...props }) => {
               </Span>
               <StyledHr borderColor="black.200" flex="1 1" />
             </Flex>
-            {application.message ? (
+            {application.message && (
               <P
                 as="q"
                 fontSize={['14px', '16px']}
@@ -331,11 +332,21 @@ const PendingApplication = ({ host, application, ...props }) => {
               >
                 {application.message}
               </P>
-            ) : (
+            )}
+            {!application.message && !application.customData && (
               <P color="black.500">
                 <FormattedMessage id="NoMessage" defaultMessage="No message provided" />
               </P>
             )}
+            {application.customData &&
+              Object.keys(application.customData).map(key => (
+                <Container my={3} key={key}>
+                  <Span fontSize="11px" fontWeight="500" color="black.500" textTransform="uppercase" mx={2}>
+                    {i18nOCFApplicationFormLabel(intl, key)}
+                  </Span>
+                  <pre>{application.customData[key]}</pre>
+                </Container>
+              ))}
           </ApplicationBody>
         </Container>
         {!isDone && (
@@ -381,6 +392,7 @@ PendingApplication.propTypes = {
   }).isRequired,
   application: PropTypes.shape({
     message: PropTypes.string,
+    customData: PropTypes.object,
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
       legacyId: PropTypes.number,
