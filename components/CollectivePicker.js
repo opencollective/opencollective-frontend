@@ -325,6 +325,7 @@ class CollectivePicker extends React.PureComponent {
                   } else if (option[FLAG_INVITE_NEW]) {
                     return (
                       <InviteCollectiveDropdownOption
+                        isSearching={!!searchText && !collectives.length}
                         onClick={() => {
                           this.setDisplayInviteMenu(true);
                           onChange?.({ label: null, value: null });

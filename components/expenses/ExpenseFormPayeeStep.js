@@ -189,7 +189,10 @@ const ExpenseFormPayeeStep = ({
     : ({ id }) => (
         <CollectivePicker
           inputId={id}
-          collectives={payoutProfiles}
+          customOptions={[
+            { options: myself, label: 'Myself' },
+            { options: myorganizations, label: 'My Organizations' },
+          ]}
           getDefaultOptions={build => values.payee && build(values.payee)}
           data-cy="select-expense-payee"
           collective={values.payee}
