@@ -41,6 +41,7 @@ const pendingApplicationsQuery = gqlV2/* GraphQL */ `
         totalCount
         nodes {
           message
+          customData
           account {
             id
             legacyId

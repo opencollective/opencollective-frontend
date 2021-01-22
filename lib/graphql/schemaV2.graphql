@@ -4321,6 +4321,7 @@ type HostApplication {
   createdAt: DateTime!
   status: HostApplicationStatus
   message: String
+  customData: JSON
 }
 
 """
@@ -4696,16 +4697,17 @@ type Individual implements Account {
   hasTwoFactorAuth: Boolean
 
   """
-  If user is a host account, this will return the matching Host object
+  If the individual is a host account, this will return the matching Host object
   """
   host: Host
 }
 
-scalar IsoDateString
 input IndividualCreateInput {
   name: String!
   email: String!
 }
+
+scalar IsoDateString
 
 """
 ISO-8601 date

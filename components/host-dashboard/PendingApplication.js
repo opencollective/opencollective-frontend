@@ -11,6 +11,7 @@ import { padding } from 'styled-system';
 import { getCollectiveMainTag } from '../../lib/collective.lib';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
 import { CustomScrollbarCSS } from '../../lib/styled-components-shared-styles';
 
 import Avatar from '../Avatar';
@@ -191,6 +192,31 @@ const getSuccessToast = (intl, action, collective, result) => {
   }
 };
 
+const InfoSectionHeader = ({ children, icon = null }) => (
+  <Flex alignItems="center" mb={3}>
+    {icon && <Box mr={2}>{icon}</Box>}
+    <Span fontSize="11px" fontWeight="500" color="black.500" textTransform="uppercase" mr={2}>
+      {children}
+    </Span>
+    <StyledHr borderColor="black.200" flex="1 1" />
+  </Flex>
+);
+
+InfoSectionHeader.propTypes = {
+  icon: PropTypes.node,
+  children: PropTypes.node,
+};
+
+const UserInputContainer = styled(P).attrs({
+  fontSize: '14px',
+  lineHeight: '24px',
+  fontStyle: 'italic',
+  color: 'black.800',
+  fontWeight: '400',
+})``;
+
+const AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmountToBeRaised'];
+
 const PendingApplication = ({ host, application, ...props }) => {
   const intl = useIntl();
   const [isDone, setIsDone] = React.useState(false);
@@ -201,6 +227,7 @@ const PendingApplication = ({ host, application, ...props }) => {
   const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
     context: API_V2_CONTEXT,
   });
+  const hasNothingToShow = !application.message && !application.customData;
 
   const processApplication = async (action, message, onSuccess) => {
     setIsDone(false);
@@ -313,29 +340,31 @@ const PendingApplication = ({ host, application, ...props }) => {
       >
         <Container px="4px" position="relative">
           <ApplicationBody p={[12, 22]}>
-            <Flex alignItems="center" mb={3}>
-              <CommentIcon size={16} />
-              <Span fontSize="11px" fontWeight="500" color="black.500" textTransform="uppercase" mx={2}>
-                <FormattedMessage id="PendingApplication.Message" defaultMessage="Message for fiscal host" />
-              </Span>
-              <StyledHr borderColor="black.200" flex="1 1" />
-            </Flex>
-            {application.message ? (
-              <P
-                as="q"
-                fontSize={['14px', '16px']}
-                lineHeight="24px"
-                fontStyle="italic"
-                color="black.800"
-                fontWeight="400"
-              >
-                {application.message}
-              </P>
-            ) : (
-              <P color="black.500">
-                <FormattedMessage id="NoMessage" defaultMessage="No message provided" />
-              </P>
+            {(application.message || hasNothingToShow) && (
+              <Box mb={3}>
+                <InfoSectionHeader icon={<CommentIcon size={16} />}>
+                  <FormattedMessage id="PendingApplication.Message" defaultMessage="Message for fiscal host" />
+                </InfoSectionHeader>
+                {application.message ? (
+                  <UserInputContainer as="q">{application.message}</UserInputContainer>
+                ) : (
+                  <P color="black.500">
+                    <FormattedMessage id="NoMessage" defaultMessage="No message provided" />
+                  </P>
+                )}
+              </Box>
             )}
+
+            {application.customData &&
+              Object.keys(application.customData).map(key => (
+                <Container mb={3} key={key}>
+                  <InfoSectionHeader>{i18nOCFApplicationFormLabel(intl, key)}</InfoSectionHeader>
+                  <UserInputContainer>
+                    {AMOUNT_FIELDS.includes(key) && '$'}
+                    {application.customData[key]}
+                  </UserInputContainer>
+                </Container>
+              ))}
           </ApplicationBody>
         </Container>
         {!isDone && (
@@ -381,6 +410,7 @@ PendingApplication.propTypes = {
   }).isRequired,
   application: PropTypes.shape({
     message: PropTypes.string,
+    customData: PropTypes.object,
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
       legacyId: PropTypes.number,

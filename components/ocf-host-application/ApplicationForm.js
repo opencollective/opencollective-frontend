@@ -6,13 +6,14 @@ import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '../../lib/collective.lib';
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
 import { Router } from '../../server/pages';
 
 import Container from '../Container';
@@ -58,57 +59,6 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
     }
   }
 `;
-
-const messages = defineMessages({
-  locationLabel: {
-    id: 'OCFHostApplication.location.label',
-    defaultMessage: 'Your Location',
-  },
-  nameLabel: {
-    id: 'OCFHostApplication.name.label',
-    defaultMessage: 'Your Name',
-  },
-  emailLabel: {
-    id: 'OCFHostApplication.email.label',
-    defaultMessage: 'Your email address',
-  },
-  initiativeNameLabel: {
-    id: 'OCFHostApplication.initiativeName.label',
-    defaultMessage: 'What is the name of your initiative?',
-  },
-  slugLabel: {
-    id: 'OCFHostApplication.slug.label',
-    defaultMessage: 'What URL would you like?',
-  },
-  initiativeDurationLabel: {
-    id: 'OCFHostApplication.initiativeDuration.label',
-    defaultMessage: 'How long has your initiative been running?',
-  },
-  totalAmountRaisedLabel: {
-    id: 'OCFHostApplication.totalAmountRaised.label',
-    defaultMessage: 'If you have begun fundraising, how much money have you raised so far?',
-  },
-  totalAmountToBeRaisedLabel: {
-    id: 'OCFHostApplication.totalAmountToBeRaised.label',
-    defaultMessage: 'How much money do you want to fundraise?',
-  },
-  expectedFundingPartnerLabel: {
-    id: 'OCFHostApplication.expectedFundingPartner.label',
-    defaultMessage: 'Who do you expect to fund you?',
-  },
-  initiativeDescriptionLabel: {
-    id: 'OCFHostApplication.initiativeDescription.label',
-    defaultMessage: 'What does your initiative do?',
-  },
-  missionImpactExplanationLabel: {
-    id: 'OCFHostApplication.missionImpactExplanation.label',
-    defaultMessage: 'Please explain how your initiative furthers one or more of our mission impact areas:',
-  },
-  websiteAndSocialLinksLabel: {
-    id: 'OCFHostApplication.websiteAndSocialLinks.label',
-    defaultMessage: 'Website and / or social media links:',
-  },
-});
 
 const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, setInitialValues }) => {
   const intl = useIntl();
@@ -255,7 +205,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                     </Box>
                     <Box width={['256px', '234px', '324px']}>
                       <StyledInputFormikField
-                        label={intl.formatMessage(messages.locationLabel)}
+                        label={i18nOCFApplicationFormLabel(intl, 'location')}
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -270,7 +220,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                     <Flex flexDirection={['column', 'row']}>
                       <Box mr={[null, 3]}>
                         <StyledInputFormikField
-                          label={intl.formatMessage(messages.nameLabel)}
+                          label={i18nOCFApplicationFormLabel(intl, 'name')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -286,7 +236,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                       </Box>
                       <Box my={2}>
                         <StyledInputFormikField
-                          label={intl.formatMessage(messages.emailLabel)}
+                          label={i18nOCFApplicationFormLabel(intl, 'email')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -312,7 +262,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                     <Flex flexDirection={['column', 'row']}>
                       <Box my={2} mr={[null, 3]}>
                         <StyledInputFormikField
-                          label={intl.formatMessage(messages.initiativeNameLabel)}
+                          label={i18nOCFApplicationFormLabel(intl, 'initiativeName')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -329,7 +279,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                       </Box>
                       <Box width={['256px', '234px', '324px']} my={2}>
                         <StyledInputFormikField
-                          label={intl.formatMessage(messages.slugLabel)}
+                          label={i18nOCFApplicationFormLabel(intl, 'slug')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -360,7 +310,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                     <Flex flexDirection={['column', 'row']}>
                       <Box mr={[null, 3]}>
                         <StyledInputFormikField
-                          label={intl.formatMessage(messages.initiativeDurationLabel)}
+                          label={i18nOCFApplicationFormLabel(intl, 'initiativeDuration')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -377,7 +327,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                       </Box>
                       <Box width={['256px', '234px', '324px']} my={2}>
                         <StyledInputFormikField
-                          label={intl.formatMessage(messages.totalAmountRaisedLabel)}
+                          label={i18nOCFApplicationFormLabel(intl, 'totalAmountRaised')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -409,7 +359,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                     <Flex flexDirection={['column', 'row']}>
                       <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
                         <StyledInputFormikField
-                          label={intl.formatMessage(messages.totalAmountToBeRaisedLabel)}
+                          label={i18nOCFApplicationFormLabel(intl, 'totalAmountToBeRaised')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -434,7 +384,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                       </Box>
                       <Box width={['256px', '234px', '324px']} my={2}>
                         <StyledInputFormikField
-                          label={intl.formatMessage(messages.expectedFundingPartnerLabel)}
+                          label={i18nOCFApplicationFormLabel(intl, 'expectedFundingPartner')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -455,7 +405,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                     </Flex>
                     <Box width={['256px', '484px', '663px']} my={2}>
                       <StyledInputFormikField
-                        label={intl.formatMessage(messages.initiativeDescriptionLabel)}
+                        label={i18nOCFApplicationFormLabel(intl, 'initiativeDescription')}
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -484,7 +434,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                     </Box>
                     <Box width={['256px', '484px', '663px']} my={2}>
                       <StyledInputFormikField
-                        label={intl.formatMessage(messages.missionImpactExplanationLabel)}
+                        label={i18nOCFApplicationFormLabel(intl, 'missionImpactExplanation')}
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -514,7 +464,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                     </Box>
                     <Box width={['256px', '484px', '663px']} my={2}>
                       <StyledInputFormikField
-                        label={intl.formatMessage(messages.websiteAndSocialLinksLabel)}
+                        label={i18nOCFApplicationFormLabel(intl, 'websiteAndSocialLinks')}
                         labelFontSize="13px"
                         labelColor="#4E5052"
                         labelProps={{ fontWeight: '600', lineHeight: '16px' }}
