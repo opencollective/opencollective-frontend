@@ -6,8 +6,9 @@ import styled, { css } from 'styled-components';
 
 import ExpenseBudgetItem from '../budget/ExpenseBudgetItem';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { Flex } from '../Grid';
+import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
+import { P } from '../Text';
 
 const ExpenseContainer = styled.div`
   ${props =>
@@ -25,6 +26,7 @@ const FooterContainer = styled.div`
 const FooterLabel = styled.span`
   font-size: 15px;
   margin-right: 5px;
+  text-transform: uppercase;
 `;
 
 const ExpensesList = ({
@@ -68,15 +70,25 @@ const ExpensesList = ({
       {!isLoading && (
         <FooterContainer>
           <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
-            <Flex my={2} mr={[3, 0]} minWidth={100} justifyContent="flex-end" data-cy="transaction-amount">
-              <React.Fragment>
+            <Flex
+              my={2}
+              mr={[3, 0]}
+              minWidth={100}
+              justifyContent="flex-end"
+              data-cy="transaction-amount"
+              flexDirection="column"
+            >
+              <Box alignSelf="flex-end">
                 <FooterLabel color="black.500">
-                  <FormattedMessage id="TOTAL" defaultMessage="TOTAL" />
+                  <FormattedMessage id="expense.page.total" defaultMessage="Page Total" />:
                 </FooterLabel>
                 <FooterLabel color="black.500">
                   <FormattedMoneyAmount amount={totalAmount} currency={collective?.currency} precision={2} />
                 </FooterLabel>
-              </React.Fragment>
+              </Box>
+              <P fontSize="12px" color="black.600">
+                <FormattedMessage id="expense.page.description" defaultMessage="Payment processor fees may apply." />
+              </P>
             </Flex>
           </Flex>
         </FooterContainer>
