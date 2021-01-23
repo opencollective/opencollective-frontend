@@ -248,7 +248,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 <AmountDetailsLine
                   value={values.amount || 0}
                   currency={collective.currency}
-                  label={<FormattedMessage id="addfunds.totalAmount" defaultMessage="Funding amount" />}
+                  label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
                 />
                 {canAddHostFee && (
                   <AmountDetailsLine
@@ -286,7 +286,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
                   <FormattedMessage
                     id="addfunds.disclaimer"
-                    defaultMessage="By clicking below, you agree to set aside {amount} in your bank account on behalf of the collective"
+                    defaultMessage="You will set aside {amount} in your bank account for this purpose."
                     values={{ amount: formatCurrency(values.amount, collective.currency) }}
                   />
                 </P>

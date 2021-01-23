@@ -343,7 +343,7 @@ class TierPage extends Component {
                 <Box width={1}>
                   {isPassed ? (
                     <P textAlign="center">
-                      <FormattedMessage id="Tier.Past" defaultMessage="This contribution type is not active anymore." />{' '}
+                      <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
                       <Link
                         route="contribute"
                         params={{ collectiveSlug: collective.slug, verb: 'contribute', redirect }}

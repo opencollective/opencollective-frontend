@@ -68,7 +68,7 @@ const CreateOpenSourceCollective = () => {
           <P fontSize="16px" color="black.600" mb={2}>
             <FormattedMessage
               id="collective.subtitle.opensource"
-              defaultMessage="Open source projects are invited to join the Open Source Collective fiscal host."
+              defaultMessage="Open source projects are invited to join the Open Source Collective Fiscal Host."
             />
           </P>
         </Box>
@@ -85,17 +85,17 @@ const CreateOpenSourceCollective = () => {
           <P mb={3}>
             <FormattedMessage
               id="createcollective.opensource.p1"
-              defaultMessage="You're creating software. You don't want to worry about creating a legal entity or separate bank account, paying taxes, or providing invoices to sponsors. Let us take care of all that, so you can stay focused on your project."
+              defaultMessage="You're creating software. You don't want to worry about creating a legal entity or bank account, taxes, invoices, and a bunch of other admin. Let us take care of all that, so you can stay focused on your project."
             />
           </P>
           <P mb={3}>
             <FormattedMessage
               id="createcollective.opensource.p2"
-              defaultMessage="We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on GitHub or meet our {criterialink}."
+              defaultMessage="We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on GitHub or to meet our {criterialink}."
               values={{
                 osclink: (
                   <StyledLink href="https://opencollective.com/opensource" openInNewTab>
-                    Open Source Collective 501c6
+                    Open Source Collective
                   </StyledLink>
                 ),
                 criterialink: (
@@ -115,7 +115,7 @@ const CreateOpenSourceCollective = () => {
           <P mb={3}>
             <FormattedMessage
               id="createcollective.opensource.p4"
-              defaultMessage="Our fees cover operating costs like accounting, payments, tax reporting, invoices, legal liability, use of the Open Collective Platform, and providing support. We also run a range of initiatives for our mission of supporting a sustainable and healthy open source ecosystem. Learn more on our website. Join us!"
+              defaultMessage="Our fees cover operating costs like accounting, payments, tax reporting, invoices, legal liability, use of the Open Collective Platform, and providing support. We also run a range of initiatives to support a sustainable and healthy open source ecosystem. Join us!"
             />
           </P>
           <Box mx={1} my={4}>

@@ -31,8 +31,7 @@ const messages = defineMessages({
   },
   'rollingLimit.placeholder': {
     id: 'collective.contributionPolicy.placeholder',
-    defaultMessage:
-      'For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.',
+    defaultMessage: 'E.g. what types of contributions you will and will not accept.',
   },
   'rollingLimit.enable': {
     id: 'editCollective.rollingLimit.enable',
@@ -102,7 +101,7 @@ const HostTwoFactorAuth = ({ collective }) => {
               <P wordBreak="break-word">
                 <FormattedMessage
                   id="TwoFactorAuth.Setup.FiscalHost.Info"
-                  defaultMessage="Two-factor authentication (2FA) adds an extra layer of security for your account when logging in. For fiscal hosts, you can turn on 2FA to be used with high-risk activities like paying expenses. Enabling 2FA for the fiscal host means that every host admin (including yourself) will be required to enable 2FA for logging into their account."
+                  defaultMessage="Two-factor authentication (2FA) adds an extra layer of security when logging in. For Fiscal Hosts or Collectives that manage their own funds, 2FA helps ensure payouts are secure. If enabled, every admin (including yourself) will be required to enable 2FA for logging into their account."
                 />
               </P>
             </Container>

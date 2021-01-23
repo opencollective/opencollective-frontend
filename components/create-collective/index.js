@@ -107,7 +107,7 @@ class CreateCollective extends Component {
             <MessageBox type="warning" withIcon mb={[1, 3]}>
               <FormattedMessage
                 id="collectives.create.error.HostNotOpenToApplications"
-                defaultMessage="This host is not open to applications"
+                defaultMessage="This Fiscal Host is not open to applications"
               />
             </MessageBox>
           </Flex>

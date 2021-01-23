@@ -246,7 +246,7 @@ class TransactionsPage extends React.Component {
                   {hasFilters ? (
                     <FormattedMessage
                       id="TransactionsList.Empty"
-                      defaultMessage="No transaction matches the given filters, <ResetLink>reset them</ResetLink> to see all transactions."
+                      defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
                       values={{
                         ResetLink(text) {
                           return (

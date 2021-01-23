@@ -161,7 +161,7 @@ const ContributorCard = ({
             }}
           >
             {truncatedPublicMessage || (
-              <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (Optional)" />
+              <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (optional)" />
             )}
           </PublicMessageEditButton>
         ) : (

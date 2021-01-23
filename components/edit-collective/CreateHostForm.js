@@ -32,23 +32,23 @@ class CreateHostForm extends React.Component {
     this.messages = defineMessages({
       'hostType.label': {
         id: 'host.types.label',
-        defaultMessage: 'Select host type',
+        defaultMessage: 'Select Host type',
       },
       'hostId.label': {
         id: 'host.hostId.label',
-        defaultMessage: 'Select organization',
+        defaultMessage: 'Select Organization',
       },
       'host.types.user.label': {
         id: 'host.types.user.label',
-        defaultMessage: 'an individual (me)',
+        defaultMessage: 'An individual (me)',
       },
       'host.types.organization.label': {
         id: 'host.types.organization.label',
-        defaultMessage: 'an organization',
+        defaultMessage: 'An Organization',
       },
       'organization.create': {
         id: 'tier.order.organization.create',
-        defaultMessage: 'create an organization',
+        defaultMessage: 'Create an Organization',
       },
     });
   }
@@ -83,7 +83,7 @@ class CreateHostForm extends React.Component {
     organizationsOptions.push({
       label: this.props.intl.formatMessage({
         id: 'organization.create',
-        defaultMessage: 'create an organization',
+        defaultMessage: 'Create an Organization',
       }),
       value: 0,
     });
@@ -145,7 +145,7 @@ class CreateHostForm extends React.Component {
               onClick={() => this.createOrganization(this.state.form.organization)}
               className="createOrganizationBtn"
             >
-              <FormattedMessage id="organization.create" defaultMessage="Create organization" />
+              <FormattedMessage id="organization.create" defaultMessage="Create Organization" />
             </StyledButton>
           </Fragment>
         )}
@@ -154,7 +154,7 @@ class CreateHostForm extends React.Component {
           <Flex justifyContent="space-between" alignItems="flex-end">
             <Box>
               <StyledButton buttonStyle="primary" type="submit" onClick={() => this.props.onSubmit(host)}>
-                <FormattedMessage id="host.link" defaultMessage="Yes, use this Organization as Fiscal Host" />
+                <FormattedMessage id="host.link" defaultMessage="Yes, use this Organization as the Fiscal Host" />
               </StyledButton>
             </Box>
             {!stripeAccount && (

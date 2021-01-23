@@ -21,7 +21,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
       <Content>
         <FormattedMessage
           id="ContributeFAQ.Safe"
-          defaultMessage="Open Collective doesn't store any credit card number, we're instead relying on our partner Stripe - a secure solution that is widely adopted by the industry. If our systems are compromised, we can't loose your credit card number because we simply don't have it. <LearnMoreLink>Learn more</LearnMoreLink> about the security of Open Collective."
+          defaultMessage="Open Collective doesn't store credit card numbers, instead relying on our payment processor, Stripe, a secure solution that is widely adopted. If our systems are compromised, your credit card information is not at risk, because we simply don't store it. <LearnMoreLink>Learn more</LearnMoreLink>."
           values={{
             LearnMoreLink: getI18nLink({
               openInNewTab: true,
@@ -36,7 +36,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
         <Title>
           <FormattedMessage
             id="ContributeFAQ.Policy.Title"
-            defaultMessage="Does {name} has a contribution policy?"
+            defaultMessage="Does {name} have a contribution policy?"
             values={{ name: collective.name }}
           />
         </Title>
@@ -50,7 +50,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
         <Title>
           <FormattedMessage
             id="ContributeFAQ.Policy.Title"
-            defaultMessage="Does {name} has a contribution policy?"
+            defaultMessage="Does {name} have a contribution policy?"
             values={{ name: collective.host.name }}
           />
         </Title>
@@ -63,13 +63,13 @@ const ContributeFAQ = ({ collective, ...props }) => (
       <Title>
         <FormattedMessage
           id="createProfile.faq.persoVSOrg.title"
-          defaultMessage="What's the difference between a personal and an organization profile?"
+          defaultMessage="What's the difference between an individual and an organization profile?"
         />
       </Title>
       <Content>
         <FormattedMessage
           id="createProfile.faq.persoVsOrg.content"
-          defaultMessage="Create an organization profile if you want to make a financial contribution in the name of your company or organization. An organization profile allows you to enable other members of your organization to make financial contributions within certain limits that you can define. Organizations can also issue gift cards."
+          defaultMessage="Organizations represent a company or entity, while individual profiles represent a person. Organization profiles can have multiple team members (individual profiles) who have access to edit it and make financial contributions in its name. If a contribution or expense is for a company, it\'s important to use an organization profile so the correct billing information shows up on receipts and invoices. Organizations can also issue gift cards."
         />
       </Content>
     </Entry>
@@ -84,7 +84,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
         <FormattedMessage
           id="ContributeDetails.faq.isIncognito.content"
           defaultMessage={
-            'If you chose to contribute as "incognito", your financial contribution will show up publicly as an incognito donation and it won\'t link to your public profile. However, in the effort of being transparent and compliant with KYC regulations (Know Your Customer), the fiscal host and the administrators of the collective can export a list of all the financial contributors with their personal information.'
+            'Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile. However, the admins will be able to see your identity privately.'
           }
         />
       </Content>

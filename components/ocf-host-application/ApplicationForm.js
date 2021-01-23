@@ -300,10 +300,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                           )}
                         </StyledInputFormikField>
                         <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                          <FormattedMessage
-                            id="OCFHostApplication.applicationForm.slugInstruction"
-                            defaultMessage="Suggested"
-                          />
+                          <FormattedMessage id="createCollective.form.suggestedLabel" defaultMessage="Suggested" />
                         </P>
                       </Box>
                     </Flex>
@@ -339,7 +336,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                               id={field.id}
                               currency="USD"
                               px="7px"
-                              placeholder="It's fine if you're just starting out."
+                              placeholder="It\'s fine if you're just starting out."
                               error={field.error}
                               value={field.value}
                               maxWidth="100%"
@@ -415,10 +412,10 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                       >
                         {({ field }) => (
                           <StyledTextarea
-                            placeholder="We make sandwiches and give them to 
-            our neighbors in an outdoor community 
-            fridge. We collaborate with other 
-            organizations to figure out what the 
+                            placeholder="We make sandwiches and give them to
+            our neighbors in an outdoor community
+            fridge. We collaborate with other
+            organizations to figure out what the
             best flavor sandwich is."
                             {...field}
                             px="7px"
@@ -428,7 +425,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                       <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
                         <FormattedMessage
                           id="OCFHostApplication.applicationForm.whatDoesInitiativeDoInstruction"
-                          defaultMessage="Write a short description of your organization (250 characters max)"
+                          defaultMessage="Write a short description of your initiative (250 characters max)"
                         />
                       </P>
                     </Box>
@@ -444,11 +441,11 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                       >
                         {({ field }) => (
                           <StyledTextarea
-                            placeholder="We create a positive social impact and 
-              combat community deterioration by 
-              providing access to the best 
-              sandwiches to our neighbors and 
-              building a strong community around our 
+                            placeholder="We create a positive social impact and
+              combat community deterioration by
+              providing access to the best
+              sandwiches to our neighbors and
+              building a strong community around our
               love of sandwiches."
                             {...field}
                             px="7px"
@@ -477,7 +474,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                       <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
                         <FormattedMessage
                           id="OCFHostApplication.applicationForm.websiteInstruction"
-                          defaultMessage="If you have something to send us please upload it to a storage service (Dropbox, Drive) and paste the sharing link here."
+                          defaultMessage="If you have something to send us, please upload it to a storage service (Dropbox, Drive) and paste the sharing link here."
                         />
                       </P>
                     </Box>
@@ -549,7 +546,7 @@ const ApplicationForm = ({ LoggedInUser, loadingLoggedInUser, initialValues, set
                       onSubmit={handleSubmit}
                       loading={submitting}
                     >
-                      <FormattedMessage id="OCFHostApplication.applyBtn" defaultMessage="Apply" />
+                      <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
                       &nbsp;
                       <ArrowRight2 size="14px" />
                     </OCFPrimaryButton>

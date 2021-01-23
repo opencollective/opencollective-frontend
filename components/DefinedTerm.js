@@ -53,26 +53,25 @@ const TranslatedDefinitions = defineMessages({
   [Terms.FISCAL_HOST]: {
     id: 'Fiscalhost.definition',
     defaultMessage:
-      'A fiscal host is a legal entity holding the money and responsible for the admin/taxes forms for the collective.',
+      'A Fiscal Host is an entity that holds the money on behalf of a Collective, and takes care of accounting, taxes, and invoices.',
   },
   [Terms.HOST_FEE]: {
     id: 'host.hostFee.help',
     defaultMessage:
-      'The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities.',
+      'The Host Fee is what a Fiscal Host charges a Collective for its services, such as holding funds, making expense payouts, meeting tax obligations, and access to the Open Collective software platform.',
   },
   [Terms.PLATFORM_FEE]: {
     id: 'host.platformFee.help',
-    defaultMessage:
-      'The platform fee is the fee that the Open Collective platform charges your collective on incoming contributions.',
+    defaultMessage: 'The Platform fee is what Open Collective charges for use of the software.',
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard.definition',
     defaultMessage:
-      'Gift cards empower your employees or community members to support the projects they love. Learn more about them <learn-more-link>here</learn-more-link>.',
+      'Gift cards empower your employees or community members to support the projects they love. <learn-more-link>Learn more</learn-more-link>.',
   },
   [Terms.ESTIMATED_BUDGET]: {
     id: 'CollectivePage.SectionBudget.Annual.Definition',
-    defaultMessage: 'Projected annual budget based on total financial contributions from the past 12 months.',
+    defaultMessage: 'Projected annual budget based on financial contributions over the past 12 months.',
   },
   [Terms.EXPENSE_TYPE]: {
     id: 'expense.type.tooltip',

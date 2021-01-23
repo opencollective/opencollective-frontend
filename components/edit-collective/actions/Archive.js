@@ -135,7 +135,7 @@ const ArchiveCollective = ({ collective }) => {
           <FormattedMessage
             id="collective.archive.availableBalance"
             defaultMessage={
-              "Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option."
+              "Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your Fiscal Host using the 'empty balance' option."
             }
             values={{ type: collective.type }}
           />
@@ -146,7 +146,7 @@ const ArchiveCollective = ({ collective }) => {
           <FormattedMessage
             id="collective.archive.isHost"
             defaultMessage={
-              "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host, please deactivate as Host first."
+              "You can/'t archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
             }
             values={{ type: collective.type }}
           />

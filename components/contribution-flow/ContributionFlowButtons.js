@@ -50,7 +50,7 @@ class NewContributionFlowButtons extends React.Component {
   getNextButtonLabel() {
     const { step, nextStep, isRecurringContributionLoggedOut } = this.props;
     if (step.name === STEPS.PROFILE && isRecurringContributionLoggedOut) {
-      return <FormattedMessage id="NewContributionFlow.JoinAndGoNext" defaultMessage="Join and go next" />;
+      return <FormattedMessage id="NewContributionFlow.JoinAndGoNext" defaultMessage="Join and continue" />;
     } else {
       return this.getStepLabel(nextStep) || <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />;
     }

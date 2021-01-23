@@ -41,8 +41,7 @@ const messages = defineMessages({
   },
   bodyPlaceholder: {
     id: 'CreateConversation.Body.Placeholder',
-    defaultMessage:
-      'You can add links, lists, code snipets and more using this text editor. Type and start adding content to your conversation here.',
+    defaultMessage: 'You can add text, links, lists, code snipets, and more here.',
   },
 });
 
@@ -209,7 +208,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
         minWidth={200}
         mt={3}
       >
-        <FormattedMessage id="CreateConversationForm.Submit" defaultMessage="Submit conversation" />
+        <FormattedMessage id="CreateConversationForm.Submit" defaultMessage="Create Conversation" />
       </StyledButton>
     </form>
   );

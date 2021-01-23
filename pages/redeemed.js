@@ -167,7 +167,7 @@ class RedeemedPage extends React.Component {
               <Box>
                 <FormattedMessage
                   id="redeemed.subtitle.line2"
-                  defaultMessage="You can now donate to any collective of your choice."
+                  defaultMessage="You can now contribute to the Collective(s) of your choice."
                 />
               </Box>
             </Subtitle>

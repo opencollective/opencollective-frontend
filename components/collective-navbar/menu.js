@@ -20,7 +20,7 @@ export const NAVBAR_ACTION_TYPE = {
 
 const titles = defineMessages({
   CONTRIBUTE: {
-    id: 'Contribute.allWays',
+    id: 'SectionContribute.All',
     defaultMessage: 'All ways to contribute',
   },
   TRANSACTIONS: {

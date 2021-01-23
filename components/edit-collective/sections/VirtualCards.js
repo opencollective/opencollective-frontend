@@ -96,9 +96,9 @@ class VirtualCards extends React.Component {
         </Link>
       );
     } else if (onlyConfirmed) {
-      return <FormattedMessage id="virtualCards.emptyClaimed" defaultMessage="No gift card claimed yet" />;
+      return <FormattedMessage id="virtualCards.emptyClaimed" defaultMessage="No gift cards claimed yet" />;
     } else {
-      return <FormattedMessage id="virtualCards.emptyUnclaimed" defaultMessage="No unclaimed gift card" />;
+      return <FormattedMessage id="virtualCards.emptyUnclaimed" defaultMessage="No unclaimed gift cards" />;
     }
   }
 

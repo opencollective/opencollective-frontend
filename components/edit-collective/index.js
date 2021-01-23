@@ -53,7 +53,7 @@ class EditCollective extends React.Component {
       },
       'collective.isArchived.edit.description': {
         id: 'collective.isArchived.edit.description',
-        defaultMessage: 'This {type} has been archived and can no longer be used for any activities.',
+        defaultMessage: 'This {type} has been archived and is no longer active.',
       },
       'user.isArchived': {
         id: 'user.isArchived',
@@ -61,7 +61,7 @@ class EditCollective extends React.Component {
       },
       'user.isArchived.edit.description': {
         id: 'user.isArchived.edit.description',
-        defaultMessage: 'This account has been archived and can no longer be used for any activities.',
+        defaultMessage: 'This account has been archived is no longer active.',
       },
     });
   }

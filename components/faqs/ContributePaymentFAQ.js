@@ -12,13 +12,13 @@ const ContributePaymentFAQ = props => (
       <Title>
         <FormattedMessage
           id="createProfile.faq.giftsCardsWithIncognito.title"
-          defaultMessage="Why can't I see my gift card?"
+          defaultMessage="Why can\'t I see my gift card?"
         />
       </Title>
       <Content>
         <FormattedMessage
           id="createProfile.faq.giftsCardsWithIncognito.content"
-          defaultMessage="Unfortunately, gifts cards cannot be used with incognito profiles. Allowing this could allow malicious users to find out what your main profile is. The protection of your personal information is too important for us to take this risk!"
+          defaultMessage="Gifts cards cannot be used for incognito contributions. This is for security reasons, ensuring profiles are not linked to incognito transactions in a way that could compromise anonymity."
         />
       </Content>
     </Entry>

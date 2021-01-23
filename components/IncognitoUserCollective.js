@@ -23,7 +23,7 @@ class IncognitoUserCollective extends React.Component {
       'incognito.title': { id: 'UserCollective.incognito.title', defaultMessage: 'Incognito user' },
       'incognito.description': {
         id: 'UserCollective.incognito.description',
-        defaultMessage: 'This user decided to remain incognito',
+        defaultMessage: 'This user has decided to remain incognito',
       },
     });
   }

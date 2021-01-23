@@ -141,7 +141,7 @@ class StripeOrBankAccountPicker extends React.Component {
                   <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                     <FormattedMessage
                       id="acceptContributions.stripe.info"
-                      defaultMessage="Automatically accept contributions with credit cards from all over the world."
+                      defaultMessage="Accept contributions via credit card. The budget will update automatically."
                     />
                   </P>
                 </Box>
@@ -202,7 +202,7 @@ class StripeOrBankAccountPicker extends React.Component {
                   <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                     <FormattedMessage
                       id="acceptContributions.bankAccount.info"
-                      defaultMessage="Manually sync contributions received on your bank account with your Collective's budget."
+                      defaultMessage="Accept contributions via bank transfer. The budget will update when you confirm receipt of funds."
                     />
                   </P>
                 </Box>

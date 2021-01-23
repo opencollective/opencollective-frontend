@@ -31,7 +31,7 @@ const messages = defineMessages({
   SUCCESS: {
     id: 'SubmitApplication.SUCCESS',
     defaultMessage:
-      "{collectiveName}'s application to be hosted by {hostName} has been {type, select, APPROVED {approved} other {sent}}",
+      "{collectiveName}'s application to {hostName} has been {type, select, APPROVED {approved} other {submitted}}",
   },
 });
 
@@ -282,7 +282,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                   <MessageBox type="warning" withIcon>
                     <FormattedMessage
                       id="collectives.create.error.HostNotOpenToApplications"
-                      defaultMessage="This host is not open to applications"
+                      defaultMessage="This Fiscal Host is not open to applications"
                     />
                   </MessageBox>
                 ) : (
@@ -337,10 +337,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                       labelProps={{ fontSize: '13px', lineHeight: '16px', fontWeight: '600', color: 'black.700' }}
                       label={
                         get(host, 'settings.applyMessage') || (
-                          <FormattedMessage
-                            id="ApplyToHost.WriteMessage"
-                            defaultMessage="Write a message to fiscal host"
-                          />
+                          <FormattedMessage id="ApplyToHost.WriteMessage" defaultMessage="Message to the Fiscal Host" />
                         )
                       }
                     >

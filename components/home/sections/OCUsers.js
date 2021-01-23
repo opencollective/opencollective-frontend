@@ -27,12 +27,12 @@ const messages = defineMessages({
   'home.OCusers.opensource': {
     id: 'home.OCusers.opensource',
     defaultMessage:
-      'More than 1,700 open source communities use Open Collective to receive money from companies and individuals.',
+      'More than 2,500 open source communities use Open Collective to receive money from companies and individuals.',
   },
   'home.OCusers.meetups': {
     id: 'home.OCusers.meetups',
     defaultMessage:
-      'Nearly 100 chapters of Women Who Code use Open Collective to raise money locally and allocate donations throughout their network.',
+      'Nearly 100 chapters of Women Who Code use Open Collective to raise money locally and allocate funding throughout their network.',
   },
   'home.OCusers.movements': {
     id: 'home.OCusers.movements',
@@ -55,7 +55,7 @@ const users = [
     id: 'meetups',
     name: 'Women Who Code',
     type: 'Meetups',
-    description: 'We will never lock you in. Everything we do is open source (MIT License)',
+    description: 'We will never lock you in. Everything we do is open source.',
     collectivePath: '/wwcodeatl',
     learnMorePath: '/wwcodeinc',
     picture: '/static/images/home/oc-users-womenwhocode.png',
@@ -64,7 +64,7 @@ const users = [
     id: 'movements',
     name: 'Extinction Rebellion Belgium',
     type: 'Movements',
-    description: 'We will never lock you in. Everything we do is open source (MIT License)',
+    description: 'We will never lock you in. Everything we do is open source.',
     collectivePath: '/xr-belgium',
     learnMorePath: '/search?q=rebellion',
     picture: '/static/images/home/oc-users-extinctionrebllion.png',

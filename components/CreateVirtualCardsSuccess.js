@@ -90,7 +90,7 @@ export default class CreateVirtualCardsSuccess extends React.Component {
             >
               <Clipboard size="1em" />
               &nbsp;
-              <FormattedMessage id="CreateVirtualCardsSuccess.RedeemLinks" defaultMessage="Copy the links" />
+              <FormattedMessage id="CreateVirtualCardsSuccess.RedeemLinks" defaultMessage="Copy links" />
             </StyledButton>
             {this.props.cards.length < 300 && (
               <FileDownloader

@@ -17,7 +17,7 @@ import { P, Span } from '../Text';
 const messages = defineMessages({
   placeholder: {
     id: 'appRejectionReason.placeholder',
-    defaultMessage: 'What is the reason for rejecting this application?',
+    defaultMessage: 'Why is this application being rejected?',
   },
 });
 
@@ -87,7 +87,7 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
               field: (
                 <FormattedMessage
                   id="ApplicationRejectionReasonModal.Help"
-                  defaultMessage="Help {accountName} know why you rejected their application"
+                  defaultMessage="Help {accountName} understand why you rejected their application"
                   values={{ accountName: collective.name }}
                 />
               ),

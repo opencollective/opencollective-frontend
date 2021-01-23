@@ -71,7 +71,7 @@ describe('Contribution Flow: Order', () => {
 
         // Frequency must not be disabled
         cy.contains('#interval button').should('not.be.disabled');
-        cy.contains('Next charge on June 1, 2042');
+        cy.contains('The next charge will be on June 1, 2042');
         cy.get('button[data-cy="cf-next-step"]').click();
 
         // ---- Step Profile ----
@@ -121,7 +121,7 @@ describe('Contribution Flow: Order', () => {
 
         // Details
         cy.contains('#interval button').should('not.be.disabled');
-        cy.contains('Next charge on June 1, 2042');
+        cy.contains('The next charge will be on June 1, 2042');
         cy.get('#amount > :nth-child(1)').click();
         cy.getByDataCy('cf-next-step').click();
 

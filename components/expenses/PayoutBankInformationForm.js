@@ -270,7 +270,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
       ))}
       <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
         Recipient&apos;s Address&nbsp;
-        <StyledTooltip content="Address of the owner of the bank account (not the address of the bank)">
+        <StyledTooltip content="Bank account holder address (not the bank address)">
           <Info size={16} />
         </StyledTooltip>
       </Box>

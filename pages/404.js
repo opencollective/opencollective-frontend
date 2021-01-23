@@ -25,7 +25,7 @@ export default function Custom404() {
             </P>
             <Flex flexWrap="wrap" justifyContent="center">
               <StyledButton m={2} onClick={() => Router.back()}>
-                &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to previous page" />
+                &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to the previous page" />
               </StyledButton>
             </Flex>
           </Flex>
