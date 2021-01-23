@@ -133,7 +133,7 @@ export default class SectionContributors extends React.PureComponent {
               <P color="black.600" mb={4}>
                 <FormattedMessage
                   id="CollectivePage.ContributorsDescription"
-                  defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
+                  defaultMessage="Thank you for supporting {collectiveName}."
                   values={{ collectiveName: collective.name }}
                 />
               </P>

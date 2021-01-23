@@ -308,7 +308,7 @@ class SectionContribute extends React.PureComponent {
               <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
                 <FormattedMessage
                   id="contributions.subtitle"
-                  defaultMessage="There are no contributions yet. To start accepting financial contributions, please choose a fiscal host."
+                  defaultMessage="To accept financial contributions, you need to complete your setup and decide where your funds will be held."
                 />
               </P>
             </Flex>
@@ -489,7 +489,7 @@ class SectionContribute extends React.PureComponent {
               <ContainerSectionContent pb={4}>
                 <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
                   <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
-                    <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
+                    <FormattedMessage id="SectionContribute.All" defaultMessage="All ways to contribute" /> →
                   </StyledButton>
                 </Link>
               </ContainerSectionContent>

@@ -13,40 +13,40 @@ const messages = defineMessages({
   // Collective Created
   collectiveCreated: {
     id: 'collective.created',
-    defaultMessage: 'Your collective has been created with success.',
+    defaultMessage: 'Your Collective has been created.',
   },
   collectiveCreatedDescription: {
     id: 'collective.created.description',
     defaultMessage:
-      'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
+      'While awaiting for approval from {host}, you can customize your page and start submitting expenses.',
   },
   collectiveApprovedDescription: {
     id: 'collective.githubflow.created.description',
     defaultMessage:
-      "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
+      "You have been approved by {host} and can now receive financial contributions.",
   },
   // Fund Created
   fundCreated: {
     id: 'createFund.created',
-    defaultMessage: 'Your fund has been successfully created.',
+    defaultMessage: 'Your Fund has been created.',
   },
   fundCreatedDescription: {
     id: 'createFund.created.description',
-    defaultMessage: 'We will reach out to you for approval shortly.',
+    defaultMessage: 'We will get in touch about approval soon.',
   },
   fundCreatedApprovedDescription: {
     id: 'createFund.createdApproved.description',
-    defaultMessage: "It's already approved by the host ({host}), you can already contribute money and submit expenses.",
+    defaultMessage: "You have been approved by {host}, and can now make contributions and submit expenses.",
   },
   // Event Created
   eventCreated: {
     id: 'event.created',
-    defaultMessage: 'Your Event has been created with success.',
+    defaultMessage: 'Your Event has been created.',
   },
   // Project Created
   projectCreated: {
     id: 'project.created',
-    defaultMessage: 'Your Project has been created with success.',
+    defaultMessage: 'Your Project has been created.',
   },
   // Organization Created
   organizationCreated: {
@@ -56,7 +56,7 @@ const messages = defineMessages({
   organizationCreateDescription: {
     id: 'organization.created.description',
     defaultMessage:
-      'You can now make financial contributions as an Organization. You can also edit your Organization profile, add team members and admins, and attach a credit card with a monthly limit.',
+      'You can now make financial contributions as an Organization. You can also edit your profile, add team members, and associate a credit card with a monthly limit.',
   },
   // Archived
   collectiveArchived: {
@@ -65,7 +65,7 @@ const messages = defineMessages({
   },
   collectiveArchivedDescription: {
     id: 'collective.isArchived.description',
-    defaultMessage: 'This collective has been archived and can no longer be used for any activities.',
+    defaultMessage: '{name} has been archived and is no longer active.',
   },
   // Pending
   approvalPending: {
@@ -74,16 +74,16 @@ const messages = defineMessages({
   },
   approvalPendingDescription: {
     id: 'collective.pending.description',
-    defaultMessage: 'This collective is pending approval from the host ({host}).',
+    defaultMessage: 'Awaiting approval from {host}.',
   },
   'event.over.sendMoneyToParent.title': {
     id: 'event.over.sendMoneyToParent.title',
-    defaultMessage: 'Event is over and still has a positive balance',
+    defaultMessage: 'This event has a positive balance.',
   },
   'event.over.sendMoneyToParent.description': {
     id: 'event.over.sendMoneyToParent.description',
     defaultMessage:
-      'If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}',
+      'Spend it by submitting event expenses, or transfer the remaining balance to your main budget.',
   },
   'event.over.sendMoneyToParent.transaction.description': {
     id: 'event.over.sendMoneyToParent.transaction.description',

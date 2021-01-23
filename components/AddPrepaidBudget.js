@@ -321,7 +321,7 @@ class AddFundsForm extends React.Component {
                 {this.props.host && (
                   <FormattedMessage
                     id="addfunds.disclaimer"
-                    defaultMessage="By clicking below, you agree to set aside {amount} in your bank account on behalf of the collective"
+                    defaultMessage="You will set aside {amount} in your bank account for this purpose."
                     values={{
                       amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency),
                     }}

@@ -118,7 +118,7 @@ class SectionUpdates extends React.PureComponent {
         <SectionTitle fontSize={['20px', '24px', '32px']} color="black.700" mb={24}>
           <FormattedMessage
             id="CollectivePage.SectionUpdates.Title"
-            defaultMessage="What's new with {collectiveName}"
+            defaultMessage="News from {collectiveName}"
             values={{ collectiveName: collective.name }}
           />
         </SectionTitle>
@@ -126,7 +126,7 @@ class SectionUpdates extends React.PureComponent {
           <P color="black.700" my={2} css={{ flex: '1 0 50%', maxWidth: 700 }}>
             <FormattedMessage
               id="section.updates.subtitle"
-              defaultMessage="Stay up to date with our latest activities and progress."
+              defaultMessage="Updates on our activities and progress."
             />
           </P>
           {isAdmin && (
@@ -135,7 +135,7 @@ class SectionUpdates extends React.PureComponent {
                 <Span fontSize="16px" fontWeight="bold" mr={2}>
                   +
                 </Span>
-                <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
+                <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="New update" />
               </StyledButton>
             </Link>
           )}
@@ -145,7 +145,7 @@ class SectionUpdates extends React.PureComponent {
             <MessageBox my={[3, 5]} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="14px">
               <FormattedMessage
                 id="SectionUpdates.PostFirst"
-                defaultMessage="Use this section to promote your actions and keep your community up-to-date."
+                defaultMessage="Report your progress and keep your community up to date."
               />
             </MessageBox>
           </div>
@@ -189,7 +189,7 @@ class SectionUpdates extends React.PureComponent {
                         <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
                           <FormattedMessage
                             id="update.private.cannot_view_message"
-                            defaultMessage="Become a backer of {collective} to see this update"
+                            defaultMessage="Contribute to {collective} to see this update"
                             values={{ collective: collective.name }}
                           />
                         </PrivateUpdateMesgBox>
@@ -198,7 +198,7 @@ class SectionUpdates extends React.PureComponent {
                         {update.isPrivate && (
                           <StyledTooltip
                             content={() => (
-                              <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
+                              <FormattedMessage id="update.private.lock_text" defaultMessage="This update is for contributors only" />
                             )}
                           >
                             <Box mr={1}>
