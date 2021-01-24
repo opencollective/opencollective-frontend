@@ -434,11 +434,11 @@ const EditCollectivePage = ({ collective }) => {
         subtitle={
           <FormattedMessage
             id="EditCollectivePage.SectionsDescription"
-            defaultMessage="In this section you can use drag and drop to reorder the Profile Page sections."
+            defaultMessage="Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!"
           />
         }
       >
-        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Page sections" />
+        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Customize Profile Page Sections" />
       </SettingsTitle>
       <Flex flexWrap="wrap" mt={4}>
         <Box width="100%" maxWidth={436}>

@@ -82,7 +82,7 @@ const NoReceipts = () => (
   <Flex alignItems="center" justifyContent="center" my={5}>
     <StyledCard height="100px" padding="16px 24px" display="flex" alignItems="center" justifyContent="center">
       <H3 fontSize="15px" lineHeight="24px" color="black.500" textAlign="center">
-        <FormattedMessage id="paymentReceipt.noReceipts" defaultMessage="No receipt available within this period." />
+        <FormattedMessage id="paymentReceipt.noReceipts" defaultMessage="No receipts available in this period." />
       </H3>
     </StyledCard>
   </Flex>

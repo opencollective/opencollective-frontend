@@ -7,17 +7,17 @@ const ROLES_DETAILS = defineMessages({
   [roles.ADMIN]: {
     id: 'RoleDetails.ADMIN',
     defaultMessage:
-      'Admins have full permissions on the profile, and can in particular change the settings, approve expenses or make financial contributions to other Collectives.',
+      'Admins have full permissions to change settings, approve expenses, and make financial contributions from the budget balance.',
   },
   [roles.MEMBER]: {
     id: 'RoleDetails.MEMBER',
     defaultMessage:
-      'Core contributors are team members that you want to showcase on the profile page. Their only special permission is to create events.',
+      'Core contributors show up in the Team section of your page and can create events, but can't change settings or approve expenses.',
   },
   [roles.ACCOUNTANT]: {
     id: 'RoleDetails.ACCOUNTANT',
     defaultMessage:
-      "Accountants can access all the financial information such as receipts, financial reports or expense's invoices.",
+      "Accountants can access financial information, such as receipts, invoices, and reports. They can't change settings or approve expenses.",
   },
 });
 

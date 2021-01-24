@@ -29,11 +29,11 @@ const messages = defineMessages({
   mainDescription: {
     id: 'EditCollective.Conversations.description',
     defaultMessage:
-      'Conversations is a way for people to post public messages that anyone can reply to. Once enabled, a new "Conversations" section will be added to your Collective page and a dedicated page will be created on {conversationsLink}.',
+      'Conversations is a message board for your page, where anyone can post and anyone can reply, like a discussion forum. Once enabled, a new "Conversations" section will appear, and a dedicated page will be created at {conversationsLink}.',
   },
   checkboxLabel: {
     id: 'EditCollective.Conversations.checkbox',
-    defaultMessage: 'Enable conversations',
+    defaultMessage: 'Enable Conversations',
   },
 });
 
@@ -96,10 +96,10 @@ const Conversations = ({ collective }) => {
       )}
       <Flex flexWrap="wrap" justifyContent="space-between" width="100%">
         <ScreenshotPreview>
-          <img src={imgPreviewThread} alt="Preview conversations list" />
+          <img src={imgPreviewThread} alt="Preview Conversations list" />
         </ScreenshotPreview>
         <ScreenshotPreview>
-          <img src={imgPreviewReplies} alt="Preview conversation replies" />
+          <img src={imgPreviewReplies} alt="Preview Conversation replies" />
         </ScreenshotPreview>
         <hr />
       </Flex>

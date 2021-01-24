@@ -105,11 +105,11 @@ class EditCollectiveForm extends React.Component {
       },
       'tos.description': {
         id: 'collective.tos.description',
-        defaultMessage: 'Link to the terms by which this host will collect money on behalf of their collectives',
+        defaultMessage: 'Link to the terms under which this Host collects and holds funds.',
       },
       'tags.description': {
         id: 'collective.tags.edit.description',
-        defaultMessage: 'Make your Collective more discoverable',
+        defaultMessage: 'Help people find you',
       },
       'company.label': {
         id: 'collective.company.label',
@@ -117,7 +117,7 @@ class EditCollectiveForm extends React.Component {
       },
       'company.description': {
         id: 'collective.company.description',
-        defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)',
+        defaultMessage: 'Start with @ to reference an organization (e.g. @airbnb)',
       },
       'amount.label': {
         id: 'Fields.amount',
@@ -129,17 +129,17 @@ class EditCollectiveForm extends React.Component {
       },
       'expensePolicy.label': {
         id: 'editCollective.menu.expenses',
-        defaultMessage: 'Expenses Policy',
+        defaultMessage: 'Expense Policy',
       },
       'expensePolicy.description': {
         id: 'collective.expensePolicy.description',
         defaultMessage:
-          "It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters.",
+          "Understanding any requirements or limitations, and setting clear expectations, helps expense submitters know what to do.",
       },
       'expensePolicy.placeholder': {
         id: 'collective.expensePolicy.placeholder',
         defaultMessage:
-          'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
+          'E.g. what can be approved, required information, tax details, expected payment schedule, etc.',
       },
       'startsAt.label': {
         id: 'startDateAndTime',
@@ -168,16 +168,16 @@ class EditCollectiveForm extends React.Component {
       },
       'application.message.label': {
         id: 'application.message.label',
-        defaultMessage: 'Apply instructions',
+        defaultMessage: 'Application instructions',
       },
       'application.message.description': {
         id: 'application.message.description',
         defaultMessage:
-          'Custom instructions displayed above the text box that projects see when applying (1000 characters max)',
+          'These instructions appear above the text box that applicants see (1000 characters max)',
       },
       'application.message.defaultValue': {
         id: 'ApplyToHost.WriteMessage',
-        defaultMessage: 'Write a message to fiscal host',
+        defaultMessage: 'Explain what information applicants should submit (plain text, 3000 characters max), or direct them to an external application form.',
       },
       'hostFeePercent.label': {
         id: 'HostFee',
@@ -185,15 +185,15 @@ class EditCollectiveForm extends React.Component {
       },
       'hostFeePercent.description': {
         id: 'collective.hostFeePercent.description',
-        defaultMessage: 'Commission on financial contributions to Collectives you fiscally host.',
+        defaultMessage: 'Fee on financial contributions to Collectives you fiscally host.',
       },
       'hostFeePercent.warning': {
         id: 'collective.hostFeePercent.warning',
-        defaultMessage: `Open Collective will charge an extra 15% fee on the money raised through Host Fees.`,
+        defaultMessage: `Open Collective will charge 15% of your Host Fee revenue as its Platform Fee.`,
       },
       'hostFeePercent.warning2': {
         id: 'newPricing.tab.hostFeeChargeExample',
-        defaultMessage: `If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform.`,
+        defaultMessage: `If your host fee is 10% and your Collectives bring in $1,000, your Host Fee revenue is $100, and you’ll pay $15 to the platform.`,
       },
       'location.label': {
         id: 'collective.location.label',
@@ -368,7 +368,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <div>
             <SettingsTitle mb={4}>
-              <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
+              <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connect Twitter" />
             </SettingsTitle>
             <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
           </div>
@@ -442,7 +442,7 @@ class EditCollectiveForm extends React.Component {
               <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
                 <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
-                  <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
+                  <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
                 </StyledButton>
               </Link>
 

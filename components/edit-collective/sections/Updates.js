@@ -29,12 +29,12 @@ const messages = defineMessages({
   mainDescription: {
     id: 'EditCollective.Updates.description',
     defaultMessage:
-      'Updates are a way to keep your community posted on your progress. They are sent by email to all you contributors and followers. Once enabled, a new "Updates" section will be added to your profile page and a dedicated page will be created on {updatesLink}.',
+      'Updates are a way to keep your community posted on your progress. They appear as a blog post on your page, and are sent by email to all your contributors. Your most recent updates will how up on your main page, and all posted Updates will appear on {updatesLink}.',
   },
   mainDescriptionHost: {
     id: 'EditCollective.Updates.descriptionHost',
     defaultMessage:
-      'Updates are a way to keep your community posted on your progress. They are sent by email to admins of your Collectives and to your team members and contributors. Once enabled, a new "Updates" section will be added to your profile page and a dedicated page will be created on {updatesLink}.',
+      'Updates are a way to keep your community posted on your progress. They appear as a blog post on your page, and are sent by email to all admins of Collectives you host, your financial contributors, and your team members. Your most recent updates will how up on your main page, and all posted Updates will appear on {updatesLink}.',
   },
   checkboxLabel: {
     id: 'EditCollective.Updates.checkbox',

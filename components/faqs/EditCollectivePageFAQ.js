@@ -8,34 +8,34 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
   <FAQ {...props}>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="EditCollectivePageFAQ.Data" defaultMessage="Is data preserved when I hide a section?" />
+        <FormattedMessage id="EditCollectivePageFAQ.Data" defaultMessage="If I disable a section will its content be deleted?" />
       </Title>
       <Content>
         <FormattedMessage
           id="EditCollectivePageFAQ.DataDetails"
-          defaultMessage="Yes, your data is preserved when you hide a section and you'll be able to re-enable it whenever you want"
+          defaultMessage="No, your data is preserved when you disable a section. You can re-enable it any time."
         />
       </Content>
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="EditCollectivePageFAQ.EditHidden" defaultMessage="Can I edit a hidden section?" />
+        <FormattedMessage id="EditCollectivePageFAQ.EditHidden" defaultMessage="Can I edit a disabled section?" />
       </Title>
       <Content>
         <FormattedMessage
           id="EditCollectivePageFAQ.EditHiddenDetails"
-          defaultMessage='If you untick "Show section", the section will be hidden for everyone - including you - and you will not be able to edit it'
+          defaultMessage='No. To edit a section, you need to make it to visible.'
         />
       </Content>
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="EditCollectivePageFAQ.Publish" defaultMessage="When will the changes be published?" />
+        <FormattedMessage id="EditCollectivePageFAQ.Publish" defaultMessage="When will changes be published?" />
       </Title>
       <Content>
         <FormattedMessage
           id="EditCollectivePageFAQ.PublishDetails"
-          defaultMessage='Your changes will be published as soon as you click on "Save"'
+          defaultMessage='As soon as you click "Save".'
         />
       </Content>
     </Entry>
@@ -46,7 +46,7 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
       <Content>
         <FormattedMessage
           id="EditCollectivePageFAQ.HideBudgetDetails"
-          defaultMessage="Open Collective is all about transparency, and hiding collective's budgets could go against this value."
+          defaultMessage="Open Collective is all about transparency, and visibility of the budget section is key for this value."
         />
       </Content>
     </Entry>

@@ -60,7 +60,7 @@ const SECTION_LABELS = defineMessages({
   },
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: {
     id: 'editCollective.menu.connectedAccounts',
-    defaultMessage: 'Connected Accounts',
+    defaultMessage: 'Connect Twitter',
   },
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: {
     id: 'updates',
