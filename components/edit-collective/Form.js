@@ -490,8 +490,10 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.HOST_PLAN:
         return <HostPlan collective={collective} />;
 
+      // Policies and moderation
       case EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS:
-        return <Policies collective={collective} showOnlyExpensePolicy />;
+      case EDIT_COLLECTIVE_SECTIONS.POLICIES:
+        return <Policies collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS:
         return <InvoicesReceipts collective={collective} />;
@@ -522,10 +524,6 @@ class EditCollectiveForm extends React.Component {
       // Payment Receipts
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS:
         return <PaymentReceipts collective={collective} />;
-
-      // Policies and moderation
-      case EDIT_COLLECTIVE_SECTIONS.POLICIES:
-        return <Policies collective={collective} />;
 
       default:
         return null;
@@ -807,11 +805,6 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="editCollective.fiscalHosting" defaultMessage={'Fiscal Hosting'} />
               </SettingsTitle>
             )}
-            {section === EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS && (
-              <SettingsTitle>
-                <FormattedMessage id="editCollective.expensesPayouts" defaultMessage={'Expenses & Payouts'} />
-              </SettingsTitle>
-            )}
             {fields && fields.length > 0 && (
               <div className="FormInputs">
                 <div className="inputs">
@@ -839,7 +832,6 @@ class EditCollectiveForm extends React.Component {
                 </div>
               </div>
             )}
-
             {[EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
               this.renderSection(section)}
 

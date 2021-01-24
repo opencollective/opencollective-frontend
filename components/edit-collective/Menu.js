@@ -38,7 +38,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   // Host Specific
   FISCAL_HOSTING: 'fiscal-hosting',
   HOST_PLAN: 'host-plan',
-  EXPENSES_PAYOUTS: 'expenses-payouts',
+  EXPENSES_PAYOUTS: 'expense-and-contribution-policies',
   INVOICES_RECEIPTS: 'invoices-receipts',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
@@ -80,7 +80,8 @@ const SECTION_LABELS = defineMessages({
   },
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: {
     id: 'editCollective.expensesPayouts',
-    defaultMessage: 'Expenses & Payouts',
+    // was expenses-payouts before #3297
+    defaultMessage: 'Policies',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',

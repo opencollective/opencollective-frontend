@@ -288,6 +288,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
     slug
     name
     settings
+    contributionPolicy
     location {
       country
     }
@@ -321,6 +322,7 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     }
     ... on Organization {
       platformFeePercent
+      contributionPolicy
       platformContributionAvailable
       host {
         ...ContributionFlowHostFields
