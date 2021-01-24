@@ -45,6 +45,20 @@ const ContributeFAQ = ({ collective, ...props }) => (
         </Content>
       </Entry>
     )}
+    {collective.host.contributionPolicy && (
+      <Entry>
+        <Title>
+          <FormattedMessage
+            id="ContributeFAQ.Policy.Title"
+            defaultMessage="Does {name} has a contribution policy?"
+            values={{ name: collective.host.name }}
+          />
+        </Title>
+        <Content>
+          <HTMLContent fontSize="13px" content={collective.host.contributionPolicy} />
+        </Content>
+      </Entry>
+    )}
     <Entry>
       <Title>
         <FormattedMessage
