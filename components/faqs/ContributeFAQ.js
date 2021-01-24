@@ -45,7 +45,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
         </Content>
       </Entry>
     )}
-    {collective.host.contributionPolicy && (
+    {collective.type === 'COLLECTIVE' && collective.host.contributionPolicy && (
       <Entry>
         <Title>
           <FormattedMessage
@@ -108,6 +108,11 @@ ContributeFAQ.propTypes = {
   collective: PropTypes.shape({
     name: PropTypes.string,
     contributionPolicy: PropTypes.string,
+    type: PropTypes.string,
+    host: PropTypes.shape({
+      name: PropTypes.string,
+      contributionPolicy: PropTypes.string,
+    }),
   }),
 };
 
