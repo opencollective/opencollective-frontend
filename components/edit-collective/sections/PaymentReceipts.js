@@ -228,13 +228,13 @@ const PaymentReceipts = ({ collective }) => {
         subtitle={
           <FormattedMessage
             id="paymentReceipts.section.description"
-            defaultMessage="Check the consolidated invoices for your contributions here."
+            defaultMessage="Consolidated receipts for your financial contributions."
           />
         }
       >
         <FormattedMessage
           id="paymentReceipts.section.title"
-          defaultMessage="Monthly payment receipts per fiscal host"
+          defaultMessage="Monthly payment receipts"
         />
       </SettingsTitle>
       <Box mt={4}>
@@ -246,7 +246,7 @@ const PaymentReceipts = ({ collective }) => {
           textTransform="uppercase"
           color="black.800"
         >
-          <FormattedMessage id="paymentReceipts.selectDate.label" defaultMessage="Display receipts of" />
+          <FormattedMessage id="paymentReceipts.selectDate.label" defaultMessage="Time period" />
         </P>
         <StyledSelect
           options={[defaultFilter, ...yearsFilter]}

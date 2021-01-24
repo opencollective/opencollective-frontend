@@ -170,7 +170,7 @@ class Tiers extends React.Component {
       },
       'customContributions.label': {
         id: 'tier.customContributions.label',
-        defaultMessage: 'Enable custom contributions',
+        defaultMessage: 'Enable flexible contributions',
       },
       standalonePage: {
         id: 'tier.standalonePage',
@@ -431,7 +431,7 @@ class Tiers extends React.Component {
         {displayCustomContributionsSettings && (
           <React.Fragment>
             <SettingsSectionTitle>
-              <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
+              <FormattedMessage id="ContributionType.Custom" defaultMessage="Flexible Contributions" />
             </SettingsSectionTitle>
             <Mutation mutation={editCollectiveSettingsMutation}>
               {(editSettings, { loading }) => (
@@ -443,7 +443,7 @@ class Tiers extends React.Component {
                     <P>
                       <FormattedMessage
                         id="Tiers.CustomTierDescription"
-                        defaultMessage="The custom contribution adds a default tier on your collective that doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized."
+                        defaultMessage="A default tier that enables freely customizable contributions, so people can set thier own amount and frequency without limitations. You cannot change the settings or description of this tier, but you can choose to disable it."
                       />
                     </P>
                     <StyledCheckbox
@@ -467,7 +467,7 @@ class Tiers extends React.Component {
               )}
             </Mutation>
             <SettingsSectionTitle mt={50}>
-              <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />
+              <FormattedMessage id="createCustomTiers" defaultMessage="Create your own tiers" />
             </SettingsSectionTitle>
           </React.Fragment>
         )}

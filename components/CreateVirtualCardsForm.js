@@ -331,7 +331,7 @@ class CreateVirtualCardsForm extends Component {
           <StyledButton buttonSize="large" mt="2em" justifyContent="center">
             <FormattedMessage
               id="virtualCards.create.requirePM"
-              defaultMessage="You must add a payment method to your account to create gift cards"
+              defaultMessage="Add a payment method to create gift cards"
             />
           </StyledButton>
         </Link>
