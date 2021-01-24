@@ -85,7 +85,7 @@ class UpdateBankDetailsForm extends React.Component {
               <P>
                 <FormattedMessage
                   id="bankaccount.instructions.variables"
-                  defaultMessage="You can use the following variables in the instructions:"
+                  defaultMessage="This is the email payers will receive when they make a bank transfer contribution. Include the details they will need to complete their payment, including reference info so you can match the pending transaction. A variable is like a blank that gets filled in automatically. You can use the following variables in the instructions:"
                 />
               </P>
 
@@ -95,26 +95,26 @@ class UpdateBankDetailsForm extends React.Component {
                     <code>&#123;account&#125;</code>:{' '}
                     <FormattedMessage
                       id="bankaccount.instructions.account"
-                      defaultMessage="bank account details added above"
+                      defaultMessage="The bank account details you added above."
                     />
                   </li>
                 )}
                 <li>
                   <code>&#123;amount&#125;</code>:{' '}
-                  <FormattedMessage id="bankaccount.instructions.amount" defaultMessage="total amount of the order" />
+                  <FormattedMessage id="bankaccount.instructions.amount" defaultMessage="Total amount the payer should transfer." />
                 </li>
                 <li>
                   <code>&#123;collective&#125;</code>:{' '}
                   <FormattedMessage
                     id="bankaccount.instructions.collective"
-                    defaultMessage="slug of the collective receiving the order"
+                    defaultMessage="Collective to receive the funds."
                   />
                 </li>
                 <li>
                   <code>&#123;reference&#125;</code>:{' '}
                   <FormattedMessage
                     id="bankaccount.instructions.reference"
-                    defaultMessage="unique id to track when the order is received"
+                    defaultMessage="Unique ID code, to confirm receipt of funds."
                   />
                 </li>
 
