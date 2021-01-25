@@ -31,7 +31,8 @@ const MemberContainer = styled.div`
     margin: 0;
   }
 
-  .ORGANIZATION {
+  .ORGANIZATION,
+  .COLLECTIVE {
     width: 200px;
     margin: 1rem;
   }
