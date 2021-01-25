@@ -13,7 +13,7 @@ import { Router } from '../server/pages';
 import CreateProfileFAQ from './faqs/CreateProfileFAQ';
 import CreateProfile from './CreateProfile';
 import { Box, Flex } from './Grid';
-import Link from './Link';
+import I18nFormatters from './I18nFormatters';
 import MessageBoxGraphqlError from './MessageBoxGraphqlError';
 import SignIn from './SignIn';
 import StyledButton from './StyledButton';
@@ -260,11 +260,8 @@ class SignInOrJoinFree extends React.Component {
                     <P mt={4} color="black.500" fontSize="12px" mb={3} data-cy="join-conditions" textAlign="center">
                       <FormattedMessage
                         id="SignIn.legal"
-                        defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
-                        values={{
-                          'tos-link': msg => <Link route="/tos">{msg}</Link>,
-                          'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
-                        }}
+                        defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
+                        values={I18nFormatters}
                       />
                     </P>
                   </Box>

@@ -6,9 +6,8 @@ import { isEmail } from 'validator';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
+import I18nFormatters from '../I18nFormatters';
 import InputTypeCountry from '../InputTypeCountry';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
@@ -135,11 +134,8 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
         <P color="black.500" fontSize="12px" my={3} data-cy="join-conditions">
           <FormattedMessage
             id="SignIn.legal"
-            defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
-            values={{
-              'tos-link': getI18nLink({ as: Link, route: '/tos' }),
-              'privacy-policy-link': getI18nLink({ as: Link, route: '/privacypolicy' }),
-            }}
+            defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
+            values={I18nFormatters}
           />
         </P>
       )}

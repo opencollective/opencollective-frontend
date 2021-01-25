@@ -26,7 +26,7 @@ import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, P } from '../Text';
 
-const BackButton = styled(StyledButton)`
+export const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
   font-size: 14px;
 `;

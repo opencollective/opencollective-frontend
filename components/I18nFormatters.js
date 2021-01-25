@@ -18,5 +18,16 @@ export const I18nSignInLink = chunks => (
   </Link>
 );
 
-const I18nFormatters = { strong: I18nBold, i: I18nItalic, SupportLink: I18nSupportLink, SignInLink: I18nSignInLink };
+export const I18nTOSLink = msg => <Link route="tos">{msg}</Link>;
+export const I18nPrivacyLink = msg => <Link route="privacypolicy">{msg}</Link>;
+
+const I18nFormatters = {
+  strong: I18nBold,
+  i: I18nItalic,
+  SupportLink: I18nSupportLink,
+  SignInLink: I18nSignInLink,
+  TOSLink: I18nTOSLink,
+  PrivacyPolicyLink: I18nPrivacyLink,
+};
+
 export default I18nFormatters;
