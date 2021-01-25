@@ -8,6 +8,9 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
+import { collectivePageQuery, getCollectivePageQueryVariables } from '../../components/collective-page/graphql/queries';
+import { budgetSectionQuery, getBudgetSectionQueryVariables } from '../../components/collective-page/sections/Budget';
+
 import { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -91,7 +94,18 @@ const buildAccountReference = input => {
 
 const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
-  const [submitAddFunds, { error }] = useMutation(addFundsMutation, { context: API_V2_CONTEXT });
+  const [submitAddFunds, { error }] = useMutation(addFundsMutation, {
+    context: API_V2_CONTEXT,
+    refetchQueries: [
+      {
+        query: budgetSectionQuery,
+        context: API_V2_CONTEXT,
+        variables: getBudgetSectionQueryVariables(collective.slug),
+      },
+      { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
+    ],
+    awaitRefetchQueries: true,
+  });
   const defaultHostFeePercent = collective.hostFeePercent;
 
   if (!LoggedInUser) {
@@ -298,6 +312,7 @@ AddFundsModal.propTypes = {
   collective: PropTypes.shape({
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
+    slug: PropTypes.string,
   }).isRequired,
   onClose: PropTypes.func,
 };
