@@ -500,6 +500,9 @@ class ExpensePage extends React.Component {
                   isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
                   permissions={expense?.permissions}
                   collective={collective}
+                  onError={error => this.setState({ error })}
+                  onEdit={this.onEditBtnClick}
+                  onDelete={this.onDelete}
                 />
                 {status !== PAGE_STATUS.EDIT_SUMMARY && (
                   <React.Fragment>
