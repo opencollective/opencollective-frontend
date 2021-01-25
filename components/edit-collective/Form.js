@@ -843,6 +843,7 @@ class EditCollectiveForm extends React.Component {
                 </div>
               </div>
             )}
+
             {[EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
               this.renderSection(section)}
 
