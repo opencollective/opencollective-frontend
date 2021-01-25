@@ -19,6 +19,7 @@ const StyledInputField = ({
   required,
   inputType,
   labelFontSize,
+  labelFontWeight,
   labelColor,
   labelProps,
   ...props
@@ -36,7 +37,7 @@ const StyledInputField = ({
             htmlFor={htmlFor}
             display="block"
             fontSize={labelFontSize}
-            fontWeight="normal"
+            fontWeight={labelFontWeight}
             mb={isCheckbox ? 0 : 2}
             mr={2}
             ml={isCheckbox ? 2 : undefined}
@@ -98,6 +99,8 @@ StyledInputField.propTypes = {
   required: PropTypes.bool,
   /** Font size for the label */
   labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
+  /** Font weight for the label */
+  labelFontWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   labelColor: PropTypes.string,
   /** Anything here will be passed down to label */
   labelProps: PropTypes.object,
@@ -107,6 +110,7 @@ StyledInputField.propTypes = {
 
 StyledInputField.defaultProps = {
   labelColor: 'black.800',
+  labelFontWeight: 'normal',
 };
 
 export default StyledInputField;

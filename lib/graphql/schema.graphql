@@ -3579,6 +3579,11 @@ type Query {
     onlyActive: Boolean
 
     """
+    Whether to skip recent accounts (48h)
+    """
+    skipRecentAccounts: Boolean = false
+
+    """
     Limit the amount of results. Defaults to 20
     """
     limit: Int = 20
