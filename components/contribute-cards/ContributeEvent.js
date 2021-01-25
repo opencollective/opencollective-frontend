@@ -6,6 +6,7 @@ import { truncate } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import DayJs from '../../lib/dayjs';
 import { canOrderTicketsFromEvent, isPastEvent } from '../../lib/events';
 
 import Container from '../Container';
@@ -22,8 +23,10 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const isTruncated = description && description.length < event.description.length;
   const isPassed = isPastEvent(event);
   const canOrderTickets = canOrderTicketsFromEvent(event);
-  const showYearOnStartDate = endsAt ? undefined : 'numeric'; // only if there's no end date
   const eventRouteParams = { parentCollectiveSlug: collective.slug, slug: event.slug };
+  const takesMultipleDays = startsAt && endsAt && !DayJs(startsAt).isSame(endsAt, 'day');
+  const showYearOnStartDate = !endsAt || !takesMultipleDays ? 'numeric' : undefined; // only if there's no end date
+
   return (
     <Contribute
       route="event"
@@ -45,9 +48,17 @@ const ContributeEvent = ({ collective, event, ...props }) => {
           <Container display="flex" alignItems="center" fontSize="12px">
             <Calendar size="1.3em" color="#C4C7CC" />
             <Span ml={2} color="black.700">
-              {startsAt && <FormattedDate value={startsAt} month="short" day="numeric" year={showYearOnStartDate} />}
-              {startsAt && startsAt && ' → '}
-              {endsAt && <FormattedDate value={endsAt} month="short" day="numeric" year="numeric" />}
+              {startsAt && (
+                <time dateTime={startsAt}>
+                  <FormattedDate value={startsAt} month="short" day="numeric" year={showYearOnStartDate} />
+                </time>
+              )}
+              {takesMultipleDays && ' → '}
+              {(takesMultipleDays || (!startsAt && endsAt)) && (
+                <time dateTime={endsAt}>
+                  <FormattedDate value={endsAt} month="short" day="numeric" year="numeric" />
+                </time>
+              )}
             </Span>
           </Container>
           {startsAt && (
