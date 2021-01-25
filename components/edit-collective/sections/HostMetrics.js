@@ -43,6 +43,10 @@ const metricsQuery = gqlV2/* GraphQL */ `
           value
           currency
         }
+        pendingHostFeeShare {
+          value
+          currency
+        }
         totalMoneyManaged {
           value
           currency
@@ -184,7 +188,22 @@ const HostMetrics = props => {
             <P fontSize="10px">
               <FormattedMessage
                 id="Host.Metrics.hostFeeShare.description"
-                defaultMessage="Host Fees you are sharing this month with Open Collective as part of your Host Plan."
+                defaultMessage="Total Host Fees you are sharing this month with Open Collective as part of your Host Plan. "
+              />
+            </P>
+          </Box>
+          <Box flex="1" py={16} px={4}>
+            <P fontSize="10px" textTransform="uppercase" color="black.700">
+              <FormattedMessage id="Host.Metrics.PendingHostFeeShare" defaultMessage="Pending Host Fee Share" />
+            </P>
+            <P fontSize="20px" mt={1}>
+              {formatValueAsCurrency(data.host.hostMetrics.pendingHostFeeShare)}{' '}
+              <Span color="black.400">{data.host.hostMetrics.pendingHostFeeShare.currency}</Span>
+            </P>
+            <P fontSize="10px">
+              <FormattedMessage
+                id="Host.Metrics.pendingHostFeeShare.description"
+                defaultMessage="Part of Host Fees that still needs to be shared with with Open Collective as part of your Host Plan. They will be charged through an invoice from Open Collective at the end of the month."
               />
             </P>
           </Box>
