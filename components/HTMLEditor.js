@@ -40,7 +40,8 @@ const HTMLEditorContainer = styled.div`
   `}
 `;
 
-/*
+/**
+ * @deprecated Prefer `RichTextEditor`
  * Simple editor component that takes placeholder text as a prop
  */
 class HTMLEditor extends React.Component {
@@ -81,7 +82,6 @@ class HTMLEditor extends React.Component {
           [{ header: props.allowedHeaders }],
           ['bold', 'italic', 'underline', 'blockquote'],
           [{ color: [] }],
-          [{ align: '' }, { align: 'center' }, { align: 'right' }],
           [{ list: 'ordered' }, { list: 'bullet' }],
           ['link', 'image'],
         ],
@@ -103,7 +103,6 @@ class HTMLEditor extends React.Component {
      * See https://quilljs.com/docs/formats/
      */
     this.formats = [
-      'align',
       'color',
       'header',
       'font',
