@@ -96,12 +96,12 @@ class UpdateWithData extends React.Component {
         {update.userCanSeeUpdate && (
           <Box pl={[0, 5]}>
             {comments.length > 0 && (
-              <Box mb={3} pt={3} maxWidth={800}>
+              <Box mb={3} pt={3} maxWidth={700}>
                 <Thread collective={collective} items={comments} onCommentDeleted={this.onCommentDeleted} />
               </Box>
             )}
             {update.publishedAt && (
-              <Flex mt="40px" maxWidth={800}>
+              <Flex mt="40px" maxWidth={700}>
                 <Box display={['none', null, 'block']} flex="0 0" p={3}>
                   <CommentIcon size={24} color="lightgrey" />
                 </Box>
