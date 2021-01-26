@@ -190,7 +190,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || isCollective(c),
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: c => isFeatureAllowed(c, FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: c => isFeatureAllowed(c, FEATURES.CONVERSATIONS) && !isFund(c),
-  [EDIT_COLLECTIVE_SECTIONS.POLICIES]: c => isHost(c) || isCollective(c) || isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.POLICIES]: c => isCollective(c) || isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: c => isCollective(c) || isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c => isOneOfTypes(c, COLLECTIVE, FUND, ORGANIZATION, EVENT),
@@ -267,8 +267,8 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
             renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_PLAN))}
           {[USER, ORGANIZATION].includes(collective.type) &&
             renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_METRICS))}
-          {[USER].includes(collective.type) &&
-            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS))}
+          {[USER, ORGANIZATION].includes(collective.type) &&
+            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.POLICIES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
