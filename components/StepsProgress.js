@@ -15,8 +15,8 @@ import { P } from './Text';
 const Circle = styled.svg`
   circle {
     fill: ${themeGet('colors.white.full')};
-    stroke: #9d9fa3;
-    stroke-width: 2px;
+    stroke: #c4c7cc;
+    stroke-width: 1px;
 
     ${props =>
       !props.disabled &&
@@ -28,6 +28,7 @@ const Circle = styled.svg`
       !props.disabled &&
       css`
         cursor: pointer;
+        stroke-width: 2px;
         &:hover {
           fill: ${themeGet('colors.black.100')};
         }
@@ -48,6 +49,7 @@ const Circle = styled.svg`
   }
 
   text {
+    font-size: 14px;
     ${props =>
       !props.disabled &&
       css`
@@ -58,12 +60,12 @@ const Circle = styled.svg`
 const Bubble = styled(Flex)`
   justify-content: center;
   align-items: center;
-  flex: 0 0 32px;
-  height: 32px;
-  width: 32px;
+  flex: 0 0 34px;
+  height: 34px;
+  width: 34px;
   border-radius: 16px;
   cursor: default;
-  color: #9d9fa3;
+  color: #c4c7cc;
   background: ${themeGet('colors.white.full')};
   transition: box-shadow 0.3s, background 0.3s;
   z-index: 2;
@@ -252,7 +254,7 @@ const getBubbleContent = (idx, checked, disabled, focused, loading) => {
 
   return (
     <Circle disabled={disabled} checked={checked} focus={focused}>
-      <circle cx="50%" cy="50%" r="1em"></circle>
+      <circle cx="50%" cy="50%" r="16px"></circle>
       <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle">
         {idx + 1}
       </text>
