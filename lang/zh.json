@@ -1643,6 +1643,7 @@
   "startDateAndTime": "start date and time",
   "StepsProgress.mobile.next": "下一步： {stepName}",
   "StepsProgress.mobile.status": "{from} of {to}",
+  "StyledDropzone.": "The following {count, plural, one {file is} other {files are}} not valid: {files}",
   "StyledDropzone.DropMsg": "Drop {count,plural, one {file} other {files}} here",
   "StyledInputTags.AddLabel": "添加标签",
   "StyledInputTags.EditLabel": "编辑标签",

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
-import { isNil, omit, partition } from 'lodash';
+import { get, isNil, omit, partition } from 'lodash';
 import { useDropzone } from 'react-dropzone';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -16,6 +16,7 @@ import { Box } from './Grid';
 import { getI18nLink } from './I18nFormatters';
 import StyledSpinner from './StyledSpinner';
 import { P } from './Text';
+import { TOAST_TYPE, useToasts } from './ToastProvider';
 import UploadedFilePreview from './UploadedFilePreview';
 
 const Dropzone = styled(Container)`
@@ -112,13 +113,14 @@ const StyledDropzone = ({
   const [isUploading, setUploading] = React.useState(false);
   const [uploadProgressList, setUploadProgressList] = React.useState([]);
   const uploadProgress = getUploadProgress(uploadProgressList);
+  const { addToast } = useToasts();
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept,
     minSize,
     maxSize,
     multiple: isMulti,
     onDrop: React.useCallback(
-      async acceptedFiles => {
+      async (acceptedFiles, rejectedFiles) => {
         setUploading(true);
         const filesToUpload = isMulti ? acceptedFiles : [acceptedFiles[0]];
         const results = await allSettled(
@@ -146,6 +148,25 @@ const StyledDropzone = ({
 
         if (onReject && failures.length > 0) {
           onReject(isMulti ? failures.map(getRejectReason) : getRejectReason(failures[0]));
+        }
+
+        if (rejectedFiles?.length) {
+          addToast({
+            type: TOAST_TYPE.ERROR,
+            message: (
+              <React.Fragment>
+                <FormattedMessage
+                  id="StyledDropzone."
+                  defaultMessage="The following {count, plural, one {file is} other {files are}} not valid: {files}"
+                  values={{
+                    count: rejectedFiles.length,
+                    files: <i>{rejectedFiles.map(({ file }) => file.name).join(', ')}</i>,
+                  }}
+                />
+                . {get(rejectedFiles[0], 'errors.0.message') || null}
+              </React.Fragment>
+            ),
+          });
         }
       },
       [isMulti, onSuccess, onReject, mockImageGenerator, uploadProgressList],
