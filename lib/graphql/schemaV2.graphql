@@ -4406,6 +4406,11 @@ type HostMetrics {
   hostFeeShare: Amount
 
   """
+  Amount in host fee shared  requiring settlement
+  """
+  pendingHostFeeShare: Amount
+
+  """
   Total amount managed on behalf of hosted collectives
   """
   totalMoneyManaged: Amount

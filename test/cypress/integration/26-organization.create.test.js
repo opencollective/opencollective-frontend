@@ -1,18 +1,28 @@
 describe('create an organization', () => {
-  before(() => {
+  beforeEach(() => {
     cy.login({ redirect: '/organizations/new' });
   });
 
-  it('edit info', () => {
-    cy.fillInputField('name', 'New org');
-    cy.fillInputField('description', 'short description for new org');
-    cy.fillInputField('website', 'https://newco.com');
-    cy.get('[data-cy="tos"] [data-cy="custom-checkbox"]').click();
-    cy.wait(500);
-    cy.get('.actions button').click();
-    cy.wait(1000);
-    cy.containsInDataCy('collective-title', 'New org', { timeout: 10000 });
-    cy.get('[data-cy="collective-hero"] [title="Website"][href="https://newco.com"]');
-    cy.get('.NotificationBar h1').contains('Your Organization has been created.');
+  it('Creates an organization successfully without co-admin', () => {
+    cy.get('[data-cy="cof-form-name"]').type('testorganization12');
+    cy.getByDataCy('cof-form-slug')
+      .first()
+      .find('input')
+      .invoke('val')
+      .then(sometext => expect(sometext).to.equal('testorganization12'));
+    cy.get('[data-cy="cof-org-description"]').type('short description for new org');
+    cy.get('[data-cy="cof-org-website"]').type('ww.com');
+    cy.get('[data-cy="custom-checkbox"]').click();
+    cy.get('[data-cy="cof-form-submit"]').click();
+  });
+
+  it('Shows an Error if Authorization is not checked', () => {
+    cy.get('[data-cy="cof-form-name"]').type('testOrganization10');
+    cy.get('[data-cy="cof-org-description"]').type('short description for new org');
+    cy.get('[data-cy="cof-org-website"]').type('ww.com');
+    cy.get('[data-cy="cof-form-submit"]').click();
+    cy.get('[data-cy="cof-error-message"]').contains(
+      'Please verify that you are an authorized representative of this organization',
+    );
   });
 });

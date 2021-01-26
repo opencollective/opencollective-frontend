@@ -409,7 +409,7 @@ const editCollectiveMembersMutation = gql`
   }
 `;
 
-const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
+export const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
   name: 'editCollectiveMembers',
 });
 

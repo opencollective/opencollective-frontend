@@ -71,10 +71,6 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
 }
 
 const InputFieldContainer = styled.div`
-  input {
-    padding: 6px 12px;
-  }
-
   label {
     margin-top: 5px;
     margin-bottom: 5px;

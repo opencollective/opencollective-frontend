@@ -184,7 +184,7 @@ const Receipts = ({ invoices }) => {
       <Flex key={monthYear} flexDirection="column">
         <Flex alignItems="center" justifyContent="space-between" mt={3}>
           <H3 fontSize="16px" lineHeight="24px" color="black.900">
-            <FormattedDate value={new Date(year, month)} month="long" year="numeric" />
+            <FormattedDate value={new Date(year, month - 1)} month="long" year="numeric" />
           </H3>
           <StyledHr width={['60%', '80%']} borderStyle="solid" borderColor="#C4C7CC" />
         </Flex>

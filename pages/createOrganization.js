@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import CreateOrganization from '../components/CreateOrganization';
 import ErrorPage from '../components/ErrorPage';
+import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
 class CreateOrganizationPage extends React.Component {
@@ -24,9 +25,9 @@ class CreateOrganizationPage extends React.Component {
     }
 
     return (
-      <div>
+      <Page>
         <CreateOrganization LoggedInUser={LoggedInUser} refetchLoggedInUser={refetchLoggedInUser} />
-      </div>
+      </Page>
     );
   }
 }
