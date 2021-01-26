@@ -79,10 +79,6 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.policies',
     defaultMessage: 'Policies',
   },
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: {
-    id: 'editCollective.expensesPayouts',
-    defaultMessage: 'Expenses & Payouts',
-  },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',
     defaultMessage: 'Fiscal Host',
@@ -207,7 +203,6 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_METRICS]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: () => false,
