@@ -4,7 +4,6 @@ import React from 'react';
 import { pick } from 'lodash';
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
-import flush from 'styled-jsx/server';
 
 import { parseToBoolean } from '../lib/utils';
 
@@ -12,7 +11,7 @@ import { parseToBoolean } from '../lib/utils';
 // data for the user's locale for React Intl to work in the browser.
 export default class IntlDocument extends Document {
   static async getInitialProps(ctx) {
-    const { locale, localeDataScript, url, noStyledJsx } = ctx.req;
+    const { locale, localeDataScript, url } = ctx.req;
 
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
@@ -47,7 +46,6 @@ export default class IntlDocument extends Document {
         styles: (
           <React.Fragment>
             {initialProps.styles}
-            {noStyledJsx ? null : flush()}
             {sheet.getStyleElement()}
           </React.Fragment>
         ),

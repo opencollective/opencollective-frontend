@@ -372,8 +372,17 @@ const ExpenseFormPayeeStep = ({
               data-cy="expense-next"
               buttonStyle="primary"
               disabled={!stepOneCompleted}
-              onClick={() => {
-                onNext?.();
+              onClick={async () => {
+                const allErrors = await formik.validateForm();
+                // Get the relevant errors for the payee step, ignores data.currency in the because it is related to expense amount.
+                const errors = omit(pick(allErrors, ['payee', 'payoutMethod']), ['payoutMethod.data.currency']);
+                if (isEmpty(flattenObjectDeep(errors))) {
+                  onNext?.();
+                } else {
+                  // We use set touched here to display errors on fields that are not dirty.
+                  formik.setTouched(errors);
+                  formik.setErrors(errors);
+                }
               }}
             >
               <FormattedMessage id="Pagination.Next" defaultMessage="Next" />

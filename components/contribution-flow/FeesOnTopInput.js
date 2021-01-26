@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import INTERVALS from '../../lib/constants/intervals';
@@ -13,6 +13,17 @@ import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
 
 import illustration from './fees-on-top-illustration.png';
+
+const msg = defineMessages({
+  noThankYou: {
+    id: 'NoThankYou',
+    defaultMessage: 'No, thank you',
+  },
+  other: {
+    id: 'platformFee.Other',
+    defaultMessage: 'Other',
+  },
+});
 
 const Illustration = styled.img.attrs({ src: illustration })`
   width: 40px;
@@ -26,33 +37,44 @@ const getOptionFromPercentage = (amount, currency, percentage) => {
   return {
     // Value must be unique, so we set a special key if feeAmount is 0
     value: feeAmount || `${percentage}%`,
+    feeAmount,
     percentage,
-    label: (
-      <span>
-        {formatCurrency(feeAmount, currency)} <Span color="black.500">({percentage * 100}%)</Span>
-      </span>
-    ),
+    currency,
+    label: `${feeAmount / 100} ${currency} (${percentage * 100}%)`,
   };
 };
 
-const getOptions = (amount, currency) => {
+const getOptions = (amount, currency, intl) => {
   return [
     ...DEFAULT_PERCENTAGES.map(percentage => {
       return getOptionFromPercentage(amount, currency, percentage);
     }),
     {
-      label: <FormattedMessage id="NoThankYou" defaultMessage="No, thank you" />,
+      label: intl.formatMessage(msg.noThankYou),
       value: 0,
     },
     {
-      label: <FormattedMessage id="platformFee.Other" defaultMessage="Other" />,
+      label: intl.formatMessage(msg.other),
       value: 'CUSTOM',
     },
   ];
 };
 
 const FeesOnTopInput = ({ currency, amount, fees, onChange }) => {
-  const options = React.useMemo(() => getOptions(amount, currency), [amount, currency]);
+  const intl = useIntl();
+  const options = React.useMemo(() => getOptions(amount, currency, intl), [amount, currency]);
+  const formatOptionLabel = option => {
+    if (option.currency) {
+      return (
+        <span>
+          {formatCurrency(option.feeAmount, option.currency)}{' '}
+          <Span color="black.500">({option.percentage * 100}%)</Span>
+        </span>
+      );
+    } else {
+      return option.label;
+    }
+  };
   const [selectedOption, setSelectedOption] = React.useState(options[1]);
   const [isReady, setReady] = React.useState(false);
 
@@ -96,6 +118,7 @@ const FeesOnTopInput = ({ currency, amount, fees, onChange }) => {
           </P>
         </Flex>
         <StyledSelect
+          aria-label="Donation percentage"
           width="100%"
           maxWidth={['100%', 190]}
           mt={[2, 0]}
@@ -103,6 +126,7 @@ const FeesOnTopInput = ({ currency, amount, fees, onChange }) => {
           fontSize="15px"
           options={options}
           onChange={setSelectedOption}
+          formatOptionLabel={formatOptionLabel}
           value={selectedOption}
         />
       </Flex>
