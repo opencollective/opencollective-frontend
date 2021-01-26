@@ -83,7 +83,7 @@ const messages = defineMessages({
   'event.over.sendMoneyToParent.description': {
     id: 'event.over.sendMoneyToParent.description',
     defaultMessage:
-      'Spend it by submitting event expenses, or transfer the remaining balance to your main budget.',
+      'Spend it by submitting event expenses, or transfer the remaining balance to the main budget.',
   },
   'event.over.sendMoneyToParent.transaction.description': {
     id: 'event.over.sendMoneyToParent.transaction.description',

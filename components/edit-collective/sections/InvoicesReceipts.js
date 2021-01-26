@@ -55,7 +55,7 @@ const InvoicesReceipts = ({ collective }) => {
       <P>
         <FormattedMessage
           id="EditHostInvoice.Receipt.Instructions"
-          defaultMessage="You can define a custom title that will appear on the receipts generated for the contributors of the Collectives you are hosting. Keep this field empty to use the default title:"
+          defaultMessage="You can customize the title (and add custom text) on the receipts that will be automatically generated for financial contributions to Collectives you are hosting, e.g. 'donation receipt' or 'tax receipt' or another phrase appropriate for your legal entity type, language, and location. Keep this field empty to use the default title:"
         />
         {/** Un-localized on purpose, because it's not localized in the actual invoice */}
         &nbsp;<i>Payment Receipt</i>.

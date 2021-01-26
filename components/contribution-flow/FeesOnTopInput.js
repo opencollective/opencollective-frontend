@@ -41,7 +41,7 @@ const getOptions = (amount, currency) => {
       return getOptionFromPercentage(amount, currency, percentage);
     }),
     {
-      label: <FormattedMessage id="NoThankYou" defaultMessage="No, thank you" />,
+      label: <FormattedMessage id="NoThankYou" defaultMessage="No thank you" />,
       value: 0,
     },
     {
@@ -85,7 +85,7 @@ const FeesOnTopInput = ({ currency, amount, fees, onChange }) => {
       <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
         <FormattedMessage
           id="platformFee.info"
-          defaultMessage="Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to keep this possible!"
+          defaultMessage="The Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to make this possible!"
         />
       </P>
       <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>

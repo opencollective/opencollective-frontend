@@ -69,7 +69,7 @@ const I18nContributionType = defineMessages({
   },
   [ContributionTypes.FINANCIAL_ONE_TIME]: {
     id: 'ContributionType.OneTime',
-    defaultMessage: 'One time contribution',
+    defaultMessage: 'One-time contribution',
   },
   [ContributionTypes.FINANCIAL_RECURRING]: {
     id: 'ContributionType.Recurring',

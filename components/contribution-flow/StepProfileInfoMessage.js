@@ -10,28 +10,28 @@ const StepProfileInfoMessage = ({ amount, interval }) => {
       return (
         <FormattedMessage
           id="ContributionFlow.recurringAccountInfo"
-          defaultMessage="Please provide a valid email, we need to create an account for you to create a recurring contribution you can manage."
+          defaultMessage="Please provide a valid email. We need to create an account so you can manage your contribution."
         />
       );
     } else if (amount < 25000) {
       return (
         <FormattedMessage
           id="ContributionFlow.lowestContributionInfoMessage"
-          defaultMessage="Please provide a valid email, we need to send you a receipt for your donation."
+          defaultMessage="Please provide a valid email. We need to send you a receipt for your contribution."
         />
       );
     } else if (amount >= 25000 && amount < 500000) {
       return (
         <FormattedMessage
           id="ContributionFlow.lowContributionInfoMessage"
-          defaultMessage="Every donation must be linked to an email account for legal reasons. Please provide a valid email."
+          defaultMessage="Every contribution must be linked to an email account for legal reasons. Please provide a valid email."
         />
       );
     } else if (amount >= 500000) {
       return (
         <FormattedMessage
           id="ContributionFlow.highContributionInfoMessage"
-          defaultMessage="While we'll email you a donation receipt, we are still required to keep an address for donations over $5000 USD."
+          defaultMessage="While we'll email you a receipt, we are still required to collect a phyisical address for donations over $5000 USD."
         />
       );
     }

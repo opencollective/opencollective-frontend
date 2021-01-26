@@ -83,7 +83,7 @@ class SuccessPage extends React.Component {
                 <P fontSize="16px" lineHeight="24px" color="black.600" textAlign="center">
                   <FormattedMessage
                     id="acceptContributions.notifiedWhen"
-                    defaultMessage="You will be notified when {hostName} has approved or rejected your application. Contribution tiers will go live once you have an active fiscal host."
+                    defaultMessage="You will be notified when {hostName} has approved or rejected your application. Contribution tiers will go live once you have an active Fiscal Host."
                     values={{
                       hostName: chosenHost.name,
                     }}
@@ -114,7 +114,7 @@ class SuccessPage extends React.Component {
               <P fontSize="13px" lineHeight="20px" mb={3} color="black.800">
                 <FormattedMessage
                   id="acceptContributions.tiers.paragraphOne"
-                  defaultMessage="Customize your contribution tiers with different amounts, frequencies (one-time, monthly, or yearly), goals, and rewards. {knowMore}."
+                  defaultMessage="Customize your contribution tiers with different names, amounts, frequencies (one-time, monthly, or yearly), goals, and rewards. {knowMore}."
                   values={{
                     knowMore: (
                       <SmallExternalLink href={TIERS_INFO_LINK}>

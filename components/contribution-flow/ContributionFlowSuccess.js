@@ -87,7 +87,7 @@ const SuccessIllustration = styled.img.attrs({ src: successIllustrationUrl })`
 const successMsgs = defineMessages({
   default: {
     id: 'order.created.tweet',
-    defaultMessage: "I've just donated to {collective}. Consider donating too, every little helps!",
+    defaultMessage: "I've just donated to {collective}. Consider contributing — every little helps!",
   },
   event: {
     id: 'order.created.tweet.event',
@@ -156,7 +156,7 @@ class NewContributionFlowSuccess extends React.Component {
         <MessageBox type="warning" fontSize="12px" mb={2}>
           <FormattedMessage
             id="collective.user.orderProcessing.manual"
-            defaultMessage="<strong>Your donation is pending.</strong> Please follow the instructions in the confirmation email to manually pay the host of the collective."
+            defaultMessage="<strong>Your contribution is pending.</strong> Please follow the payment instructions in the confirmation email to complete your transaction."
             values={I18nFormatters}
           />
         </MessageBox>
@@ -174,7 +174,7 @@ class NewContributionFlowSuccess extends React.Component {
           <P fontSize="16px" color="black.700">
             <FormattedMessage
               id="NewContributionFlow.InTheMeantime"
-              defaultMessage="In the meantime, you can follow {collective} and see how they are spending the money <CollectiveLink>on their collective page</CollectiveLink>."
+              defaultMessage="In the meantime, you can see what {collective} is up to <CollectiveLink>on their Collective page</CollectiveLink>."
               values={{
                 collective: this.props.data.order.toAccount.name,
                 CollectiveLink: getI18nLink({

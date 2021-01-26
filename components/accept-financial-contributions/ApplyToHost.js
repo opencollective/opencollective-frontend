@@ -57,16 +57,16 @@ class ApplyToHost extends React.Component {
       },
       applyToHost: {
         id: 'pricing.applyFiscalHost',
-        defaultMessage: 'Apply to a fiscal host',
+        defaultMessage: 'Apply to a Fiscal Host',
       },
       infoParagraph: {
         id: 'fiscalHost.apply.info',
         defaultMessage:
-          "With this option, you don't need to set up a legal entity and bank account for your project. The fiscal host will hold funds on your behalf, and take care of accounting, invoices, tax, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the host's page before confirming).",
+          "With this option, you don't need a legal entity and bank account for your project. The Fiscal Host will hold funds on your behalf, and take care of accounting, invoices, tax, admin, payments, and liability. Most Hosts charge a fee for this service (you'll have a chance to review these details before applying to join a Host).",
       },
       becomeHost: {
         id: 'home.fiscalHost.becomeHostBtn',
-        defaultMessage: 'Become a fiscal host',
+        defaultMessage: 'Become a Fiscal Host',
       },
       interestedInHosting: {
         id: 'fiscalHost.interestedInHosting',
@@ -74,11 +74,11 @@ class ApplyToHost extends React.Component {
       },
       seeMoreHosts: {
         id: 'fiscalHost.seeMoreHosts',
-        defaultMessage: 'See more hosts',
+        defaultMessage: 'See more Hosts',
       },
       allFiscalHosts: {
         id: 'fiscalHost.allFiscalHosts',
-        defaultMessage: 'All fiscal hosts',
+        defaultMessage: 'All Fiscal Hosts',
       },
     });
 

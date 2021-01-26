@@ -322,7 +322,7 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
                   <P color="black.900" textAlign="left" mt={[2, 3]} fontSize="14px">
                     <FormattedMessage
                       id="acceptContributions.HowDoesItWork.details"
-                      defaultMessage="Financial contributors will be able to choose 'Bank transfer' as a payment method. Instructions to make the transfer will be emailed to them. Once you receive the money, you can mark the corresponding pending order as paid and the funds will be credited to the Collective's balance. You can edit these bank transfer instructions in the 'receiving money' section of your settings."
+                      defaultMessage="Financial contributors will be able to choose 'Bank transfer' as a payment method, and instructions will be emailed to them. You can confirm once you receive the money, and the funds will be credited to the Collective's balance. You can edit the bank transfer instructions in the 'receiving money' section of your settings."
                     />
                   </P>
                   <Formik initialValues={initialValues} onSubmit={submit}>

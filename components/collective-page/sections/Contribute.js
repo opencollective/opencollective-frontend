@@ -292,7 +292,7 @@ class SectionContribute extends React.PureComponent {
               info={
                 <FormattedMessage
                   id="CollectivePage.SectionContribute.info"
-                  defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
+                  defaultMessage="Support {collectiveName} by contributing once, monthly, or yearly."
                   values={{ collectiveName: collective.name }}
                 />
               }
