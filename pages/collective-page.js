@@ -62,7 +62,6 @@ class CollectivePage extends React.Component {
 
     // If on server side
     if (req) {
-      req.noStyledJsx = true;
       const hasNewCollectiveNavbar = hasNewNavbar(navbarVersion);
       await preloadCollectivePageGraphlQueries(slug, client, hasNewCollectiveNavbar);
       skipDataFromTree = true;

@@ -23,7 +23,7 @@ const COMMON_DIRECTIVES = {
   ],
   styleSrc: [
     SELF,
-    UNSAFE_INLINE, // For styled-components/styled-jsx. TODO: Limit for nonce
+    UNSAFE_INLINE, // For styled-components. TODO: Limit for nonce
   ],
   connectSrc: [
     SELF,
