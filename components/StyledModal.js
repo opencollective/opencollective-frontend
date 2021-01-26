@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
 import themeGet from '@styled-system/theme-get';
+import FocusTrap from 'focus-trap-react';
 import { createPortal } from 'react-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { background, margin, overflow, space } from 'styled-system';
@@ -183,14 +184,16 @@ const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
       <React.Fragment>
         <GlobalModalStyle />
         <Wrapper>
-          <Modal {...props}>
-            {React.Children.map(children, child => {
-              if (child.type.displayName === 'Header') {
-                return React.cloneElement(child, { onClose });
-              }
-              return child;
-            })}
-          </Modal>
+          <FocusTrap focusTrapOptions={{ clickOutsideDeactivates: true }}>
+            <Modal {...props}>
+              {React.Children.map(children, child => {
+                if (child.type.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose });
+                }
+                return child;
+              })}
+            </Modal>
+          </FocusTrap>
         </Wrapper>
       </React.Fragment>
     );
@@ -200,14 +203,16 @@ const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
       <React.Fragment>
         <GlobalModalStyle />
         <Wrapper>
-          <Modal {...props}>
-            {React.Children.map(children, child => {
-              if (child.type?.displayName === 'Header') {
-                return React.cloneElement(child, { onClose });
-              }
-              return child;
-            })}
-          </Modal>
+          <FocusTrap focusTrapOptions={{ clickOutsideDeactivates: true }}>
+            <Modal {...props}>
+              {React.Children.map(children, child => {
+                if (child.type?.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose });
+                }
+                return child;
+              })}
+            </Modal>
+          </FocusTrap>
           <ModalOverlay onClick={onClose} />
         </Wrapper>
       </React.Fragment>,

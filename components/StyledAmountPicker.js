@@ -71,6 +71,8 @@ const StyledAmountPicker = ({ presets, currency, value, otherAmountDisplay, onCh
         <StyledButtonSet
           id="amount"
           data-cy="amount-picker"
+          role="group"
+          aria-label="Contribution amount"
           width="100%"
           justifyContent="center"
           items={options}
