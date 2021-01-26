@@ -68,13 +68,13 @@ const GenericPlanFeatures = ({ plan }) => {
     <ul>
       <li>
         {collectiveLimits[plan] === 1 && (
-          <FormattedMessage id="Host.Plan.Collectives.single" defaultMessage="1 hosted collective" />
+          <FormattedMessage id="Host.Plan.Collectives.single" defaultMessage="1 hosted Collective" />
         )}
         {collectiveLimits[plan] > 1 && (
           <FormattedMessage
             id="Host.Plan.Collectives.limited"
             values={{ n: collectiveLimits[plan] }}
-            defaultMessage="Up to {n} hosted collectives"
+            defaultMessage="Up to {n} hosted Collectives"
           />
         )}
       </li>
@@ -87,7 +87,7 @@ const GenericPlanFeatures = ({ plan }) => {
       <li>
         <FormattedMessage
           id="Host.Plan.TransferwisePayouts.unlimited"
-          defaultMessage="Unlimited payouts with TranferWise"
+          defaultMessage="Unlimited payouts"
         />
       </li>
     </ul>
@@ -113,13 +113,13 @@ const NewPlanFeatures = ({ collective, plan, label, loading, editHostPlan, hostF
               .&nbsp;
               <FormattedMessage
                 id="Host.Plan.RevenueCharge.yes"
-                defaultMessage="15% charge on revenue made through it"
+                defaultMessage="Platform fees will be 15% of Host fees"
               />{' '}
               <StyledTooltip
                 content={() => (
                   <FormattedMessage
                     id="newPricing.tab.hostFeeChargeExample"
-                    defaultMessage="If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform."
+                    defaultMessage="If your Host fee is 10% and your Collectives bring in $1,000, your Platform fee will be $15. If you host fee is 0%, your Platform fee will be 0."
                   />
                 )}
               >
@@ -141,11 +141,11 @@ const NewPlanFeatures = ({ collective, plan, label, loading, editHostPlan, hostF
           <li>
             <FormattedMessage
               id="Host.Plan.TransferwisePayouts.unlimited"
-              defaultMessage="Unlimited payouts with TranferWise"
+              defaultMessage="Unlimited payouts"
             />
           </li>
           <li>
-            <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimal revenue." />
+            <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimum revenue." />
           </li>
         </ul>
       </PlanFeatures>
@@ -217,7 +217,7 @@ const HostPlan = props => {
                 .&nbsp;
                 <FormattedMessage
                   id="Host.Plan.RevenueCharge.no"
-                  defaultMessage="No charge on revenue made through it."
+                  defaultMessage="No Platform fee charges on Host fee."
                 />
               </li>
               <li>
@@ -233,7 +233,7 @@ const HostPlan = props => {
                 />
               </li>
               <li>
-                <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimal revenue." />
+                <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimum revenue." />
               </li>
             </ul>
           </PlanFeatures>
@@ -285,13 +285,13 @@ const HostPlan = props => {
               <li>
                 <FormattedMessage
                   id="Host.Plan.TransferwisePayouts.unlimited"
-                  defaultMessage="Unlimited payouts with TranferWise"
+                  defaultMessage="Unlimited payouts"
                 />
               </li>
               <li>
                 <FormattedMessage
                   id="newPricingTable.row.minimumRaised"
-                  defaultMessage="+ {minimumRaised} total raised"
+                  defaultMessage="> {minimumRaised} total processed"
                   values={{ minimumRaised: '$150,000' }}
                 />
               </li>
@@ -326,7 +326,7 @@ const HostPlan = props => {
             content={() => (
               <FormattedMessage
                 id="collective.hostSettings.help.fundsLimit"
-                defaultMessage="The maximum amount of fund added, during any timeframe, across all collectives."
+                defaultMessage="Max funds added, all time, all Collectives."
               />
             )}
           >
@@ -348,7 +348,7 @@ const HostPlan = props => {
             content={() => (
               <FormattedMessage
                 id="collective.hostSettings.help.manualPayments"
-                defaultMessage="Your contributors create a pending donation and receive email instructions with your bank details. You can reconcile the donation when you receive it."
+                defaultMessage="Financial contributors can select 'bank transfer' at checkout and will receive email instructions with your bank details. You confirm once funds are received."
               />
             )}
           >

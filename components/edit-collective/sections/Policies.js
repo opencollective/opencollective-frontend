@@ -213,7 +213,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               <P fontSize="14px" lineHeight="18px" color="black.600" mt={2}>
                 <FormattedMessage
                   id="collective.contributionPolicy.description"
-                  defaultMessage="All categorized Financial Contributors are manually classified by the Open Collective team. Only contributors that are thought to be abusing are classified with these categories. Financial Contributors with a good reputation should normally not be affected by this setting."
+                  defaultMessage="Financial Contributors are manually reviewed by the Open Collective team, and only those thought to be abusing or spamming are flagged. Financial Contributors with a good reputation should not be affected by this setting."
                 />
               </P>
             </Container>
@@ -261,7 +261,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             <P mb={2}>
               <FormattedMessage
                 id="editCollective.rejectCategories.description"
-                defaultMessage="Select which categories of contributor, if any, you do not wish to receive any contributions from. This will automatically prevent them from being able to become a sponsor of your Collective."
+                defaultMessage="Specify any categories you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)"
               />
             </P>
             <StyledSelect
