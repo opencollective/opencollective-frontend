@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { compact, isEmpty, pick, values } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { Link } from '../server/pages';
+import Link from '../components/Link';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';

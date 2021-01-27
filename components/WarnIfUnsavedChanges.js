@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { IgnorableError } from '../lib/errors';
-import { Router } from '../server/pages';
 
 /**
  * A component to warn users if they try to leave with unsaved data. Just set
@@ -12,6 +12,7 @@ import { Router } from '../server/pages';
  */
 class WarnIfUnsavedChanges extends React.Component {
   static propTypes = {
+    router: PropTypes.object,
     hasUnsavedChanges: PropTypes.bool,
     children: PropTypes.node,
     intl: PropTypes.object,
@@ -19,12 +20,12 @@ class WarnIfUnsavedChanges extends React.Component {
 
   componentDidMount() {
     window.addEventListener('beforeunload', this.beforeunload);
-    Router.router.events.on('routeChangeStart', this.routeChangeStart);
+    this.props.router.events.on('routeChangeStart', this.routeChangeStart);
   }
 
   componentWillUnmount() {
     window.removeEventListener('beforeunload', this.beforeunload);
-    Router.router.events.off('routeChangeStart', this.routeChangeStart);
+    this.props.router.events.off('routeChangeStart', this.routeChangeStart);
   }
 
   messages = defineMessages({
@@ -41,8 +42,8 @@ class WarnIfUnsavedChanges extends React.Component {
   routeChangeStart = () => {
     const { hasUnsavedChanges, intl } = this.props;
     if (hasUnsavedChanges && !confirm(intl.formatMessage(this.messages.warning))) {
-      Router.router.abortComponentLoad();
-      Router.router.events.emit('routeChangeError'); // For NProgress to stop the loading indicator
+      this.props.router.abortComponentLoad();
+      this.props.router.events.emit('routeChangeError'); // For NProgress to stop the loading indicator
       throw new IgnorableError('Abort page navigation');
     }
   };
@@ -63,4 +64,4 @@ class WarnIfUnsavedChanges extends React.Component {
   }
 }
 
-export default injectIntl(WarnIfUnsavedChanges);
+export default injectIntl(withRouter(WarnIfUnsavedChanges));

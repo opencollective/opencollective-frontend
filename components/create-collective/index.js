@@ -8,7 +8,6 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { parseToBoolean } from '../../lib/utils';
-import { Router } from '../../server/pages';
 
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -68,19 +67,29 @@ class CreateCollective extends Component {
       await this.props.refetchLoggedInUser();
       // don't show banner if we show the modal and vice versa
       if (parseToBoolean(process.env.ONBOARDING_MODAL) === true) {
-        Router.pushRoute('collective-with-onboarding', {
-          slug: newCollective.slug,
-          mode: 'onboarding',
-          CollectiveId: newCollective.legacyId,
-          CollectiveSlug: newCollective.slug,
-        }).then(() => window.scrollTo(0, 0));
+        this.props.router
+          .push({
+            pathname: '/collective-with-onboarding',
+            query: {
+              slug: newCollective.slug,
+              mode: 'onboarding',
+              CollectiveId: newCollective.legacyId,
+              CollectiveSlug: newCollective.slug,
+            },
+          })
+          .then(() => window.scrollTo(0, 0));
       } else {
-        Router.pushRoute('collective', {
-          slug: newCollective.slug,
-          status: 'collectiveCreated',
-          CollectiveId: newCollective.legacyId,
-          CollectiveSlug: newCollective.slug,
-        }).then(() => window.scrollTo(0, 0));
+        this.props.router
+          .push({
+            pathname: '/collective',
+            query: {
+              slug: newCollective.slug,
+              status: 'collectiveCreated',
+              CollectiveId: newCollective.legacyId,
+              CollectiveSlug: newCollective.slug,
+            },
+          })
+          .then(() => window.scrollTo(0, 0));
       }
     } catch (err) {
       const errorMsg = i18nGraphqlException(this.props.intl, err);

@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { defaultBackgroundImage } from '../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { Router } from '../../server/pages';
 
 import Body from '../Body';
 import CollectiveNavbar from '../collective-navbar';
@@ -40,6 +40,7 @@ class EditCollective extends React.Component {
     refetchLoggedInUser: PropTypes.func.isRequired, // passed from Page with withUser
     editCollective: PropTypes.func.isRequired, // passed from Page with addEditCollectiveMutation
     intl: PropTypes.object.isRequired, // from injectIntl
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -89,11 +90,14 @@ class EditCollective extends React.Component {
       const response = await this.props.editCollective(collective);
       const updatedCollective = response.data.editCollective;
       this.setState({ status: 'saved', result: { error: null } });
-      const currentSlug = Router.router.query.eventSlug ?? Router.router.query.slug;
+      const currentSlug = this.props.router.query.eventSlug ?? this.props.router.query.slug;
       if (currentSlug !== updatedCollective.slug) {
-        Router.replaceRoute('editCollective', {
-          ...Router.router.query,
-          slug: updatedCollective.slug,
+        this.props.router.replace({
+          pathname: '/editCollective',
+          query: {
+            ...this.props.router.query,
+            slug: updatedCollective.slug,
+          },
         });
 
         await this.props.refetchLoggedInUser();
@@ -179,4 +183,4 @@ class EditCollective extends React.Component {
   }
 }
 
-export default injectIntl(withUser(EditCollective));
+export default injectIntl(withUser(withRouter(EditCollective)));

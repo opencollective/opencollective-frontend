@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-
-import { Router } from '../../../server/pages';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -46,7 +45,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
   return (
     <Container mx={3} my={4}>
       <Box display={['block', null, 'none']}>
-        <BackButton onClick={() => Router.pushRoute('pricing')} />
+        <BackButton onClick={() => this.props.router.push('/pricing')} />
       </Box>
 
       <Flex justifyContent="center">
@@ -195,6 +194,7 @@ const addPricingHostsData = graphql(pricingHostsQuery, {
   options: {
     variables: { slugs: featuredHostsSlugs },
   },
+  router: PropTypes.object,
 });
 
-export default addPricingHostsData(SingleCollectiveWithoutBankAccount);
+export default addPricingHostsData(withRouter(SingleCollectiveWithoutBankAccount));

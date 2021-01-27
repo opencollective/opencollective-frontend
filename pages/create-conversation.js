@@ -8,7 +8,6 @@ import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -71,7 +70,10 @@ class CreateConversationPage extends React.Component {
 
   onCreateSuccess = async conversation => {
     const { collectiveSlug } = this.props;
-    await Router.pushRoute('conversation', { collectiveSlug, slug: conversation.slug, id: conversation.id });
+    await this.props.router.push({
+      pathname: '/conversation',
+      query: { collectiveSlug, slug: conversation.slug, id: conversation.id },
+    });
   };
 
   getSuggestedTags(collective) {

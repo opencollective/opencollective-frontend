@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { isURL, matches } from 'validator';
@@ -10,7 +11,6 @@ import { isURL, matches } from 'validator';
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { compose } from '../../lib/utils';
-import { Router } from '../../server/pages';
 
 import Container from '../../components/Container';
 import MessageBox from '../../components/MessageBox';
@@ -115,6 +115,7 @@ const params = {
 
 class OnboardingModal extends React.Component {
   static propTypes = {
+    router: PropTypes.object,
     step: PropTypes.string,
     mode: PropTypes.string,
     collective: PropTypes.object,
@@ -209,13 +210,18 @@ class OnboardingModal extends React.Component {
     try {
       await this.submitContact(values);
       await this.submitAdmins();
-      Router.pushRoute('collective-with-onboarding', {
-        mode: this.props.mode,
-        slug: this.props.collective.slug,
-        step: 'success',
-      }).then(() => {
-        confettiFireworks(5000, { zIndex: 3000 });
-      });
+      this.props.router
+        .push({
+          pathname: '/collective-with-onboarding',
+          query: {
+            mode: this.props.mode,
+            slug: this.props.collective.slug,
+            step: 'success',
+          },
+        })
+        .then(() => {
+          confettiFireworks(5000, { zIndex: 3000 });
+        });
     } catch (e) {
       this.setState({ isSubmitting: false, error: e });
     }
@@ -228,7 +234,7 @@ class OnboardingModal extends React.Component {
   onClose = () => {
     this.setState({ noOverlay: true });
     this.props.setShowOnboardingModal(false);
-    Router.pushRoute('collective', { slug: this.props.collective.slug });
+    this.props.router.push({ pathname: '/collective', query: { slug: this.props.collective.slug } });
   };
 
   validateFormik = values => {
@@ -431,4 +437,4 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
 
 const addGraphql = compose(addEditCollectiveMembersMutation, addEditCollectiveContactMutation);
 
-export default injectIntl(addGraphql(OnboardingModal));
+export default injectIntl(addGraphql(withRouter(OnboardingModal)));

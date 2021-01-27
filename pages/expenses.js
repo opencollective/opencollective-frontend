@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { has, mapValues, omit, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -13,7 +14,6 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
@@ -117,6 +117,7 @@ class ExpensePage extends React.Component {
         limit: PropTypes.number,
       }),
     }),
+    router: PropTypes.object,
   };
 
   componentDidUpdate(oldProps) {
@@ -149,12 +150,15 @@ class ExpensePage extends React.Component {
   }
 
   updateFilters = queryParams => {
-    return Router.pushRoute('expenses', this.buildFilterLinkParams({ ...queryParams, offset: null }));
+    return this.props.router.push({
+      pathname: '/expenses',
+      query: this.buildFilterLinkParams({ ...queryParams, offset: null }),
+    });
   };
 
   handleSearch = searchTerm => {
     const params = this.buildFilterLinkParams({ searchTerm, offset: null });
-    Router.pushRoute('expenses', params);
+    this.props.router.push({ pathname: '/expenses', query: params });
   };
 
   getTagProps = tag => {
@@ -426,4 +430,4 @@ const addExpensesPageData = graphql(expensesPageQuery, {
   },
 });
 
-export default injectIntl(addExpensesPageData(withUser(ExpensePage)));
+export default injectIntl(addExpensesPageData(withRouter(withUser(ExpensePage))));

@@ -4,7 +4,7 @@ import { gql, useQuery } from '@apollo/client';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
 import { FormattedMessage } from 'react-intl';
 
-import { Link } from '../server/pages';
+import Link from '../components/Link';
 
 import Container from './Container';
 import Currency from './Currency';

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 
 import withViewport, { VIEWPORTS } from '../../lib/withViewport';
-import { Router } from '../../server/pages';
 
 import Container from '../Container';
 
@@ -15,10 +15,11 @@ class Pricing extends Component {
   static propTypes = {
     tab: PropTypes.string,
     viewport: PropTypes.oneOf(Object.values(VIEWPORTS)),
+    router: PropTypes.object,
   };
 
   handleOnChangeTab = async tab => {
-    await Router.pushRoute('pricing', { tab: tab });
+    await this.props.router.push({ pathname: '/pricing', router: { tab: tab } });
   };
 
   renderContent(tab) {
@@ -52,4 +53,4 @@ class Pricing extends Component {
   }
 }
 
-export default withViewport(Pricing);
+export default withRouter(withViewport(Pricing));

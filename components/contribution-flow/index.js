@@ -20,7 +20,6 @@ import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
 import { getWebsiteUrl, reportValidityHTML5 } from '../../lib/utils';
-import { Router } from '../../server/pages';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Container from '../Container';
@@ -103,6 +102,7 @@ class ContributionFlow extends React.Component {
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
     createCollective: PropTypes.func.isRequired, // from mutation
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -230,7 +230,7 @@ class ContributionFlow extends React.Component {
       if (isAllowedRedirect(url.host)) {
         window.location.href = url.href;
       } else {
-        await Router.pushRoute('external-redirect', { url: url.href, fallback });
+        await this.props.router.push({ pathname: '/external-redirect', query: { url: url.href, fallback } });
         return this.scrollToTop();
       }
     } else {
@@ -360,7 +360,7 @@ class ContributionFlow extends React.Component {
           websiteUrl: getWebsiteUrl(),
         },
       });
-      await Router.pushRoute('signinLinkSent', { email: user.email });
+      await this.props.router.push({ pathname: '/signinLinkSent', query: { email: user.email } });
     } catch (error) {
       this.setState({ error: error.message, isSubmitting: false });
     } finally {
@@ -415,7 +415,7 @@ class ContributionFlow extends React.Component {
     if (stepName === 'payment' && !LoggedInUser && stepDetails?.interval) {
       await this.createProfileForRecurringContributions(stepProfile);
     } else {
-      await Router.pushRoute(route, params);
+      await this.props.router.push({ pathname: route, query: params });
     }
 
     this.scrollToTop();

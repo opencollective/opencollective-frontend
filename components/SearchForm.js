@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import styled from 'styled-components';
 import { borderRadius, fontSize } from 'styled-system';
-
-import { Router } from '../server/pages';
 
 import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
@@ -40,7 +39,7 @@ const SearchButton = styled(Flex)`
 
 const handleSubmit = event => {
   const searchInput = event.target.elements.q;
-  Router.pushRoute('search', { q: searchInput.value });
+  this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
   event.preventDefault();
 };
 
@@ -89,4 +88,4 @@ SearchForm.propTypes = {
   borderRadius: PropTypes.string,
 };
 
-export default SearchForm;
+export default withRouter(SearchForm);

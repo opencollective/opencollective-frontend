@@ -13,9 +13,8 @@ import { formatCurrency } from '../lib/currency-utils';
 import { isPastEvent } from '../lib/events';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { capitalize } from '../lib/utils';
-import { Link } from '../server/pages';
 
-import ComponentLink from '../components/Link';
+import Link from '../components/Link';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -361,11 +360,11 @@ class TopBarProfileMenu extends React.Component {
                 <FormattedMessage id="collective" defaultMessage="my collectives" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <ComponentLink route="/create">
+              <Link route="/create">
                 <StyledRoundButton ml={2} size={24} color="#C4C7CC">
                   <Plus size={12} color="#76777A" />
                 </StyledRoundButton>
-              </ComponentLink>
+              </Link>
             </Flex>
             <Box as="ul" p={0} my={2}>
               {collectives.map(this.renderMembershipLine)}
@@ -442,11 +441,11 @@ class TopBarProfileMenu extends React.Component {
                 <FormattedMessage id="organization" defaultMessage="my organizations" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <ComponentLink route="/organizations/new">
+              <Link route="/organizations/new">
                 <StyledRoundButton ml={2} size={24} color="#C4C7CC">
                   <Plus size={12} color="#76777A" />
                 </StyledRoundButton>
-              </ComponentLink>
+              </Link>
             </Flex>
             <Box as="ul" p={0} my={2}>
               {orgs.map(this.renderMembershipLine)}

@@ -7,7 +7,6 @@ import { FormattedMessage } from 'react-intl';
 
 import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
@@ -131,7 +130,11 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
       setPaypalPreApprovalError(query.paypalApprovalError);
-      Router.replaceRoute('host.dashboard', omit(query, 'paypalApprovalError'), { shallow: true });
+      query.replace({
+        pathname: '/host.dashboard',
+        query: omit(query, 'paypalApprovalError'),
+        options: { shallow: true },
+      });
     }
   }, [query.paypalApprovalError]);
 
@@ -145,7 +148,9 @@ const HostDashboardExpenses = ({ hostSlug }) => {
         <Box p={2}>
           <SearchBar
             defaultValue={query.searchTerm}
-            onSubmit={searchTerm => Router.pushRoute('host.dashboard', { ...query, searchTerm, offset: null })}
+            onSubmit={searchTerm =>
+              query.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
+            }
           />
         </Box>
       </Flex>
@@ -190,10 +195,13 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             collective={data.host}
             filters={query}
             onChange={queryParams =>
-              Router.pushRoute('host.dashboard', {
-                ...query,
-                ...queryParams,
-                offset: null,
+              query.push({
+                pathname: '/host.dashboard',
+                query: {
+                  ...query,
+                  ...queryParams,
+                  offset: null,
+                },
               })
             }
           />

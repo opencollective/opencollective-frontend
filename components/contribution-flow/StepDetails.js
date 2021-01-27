@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
+import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
@@ -9,7 +10,6 @@ import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
-import { Router } from '../../server/pages';
 
 import { Box, Flex } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
@@ -226,10 +226,13 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           onConfirm={() => {
             dispatchChange('interval', temporaryInterval);
             setTemporaryInterval(undefined);
-            Router.pushRoute('orderCollectiveNew', {
-              collectiveSlug: collective.slug,
-              verb: 'donate',
-              step: 'details',
+            this.props.router.push({
+              pathname: '/orderCollectiveNew',
+              query: {
+                collectiveSlug: collective.slug,
+                verb: 'donate',
+                step: 'details',
+              },
             });
           }}
         />
@@ -241,6 +244,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
 StepDetails.propTypes = {
   onChange: PropTypes.func,
   showFeesOnTop: PropTypes.bool,
+  router: PropTypes.object,
   data: PropTypes.shape({
     amount: PropTypes.number,
     platformContribution: PropTypes.number,
@@ -271,4 +275,4 @@ StepDetails.propTypes = {
   }),
 };
 
-export default StepDetails;
+export default withRouter(StepDetails);

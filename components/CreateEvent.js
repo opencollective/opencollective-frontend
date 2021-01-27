@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import dayjs from '../lib/dayjs';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
-import { Router } from '../server/pages';
 
 import Body from './Body';
 import CollectiveNavbar from './collective-navbar';
@@ -23,6 +23,7 @@ class CreateEvent extends React.Component {
     createCollective: PropTypes.func,
     LoggedInUser: PropTypes.object, // from withUser
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -64,10 +65,13 @@ class CreateEvent extends React.Component {
         result: { success: `Event created successfully.` },
       });
       await this.props.refetchLoggedInUser();
-      await Router.pushRoute('event', {
-        parentCollectiveSlug: parentCollective.slug,
-        slug: event.slug,
-        status: 'eventCreated',
+      await this.props.router.push({
+        pathname: '/event',
+        query: {
+          parentCollectiveSlug: parentCollective.slug,
+          slug: event.slug,
+          status: 'eventCreated',
+        },
       });
       window.scrollTo(0, 0);
     } catch (err) {
@@ -141,4 +145,4 @@ class CreateEvent extends React.Component {
   }
 }
 
-export default withUser(addCreateCollectiveMutation(CreateEvent));
+export default withUser(addCreateCollectiveMutation(withRouter(CreateEvent)));

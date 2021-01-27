@@ -10,7 +10,6 @@ import styled from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -220,10 +219,13 @@ class StripeOrBankAccountPicker extends React.Component {
             onClick={async () => {
               this.setState({ buttonLoading: true });
               await addHost(collective, host);
-              await Router.pushRoute('accept-financial-contributions', {
-                slug: router.query.slug,
-                path: router.query.path,
-                state: 'success',
+              await router.push({
+                pathname: '/accept-financial-contributions',
+                query: {
+                  slug: router.query.slug,
+                  path: router.query.path,
+                  state: 'success',
+                },
               });
               window.scrollTo(0, 0);
             }}
@@ -262,4 +264,4 @@ const addHostData = graphql(hostQuery, {
   }),
 });
 
-export default injectIntl(withRouter(addHostData(StripeOrBankAccountPicker)));
+export default injectIntl(addHostData(withRouter(StripeOrBankAccountPicker)));

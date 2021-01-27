@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { getGithubRepos } from '../../lib/api';
-import { Router } from '../../server/pages';
 
 import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
 import { Box, Flex } from '../Grid';
@@ -68,7 +67,7 @@ class ConnectGithub extends React.Component {
       verb: this.props.router.query.verb,
       hostCollectiveSlug: this.props.router.query.hostCollectiveSlug || undefined,
     };
-    await Router.pushRoute('create-collective', params);
+    await this.props.router.push({ pathname: '/create-collective', query: params });
     window.scrollTo(0, 0);
   };
 

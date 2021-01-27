@@ -8,7 +8,6 @@ import { FormattedMessage } from 'react-intl';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { usePrevious } from '../../lib/hooks/usePrevious';
-import { Router } from '../../server/pages';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
@@ -133,7 +132,7 @@ const hasParams = query => {
 
 const updateQuery = (router, queryParams) => {
   const { route, query } = router;
-  return Router.pushRoute(route.slice(1), { ...query, ...queryParams });
+  return route.push({ pathname: route.slice(1), query: { ...query, ...queryParams } });
 };
 
 const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {

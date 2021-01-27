@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-
-import { Router } from '../../server/pages';
 
 import StyledButton from '../../components/StyledButton';
 
 class OnboardingSkipButton extends React.Component {
   static propTypes = {
     slug: PropTypes.string,
+    router: PropTypes.object,
   };
 
   render() {
@@ -20,7 +20,7 @@ class OnboardingSkipButton extends React.Component {
         width="fit-content"
         buttonStyle="primary"
         onClick={() => {
-          Router.pushRoute('collective-with-onboarding', { slug });
+          this.props.router.push({ pathname: '/collective-with-onboarding', query: { slug } });
         }}
       >
         <FormattedMessage id="SkipOnboarding" defaultMessage="Skip onboarding" />
@@ -29,4 +29,4 @@ class OnboardingSkipButton extends React.Component {
   }
 }
 
-export default OnboardingSkipButton;
+export default withRouter(OnboardingSkipButton);

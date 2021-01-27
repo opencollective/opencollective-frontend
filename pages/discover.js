@@ -6,12 +6,11 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { Link } from '../server/pages';
-
 import Container from '../components/Container';
 import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
 import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import { Box, Flex, Grid } from '../components/Grid';
+import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';

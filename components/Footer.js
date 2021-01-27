@@ -9,11 +9,11 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import languages from '../lib/constants/locales';
-import { Link } from '../server/pages';
 
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import ListItem from './ListItem';
 import StyledLink from './StyledLink';
 import StyledSelect from './StyledSelect';

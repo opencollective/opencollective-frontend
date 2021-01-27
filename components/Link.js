@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { pick } from 'lodash';
+import NextLink from 'next/link';
+import { withRouter } from 'next/router';
 import Scrollchor from 'react-scrollchor';
-
-import router from '../server/pages';
 
 class Link extends React.Component {
   static propTypes = {
@@ -17,6 +17,7 @@ class Link extends React.Component {
     openInNewTab: PropTypes.bool,
     children: PropTypes.node.isRequired,
     'data-cy': PropTypes.string,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -48,7 +49,7 @@ class Link extends React.Component {
         </Scrollchor>
       );
     } else if (this.isIframe) {
-      const routeFromRouter = router.findByName(route);
+      const routeFromRouter = this.props.router.findByName(route);
       const path = routeFromRouter ? routeFromRouter.getAs(params) : `https://opencollective.com${route}`;
       return (
         <a href={path} title={title} target="_top" className={className} {...otherProps}>
@@ -57,20 +58,27 @@ class Link extends React.Component {
       );
     } else {
       return (
-        <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
-          <a
-            className={className}
-            title={title}
-            onClick={onClick}
-            data-cy={this.props['data-cy']}
-            {...(!openInNewTab ? null : { target: '_blank', rel: 'noopener noreferrer' })}
-          >
-            {children}
-          </a>
-        </router.Link>
+        <NextLink href={route} {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
+          <span className={className} title={title} onClick={onClick} data-cy={this.props['data-cy']}>
+            {openInNewTab ? (
+              <a
+                className={className}
+                title={title}
+                onClick={onClick}
+                data-cy={this.props['data-cy']}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {children}
+              </a>
+            ) : (
+              children
+            )}
+          </span>
+        </NextLink>
       );
     }
   }
 }
 
-export default Link;
+export default withRouter(Link);

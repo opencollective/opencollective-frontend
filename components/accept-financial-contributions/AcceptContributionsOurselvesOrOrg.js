@@ -11,7 +11,6 @@ import styled from 'styled-components';
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import Avatar from '../Avatar';
 import CollectiveNavbar from '../collective-navbar';
@@ -184,10 +183,13 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
         await this.submitBankAccountInformation(data);
         await this.addHost(collective, organization ? organization : collective);
         await this.props.refetchLoggedInUser();
-        await Router.pushRoute('accept-financial-contributions', {
-          slug: this.props.collective.slug,
-          path: this.props.router.query.path,
-          state: 'success',
+        await router.push({
+          pathname: '/accept-financial-contributions',
+          query: {
+            slug: this.props.collective.slug,
+            path: this.props.router.query.path,
+            state: 'success',
+          },
         });
         window.scrollTo(0, 0);
       } catch (e) {
@@ -370,10 +372,15 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
                               minHeight="36px"
                               type="button"
                               onClick={() => {
-                                Router.pushRoute('accept-financial-contributions', {
-                                  slug: this.props.collective.slug,
-                                  path: this.props.router.query.path,
-                                }).then(() => window.scrollTo(0, 0));
+                                router
+                                  .push({
+                                    pathname: '/accept-financial-contributions',
+                                    query: {
+                                      slug: this.props.collective.slug,
+                                      path: this.props.router.query.path,
+                                    },
+                                  })
+                                  .then(() => window.scrollTo(0, 0));
                               }}
                             >
                               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />

@@ -9,7 +9,6 @@ import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -161,6 +160,7 @@ class ConversationPage extends React.Component {
         }),
       }),
     }).isRequired, // from withData
+    router: PropTypes.object,
   };
 
   static MAX_NB_FOLLOWERS_AVATARS = 4;
@@ -234,7 +234,7 @@ class ConversationPage extends React.Component {
   };
 
   onConversationDeleted = () => {
-    return Router.pushRoute('conversations', { collectiveSlug: this.props.collectiveSlug });
+    return this.props.router.push({ pathname: '/conversations', query: { collectiveSlug: this.props.collectiveSlug } });
   };
 
   getSuggestedTags(collective) {

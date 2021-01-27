@@ -7,7 +7,7 @@ export const mockedRouter = {
   replace: () => {},
   prefetch: () => {},
   route: '/mock-route',
-  pathname: 'mock-path',
+  pathname: '/mock-path',
 };
 
 Router.router = mockedRouter;

@@ -6,10 +6,10 @@ import styled from 'styled-components';
 
 import { rotateMixin } from '../lib/constants/animations';
 import theme from '../lib/theme';
-import { Link } from '../server/pages';
 
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
+import Link from './Link';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
 import TopBarMobileMenu from './TopBarMobileMenu';
@@ -107,7 +107,7 @@ class TopBar extends React.Component {
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
         ref={this.ref}
       >
-        <Link route="home" passHref>
+        <Link route="/" passHref>
           <Flex as="a" alignItems="center">
             <Logo width="24" height="24" />
             <Hide xs>

@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { isEqual } from 'lodash';
+import { withRouter } from 'next/router';
 
 import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import { Router } from '../server/pages';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -29,6 +29,7 @@ class UserProvider extends React.Component {
      * on `/signin` that uses `Router` will crash. Setting this prop bypass this behavior.
      */
     skipRouteCheck: PropTypes.bool,
+    router: PropTypes.object,
   };
 
   state = {
@@ -42,7 +43,7 @@ class UserProvider extends React.Component {
     window.addEventListener('storage', this.checkLogin);
 
     // Disable auto-login on SignIn page
-    if (this.props.skipRouteCheck || Router.pathname !== '/signin') {
+    if (this.props.skipRouteCheck || this.props.router.pathname !== '/signin') {
       await this.login();
     }
   }
@@ -73,7 +74,7 @@ class UserProvider extends React.Component {
   logout = async () => {
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.LOGGED_IN_USER);
-    this.props.client.resetStore();
+    await this.props.client.resetStore();
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
   };
 
@@ -155,6 +156,6 @@ const withUser = WrappedComponent => {
 
 const useUser = () => React.useContext(UserContext);
 
-export default withApollo(withLoggedInUser(UserProvider));
+export default withApollo(withLoggedInUser(withRouter(UserProvider)));
 
 export { UserConsumer, withUser, useUser };

@@ -5,10 +5,10 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { getCurrencySymbol } from '../../lib/currency-utils';
 import { paymentMethodLabelWithIcon } from '../../lib/payment_method_label';
 import { capitalize } from '../../lib/utils';
-import { Link } from '../../server/pages';
 
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 

@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -13,7 +14,6 @@ import { getErrorFromGraphqlException } from '../lib/errors';
 import { legacyCollectiveQuery } from '../lib/graphql/queries';
 import { imagePreview } from '../lib/image-utils';
 import { compose } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import Avatar from '../components/Avatar';
 import Body from '../components/Body';
@@ -165,6 +165,7 @@ class CreatePledgePage extends React.Component {
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     createPledge: PropTypes.func,
+    router: PropTypes.object,
   };
 
   state = {
@@ -234,7 +235,7 @@ class CreatePledgePage extends React.Component {
       } = await this.props.createPledge(order, this.props.data?.Collective);
       if (result.collective.slug) {
         const params = { slug: result.collective.slug };
-        Router.pushRoute('collective', params);
+        this.props.router.push({ pathname: '/collective', query: params });
       }
     } catch (error) {
       this.setState({
@@ -732,4 +733,4 @@ export const addCreatePledgeMutation = graphql(createPledgeMutation, {
 
 const addGraphql = compose(addCreatePledgePageData, addCreatePledgeMutation);
 
-export default injectIntl(withUser(addGraphql(CreatePledgePage)));
+export default injectIntl(withRouter(withUser(addGraphql(CreatePledgePage))));
