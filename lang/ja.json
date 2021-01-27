@@ -230,6 +230,7 @@
   "collective.created.description": "While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.",
   "Collective.CreateNew": "新しいコレクティブを作成",
   "collective.currency.placeholder": "通貨を選択",
+  "collective.currency.warning": "Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if it's an issue.",
   "collective.delete.description": "{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} will be deleted, along with all related data.",
   "collective.delete.isHost": "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host, please deactivate as Host first.",
   "collective.delete.isNotDeletable-message": "{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.",
