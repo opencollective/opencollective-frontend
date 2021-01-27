@@ -119,7 +119,15 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
 
   return (
-    <StyledModal show onClose={onClose} width="100%" minWidth={280} maxWidth={334} data-cy="pay-expense-modal">
+    <StyledModal
+      show
+      onClose={onClose}
+      width="100%"
+      minWidth={280}
+      maxWidth={334}
+      data-cy="pay-expense-modal"
+      trapFocus
+    >
       <ModalHeader>
         <H4 fontSize="20px" fontWeight="700">
           <FormattedMessage id="PayExpenseTitle" defaultMessage="Pay expense" />

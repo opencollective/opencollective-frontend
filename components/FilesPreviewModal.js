@@ -93,7 +93,7 @@ export default class FilesPreviewModal extends React.Component {
     const hasMultipleFiles = nbFiles > 1;
 
     return (
-      <StyledModal {...props} width="100%" maxWidth={450}>
+      <StyledModal {...props} width="100%" maxWidth={450} trapFocus={false}>
         <ModalHeader mb={3}>
           <FormattedMessage id="FilesPreviewModal.AttachmentPreview" defaultMessage="Attachment preview" />
         </ModalHeader>
