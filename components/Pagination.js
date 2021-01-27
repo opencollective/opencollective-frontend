@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { Router } from '../server/pages';
+
 import Container from './Container';
 import { Flex } from './Grid';
 import Link from './Link';
@@ -29,8 +31,7 @@ const Pagination = ({ route, limit, offset, total, scrollToTopOnChange, isDisabl
       return;
     }
 
-    const { pathname, query } = router;
-    await router.push({ pathname, query: { ...query, offset: (value - 1) * limit } });
+    Router.pushRoute(route, { ...Router.query, offset: (value - 1) * limit });
 
     if (scrollToTopOnChange) {
       window.scrollTo(0, 0);
