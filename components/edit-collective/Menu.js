@@ -39,7 +39,6 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   FISCAL_HOSTING: 'fiscal-hosting',
   HOST_PLAN: 'host-plan',
   HOST_METRICS: 'host-metrics',
-  EXPENSES_PAYOUTS: 'expenses-payouts',
   INVOICES_RECEIPTS: 'invoices-receipts',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
