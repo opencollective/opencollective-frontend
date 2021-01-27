@@ -66,8 +66,9 @@ const ExpenseSummary = ({
         flexDirection={['column-reverse', 'row']}
         alignItems={['flex-start', 'center']}
         justifyContent="space-between"
+        data-cy="expense-title"
       >
-        <H4 mb={2} mr={2} fontWeight="500">
+        <H4 mb={2} mr={2} fontWeight="500" data-cy="expense-description">
           {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
         </H4>
         {expense?.status && (
@@ -91,7 +92,7 @@ const ExpenseSummary = ({
             <LinkCollective collective={createdByAccount}>
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
-            <P ml={2} fontSize="12px" color="black.600">
+            <P ml={2} fontSize="12px" color="black.600" data-cy="expense-author">
               {expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedByOnDate"

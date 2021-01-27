@@ -30,6 +30,11 @@ Cypress.Commands.add('login', (params = {}) => {
   });
 });
 
+Cypress.Commands.add('logout', () => {
+  cy.getByDataCy('user-menu-trigger').click();
+  cy.getByDataCy('logout').click();
+});
+
 /**
  * Create a new account an SignIn. If no email is provided in `params`, the account
  * will be generated using a random email.

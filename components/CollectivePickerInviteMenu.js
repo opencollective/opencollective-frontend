@@ -26,7 +26,7 @@ export const InviteCollectiveDropdownOption = ({ onClick, isSearching }) => (
         </Box>
       </Flex>
     )}
-    <StyledButton borderRadius="14px" onClick={onClick}>
+    <StyledButton borderRadius="14px" onClick={onClick} data-cy="collective-picker-invite-button">
       <Flex alignItems="center">
         <PlusCircle size={24} />
         <Box ml="16px" fontSize="11px">
@@ -60,6 +60,7 @@ export const InviteCollectiveForm = ({ onCancel, onSave }) => {
           e.stopPropagation();
           onSave(value);
         }}
+        data-cy="collective-picker-invite-form"
       >
         <StyledInputField
           name="name"

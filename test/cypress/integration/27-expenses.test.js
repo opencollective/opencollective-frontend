@@ -1,5 +1,7 @@
 import 'cypress-file-upload';
 
+import { randomEmail } from '../support/faker';
+
 describe('New expense flow', () => {
   describe('new expense when logged out', () => {
     it('shows the login screen', () => {
@@ -129,6 +131,51 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-summary-items').should('contain', 'Some more delicious stuff');
     });
 
+    it('can create a new organization', () => {
+      cy.getByDataCy('radio-expense-type-RECEIPT').click();
+
+      cy.getByDataCy('select-expense-payee').click();
+      cy.getByDataCy('collective-type-picker-ORGANIZATION').click();
+      cy.getByDataCy('mini-form-name-field').type('Dummy Expense Org');
+      cy.getByDataCy('mini-form-website-field').type('dummy.com');
+      cy.getByDataCy('mini-form-save-button').click();
+
+      // Select Payout Method
+      cy.getByDataCy('payout-method-select').click();
+      cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
+      cy.getByDataCy('expense-next').click();
+
+      cy.get('input[name="description"]').type('Brussels January team retreat');
+
+      cy.fixture('images/receipt.jpg').then(fileContent => {
+        const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
+        const files = [getFile(1), getFile(2)];
+        cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
+      });
+      cy.getByDataCy('expense-attachment-form').should('have.length', 2);
+      // Fill info for first attachment
+      cy.get('input[name="items[0].description"]').type('Fancy restaurant');
+      cy.get('input[name="items[0].amount"]').type('{selectall}183');
+      cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
+      cy.get('input[name="items[1].amount"]').type('{selectall}92.50');
+      cy.getByDataCy('expense-summary-btn').click();
+
+      cy.getByDataCy('expense-summary-payee').should('contain', 'Dummy Expense Org');
+      cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+      cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50 USD');
+      cy.getByDataCy('expense-summary-items').should('contain', 'Fancy restaurant');
+      cy.getByDataCy('expense-summary-items').should('contain', 'Potatoes for the giant raclette');
+
+      // Submit!
+      cy.getByDataCy('submit-expense-btn').click();
+      cy.contains('[data-cy="temporary-notification"]', 'Expense submitted!');
+      cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
+      cy.getByDataCy('dismiss-temporary-notification-btn').click();
+      cy.getByDataCy('temporary-notification').should('not.exist');
+    });
+
     // This can happen if you start with an invoice then switch to receipts
     it('should prevent submitting receipts if missing items', () => {
       cy.getByDataCy('radio-expense-type-INVOICE').click();
@@ -149,6 +196,69 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-summary-btn').click();
       cy.getByDataCy('attachment-url-field').should('contain', 'Receipt required');
+    });
+
+    describe('submit on behalf', () => {
+      let collective, expenseId;
+      const inviteeEmail = randomEmail();
+
+      it('can invite a third-party user to submit an expense', () => {
+        cy.getByDataCy('radio-expense-type-INVOICE').click();
+
+        cy.getByDataCy('select-expense-payee').click();
+        cy.getByDataCy('collective-picker-invite-button').click();
+        cy.get('[data-cy="collective-picker-invite-form"] input[name="name"]').type('Nicolas Cage');
+        cy.get('[data-cy="collective-picker-invite-form"] input[name="email"]').type(inviteeEmail);
+        cy.get('[data-cy="collective-picker-invite-form"] [type="submit"]').click();
+
+        cy.get('input[name="description"]').type('Service Invoice');
+        cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+
+        cy.getByDataCy('expense-summary-btn').click();
+        cy.wait(500);
+
+        cy.getByDataCy('expense-status-msg').should('contain', 'DRAFT');
+        cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
+        cy.getByDataCy('expense-draft-banner').should('contain', `An email has been sent to ${inviteeEmail}`);
+        cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
+
+        // Log out and submit as invitee...
+        cy.url({ log: true }).then(_url => {
+          [, collective, expenseId] = _url.match(/\/([\w-]+)\/expenses\/(\w+)$/);
+        });
+      });
+
+      it('can create a new expense and account as the invitee', () => {
+        cy.visit(`/${collective}/expenses/${expenseId}?key=draft-key`);
+        cy.logout();
+        cy.reload();
+
+        cy.getByDataCy('payee-country').click();
+        cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
+        cy.get('textarea[data-cy="payee-address"]').type('Street Name, 123');
+
+        cy.getByDataCy('payout-method-select').click();
+        cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+        cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
+
+        cy.getByDataCy('expense-next').click();
+
+        cy.get('input[name="items[0].description"]').type('That service');
+        cy.getByDataCy('expense-summary-btn').click();
+        cy.get('[data-cy="checkbox-tos"] [data-cy="custom-checkbox"]').click();
+        cy.getByDataCy('save-expense-btn').click();
+        cy.wait(500);
+        cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
+        cy.getByDataCy('expense-status-msg').parent().should('contain', 'Unverified');
+        cy.login({ email: inviteeEmail, redirect: `/${collective}/expenses/${expenseId}` });
+        cy.visit(`/${collective}/expenses/${expenseId}`);
+        cy.getByDataCy('temporary-notification');
+        cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
+        cy.getByDataCy('expense-author').should('contain', 'Requested by');
+        cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
+        cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+        cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
+      });
     });
   });
 

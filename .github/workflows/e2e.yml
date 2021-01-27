@@ -209,5 +209,12 @@ jobs:
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
+      - name: Archive test screenshots
+        uses: actions/upload-artifact@v1
+        with:
+          name: screenshots
+          path: test/cypress/screenshots
+        if: ${{ failure() }}
+
       - name: Report Coverage
         run: npm run test:coverage
