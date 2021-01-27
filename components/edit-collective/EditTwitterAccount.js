@@ -38,17 +38,17 @@ class EditTwitterAccount extends React.Component {
     this.messages = defineMessages({
       'newBacker.toggle.label': {
         id: 'connectedAccounts.twitter.newBacker.toggle.label',
-        defaultMessage: 'New backers',
+        defaultMessage: 'New financial contributors',
       },
       'newBacker.toggle.description': {
         id: 'connectedAccounts.twitter.newBacker.toggle.description',
         defaultMessage:
-          'Whenever you have a new backer that has provided a twitter username, a tweet will be sent from your connected account',
+          'Whenever you have a new contributor that has provided a twitter username, a tweet will be sent from your connected account',
       },
       'newBacker.tweet': {
         id: 'connectedAccounts.twitter.newBacker.tweet',
         defaultMessage:
-          '{backerTwitterHandle} thank you for your {amount} donation 🙏 - your contribution makes a difference!',
+          '{backerTwitterHandle} thank you for your contribution of {amount} 🙏 - it makes a difference!',
       },
       'monthlyStats.toggle.label': {
         id: 'connectedAccounts.twitter.monthlyStats.toggle.label',
@@ -57,7 +57,7 @@ class EditTwitterAccount extends React.Component {
       'monthlyStats.toggle.description': {
         id: 'connectedAccounts.twitter.monthlyStats.toggle.description',
         defaultMessage:
-          'Every first of the month, automatically send a public tweet with the latest stats, the new backers and the all time top backers',
+          'On the first of the month, automatically send a tweet with your latest stats (new and top contributors)',
       },
       'updatePublished.toggle.label': {
         id: 'connectedAccounts.twitter.updatePublished.toggle.label',
@@ -65,44 +65,44 @@ class EditTwitterAccount extends React.Component {
       },
       'updatePublished.toggle.description': {
         id: 'connectedAccounts.twitter.updatePublished.toggle.description',
-        defaultMessage: 'Send a tweet whenever you publish an update',
+        defaultMessage: 'Send a tweet whenever you publish an Update',
       },
       'tenBackers.toggle.label': {
         id: 'connectedAccounts.twitter.tenBackers.toggle.label',
-        defaultMessage: '10 backers',
+        defaultMessage: '10 contributors',
       },
       'tenBackers.toggle.description': {
         id: 'connectedAccounts.twitter.tenBackers.toggle.description',
-        defaultMessage: 'Whenever one of the collectives that you are hosting reaches 10 backers',
+        defaultMessage: 'Whenever one of the Collectives that you are Hosting reaches 10 contributors',
       },
       'tenBackers.tweet': {
         id: 'connectedAccounts.twitter.tenBackers.tweet',
         defaultMessage:
-          '🎉 {collective} just reached 10 backers! Thank you {topBackersTwitterHandles} 🙌  Support them too!',
+          '🎉 {collective} just reached 10 contributors! Thank you {topBackersTwitterHandles}! 🙌',
       },
       'oneHundredBackers.toggle.label': {
         id: 'connectedAccounts.twitter.oneHundredBackers.toggle.label',
-        defaultMessage: '100 backers',
+        defaultMessage: '100 contributors',
       },
       'oneHundredBackers.toggle.description': {
         id: 'connectedAccounts.twitter.oneHundredBackers.toggle.description',
-        defaultMessage: 'Whenever one of the collectives that you are hosting reaches 100 backers',
+        defaultMessage: 'Whenever one of the Collectives that you are Hosting reaches 100 contributors',
       },
       'oneHundredBackers.tweet': {
         id: 'connectedAccounts.twitter.oneHundredBackers.tweet',
-        defaultMessage: '🎉 {collective} just reached 100 backers!! 🙌  Support them too!',
+        defaultMessage: '🎉 {collective} just reached 100 contributors!! 🙌.',
       },
       'oneThousandBackers.toggle.label': {
         id: 'connectedAccounts.twitter.oneThousandBackers.toggle.label',
-        defaultMessage: '1,000 backers',
+        defaultMessage: '1,000 contributos',
       },
       'oneThousandBackers.toggle.description': {
         id: 'connectedAccounts.twitter.oneThousandBackers.toggle.description',
-        defaultMessage: 'Whenever one of the collectives that you are hosting reaches 1,000 backers',
+        defaultMessage: 'Whenever one of the Collectives that you are Hosting reaches 1,000 contributors',
       },
       'oneThousandBackers.tweet': {
         id: 'connectedAccounts.twitter.oneThousandBackers.tweet',
-        defaultMessage: '🎉 {collective} just reached 1,000 backers!! 🙌  Support them too!',
+        defaultMessage: 'Wow! 🎉 {collective} just reached 1,000 contributors!! 🙌',
       },
     });
 

@@ -83,7 +83,7 @@ const EditTransferWiseAccount = props => {
         <P fontSize="13px" color="black.700" fontWeight="normal" mb={3}>
           <FormattedMessage
             id="collective.create.connectedAccounts.transferwise.description"
-            defaultMessage="Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TransferWise, please, <a>read our documentation</a>."
+            defaultMessage="Connect a TransferWise account to pay expenses with one click. (<a>Instructions</a>)."
             values={{
               a: getI18nLink({
                 href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise',
@@ -116,7 +116,7 @@ const EditTransferWiseAccount = props => {
         <P my={1}>
           <FormattedMessage
             id="collective.connectedAccounts.transferwise.connected"
-            defaultMessage="TransferWise account connected on {updatedAt, date, short}"
+            defaultMessage="TransferWise connected on {updatedAt, date, short}"
             values={{
               updatedAt: new Date(connectedAccount.updatedAt || connectedAccount.createdAt),
             }}

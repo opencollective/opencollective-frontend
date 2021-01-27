@@ -129,7 +129,7 @@ class Tiers extends React.Component {
       },
       'goal.description': {
         id: 'tier.goal.description',
-        defaultMessage: 'The amount that you are trying to raise with this tier',
+        defaultMessage: 'Amount you aim to raise',
       },
       'interval.label': {
         id: 'tier.interval.label',
@@ -158,7 +158,7 @@ class Tiers extends React.Component {
       'endsAt.label': { id: 'tier.expiration.label', defaultMessage: 'Expiration' },
       'endsAt.description': {
         id: 'tier.endsAt.description',
-        defaultMessage: 'Date and time until when this tier should be available',
+        defaultMessage: 'Date this tier should deactivate',
       },
       'maxQuantity.label': {
         id: 'tier.maxQuantity.label',
@@ -166,7 +166,7 @@ class Tiers extends React.Component {
       },
       'maxQuantity.description': {
         id: 'tier.maxQuantity.description',
-        defaultMessage: 'Leave it empty for unlimited',
+        defaultMessage: 'Leave empty for unlimited',
       },
       'customContributions.label': {
         id: 'tier.customContributions.label',
@@ -178,7 +178,7 @@ class Tiers extends React.Component {
       },
       standalonePageDescription: {
         id: 'tier.standalonePageDescription',
-        defaultMessage: 'Whether to enable the <link>standalone</link> page for this tier',
+        defaultMessage: 'Whether to create a <link>standalone</link> page for this tier. It's like a mini-crowdfunding campaign page that you can add a detailed description and video to, and link to directly',
       },
     });
 
@@ -443,7 +443,7 @@ class Tiers extends React.Component {
                     <P>
                       <FormattedMessage
                         id="Tiers.CustomTierDescription"
-                        defaultMessage="A default tier that enables freely customizable contributions, so people can set thier own amount and frequency without limitations. You cannot change the settings or description of this tier, but you can choose to disable it."
+                        defaultMessage="A default tier that enables freely customizable contributions, so people can set thier own amount and frequency without limitations. You cannot change the settings or description of this tier, but you can disable it."
                       />
                     </P>
                     <StyledCheckbox

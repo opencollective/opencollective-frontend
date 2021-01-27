@@ -48,7 +48,7 @@ const content = () => (
     <P fontSize="12px" lineHeight="18px">
       <FormattedMessage
         id="TwoFactorAuth.Setup.AppInfo"
-        defaultMessage="You can use apps such as Google Authenticator, Authy, 1Password, LastPass, or Microsoft Authenticator to scan the QR code and receive a code to input."
+        defaultMessage="You can use 2FA apps such as Google Authenticator, Authy, 1Password, LastPass, or Microsoft Authenticator to scan the QR code."
       />
     </P>
   </div>

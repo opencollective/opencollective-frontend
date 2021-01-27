@@ -31,7 +31,7 @@ const messages = defineMessages({
   'rollingLimit.placeholder': {
     id: 'collective.contributionPolicy.placeholder',
     defaultMessage:
-      'For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.',
+      'E.g. what type of contributions you will or will not accept.',
   },
   'rollingLimit.enable': {
     id: 'editCollective.rollingLimit.enable',
@@ -83,7 +83,7 @@ const HostTwoFactorAuth = ({ collective }) => {
             <P wordBreak="break-word">
               <FormattedMessage
                 id="TwoFactorAuth.Setup.FiscalHost.Info"
-                defaultMessage="Two-factor authentication (2FA) adds an extra layer of security for your account when logging in. For fiscal hosts, you can turn on 2FA to be used with high-risk activities like paying expenses. Enabling 2FA for the fiscal host means that every host admin (including yourself) will be required to enable 2FA for logging into their account."
+                defaultMessage="Two-factor authentication (2FA) adds an extra layer of security when logging in. For Fiscal Hosts or Collectives that manage their own funds, 2FA helps ensure payouts are secure. If enabled, every admin (including yourself) will be required to enable 2FA for logging into their account."
               />
             </P>
           </Container>
@@ -152,10 +152,10 @@ const HostTwoFactorAuth = ({ collective }) => {
         )}
         <Flex flexWrap="wrap" justifyContent="space-between" width="100%">
           <ScreenshotPreview>
-            <img src={imgPreviewModal} alt="Preview host payouts rolling limit" />
+            <img src={imgPreviewModal} alt="Preview Host payouts rolling limit" />
           </ScreenshotPreview>
           <ScreenshotPreview>
-            <img src={imgPreviewPrompt} alt="Preview host payouts rolling limit" />
+            <img src={imgPreviewPrompt} alt="Preview Host payouts rolling limit" />
           </ScreenshotPreview>
           <hr />
         </Flex>

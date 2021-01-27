@@ -135,7 +135,7 @@ class EditCollectiveForm extends React.Component {
       'expensePolicy.description': {
         id: 'collective.expensePolicy.description',
         defaultMessage:
-          "Understanding any requirements or limitations, and setting clear expectations, helps expense submitters know what to do.",
+          "Clarity about requirements, limitations, and expectations helps expense submitters know what to do.",
       },
       'expensePolicy.placeholder': {
         id: 'collective.expensePolicy.placeholder',
@@ -178,7 +178,7 @@ class EditCollectiveForm extends React.Component {
       },
       'application.message.defaultValue': {
         id: 'ApplyToHost.WriteMessage',
-        defaultMessage: 'Explain what information applicants should submit (plain text, 3000 characters max), or direct them to an external application form.',
+        defaultMessage: 'Explain what information applicants should submit for your review (plain text, 3000 characters max), or direct them to an external application form.',
       },
       'hostFeePercent.label': {
         id: 'HostFee',
@@ -194,7 +194,7 @@ class EditCollectiveForm extends React.Component {
       },
       'hostFeePercent.warning2': {
         id: 'newPricing.tab.hostFeeChargeExample',
-        defaultMessage: `If your host fee is 10% and your Collectives bring in $1,000, your Host Fee revenue is $100, and you’ll pay $15 to the platform.`,
+        defaultMessage: `If your host fee is 10% and your Collectives bring in $1,000, then your Host Fee revenue is $100, and you’ll pay $15 to the platform.`,
       },
       'location.label': {
         id: 'collective.location.label',

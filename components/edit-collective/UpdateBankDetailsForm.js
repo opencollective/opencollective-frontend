@@ -85,7 +85,7 @@ class UpdateBankDetailsForm extends React.Component {
               <P>
                 <FormattedMessage
                   id="bankaccount.instructions.variables"
-                  defaultMessage="This is the email payers will receive when they make a bank transfer contribution. Include the details they will need to complete their payment, including reference info so you can match the pending transaction. A variable is like a blank that gets filled in automatically. You can use the following variables in the instructions:"
+                  defaultMessage="This is the email that payers will automatically receive when they make a bank transfer contribution. Include the details they need to complete their payment, including reference info so you can match the pending transaction. A variable is like a blank that gets filled in automatically. You can use the following variables in the instructions:"
                 />
               </P>
 
@@ -107,7 +107,7 @@ class UpdateBankDetailsForm extends React.Component {
                   <code>&#123;collective&#125;</code>:{' '}
                   <FormattedMessage
                     id="bankaccount.instructions.collective"
-                    defaultMessage="Collective to receive the funds."
+                    defaultMessage="Collective to receive the funds. If you only have one Collective, you might not need to include this."
                   />
                 </li>
                 <li>

@@ -61,7 +61,7 @@ const messages = defineMessages({
   'contributionPolicy.placeholder': {
     id: 'collective.contributionPolicy.placeholder',
     defaultMessage:
-      'For example: what type of contributors (like casinos) you do not want donations from, or under what circumstances you might allow certain donations, etc.',
+      'E.g. what types of contributions you will and will not accept.',
   },
   'contributionPolicy.error': {
     id: 'collective.contributionPolicy.error',
@@ -74,7 +74,7 @@ const messages = defineMessages({
   'expensePolicy.placeholder': {
     id: 'collective.expensePolicy.placeholder',
     defaultMessage:
-      'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
+      'E.g. approval criteria, limitations, or required documentation.',
   },
   'expensePolicy.error': {
     id: 'collective.expensePolicy.error',
@@ -213,7 +213,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               <P fontSize="14px" lineHeight="18px" color="black.600" mt={2}>
                 <FormattedMessage
                   id="collective.contributionPolicy.description"
-                  defaultMessage="Financial Contributors are manually reviewed by the Open Collective team, and only those thought to be abusing or spamming are flagged. Financial Contributors with a good reputation should not be affected by this setting."
+                  defaultMessage="Financial Contributors are manually reviewed by the Open Collective team to check for abuse or spam. Financial Contributors with a good reputation should not be affected by this setting."
                 />
               </P>
             </Container>
@@ -261,7 +261,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             <P mb={2}>
               <FormattedMessage
                 id="editCollective.rejectCategories.description"
-                defaultMessage="Specify any categories you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)"
+                defaultMessage="Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)"
               />
             </P>
             <StyledSelect

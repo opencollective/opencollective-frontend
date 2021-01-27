@@ -53,12 +53,12 @@ class EditPaymentMethod extends React.Component {
       },
       'paymentMethod.monthlyLimitPerMember.label': {
         id: 'paymentMethod.monthlyLimitPerMember.label',
-        defaultMessage: 'Monthly limit per member',
+        defaultMessage: 'Monthly limit per team member',
       },
       'paymentMethod.monthlyLimitPerMember.description': {
         id: 'paymentMethod.monthlyLimitPerMember.description',
         defaultMessage:
-          'Set a monthly limit to allow other team members of your Organization to use this credit card within that limit. If set to zero, only Organization admins will be able to use this card.',
+          'Set a monthly limit for Organization team members using this card. If set to zero, only Organization admins will be able to use this card.',
       },
     });
   }
