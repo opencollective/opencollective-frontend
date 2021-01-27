@@ -43,6 +43,7 @@ const ExpenseModal = ({ expense, onDelete, onProcess, onClose, show }) => {
       position="relative"
       padding={0}
       overflowY="hidden"
+      trapFocus={!loading}
     >
       <ModalBody maxHeight="calc(80vh - 80px)" overflowY="auto" mb={80} p={20}>
         <ExpenseSummary

@@ -113,7 +113,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   }
 
   return (
-    <StyledModal width="100%" maxWidth={435} {...props}>
+    <StyledModal width="100%" maxWidth={435} {...props} trapFocus>
       <CollectiveModalHeader collective={collective} />
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
