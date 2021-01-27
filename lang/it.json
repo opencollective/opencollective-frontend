@@ -673,7 +673,6 @@
   "Edit": "Modifica",
   "EditCollective.Conversations.checkbox": "Abilita conversazioni",
   "EditCollective.Conversations.description": "Le conversazioni sono un modo per pubblicare messaggi pubblici a cui chiunque può rispondere. Una volta abilitata, una nuova sezione \"Conversazioni\" verrà aggiunta alla tua pagina Collettivo e una pagina dedicata verrà creata il {conversationsLink}.",
-  "editCollective.expensesPayouts": "Expenses & Payouts",
   "editCollective.fiscalHosting": "Fiscal Hosting",
   "EditCollective.GSTNumber": "GST number",
   "editCollective.host.balance": "It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund}}.",
