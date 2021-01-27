@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Info } from '@styled-icons/feather/Info';
+import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -16,10 +17,10 @@ import { P } from '../Text';
 import { Dimensions } from './_constants';
 import SectionTitle from './SectionTitle';
 
-import aboutSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveSectionHeaderIconAbout.png';
-import budgetSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveSectionHeaderIconBudget.png';
-import connectSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveSectionHeaderIconConnect.png';
-import contributeSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveSectionHeaderIconContribute.png';
+import aboutSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconAbout.png';
+import budgetSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconBudget.png';
+import connectSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconConnect.png';
+import contributeSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconContribute.png';
 
 const ContainerWithMaxWidth = styled(Container).attrs({
   maxWidth: Dimensions.MAX_SECTION_WIDTH,
@@ -32,8 +33,32 @@ const ContainerWithMaxWidth = styled(Container).attrs({
 `;
 
 const TypeIllustration = styled.img.attrs({ alt: '' })`
+  position: absolute;
   width: 48px;
   height: 48px;
+`;
+
+const TypeIllustrationCircle = styled(Flex)`
+  position: relative;
+  width: 48px;
+  height: 48px;
+
+  &::before {
+    content: '';
+    background: ${themeGet('colors.primary.100')};
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
 `;
 
 const getCategoryData = (intl, collective, category) => {
@@ -117,9 +142,9 @@ const CategoryHeader = React.forwardRef(({ collective, category, isAdmin, ...pro
   return (
     <ContainerWithMaxWidth ref={ref} {...props}>
       <Flex alignItems="center" justifyContent="center">
-        <Flex alignItems="center" mr={2}>
+        <TypeIllustrationCircle alignItems="center" mr={2}>
           <TypeIllustration src={data.img} />
-        </Flex>
+        </TypeIllustrationCircle>
         <Flex alignItems="center" mr={3}>
           <SectionTitle mr={2} my={3} data-cy={`category-${category}-title`}>
             {data.title}
