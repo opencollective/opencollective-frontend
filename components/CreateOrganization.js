@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -10,7 +11,9 @@ import { Router } from '../server/pages';
 import { addEditCollectiveMembersMutation } from './onboarding-modal/OnboardingModal';
 import Container from './Container';
 import CreateOrganizationForm from './CreateOrganizationForm';
+import { Box, Flex } from './Grid';
 import SignInOrJoinFree from './SignInOrJoinFree';
+import { H1, P } from './Text';
 
 class CreateOrganization extends React.Component {
   static propTypes = {
@@ -18,6 +21,7 @@ class CreateOrganization extends React.Component {
     editCollectiveMembers: PropTypes.func,
     LoggedInUser: PropTypes.object,
     refetchLoggedInUser: PropTypes.func.isRequired,
+    intl: PropTypes.object,
   };
 
   constructor(props) {
@@ -108,21 +112,34 @@ class CreateOrganization extends React.Component {
     return (
       <Container>
         {!LoggedInUser && (
-          <Container textAlign="center">
+          <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
+            <Flex flexDirection="column" p={4} mt={2}>
+              <Box mb={3}>
+                <H1 fontSize="32px" lineHeight="36px" fontWeight="bold" textAlign="center">
+                  <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
+                </H1>
+              </Box>
+              <Box textAlign="center">
+                <P fontSize="14px" color="black.600" mb={1}>
+                  <FormattedMessage
+                    id="organization.create.createOrSignIn"
+                    defaultMessage="Create an account (or sign in) to create an organization."
+                  />
+                </P>
+              </Box>
+            </Flex>
             <SignInOrJoinFree />
-          </Container>
+          </Flex>
         )}
         {LoggedInUser && (
-          <Container>
-            <CreateOrganizationForm
-              collective={collective}
-              onSubmit={this.createOrganization}
-              onChange={this.resetError}
-              error={result.error}
-              updateAdmins={this.updateAdmins}
-              loading={status === 'loading'}
-            />
-          </Container>
+          <CreateOrganizationForm
+            collective={collective}
+            onSubmit={this.createOrganization}
+            onChange={this.resetError}
+            error={result.error}
+            updateAdmins={this.updateAdmins}
+            loading={status === 'loading'}
+          />
         )}
       </Container>
     );
@@ -149,4 +166,4 @@ const addCreateOrganizationMutation = graphql(createOrganizationMutation, {
 
 const addGraphql = compose(addCreateOrganizationMutation, addEditCollectiveMembersMutation);
 
-export default addGraphql(CreateOrganization);
+export default injectIntl(addGraphql(CreateOrganization));
