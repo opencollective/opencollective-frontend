@@ -74,6 +74,13 @@ const getFlexBasisForCol = (nbContributors, totalContributors) => {
   const maxPercentage = 0.75;
   const percentageNbContributors = nbContributors / totalContributors;
   const width = Math.min(percentageNbContributors - baseSpaceBetween, maxPercentage);
+
+  // If one of the two blocks has less contributors but still two columns, we
+  // force the size two make sure both columns are displayed
+  if (percentageNbContributors <= 0.45 && nbContributors > 5) {
+    return '40%';
+  }
+
   return `${Math.trunc(width * 100)}%`;
 };
 
