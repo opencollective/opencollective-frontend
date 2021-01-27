@@ -180,7 +180,7 @@ class StyledUpdate extends Component {
             />
           </Box>
         )}
-        <StyledTag fontSize="10px" py={1}>
+        <StyledTag textTransform="uppercase" fontSize="10px" py={1}>
           <FormattedMessage id="Member.Role.ADMIN" defaultMessage="Admin" />
         </StyledTag>
         {editable && (
