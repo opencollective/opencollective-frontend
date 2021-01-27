@@ -1643,6 +1643,7 @@
   "startDateAndTime": "fecha y hora de inicio",
   "StepsProgress.mobile.next": "Siguiente: {stepName}",
   "StepsProgress.mobile.status": "{from} de {to}",
+  "StyledDropzone.": "The following {count, plural, one {file is} other {files are}} not valid: {files}",
   "StyledDropzone.DropMsg": "Drop {count,plural, one {file} other {files}} here",
   "StyledInputTags.AddLabel": "Añadir etiquetas",
   "StyledInputTags.EditLabel": "Editar las etiquetas",
