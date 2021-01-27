@@ -255,7 +255,7 @@ const getBubbleContent = (idx, checked, disabled, focused, loading) => {
   return (
     <Circle disabled={disabled} checked={checked} focus={focused}>
       <circle cx="50%" cy="50%" r="16px"></circle>
-      <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle">
+      <text x="50%" y="51%" dominantBaseline="middle" textAnchor="middle">
         {idx + 1}
       </text>
     </Circle>
