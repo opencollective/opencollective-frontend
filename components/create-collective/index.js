@@ -107,7 +107,7 @@ class CreateCollective extends Component {
             <MessageBox type="warning" withIcon mb={[1, 3]}>
               <FormattedMessage
                 id="collectives.create.error.HostNotOpenToApplications"
-                defaultMessage="This host is not open to applications"
+                defaultMessage="This Host is not open to applications"
               />
             </MessageBox>
           </Flex>
@@ -128,7 +128,7 @@ class CreateCollective extends Component {
               <P fontSize="14px" color="black.600" mb={1}>
                 <FormattedMessage
                   id="collective.create.createOrSignIn"
-                  defaultMessage="Create an account (or sign in) to start a collective."
+                  defaultMessage="Join or sign in to create a Collective."
                 />
               </P>
             </Box>

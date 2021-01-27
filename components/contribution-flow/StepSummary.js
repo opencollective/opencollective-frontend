@@ -51,7 +51,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
     <React.Fragment>
       <AmountLine>
         <Label fontWeight={500} color="black.800">
-          <FormattedMessage id="contribution.netAmountForCollective" defaultMessage="Net amount for collective" />
+          <FormattedMessage id="contribution.netAmountForCollective" defaultMessage="Net amount for Collective" />
         </Label>
         <Span fontSize="16px" fontWeight={500} color="black.700">
           {formatCurrency(netAmountForCollective, currency)}
@@ -71,7 +71,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
       {Boolean(hostFeePercent) && (
         <AmountLine>
           <Label color="black.500">
-            <FormattedMessage id="contribution.hostFeePercent" defaultMessage="Fiscal host fee" />
+            <FormattedMessage id="contribution.hostFeePercent" defaultMessage="Fiscal Host fee" />
             {` (-${hostFeePercent}%)`}
           </Label>
           <Span fontSize="16px" color="black.500">

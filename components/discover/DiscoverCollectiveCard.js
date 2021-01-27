@@ -22,7 +22,7 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
             {collective.stats.backers.all > 0 && (
               <FormattedMessage
                 id="discoverCard.backers.all"
-                defaultMessage="{count, plural, one {contributor {prettyCount} } other {Financial contributors {prettyCount} }}"
+                defaultMessage="{count, plural, one {contributor {prettyCount} } {Financial contributors {prettyCount} }}"
                 values={{
                   count: collective.stats.backers.all,
                   prettyCount: (

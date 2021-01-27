@@ -51,7 +51,7 @@ class ConnectGithub extends React.Component {
       } else {
         this.setState({
           loadingRepos: false,
-          error: "We couldn't find any repositories (with >= 100 stars) linked to this account",
+          error: "We couldn't find any repositories with at least 100 stars linked to this account",
         });
       }
     } catch (error) {

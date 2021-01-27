@@ -146,7 +146,7 @@ const ArchiveCollective = ({ collective }) => {
           <FormattedMessage
             id="collective.archive.isHost"
             defaultMessage={
-              "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host, please deactivate as Host first."
+              "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
             }
             values={{ type: collective.type }}
           />

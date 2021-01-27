@@ -29,7 +29,7 @@ const messages = defineMessages({
   mainDescription: {
     id: 'EditCollective.Conversations.description',
     defaultMessage:
-      'Conversations is a message board for your page, where anyone can post and anyone can reply, like a discussion forum. Once enabled, a new "Conversations" section will appear, and a dedicated page will be created at {conversationsLink}.',
+      'Conversations are like a message board or forum, where anyone can post and reply. Once enabled, a new "Conversations" section will appear, and a dedicated page will be created at {conversationsLink}.',
   },
   checkboxLabel: {
     id: 'EditCollective.Conversations.checkbox',

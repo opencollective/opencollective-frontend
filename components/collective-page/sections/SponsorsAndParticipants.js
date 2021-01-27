@@ -97,7 +97,7 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
             <FormattedMessage
               id="event.responses.title.going"
               values={{ n: responses.length }}
-              defaultMessage="{n} {n, plural, one {person going} {people going}}"
+              defaultMessage="{n} {n, plural, one {person going} other {people going}}"
             />
           </SectionTitle>
           {canEditEvent && isRefetched && (

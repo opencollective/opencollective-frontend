@@ -33,15 +33,15 @@ const placeholders = {
 };
 
 const messages = defineMessages({
-  nameLabel: { id: 'createProject.form.nameLabel', defaultMessage: "What's the name of your Project?" },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
+  nameLabel: { id: 'createProject.form.nameLabel', defaultMessage: "Project name" },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   descriptionLabel: {
     id: 'createProject.form.descriptionLabel',
     defaultMessage: "What's the purpose of your Project?",
   },
   descriptionHint: {
     id: 'createProject.form.descriptionHint',
-    defaultMessage: 'Write a short description of your Project (150 characters max)',
+    defaultMessage: 'Write a short description (150 characters max)',
   },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',

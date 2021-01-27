@@ -122,7 +122,7 @@ const BankTransfer = props => {
               {data.host.plan.manualPayments ? (
                 <FormattedMessage
                   id="paymentMethods.manual.add.info"
-                  defaultMessage="Define instructions for contributions via bank transfer. When funds arrive, you'll mark them as confirmed to credit the budget balance."
+                  defaultMessage="Define instructions for contributions via bank transfer. When funds arrive, you can mark them as confirmed to credit the budget balance."
                 />
               ) : (
                 <FormattedMessage
@@ -201,7 +201,7 @@ const BankTransfer = props => {
                 <P mr={2}>
                   <FormattedMessage
                     id="paymentMethod.manual.edit.description"
-                    defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout. Instructions will be autmatically emailed to them, including a unique reference code. Once received, mark the corresponding pending order as complete to credit the budget on Open Collective.'
+                    defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout and instructions will be autmatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on Open Collective.'
                   />
                 </P>
                 <img src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} />

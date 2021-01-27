@@ -108,7 +108,7 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
         instructions: (
           <FormattedMessage
             id="NewContributionFlow.bankInstructions"
-            defaultMessage="Instructions will be given on the next page to make a transfer."
+            defaultMessage="Instructions to make a transfer will be given on the next page."
           />
         ),
       });

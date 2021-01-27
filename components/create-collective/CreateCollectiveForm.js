@@ -47,16 +47,16 @@ const placeholders = {
 };
 
 const messages = defineMessages({
-  nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "What's the name of your collective?" },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
+  nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "Collective name" },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'createCollective.form.descriptionLabel',
-    defaultMessage: 'What does your collective do?',
+    defaultMessage: 'What does your Collective do?',
   },
   descriptionHint: {
     id: 'createCollective.form.descriptionHint',
-    defaultMessage: 'Write a short description of your Collective (150 characters max)',
+    defaultMessage: 'Write a short description (150 characters max)',
   },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
@@ -64,7 +64,7 @@ const messages = defineMessages({
   },
   errorSlugHyphen: {
     id: 'createCollective.form.error.slug.hyphen',
-    defaultMessage: 'Collective slug can not start nor end with hyphen',
+    defaultMessage: 'Collective slug URL cannot start or end with a hyphen',
   },
 });
 
@@ -290,7 +290,7 @@ class CreateCollectiveForm extends React.Component {
                             get(host, 'settings.applyMessage') || (
                               <FormattedMessage
                                 id="ApplyToHost.WriteMessage"
-                                defaultMessage="Write a message to fiscal host"
+                                defaultMessage="Message to Fiscal Host"
                               />
                             )
                           }

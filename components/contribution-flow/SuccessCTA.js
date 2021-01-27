@@ -35,12 +35,12 @@ const headerMessages = defineMessages({
 const contentMessages = defineMessages({
   [SUCCESS_CTA_TYPE.JOIN]: {
     id: 'NewContributionFlow.Success.CTA.Join.Content',
-    defaultMessage: 'Create an account and show all your contributions to the community.',
+    defaultMessage: 'Create an account and show all your contributions.',
   },
   [SUCCESS_CTA_TYPE.BLOG]: {
     id: 'NewContributionFlow.Success.CTA.Read.Content',
     defaultMessage:
-      'Open Collective aims to foster transparency and sustainability in communities around the world. See how you could participate.',
+      'Open Collective aims to foster transparency and sustainability in communities around the world. Here's how you can participate.',
   },
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {
     id: 'home.joinUsSection.weNeedUpdate',

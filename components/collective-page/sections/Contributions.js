@@ -267,7 +267,7 @@ class SectionContributions extends React.PureComponent {
                   <FormattedMessage
                     id="organization.collective.memberOf.collective.host.title"
                     values={{ n: data.Collective.stats.collectives.hosted }}
-                    defaultMessage="We are fiscally hosting {n, plural, one {this Collective} {{n} Collectives}}"
+                    defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
                   />
                 </H3>
               )}
@@ -322,13 +322,13 @@ class SectionContributions extends React.PureComponent {
                 {isOrganization ? (
                   <FormattedMessage
                     id="CP.Contributions.PartOfOrg"
-                    defaultMessage="{n, plural, one {This Collective is} {These Collectives are}} part of our Organization"
+                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
                     values={{ n: connectedCollectives.length }}
                   />
                 ) : (
                   <FormattedMessage
                     id="CP.Contributions.ConnectedCollective"
-                    defaultMessage="{n, plural, one {This Collective is} {These Collectives are}} connected to us"
+                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} connected to us"
                     values={{ n: connectedCollectives.length }}
                   />
                 )}

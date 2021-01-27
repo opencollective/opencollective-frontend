@@ -189,7 +189,7 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
           }}
           header={
             isConversationRoot ? (
-              <FormattedMessage id="conversation.deleteModalTitle" defaultMessage="Delete this conversation?" />
+              <FormattedMessage id="conversation.deleteModalTitle" defaultMessage="Delete this Conversation?" />
             ) : (
               <FormattedMessage id="Comment.DeleteConfirmTitle" defaultMessage="Delete this comment?" />
             )

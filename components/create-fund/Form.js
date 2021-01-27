@@ -42,7 +42,7 @@ const messages = defineMessages({
   },
   descriptionHint: {
     id: 'createFund.form.descriptionHint',
-    defaultMessage: 'Write a short description of your Fund (150 characters max)',
+    defaultMessage: 'Write a short description (150 characters max)',
   },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
