@@ -25,7 +25,7 @@ const OPTION_LABELS = defineMessages({
   },
   [HOST_FEE_STRUCTURE.CUSTOM_FEE]: {
     id: 'CollectiveFeesForm.CustomFees',
-    defaultMessage: 'Set custom fee for this Collective only.',
+    defaultMessage: 'Set a custom fee for this Collective.',
   },
 });
 
@@ -64,7 +64,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
       <CollectiveModalHeader collective={collective} mb={3} />
       <ModalBody>
         <P fontSize="16px" lineHeight="24px" fontWeight="500" mb={2}>
-          <FormattedMessage id="CollectiveFeesForm.Title" defaultMessage="Set fees structure" />
+          <FormattedMessage id="CollectiveFeesForm.Title" defaultMessage="Set fee structure" />
         </P>
 
         <StyledRadioList
@@ -85,7 +85,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                   <P fontSize="11px" lineHeight="16px" color="black.600" fontWeight="normal">
                     <FormattedMessage
                       id="CollectiveFeesForm.DefaultDescription"
-                      defaultMessage="You set this global fee for all Collectives hosted using <Link>settings</Link>."
+                      defaultMessage="Set the global (default) fee in your <Link>settings</Link>."
                       values={{
                         Link: getI18nLink({
                           as: Link,

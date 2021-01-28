@@ -152,9 +152,9 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
       {!error && !loading && !hostedMemberships?.nodes.length ? (
         <MessageBox type="info" withIcon data-cy="zero-collective-message">
           {hasFilters ? (
-            <FormattedMessage id="discover.searchNoResult" defaultMessage="No collective matches the current search." />
+            <FormattedMessage id="discover.searchNoResult" defaultMessage="No Collectives matche the current search." />
           ) : (
-            <FormattedMessage id="menu.collective.none" defaultMessage="No collectives yet" />
+            <FormattedMessage id="menu.collective.none" defaultMessage="No Collectives yet" />
           )}
         </MessageBox>
       ) : (

@@ -236,7 +236,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 <AmountDetailsLine
                   value={values.amount || 0}
                   currency={host.currency}
-                  label={<FormattedMessage id="addfunds.totalAmount" defaultMessage="Funding amount" />}
+                  label={<FormattedMessage id="addfunds.totalAmount" defaultMessage="Amount" />}
                 />
                 <AmountDetailsLine
                   value={hostFee}
