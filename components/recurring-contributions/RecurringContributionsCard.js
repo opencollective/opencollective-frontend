@@ -78,7 +78,7 @@ const RecurringContributionsCard = ({
                 content={() => (
                   <FormattedMessage
                     id="Subscriptions.FeesOnTopTooltip"
-                    defaultMessage="Contribution to collective plus contribution to the platform"
+                    defaultMessage="Collective and Platform contributions in total"
                   />
                 )}
               >
