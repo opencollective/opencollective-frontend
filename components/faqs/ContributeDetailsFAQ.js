@@ -27,7 +27,7 @@ const ContributeDetailsFAQ = ({ tax, isIncognito, hasInterval, ...props }) =>
             <FormattedMessage
               id="ContributeDetails.faq.isIncognito.content"
               defaultMessage={
-                'If you chose to contribute as "incognito", your financial contribution will show up publicly as an incognito donation and it won\'t link to your public profile. However, in the effort of being transparent and compliant with KYC regulations (Know Your Customer), the fiscal host and the administrators of the collective can export a list of all the financial contributors with their personal information.'
+                'Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile. However, the admins will be able to see your identity privately.'
               }
             />
           </Content>
@@ -38,13 +38,13 @@ const ContributeDetailsFAQ = ({ tax, isIncognito, hasInterval, ...props }) =>
           <Title>
             <FormattedMessage
               id="ContributeDetails.faq.frequency.title"
-              defaultMessage="When will I be billed next time?"
+              defaultMessage="When will I be charged?"
             />
           </Title>
           <Content>
             <FormattedMessage
               id="ContributeDetails.faq.frequency.content"
-              defaultMessage="You will be charged today, and then on the 1st of each month (for monthly contributions) or the 1st of the same month next year (for yearly contributions). Note: To prevent you from being charged twice in a short time frame, if you contribute after the 15th of a given month, the next charge will not be the 1st of next month but the month after."
+              defaultMessage="You will be charged today, and then going forward on the 1st of each month (or the 1st of the same month for yearly contributions). To avoid two charges in a short time frame, recurring contributions started after the 15th will not be charged again until the next subsequent month, e.g. if the initial charge is on April 16 the second charge will be on June 1."
             />
           </Content>
         </Entry>

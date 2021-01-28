@@ -46,7 +46,7 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
       <Content>
         <FormattedMessage
           id="EditCollectivePageFAQ.HideBudgetDetails"
-          defaultMessage="Open Collective is all about transparency, and visibility of the budget section is key for this value."
+          defaultMessage="Open Collective is all about transparency, and visibility of the budget section is a key part of that."
         />
       </Content>
     </Entry>

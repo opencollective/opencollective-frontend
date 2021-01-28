@@ -13,25 +13,25 @@ const CreateProfileFAQ = props => (
       <Title>
         <FormattedMessage
           id="createProfile.faq.persoVSOrg.title"
-          defaultMessage="What's the difference between a personal and an organization profile?"
+          defaultMessage="What's the difference between an individual and an organization profile?"
         />
       </Title>
       <Content>
         <FormattedMessage
           id="createProfile.faq.persoVsOrg.content"
-          defaultMessage="Create an organization profile if you want to make a financial contribution in the name of your company or organization. An organization profile allows you to enable other members of your organization to make financial contributions within certain limits that you can define. Organizations can also issue gift cards."
+          defaultMessage="Organizations represent a company or entity, while individual profiles represent a person. Organization profiles can have multiple team members (individual profiles) who have access to edit it and make financial contributions in its name. If a contribution or expense is for a company, it's important to use an organization profile so the correct billing information shows up on receipts and invoices. Organizations can also issue gift cards."
         />
       </Content>
     </Entry>
 
     <Entry>
       <Title>
-        <FormattedMessage id="createProfile.faq.email.title" defaultMessage="With whom my email will be shared?" />
+        <FormattedMessage id="createProfile.faq.email.title" defaultMessage="Who can see my email address?" />
       </Title>
       <Content>
         <FormattedMessage
           id="createProfile.faq.email.content"
-          defaultMessage="For legal reasons, your email is shared with the administrators of the collective and of its fiscal host. We don't share it with any other partner. We don't use it for any type of marketing. We hate spam as much as you do."
+          defaultMessage="The admins of the Collective and its Fiscal Host will have access to your email address. We do not share emails with anyone else and we don't use it for any type of marketing. We hate spam as much as you do."
         />
       </Content>
     </Entry>
@@ -43,7 +43,7 @@ const CreateProfileFAQ = props => (
       <Content>
         <FormattedMessage
           id="createProfile.faq.privacy.content"
-          defaultMessage="We care about privacy. We don't use cookies. No Google Analytics. No tracking. Then why are we asking you for your personal information? Because for legal reasons the host of the collective needs to know who is giving them money (KYC as in Know Your Customer). However, we give you full control on how your information is being shown publicly (yes you can make incognito contributions, see below)."
+          defaultMessage="We care about privacy. We don't use cookies, Google Analytics, or any kind of tracking. We collect certain personal information because it's required for regulatory reasons that the entity receiving money from you know who you are (KYC - Know Your Customer). You can choose to make an incognito contribution if you don't want your identity to be public."
         />
       </Content>
     </Entry>
@@ -58,7 +58,7 @@ const CreateProfileFAQ = props => (
       <Content>
         <FormattedMessage
           id="createProfile.faq.anonymous.content"
-          defaultMessage="Yes you can! However, in the effort of being transparent and compliant with KYC regulations (Know Your Customer), anonymous contributions still require you to create an Open Collective account with a valid email address. You will have the opportunity to make a donation anonymously after being logged in to make sure that your identity won't be shown publicly on the page of the collective."
+          defaultMessage="Yes you can! Select the 'incognito' option to make your contribution anonymous to the public. However, the admins will still be able to see your profile and identity privately."
         />
       </Content>
     </Entry>

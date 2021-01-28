@@ -49,7 +49,7 @@ const CreateUpdateFAQ = ({ defaultOpen, ...props }) => (
       <Content>
         <FormattedMessage
           id="CreateUpdateFAQ.whatfor.content"
-          defaultMessage="Let your community know what you're doing, engage supporters to keep contributing, and report back to funders."
+          defaultMessage="Let your community know what you're doing, engage supporters to keep contributing, and report back to funders. Share your triumphs, ask for help, and tellyour story."
         />
       </Content>
     </Entry>
