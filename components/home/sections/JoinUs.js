@@ -160,7 +160,7 @@ const JoinUs = ({ page }) => (
                 >
                   <FormattedMessage
                     id="home.joinUsSection.ourStories"
-                    defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world, see how you could participate."
+                    defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world. See how you can participate."
                   />
                 </P>
               </Box>

@@ -33,7 +33,7 @@ const WeAreOpen = () => (
         >
           <FormattedMessage
             id="home.weAreOpenSection.subtitle"
-            defaultMessage="We not only help you be transparent, we are too!"
+            defaultMessage="We are transparent, just like we help you to be transparent."
           />
         </SectionSubtitle>
       </Box>

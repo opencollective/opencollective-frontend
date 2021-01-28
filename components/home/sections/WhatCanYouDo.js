@@ -52,7 +52,7 @@ const WhatCanYouDo = () => {
   return (
     <Flex mx={[3, 4]} my={4} flexDirection="column" alignItems="center" textAlign="center">
       <SectionTitle>
-        <FormattedMessage id="home.whatCanYouDoSection.title" defaultMessage="What can you do on Open Collective?" />
+        <FormattedMessage id="home.whatCanYouDoSection.title" defaultMessage="What can you do with Open Collective?" />
       </SectionTitle>
       <Box width={['288px', '548px', '708px', null, '755px']} textAlign="center">
         <SectionSubTitle
