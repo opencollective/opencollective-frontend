@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { includes } from 'lodash';
+import { includes, pick } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import expenseStatus from '../../lib/constants/expense-status';
@@ -19,6 +19,7 @@ import StyledHr from '../StyledHr';
 import { H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
+import ExpenseAdminActions from './ExpenseAdminActions';
 import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
@@ -52,6 +53,10 @@ const ExpenseSummary = ({
   permissions,
   isEditing,
   borderless,
+  onClose,
+  onDelete,
+  onEdit,
+  onError,
   ...props
 }) => {
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
@@ -61,7 +66,12 @@ const ExpenseSummary = ({
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
 
   return (
-    <StyledCard p={borderless ? 0 : [16, 24, 32]} borderStyle={borderless ? 'none' : 'solid'} {...props}>
+    <StyledCard
+      p={borderless ? 0 : [16, 24, 32]}
+      mb={borderless ? [4, 0] : 0}
+      borderStyle={borderless ? 'none' : 'solid'}
+      {...props}
+    >
       <Flex
         flexDirection={['column-reverse', 'row']}
         alignItems={['flex-start', 'center']}
@@ -71,17 +81,36 @@ const ExpenseSummary = ({
         <H4 mb={2} mr={2} fontWeight="500" data-cy="expense-description">
           {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
         </H4>
-        {expense?.status && (
-          <ExpenseStatusTag
-            display="block"
-            status={expense.status}
-            letterSpacing="0.8px"
-            fontWeight="600"
-            fontSize="10px"
-            showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
-            showTaxFormMsg={expense.payee.isAdmin}
-          />
-        )}
+        <Box display="flex" mb={3} width={1} justifyContent={['space-between', 'end']} alignItems="center">
+          {expense?.status && (
+            <Box>
+              <ExpenseStatusTag
+                display="block"
+                status={expense.status}
+                letterSpacing="0.8px"
+                fontWeight="600"
+                fontSize="10px"
+                showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+                showTaxFormMsg={expense.payee.isAdmin}
+              />
+            </Box>
+          )}
+          {!isLoading && expense.id && (
+            <Box display={['flex', 'none']}>
+              <ExpenseAdminActions
+                collective={collective}
+                expense={expense}
+                permissions={pick(expense.permissions, ['canSeeInvoiceInfo', 'canDelete'])}
+                buttonProps={{ size: 32, m: 1 }}
+                linkAction="link"
+                onDelete={() => {
+                  onClose?.();
+                  onDelete?.(expense);
+                }}
+              />
+            </Box>
+          )}
+        </Box>
       </Flex>
       <ExpenseTags expense={expense} isLoading={isLoading} />
       <Flex alignItems="center" mt={3}>
@@ -235,7 +264,32 @@ const ExpenseSummary = ({
         isDraft={!isEditing && expense?.status == expenseStatus.DRAFT}
       />
       {showProcessButtons && (
-        <Container borderTop="1px solid #DCDEE0" mt={4} pt={12}>
+        <Container
+          display="flex"
+          width={1}
+          justifyContent={['end', 'space-between', 'end']}
+          alignItems="flex-end"
+          borderTop="1px solid #DCDEE0"
+          mt={4}
+          pt={12}
+        >
+          <Box display={['none', 'flex', 'none']} alignItems="center">
+            <ExpenseAdminActions
+              collective={collective}
+              expense={expense}
+              permissions={expense?.permissions}
+              buttonProps={{ size: 32, m: 1 }}
+              linkAction="link"
+              onDelete={() => {
+                onClose();
+                if (onDelete) {
+                  onDelete(expense);
+                }
+              }}
+              onError={error => onError({ error })}
+              onEdit={onEdit}
+            />
+          </Box>
           <Flex flexWrap="wrap" justifyContent="flex-end">
             <ProcessExpenseButtons expense={expense} permissions={permissions} collective={collective} host={host} />
           </Flex>
@@ -322,6 +376,10 @@ ExpenseSummary.propTypes = {
         }),
       ),
     }),
+    permissions: PropTypes.shape({
+      canSeeInvoiceInfo: PropTypes.bool,
+      canDelete: PropTypes.bool,
+    }),
   }),
   /** Wether or not this is being displayed for an edited Expense */
   isEditing: PropTypes.bool,
@@ -331,6 +389,13 @@ ExpenseSummary.propTypes = {
   permissions: PropTypes.object,
   /** Disable border and paiding in styled card, usefull for modals */
   borderless: PropTypes.bool,
+  /** Passed down from ExpenseModal */
+  onClose: PropTypes.func,
+  /** Passed down from pages/expense.js */
+  onEdit: PropTypes.func,
+  onError: PropTypes.func,
+  /** Passed down from either ExpenseModal or pages/expense.js */
+  onDelete: PropTypes.func,
 };
 
 export default ExpenseSummary;
