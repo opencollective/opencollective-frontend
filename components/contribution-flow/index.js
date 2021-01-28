@@ -15,7 +15,7 @@ import { TransactionTypes } from '../../lib/constants/transactions';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
-import { getGuestToken, setGuestToken } from '../../lib/guest-accounts';
+import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
@@ -141,10 +141,7 @@ class ContributionFlow extends React.Component {
 
     let fromAccount, guestInfo;
     if (stepProfile.isGuest) {
-      guestInfo = {
-        ...pick(stepProfile, ['email', 'name', 'location']),
-        token: getGuestToken(stepProfile.email),
-      };
+      guestInfo = pick(stepProfile, ['email', 'name', 'location']);
     } else {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     }
@@ -182,8 +179,8 @@ class ContributionFlow extends React.Component {
   };
 
   handleOrderResponse = async ({ order, stripeError, guestToken }, email) => {
-    if (guestToken) {
-      setGuestToken(email, guestToken);
+    if (guestToken && order) {
+      setGuestToken(email, order.id, guestToken);
     }
 
     if (stripeError) {

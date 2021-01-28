@@ -68,6 +68,7 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('Contribute as guest');
 
+      cy.get('input[name=name]').type('Rick Astley');
       cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.useAnyPaymentMethod();
@@ -94,7 +95,7 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name=email]:invalid').should('have.length', 1); // Empty
 
       cy.get('input[name=name]').type('Rick Astley');
-      cy.get('input[name=email]').type(`{selectall}${secondEmail}`);
+      cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.useAnyPaymentMethod();
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $500').click();
@@ -163,19 +164,15 @@ describe('Contribution Flow: Guest contributions', () => {
 
       // Redirected from email
       cy.location('pathname').should('include', '/confirm/guest');
-      cy.contains("It seems that you've made other contributions using this browser.");
-      cy.contains('[data-cy="guest-email-checkbox"]', secondEmail).click();
-      cy.getByDataCy('confirm-account-btn').click();
       cy.contains('Your email has been confirmed');
 
       // Redirected to profile, contains all transactions
       cy.location('pathname').should('include', '/rick-astley'); // Used name to generate the profile
       cy.contains('Rick Astley');
-      cy.contains('[data-cy="hero-total-amount-contributed"]', '$5,510.00 USD');
-      cy.get('[data-cy="transaction-item"]').should('have.length', 3);
+      cy.contains('[data-cy="hero-total-amount-contributed"]', '$510.00 USD');
+      cy.get('[data-cy="transaction-item"]').should('have.length', 2);
       cy.contains('[data-cy="transaction-item"]', '$10.00');
       cy.contains('[data-cy="transaction-item"]', '$500.00');
-      cy.contains('[data-cy="transaction-item"]', '$5,000.00');
     });
   });
 });
