@@ -1811,7 +1811,7 @@
   "unsubscribe.unsubscribing": "Désabonnement de votre adresse email...",
   "Unverified": "Unverified",
   "update.createdAtBy": "Créée le {date} (brouillon) par {author}",
-  "update.delete": "supprimer",
+  "update.delete": "Delete",
   "update.makePublicOn.label": "Rendre public à cette date",
   "update.new.preview": "Prévisualiser l'actualité",
   "update.notify.everyone": "Notifier tout le monde",

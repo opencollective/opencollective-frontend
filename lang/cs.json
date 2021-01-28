@@ -1811,7 +1811,7 @@
   "unsubscribe.unsubscribing": "Unsubscribing your email...",
   "Unverified": "Unverified",
   "update.createdAtBy": "Created on {date} (draft) by {author}",
-  "update.delete": "odstranit",
+  "update.delete": "Delete",
   "update.makePublicOn.label": "Automaticky zveřejnit v tento den",
   "update.new.preview": "Náhled aktualizace",
   "update.notify.everyone": "Notify everyone",

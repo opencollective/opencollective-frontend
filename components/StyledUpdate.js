@@ -42,13 +42,6 @@ const UpdateWrapper = styled(Flex)`
   }
 `;
 
-const ActionButton = styled.button`
-  color: #71757a;
-  outline: none;
-  border: none;
-  background: none;
-`;
-
 const PrivateUpdateMesgBox = styled(MessageBox)`
   height: 40px;
   background: #f0f8ff;
@@ -192,7 +185,7 @@ class StyledUpdate extends Component {
             </Box>
             <Box mr={2} fontSize="12px">
               <StyledButton buttonSize="tiny" onClick={this.deleteUpdate}>
-                <FormattedMessage id="update.delete" defaultMessage="delete" />
+                <FormattedMessage id="update.delete" defaultMessage="Delete" />
               </StyledButton>
             </Box>
           </React.Fragment>

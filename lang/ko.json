@@ -1811,7 +1811,7 @@
   "unsubscribe.unsubscribing": "Unsubscribing your email...",
   "Unverified": "Unverified",
   "update.createdAtBy": "Created on {date} (draft) by {author}",
-  "update.delete": "삭제",
+  "update.delete": "Delete",
   "update.makePublicOn.label": "Automatically make public on this date",
   "update.new.preview": "업데이트 미리 보기",
   "update.notify.everyone": "Notify everyone",

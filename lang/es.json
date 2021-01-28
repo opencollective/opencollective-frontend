@@ -1811,7 +1811,7 @@
   "unsubscribe.unsubscribing": "Dando de baja su correo electrónico...",
   "Unverified": "Unverified",
   "update.createdAtBy": "Creado el {date} (borrador) por {author}",
-  "update.delete": "eliminar",
+  "update.delete": "Delete",
   "update.makePublicOn.label": "Hacer público automáticamente en esta fecha",
   "update.new.preview": "Vista previa de la actualización",
   "update.notify.everyone": "Notify everyone",
