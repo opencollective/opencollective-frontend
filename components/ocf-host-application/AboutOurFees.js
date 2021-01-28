@@ -103,7 +103,7 @@ const AboutOurFees = () => (
         <P fontSize="12px" lineHeight="18px" color="#050505" mb="24px">
           <FormattedMessage
             id="OCFHostApplication.aboutOurFees.note"
-            defaultMessage="*Third-party payment processors (like Stripe and Paypal) charge separate fees on each transaction made using their service. <LearnMoreLink>Learn more here</LearnMoreLink>."
+            defaultMessage="*Third-party payment processors (like Stripe and Paypal) charge their own fees. <LearnMoreLink>Learn more</LearnMoreLink>."
             values={{
               LearnMoreLink: getI18nLink({
                 openInNewTab: true,
@@ -116,7 +116,7 @@ const AboutOurFees = () => (
         <P fontSize="12px" lineHeight="18px" color="#050505">
           <FormattedMessage
             id="OCFHostApplication.aboutOurFees.otherFees"
-            defaultMessage="<strong>**8%</strong> Up to 500k raised. <strong>- 6%</strong> Up to 1 Million raised. <strong>- 4%</strong> Over a Million raised"
+            defaultMessage="<strong>**8%</strong> Up to $500k raised. <strong>- 6%</strong> Up to $1 million raised. <strong>- 4%</strong> Over $1 million raised"
             values={I18nFormatters}
           />
         </P>
