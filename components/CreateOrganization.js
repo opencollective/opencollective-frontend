@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -21,7 +21,6 @@ class CreateOrganization extends React.Component {
     editCollectiveMembers: PropTypes.func,
     LoggedInUser: PropTypes.object,
     refetchLoggedInUser: PropTypes.func.isRequired,
-    intl: PropTypes.object,
   };
 
   constructor(props) {
@@ -166,4 +165,4 @@ const addCreateOrganizationMutation = graphql(createOrganizationMutation, {
 
 const addGraphql = compose(addCreateOrganizationMutation, addEditCollectiveMembersMutation);
 
-export default injectIntl(addGraphql(CreateOrganization));
+export default addGraphql(CreateOrganization);

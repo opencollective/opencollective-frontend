@@ -97,7 +97,7 @@ const CreateOrganizationForm = props => {
     }
     const regexExp = /[-a-zA-Z0-9@:%._/+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_/+.~#?&//=]*)?/gi;
 
-    if (!values.website.match(new RegExp(regexExp)) || values.website.startsWith('http')) {
+    if ((values.website && !values.website.match(new RegExp(regexExp))) || values.website.startsWith('http')) {
       errors.website = intl.formatMessage(orgMessages.errorWebsite);
     }
     return errors;
@@ -141,7 +141,7 @@ const CreateOrganizationForm = props => {
           return (
             <Form>
               <Flex flexDirection="column" alignItems="center">
-                <Container px={[1, 30]}>
+                <Box mx={2} maxWidth="992px">
                   <Flex flexDirection="column" my={[0, 2]} mb={[24, 28, 28, 58]}>
                     <Box>
                       <BackButton asLink onClick={() => window && window.history.back()} px={[0, 2]}>
@@ -169,11 +169,12 @@ const CreateOrganizationForm = props => {
                       </Flex>
                     )}
                   </Flex>
+
                   <Container display="flex" flexDirection={['column', 'row', 'row']}>
                     <Flex
                       flexDirection="column"
                       mx={[1, 10, 10]}
-                      maxWidth={[320, 350, 376, 472]}
+                      maxWidth={[320, 350, 472]}
                       justifyContent="space-around"
                     >
                       <H4 color="black.900" fontSize="18px">
@@ -271,6 +272,7 @@ const CreateOrganizationForm = props => {
                         labelColor="black.700"
                         labelFontWeight="600"
                         value={values.website}
+                        required={false}
                         mt={3}
                         mb={2}
                         data-cy="cof-org-website"
@@ -288,7 +290,7 @@ const CreateOrganizationForm = props => {
                         )}
                       </StyledInputField>
                     </Flex>
-                    <Flex flexDirection="column" width={[320, 350, 376, 472]} mt={[3, 0]} mx={[1, 10, 38]}>
+                    <Flex flexDirection="column" maxWidth={[320, 350, 472]} mt={[3, 0]} mx={[1, 10, 10]}>
                       <H4 color="black.900" fontSize="18px" mb={[3, 1]}>
                         <FormattedMessage id="administrators" defaultMessage="Administrators" />
                       </H4>
@@ -352,7 +354,7 @@ const CreateOrganizationForm = props => {
                     flexDirection="column"
                     my={4}
                     mx={2}
-                    width={[320, 350, 450]}
+                    maxWidth={[320, 350, 450]}
                     color="black.800"
                     letterSpacing="0.2px"
                   >
@@ -386,7 +388,7 @@ const CreateOrganizationForm = props => {
                       </StyledButton>
                     </Flex>
                   </Flex>
-                </Container>
+                </Box>
               </Flex>
             </Form>
           );
