@@ -1645,7 +1645,7 @@
   "StyledInputTags.EditLabel": "Изменить Теги",
   "StyledInputTags.Placeholder": "Создать Новый Тег",
   "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}",
-  "SubmitApplication.SUCCESS": "{collectiveName}'s application to be hosted by {hostName} has been sent",
+  "SubmitApplication.SUCCESS": "{collectiveName}'s application to be hosted by {hostName} has been {type, select, APPROVED {approved} other {sent}}",
   "subscription.createSuccessActivate": "Повторяющийся вклад <strong>активирован</strong>! Вуухуу! 🎉",
   "subscription.createSuccessCancel": "Ваш периодический вклад был <strong>отменен</strong>.",
   "subscription.createSuccessUpdated": "Ваш периодический вклад был <strong>обновлен</strong>.",

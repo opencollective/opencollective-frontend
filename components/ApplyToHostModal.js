@@ -30,7 +30,8 @@ import { TOAST_TYPE, useToasts } from './ToastProvider';
 const messages = defineMessages({
   SUCCESS: {
     id: 'SubmitApplication.SUCCESS',
-    defaultMessage: "{collectiveName}'s application to be hosted by {hostName} has been sent",
+    defaultMessage:
+      "{collectiveName}'s application to be hosted by {hostName} has been {type, select, APPROVED {approved} other {sent}}",
   },
 });
 
@@ -68,7 +69,7 @@ const applyToHostWithAccountsQuery = gqlV2/* GraphQL */ `
     }
     loggedInAccount {
       id
-      memberOf(role: ADMIN, accountType: COLLECTIVE, isApproved: false, isArchived: false) {
+      memberOf(role: ADMIN, accountType: [COLLECTIVE, FUND], isApproved: false, isArchived: false) {
         nodes {
           id
           account {
@@ -96,10 +97,12 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
     applyToHost(collective: $collective, host: $host, message: $message) {
       id
       slug
-      isActive
-      isApproved
-      host {
-        ...ApplyToHostFields
+      ... on AccountWithHost {
+        isActive
+        isApproved
+        host {
+          ...ApplyToHostFields
+        }
       }
     }
   }
@@ -208,6 +211,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                   message: values.message,
                 },
               });
+
               if (onSuccess) {
                 await onSuccess(result);
               } else {
@@ -216,6 +220,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                   message: intl.formatMessage(messages.SUCCESS, {
                     hostName: host.name,
                     collectiveName: values.collective.name,
+                    type: result.data.applyToHost.isApproved ? 'APPROVED' : 'SENT',
                   }),
                 });
                 onClose();

@@ -447,9 +447,11 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
     applyToHost(collective: $collective, host: $host) {
       id
       slug
-      host {
-        id
-        slug
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
       }
     }
   }
