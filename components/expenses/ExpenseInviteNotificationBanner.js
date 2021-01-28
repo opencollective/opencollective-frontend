@@ -113,7 +113,7 @@ const ExpenseInviteNotificationBanner = props => {
             {props.createdUser ? (
               <FormattedMessage
                 id="VerifyEmailInstructions"
-                defaultMessage="An email has been sent to {email} to verify your account. Please click the link in the email to complete submitting this expense. If you have not received the email after a few minutes, please check your spam."
+                defaultMessage="A verification email has been sent to {email}. Click the link to complete submitting this expense. If you have not received the email, please check your spam."
                 values={{
                   email: props.createdUser?.email || props.expense.draft?.payee?.name,
                 }}
@@ -121,7 +121,7 @@ const ExpenseInviteNotificationBanner = props => {
             ) : (
               <FormattedMessage
                 id="Expense.InviteIsOnItsWay.Description"
-                defaultMessage="An email has been sent to {email} with an invitation to submit this expense. Once they confirm and finish the process, it will appear on the expenses list."
+                defaultMessage="An invitation to submit this expense has been sent to {email}. Once they confirm and finish the process, it will appear on the expenses list."
                 values={{
                   email: props.expense.draft?.payee?.email || props.expense.draft?.payee?.name,
                 }}

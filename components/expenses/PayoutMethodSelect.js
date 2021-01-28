@@ -261,7 +261,7 @@ class PayoutMethodSelect extends React.Component {
             header={
               <FormattedMessage
                 id="PayoutMethod.RemoveWarning"
-                defaultMessage="Do you want to remove this payout method?"
+                defaultMessage="Remove this payout method?"
               />
             }
           >

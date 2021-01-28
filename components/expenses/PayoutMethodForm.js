@@ -89,7 +89,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
               disabled={!isNew}
               required
             >
-              {inputProps => <StyledInput placeholder="i.e. yourname@yourhost.com" {...inputProps} {...field} />}
+              {inputProps => <StyledInput placeholder="e.g. yourname@yourhost.com" {...inputProps} {...field} />}
             </StyledInputField>
           )}
         </Field>

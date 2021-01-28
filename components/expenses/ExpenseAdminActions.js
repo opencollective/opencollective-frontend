@@ -92,7 +92,7 @@ const ExpenseAdminActions = ({
             icon={<IconLink size="50%" />}
             label={
               <span>
-                <FormattedMessage id="Transactions.Modal.ExpenseLink" defaultMessage="Go to expense page" /> →
+                <FormattedMessage id="Transactions.Modal.ExpenseLink" defaultMessage="Go to expense" /> →
               </span>
             }
             {...buttonProps}
@@ -131,7 +131,7 @@ const ExpenseAdminActions = ({
             disabled={isDisabled}
             onClick={() => showDeleteConfirm(true)}
             icon={<IconTrash size="50%" />}
-            label={<FormattedMessage id="Expense.delete" defaultMessage="Delete expense" />}
+            label={<FormattedMessage id="Expense.delete" defaultMessage="Delete" />}
             {...buttonProps}
           />
           {hasDeleteConfirm && (
@@ -142,7 +142,7 @@ const ExpenseAdminActions = ({
                   show
                   type="delete"
                   onClose={() => showDeleteConfirm(false)}
-                  header={<FormattedMessage id="deleteExpense.modal.header" defaultMessage="Delete Expense" />}
+                  header={<FormattedMessage id="deleteExpense.modal.header" defaultMessage="Delete" />}
                   continueHandler={async () => {
                     await deleteExpense({ variables: { id: expense.id } });
                     if (onDelete) {
@@ -153,7 +153,7 @@ const ExpenseAdminActions = ({
                 >
                   <FormattedMessage
                     id="Expense.DeleteDetails"
-                    defaultMessage="This will permanently delete this expense and all attached comments."
+                    defaultMessage="This will permanently delete the expense and all attachments and comments."
                   />
                 </ConfirmationModal>
               )}
