@@ -52,7 +52,7 @@ const ConfirmationModal = ({
   const { formatMessage } = useIntl();
 
   return (
-    <Modal width="570px" show={show} onClose={onClose} {...props}>
+    <Modal role="alertdialog" width="570px" show={show} onClose={onClose} trapFocus {...props}>
       <ModalHeader onClose={onClose}>{header}</ModalHeader>
       <ModalBody pt={2}>{children || <P>{body}</P>}</ModalBody>
       <ModalFooter>
@@ -60,6 +60,7 @@ const ConfirmationModal = ({
           <StyledButton
             mx={20}
             my={1}
+            autoFocus
             minWidth={140}
             onClick={cancelHandler || onClose}
             disabled={submitting}

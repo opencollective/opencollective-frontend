@@ -10,18 +10,62 @@ import withViewport, { VIEWPORTS } from '../lib/withViewport';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import StyledSpinner from './StyledSpinner';
-import { P, Span } from './Text';
+import { P } from './Text';
 
+const Circle = styled.svg`
+  circle {
+    fill: ${themeGet('colors.white.full')};
+    stroke: #c4c7cc;
+    stroke-width: 1px;
+
+    ${props =>
+      !props.disabled &&
+      css`
+        stroke: ${themeGet('colors.primary.600')};
+      `}
+
+    ${props =>
+      !props.disabled &&
+      css`
+        cursor: pointer;
+        stroke-width: 2px;
+        &:hover {
+          fill: ${themeGet('colors.black.100')};
+        }
+      `}
+
+  ${props =>
+      props.checked &&
+      (props.disabled
+        ? css`
+            fill: ${themeGet('colors.black.500')};
+          `
+        : css`
+        fill: ${themeGet('colors.primary.600')};
+        &:hover {
+          fill: ${themeGet('colors.primary.400')};
+        })
+  `)}
+  }
+
+  text {
+    font-size: 14px;
+    ${props =>
+      !props.disabled &&
+      css`
+        fill: ${themeGet('colors.primary.600')};
+      `}
+  }
+`;
 const Bubble = styled(Flex)`
   justify-content: center;
   align-items: center;
-  flex: 0 0 32px;
-  height: 32px;
-  width: 32px;
+  flex: 0 0 34px;
+  height: 34px;
+  width: 34px;
   border-radius: 16px;
   cursor: default;
-  color: #9d9fa3;
-  border: 1px solid #9d9fa3;
+  color: #c4c7cc;
   background: ${themeGet('colors.white.full')};
   transition: box-shadow 0.3s, background 0.3s;
   z-index: 2;
@@ -30,7 +74,6 @@ const Bubble = styled(Flex)`
     !props.disabled &&
     css`
       color: ${themeGet('colors.primary.600')};
-      border: 2px solid ${themeGet('colors.primary.600')};
     `}
 
   ${props =>
@@ -202,7 +245,7 @@ const PieHalfCircleRight = styled(PieHalfCircle)`
         `}
 `;
 
-const getBubbleContent = (idx, checked, loading) => {
+const getBubbleContent = (idx, checked, disabled, focused, loading) => {
   if (loading) {
     return <StyledSpinner color={checked ? '#FFFFFF' : 'primary.700'} size={14} />;
   } else if (checked) {
@@ -210,9 +253,12 @@ const getBubbleContent = (idx, checked, loading) => {
   }
 
   return (
-    <Span fontWeight={400} fontSize="14px" lineHeight="20px">
-      {idx + 1}
-    </Span>
+    <Circle disabled={disabled} checked={checked} focus={focused}>
+      <circle cx="50%" cy="50%" r="16px"></circle>
+      <text x="50%" y="51%" dominantBaseline="middle" textAnchor="middle">
+        {idx + 1}
+      </text>
+    </Circle>
   );
 };
 
@@ -307,7 +353,7 @@ const StepsProgress = ({
                     checked={checked}
                     focus={focused}
                   >
-                    {getBubbleContent(idx, checked, loading)}
+                    {getBubbleContent(idx, checked, disabled, focused, loading)}
                   </Bubble>
                   <SeparatorLine active={checked} transparent={idx === steps.length - 1} />
                 </Flex>

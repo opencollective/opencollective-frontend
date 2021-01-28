@@ -494,9 +494,6 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.HOST_METRICS:
         return <HostMetrics collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS:
-        return <Policies collective={collective} showOnlyExpensePolicy />;
-
       case EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS:
         return <InvoicesReceipts collective={collective} />;
 
@@ -809,11 +806,6 @@ class EditCollectiveForm extends React.Component {
             {section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && (
               <SettingsTitle>
                 <FormattedMessage id="editCollective.fiscalHosting" defaultMessage={'Fiscal Hosting'} />
-              </SettingsTitle>
-            )}
-            {section === EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS && (
-              <SettingsTitle>
-                <FormattedMessage id="editCollective.expensesPayouts" defaultMessage={'Expenses & Payouts'} />
               </SettingsTitle>
             )}
             {fields && fields.length > 0 && (

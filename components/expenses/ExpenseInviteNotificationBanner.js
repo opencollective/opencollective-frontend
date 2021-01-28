@@ -98,7 +98,7 @@ ResendSignInEmailButton.propTypes = {
 
 const ExpenseInviteNotificationBanner = props => {
   return (
-    <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'}>
+    <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'} data-cy="expense-draft-banner">
       <Flex>
         <PidgeonIllustration />
         <Flex ml={[0, 2]} maxWidth="448px" flexDirection="column">

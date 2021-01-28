@@ -266,7 +266,7 @@ export { SearchPage as MockSearchPage };
 
 export const searchPageQuery = gql`
   query SearchPage($term: String!, $types: [TypeOfCollective], $isHost: Boolean, $limit: Int, $offset: Int) {
-    search(term: $term, types: $types, isHost: $isHost, limit: $limit, offset: $offset, onlyActive: true) {
+    search(term: $term, types: $types, isHost: $isHost, limit: $limit, offset: $offset, skipRecentAccounts: true) {
       collectives {
         id
         isActive

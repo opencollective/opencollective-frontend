@@ -288,6 +288,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
     slug
     name
     settings
+    contributionPolicy
     location {
       country
     }

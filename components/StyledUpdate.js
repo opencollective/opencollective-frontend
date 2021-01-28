@@ -180,7 +180,7 @@ class StyledUpdate extends Component {
             />
           </Box>
         )}
-        <StyledTag fontSize="10px" py={1}>
+        <StyledTag textTransform="uppercase" fontSize="10px" py={1}>
           <FormattedMessage id="Member.Role.ADMIN" defaultMessage="Admin" />
         </StyledTag>
         {editable && (
@@ -247,7 +247,7 @@ class StyledUpdate extends Component {
     const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
 
     return (
-      <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]}>
+      <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]} maxWidth={750}>
         <StyledHr mt={3} mb={4} borderColor="black.100" />
         {update.html ? (
           <div dangerouslySetInnerHTML={{ __html: update.html }} />
@@ -271,7 +271,7 @@ class StyledUpdate extends Component {
     const { collective, update } = this.props;
 
     return (
-      <Container display="flex" flexDirection="column" flex="1 1" maxWidth="1200px" flexWrap="wrap">
+      <Container display="flex" flexDirection="column" flex="1 1" maxWidth={750} flexWrap="wrap">
         {this.renderUpdateMeta(update, true)}
         <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
       </Container>

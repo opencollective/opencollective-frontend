@@ -17,6 +17,8 @@ const HTMLEditorContainer = styled.div`
     border: 1px solid #dcdee0;
     border-radius: 4px;
     overflow: hidden;
+    font-size: 14px;
+    letter-spacing: 0.4px;
   }
   .ql-editor {
     min-height: 20rem;

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
 import themeGet from '@styled-system/theme-get';
+import FocusTrap from 'focus-trap-react';
 import { createPortal } from 'react-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { background, margin, overflow, space } from 'styled-system';
@@ -174,7 +175,9 @@ ModalFooter.defaultProps = {
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
  */
-const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
+const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }) => {
+  const TrapContainer = trapFocus ? FocusTrap : React.Fragment;
+
   // Closes the modal upon the `ESC` key press.
   useKeyBoardShortcut({ callback: () => onClose(), keyMatch: ESCAPE_KEY });
 
@@ -183,14 +186,16 @@ const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
       <React.Fragment>
         <GlobalModalStyle />
         <Wrapper>
-          <Modal {...props}>
-            {React.Children.map(children, child => {
-              if (child.type.displayName === 'Header') {
-                return React.cloneElement(child, { onClose });
-              }
-              return child;
-            })}
-          </Modal>
+          <TrapContainer focusTrapOptions={{ clickOutsideDeactivates: true }}>
+            <Modal {...props}>
+              {React.Children.map(children, child => {
+                if (child.type.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose });
+                }
+                return child;
+              })}
+            </Modal>
+          </TrapContainer>
         </Wrapper>
       </React.Fragment>
     );
@@ -200,14 +205,16 @@ const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
       <React.Fragment>
         <GlobalModalStyle />
         <Wrapper>
-          <Modal {...props}>
-            {React.Children.map(children, child => {
-              if (child.type?.displayName === 'Header') {
-                return React.cloneElement(child, { onClose });
-              }
-              return child;
-            })}
-          </Modal>
+          <TrapContainer focusTrapOptions={{ clickOutsideDeactivates: true }}>
+            <Modal {...props}>
+              {React.Children.map(children, child => {
+                if (child.type?.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose });
+                }
+                return child;
+              })}
+            </Modal>
+          </TrapContainer>
           <ModalOverlay onClick={onClose} />
         </Wrapper>
       </React.Fragment>,
@@ -237,6 +244,8 @@ StyledModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   /** wether to render the modal at the root with a potal */
   usePortal: PropTypes.bool,
+  /** set this to true if the modal contains a form or buttons */
+  trapFocus: PropTypes.bool,
   /** children */
   children: PropTypes.node,
 };

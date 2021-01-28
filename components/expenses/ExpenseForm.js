@@ -582,6 +582,7 @@ const ExpenseForm = ({
   const initialValues = { ...getDefaultExpense(collective), ...expense };
   if (isDraft) {
     initialValues.items = expense.draft.items;
+    initialValues.attachedFiles = expense.draft.attachedFiles;
   }
 
   return (

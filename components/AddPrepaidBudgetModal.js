@@ -39,7 +39,7 @@ const AddPrepaidBudgetModal = ({ LoggedInUser, show, setShow, collective, host }
   }
 
   return (
-    <StyledModal show={show} onClose={close}>
+    <StyledModal show={show} onClose={close} trapFocus>
       <ModalBody>
         <Flex flexDirection="column">
           <Box>

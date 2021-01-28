@@ -39,7 +39,6 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   FISCAL_HOSTING: 'fiscal-hosting',
   HOST_PLAN: 'host-plan',
   HOST_METRICS: 'host-metrics',
-  EXPENSES_PAYOUTS: 'expenses-payouts',
   INVOICES_RECEIPTS: 'invoices-receipts',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
@@ -78,10 +77,6 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.POLICIES]: {
     id: 'editCollective.menu.policies',
     defaultMessage: 'Policies',
-  },
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: {
-    id: 'editCollective.expensesPayouts',
-    defaultMessage: 'Expenses & Payouts',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',
@@ -207,7 +202,6 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_METRICS]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: () => false,
@@ -268,7 +262,7 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
           {[USER, ORGANIZATION].includes(collective.type) &&
             renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_METRICS))}
           {[USER, ORGANIZATION].includes(collective.type) &&
-            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS))}
+            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.POLICIES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
