@@ -1808,7 +1808,7 @@
   "unsubscribe.unsubscribing": "Відписка вашої адреси електронної пошти...",
   "Unverified": "Unverified",
   "update.createdAtBy": "Created on {date} (draft) by {author}",
-  "update.delete": "видалити",
+  "update.delete": "Delete",
   "update.makePublicOn.label": "Automatically make public on this date",
   "update.new.preview": "Попередній перегляд оновлення",
   "update.notify.everyone": "Сповістити всіх",

@@ -42,13 +42,6 @@ const UpdateWrapper = styled(Flex)`
   }
 `;
 
-const ActionButton = styled.button`
-  color: #71757a;
-  outline: none;
-  border: none;
-  background: none;
-`;
-
 const PrivateUpdateMesgBox = styled(MessageBox)`
   height: 40px;
   background: #f0f8ff;
@@ -185,15 +178,15 @@ class StyledUpdate extends Component {
         </StyledTag>
         {editable && (
           <React.Fragment>
-            <Box mr={2} fontSize="12px">
-              <ActionButton onClick={this.toggleEdit} data-cy="toggleEditUpdate">
+            <Box ml={2} mr={2} fontSize="12px">
+              <StyledButton buttonSize="tiny" onClick={this.toggleEdit} data-cy="toggleEditUpdate">
                 {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
-              </ActionButton>
+              </StyledButton>
             </Box>
             <Box mr={2} fontSize="12px">
-              <ActionButton onClick={this.deleteUpdate}>
-                <FormattedMessage id="update.delete" defaultMessage="delete" />
-              </ActionButton>
+              <StyledButton buttonSize="tiny" onClick={this.deleteUpdate}>
+                <FormattedMessage id="update.delete" defaultMessage="Delete" />
+              </StyledButton>
             </Box>
           </React.Fragment>
         )}

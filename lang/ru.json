@@ -1808,7 +1808,7 @@
   "unsubscribe.unsubscribing": "Unsubscribing your email...",
   "Unverified": "Unverified",
   "update.createdAtBy": "Создано {date} (черновик) пользователем {author}",
-  "update.delete": "удалить",
+  "update.delete": "Delete",
   "update.makePublicOn.label": "Automatically make public on this date",
   "update.new.preview": "Preview Update",
   "update.notify.everyone": "Notify everyone",
