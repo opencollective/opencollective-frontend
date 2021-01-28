@@ -5,6 +5,17 @@ import { FormattedMessage } from 'react-intl';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import { Span } from './Text';
 
+/** If using I18nAddressFields component, address will be stringified JSON */
+const isAddressJson = address => {
+  let addressObject;
+  try {
+    addressObject = JSON.parse(address);
+  } catch (e) {
+    return false;
+  }
+  return addressObject;
+};
+
 /**
  * Displays a location object
  */
@@ -25,9 +36,22 @@ const LocationAddress = ({ location, isLoading, showMessageIfEmpty }) => {
     );
   }
 
+  const addressJSON = isAddressJson(location.address);
+
   return (
     <React.Fragment>
-      {location.address}
+      {addressJSON ? (
+        <React.Fragment>
+          {Object.entries(addressJSON).map(([addressLineKey, addressLineValue], idx) => (
+            <React.Fragment key={addressLineKey}>
+              {idx !== 0 && <br />}
+              {addressLineValue}
+            </React.Fragment>
+          ))}
+        </React.Fragment>
+      ) : (
+        <React.Fragment>{location.address}</React.Fragment>
+      )}
       {location.address && location.country && <br />}
       {location.country}
     </React.Fragment>

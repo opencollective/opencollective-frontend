@@ -310,6 +310,9 @@ const ExpenseFormBody = ({
                 loggedInAccount={loggedInAccount}
                 onNext={() => {
                   const validation = validatePayoutMethod(values.payoutMethod);
+                  if (typeof values.payeeLocation.address === 'object') {
+                    values.payeeLocation.address = JSON.stringify(values.payeeLocation.address);
+                  }
                   if (isEmpty(validation)) {
                     setStep(STEPS.EXPENSE);
                   } else {

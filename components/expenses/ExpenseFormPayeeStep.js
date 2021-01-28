@@ -18,6 +18,7 @@ import CollectivePicker, {
 } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
+import I18nAddressFields from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -237,7 +238,9 @@ const ExpenseFormPayeeStep = ({
                       <InputTypeCountry
                         data-cy="payee-country"
                         inputId={id}
-                        onChange={value => formik.setFieldValue(field.name, value)}
+                        onChange={value => {
+                          formik.setFieldValue(field.name, value);
+                        }}
                         value={field.value}
                         error={error}
                       />
@@ -245,28 +248,41 @@ const ExpenseFormPayeeStep = ({
                   </StyledInputField>
                 )}
               </FastField>
-              <FastField name="payeeLocation.address">
+              <Field name="payeeLocation.address">
                 {({ field }) => (
-                  <StyledInputField
-                    name={field.name}
-                    label={formatMessage(msg.address)}
-                    labelFontSize="13px"
-                    error={formatFormErrorMessage(intl, errors.payeeLocation?.address)}
-                    required
-                    mt={3}
-                  >
-                    {inputProps => (
-                      <StyledTextarea
-                        {...inputProps}
-                        {...field}
-                        minHeight={100}
-                        data-cy="payee-address"
-                        placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
-                      />
-                    )}
-                  </StyledInputField>
+                  <I18nAddressFields
+                    selectedCountry={values.payeeLocation?.country}
+                    value={field.value}
+                    onChange={({ name, value }) => {
+                      // If name === field.name we are using fallback textarea,
+                      // so we set payeeLocation.address directly
+                      if (name === field.name) {
+                        formik.setFieldValue(field.name, value);
+                      }
+                      // Otherwise we are setting multiple address fields.
+                      // However, if payeeLocation.address is a string coming
+                      // from the old single address field, we don't want to
+                      // use the spread iterator.
+                      else {
+                        formik.setFieldValue(
+                          'payeeLocation.address',
+                          typeof formik.values.payeeLocation.address === 'object'
+                            ? {
+                                ...formik.values.payeeLocation.address,
+                                [name]: value,
+                              }
+                            : { [name]: value },
+                        );
+                      }
+                    }}
+                    onCountryChange={addressObject => {
+                      if (addressObject) {
+                        formik.setFieldValue('payeeLocation.address', addressObject);
+                      }
+                    }}
+                  />
                 )}
-              </FastField>
+              </Field>
               <FastField name="invoiceInfo">
                 {({ field }) => (
                   <StyledInputField

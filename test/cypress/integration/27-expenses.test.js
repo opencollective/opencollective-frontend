@@ -178,12 +178,38 @@ describe('New expense flow', () => {
 
     // This can happen if you start with an invoice then switch to receipts
     it('should prevent submitting receipts if missing items', () => {
+      cy.server();
+      cy.route({
+        method: 'POST',
+        url: 'https://country-service.shopifycloud.com/graphql',
+        response: {
+          country: {
+            name: 'Angola',
+            labels: {
+              address1: 'Address',
+              address2: 'Apartment, suite, etc.',
+              city: 'City',
+              postalCode: 'Postal code',
+              zone: 'Region',
+            },
+            optionalLabels: {
+              address2: 'Apartment, suite, etc. (optional)',
+            },
+            formatting: {
+              edit: '{firstName}{lastName}_{company}_{address1}_{address2}_{city}_{country}_{phone}',
+              show: '{firstName} {lastName}_{company}_{address1}_{address2}_{city}_{country}_{phone}',
+            },
+            zones: [],
+          },
+        },
+      });
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.getByDataCy('payee-country').click();
       cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
-      cy.get('textarea[data-cy="payee-address"]').type('Street Name, 123');
+      cy.get('input[data-cy="payee-address-address1"]').type('Street Name, 123');
+      cy.get('input[data-cy="payee-address-city"]').type('Citycitycity');
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
       cy.getByDataCy('expense-next').click();
       // Fill the form with valid data
