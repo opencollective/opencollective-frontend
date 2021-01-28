@@ -1648,7 +1648,7 @@
   "StyledInputTags.EditLabel": "Edit Tags",
   "StyledInputTags.Placeholder": "Create New Tag",
   "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}",
-  "SubmitApplication.SUCCESS": "{collectiveName}'s application to be hosted by {hostName} has been sent",
+  "SubmitApplication.SUCCESS": "{collectiveName}'s application to be hosted by {hostName} has been {type, select, APPROVED {approved} other {sent}}",
   "subscription.createSuccessActivate": "Recurring contribution <strong>activated</strong>! Woohoo! 🎉",
   "subscription.createSuccessCancel": "Your recurring contribution has been <strong>cancelled</strong>.",
   "subscription.createSuccessUpdated": "Your recurring contribution has been <strong>updated</strong>.",

@@ -1648,7 +1648,7 @@
   "StyledInputTags.EditLabel": "Modifier les Tags",
   "StyledInputTags.Placeholder": "Créer un Tag",
   "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributeur} other {{prettyCount} contributeurs}}",
-  "SubmitApplication.SUCCESS": "La candidature de {collectiveName} pour être hébergé par {hostName} a été envoyée",
+  "SubmitApplication.SUCCESS": "{collectiveName}'s application to be hosted by {hostName} has been {type, select, APPROVED {approved} other {sent}}",
   "subscription.createSuccessActivate": "La contribution récurrente <strong>a été activée</strong>! Woohoo! 🎉",
   "subscription.createSuccessCancel": "Votre contribution récurrente a été <strong>annulée</strong>.",
   "subscription.createSuccessUpdated": "Votre contribution récurrente a été <strong>mise à jour</strong>.",

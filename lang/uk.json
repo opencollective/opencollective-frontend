@@ -1648,7 +1648,7 @@
   "StyledInputTags.EditLabel": "Змінити мітки",
   "StyledInputTags.Placeholder": "Створити нову мітку",
   "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}",
-  "SubmitApplication.SUCCESS": "{collectiveName}'s application to be hosted by {hostName} has been sent",
+  "SubmitApplication.SUCCESS": "{collectiveName}'s application to be hosted by {hostName} has been {type, select, APPROVED {approved} other {sent}}",
   "subscription.createSuccessActivate": "Recurring contribution <strong>activated</strong>! Woohoo! 🎉",
   "subscription.createSuccessCancel": "Ваш повторюваний внесок <strong>скасовано</strong>.",
   "subscription.createSuccessUpdated": "Your recurring contribution has been <strong>updated</strong>.",
