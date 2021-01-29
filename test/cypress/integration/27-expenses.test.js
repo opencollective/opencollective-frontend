@@ -278,7 +278,6 @@ describe('New expense flow', () => {
     beforeEach(() => {
       cy.createExpense({
         userEmail: user.email,
-        user: { paypalEmail: 'paypal@test.com', id: user.id },
         collective: { id: collective.id },
       }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.id}`));
     });
