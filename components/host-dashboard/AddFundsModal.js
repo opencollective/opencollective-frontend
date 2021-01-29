@@ -111,8 +111,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
   const canAddHostFee = host.plan.hostFees && collective.id !== host.id;
-
   const defaultHostFeePercent = canAddHostFee ? collective.hostFeePercent : 0;
+
+  const canAddPlatformFee = LoggedInUser.isRoot();
+  const defaultPlatformFeePercent = 0;
 
   if (!LoggedInUser) {
     return null;
@@ -137,7 +139,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       >
         {({ values, isSubmitting, isValid, dirty }) => {
           const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
-          const platformFeePercent = isNaN(values.platformFeePercent) ? 0 : values.platformFeePercent;
+          const platformFeePercent = isNaN(values.platformFeePercent)
+            ? defaultPlatformFeePercent
+            : values.platformFeePercent;
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
           const platformFee = Math.round(values.amount * (platformFeePercent / 100));
 
@@ -161,7 +165,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     {({ form, field }) => (
                       <StyledInputAmount
                         id={field.id}
-                        currency={collective.currency || host.currency}
+                        currency={collective.currency}
                         placeholder="0.00"
                         error={field.error}
                         value={field.value}
@@ -191,7 +195,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     </StyledInputFormikField>
                   )}
                 </Flex>
-                {LoggedInUser.isRoot() && (
+                {canAddPlatformFee && (
                   <StyledInputFormikField
                     name="platformFeePercent"
                     htmlFor="addFunds-platformFeePercent"
@@ -243,35 +247,39 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 <StyledHr my={2} borderColor="black.300" />
                 <AmountDetailsLine
                   value={values.amount || 0}
-                  currency={host.currency}
+                  currency={collective.currency}
                   label={<FormattedMessage id="addfunds.totalAmount" defaultMessage="Funding amount" />}
                 />
-                <AmountDetailsLine
-                  value={hostFee}
-                  currency={host.currency}
-                  label={
-                    <FormattedMessage
-                      id="addfunds.hostFees"
-                      defaultMessage="Host fees ({hostFees})"
-                      values={{ hostFees: `${hostFeePercent}%` }}
-                    />
-                  }
-                />
-                <AmountDetailsLine
-                  value={platformFee}
-                  currency={host.currency}
-                  label={
-                    <FormattedMessage
-                      id="addfunds.platformFees"
-                      defaultMessage="Platform fees ({platformFees})"
-                      values={{ platformFees: `${platformFeePercent}%` }}
-                    />
-                  }
-                />
+                {canAddHostFee && (
+                  <AmountDetailsLine
+                    value={hostFee}
+                    currency={collective.currency}
+                    label={
+                      <FormattedMessage
+                        id="addfunds.hostFees"
+                        defaultMessage="Host fees ({hostFees})"
+                        values={{ hostFees: `${hostFeePercent}%` }}
+                      />
+                    }
+                  />
+                )}
+                {canAddPlatformFee && (
+                  <AmountDetailsLine
+                    value={platformFee}
+                    currency={collective.currency}
+                    label={
+                      <FormattedMessage
+                        id="addfunds.platformFees"
+                        defaultMessage="Platform fees ({platformFees})"
+                        values={{ platformFees: `${platformFeePercent}%` }}
+                      />
+                    }
+                  />
+                )}
                 <StyledHr my={2} borderColor="black.300" />
                 <AmountDetailsLine
                   value={values.amount - hostFee - platformFee}
-                  currency={host.currency}
+                  currency={collective.currency}
                   label={<FormattedMessage id="addfunds.netAmount" defaultMessage="Net amount" />}
                   isLargeAmount
                 />
@@ -312,19 +320,16 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 AddFundsModal.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    legacyId: PropTypes.number,
-    currency: PropTypes.string,
     name: PropTypes.string,
-    hostFeePercent: PropTypes.number,
     plan: PropTypes.shape({
       hostFees: PropTypes.bool,
     }),
   }).isRequired,
   collective: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    legacyId: PropTypes.number,
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
+    platformFeePercent: PropTypes.number,
     slug: PropTypes.string,
   }).isRequired,
   onClose: PropTypes.func,

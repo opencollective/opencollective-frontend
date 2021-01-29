@@ -106,7 +106,7 @@ const BankTransfer = props => {
     useStructuredForm && (existingPayoutMethodMatchesCurrency || isConnectedToStripe) && data.host.currency;
 
   const initialValues = {
-    ...(existingPayoutMethod || { data: { currency: fixedCurrency } }),
+    ...(existingPayoutMethod || { data: { currency: fixedCurrency || data.host.currency } }),
     instructions,
   };
 
@@ -186,6 +186,10 @@ const BankTransfer = props => {
                 value: instructions,
                 account: { slug: props.collectiveSlug },
               },
+              refetchQueries: [
+                { query: hostQuery, context: API_V2_CONTEXT, variables: { slug: props.collectiveSlug } },
+              ],
+              awaitRefetchQueries: true,
             });
             setSubmitting(false);
             setShowForm(false);
