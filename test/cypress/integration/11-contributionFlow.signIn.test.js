@@ -1,7 +1,5 @@
 import { randomEmail } from '../support/faker';
 
-const hasGuestContributions = Cypress.env('ENABLE_GUEST_CONTRIBUTIONS');
-
 describe('Contribution Flow: Sign In', () => {
   const validUserEmail = randomEmail();
 
@@ -13,11 +11,7 @@ describe('Contribution Flow: Sign In', () => {
     cy.visit('/apex/donate');
     cy.get('button[data-cy="cf-next-step"]').click();
 
-    if (hasGuestContributions) {
-      cy.getByDataCy('cf-profile-signin-btn').click();
-    } else {
-      cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
-    }
+    cy.getByDataCy('cf-profile-signin-btn').click();
 
     cy.get('[data-cy="cf-content"] input[name=email]').type('zzzzzzzzzzzzz');
     cy.get('[data-cy="cf-content"] button[type=submit]').should('be.disabled');
@@ -29,11 +23,7 @@ describe('Contribution Flow: Sign In', () => {
     cy.visit('/apex/donate');
     cy.get('button[data-cy="cf-next-step"]').click();
 
-    if (hasGuestContributions) {
-      cy.getByDataCy('cf-profile-signin-btn').click();
-    } else {
-      cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
-    }
+    cy.getByDataCy('cf-profile-signin-btn').click();
 
     cy.get('[data-cy="cf-content"] input[name=email]').type(randomEmail());
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
@@ -44,11 +34,7 @@ describe('Contribution Flow: Sign In', () => {
     cy.visit('/apex/donate');
     cy.get('button[data-cy="cf-next-step"]').click();
 
-    if (hasGuestContributions) {
-      cy.getByDataCy('cf-profile-signin-btn').click();
-    } else {
-      cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
-    }
+    cy.getByDataCy('cf-profile-signin-btn').click();
 
     cy.get('[data-cy="cf-content"] input[name=email]').type(validUserEmail);
     cy.get('[data-cy="cf-content"] button[type=submit]').click();

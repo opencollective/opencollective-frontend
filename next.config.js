@@ -23,7 +23,6 @@ const nextConfig = {
         ONBOARDING_MODAL: true,
         NEW_HOST_APPLICATION_FLOW: null,
         TW_API_COLLECTIVE_SLUG: null,
-        ENABLE_GUEST_CONTRIBUTIONS: false,
         REJECT_CONTRIBUTION: false,
         REJECTED_CATEGORIES: false,
         NEW_COLLECTIVE_NAVBAR: false,

@@ -23,7 +23,6 @@ const defaults = {
   ONBOARDING_MODAL: true,
   NEW_COLLECTIVE_NAVBAR: false,
   NEW_HOST_APPLICATION_FLOW: false,
-  ENABLE_GUEST_CONTRIBUTIONS: false,
   REJECT_CONTRIBUTION: false,
   REJECTED_CATEGORIES: false,
   TW_API_COLLECTIVE_SLUG: 'opencollective-host',
