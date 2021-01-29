@@ -230,6 +230,7 @@
   "collective.created.description": "Pendant que vous attendez l'approbation de votre hôte ({host}), vous pouvez déjà personnaliser votre collectif, ajouter des dépenses et même créer des événements.",
   "Collective.CreateNew": "Créer un Collectif",
   "collective.currency.placeholder": "Sélectionner une devise",
+  "collective.currency.warning": "Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if it's an issue.",
   "collective.delete.description": "{type, select, EVENT {Cet Événement} PROJECT {Ce Projet} FUND {Ce Fonds} COLLECTIVE {Ce Collectif} ORGANIZATION {Cette Organisation} other {Ce Compte}} sera supprimé, ainsi que toutes les données attachées.",
   "collective.delete.isHost": "Vous ne pouvez pas supprimer votre {type, select, ORGANIZATION {Organisation si celle-ci} other {compte si celui-ci}} est un hôte, veuillez désactiver le mode hôte auparavant.",
   "collective.delete.isNotDeletable-message": "Les {type, select, EVENT {Événements} PROJECT {Projets} FUND {Fonds} COLLECTIVE {Collectifs} ORGANIZATION {Organisations} other {Comptes}} avec des transactions, commandes, événements ou dépenses payées ne peuvent pas être supprimés. Veuillez l'archiver à la place.",
