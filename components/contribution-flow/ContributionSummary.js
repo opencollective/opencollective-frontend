@@ -47,10 +47,10 @@ const Amount = styled(Span)`
   text-align: right;
 `;
 
-const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment }) => {
+const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment, currency }) => {
   const intl = useIntl();
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
-  const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, collective.currency);
+  const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
   const platformContribution = stepDetails.platformContribution || 0;
 
   return (
@@ -79,7 +79,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
             <Amount>
               <FormattedMoneyAmount
                 amount={stepDetails.amount}
-                currency={collective.currency}
+                currency={currency}
                 amountStyles={{ color: 'black.700', fontWeight: 400 }}
               />
             </Amount>
@@ -90,7 +90,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               <Amount>
                 <FormattedMoneyAmount
                   amount={stepSummary.amount}
-                  currency={collective.currency}
+                  currency={currency}
                   amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 />
               </Amount>
@@ -108,7 +108,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               <Amount>
                 <FormattedMoneyAmount
                   amount={platformContribution}
-                  currency={collective.currency}
+                  currency={currency}
                   amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 />
               </Amount>
@@ -156,7 +156,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                 )}
                 <FormattedMoneyAmount
                   amount={pmFeeInfo.fee}
-                  currency={collective.currency}
+                  currency={currency}
                   amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 />
               </Amount>
@@ -171,7 +171,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700">
-          <FormattedMoneyAmount amount={totalAmount} currency={collective.currency} amountStyles={null} />
+          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && (
@@ -186,7 +186,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           <Amount>
             <FormattedMoneyAmount
               amount={totalAmount - pmFeeInfo.fee - platformContribution}
-              currency={collective.currency}
+              currency={currency}
               amountStyles={null}
             />
           </Amount>
@@ -221,6 +221,7 @@ ContributionSummary.propTypes = {
   stepDetails: PropTypes.object,
   stepSummary: PropTypes.object,
   stepPayment: PropTypes.object,
+  currency: PropTypes.string,
 };
 
 export default ContributionSummary;
