@@ -213,7 +213,7 @@ const CreateProfile = ({
                   {...inputProps}
                   {...getFieldProps(inputProps.name)}
                   type="email"
-                  placeholder="i.e. yourname@yourhost.com"
+                  placeholder="e.g. yourname@yourhost.com"
                   value={email}
                   onKeyDown={e => {
                     // See https://github.com/facebook/react/issues/6368
@@ -398,7 +398,7 @@ const CreateProfile = ({
 };
 
 CreateProfile.propTypes = {
-  /** a map of errors to the matching field name, i.e. `{ email: 'Invalid email' }` will display that message until the email field */
+  /** a map of errors to the matching field name, e.g. `{ email: 'Invalid email' }` will display that message until the email field */
   errors: PropTypes.objectOf(PropTypes.string),
   /** handles submissions of personal profile form */
   onPersonalSubmit: PropTypes.func.isRequired,

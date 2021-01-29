@@ -65,7 +65,7 @@ const AboutOurFees = () => (
           <P textAlign="center" color="black.600" fontSize="13px" lineHeight="16px">
             <FormattedMessage
               id="OCFHostApplication.crowdFunding.description"
-              defaultMessage="On each incoming donation made via the Open Collective Platform"
+              defaultMessage="On each incoming contribution made via the Open Collective Platform"
             />
           </P>
         </Box>

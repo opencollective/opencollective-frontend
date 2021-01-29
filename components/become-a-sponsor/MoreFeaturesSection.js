@@ -93,7 +93,7 @@ const MoreFeatures = () => (
                 knowMore: (
                   <Link route="https://backyourstack.com">
                     <Span color="rgb(220, 95, 125)">
-                      Know more <ArrowRight2 size="18" />
+                      Learn more <ArrowRight2 size="18" />
                     </Span>
                   </Link>
                 ),

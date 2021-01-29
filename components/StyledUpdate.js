@@ -233,7 +233,7 @@ class StyledUpdate extends Component {
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
               id="update.private.cannot_view_message"
-              defaultMessage="Become a backer of {collective} to see this update"
+              defaultMessage="Contribute to {collective} to see this Update"
               values={{ collective: collective.name }}
             />
           </PrivateUpdateMesgBox>
@@ -255,7 +255,7 @@ class StyledUpdate extends Component {
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
               id="update.private.cannot_view_message"
-              defaultMessage="Become a backer of {collective} to see this update"
+              defaultMessage="Contribute to {collective} to see this Update"
               values={{ collective: collective.name }}
             />
           </PrivateUpdateMesgBox>

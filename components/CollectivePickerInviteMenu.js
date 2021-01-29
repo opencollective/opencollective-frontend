@@ -73,7 +73,7 @@ export const InviteCollectiveForm = ({ onCancel, onSave }) => {
             <StyledInput
               {...props}
               type="text"
-              placeholder="i.e. Jane Doe"
+              placeholder="e.g. Jane Doe"
               value={value.name}
               onChange={setValueProp('name')}
               mb="20px"
@@ -91,7 +91,7 @@ export const InviteCollectiveForm = ({ onCancel, onSave }) => {
             <StyledInput
               {...props}
               type="email"
-              placeholder="i.e. jane@opencollective.com"
+              placeholder="e.g. jane@opencollective.com"
               value={value.email}
               onChange={setValueProp('email')}
               mb="18px"

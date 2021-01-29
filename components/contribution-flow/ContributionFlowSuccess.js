@@ -87,7 +87,7 @@ const SuccessIllustration = styled.img.attrs({ src: successIllustrationUrl })`
 const successMsgs = defineMessages({
   default: {
     id: 'order.created.tweet',
-    defaultMessage: "I've just donated to {collective}. Consider contributing — every little helps!",
+    defaultMessage: "I've just contributed to {collective}. Consider supporting them too — every little helps!",
   },
   event: {
     id: 'order.created.tweet.event',

@@ -30,7 +30,7 @@ import { TOAST_TYPE, useToasts } from './ToastProvider';
 const messages = defineMessages({
   SUCCESS: {
     id: 'SubmitApplication.SUCCESS',
-    defaultMessage: "{collectiveName}'s application to be hosted by {hostName} has been sent",
+    defaultMessage: "{collectiveName}'s' application to {hostName} has been submitted.",
   },
 });
 

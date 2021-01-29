@@ -31,7 +31,7 @@ const StepProfileInfoMessage = ({ amount, interval }) => {
       return (
         <FormattedMessage
           id="ContributionFlow.highContributionInfoMessage"
-          defaultMessage="While we'll email you a receipt, we are still required to collect a phyisical address for donations over $5000 USD."
+          defaultMessage="While we'll email you a receipt, we are still required to collect a phyisical address for contributions over $5,000 USD."
         />
       );
     }
