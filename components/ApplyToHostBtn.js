@@ -78,7 +78,7 @@ class ApplyToHostBtn extends React.Component {
             content={
               <FormattedMessage
                 id="host.hostLimit.warning"
-                defaultMessage="Host already reached the limit of hosted collectives for its plan. <a>Contact {collectiveName}</a> and let them know you want to apply."
+                defaultMessage="This Fiscal Host has reached its Collective limit. <a>Contact {collectiveName}</a> to request they upgrade, and let them know you want to apply."
                 values={{
                   collectiveName: hostSlug,
                   a: getI18nLink({ as: Link, route: 'collective-contact', params: { collectiveSlug: hostSlug } }),

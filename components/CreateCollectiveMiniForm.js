@@ -29,11 +29,11 @@ const CreateNewMessages = defineMessages({
   },
   [CollectiveType.USER]: {
     id: 'User.InviteNew',
-    defaultMessage: 'Invite new user',
+    defaultMessage: 'Invite new User',
   },
   [CollectiveType.EVENT]: {
     id: 'Event.CreateNew',
-    defaultMessage: 'Create new event',
+    defaultMessage: 'Create new Event',
   },
   [CollectiveType.ORGANIZATION]: {
     id: 'Organization.CreateNew',

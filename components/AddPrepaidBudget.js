@@ -70,7 +70,7 @@ class AddFundsForm extends React.Component {
     this.messages = defineMessages({
       'api.error.unreachable': {
         id: 'api.error.unreachable',
-        defaultMessage: "Can't reach the API. Please try again in a few.",
+        defaultMessage: "Can't reach the API. Please try again in a few minutes.",
       },
       'totalAmount.label': {
         id: 'Fields.amount',
@@ -260,7 +260,7 @@ class AddFundsForm extends React.Component {
                 <tbody>
                   <tr>
                     <td>
-                      <FormattedMessage id="addfunds.totalAmount" defaultMessage="Funding amount" />
+                      <FormattedMessage id="addfunds.totalAmount" defaultMessage="Amount" />
                     </td>
                     <td className="amount">
                       {formatCurrency(this.state.form.totalAmount, this.props.collective.currency, {
@@ -310,7 +310,7 @@ class AddFundsForm extends React.Component {
                   <Container padding="8px 0">
                     <FormattedMessage
                       id="AddFundsForm.PutAside"
-                      defaultMessage="Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees."
+                      defaultMessage="Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fee and {platformFeePercent}% ({platformFeeAmount}) for platform fees."
                       values={{ hostFeePercent, hostFeeAmount, platformFeePercent, platformFeeAmount }}
                     />
                   </Container>
@@ -331,7 +331,7 @@ class AddFundsForm extends React.Component {
                 {!this.props.host && (
                   <FormattedMessage
                     id="addfunds.disclaimerOrganization"
-                    defaultMessage="By clicking below, you agree to create a pre-paid credit card with the amount of {amount} for this organization"
+                    defaultMessage="You agree to set aside {amount} for this Organization's contributions."
                     values={{
                       amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency),
                     }}

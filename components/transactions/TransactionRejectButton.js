@@ -21,7 +21,7 @@ const tooltipContent = () => (
     <P fontSize="12px" lineHeight="18px">
       <FormattedMessage
         id="transaction.reject.info"
-        defaultMessage="Please only use this option if you do not wish for this contributor to be a part of your Collective. This will refund their transaction, remove them from your Collective, and display the contribution as 'rejected' in your ledger."
+        defaultMessage="Only reject if you want to remove the contributor from your Collective. This will refund their transaction, remove them from your Collective, and display the contribution as 'rejected'."
       />
     </P>
   </div>

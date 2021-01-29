@@ -358,7 +358,7 @@ class TopBarProfileMenu extends React.Component {
                 textTransform="uppercase"
                 whiteSpace="nowrap"
               >
-                <FormattedMessage id="collective" defaultMessage="my collectives" />
+                <FormattedMessage id="collective" defaultMessage="My Collectives" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
               <ComponentLink route="/create">
@@ -374,7 +374,7 @@ class TopBarProfileMenu extends React.Component {
               <Box my={2}>
                 <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
                   <em>
-                    <FormattedMessage id="menu.collective.none" defaultMessage="No collectives yet" />
+                    <FormattedMessage id="menu.collective.none" defaultMessage="No Collectives yet" />
                   </em>
                 </P>
               </Box>
@@ -392,7 +392,7 @@ class TopBarProfileMenu extends React.Component {
                     textTransform="uppercase"
                     whiteSpace="nowrap"
                   >
-                    <FormattedMessage id="events" defaultMessage="my events" />
+                    <FormattedMessage id="events" defaultMessage="My Events" />
                   </P>
                   <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
                 </Flex>
@@ -414,7 +414,7 @@ class TopBarProfileMenu extends React.Component {
                     textTransform="uppercase"
                     whiteSpace="nowrap"
                   >
-                    <FormattedMessage id="funds" defaultMessage="my funds" />
+                    <FormattedMessage id="funds" defaultMessage="My Funds" />
                   </P>
                   <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
                   <StyledRoundButton ml={2} size={24} color="#C4C7CC">
@@ -439,7 +439,7 @@ class TopBarProfileMenu extends React.Component {
                 textTransform="uppercase"
                 whiteSpace="nowrap"
               >
-                <FormattedMessage id="organization" defaultMessage="my organizations" />
+                <FormattedMessage id="organization" defaultMessage="My Organizations" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
               <ComponentLink route="/organizations/new">
@@ -455,7 +455,7 @@ class TopBarProfileMenu extends React.Component {
               <Box my={2}>
                 <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
                   <em>
-                    <FormattedMessage id="menu.organizations.none" defaultMessage="No organizations yet" />
+                    <FormattedMessage id="menu.organizations.none" defaultMessage="No Organizations yet" />
                   </em>
                 </P>
               </Box>

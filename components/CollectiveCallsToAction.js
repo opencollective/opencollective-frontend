@@ -42,7 +42,7 @@ const CollectiveCallsToAction = ({
     : true;
 
   let contributeRoute = 'orderCollectiveNew';
-  let contributeRouteParams = { collectiveSlug: collective.slug, verb: 'donate' };
+  let contributeRouteParams = { collectiveSlug: collective.slug, verb: 'Contribute' };
   if (collective.settings?.disableCustomContributions) {
     if (collective.tiers && collective.tiers.length > 0) {
       const tier = collective.tiers[0];

@@ -277,7 +277,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                   <MessageBox type="warning" withIcon>
                     <FormattedMessage
                       id="collectives.create.error.HostNotOpenToApplications"
-                      defaultMessage="This host is not open to applications"
+                      defaultMessage="This Fiscal Host is not open to applications"
                     />
                   </MessageBox>
                 ) : (
@@ -334,7 +334,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                         get(host, 'settings.applyMessage') || (
                           <FormattedMessage
                             id="ApplyToHost.WriteMessage"
-                            defaultMessage="Write a message to fiscal host"
+                            defaultMessage="Message to the Fiscal Host"
                           />
                         )
                       }

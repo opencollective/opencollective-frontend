@@ -20,7 +20,7 @@ export const InviteCollectiveDropdownOption = ({ onClick, isSearching }) => (
           <Span fontSize="12px" fontWeight="700" color="black.800">
             <FormattedMessage
               id="CollectivePicker.InviteMenu.Description"
-              defaultMessage="The person or organization you are looking for is not on Open Collective yet."
+              defaultMessage="Not found. You can invite or create a new profile."
             />
           </Span>
         </Box>
@@ -64,7 +64,7 @@ export const InviteCollectiveForm = ({ onCancel, onSave }) => {
       >
         <StyledInputField
           name="name"
-          label="What's the name of who you want to invite?"
+          label="Name"
           labelFontSize="13px"
           labelColor="black.700"
           labelProps={{ fontWeight: 600 }}
@@ -82,7 +82,7 @@ export const InviteCollectiveForm = ({ onCancel, onSave }) => {
         </StyledInputField>
         <StyledInputField
           name="email"
-          label="What's their email?"
+          label="Email"
           labelFontSize="13px"
           labelColor="black.700"
           labelProps={{ fontWeight: 600 }}

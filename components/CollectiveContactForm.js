@@ -57,7 +57,7 @@ const CollectiveContactForm = ({ collective }) => {
       <P mb={4}>
         <FormattedMessage
           id="CollectiveContactForm.Disclaimer"
-          defaultMessage="Your email address will be shared with the admins, who will receive this message."
+          defaultMessage="Your email address will be shared with the admins who will receive this message."
         />
       </P>
       <StyledInputField label={subjectLabel} htmlFor="subject" mb={4} width="100%">

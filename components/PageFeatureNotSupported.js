@@ -32,7 +32,7 @@ const PageFeatureNotSupported = ({ showContactSupportLink, ...props }) => {
         <P>
           <FormattedMessage
             id="FeatureNotSupported.description"
-            defaultMessage="This feature is not activated for this collective."
+            defaultMessage="This feature has not been activated for this Collective."
           />
           {showContactSupportLink && (
             <React.Fragment>

@@ -69,7 +69,7 @@ class PublishUpdateBtn extends React.Component {
         label: (
           <FormattedMessage
             id="update.notify.hostedCollectiveAdmins"
-            defaultMessage="Notify hosted collective's admins"
+            defaultMessage="Notify Collective admins"
           />
         ),
         value: 'COLLECTIVE_ADMINS',
@@ -86,7 +86,7 @@ class PublishUpdateBtn extends React.Component {
         notice = (
           <FormattedMessage
             id="update.publish.notify.financialContributors"
-            defaultMessage="Your update will be sent to {n} financial contributors"
+            defaultMessage="Your Update will be sent to {n} financial contributors"
             values={{ n: backers }}
           />
         );
@@ -96,7 +96,7 @@ class PublishUpdateBtn extends React.Component {
         notice = (
           <FormattedMessage
             id="update.publish.notify.hostedCollectiveAdmins"
-            defaultMessage="Your update will be sent to the admins of {m} hosted collectives"
+            defaultMessage="Your Update will be sent to the admins of {m} hosted Collectives"
             values={{ m: hostedCollectives }}
           />
         );
@@ -106,7 +106,7 @@ class PublishUpdateBtn extends React.Component {
         notice = (
           <FormattedMessage
             id="update.publish.notify.Everyone"
-            defaultMessage="Your update will be sent to the admins of {m} hosted collectives and to {n} financial contributors"
+            defaultMessage="Your Update will be sent to the admins of {m} hosted Collectives and {n} financial contributors"
             values={{ m: hostedCollectives, n: backers }}
           />
         );

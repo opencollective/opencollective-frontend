@@ -22,7 +22,7 @@ const messages = defineMessages({
   emailDetails: {
     id: 'MemberInvitation.detailsEmail',
     defaultMessage:
-      'If you accept this invitation, your email address will be visible from the other admins of the collective.',
+      'If you accept, your email address will be visible to other admins of this Collective.',
   },
   decline: {
     id: 'Decline',

@@ -90,7 +90,7 @@ class ErrorPage extends React.Component {
           {message}
         </MessageBox>
         <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => Router.back()}>
-          &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to previous page" />
+          &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to the previous page" />
         </StyledButton>
       </Flex>
     );
@@ -102,7 +102,7 @@ class ErrorPage extends React.Component {
         <H1 fontSize={30} textAlign="center">
           <FormattedMessage
             id="page.error.networkError"
-            defaultMessage="The Open Collective Server is momentarily unreachable"
+            defaultMessage="Open Collective is momentarily unreachable"
           />
           &nbsp; 🙀
         </H1>
@@ -110,7 +110,7 @@ class ErrorPage extends React.Component {
           <P textAlign="center">
             <FormattedMessage
               id="page.error.networkError.description"
-              defaultMessage="Worry not! One of our engineers is probably already on it  👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)"
+              defaultMessage="Don't worry! One of our engineers is probably already on it  👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)"
             />
           </P>
         </Flex>
@@ -127,7 +127,7 @@ class ErrorPage extends React.Component {
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={[4, 6]}>
         <H1 fontSize={30} textAlign="center">
-          <FormattedMessage id="error.unexpected" defaultMessage="Ooops, an unexpected error seems to have occurred" />
+          <FormattedMessage id="error.unexpected" defaultMessage="Oops, an unexpected error seems to have occurred" />
           &nbsp; 🤕
         </H1>
         <Flex mt={5} flexWrap="wrap" alignItems="center" justifyContent="center">

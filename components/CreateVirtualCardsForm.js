@@ -39,12 +39,12 @@ const messages = defineMessages({
   },
   limitToHostsPlaceholder: {
     id: 'virtualCards.limitToHosts.placeholder',
-    defaultMessage: 'All hosts',
+    defaultMessage: 'All Hosts',
   },
   limitToCollectivesPlaceholder: {
     id: 'virtualCards.limitToCollectives.placeholder',
     defaultMessage:
-      'All collectives {nbHosts, plural, =0 {} =1 {under the selected host} other {under the selected hosts}}',
+      'All Collectives {nbHosts, plural, =0 {} =1 {under the selected Host} other {under the selected Hosts}}',
   },
   notBatched: {
     id: 'virtualCards.notBatched',
@@ -549,7 +549,7 @@ class CreateVirtualCardsForm extends Component {
                     <Flex flexDirection="column">
                       <FormattedMessage
                         id="virtualCards.create.limitToHosts"
-                        defaultMessage="Limit to the following hosts"
+                        defaultMessage="Limit to the following Hosts"
                       />
                       <FieldLabelDetails>
                         <FormattedMessage id="forms.optional" defaultMessage="Optional" />
@@ -594,7 +594,7 @@ class CreateVirtualCardsForm extends Component {
           <MessageBox type="info" fontSize="13px" withIcon mb={4}>
             <FormattedMessage
               id="VirtualCard.Limitinfo"
-              defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
+              defaultMessage="Your account is currently limited to {limit} gift cards per day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
               values={{
                 SupportLink: I18nSupportLink,
                 limit: get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100,
