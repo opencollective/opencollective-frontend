@@ -175,6 +175,7 @@ const editHostPlanMutation = gqlV2/* GraphQL */ `
       id
       slug
       plan {
+        id
         name
       }
     }

@@ -2,13 +2,12 @@ import React, { Fragment } from 'react';
 import { useMutation } from '@apollo/client';
 import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 import { Email } from '@styled-icons/material/Email';
-import { size } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { getAllGuestTokens } from '../lib/guest-accounts';
+import { getAllGuestEmails } from '../lib/guest-accounts';
 
 import Container from '../components/Container';
 import { Box } from '../components/Grid';
@@ -59,12 +58,11 @@ const JoinAsGuest = () => {
   const theme = useTheme();
   const [status, setStatus] = React.useState(STATUS.SUBMITTING);
   const router = useRouter();
-  const guestTokens = getAllGuestTokens();
+  const guestEmails = getAllGuestEmails();
   const query = router?.query || {};
-  const nbTokens = size(guestTokens);
   const [selectedEmail, setSelectedEmail] = React.useState(null);
   const [callSendGuestConfirmationEmail, { error }] = useMutation(confirmGuestAccountMutation, MUTATION_OPTS);
-  const submittedEmail = selectedEmail || Object.keys(guestTokens)[0];
+  const submittedEmail = selectedEmail || guestEmails[0];
 
   const sendGuestConfirmationEmail = async email => {
     setStatus(STATUS.SUBMITTING);
@@ -78,12 +76,12 @@ const JoinAsGuest = () => {
 
   // Submit on mount if there's only one guest token, else show picker
   React.useEffect(() => {
-    if (!nbTokens) {
+    if (!guestEmails.length) {
       setStatus(STATUS.ERROR_NO_EMAIL);
-    } else if (nbTokens === 1) {
-      const email = Object.keys(guestTokens)[0];
+    } else if (guestEmails.length === 1) {
+      const email = guestEmails[0];
       sendGuestConfirmationEmail(email);
-    } else if (nbTokens > 1) {
+    } else if (guestEmails.length > 1) {
       setStatus(STATUS.PICK_PROFILE);
     }
   }, []);
@@ -123,7 +121,7 @@ const JoinAsGuest = () => {
             <FormattedMessage
               id="guestJoin.otherProfilesFound"
               defaultMessage="We found {count} emails that you used to contribute"
-              values={{ count: nbTokens }}
+              values={{ count: guestEmails.length }}
             />
           </strong>
           <P fontSize="15px" lineHeight="22px" mt={2} mb={3}>
@@ -134,7 +132,7 @@ const JoinAsGuest = () => {
           </P>
           <StyledCard maxWidth={350}>
             <StyledRadioList
-              options={Object.keys(guestTokens)}
+              options={guestEmails}
               onChange={({ value }) => setSelectedEmail(value)}
               value={selectedEmail}
             >

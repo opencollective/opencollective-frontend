@@ -158,7 +158,7 @@ const CollectiveCallsToAction = ({
           <AddFundsModal
             show={hasAddFundsModal}
             collective={collective}
-            host={collective}
+            host={collective.host}
             onClose={() => showAddFundsModal(null)}
           />
         </Fragment>

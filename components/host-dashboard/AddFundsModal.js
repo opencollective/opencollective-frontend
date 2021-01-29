@@ -94,6 +94,7 @@ const buildAccountReference = input => {
 
 const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
+
   const [submitAddFunds, { error }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
@@ -106,7 +107,12 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     ],
     awaitRefetchQueries: true,
   });
-  const defaultHostFeePercent = collective.hostFeePercent;
+
+  // From the Collective page we pass host and collective as API v1 objects
+  // From the Host dashboard we pass host and collective as API v2 objects
+  const canAddHostFee = host.plan.hostFees && collective.id !== host.id;
+
+  const defaultHostFeePercent = canAddHostFee ? collective.hostFeePercent : 0;
 
   if (!LoggedInUser) {
     return null;
@@ -165,23 +171,25 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       />
                     )}
                   </StyledInputFormikField>
-                  <StyledInputFormikField
-                    name="hostFeePercent"
-                    htmlFor="addFunds-hostFeePercent"
-                    label={<FormattedMessage id="HostFee" defaultMessage="Host fee" />}
-                    ml={3}
-                  >
-                    {({ form, field }) => (
-                      <StyledInputPercentage
-                        id={field.id}
-                        placeholder={defaultHostFeePercent}
-                        value={field.value}
-                        error={field.error}
-                        onChange={value => form.setFieldValue(field.name, value)}
-                        onBlur={() => form.setFieldTouched(field.name, true)}
-                      />
-                    )}
-                  </StyledInputFormikField>
+                  {canAddHostFee && (
+                    <StyledInputFormikField
+                      name="hostFeePercent"
+                      htmlFor="addFunds-hostFeePercent"
+                      label={<FormattedMessage id="HostFee" defaultMessage="Host fee" />}
+                      ml={3}
+                    >
+                      {({ form, field }) => (
+                        <StyledInputPercentage
+                          id={field.id}
+                          placeholder={defaultHostFeePercent}
+                          value={field.value}
+                          error={field.error}
+                          onChange={value => form.setFieldValue(field.name, value)}
+                          onBlur={() => form.setFieldTouched(field.name, true)}
+                        />
+                      )}
+                    </StyledInputFormikField>
+                  )}
                 </Flex>
                 {LoggedInUser.isRoot() && (
                   <StyledInputFormikField
@@ -308,8 +316,13 @@ AddFundsModal.propTypes = {
     currency: PropTypes.string,
     name: PropTypes.string,
     hostFeePercent: PropTypes.number,
+    plan: PropTypes.shape({
+      hostFees: PropTypes.bool,
+    }),
   }).isRequired,
   collective: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,

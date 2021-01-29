@@ -34,6 +34,7 @@ const hostQuery = gqlV2/* GraphQL */ `
         service
       }
       plan {
+        id
         addedFunds
         addedFundsLimit
         bankTransfers

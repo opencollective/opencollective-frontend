@@ -11,7 +11,6 @@ import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
 import CollectivePickerAsync from './CollectivePickerAsync';
 import Container from './Container';
 import { Box, Flex } from './Grid';
-import I18nFormatters from './I18nFormatters';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
@@ -98,7 +97,7 @@ const CreateOrganizationForm = props => {
     }
     const regexExp = /[-a-zA-Z0-9@:%._/+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_/+.~#?&//=]*)?/gi;
 
-    if (!values.website.match(new RegExp(regexExp)) || values.website.startsWith('http')) {
+    if ((values.website && !values.website.match(new RegExp(regexExp))) || values.website.startsWith('http')) {
       errors.website = intl.formatMessage(orgMessages.errorWebsite);
     }
     return errors;
@@ -142,15 +141,15 @@ const CreateOrganizationForm = props => {
           return (
             <Form>
               <Flex flexDirection="column" alignItems="center">
-                <Container px={[1, 30, 150]}>
+                <Box mx={2} maxWidth="992px">
                   <Flex flexDirection="column" my={[0, 2]} mb={[24, 28, 28, 58]}>
-                    <Box mx={[-4, -4, -4, -95]}>
-                      <BackButton asLink onClick={() => window && window.history.back()}>
+                    <Box>
+                      <BackButton asLink onClick={() => window && window.history.back()} px={[0, 2]}>
                         ←&nbsp;
                         <FormattedMessage id="Back" defaultMessage="Back" />
                       </BackButton>
                     </Box>
-                    <Box alignItems="center">
+                    <Box alignItems="center" px={[0, 2]}>
                       <H1
                         fontSize="28px"
                         lineHeight="36px"
@@ -159,7 +158,7 @@ const CreateOrganizationForm = props => {
                         color="black.900"
                         letterSpacing="1px"
                       >
-                        <FormattedMessage id="create.org.title" defaultMessage="Create Organization" />
+                        <FormattedMessage id="organization.create" defaultMessage="Create organization" />
                       </H1>
                     </Box>
                     {error && !loading && (
@@ -170,11 +169,12 @@ const CreateOrganizationForm = props => {
                       </Flex>
                     )}
                   </Flex>
+
                   <Container display="flex" flexDirection={['column', 'row', 'row']}>
                     <Flex
                       flexDirection="column"
                       mx={[1, 10, 10]}
-                      width={[320, 350, 376, 472]}
+                      maxWidth={[320, 350, 472]}
                       justifyContent="space-around"
                     >
                       <H4 color="black.900" fontSize="18px">
@@ -272,7 +272,7 @@ const CreateOrganizationForm = props => {
                         labelColor="black.700"
                         labelFontWeight="600"
                         value={values.website}
-                        required
+                        required={false}
                         mt={3}
                         mb={2}
                         data-cy="cof-org-website"
@@ -290,7 +290,7 @@ const CreateOrganizationForm = props => {
                         )}
                       </StyledInputField>
                     </Flex>
-                    <Flex flexDirection="column" width={[320, 350, 376, 472]} mt={[3, 0]} mx={[1, 10, 38]}>
+                    <Flex flexDirection="column" maxWidth={[320, 350, 472]} mt={[3, 0]} mx={[1, 10, 10]}>
                       <H4 color="black.900" fontSize="18px" mb={[3, 1]}>
                         <FormattedMessage id="administrators" defaultMessage="Administrators" />
                       </H4>
@@ -302,8 +302,10 @@ const CreateOrganizationForm = props => {
                       </P>
                       <Container border="1px solid #E6E8EB" borderRadius="16px" p={3} height="auto">
                         <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
-                          <Flex fontSize="9px" mr={2} color="black.700" fontWeight="500">
-                            <FormattedMessage id="inviteAdmin" defaultMessage="INVITE CO-ADMIN" />
+                          <Flex mr={2}>
+                            <P fontSize="9px" color="black.700" fontWeight="500" textTransform="uppercase">
+                              <FormattedMessage id="Admins" defaultMessage="Admins" />
+                            </P>
                           </Flex>
                           <StyledHr flex="1" borderStyle="solid" borderColor="black.300" width={[100, 110, 120]} />
                         </Flex>
@@ -322,8 +324,10 @@ const CreateOrganizationForm = props => {
                           )}
                         </Flex>
                         <Flex flexDirection="row" alignItems="center" justifyContent="space-around" mt={4}>
-                          <Flex fontSize="9px" mr={2} color="black.700" fontWeight="500">
-                            <FormattedMessage id="inviteAdmin" defaultMessage="INVITE CO-ADMIN" />
+                          <Flex mr={2}>
+                            <P fontSize="9px" color="black.700" fontWeight="500" textTransform="uppercase">
+                              <FormattedMessage id="inviteAdmin" defaultMessage="Invite co-admin" />
+                            </P>
                           </Flex>
                           <StyledHr flex="1" borderStyle="solid" borderColor="black.300" width={[100, 110, 120]} />
                         </Flex>
@@ -350,7 +354,7 @@ const CreateOrganizationForm = props => {
                     flexDirection="column"
                     my={4}
                     mx={2}
-                    width={[320, 350, 450]}
+                    maxWidth={[320, 350, 450]}
                     color="black.800"
                     letterSpacing="0.2px"
                   >
@@ -382,31 +386,8 @@ const CreateOrganizationForm = props => {
                         <FormattedMessage id="create.org.title" defaultMessage="Create Organization" />
                       </StyledButton>
                     </Flex>
-
-                    <Box textAlign="left" fontSize="12px" minHeight="24px" fontWeight="normal" letterSpacing="0.5px">
-                      <FormattedMessage
-                        id="SignIn.legal"
-                        defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
-                        values={I18nFormatters}
-                      />
-                    </Box>
-                    <Flex alignItems="center">
-                      <P fontSize="12px" color="black.500" fontWeight="normal" letterSpacing="0.5px" mr={2}>
-                        <FormattedMessage
-                          id="CreateProfile.AlreadyHaveAnAccount"
-                          defaultMessage="Already have an account?"
-                        />
-                      </P>
-                      <P fontSize="12px" color="black.500" fontWeight="normal" letterSpacing="0.5px">
-                        <FormattedMessage
-                          id="signInLink"
-                          defaultMessage="<SignInLink>Sign In →</SignInLink>"
-                          values={I18nFormatters}
-                        />
-                      </P>
-                    </Flex>
                   </Flex>
-                </Container>
+                </Box>
               </Flex>
             </Form>
           );

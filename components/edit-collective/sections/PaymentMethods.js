@@ -334,6 +334,7 @@ const paymentMethodsQuery = gql`
       isHost
       settings
       plan {
+        id
         addedFunds
         addedFundsLimit
         bankTransfers
