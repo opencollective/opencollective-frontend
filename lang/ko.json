@@ -230,6 +230,7 @@
   "collective.created.description": "호스트 ({host})의 승인을 기다리는 동안, 귀하의 콜렉티브를 설정하거나 경비를 지불할 수 있고 이벤트를 생성할 수도 있습니다.",
   "Collective.CreateNew": "새 콜렉티브 만들기",
   "collective.currency.placeholder": "통화 선택",
+  "collective.currency.warning": "Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if it's an issue.",
   "collective.delete.description": "{type, select, EVENT {이 이벤트를} PROJECT {이 프로젝트를} FUND {이 펀드를} COLLECTIVE {이 콜렉티브를} ORGANIZATION {이 조직을} other {이 계정을}} 모든 관련된 데이터와 함께 삭제합니다.",
   "collective.delete.isHost": "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host, please deactivate as Host first.",
   "collective.delete.isNotDeletable-message": "{type, select, EVENT {이벤트} PROJECT {프로젝트} FUND {펀드} COLLECTIVE {콜렉티브} ORGANIZATION {조직} other {계정}}의 거래, 주문, 이벤트 또는 경비 지불은 삭제할 수 없습니다. 그 대신에 보관해주세요.",
