@@ -230,6 +230,7 @@
   "collective.created.description": "在等待主管 ({host}) 批准时，您可以自定义您的社群费用，文件费用，甚至是创建事件。",
   "Collective.CreateNew": "新建社群",
   "collective.currency.placeholder": "选择币种",
+  "collective.currency.warning": "Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if it's an issue.",
   "collective.delete.description": "{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} will be deleted, along with all related data.",
   "collective.delete.isHost": "当作为主管时，你不能删除 {type, select, ORGANIZATION {你的组织} other {你的帐户}}。请先停用成为主管。",
   "collective.delete.isNotDeletable-message": "{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.",
