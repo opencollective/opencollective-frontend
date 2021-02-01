@@ -23,5 +23,8 @@ styleguide/static/fonts
 .vscode/*
 .history
 
+# IntelliJ generated project files
+.idea/*
+
 # Git time manager
 .gtm

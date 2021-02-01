@@ -71,6 +71,7 @@ const TransactionPageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+
   #footer {
     margin-top: auto;
   }
@@ -212,14 +213,15 @@ class TransactionsPage extends React.Component {
                 <TransactionsFilters
                   filters={query}
                   collective={collective}
-                  onChange={queryParams =>
-                    Router.pushRoute('transactions', {
-                      ...query,
-                      ...queryParams,
-                      collectiveSlug: slug,
-                      offset: null,
-                    })
-                  }
+                  onChange={queryParams => {
+                    console.log(queryParams, 'FILTER QUERY PARAMS');
+                    // Router.pushRoute('transactions', {
+                    //   ...query,
+                    //   ...queryParams,
+                    //   collectiveSlug: slug,
+                    //   offset: null,
+                    // });
+                  }}
                 />
                 <Flex>
                   {canDownloadInvoices && (

@@ -16,7 +16,12 @@ const TransactionTypeFilter = ({ onChange, value, ...props }) => {
       isSearchable={false}
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}
-      options={[getOption('ALL'), getOption(TransactionTypes.CREDIT), getOption(TransactionTypes.DEBIT)]}
+      options={[
+        getOption('ALL'),
+        getOption(TransactionTypes.CREDIT),
+        getOption(TransactionTypes.DEBIT),
+        getOption(TransactionTypes.GIFT_CARDS),
+      ]}
       {...props}
     />
   );
