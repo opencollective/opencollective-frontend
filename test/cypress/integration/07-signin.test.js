@@ -8,7 +8,7 @@ describe('signin', () => {
     cy.visit('/signin?next=/testuseradmin');
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');
     cy.get('button[type=submit]').click();
-    cy.get('.LoginTopBarProfileButton-name').contains('testuseradmin', { timeout: 15000 });
+    cy.getByDataCy('topbar-login-username').contains('Test User Admin', { timeout: 15000 });
   });
 
   it('can signin with a valid token and is redirected', () => {
