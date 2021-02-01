@@ -34,7 +34,6 @@ class OrdersPage extends React.Component {
               isLoading={data.loading}
               collective={data.Collective}
               isAdmin={LoggedInUser?.canEditCollective(collective)}
-              showEdit
             />
           </Container>
         )}

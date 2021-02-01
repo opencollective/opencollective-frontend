@@ -184,7 +184,6 @@ class ExpensePage extends React.Component {
           isLoading={!data.account}
           selected={Sections.BUDGET}
           selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-          callsToAction={{ hasSubmitExpense: data.account && !data.account.isArchived }}
         />
         <Container position="relative" minHeight={[null, 800]}>
           <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>

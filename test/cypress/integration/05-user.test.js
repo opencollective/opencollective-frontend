@@ -1,12 +1,22 @@
+import { disableSmoothScroll } from '../support/helpers';
+
+const scrollToSection = section => {
+  // Wait for collective page to load before disabling smooth scroll
+  cy.get('[data-cy=collective-page-main]');
+  disableSmoothScroll();
+  cy.get(`#section-${section}`).scrollIntoView();
+};
+
 describe('New users profiles', () => {
   before(() => {
     cy.visit('/xdamman');
   });
+
   describe('Contributions section', () => {
     it('Shows contributions with date since and amount contributed', () => {
-      cy.get('[data-cy=section-contributions]').click();
-      cy.hash().should('eq', '#section-contributions');
-      cy.get('[data-cy=section-contributions-title]').contains('Contributions');
+      cy.get('a[href="#category-CONTRIBUTIONS"]').click();
+      cy.wait(50);
+      cy.hash().should('eq', '#category-CONTRIBUTIONS');
       cy.get('[data-cy=contribution-date-since]').first().contains('Admin since');
       cy.get('[data-cy=contribution-date-since]').first().contains('August 2016');
       cy.get('[data-cy=amount-contributed]').first().contains('Amount contributed');
@@ -33,9 +43,7 @@ describe('New users profiles', () => {
 
   describe('Transactions section', () => {
     it('Can filter by expense/contributions', () => {
-      cy.getByDataCy('section-transactions').click();
-      cy.wait(1000);
-      cy.getByDataCy('section-transactions-title').contains('Transactions');
+      scrollToSection('transactions');
       cy.get('button[data-cy="filter-button expenses"]').click();
       cy.wait(300);
       cy.get('[data-cy="transaction-sign"]').first().contains('+');

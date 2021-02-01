@@ -180,7 +180,6 @@ class TransactionsPage extends React.Component {
               <CollectiveNavbar
                 collective={collective}
                 isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
-                showEdit
                 selectedCategory={NAVBAR_CATEGORIES.BUDGET}
                 selectedSection={
                   collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS
