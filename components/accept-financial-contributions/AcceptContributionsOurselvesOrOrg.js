@@ -453,6 +453,12 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
           slug
         }
       }
+      ... on Organization {
+        host {
+          id
+          slug
+        }
+      }
     }
   }
 `;

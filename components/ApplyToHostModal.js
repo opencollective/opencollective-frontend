@@ -104,6 +104,11 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
           ...ApplyToHostFields
         }
       }
+      ... on Organization {
+        host {
+          ...ApplyToHostFields
+        }
+      }
     }
   }
   ${hostFields}
