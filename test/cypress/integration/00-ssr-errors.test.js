@@ -40,6 +40,6 @@ describe('the NotFound page when logged in', () => {
   });
 
   it('has the user properly logged in', () => {
-    cy.get('.LoginTopBarProfileButton-name').should('contain', 'testuseradmin');
+    cy.getByDataCy('topbar-login-username').should('contain', 'Test User Admin');
   });
 });

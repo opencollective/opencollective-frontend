@@ -480,11 +480,10 @@ class TopBarProfileMenu extends React.Component {
             fontWeight="500"
             letterSpacing="1px"
             mx={2}
-            className="LoginTopBarProfileButton-name"
             cursor="pointer"
             data-cy="topbar-login-username"
           >
-            {LoggedInUser.username}
+            {LoggedInUser.collective.name || LoggedInUser.username}
           </P>
         </Hide>
         <Avatar collective={get(LoggedInUser, 'collective')} radius="3rem" mr={2} />
