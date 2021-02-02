@@ -295,6 +295,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
               <ModalFooter isFullWidth>
                 <Flex justifyContent="center" flexWrap="wrap">
                   <StyledButton
+                    type="submit"
                     buttonStyle="primary"
                     mx={2}
                     mb={1}
@@ -304,7 +305,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   >
                     <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
                   </StyledButton>
-                  <StyledButton mx={2} mb={1} minWidth={100} onClick={props.onClose}>
+                  <StyledButton mx={2} mb={1} minWidth={100} onClick={props.onClose} type="button">
                     <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                   </StyledButton>
                 </Flex>

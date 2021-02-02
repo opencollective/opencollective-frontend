@@ -5,6 +5,7 @@ import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
+import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Close } from '@styled-icons/material/Close';
 import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
@@ -18,6 +19,8 @@ import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/c
 import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
+import AddFundsBtn from '../AddFundsBtn';
+import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Avatar from '../Avatar';
 import { Dimensions } from '../collective-page/_constants';
@@ -190,7 +193,7 @@ const getDefaultCallsToActions = (collective, isAdmin, isHostAdmin, isRoot) => {
  * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
  * Returns the second CTA that should be displayed as a button in ActionsMenu.js if only 2 CTAs.
  */
-const getMainAction = (collective, isAdmin, callsToAction) => {
+const getMainAction = (collective, callsToAction) => {
   if (!collective || !callsToAction) {
     return null;
   }
@@ -292,8 +295,39 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
         </Link>
       ),
     };
+  } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.ADD_FUNDS) && collective.host) {
+    return {
+      type: NAVBAR_ACTION_TYPE.ADD_FUNDS,
+      component: (
+        <AddFundsBtn collective={collective} host={collective.host}>
+          {btnProps => (
+            <MainActionBtn {...btnProps}>
+              <AttachMoney size="1em" />
+              <Span>
+                <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+              </Span>
+            </MainActionBtn>
+          )}
+        </AddFundsBtn>
+      ),
+    };
+  } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET)) {
+    return {
+      type: NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET,
+      component: (
+        <AddPrepaidBudgetBtn collective={collective}>
+          {btnProps => (
+            <MainActionBtn {...btnProps}>
+              <AttachMoney size="1em" />
+              <Span>
+                <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
+              </Span>
+            </MainActionBtn>
+          )}
+        </AddPrepaidBudgetBtn>
+      ),
+    };
   } else {
-    // TO DO: Need to add addFunds and addPrepaidBudget CTAs.
     return null;
   }
 };
@@ -358,8 +392,8 @@ const CollectiveNavbar = ({
   const isRoot = LoggedInUser?.isRoot;
   callsToAction = { ...getDefaultCallsToActions(collective, isAdmin, isHostAdmin, isRoot), ...callsToAction };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(collective, isAdmin, actionsArray);
-  const secondAction = getMainAction(collective, isAdmin, without(actionsArray, mainAction?.type));
+  const mainAction = getMainAction(collective, actionsArray);
+  const secondAction = getMainAction(collective, without(actionsArray, mainAction?.type));
   const navbarRef = useRef();
 
   useGlobalBlur(navbarRef, outside => {
