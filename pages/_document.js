@@ -72,7 +72,6 @@ export default class IntlDocument extends Document {
       'GOOGLE_MAPS_API_KEY',
       'RECAPTCHA_SITE_KEY',
       'RECAPTCHA_ENABLED',
-      'NEW_COLLECTIVE_NAVBAR',
     ]);
   }
 

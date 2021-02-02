@@ -8,14 +8,13 @@ import { Settings } from '@styled-icons/feather/Settings';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url_helpers';
 
-import CollectiveCallsToAction from '../../CollectiveCallsToAction';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
@@ -78,7 +77,8 @@ const StyledShortDescription = styled.h2`
 /**
  * Collective's page Hero/Banner/Cover component.
  */
-const Hero = ({ collective, host, isAdmin, hasNewNavbar, onPrimaryColorChange, callsToAction, intl }) => {
+const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
+  const intl = useIntl();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
   const [message, showMessage] = React.useState(null);
@@ -348,19 +348,6 @@ const Hero = ({ collective, host, isAdmin, hasNewNavbar, onPrimaryColorChange, c
           {!collective.isHost && [CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collective.type) && (
             <HeroTotalCollectiveContributionsWithData collective={collective} />
           )}
-
-          {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
-          {!hasNewNavbar && (
-            <CollectiveCallsToAction
-              display={['flex', null, 'none']}
-              flexWrap="wrap"
-              mt={3}
-              width="100%"
-              collective={collective}
-              callsToAction={callsToAction}
-              buttonsMinWidth={140}
-            />
-          )}
         </ContainerSectionContent>
       </Container>
     </Fragment>
@@ -416,16 +403,8 @@ Hero.propTypes = {
   /** Show the color picker input */
   onPrimaryColorChange: PropTypes.func.isRequired,
 
-  /** Defines which buttons get displayed. See `CollectiveCallsToAction` */
-  callsToAction: PropTypes.object,
-
   /** Define if we need to display special actions like the "Edit collective" button */
   isAdmin: PropTypes.bool,
-
-  hasNewNavbar: PropTypes.bool,
-
-  /** @ignore */
-  intl: PropTypes.object,
 };
 
-export default React.memo(injectIntl(Hero));
+export default React.memo(Hero);

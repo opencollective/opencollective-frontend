@@ -146,7 +146,7 @@ class HostDashboardPage extends React.Component {
       <Page collective={host} title={host.name || 'Host Dashboard'}>
         {data.account && (
           <Container>
-            <CollectiveNavbar collective={host} isAdmin={canEdit} showEdit onlyInfos={true} />
+            <CollectiveNavbar collective={host} isAdmin={canEdit} onlyInfos={true} />
           </Container>
         )}
         {loadingLoggedInUser || data.loading ? (

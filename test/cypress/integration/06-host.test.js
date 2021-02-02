@@ -17,10 +17,9 @@ describe('New host page', () => {
     });
   });
 
-  describe('Contributors section', () => {
-    it('Only shows core contributors without any filter', () => {
-      cy.get('[data-cy=Contributors] button').should('not.exist');
-      cy.contains('[data-cy=contributors-grid]', /(pia mancini|Xavier Damma|Open Source Host User)/);
+  describe('About category', () => {
+    it('Show team members', () => {
+      cy.contains('[data-cy=section-our-team]', /(pia mancini|Xavier Damma|Open Source Host User)/);
     });
   });
 });

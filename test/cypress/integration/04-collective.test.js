@@ -130,14 +130,6 @@ describe('Collective page', () => {
     });
   });
 
-  describe('Budget section', () => {
-    it("Shows today's balance and estimated annual budget", () => {
-      scrollToSection(Sections.BUDGET);
-      cy.get('[data-cy=budgetSection-today-balance]').contains('$0.00');
-      cy.get('[data-cy=budgetSection-estimated-budget]').contains('$0.00');
-    });
-  });
-
   describe('Contributors section', () => {
     it('Shows contributors with role, public message and total amount contributor', () => {
       cy.get('[data-cy=ContributorsGrid_ContributorCard]').then($contributorCard => {

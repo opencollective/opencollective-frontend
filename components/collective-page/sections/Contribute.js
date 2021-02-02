@@ -1,15 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, get, orderBy, partition, set } from 'lodash';
+import { cloneDeep, get, orderBy, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
-import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
-import { getTopContributors } from '../../../lib/collective.lib';
-import { hasNewNavbar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
@@ -20,9 +16,7 @@ import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import ContributeCardContainer, { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
-import ContributeCollective from '../../contribute-cards/ContributeCollective';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
-import ContributeEvent from '../../contribute-cards/ContributeEvent';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
@@ -30,28 +24,16 @@ import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
-import { H3, H4, P } from '../../Text';
-import { Sections } from '../_constants';
+import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../graphql/queries';
-import SectionHeader from '../SectionHeader';
-import TopContributors from '../TopContributors';
-
-import contributeSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconContribute.png';
 
 // Dynamic imports
 const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {
   ssr: false,
 });
-
-/** The container for Top Contributors view */
-const TopContributorsContainer = styled.div`
-  padding: 32px 16px;
-  margin-top: 48px;
-  background-color: #f5f7fa;
-`;
 
 const TIERS_ORDER_KEY = 'collectivePage.tiersOrder';
 
@@ -100,7 +82,6 @@ class SectionContribute extends React.PureComponent {
     ),
     isAdmin: PropTypes.bool,
     editAccountSettings: PropTypes.func.isRequired,
-    router: PropTypes.object,
   };
 
   state = {
@@ -221,12 +202,6 @@ class SectionContribute extends React.PureComponent {
     return waysToContribute;
   });
 
-  triageEvents = memoizeOne(events => {
-    return partition(events, isPastEvent);
-  });
-
-  getTopContributors = memoizeOne(getTopContributors);
-
   hasContributors = memoizeOne(contributors => {
     return contributors.find(c => c.isBacker);
   });
@@ -240,10 +215,8 @@ class SectionContribute extends React.PureComponent {
   });
 
   render() {
-    const { collective, tiers, events, connectedCollectives, contributors, isAdmin, router } = this.props;
+    const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
     const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
-    const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
-    const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const orderKeys = draggingContributionsOrder || this.getCollectiveContributionCardsOrder();
     const sortedTiers = this.getSortedCollectiveTiers(tiers, orderKeys);
     const isEvent = collective.type === CollectiveType.EVENT;
@@ -257,12 +230,10 @@ class SectionContribute extends React.PureComponent {
     const hasHost = collective.host;
     const isHost = collective.isHost;
     const waysToContribute = this.getFinancialContributions(sortedTiers);
-    const [pastEvents, upcomingEvents] = this.triageEvents(events);
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
     const cannotOrderTickets = (!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin);
-    const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
 
     /*
     cases
@@ -279,28 +250,6 @@ class SectionContribute extends React.PureComponent {
 
     return (
       <Fragment>
-        {!newNavbarFeatureFlag && (
-          <ContainerSectionContent pt={[4, 5]}>
-            <SectionHeader
-              title={Sections.CONTRIBUTE}
-              subtitle={
-                <FormattedMessage
-                  id="CollectivePage.SectionContribute.Subtitle"
-                  defaultMessage="Become a financial contributor."
-                />
-              }
-              info={
-                <FormattedMessage
-                  id="CollectivePage.SectionContribute.info"
-                  defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
-                  values={{ collectiveName: collective.name }}
-                />
-              }
-              illustrationSrc={contributeSectionHeaderIcon}
-            />
-          </ContainerSectionContent>
-        )}
-
         {/* "Start accepting financial contributions" for admins */}
         {isAdmin && !hasHost && !isHost && (
           <ContainerSectionContent py={4}>
@@ -332,11 +281,6 @@ class SectionContribute extends React.PureComponent {
                     <div>
                       <ContainerSectionContent>
                         <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                          {hasOtherWaysToContribute && !newNavbarFeatureFlag && (
-                            <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
-                              <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
-                            </H3>
-                          )}
                           <Box m={2} flex="0 0 50px">
                             <Chevrons />
                           </Box>
@@ -378,70 +322,8 @@ class SectionContribute extends React.PureComponent {
               </Box>
             )}
 
-            {/* Events, for now (til v2 standalone section) */}
-            {hasOtherWaysToContribute && !newNavbarFeatureFlag && (
-              <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-                {(ref, Chevrons) => (
-                  <div>
-                    <ContainerSectionContent>
-                      <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                        <H3 fontSize="20px" fontWeight="600" color="black.700">
-                          {connectedCollectives.length > 0 ? (
-                            <FormattedMessage
-                              id="SectionContribute.MoreWays"
-                              defaultMessage="More ways to contribute"
-                            />
-                          ) : (
-                            <FormattedMessage id="Events" defaultMessage="Events" />
-                          )}
-                        </H3>
-                        <Box m={2} flex="0 0 50px">
-                          <Chevrons />
-                        </Box>
-                      </Flex>
-                    </ContainerSectionContent>
-
-                    <ContributeCardsContainer ref={ref}>
-                      {upcomingEvents.map(event => (
-                        <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                          <ContributeEvent
-                            collective={collective}
-                            event={event}
-                            hideContributors={hasNoContributorForEvents}
-                            disableCTA={!collective.isActive || !event.isActive}
-                          />
-                        </Box>
-                      ))}
-                      {connectedCollectives.map(({ id, collective }) => (
-                        <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
-                          <ContributeCollective collective={collective} />
-                        </Box>
-                      ))}
-                      {pastEvents.map(event => (
-                        <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                          <ContributeEvent
-                            collective={collective}
-                            event={event}
-                            hideContributors={hasNoContributorForEvents}
-                            disableCTA={!collective.isActive || !event.isActive}
-                          />
-                        </Box>
-                      ))}
-                      {isAdmin && (
-                        <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
-                          <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
-                            <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
-                          </CreateNew>
-                        </Box>
-                      )}
-                    </ContributeCardsContainer>
-                  </div>
-                )}
-              </HorizontalScroller>
-            )}
-
             {/* Tickets for type EVENT */}
-            {isEvent && newNavbarFeatureFlag && !cannotOrderTickets && !hideTicketsFromNonAdmins && (
+            {isEvent && !cannotOrderTickets && !hideTicketsFromNonAdmins && (
               <Box pb={4} data-cy="Tickets">
                 <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
                   {(ref, Chevrons) => (
@@ -494,25 +376,6 @@ class SectionContribute extends React.PureComponent {
                 </Link>
               </ContainerSectionContent>
             )}
-
-            {/* Top contributors, for now (til moved to own widget in v2) */}
-            {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && !newNavbarFeatureFlag && (
-              <TopContributorsContainer>
-                <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
-                  <H4 fontWeight="normal" color="black.700" mb={3}>
-                    <FormattedMessage
-                      id="SectionContribute.TopContributors"
-                      defaultMessage="Top financial contributors"
-                    />
-                  </H4>
-                  <TopContributors
-                    organizations={topOrganizations}
-                    individuals={topIndividuals}
-                    currency={collective.currency}
-                  />
-                </Container>
-              </TopContributorsContainer>
-            )}
           </Fragment>
         )}
       </Fragment>
@@ -525,4 +388,4 @@ const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-export default withRouter(addEditAccountSettingMutation(SectionContribute));
+export default addEditAccountSettingMutation(SectionContribute);

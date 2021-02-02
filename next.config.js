@@ -25,7 +25,6 @@ const nextConfig = {
         TW_API_COLLECTIVE_SLUG: null,
         REJECT_CONTRIBUTION: false,
         REJECTED_CATEGORIES: false,
-        NEW_COLLECTIVE_NAVBAR: false,
       }),
     );
 
