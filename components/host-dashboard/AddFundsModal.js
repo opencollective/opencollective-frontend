@@ -110,7 +110,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = host.plan.hostFees && collective.id !== host.id;
+  const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
   const defaultHostFeePercent = canAddHostFee ? collective.hostFeePercent : 0;
 
   const canAddPlatformFee = LoggedInUser.isRoot();
