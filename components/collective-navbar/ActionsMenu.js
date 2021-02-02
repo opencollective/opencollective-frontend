@@ -48,10 +48,17 @@ const MenuItem = styled('li')`
       color: #313233;
     }
 
+    &:hover:not(:disabled):not(:active) {
+      background: none;
+      color: ${props => props.theme.colors.primary[600]};
+    }
+
     &:focus {
       box-shadow: none;
       outline: none;
       text-decoration: underline;
+      background: none;
+      color: ${props => props.theme.colors.primary[600]};
     }
 
     &:disabled {
@@ -62,6 +69,7 @@ const MenuItem = styled('li')`
   svg {
     margin-right: 8px;
     fill: ${props => props.theme.colors.primary[600]};
+    color: ${props => props.theme.colors.primary[600]};
   }
 
   ${props =>
@@ -115,13 +123,12 @@ const StyledActionButton = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
   border: 2px solid white;
   color: ${themeGet('colors.primary.600')};
 
-  &:focus {
-    border: 2px solid #050505;
-  }
-
   &:hover {
     background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
       linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
+  }
+
+  &:hover:not(:focus) {
     border: 2px solid white;
   }
 
