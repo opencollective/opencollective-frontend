@@ -47,7 +47,6 @@ import SendingMoney from './sections/SendingMoney';
 import SetupTwoFactorAuth from './sections/SetupTwoFactorAuth';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
-import Updates from './sections/Updates';
 import VirtualCards from './sections/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
@@ -378,9 +377,6 @@ class EditCollectiveForm extends React.Component {
             <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
           </div>
         );
-
-      case EDIT_COLLECTIVE_SECTIONS.UPDATES:
-        return <Updates collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS:
         return <Conversations collective={collective} />;
