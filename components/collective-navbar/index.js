@@ -210,7 +210,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
         </Link>
       ),
     };
-  } else if (!isAdmin && callsToAction.includes('hasContribute') && getContributeRoute(collective)) {
+  } else if (callsToAction.includes('hasContribute') && getContributeRoute(collective)) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
@@ -224,7 +224,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
         </Link>
       ),
     };
-  } else if (!isAdmin && callsToAction.includes('hasApply')) {
+  } else if (callsToAction.includes('hasApply')) {
     const plan = collective.plan || {};
     return {
       type: NAVBAR_ACTION_TYPE.APPLY,
@@ -264,7 +264,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
         </Link>
       ),
     };
-  } else if (!isAdmin && callsToAction.includes('hasContact')) {
+  } else if (callsToAction.includes('hasContact')) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
@@ -276,21 +276,6 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
             </Span>
           </MainActionBtn>
         </Link>
-      ),
-    };
-  }
-  // CTAs after this line are called when figuring out the second CTA if there are only 2.
-  // TO DO: Need to add addFunds and addPrepaidBudget CTAs.
-  else if (callsToAction.includes('hasApply')) {
-    const plan = collective.plan || {};
-    return {
-      type: NAVBAR_ACTION_TYPE.APPLY,
-      component: (
-        <ApplyToHostBtn
-          hostSlug={collective.slug}
-          buttonRenderer={props => <MainActionBtn {...props} />}
-          hostWithinLimit={!plan.hostedCollectivesLimit || plan.hostedCollectives < plan.hostedCollectivesLimit}
-        />
       ),
     };
   } else if (callsToAction.includes('hasRequestGrant')) {
@@ -308,6 +293,7 @@ const getMainAction = (collective, isAdmin, callsToAction) => {
       ),
     };
   } else {
+    // TO DO: Need to add addFunds and addPrepaidBudget CTAs.
     return null;
   }
 };
