@@ -1,11 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { get, isEmpty } from 'lodash';
-import { useRouter } from 'next/router';
+import { isEmpty } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { hasNewNavbar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { GraphQLContext } from '../../../lib/graphql/context';
@@ -22,11 +20,7 @@ import { P, Span } from '../../Text';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionsList from '../../transactions/TransactionsList';
 import { withUser } from '../../UserProvider';
-import { Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
-import SectionHeader from '../SectionHeader';
-
-import budgetSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconBudget.png';
 
 export const budgetSectionQuery = gqlV2/* GraphQL */ `
   query BudgetSection($slug: String!, $limit: Int!) {
@@ -55,8 +49,6 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
   const isProject = collective.type === CollectiveType.PROJECT;
-  const router = useRouter();
-  const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
 
   React.useEffect(() => {
     refetch();
@@ -64,25 +56,6 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
 
   return (
     <ContainerSectionContent pb={4}>
-      {!newNavbarFeatureFlag && (
-        <SectionHeader
-          title={Sections.BUDGET}
-          subtitle={
-            <FormattedMessage
-              id="CollectivePage.SectionBudget.Subtitle"
-              defaultMessage="Transparent and open finances."
-            />
-          }
-          info={
-            <FormattedMessage
-              id="CollectivePage.SectionBudget.Description"
-              defaultMessage="See how funds circulate through {collectiveName}. Contributions and expenses are transparent. Learn where the money comes from and where it goes."
-              values={{ collectiveName: collective.name }}
-            />
-          }
-          illustrationSrc={budgetSectionHeaderIcon}
-        />
-      )}
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
         {isEmpty(data?.transactions) && (
           <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="14px">

@@ -1,6 +1,5 @@
 import { randomSlug } from '../support/faker';
 
-const hasNewNavbar = Cypress.env('NEW_COLLECTIVE_NAVBAR');
 const env = Cypress.env('OC_ENV');
 
 describe('apply to host', () => {
@@ -12,13 +11,7 @@ describe('apply to host', () => {
       cy.contains('We are fiscally hosting 2 Collectives');
     }
 
-    if (hasNewNavbar) {
-      cy.getByDataCy('collective-navbar-actions-btn').click();
-      cy.getByDataCy('host-apply-btn').click({ force: true });
-    } else {
-      cy.get('[data-cy="host-apply-btn"]:visible').click();
-    }
-
+    cy.get('[data-cy="host-apply-btn"]:visible').click();
     cy.getByDataCy('host-apply-collective-picker').click();
     cy.getByDataCy('host-apply-new-collective-link').click();
     cy.get('#email').type('testuser@opencollective.com');

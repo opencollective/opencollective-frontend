@@ -61,7 +61,6 @@ export default class IntlDocument extends Document {
     // They can later be read with getEnvVar()
     // Please, NEVER SECRETS!
     props.__NEXT_DATA__.env = pick(process.env, [
-      'ENABLE_GUEST_CONTRIBUTIONS',
       'IMAGES_URL',
       'REJECT_CONTRIBUTION',
       'REJECTED_CATEGORIES',
@@ -73,7 +72,6 @@ export default class IntlDocument extends Document {
       'GOOGLE_MAPS_API_KEY',
       'RECAPTCHA_SITE_KEY',
       'RECAPTCHA_ENABLED',
-      'NEW_COLLECTIVE_NAVBAR',
     ]);
   }
 

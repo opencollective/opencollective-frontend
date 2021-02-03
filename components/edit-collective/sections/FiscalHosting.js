@@ -17,7 +17,12 @@ const activateCollectiveAsHostMutation = gql`
   mutation ActivateCollectiveAsHost($id: Int!) {
     activateCollectiveAsHost(id: $id) {
       id
+      currency
       isHost
+      plan {
+        id
+        name
+      }
     }
   }
 `;
@@ -26,7 +31,12 @@ const deactivateCollectiveAsHostMutation = gql`
   mutation DeactivateCollectiveAsHost($id: Int!) {
     deactivateCollectiveAsHost(id: $id) {
       id
+      currency
       isHost
+      plan {
+        id
+        name
+      }
     }
   }
 `;

@@ -41,6 +41,8 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
+  const currency = tier?.amount.currency || collective.currency;
+
   return (
     <Box width={1}>
       {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && (
@@ -73,7 +75,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
       {!isFixedContribution ? (
         <Box mb="30px">
           <StyledAmountPicker
-            currency={collective.currency}
+            currency={currency}
             presets={presets}
             otherAmountDisplay="button"
             value={isOtherAmountSelected ? OTHER_AMOUNT_KEY : data?.amount}
@@ -91,7 +93,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
               <StyledInputAmount
                 name="custom-amount"
                 type="number"
-                currency={collective.currency}
+                currency={currency}
                 value={data?.amount || null}
                 width={1}
                 min={minAmount}
@@ -108,8 +110,8 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
                     id="contribution.minimumAmount"
                     defaultMessage="Minimum amount: {minAmount} {currency}"
                     values={{
-                      minAmount: formatCurrency(minAmount, collective.currency),
-                      currency: collective.currency,
+                      minAmount: formatCurrency(minAmount, currency),
+                      currency,
                     }}
                   />
                 </Flex>
@@ -124,7 +126,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             defaultMessage="You’ll contribute {amount}{interval, select, month { monthly} year { yearly} other {}}."
             values={{
               interval: tier.interval,
-              amount: <FormattedMoneyAmount amount={getTotalAmount(data)} currency={collective.currency} />,
+              amount: <FormattedMoneyAmount amount={getTotalAmount(data)} currency={currency} />,
             }}
           />
         </Box>
@@ -196,7 +198,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
       {showFeesOnTop && (
         <Box mt={28}>
           <FeesOnTopInput
-            currency={collective.currency}
+            currency={currency}
             amount={data?.amount}
             fees={data?.platformContribution}
             interval={data?.interval}

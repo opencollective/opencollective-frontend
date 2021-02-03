@@ -1,7 +1,5 @@
 import { randomSlug } from '../support/faker';
 
-const hasNewNavbar = Cypress.env('NEW_COLLECTIVE_NAVBAR');
-
 describe('host dashboard', () => {
   before(() => {
     cy.signup({ redirect: '/brusselstogetherasbl' });
@@ -10,14 +8,7 @@ describe('host dashboard', () => {
   describe('pending applications', () => {
     it('mark pending application approved', () => {
       const collectiveSlug = randomSlug();
-
-      if (hasNewNavbar) {
-        cy.getByDataCy('collective-navbar-actions-btn').click();
-        cy.getByDataCy('host-apply-btn').click({ force: true });
-      } else {
-        cy.get('[data-cy="host-apply-btn"]:visible').click();
-      }
-
+      cy.get('[data-cy="host-apply-btn"]:visible').click();
       cy.getByDataCy('host-apply-collective-picker').click();
       cy.getByDataCy('host-apply-new-collective-link').click();
       cy.get(`input[name="name"]`).type('Cavies United');

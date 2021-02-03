@@ -1,11 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { hasNewNavbar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 
 import Container from '../../Container';
@@ -16,12 +13,8 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
-import { Sections } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
-import SectionHeader from '../SectionHeader';
-
-import aboutSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconAbout.png';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -45,13 +38,9 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isFund = collective.type === CollectiveType.FUND;
   canEdit = collective.isArchived ? false : canEdit;
-  const router = useRouter();
-  const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
 
   return (
     <ContainerSectionContent px={2} pb={4}>
-      {!newNavbarFeatureFlag && <SectionHeader title={Sections.ABOUT} illustrationSrc={aboutSectionHeaderIcon} />}
-
       <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
         <InlineEditField
           mutation={editCollectiveLongDescriptionMutation}

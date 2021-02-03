@@ -3,21 +3,13 @@ import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
-import { cloneDeep, difference, flatten, get, isEqual, set, uniqBy } from 'lodash';
+import { cloneDeep, flatten, get, isEqual, set } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { useRouter } from 'next/router';
 import { useDrag, useDrop } from 'react-dnd';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import hasFeature, { FEATURES } from '../../../lib/allowed-features';
-import {
-  addDefaultSections,
-  convertSectionsToNewFormat,
-  getDefaultSectionsForCollective,
-  getSectionPath,
-  hasNewNavbar,
-} from '../../../lib/collective-sections';
+import { addDefaultSections, getSectionPath } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
@@ -217,49 +209,22 @@ CollectiveSectionEntry.propTypes = {
   parentItem: PropTypes.object,
 };
 
-export const isCollectiveSectionEnabled = (collective, section) => {
-  switch (section) {
-    case Sections.GOALS:
-      return hasFeature(collective, FEATURES.COLLECTIVE_GOALS);
-    case Sections.CONVERSATIONS:
-      return hasFeature(collective, FEATURES.CONVERSATIONS);
-    case Sections.UPDATES:
-      return hasFeature(collective, FEATURES.UPDATES);
-    default:
-      return true;
-  }
-};
-
 /**
  * Sections used to be stored as an array of string. This helpers loads and convert them to
  * the new format if necessary.
  */
-const loadSectionsForCollective = (collective, useNewSections) => {
+const loadSectionsForCollective = collective => {
   const collectiveSections = get(collective, 'settings.collectivePage.sections');
-  if (collective.settings?.collectivePage?.useNewSections) {
-    return collectiveSections;
-  }
-
-  const defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive, useNewSections);
-
-  const transformLegacySection = section => {
-    return typeof section === 'string'
-      ? { section, isEnabled: isCollectiveSectionEnabled(collective, section) }
-      : section;
-  };
-
   if (collectiveSections) {
-    const existingSections = collectiveSections.map(transformLegacySection);
-    const addedSections = defaultSections.map(section => ({ section, isEnabled: false }));
-    return uniqBy([...existingSections, ...addedSections], 'section');
+    return addDefaultSections(collective, collectiveSections, false);
   } else {
-    return defaultSections.map(transformLegacySection);
+    return addDefaultSections(collective, [], true);
   }
 };
 
-const getNewSections = memoizeOne((sections, item, toIndex, useNewSections) => {
+const getNewSections = memoizeOne((sections, item, toIndex) => {
   const newSections = cloneDeep(sections);
-  if (useNewSections && item.parentItem) {
+  if (item.parentItem) {
     const subSectionsIdx = newSections.findIndex(e => e.type === 'CATEGORY' && e.name === item.parentItem.name);
     const newSubsections = [...newSections[subSectionsIdx].sections];
     newSubsections.splice(toIndex, 0, newSubsections.splice(item.index, 1)[0]);
@@ -335,38 +300,8 @@ MenuCategory.propTypes = {
   onSectionToggle: PropTypes.func,
 };
 
-/**
- * Sections used to be stored as an array of string. This helpers loads and convert them to
- * the new format if necessary.
- */
-const loadSectionsForCollectiveV1 = collective => {
-  const collectiveSections = get(collective, 'settings.collectivePage.sections');
-  let defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive);
-
-  if (collective.type === CollectiveType.FUND) {
-    // TODO this is not the right place for this
-    defaultSections = difference(defaultSections, [Sections.GOALS, Sections.CONVERSATIONS]);
-  }
-
-  const transformLegacySection = section => {
-    return typeof section === 'string'
-      ? { section, isEnabled: isCollectiveSectionEnabled(collective, section) }
-      : section;
-  };
-
-  if (collectiveSections) {
-    const existingSections = collectiveSections.map(transformLegacySection);
-    const addedSections = defaultSections.map(section => ({ section, isEnabled: false }));
-    return uniqBy([...existingSections, ...addedSections], 'section');
-  } else {
-    return defaultSections.map(transformLegacySection);
-  }
-};
-
 const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
-  const router = useRouter();
-  const useNewSections = hasNewNavbar(get(router, 'query.navbarVersion'));
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
   const [tmpSections, setTmpSections] = React.useState(null);
@@ -383,23 +318,13 @@ const EditCollectivePage = ({ collective }) => {
   // Load sections from fetched collective
   React.useEffect(() => {
     if (data?.account) {
-      const sectionsFromCollective = loadSectionsForCollective(data.account, useNewSections);
-      if (useNewSections) {
-        if (!data.account.settings?.collectivePage?.useNewSections) {
-          const convertedSections = convertSectionsToNewFormat(sectionsFromCollective, data.account.type);
-          setSections(addDefaultSections(data.account, convertedSections));
-        } else {
-          const hasSections = Boolean(data.account?.settings?.collectivePage?.sections);
-          setSections(addDefaultSections(data.account, sectionsFromCollective, !hasSections));
-        }
-      } else {
-        setSections(loadSectionsForCollectiveV1(data.account));
-      }
+      const sections = loadSectionsForCollective(data.account, true);
+      setSections(sections);
     }
   }, [data?.account]);
 
   const onMove = (item, hoverIndex) => {
-    const newSections = getNewSections(sections, item, hoverIndex, useNewSections);
+    const newSections = getNewSections(sections, item, hoverIndex);
     if (!isEqual(tmpSections, newSections)) {
       setTmpSections(newSections);
     }
@@ -419,14 +344,6 @@ const EditCollectivePage = ({ collective }) => {
     setSections(newSections);
     setDirty(true);
   };
-
-  if (!useNewSections && get(data, 'account.settings.collectivePage.useNewSections')) {
-    return (
-      <MessageBox type="warning" withIcon>
-        This page has been temporarily disabled for this account.
-      </MessageBox>
-    );
-  }
 
   const displayedSections = tmpSections || sections;
   return (
@@ -448,52 +365,35 @@ const EditCollectivePage = ({ collective }) => {
           ) : (
             <div>
               <StyledCard mb={4}>
-                {useNewSections
-                  ? displayedSections.map((item, index) => (
-                      <React.Fragment key={`${item.type}-${item.name}`}>
-                        {index !== 0 && <StyledHr borderColor="black.200" />}
-                        {item.type === 'CATEGORY' ? (
-                          <MenuCategory
-                            item={item}
-                            index={index}
-                            collective={collective}
-                            onMove={onMove}
-                            onDrop={onDrop}
-                            onSectionToggle={onSectionToggle}
-                          />
-                        ) : item.type === 'SECTION' ? (
-                          <CollectiveSectionEntry
-                            key={`${item.type}-${item.name}`}
-                            section={item.name}
-                            index={index}
-                            isEnabled={item.isEnabled}
-                            collectiveType={collective.type}
-                            restrictedTo={item.restrictedTo}
-                            onMove={onMove}
-                            onDrop={onDrop}
-                            onSectionToggle={onSectionToggle}
-                            fontWeight="bold"
-                            showDragIcon
-                          />
-                        ) : null}
-                      </React.Fragment>
-                    ))
-                  : displayedSections.map(({ section, isEnabled, restrictedTo }, index) => (
-                      <React.Fragment key={section}>
-                        <CollectiveSectionEntry
-                          section={section}
-                          index={index}
-                          isEnabled={isEnabled}
-                          collectiveType={collective.type}
-                          restrictedTo={restrictedTo}
-                          onMove={onMove}
-                          onDrop={onDrop}
-                          onSectionToggle={onSectionToggle}
-                          showDragIcon
-                        />
-                        {index !== displayedSections.length - 1 && <StyledHr borderColor="black.200" />}
-                      </React.Fragment>
-                    ))}
+                {displayedSections.map((item, index) => (
+                  <React.Fragment key={`${item.type}-${item.name}`}>
+                    {index !== 0 && <StyledHr borderColor="black.200" />}
+                    {item.type === 'CATEGORY' ? (
+                      <MenuCategory
+                        item={item}
+                        index={index}
+                        collective={collective}
+                        onMove={onMove}
+                        onDrop={onDrop}
+                        onSectionToggle={onSectionToggle}
+                      />
+                    ) : item.type === 'SECTION' ? (
+                      <CollectiveSectionEntry
+                        key={`${item.type}-${item.name}`}
+                        section={item.name}
+                        index={index}
+                        isEnabled={item.isEnabled}
+                        collectiveType={collective.type}
+                        restrictedTo={item.restrictedTo}
+                        onMove={onMove}
+                        onDrop={onDrop}
+                        onSectionToggle={onSectionToggle}
+                        fontWeight="bold"
+                        showDragIcon
+                      />
+                    ) : null}
+                  </React.Fragment>
+                ))}
               </StyledCard>
               {error && (
                 <MessageBox type="error" fontSize="14px" withIcon my={2}>
@@ -515,7 +415,6 @@ const EditCollectivePage = ({ collective }) => {
                         value: {
                           ...data.account.settings.collectivePage,
                           sections,
-                          useNewSections,
                           showGoals: flatten(sections, item => item.sections || item).some(
                             ({ section }) => section === Sections.GOALS,
                           ),

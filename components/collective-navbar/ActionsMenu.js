@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
@@ -10,10 +10,11 @@ import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy } from 'lodash';
-import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import AddFundsBtn from '../AddFundsBtn';
+import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -25,10 +26,6 @@ import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
-
-// Dynamic imports
-const AddPrepaidBudgetModal = dynamic(() => import('../AddPrepaidBudgetModal'));
-const AddFundsModal = dynamic(() => import('../host-dashboard/AddFundsModal'));
 
 //  Styled components
 const MenuItem = styled('li')`
@@ -51,10 +48,17 @@ const MenuItem = styled('li')`
       color: #313233;
     }
 
+    &:hover:not(:disabled):not(:active) {
+      background: none;
+      color: ${props => props.theme.colors.primary[600]};
+    }
+
     &:focus {
       box-shadow: none;
       outline: none;
       text-decoration: underline;
+      background: none;
+      color: ${props => props.theme.colors.primary[600]};
     }
 
     &:disabled {
@@ -65,6 +69,7 @@ const MenuItem = styled('li')`
   svg {
     margin-right: 8px;
     fill: ${props => props.theme.colors.primary[600]};
+    color: ${props => props.theme.colors.primary[600]};
   }
 
   ${props =>
@@ -97,7 +102,7 @@ const ActionsDropdown = styled(Dropdown)`
   }
 
   ${props =>
-    props.isHiddenOnNonMobile &&
+    props.$isHiddenOnNonMobile &&
     css`
       @media screen and (min-width: 40em) {
         display: none;
@@ -118,13 +123,12 @@ const StyledActionButton = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
   border: 2px solid white;
   color: ${themeGet('colors.primary.600')};
 
-  &:focus {
-    border: 2px solid #050505;
-  }
-
   &:hover {
     background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
       linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
+  }
+
+  &:hover:not(:focus) {
     border: 2px solid white;
   }
 
@@ -174,17 +178,14 @@ export const getContributeRoute = collective => {
   return { route, params };
 };
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile, secondAction }) => {
+const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile }) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
-  const hasOnlyTwoCTAs = enabledCTAs.length === 2;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
   const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
   const hostWithinLimit = hostedCollectivesLimit
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
     : true;
-  const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
-  const [hasAddPrepaidBudgetModal, showAddPrepaidBudgetModal] = React.useState(false);
   const contributeRoute = getContributeRoute(collective);
 
   // Do not render the menu if there are no available CTAs
@@ -200,8 +201,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
       borderTop={['1px solid #e1e1e1', 'none']}
     >
       <Box px={1}>
-        {hasOnlyTwoCTAs && <Box display={['none', 'block']}>{secondAction?.component}</Box>}
-        <ActionsDropdown trigger="click" isHiddenOnNonMobile={hasOnlyTwoCTAs}>
+        <ActionsDropdown trigger="click" $isHiddenOnNonMobile={enabledCTAs.length <= 2}>
           {({ triggerProps, dropdownProps }) => (
             <React.Fragment>
               <Flex alignItems="center">
@@ -246,7 +246,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
-                      <MenuItem py={1}>
+                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
                         <StyledLink
                           as={Link}
                           route="create-expense"
@@ -280,44 +280,35 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       </MenuItem>
                     )}
                     {callsToAction.addFunds && (
-                      <Fragment>
-                        <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
-                          <StyledButton p={ITEM_PADDING} onClick={() => showAddFundsModal(true)} isBorderless>
-                            <AttachMoney size="20px" />
-                            <Span>
-                              <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
-                            </Span>
-                          </StyledButton>
-                        </MenuItem>
-                        <AddFundsModal
-                          collective={collective}
-                          host={collective.host}
-                          show={hasAddFundsModal}
-                          setShow={showAddFundsModal}
-                          onClose={() => showAddFundsModal(null)}
-                        />
-                      </Fragment>
+                      <AddFundsBtn collective={collective} host={collective.host}>
+                        {btnProps => (
+                          <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
+                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                              <AttachMoney size="20px" />
+                              <Span>
+                                <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+                              </Span>
+                            </StyledButton>
+                          </MenuItem>
+                        )}
+                      </AddFundsBtn>
                     )}
                     {callsToAction.addPrepaidBudget && (
-                      <Fragment>
-                        <MenuItem
-                          py={1}
-                          isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET}
-                        >
-                          <StyledButton p={ITEM_PADDING} onClick={() => showAddPrepaidBudgetModal(true)} isBorderless>
-                            <AttachMoney size="20px" />
-                            <Span>
-                              <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
-                            </Span>
-                          </StyledButton>
-                        </MenuItem>
-                        <AddPrepaidBudgetModal
-                          collective={collective}
-                          show={hasAddPrepaidBudgetModal}
-                          setShow={showAddPrepaidBudgetModal}
-                          onClose={() => showAddPrepaidBudgetModal(null)}
-                        />
-                      </Fragment>
+                      <AddPrepaidBudgetBtn collective={collective}>
+                        {btnProps => (
+                          <MenuItem
+                            py={1}
+                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET}
+                          >
+                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                              <AttachMoney size="20px" />
+                              <Span>
+                                <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
+                              </Span>
+                            </StyledButton>
+                          </MenuItem>
+                        )}
+                      </AddPrepaidBudgetBtn>
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
@@ -333,15 +324,13 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       </MenuItem>
                     )}
                     {callsToAction.hasApply && (
-                      <React.Fragment>
-                        <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
-                          <ApplyToHostBtn
-                            hostSlug={collective.slug}
-                            hostWithinLimit={hostWithinLimit}
-                            buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
-                          />
-                        </MenuItem>
-                      </React.Fragment>
+                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
+                        <ApplyToHostBtn
+                          hostSlug={collective.slug}
+                          hostWithinLimit={hostWithinLimit}
+                          buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
+                        />
+                      </MenuItem>
                     )}
                   </Box>
                 </DropdownContent>
@@ -388,7 +377,6 @@ CollectiveNavbarActionsMenu.propTypes = {
     addPrepaidBudget: PropTypes.bool,
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
-  secondAction: PropTypes.object,
 };
 
 CollectiveNavbarActionsMenu.defaultProps = {

@@ -47,7 +47,6 @@ import SendingMoney from './sections/SendingMoney';
 import SetupTwoFactorAuth from './sections/SetupTwoFactorAuth';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
-import Updates from './sections/Updates';
 import VirtualCards from './sections/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
@@ -212,6 +211,10 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.currency.placeholder',
         defaultMessage: 'Select currency',
       },
+      'currency.warning': {
+        id: 'collective.currency.warning',
+        defaultMessage: `Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if it's an issue.`,
+      },
       'address.label': {
         id: 'collective.address.label',
         defaultMessage: 'Address',
@@ -374,9 +377,6 @@ class EditCollectiveForm extends React.Component {
             <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
           </div>
         );
-
-      case EDIT_COLLECTIVE_SECTIONS.UPDATES:
-        return <Updates collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS:
         return <Conversations collective={collective} />;
@@ -714,15 +714,9 @@ class EditCollectiveForm extends React.Component {
           type: 'select',
           defaultValue: get(this.state.collective, 'currency'),
           options: currencyOptions,
-          when: () => {
-            if (get(this.state.collective, 'isHost')) {
-              return false;
-            }
-            if ([CollectiveType.ORGANIZATION, CollectiveType.USER].includes(get(this.state.collective, 'type'))) {
-              return true;
-            }
-            return false;
-          },
+          description: collective.isHost ? intl.formatMessage(this.messages['currency.warning']) : null,
+          disabled:
+            (collective.type === CollectiveType.COLLECTIVE && collective.isActive) || collective.isHost ? true : false,
         },
         ...this.getApplicableTaxesFields(),
         {

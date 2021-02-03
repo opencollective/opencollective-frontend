@@ -9,24 +9,9 @@ describe('New organization profile', () => {
       cy.visit(`/${collectiveSlug}/`);
     });
   });
-  describe('Contributors section', () => {
-    it('Only shows core contributors without any filter', () => {
-      cy.getByDataCy('filters').should('not.exist');
-      cy.getByDataCy('section-contributors').click();
-      cy.hash().should('eq', '#section-contributors');
-      cy.getByDataCy('section-contributors-title').contains('Team');
-      cy.getByDataCy('ContributorsGrid_ContributorCard').contains('Admin');
-    });
-  });
 
-  describe('Transactions section', () => {
-    // The rest of the transactions section tests are in `05-user.test.js`
-    it("Has no filters (because organizations don't have expenses)", () => {
-      cy.getByDataCy('filters').should('not.exist');
-      cy.getByDataCy('section-transactions').click();
-      cy.hash().should('eq', '#section-transactions');
-      cy.contains('h2', 'Transactions');
-      cy.contains('No transaction yet');
-    });
+  it('Has a team section', () => {
+    cy.getByDataCy('section-our-team').contains('Our team');
+    cy.getByDataCy('section-our-team').contains('Test User Admin');
   });
 });

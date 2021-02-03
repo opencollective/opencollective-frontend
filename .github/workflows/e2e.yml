@@ -14,7 +14,6 @@ env:
   IMAGES_URL: http://localhost:3001
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
-  ENABLE_GUEST_CONTRIBUTIONS: true
   CYPRESS_RECORD: false
   CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
@@ -87,14 +86,17 @@ jobs:
       - name: Checkout (frontend)
         uses: actions/checkout@v2-beta
 
+      - name: Set REF in env, removing the `refs/` part
+        run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV
+
       - name: Check matching branch (api)
         id: check-matching-branch
         uses: octokit/request-action@v2.x
         with:
-          route: GET /repos/:owner/:repo/git/:ref
+          route: GET /repos/{owner}/{repo}/git/ref/{ref}
           owner: opencollective
           repo: opencollective-api
-          ref: ${{ github.ref }}
+          ref: ${{ env.MATCHING_BRANCH_REF }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true

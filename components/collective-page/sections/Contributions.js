@@ -2,13 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { hasNewNavbar } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 
@@ -21,12 +18,9 @@ import StyledFilters from '../../StyledFilters';
 import { fadeIn } from '../../StyledKeyframes';
 import StyledMembershipCard from '../../StyledMembershipCard';
 import { H3 } from '../../Text';
-import { Dimensions, Sections } from '../_constants';
+import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
-import SectionHeader from '../SectionHeader';
 import SectionTitle from '../SectionTitle';
-
-import contributeSectionHeaderIcon from '../../../public/static/images/collective-navigation/CollectiveSectionHeaderIconContribute.png';
 
 const FILTERS = {
   ALL: 'ALL',
@@ -36,6 +30,7 @@ const FILTERS = {
   FINANCIAL: 'FINANCIAL',
   EVENTS: 'EVENTS',
 };
+
 const FILTERS_LIST = Object.values(FILTERS);
 const I18nFilters = defineMessages({
   [FILTERS.ALL]: {
@@ -138,9 +133,6 @@ class SectionContributions extends React.PureComponent {
 
     /** @ignore from withIntl */
     intl: PropTypes.object,
-
-    /** @ignore from withRouter */
-    router: PropTypes.object,
   };
 
   state = {
@@ -217,9 +209,8 @@ class SectionContributions extends React.PureComponent {
   };
 
   render() {
-    const { collective, data, intl, router } = this.props;
+    const { collective, data, intl } = this.props;
     const { nbMemberships, selectedFilter } = this.state;
-    const newNavbarFeatureFlag = hasNewNavbar(get(router, 'query.navbarVersion'));
 
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
@@ -250,18 +241,6 @@ class SectionContributions extends React.PureComponent {
         {memberOf.length > 0 && (
           <React.Fragment>
             <ContainerSectionContent>
-              {!newNavbarFeatureFlag && (
-                <SectionHeader
-                  title={Sections.CONTRIBUTIONS}
-                  subtitle={
-                    <FormattedMessage
-                      id="CollectivePage.SectionContributions.Subtitle"
-                      defaultMessage="How we are supporting Collectives."
-                    />
-                  }
-                  illustrationSrc={contributeSectionHeaderIcon}
-                />
-              )}
               {data.Collective.stats.collectives.hosted > 0 && (
                 <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
                   <FormattedMessage
@@ -444,4 +423,4 @@ const addContributionsSectionData = graphql(contributionsSectionQuery, {
   }),
 });
 
-export default React.memo(withRouter(injectIntl(addContributionsSectionData(SectionContributions))));
+export default React.memo(injectIntl(addContributionsSectionData(SectionContributions)));

@@ -94,7 +94,6 @@ class ContributionFlow extends React.Component {
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
-    hasGuestContributions: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
     verb: PropTypes.string,
@@ -456,8 +455,7 @@ class ContributionFlow extends React.Component {
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
-    const hasPickedGuestProfile = this.props.hasGuestContributions && stepProfile?.isGuest;
-    const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || hasPickedGuestProfile);
+    const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || stepProfile?.isGuest);
 
     const steps = [
       {
@@ -513,13 +511,13 @@ class ContributionFlow extends React.Component {
     return steps;
   }
 
-  getPaypalButtonProps() {
+  getPaypalButtonProps({ currency }) {
     const { stepPayment, stepDetails, stepSummary } = this.state;
     if (stepPayment?.paymentMethod?.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
-      const { collective, host } = this.props;
+      const { host } = this.props;
       return {
         host: host,
-        currency: collective.currency,
+        currency: currency,
         style: { size: 'responsive', height: 47 },
         totalAmount: getTotalAmount(stepDetails, stepSummary),
         onClick: () => this.setState({ isSubmitting: true }),
@@ -570,6 +568,8 @@ class ContributionFlow extends React.Component {
     const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
 
+    const currency = tier?.amount.currency || collective.currency;
+
     return (
       <Steps
         steps={this.getSteps()}
@@ -615,7 +615,7 @@ class ContributionFlow extends React.Component {
                 stepSummary={stepSummary}
                 isSubmitted={this.state.isSubmitted}
                 loading={isValidating || isSubmitted || isSubmitting}
-                currency={collective.currency}
+                currency={currency}
                 isFreeTier={this.getTierMinAmount(tier) === 0}
               />
             </StepsProgressBox>
@@ -624,9 +624,7 @@ class ContributionFlow extends React.Component {
               <Box py={[4, 5]}>
                 <Loading />
               </Box>
-            ) : currentStep.name === STEPS.PROFILE &&
-              !LoggedInUser &&
-              (this.state.showSignIn || !this.props.hasGuestContributions) ? (
+            ) : currentStep.name === STEPS.PROFILE && !LoggedInUser && this.state.showSignIn ? (
               <SignInOrJoinFree
                 defaultForm={this.state.showSignIn ? 'signin' : 'create-account'}
                 redirect={this.getRedirectUrlForSignIn()}
@@ -683,9 +681,9 @@ class ContributionFlow extends React.Component {
                       nextStep={nextStep}
                       isRecurringContributionLoggedOut={Boolean(!LoggedInUser && stepDetails?.interval)}
                       isValidating={isValidating || isSubmitted || isSubmitting}
-                      paypalButtonProps={this.getPaypalButtonProps()}
+                      paypalButtonProps={this.getPaypalButtonProps({ currency })}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
-                      currency={collective.currency}
+                      currency={currency}
                     />
                   </Box>
                 </Box>
@@ -698,6 +696,7 @@ class ContributionFlow extends React.Component {
                         stepDetails={stepDetails}
                         stepSummary={stepSummary}
                         stepPayment={stepPayment}
+                        currency={currency}
                       />
                     </Box>
                     <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />
