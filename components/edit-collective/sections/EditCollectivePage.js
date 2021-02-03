@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
-import { cloneDeep, flatten, get, isEqual, set } from 'lodash';
+import { cloneDeep, flatten, isEqual, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { useDrag, useDrop } from 'react-dnd';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { addDefaultSections, getSectionPath } from '../../../lib/collective-sections';
+import { getCollectiveSections, getSectionPath } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
@@ -209,19 +209,6 @@ CollectiveSectionEntry.propTypes = {
   parentItem: PropTypes.object,
 };
 
-/**
- * Sections used to be stored as an array of string. This helpers loads and convert them to
- * the new format if necessary.
- */
-const loadSectionsForCollective = collective => {
-  const collectiveSections = get(collective, 'settings.collectivePage.sections');
-  if (collectiveSections) {
-    return addDefaultSections(collective, collectiveSections, false);
-  } else {
-    return addDefaultSections(collective, [], true);
-  }
-};
-
 const getNewSections = memoizeOne((sections, item, toIndex) => {
   const newSections = cloneDeep(sections);
   if (item.parentItem) {
@@ -318,7 +305,7 @@ const EditCollectivePage = ({ collective }) => {
   // Load sections from fetched collective
   React.useEffect(() => {
     if (data?.account) {
-      const sections = loadSectionsForCollective(data.account, true);
+      const sections = getCollectiveSections(data.account);
       setSections(sections);
     }
   }, [data?.account]);

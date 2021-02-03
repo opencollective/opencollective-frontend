@@ -44,7 +44,7 @@ describe('Archive Collective', () => {
       cy.get('[data-cy=submit-expense-btn]').should('not.exist');
 
       cy.visit(`${collectiveSlug}/expenses/new`);
-      cy.contains('This feature is not activated for this collective.');
+      cy.contains('Page inaccessible');
     });
   });
 });
