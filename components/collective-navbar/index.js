@@ -191,7 +191,6 @@ const getDefaultCallsToActions = (collective, isAdmin, isHostAdmin, isRoot) => {
 
 /**
  * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
- * Returns the second CTA that should be displayed as a button in ActionsMenu.js if only 2 CTAs.
  */
 const getMainAction = (collective, callsToAction) => {
   if (!collective || !callsToAction) {
@@ -239,6 +238,20 @@ const getMainAction = (collective, callsToAction) => {
         />
       ),
     };
+  } else if (callsToAction.includes('hasRequestGrant')) {
+    return {
+      type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
+      component: (
+        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
+          <MainActionBtn tabIndex="-1">
+            <MoneyCheckAlt size="1em" />
+            <Span ml={2}>
+              <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
+            </Span>
+          </MainActionBtn>
+        </Link>
+      ),
+    };
   } else if (callsToAction.includes('hasSubmitExpense')) {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
@@ -276,20 +289,6 @@ const getMainAction = (collective, callsToAction) => {
             <Envelope size="1em" />
             <Span ml={2}>
               <FormattedMessage id="Contact" defaultMessage="Contact" />
-            </Span>
-          </MainActionBtn>
-        </Link>
-      ),
-    };
-  } else if (callsToAction.includes('hasRequestGrant')) {
-    return {
-      type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
-      component: (
-        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
-          <MainActionBtn tabIndex="-1">
-            <MoneyCheckAlt size="1em" />
-            <Span ml={2}>
-              <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
             </Span>
           </MainActionBtn>
         </Link>
@@ -393,7 +392,7 @@ const CollectiveNavbar = ({
   callsToAction = { ...getDefaultCallsToActions(collective, isAdmin, isHostAdmin, isRoot), ...callsToAction };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
   const mainAction = getMainAction(collective, actionsArray);
-  const secondAction = getMainAction(collective, without(actionsArray, mainAction?.type));
+  const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));
   const navbarRef = useRef();
 
   useGlobalBlur(navbarRef, outside => {
@@ -508,6 +507,7 @@ const CollectiveNavbar = ({
             {mainAction && (
               <Container display={['none', 'flex']} alignItems="center">
                 {mainAction.component}
+                {secondAction?.component || null}
               </Container>
             )}
             {!isLoading && (
@@ -515,7 +515,6 @@ const CollectiveNavbar = ({
                 collective={collective}
                 callsToAction={callsToAction}
                 hiddenActionForNonMobile={mainAction?.type}
-                secondAction={secondAction}
               />
             )}
             {!onlyInfos && (
