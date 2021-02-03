@@ -101,7 +101,10 @@ class UpdateBankDetailsForm extends React.Component {
                 )}
                 <li>
                   <code>&#123;amount&#125;</code>:{' '}
-                  <FormattedMessage id="bankaccount.instructions.amount" defaultMessage="Total amount the payer should transfer." />
+                  <FormattedMessage
+                    id="bankaccount.instructions.amount"
+                    defaultMessage="Total amount the payer should transfer."
+                  />
                 </li>
                 <li>
                   <code>&#123;collective&#125;</code>:{' '}

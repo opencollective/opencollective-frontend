@@ -198,7 +198,7 @@ const FiscalHosting = ({ collective }) => {
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.hostAccount.deactivate.description"
             defaultMessage={
-              "After deactivating, you will not be able to act as a Host anymore. The profile will remain active as a {type}."
+              'After deactivating, you will not be able to act as a Host anymore. The profile will remain active as a {type}.'
             }
           />
         </P>
@@ -233,7 +233,9 @@ const FiscalHosting = ({ collective }) => {
           <FormattedMessage
             values={{ hostedCollectives: collective.plan.hostedCollectives }}
             id="collective.hostAccount.deactivate.isHost"
-            defaultMessage={"You are currently hosting {hostedCollectives} Collectives. To deactivate, they need to be moved to a different Host or archived."}
+            defaultMessage={
+              'You are currently hosting {hostedCollectives} Collectives. To deactivate, they need to be moved to a different Host or archived.'
+            }
           />
         </P>
       )}

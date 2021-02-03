@@ -258,12 +258,7 @@ class PayoutMethodSelect extends React.Component {
             type="remove"
             onClose={() => this.setState({ removingPayoutMethod: null })}
             continueHandler={() => this.removePayoutMethod(removingPayoutMethod)}
-            header={
-              <FormattedMessage
-                id="PayoutMethod.RemoveWarning"
-                defaultMessage="Remove this payout method?"
-              />
-            }
+            header={<FormattedMessage id="PayoutMethod.RemoveWarning" defaultMessage="Remove this payout method?" />}
           >
             <Box mb={2}>
               <PayoutMethodTypeWithIcon type={removingPayoutMethod.type} />

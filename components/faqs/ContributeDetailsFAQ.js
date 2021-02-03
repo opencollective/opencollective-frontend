@@ -36,10 +36,7 @@ const ContributeDetailsFAQ = ({ tax, isIncognito, hasInterval, ...props }) =>
       {hasInterval && (
         <Entry>
           <Title>
-            <FormattedMessage
-              id="ContributeDetails.faq.frequency.title"
-              defaultMessage="When will I be charged?"
-            />
+            <FormattedMessage id="ContributeDetails.faq.frequency.title" defaultMessage="When will I be charged?" />
           </Title>
           <Content>
             <FormattedMessage

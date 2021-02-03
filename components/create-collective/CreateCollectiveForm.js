@@ -47,7 +47,7 @@ const placeholders = {
 };
 
 const messages = defineMessages({
-  nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "Collective name" },
+  nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective name' },
   slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
@@ -288,10 +288,7 @@ class CreateCollectiveForm extends React.Component {
                           mt={24}
                           label={
                             get(host, 'settings.applyMessage') || (
-                              <FormattedMessage
-                                id="ApplyToHost.WriteMessage"
-                                defaultMessage="Message to Fiscal Host"
-                              />
+                              <FormattedMessage id="ApplyToHost.WriteMessage" defaultMessage="Message to Fiscal Host" />
                             )
                           }
                         >

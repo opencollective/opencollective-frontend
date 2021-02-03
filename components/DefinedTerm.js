@@ -62,8 +62,7 @@ const TranslatedDefinitions = defineMessages({
   },
   [Terms.PLATFORM_FEE]: {
     id: 'host.platformFee.help',
-    defaultMessage:
-      'The Platform fee is what Open Collective charges for use of the software.',
+    defaultMessage: 'The Platform fee is what Open Collective charges for use of the software.',
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard.definition',

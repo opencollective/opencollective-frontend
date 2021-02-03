@@ -23,13 +23,13 @@ import { H1, H4, P } from './Text';
 import { withUser } from './UserProvider';
 
 const orgMessages = defineMessages({
-  nameLabel: { id: 'createOrg.form.nameLabel', defaultMessage: "Organization name" },
+  nameLabel: { id: 'createOrg.form.nameLabel', defaultMessage: 'Organization name' },
   slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
     defaultMessage: 'Making the world a better place',
   },
-  websiteLabel: { id: 'createOrg.form.webstiteLabel', defaultMessage: "Organization website" },
+  websiteLabel: { id: 'createOrg.form.webstiteLabel', defaultMessage: 'Organization website' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'ExpenseForm.inviteeOrgDescriptionLabel',

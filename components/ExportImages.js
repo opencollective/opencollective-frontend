@@ -51,8 +51,7 @@ class ExportImages extends React.Component {
               },
               {
                 name: 'color',
-                description:
-                  'badge color (brightgreen, green, yellowgreen, yellow, orange, red, lightgrey, blue)',
+                description: 'badge color (brightgreen, green, yellowgreen, yellow, orange, red, lightgrey, blue)',
                 defaultValue: 'brightgreen',
               },
             ],

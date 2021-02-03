@@ -85,10 +85,7 @@ const GenericPlanFeatures = ({ plan }) => {
         <FormattedMessage id="Host.Plan.BankTransfers.unlimited" defaultMessage="Unlimited bank transfers" />
       </li>
       <li>
-        <FormattedMessage
-          id="Host.Plan.TransferwisePayouts.unlimited"
-          defaultMessage="Unlimited payouts"
-        />
+        <FormattedMessage id="Host.Plan.TransferwisePayouts.unlimited" defaultMessage="Unlimited payouts" />
       </li>
     </ul>
   );
@@ -139,10 +136,7 @@ const NewPlanFeatures = ({ collective, plan, label, loading, editHostPlan, hostF
             <FormattedMessage id="Host.Plan.BankTransfers.unlimited" defaultMessage="Unlimited bank transfers" />
           </li>
           <li>
-            <FormattedMessage
-              id="Host.Plan.TransferwisePayouts.unlimited"
-              defaultMessage="Unlimited payouts"
-            />
+            <FormattedMessage id="Host.Plan.TransferwisePayouts.unlimited" defaultMessage="Unlimited payouts" />
           </li>
           <li>
             <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimum revenue." />
@@ -284,10 +278,7 @@ const HostPlan = props => {
                 <FormattedMessage id="Host.Plan.BankTransfers.unlimited" defaultMessage="Unlimited bank transfers" />
               </li>
               <li>
-                <FormattedMessage
-                  id="Host.Plan.TransferwisePayouts.unlimited"
-                  defaultMessage="Unlimited payouts"
-                />
+                <FormattedMessage id="Host.Plan.TransferwisePayouts.unlimited" defaultMessage="Unlimited payouts" />
               </li>
               <li>
                 <FormattedMessage

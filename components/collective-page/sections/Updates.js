@@ -124,10 +124,7 @@ class SectionUpdates extends React.PureComponent {
         </SectionTitle>
         <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
           <P color="black.700" my={2} css={{ flex: '1 0 50%', maxWidth: 700 }}>
-            <FormattedMessage
-              id="section.updates.subtitle"
-              defaultMessage="Updates on our activities and progress."
-            />
+            <FormattedMessage id="section.updates.subtitle" defaultMessage="Updates on our activities and progress." />
           </P>
           {isAdmin && (
             <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
@@ -198,7 +195,10 @@ class SectionUpdates extends React.PureComponent {
                         {update.isPrivate && (
                           <StyledTooltip
                             content={() => (
-                              <FormattedMessage id="update.private.lock_text" defaultMessage="This update is for contributors only" />
+                              <FormattedMessage
+                                id="update.private.lock_text"
+                                defaultMessage="This update is for contributors only"
+                              />
                             )}
                           >
                             <Box mr={1}>

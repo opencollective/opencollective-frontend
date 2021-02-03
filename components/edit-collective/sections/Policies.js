@@ -60,8 +60,7 @@ const messages = defineMessages({
   },
   'contributionPolicy.placeholder': {
     id: 'collective.contributionPolicy.placeholder',
-    defaultMessage:
-      'E.g. what types of contributions you will and will not accept.',
+    defaultMessage: 'E.g. what types of contributions you will and will not accept.',
   },
   'contributionPolicy.error': {
     id: 'collective.contributionPolicy.error',
@@ -73,8 +72,7 @@ const messages = defineMessages({
   },
   'expensePolicy.placeholder': {
     id: 'collective.expensePolicy.placeholder',
-    defaultMessage:
-      'E.g. approval criteria, limitations, or required documentation.',
+    defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
   },
   'expensePolicy.error': {
     id: 'collective.expensePolicy.error',

@@ -41,8 +41,7 @@ const messages = defineMessages({
   },
   bodyPlaceholder: {
     id: 'CreateConversation.Body.Placeholder',
-    defaultMessage:
-      'You can add text, links, lists, code snipets, and more here.',
+    defaultMessage: 'You can add text, links, lists, code snipets, and more here.',
   },
 });
 

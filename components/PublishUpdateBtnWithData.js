@@ -66,12 +66,7 @@ class PublishUpdateBtn extends React.Component {
         value: 'FINANCIAL_CONTRIBUTORS',
       },
       {
-        label: (
-          <FormattedMessage
-            id="update.notify.hostedCollectiveAdmins"
-            defaultMessage="Notify Collective admins"
-          />
-        ),
+        label: <FormattedMessage id="update.notify.hostedCollectiveAdmins" defaultMessage="Notify Collective admins" />,
         value: 'COLLECTIVE_ADMINS',
       },
       {

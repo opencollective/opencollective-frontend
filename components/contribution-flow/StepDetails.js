@@ -131,10 +131,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           />
         </Box>
       ) : !hasQuantity ? (
-        <FormattedMessage
-          id="contribute.freeTier"
-          defaultMessage="This is a free tier."
-        />
+        <FormattedMessage id="contribute.freeTier" defaultMessage="This is a free tier." />
       ) : null}
 
       {hasQuantity && (

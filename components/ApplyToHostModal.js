@@ -337,10 +337,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                       labelProps={{ fontSize: '13px', lineHeight: '16px', fontWeight: '600', color: 'black.700' }}
                       label={
                         get(host, 'settings.applyMessage') || (
-                          <FormattedMessage
-                            id="ApplyToHost.WriteMessage"
-                            defaultMessage="Message to the Fiscal Host"
-                          />
+                          <FormattedMessage id="ApplyToHost.WriteMessage" defaultMessage="Message to the Fiscal Host" />
                         )
                       }
                     >

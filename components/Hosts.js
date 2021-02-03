@@ -35,7 +35,7 @@ class Hosts extends React.Component {
       'hosts.description': {
         id: 'hosts.description',
         defaultMessage:
-          "Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}",
+          'Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}',
       },
       'hosts.findOutMoreLink': {
         id: 'hosts.description.findOutMoreLink',

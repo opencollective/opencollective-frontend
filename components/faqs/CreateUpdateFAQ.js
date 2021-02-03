@@ -19,10 +19,7 @@ const CreateUpdateFAQ = ({ defaultOpen, ...props }) => (
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage
-          id="CreateUpdateFAQ.notification"
-          defaultMessage="Who gets notificatied of Updates?"
-        />
+        <FormattedMessage id="CreateUpdateFAQ.notification" defaultMessage="Who gets notificatied of Updates?" />
       </Title>
       <Content>
         <FormattedMessage
@@ -36,10 +33,7 @@ const CreateUpdateFAQ = ({ defaultOpen, ...props }) => (
         <FormattedMessage id="CreateUpdateFAQ.moderation" defaultMessage="Who can post an Update?" />
       </Title>
       <Content>
-        <FormattedMessage
-          id="CreateUpdateFAQ.moderation.content"
-          defaultMessage="Only the admins can post Updates."
-        />
+        <FormattedMessage id="CreateUpdateFAQ.moderation.content" defaultMessage="Only the admins can post Updates." />
       </Content>
     </Entry>
     <Entry open={defaultOpen}>

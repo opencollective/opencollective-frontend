@@ -100,10 +100,7 @@ class ErrorPage extends React.Component {
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={6}>
         <H1 fontSize={30} textAlign="center">
-          <FormattedMessage
-            id="page.error.networkError"
-            defaultMessage="Open Collective is momentarily unreachable"
-          />
+          <FormattedMessage id="page.error.networkError" defaultMessage="Open Collective is momentarily unreachable" />
           &nbsp; 🙀
         </H1>
         <Flex mt={3}>

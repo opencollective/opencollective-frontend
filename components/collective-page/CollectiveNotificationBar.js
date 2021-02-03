@@ -22,8 +22,7 @@ const messages = defineMessages({
   },
   collectiveApprovedDescription: {
     id: 'collective.githubflow.created.description',
-    defaultMessage:
-      "You have been approved by {host} and can now receive financial contributions.",
+    defaultMessage: 'You have been approved by {host} and can now receive financial contributions.',
   },
   // Fund Created
   fundCreated: {
@@ -36,7 +35,7 @@ const messages = defineMessages({
   },
   fundCreatedApprovedDescription: {
     id: 'createFund.createdApproved.description',
-    defaultMessage: "You have been approved by {host}, and can now make contributions and submit expenses.",
+    defaultMessage: 'You have been approved by {host}, and can now make contributions and submit expenses.',
   },
   // Event Created
   eventCreated: {
@@ -82,8 +81,7 @@ const messages = defineMessages({
   },
   'event.over.sendMoneyToParent.description': {
     id: 'event.over.sendMoneyToParent.description',
-    defaultMessage:
-      'Spend it by submitting event expenses, or transfer the remaining balance to the main budget.',
+    defaultMessage: 'Spend it by submitting event expenses, or transfer the remaining balance to the main budget.',
   },
   'event.over.sendMoneyToParent.transaction.description': {
     id: 'event.over.sendMoneyToParent.transaction.description',

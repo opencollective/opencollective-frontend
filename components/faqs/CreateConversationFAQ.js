@@ -30,10 +30,7 @@ const CreateConversationFAQ = ({ defaultOpen, ...props }) => (
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage
-          id="CreateConversationFAQ.replies"
-          defaultMessage="Will I be notified of replies?"
-        />
+        <FormattedMessage id="CreateConversationFAQ.replies" defaultMessage="Will I be notified of replies?" />
       </Title>
       <Content>
         <FormattedMessage

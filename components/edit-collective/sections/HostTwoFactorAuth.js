@@ -30,8 +30,7 @@ const messages = defineMessages({
   },
   'rollingLimit.placeholder': {
     id: 'collective.contributionPolicy.placeholder',
-    defaultMessage:
-      'E.g. what type of contributions you will or will not accept.',
+    defaultMessage: 'E.g. what type of contributions you will or will not accept.',
   },
   'rollingLimit.enable': {
     id: 'editCollective.rollingLimit.enable',

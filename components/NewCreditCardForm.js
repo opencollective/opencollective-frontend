@@ -116,7 +116,10 @@ class NewCreditCardFormWithoutStripe extends React.Component {
       if (!stripeData.complete) {
         if (!this.props.hidePostalCode && !stripeData.value?.postalCode) {
           return (
-            <FormattedMessage id="NewCreditCardForm.PostalCode" defaultMessage="Credit card zip/postal code is required" />
+            <FormattedMessage
+              id="NewCreditCardForm.PostalCode"
+              defaultMessage="Credit card zip/postal code is required"
+            />
           );
         }
       }

@@ -126,8 +126,7 @@ const messages = defineMessages({
   },
   'home.learnMore.openSourceCode': {
     id: 'home.learnMore.OpenSourceCode',
-    defaultMessage:
-      'Our code is open source. You can contribute! Check it out on GitHub.',
+    defaultMessage: 'Our code is open source. You can contribute! Check it out on GitHub.',
   },
   'home.learnMore.openSourceCode.buttonText': {
     id: 'home.learnMore.openSourceCode.buttonText',

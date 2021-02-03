@@ -47,8 +47,7 @@ class EditTwitterAccount extends React.Component {
       },
       'newBacker.tweet': {
         id: 'connectedAccounts.twitter.newBacker.tweet',
-        defaultMessage:
-          '{backerTwitterHandle} thank you for your contribution of {amount} 🙏 - it makes a difference!',
+        defaultMessage: '{backerTwitterHandle} thank you for your contribution of {amount} 🙏 - it makes a difference!',
       },
       'monthlyStats.toggle.label': {
         id: 'connectedAccounts.twitter.monthlyStats.toggle.label',
@@ -77,8 +76,7 @@ class EditTwitterAccount extends React.Component {
       },
       'tenBackers.tweet': {
         id: 'connectedAccounts.twitter.tenBackers.tweet',
-        defaultMessage:
-          '🎉 {collective} just reached 10 contributors! Thank you {topBackersTwitterHandles}! 🙌',
+        defaultMessage: '🎉 {collective} just reached 10 contributors! Thank you {topBackersTwitterHandles}! 🙌',
       },
       'oneHundredBackers.toggle.label': {
         id: 'connectedAccounts.twitter.oneHundredBackers.toggle.label',

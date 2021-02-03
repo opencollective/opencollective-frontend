@@ -232,10 +232,7 @@ const PaymentReceipts = ({ collective }) => {
           />
         }
       >
-        <FormattedMessage
-          id="paymentReceipts.section.title"
-          defaultMessage="Monthly payment receipts"
-        />
+        <FormattedMessage id="paymentReceipts.section.title" defaultMessage="Monthly payment receipts" />
       </SettingsTitle>
       <Box mt={4}>
         <P

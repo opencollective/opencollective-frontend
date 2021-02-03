@@ -233,10 +233,7 @@ const BankTransfer = props => {
               )}
 
               <SettingsSectionTitle mt={4}>
-                <FormattedMessage
-                  id="paymentMethods.manual.instructions.title"
-                  defaultMessage="Define instructions"
-                />
+                <FormattedMessage id="paymentMethods.manual.instructions.title" defaultMessage="Define instructions" />
               </SettingsSectionTitle>
               <Box mr={2} flexGrow={1}>
                 <UpdateBankDetailsForm

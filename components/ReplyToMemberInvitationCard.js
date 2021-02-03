@@ -21,8 +21,7 @@ import { withUser } from './UserProvider';
 const messages = defineMessages({
   emailDetails: {
     id: 'MemberInvitation.detailsEmail',
-    defaultMessage:
-      'If you accept, your email address will be visible to other admins of this Collective.',
+    defaultMessage: 'If you accept, your email address will be visible to other admins of this Collective.',
   },
   decline: {
     id: 'Decline',
