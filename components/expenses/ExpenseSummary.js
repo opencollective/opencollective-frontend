@@ -81,7 +81,7 @@ const ExpenseSummary = ({
         <H4 mb={2} mr={2} fontWeight="500" data-cy="expense-description">
           {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
         </H4>
-        <Box display="flex" mb={3} width={1} justifyContent={['space-between', 'end']} alignItems="center">
+        <Box display="flex" mb={3} width={1} justifyContent={['space-between', 'flex-end']} alignItems="center">
           {expense?.status && (
             <Box>
               <ExpenseStatusTag
