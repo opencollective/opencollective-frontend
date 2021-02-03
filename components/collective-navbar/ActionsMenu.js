@@ -102,7 +102,7 @@ const ActionsDropdown = styled(Dropdown)`
   }
 
   ${props =>
-    props.isHiddenOnNonMobile &&
+    props.$isHiddenOnNonMobile &&
     css`
       @media screen and (min-width: 40em) {
         display: none;
@@ -178,10 +178,9 @@ export const getContributeRoute = collective => {
   return { route, params };
 };
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile, secondAction }) => {
+const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile }) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
-  const hasOnlyTwoCTAs = enabledCTAs.length === 2;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
   const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
   const hostWithinLimit = hostedCollectivesLimit
@@ -202,8 +201,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
       borderTop={['1px solid #e1e1e1', 'none']}
     >
       <Box px={1}>
-        {hasOnlyTwoCTAs && <Box display={['none', 'block']}>{secondAction?.component}</Box>}
-        <ActionsDropdown trigger="click" isHiddenOnNonMobile={hasOnlyTwoCTAs}>
+        <ActionsDropdown trigger="click" $isHiddenOnNonMobile={enabledCTAs.length <= 2}>
           {({ triggerProps, dropdownProps }) => (
             <React.Fragment>
               <Flex alignItems="center">
@@ -248,7 +246,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
-                      <MenuItem py={1}>
+                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
                         <StyledLink
                           as={Link}
                           route="create-expense"
@@ -379,7 +377,6 @@ CollectiveNavbarActionsMenu.propTypes = {
     addPrepaidBudget: PropTypes.bool,
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
-  secondAction: PropTypes.object,
 };
 
 CollectiveNavbarActionsMenu.defaultProps = {
