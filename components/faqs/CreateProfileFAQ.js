@@ -43,7 +43,7 @@ const CreateProfileFAQ = props => (
       <Content>
         <FormattedMessage
           id="createProfile.faq.privacy.content"
-          defaultMessage="We care about privacy. We don't use cookies, Google Analytics, or any kind of tracking. We collect certain personal information because it's required for regulatory reasons that the entity receiving money from you know who you are (KYC - Know Your Customer). You can choose to make an incognito contribution if you don't want your identity to be public."
+          defaultMessage="We care about privacy. We don't use cookies, Google Analytics, or any kind of tracking. We collect certain personal information because it\'s required for regulatory reasons that the entity receiving money from you know who you are (KYC - Know Your Customer). You can choose to make an incognito contribution if you don't want your identity to be public."
         />
       </Content>
     </Entry>

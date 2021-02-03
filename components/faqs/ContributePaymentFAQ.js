@@ -12,7 +12,7 @@ const ContributePaymentFAQ = props => (
       <Title>
         <FormattedMessage
           id="createProfile.faq.giftsCardsWithIncognito.title"
-          defaultMessage="Why can't I see my gift card?"
+          defaultMessage="Why can\'t I see my gift card?"
         />
       </Title>
       <Content>

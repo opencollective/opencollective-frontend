@@ -12,7 +12,7 @@ const ROLES_DETAILS = defineMessages({
   [roles.MEMBER]: {
     id: 'RoleDetails.MEMBER',
     defaultMessage:
-      'Core contributors show up in the Team section of your page and can create events, but can't change settings or approve expenses.',
+      "Core contributors show up in the Team section of your page and can create events, but can't change settings or approve expenses.",
   },
   [roles.ACCOUNTANT]: {
     id: 'RoleDetails.ACCOUNTANT',

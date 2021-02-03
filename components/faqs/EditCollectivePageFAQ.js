@@ -8,7 +8,10 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
   <FAQ {...props}>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="EditCollectivePageFAQ.Data" defaultMessage="If I disable a section will its content be deleted?" />
+        <FormattedMessage
+          id="EditCollectivePageFAQ.Data"
+          defaultMessage="If I disable a section will its content be deleted?"
+        />
       </Title>
       <Content>
         <FormattedMessage
@@ -24,7 +27,7 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
       <Content>
         <FormattedMessage
           id="EditCollectivePageFAQ.EditHiddenDetails"
-          defaultMessage='No. To edit a section, you need to make it to visible.'
+          defaultMessage="No. To edit a section, you need to make it to visible."
         />
       </Content>
     </Entry>
@@ -33,15 +36,12 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
         <FormattedMessage id="EditCollectivePageFAQ.Publish" defaultMessage="When will changes be published?" />
       </Title>
       <Content>
-        <FormattedMessage
-          id="EditCollectivePageFAQ.PublishDetails"
-          defaultMessage='As soon as you click "Save".'
-        />
+        <FormattedMessage id="EditCollectivePageFAQ.PublishDetails" defaultMessage='As soon as you click "Save".' />
       </Content>
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="EditCollectivePageFAQ.HideBudget" defaultMessage="Why can't I hide my budget section?" />
+        <FormattedMessage id="EditCollectivePageFAQ.HideBudget" defaultMessage="Why can\'t I hide my budget section?" />
       </Title>
       <Content>
         <FormattedMessage

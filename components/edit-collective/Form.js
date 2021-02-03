@@ -134,12 +134,11 @@ class EditCollectiveForm extends React.Component {
       'expensePolicy.description': {
         id: 'collective.expensePolicy.description',
         defaultMessage:
-          "Clarity about requirements, limitations, and expectations helps expense submitters know what to do.",
+          'Clarity about requirements, limitations, and expectations helps expense submitters know what to do.',
       },
       'expensePolicy.placeholder': {
         id: 'collective.expensePolicy.placeholder',
-        defaultMessage:
-          'E.g. what can be approved, required information, tax details, expected payment schedule, etc.',
+        defaultMessage: 'E.g. what can be approved, required information, tax details, expected payment schedule, etc.',
       },
       'startsAt.label': {
         id: 'startDateAndTime',
@@ -172,12 +171,12 @@ class EditCollectiveForm extends React.Component {
       },
       'application.message.description': {
         id: 'application.message.description',
-        defaultMessage:
-          'These instructions appear above the text box that applicants see (1000 characters max)',
+        defaultMessage: 'These instructions appear above the text box that applicants see (1000 characters max)',
       },
       'application.message.defaultValue': {
         id: 'ApplyToHost.WriteMessage',
-        defaultMessage: 'Explain what information applicants should submit for your review (plain text, 3000 characters max), or direct them to an external application form.',
+        defaultMessage:
+          'Explain what information applicants should submit for your review (plain text, 3000 characters max), or direct them to an external application form.',
       },
       'hostFeePercent.label': {
         id: 'HostFee',
@@ -213,7 +212,7 @@ class EditCollectiveForm extends React.Component {
       },
       'currency.warning': {
         id: 'collective.currency.warning',
-        defaultMessage: `Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if it's an issue.`,
+        defaultMessage: `Active Collectives and Fiscal Hosts can\'t edit their currency. Contact support@opencollective.com if this is an issue.`,
       },
       'address.label': {
         id: 'collective.address.label',

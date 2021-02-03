@@ -178,7 +178,8 @@ class Tiers extends React.Component {
       },
       standalonePageDescription: {
         id: 'tier.standalonePageDescription',
-        defaultMessage: 'Whether to create a <link>standalone</link> page for this tier. It's like a mini-crowdfunding campaign page that you can add a detailed description and video to, and link to directly',
+        defaultMessage:
+          "Create a <link>standalone</link> page for this tier? It's like a mini-crowdfunding campaign page that you can add a detailed description and video to, and link to directly",
       },
     });
 

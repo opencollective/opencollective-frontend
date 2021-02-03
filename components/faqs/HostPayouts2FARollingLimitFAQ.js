@@ -36,7 +36,10 @@ const HostPayouts2FARollingLimitFAQ = ({ defaultOpen, currency, ...props }) => (
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="RollingLimitFAQ.admins" defaultMessage="Do all admins need to use 2FA if we turn it on?" />
+        <FormattedMessage
+          id="RollingLimitFAQ.admins"
+          defaultMessage="Do all admins need to use 2FA if we turn it on?"
+        />
       </Title>
       <Content>
         <FormattedMessage
@@ -47,7 +50,7 @@ const HostPayouts2FARollingLimitFAQ = ({ defaultOpen, currency, ...props }) => (
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="RollingLimitFAQ.disable" defaultMessage="How do I disable 2FA once it's been enabled?" />
+        <FormattedMessage id="RollingLimitFAQ.disable" defaultMessage="How do I disable 2FA once it\'s been enabled?" />
       </Title>
       <Content>
         <FormattedMessage

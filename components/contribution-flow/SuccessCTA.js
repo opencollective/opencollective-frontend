@@ -40,7 +40,7 @@ const contentMessages = defineMessages({
   [SUCCESS_CTA_TYPE.BLOG]: {
     id: 'NewContributionFlow.Success.CTA.Read.Content',
     defaultMessage:
-      'Open Collective aims to foster transparency and sustainability in communities around the world. Here's how you can participate.',
+      "Open Collective aims to foster transparency and sustainability in communities around the world. Here's how you can participate.",
   },
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {
     id: 'home.joinUsSection.weNeedUpdate',

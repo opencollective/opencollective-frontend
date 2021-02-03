@@ -31,7 +31,7 @@ const FinancialContributionsFAQ = props => (
       <Content>
         <FormattedMessage
           id="acceptContributions.FAQ.moneyNotReceivedDetails"
-          defaultMessage="Nothing happens if the funds are never confirmed as received. The transaction will stay pending and not be added to the budget. Admins can mark pending transactions as expired to cancel them if it's not likely the money will ever arrive."
+          defaultMessage="Nothing happens if the funds are never confirmed as received. The transaction will stay pending and not be added to the budget. Admins can mark pending transactions as expired to cancel them if it\'s not likely the money will ever arrive."
         />
       </Content>
     </Entry>

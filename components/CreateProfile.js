@@ -39,7 +39,8 @@ const messages = defineMessages({
   },
   profileNameError: {
     id: 'CreateProfile.name.conflict',
-    defaultMessage: "You can't use the same name for your Personal and Organization profiles. Personal profiles represent individual people, who can be administrators of Organization profiles.",
+    defaultMessage:
+      "You can't use the same name for your Personal and Organization profiles. Personal profiles represent individual people, who can be administrators of Organization profiles.",
   },
 });
 

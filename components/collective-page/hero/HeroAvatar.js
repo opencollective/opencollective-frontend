@@ -168,7 +168,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
                   )}
                   {isDragActive &&
                     (isDragAccept ? (
-                      <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
+                      <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it\'s hot 🔥" />
                     ) : (
                       <FormattedMessage
                         id="uploadImage.isDragReject"
