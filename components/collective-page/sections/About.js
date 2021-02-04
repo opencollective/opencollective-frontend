@@ -40,7 +40,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
-    <ContainerSectionContent px={2} pb={4}>
+    <ContainerSectionContent px={2} pb={5}>
       <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
         <InlineEditField
           mutation={editCollectiveLongDescriptionMutation}
