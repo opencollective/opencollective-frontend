@@ -1,8 +1,10 @@
 import { randomSlug } from '../support/faker';
 
 describe('host dashboard', () => {
+  let user;
+
   before(() => {
-    cy.signup({ redirect: '/brusselstogetherasbl' });
+    cy.signup({ redirect: '/brusselstogetherasbl' }).then(u => (user = u));
   });
 
   describe('pending applications', () => {
@@ -39,12 +41,16 @@ describe('host dashboard', () => {
 
     before(() => {
       // 207 - BrusselsTogether
-      cy.createExpense({ collective: { id: 207 } }).then(e => (expense = e));
+      cy.createExpense({
+        userEmail: user.email,
+        account: { legacyId: 207 },
+        payee: { legacyId: user.CollectiveId },
+      }).then(e => (expense = e));
     });
 
     it('Process expense', () => {
       cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses' });
-      cy.getByDataCy(`expense-container-${expense.id}`).as('currentExpense');
+      cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
 
       // Defaults to pending, approve it
       cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
