@@ -41,7 +41,6 @@ const MainContainer = styled(Container)`
   background: white;
   display: flex;
   justify-content: flex-start;
-  overflow-y: auto;
 `;
 
 const AvatarBox = styled(Box)`
@@ -395,6 +394,8 @@ const CollectiveNavbar = ({
   const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));
   const navbarRef = useRef();
 
+  /** This is to close the navbar dropdown menus (desktop)/slide-out menu (tablet)/non-collapsible menu (mobile)
+   * when we click a category header to scroll down to (i.e. Connect) or sub-section page to open (i.e. Updates) */
   useGlobalBlur(navbarRef, outside => {
     if (!outside && isExpanded) {
       setTimeout(() => {
