@@ -74,14 +74,17 @@ const ExpenseSummary = ({
     >
       <Flex
         flexDirection={['column-reverse', 'row']}
-        alignItems={['flex-start', 'center']}
+        alignItems={['stretch', 'center']}
         justifyContent="space-between"
         data-cy="expense-title"
+        mb={3}
       >
-        <H4 mb={2} mr={2} fontWeight="500" data-cy="expense-description">
-          {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
-        </H4>
-        <Box display="flex" mb={3} width={1} justifyContent={['space-between', 'end']} alignItems="center">
+        <Flex mr={[0, 2]}>
+          <H4 fontWeight="500" data-cy="expense-description">
+            {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
+          </H4>
+        </Flex>
+        <Flex mb={[3, 0]} justifyContent={['space-between', 'flex-end']} alignItems="center">
           {expense?.status && (
             <Box>
               <ExpenseStatusTag
@@ -110,7 +113,7 @@ const ExpenseSummary = ({
               />
             </Box>
           )}
-        </Box>
+        </Flex>
       </Flex>
       <ExpenseTags expense={expense} isLoading={isLoading} />
       <Flex alignItems="center" mt={3}>
