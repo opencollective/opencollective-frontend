@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
@@ -164,7 +164,7 @@ class ExpensePage extends React.Component {
   };
 
   render() {
-    const { collectiveSlug, data, query } = this.props;
+    const { collectiveSlug, data, query, LoggedInUser } = this.props;
     const hasFilters = this.hasFilter(query);
 
     if (!data.loading) {
@@ -174,6 +174,13 @@ class ExpensePage extends React.Component {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
+      } else if (
+        isSectionForAdminsOnly(data.account, Sections.BUDGET) &&
+        !LoggedInUser?.canEditCollective(data.account) &&
+        !LoggedInUser?.isHostAdmin(data.account)
+      ) {
+        // Hack for funds that want to keep their budget "private"
+        return <PageFeatureNotSupported showContactSupportLink={false} />;
       }
     }
 

@@ -9,7 +9,7 @@ import { H1, P } from './Text';
 const messages = defineMessages({
   title: {
     id: 'FeatureNotSupported.title',
-    defaultMessage: 'Feature not supported',
+    defaultMessage: 'Page inaccessible',
   },
 });
 
@@ -23,7 +23,7 @@ const PageFeatureNotSupported = ({ showContactSupportLink, ...props }) => {
   return (
     <Page noRobots title={title} {...props}>
       <Flex flexDirection="column" justifyContent="center" alignItems="center" px={2} py={[5, 6]}>
-        <H1 mb={3} textAlign="center">
+        <H1 fontSize="38px" mb={3} textAlign="center">
           {title}
         </H1>
         <P fontSize="64px" mt={3} mb={5}>
@@ -32,7 +32,7 @@ const PageFeatureNotSupported = ({ showContactSupportLink, ...props }) => {
         <P>
           <FormattedMessage
             id="FeatureNotSupported.description"
-            defaultMessage="This feature is not activated for this collective."
+            defaultMessage="This page is not enabled for this profile or you don't have permission to see it."
           />
           {showContactSupportLink && (
             <React.Fragment>

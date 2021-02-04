@@ -16,6 +16,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
 import CollectiveNavbar from '../components/collective-navbar';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
@@ -281,7 +282,11 @@ class CreateExpensePage extends React.Component {
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)}>
         <React.Fragment>
-          <CollectiveNavbar collective={collective} isLoading={!collective} />
+          <CollectiveNavbar
+            collective={collective}
+            isLoading={!collective}
+            callsToAction={{ hasSubmitExpense: false, hasRequestGrant: false }}
+          />
           <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>
             {!loadingLoggedInUser && !LoggedInUser && (
               <ContainerOverlay
@@ -427,6 +432,9 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       currency
       isArchived
       expensePolicy
+      features {
+        ...NavbarFields
+      }
       expensesTags {
         id
         tag
@@ -461,6 +469,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
 
   ${loggedInAccountExpensePayoutFieldsFragment}
   ${hostFieldsFragment}
+  ${collectiveNavbarFieldsFragment}
 `;
 
 const addCreateExpensePageData = graphql(createExpensePageQuery, {

@@ -5,7 +5,7 @@ import { get, mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
@@ -28,6 +28,7 @@ import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
 import StyledHr from '../components/StyledHr';
@@ -169,6 +170,13 @@ class TransactionsPage extends React.Component {
       );
     } else if (!collective) {
       return <ErrorPage data={data} />;
+    } else if (
+      isSectionForAdminsOnly(collective, Sections.BUDGET) &&
+      !LoggedInUser?.canEditCollective(collective) &&
+      !LoggedInUser?.isHostAdmin(collective)
+    ) {
+      // Hack for funds that want to keep their budget "private"
+      return <PageFeatureNotSupported showContactSupportLink={false} />;
     }
 
     return (
