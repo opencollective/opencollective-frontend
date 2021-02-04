@@ -14,9 +14,9 @@ describe('New Expense Flow comments', () => {
   beforeEach(() => {
     cy.createExpense({
       userEmail: user.email,
-      user: { paypalEmail: 'paypal@test.com', id: user.id },
-      collective: { id: collective.id },
-    }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.id}`));
+      payee: { legacyId: user.CollectiveId },
+      account: { legacyId: collective.id },
+    }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.legacyId}`));
   });
 
   it('Add, Edit and delete comment', () => {

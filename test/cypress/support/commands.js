@@ -150,33 +150,33 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 /**
  * Create a expense.
  */
-Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, ...params } = {}) => {
+Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, account, ...params } = {}) => {
   const expense = {
-    category: 'Engineering',
+    tags: ['Engineering'],
     type: 'INVOICE',
-    payoutMethod: 'paypal',
+    payoutMethod: { type: 'PAYPAL', data: { email: userEmail || randomEmail() } },
     description: 'Expense 1',
-    amount: 10000,
-    attachment: 'https://d.pr/free/i/OlQVIb+',
-    currency: 'USD',
+    items: [{ description: 'Some stuff', amount: 1000 }],
     ...params,
   };
 
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
-    return graphqlQuery(token, {
+    return graphqlQueryV2(token, {
       operationName: 'createExpense',
       query: `
-          mutation createExpense($expense: ExpenseInputType!) {
-            createExpense(expense: $expense) {
+          mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
+            createExpense(expense: $expense, account: $account) {
               id
-              collective {
+              legacyId
+              account {
                 id
                 slug
               }
             }
           }
         `,
-      variables: { expense },
+      variables: { expense, account },
+      failOnStatusCode: false,
     }).then(({ body }) => {
       return body.data.createExpense;
     });
@@ -473,6 +473,19 @@ function signinRequestAndReturnToken(user, redirect) {
 function graphqlQuery(token, body) {
   return cy.request({
     url: '/api/graphql',
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+function graphqlQueryV2(token, body) {
+  return cy.request({
+    url: '/api/graphql/v2',
     method: 'POST',
     headers: {
       Accept: 'application/json',

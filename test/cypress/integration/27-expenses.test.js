@@ -278,9 +278,9 @@ describe('New expense flow', () => {
     beforeEach(() => {
       cy.createExpense({
         userEmail: user.email,
-        user: { paypalEmail: 'paypal@test.com', id: user.id },
-        collective: { id: collective.id },
-      }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.id}`));
+        account: { legacyId: collective.id },
+        payee: { legacyId: user.CollectiveId },
+      }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.legacyId}`));
     });
 
     it('Approve, unapprove, reject and pay actions on expense', () => {
