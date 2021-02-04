@@ -151,7 +151,7 @@
     "test:update": "npm run test:jest -- --updateSnapshot"
   },
   "devDependencies": {
-    "@babel/cli": "^7.12.10",
+    "@babel/cli": "^7.12.13",
     "@babel/core": "^7.12.3",
     "@babel/node": "^7.12.10",
     "@cypress/code-coverage": "^3.9.2",
