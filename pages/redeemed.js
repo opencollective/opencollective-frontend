@@ -23,7 +23,6 @@ import MessageBox from '../components/MessageBox';
 import SearchForm from '../components/SearchForm';
 import { H1, H5, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import CollectiveCard from '../components/virtual-cards/CollectiveCard';
 import HappyBackground from '../components/virtual-cards/HappyBackground';
 
 const redeemedPaymentMethodQuery = gql`
@@ -221,20 +220,6 @@ class RedeemedPage extends React.Component {
                         collective={collective}
                         expiryDate={expiryDate}
                       />
-                      {emitter && emitter.imageUrl && (
-                        <Container position="absolute" top={[85, 115]} left={[10, 20]}>
-                          <CollectiveCard
-                            collective={emitter}
-                            mb={3}
-                            size={[48, 64]}
-                            avatarSize={[24, 32]}
-                            fontSize="14px"
-                            boxShadow="0 0 8px rgba(0, 0, 0, 0.24) inset"
-                            borderColor="blue.200"
-                            p={2}
-                          />
-                        </Container>
-                      )}
                     </Container>
                   )}
                 </Container>

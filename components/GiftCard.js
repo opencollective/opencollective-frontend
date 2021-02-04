@@ -5,6 +5,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fontSize, height, width } from 'styled-system';
 
+import CollectiveCard from './virtual-cards/CollectiveCard';
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex } from './Grid';
@@ -41,12 +42,14 @@ const Text = styled.p`
   color: white;
   text-align: left;
   font-size: 14px;
+  margin: 6px 0;
   ${fontSize};
 `;
 
 const Title = styled(Text)`
   font-size: 24px;
   font-weight: bold;
+  margin-top: 0;
   margin-bottom: 2px;
   ${fontSize};
 `;
@@ -61,6 +64,7 @@ class GiftCard extends React.Component {
     emitter: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string,
     }),
     expiryDate: PropTypes.string,
   };
@@ -68,8 +72,8 @@ class GiftCard extends React.Component {
   render() {
     const { amount, currency, collective, emitter, expiryDate } = this.props;
     return (
-      <ShadowCard width={['300px', '400px']} height={['168px', '224px']} m="0 auto">
-        <Container position="absolute" left={['12px', '24px']} top={['12px', '24px']}>
+      <ShadowCard maxWidth={['320px', '450px']} width="100%" minHeight={['200px', '260px']} m="0 auto">
+        <Container p={['18px', '24px']}>
           <Title fontSize={['18px', '24px']}>
             <FormattedMessage
               id="giftcard.user.name"
@@ -86,9 +90,24 @@ class GiftCard extends React.Component {
               }}
             />
           </Text>
+          {emitter?.imageUrl ? (
+            <Container mt={3}>
+              <CollectiveCard
+                m="0px"
+                collective={emitter}
+                mb={3}
+                size={[48, 64]}
+                avatarSize={[24, 32]}
+                fontSize="14px"
+                boxShadow="0 0 8px rgba(0, 0, 0, 0.24) inset"
+                borderColor="blue.200"
+                p={2}
+              />
+            </Container>
+          ) : null}
         </Container>
         {expiryDate && (
-          <Container position="absolute" left={['6px', '12px']} bottom={['3px', '5px']}>
+          <Container position="absolute" left={['8px', '12px']} bottom={['8px', '12px']}>
             <P mt={2} fontSize="12px" color="black.700">
               <Clock size="1.2em" />
               <Span ml={1} css={{ verticalAlign: 'middle' }}>
@@ -107,7 +126,7 @@ class GiftCard extends React.Component {
             </P>
           </Container>
         )}
-        <Container position="absolute" right={['12px', '24px']} bottom={['12px', '24px']}>
+        <Container position="absolute" right={['8px', '12px']} bottom={['8px', '12px']}>
           <Flex alignItems="top" className="AmountCurrency">
             <Span fontWeight="bold" fontSize="4rem" lineHeight="4rem" color="#313233">
               <Currency value={amount} currency={currency} precision={0} />
