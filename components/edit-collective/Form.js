@@ -29,7 +29,6 @@ import EmptyBalance from './actions/EmptyBalance';
 // Sections
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
-import Conversations from './sections/Conversations';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
@@ -377,9 +376,6 @@ class EditCollectiveForm extends React.Component {
             <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
           </div>
         );
-
-      case EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS:
-        return <Conversations collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.EXPENSES:
         return null;
