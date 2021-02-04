@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
 import Geosuggest from 'react-geosuggest';
 import { FormattedMessage } from 'react-intl';
@@ -16,20 +17,44 @@ const GeoSuggestItem = styled(Geosuggest)`
     text-align: left;
   }
   .geosuggest__input {
-    display: block;
-    width: 100%;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
+    min-height: 36px;
+    border: 1px solid #dcdee0;
+    border-color: #dcdee0;
     border-radius: 4px;
-  }
-  .geosuggest__input:focus {
-    border-color: #267dc0;
-    box-shadow: 0 0 0 transparent;
+    color: #313233;
+    overflow: scroll;
+    max-height: 100%;
+    min-width: 0;
+    width: 100%;
+    flex: 1 1 auto;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow: scroll;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #ffffff;
+    border-color: ${themeGet('colors.black.300')};
+    box-sizing: border-box;
+    &:disabled {
+      background-color: ${themeGet('colors.black.50')};
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: ${themeGet('colors.primary.300')};
+    }
+
+    &:focus:not(:disabled) {
+      border-color: ${themeGet('colors.primary.500')};
+    }
+
+    &::placeholder {
+      color: ${themeGet('colors.black.400')};
+    }
   }
   .geosuggest__suggests {
     top: 100%;
