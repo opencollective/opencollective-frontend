@@ -508,7 +508,7 @@ const CollectiveNavbar = ({
             {mainAction && (
               <Container display={['none', 'flex']} alignItems="center">
                 {mainAction.component}
-                {secondAction?.component || null}
+                {secondAction?.component ? <Container ml={2}>{secondAction?.component}</Container> : null}
               </Container>
             )}
             {!isLoading && (
