@@ -57,7 +57,7 @@ const ContributorName = styled.div`
   font-size: 12px;
   line-height: 18px;
   font-weight: bold;
-  color: #4e5052;
+  color: ${props => props.theme.colors.black[800]};
   letter-spacing: -0.4px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -117,7 +117,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                   )}
                 </ContributorName>
               </LinkContributor>
-              <P color="black.500" fontSize="10px" lineHeight="14px">
+              <P color="black.700" fontSize="10px" lineHeight="14px">
                 {contributor.totalAmountDonated ? (
                   <FormattedMessage
                     id="TotalDonatedSince"

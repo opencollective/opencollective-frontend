@@ -41,7 +41,7 @@ const TAG_TYPE_VARIANTS = {
   success: {
     backgroundColor: 'green.100',
     borderColor: 'green.500',
-    color: 'green.700',
+    color: 'green.800',
   },
   warning: {
     backgroundColor: 'yellow.300',
@@ -64,7 +64,7 @@ const StyledTagBase = styled.div`
     prop: 'variant',
     variants: {
       squared: {
-        color: '#71757A',
+        color: 'black.700',
         background: '#F0F2F5',
         borderRadius: '4px',
         padding: '6px 8px',
