@@ -195,16 +195,6 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     context: API_V2_CONTEXT,
     variables: { slug: host.slug, currency },
   });
-  React.useEffect(() => {
-    const type = get(data, 'host.transferwise.requiredFields[0].type');
-    if (type) {
-      formik.setFieldValue(getFieldName('data.type'), type);
-    }
-    // Having this effect bein triggered on updates in formik and getFieldName
-    // would result in infinite re-rendering.
-    // This is also not necessary since these props are required.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
 
   if (loading && !data) {
     return <StyledSpinner />;
@@ -213,18 +203,38 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     return <P>{error.message}</P>;
   }
 
-  const [requiredFields] = data.host.transferwise.requiredFields;
-  const [addressFields, otherFields] = partition(requiredFields.fields, f =>
-    f.group.every(g => g.key.includes('address.')),
+  const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({ label: rf.title, value: rf.type }));
+  // Some currencies offer different methods for the transaction
+  // e.g. USD allows ABA and SWIFT transactions.
+  const availableMethods = data.host.transferwise.requiredFields.find(
+    method => method.type == get(formik.values, getFieldName(`data.type`)),
+  );
+  const [addressFields, otherFields] = partition(availableMethods?.fields, field =>
+    field.group.every(g => g.key.includes('address.')),
   );
 
   return (
     <Flex flexDirection="column">
-      <Box mt={2} flex="1">
-        <P fontSize="16px" fontWeight="bold">
-          {requiredFields.title}
-        </P>
-      </Box>
+      <Field name={getFieldName('data.type')}>
+        {({ field }) => (
+          <StyledInputField name={field.name} label="Transaction Method" labelFontSize="13px" mt={3} mb={2}>
+            {({ id }) => (
+              <StyledSelect
+                inputId={id}
+                name={field.name}
+                onChange={({ value }) => {
+                  const { type, currency } = get(formik.values, getFieldName(`data`));
+                  formik.setFieldValue(getFieldName('data'), { type, currency });
+                  formik.setFieldValue(field.name, value);
+                }}
+                options={transactionTypeValues}
+                value={transactionTypeValues.find(method => method.value === availableMethods?.type) || null}
+                disabled={disabled}
+              />
+            )}
+          </StyledInputField>
+        )}
+      </Field>
       <Box mt={3} flex="1">
         <P fontSize="14px" fontWeight="bold">
           Account Information
@@ -232,7 +242,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
       </Box>
       {
         // Displays the account holder field only if the other fields are also loaded
-        Boolean(requiredFields.fields.length) && (
+        Boolean(availableMethods?.fields.length) && (
           <FieldGroup
             currency={currency}
             disabled={disabled}
