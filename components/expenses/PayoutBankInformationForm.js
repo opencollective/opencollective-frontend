@@ -204,18 +204,20 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   }
 
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({ label: rf.title, value: rf.type }));
-  const requiredFields = data.host.transferwise.requiredFields.find(
-    rf => rf.type == get(formik.values, getFieldName(`data.type`)),
+  // Some currencies offer different methods for the transaction
+  // e.g. USD allows ABA and SWIFT transactions.
+  const availableMethods = data.host.transferwise.requiredFields.find(
+    method => method.type == get(formik.values, getFieldName(`data.type`)),
   );
-  const [addressFields, otherFields] = partition(requiredFields?.fields, f =>
-    f.group.every(g => g.key.includes('address.')),
+  const [addressFields, otherFields] = partition(availableMethods?.fields, field =>
+    field.group.every(g => g.key.includes('address.')),
   );
 
   return (
     <Flex flexDirection="column">
       <Field name={getFieldName('data.type')}>
         {({ field }) => (
-          <StyledInputField name={field.name} label="Transaction Type" labelFontSize="13px" mt={3} mb={2}>
+          <StyledInputField name={field.name} label="Transaction Method" labelFontSize="13px" mt={3} mb={2}>
             {({ id }) => (
               <StyledSelect
                 inputId={id}
@@ -226,7 +228,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
                   formik.setFieldValue(field.name, value);
                 }}
                 options={transactionTypeValues}
-                value={transactionTypeValues.find(c => c.value === requiredFields?.type) || null}
+                value={transactionTypeValues.find(method => method.value === availableMethods?.type) || null}
                 disabled={disabled}
               />
             )}
@@ -240,7 +242,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
       </Box>
       {
         // Displays the account holder field only if the other fields are also loaded
-        Boolean(requiredFields?.fields.length) && (
+        Boolean(availableMethods?.fields.length) && (
           <FieldGroup
             currency={currency}
             disabled={disabled}
