@@ -176,7 +176,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
         {!isDisabled && minAmount > 0 && (
           <div>
             {isFlexibleAmount && (
-              <P fontSize="10px" color="black.600" textTransform="uppercase" mb={1}>
+              <P fontSize="10px" color="black.700" textTransform="uppercase" mb={1}>
                 <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
               </P>
             )}

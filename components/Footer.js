@@ -177,7 +177,7 @@ const switchLanguage = key => {
   window.scrollTo(0, 0);
 };
 
-const FooterContainer = styled.div.attrs({
+const FooterContainer = styled.footer.attrs({
   id: 'footer',
 })`
   display: flex;

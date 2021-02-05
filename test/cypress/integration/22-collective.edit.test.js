@@ -78,9 +78,9 @@ describe('edit collective', () => {
     cy.get('.backToProfile a').click(); // back to profile
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
-    cy.get('[data-cy="collective-hero"] [title="Twitter"][href="https://twitter.com/opencollect"]');
-    cy.get('[data-cy="collective-hero"] [title="Github"][href="https://github.com/AwesomeHandle"]');
-    cy.get('[data-cy="collective-hero"] [title="Website"][href="https://opencollective.com"]');
+    cy.get('[data-cy="collective-hero"] a[href="https://twitter.com/opencollect"] [title="Twitter"]');
+    cy.get('[data-cy="collective-hero"] a[href="https://github.com/AwesomeHandle"] [title="Github"]');
+    cy.get('[data-cy="collective-hero"] a[href="https://opencollective.com"] [title="Website"]');
   });
 
   it('edit tiers', () => {

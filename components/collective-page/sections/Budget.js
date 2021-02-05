@@ -126,7 +126,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
               <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
             </P>
             <P fontSize="20px" mt={1}>
-              {formatCurrency(stats.balance, collective.currency)} <Span color="black.400">{collective.currency}</Span>
+              {formatCurrency(stats.balance, collective.currency)} <Span color="black.700">{collective.currency}</Span>
             </P>
           </Box>
           {!isFund && !isProject && (
@@ -154,7 +154,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
               />
               <P fontSize="20px" mt={2}>
                 <Span fontWeight="bold">~ {formatCurrency(stats.yearlyBudget, collective.currency)}</Span>{' '}
-                <Span color="black.400">{collective.currency}</Span>
+                <Span color="black.700">{collective.currency}</Span>
               </P>
             </Container>
           )}

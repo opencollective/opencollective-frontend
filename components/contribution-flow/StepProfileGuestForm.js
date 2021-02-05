@@ -44,7 +44,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
   };
 
   return (
-    <Container as="fieldset" border="none" width={1} py={3}>
+    <Container border="none" width={1} py={3}>
       <Flex justifyContent="space-between">
         <Box width={1 / 2} mb={3} mr={1}>
           <StyledInputField

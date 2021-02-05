@@ -14,7 +14,7 @@ import { Box, Flex } from './Grid';
 import LinkContributor from './LinkContributor';
 import StyledCard from './StyledCard';
 import StyledTag from './StyledTag';
-import { H5, P } from './Text';
+import { P } from './Text';
 
 /** Main card */
 const MainContainer = styled(StyledCard)`
@@ -40,11 +40,12 @@ const publicMessageStyle = css`
   font-size: 10px;
   line-height: 13px;
   letter-spacing: -0.5px;
-  color: #76777a;
+  color: #4e5052;
   text-align: center;
   word-break: break-word;
   font-style: italic;
 `;
+
 /** User-submitted public message */
 const PublicMessage = styled.p`
   ${publicMessageStyle}
@@ -127,14 +128,21 @@ const ContributorCard = ({
       </CollectiveLogoContainer>
       <Flex flexDirection="column" alignItems="center" p={2} pt={1}>
         <LinkContributor contributor={contributor}>
-          <H5 fontSize="14px" fontWeight="bold" textAlign="center" lineHeight="18px" title={contributor.name}>
+          <P
+            color="black.900"
+            fontSize="14px"
+            fontWeight="bold"
+            textAlign="center"
+            lineHeight="18px"
+            title={contributor.name}
+          >
             {truncate(contributor.name, { length: 16 })}
-          </H5>
+          </P>
         </LinkContributor>
         <ContributorTag>{formatMemberRole(intl, getMainContributorRole(contributor))}</ContributorTag>
         {contributor.totalAmountDonated > 0 && !hideTotalAmountDonated && (
           <React.Fragment>
-            <P fontSize="10px" lineHeight="18px" color="black.500">
+            <P fontSize="10px" lineHeight="18px" color="black.700">
               <FormattedMessage id="ContributorCard.Total" defaultMessage="Total contributions" />
             </P>
             <P fontSize="12px" fontWeight="bold">

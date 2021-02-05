@@ -21,7 +21,7 @@ const GoalContainer = styled.div`
   text-align: right;
   transition: width 3s;
   height: 15px;
-  color: ${props => props.theme.colors.black[500]};
+  color: ${props => props.theme.colors.black[700]};
   border-right: 1px solid
     ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme))};
   width: ${props => `${props.goal.progress * 100}%`};
@@ -59,7 +59,7 @@ const GoalContainer = styled.div`
   ${props =>
     props.goal.isReached &&
     css`
-      color: ${props.theme.colors.black[600]};
+      color: ${props.theme.colors.black[800]};
     `}
 
   ${props =>
