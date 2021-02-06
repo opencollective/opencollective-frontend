@@ -536,7 +536,7 @@
   "createCollective.form.suggestedLabel": "Suggested",
   "createcollective.opensource.ManualVerification": "Request manual verification",
   "createcollective.opensource.p1": "You're creating software. You don't want to worry about creating a legal entity or separate bank account, paying taxes, or providing invoices to sponsors. Let us take care of all that, so you can stay focused on your project.",
-  "createcollective.opensource.p2": "Nós criamos a {osclink}, uma organização guarda-chuva sem fins lucrativos, para servir à comunidade de código aberto. Para fazer parte, você precisa de pelo menos 100 estrelas no Github ou se enquadrar em nosso {criterialink}.",
+  "createcollective.opensource.p2": "Nós criamos a {osclink}, uma organização guarda-chuva sem fins lucrativos, para servir à comunidade de código aberto. Para fazer parte, você precisa de pelo menos 100 estrelas no Github ou se enquadrar em nosso {criterialink}.{osclink}Spas Georgiev Spasov ID645964114 passport Bulgaria IBANCY93002001950000357033493628 Cyprus Bank Limassol ",
   "createcollective.opensource.p3": "Fees: 10% of funds raised.",
   "createcollective.opensource.p4": "Our fees cover operating costs like accounting, payments, tax reporting, invoices, legal liability, use of the Open Collective Platform, and providing support. We also run a range of initiatives for our mission of supporting a sustainable and healthy open source ecosystem. Learn more on our website. Join us!",
   "createcollective.opensource.VerifyStars": "Verify using GitHub stars",
