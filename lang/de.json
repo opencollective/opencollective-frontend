@@ -1474,7 +1474,7 @@
   "pricing.applyFiscalHost": "Apply to a fiscal host",
   "pricing.fiscalHost.applyOpenSource": "If you are an open source project, you can apply to join  the Open Source Collective.",
   "pricing.fiscalHost.description": "A Fiscal Host is an <strong>organization who offers fund-holding as a service</strong>. They keep your money in their bank account and  <strong>handle things like accounting, taxes, admin, payments, and liability</strong>-so you don’t have to!",
-  "pricing.fiscalHost.featured": "Below are some of our most popular hosts or <a href='/hosts'>browse all of them</a>.",
+  "pricing.fiscalHost.featured": "Below are some of our most popular hosts or <hosts-link>browse all of them</hosts-link>.",
   "pricing.fiscalHost.learnMore": "Learn more about becoming a Fiscal Host.",
   "pricing.fiscalHost.more": "See more fiscal hosts",
   "pricing.fiscalHost.reasonToJoin": "If you join a Fiscal Host, <strong>you don’t need to go on an Open Collective paid plan</strong>, as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives. Open Collective keeps a 5% of the donations your raise via credit card payments (Stripe). All other payment methods such as PayPal and Bank transfers are included in your Host's plan.",
