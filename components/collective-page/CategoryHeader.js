@@ -120,12 +120,6 @@ const getCategoryData = (intl, collective, category) => {
       return {
         img: contributeSectionHeaderIcon,
         title: i18nNavbarCategory(intl, category),
-        subtitle: (
-          <FormattedMessage
-            id="CollectivePage.SectionContributions.Subtitle"
-            defaultMessage="How we are supporting other Collectives."
-          />
-        ),
       };
     default:
       return null;
