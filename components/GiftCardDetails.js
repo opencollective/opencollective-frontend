@@ -22,12 +22,12 @@ const DetailsColumnHeader = styled.span`
   white-space: nowrap;
 `;
 
-/** Render a text status to indicate if virtual card is claimed, and by whom */
-const VirtualCardStatus = ({ isConfirmed, collective, data }) => {
+/** Render a text status to indicate if gift card is claimed, and by whom */
+const GiftCardStatus = ({ isConfirmed, collective, data }) => {
   if (isConfirmed) {
     return (
       <FormattedMessage
-        id="virtualCards.claimedBy"
+        id="giftCards.claimedBy"
         defaultMessage="claimed by {user}"
         values={{
           user: (
@@ -41,25 +41,25 @@ const VirtualCardStatus = ({ isConfirmed, collective, data }) => {
   } else if (get(data, 'email')) {
     return (
       <FormattedMessage
-        id="virtualCards.sentTo"
+        id="giftCards.sentTo"
         defaultMessage="sent to {email}"
         values={{ email: <a href={`mailto:${data.email}`}>{data.email}</a> }}
       />
     );
   } else {
-    return <FormattedMessage id="virtualCards.notYetClaimed" defaultMessage="not yet claimed" />;
+    return <FormattedMessage id="giftCards.notYetClaimed" defaultMessage="not yet claimed" />;
   }
 };
 
 /**
- * Render a VirtualCard details like its status (claimed or not), who claimed it,
+ * Render GiftCard details like its status (claimed or not), who claimed it,
  * when was it created... It is not meant to be show to all users, but just to
- * the organizations that create the virtual cards.
+ * the organizations that create the gift cards.
  */
-class VirtualCardDetails extends React.Component {
+class GiftCardDetails extends React.Component {
   static propTypes = {
-    /** The virtual card, which is actually a PaymentMethod */
-    virtualCard: PropTypes.object.isRequired,
+    /** The gift card, which is actually a PaymentMethod */
+    giftCard: PropTypes.object.isRequired,
     /** Collective slug */
     collectiveSlug: PropTypes.string.isRequired,
     /** @ignore Provided by styled-component withTheme(...) */
@@ -85,17 +85,17 @@ class VirtualCardDetails extends React.Component {
   }
 
   renderDetails() {
-    const { virtualCard, collectiveSlug } = this.props;
-    const redeemCode = virtualCard.uuid.split('-')[0];
-    const email = get(virtualCard, 'data.email');
+    const { giftCard, collectiveSlug } = this.props;
+    const redeemCode = giftCard.uuid.split('-')[0];
+    const email = get(giftCard, 'data.email');
     const linkParams = email ? { code: redeemCode, email, collectiveSlug } : { code: redeemCode, collectiveSlug };
 
     return (
       <Flex mt="0.75em" fontSize="0.8em">
-        {!virtualCard.isConfirmed && (
+        {!giftCard.isConfirmed && (
           <Flex flexDirection="column" mr="2em">
             <DetailsColumnHeader>
-              <FormattedMessage id="virtualCards.redeemCode" defaultMessage="REDEEM CODE" />
+              <FormattedMessage id="giftCards.redeemCode" defaultMessage="REDEEM CODE" />
             </DetailsColumnHeader>
             <Link route="redeem" params={linkParams}>
               {redeemCode}
@@ -104,44 +104,44 @@ class VirtualCardDetails extends React.Component {
         )}
         <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.emmited" defaultMessage="Emitted" />
+            <FormattedMessage id="giftCards.emmited" defaultMessage="Emitted" />
           </DetailsColumnHeader>
-          <FormattedDate value={virtualCard.createdAt} />
+          <FormattedDate value={giftCard.createdAt} />
         </Flex>
         <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.expiryDate" defaultMessage="EXPIRY DATE" />
+            <FormattedMessage id="giftCards.expiryDate" defaultMessage="EXPIRY DATE" />
           </DetailsColumnHeader>
-          <span>{dayjs(virtualCard.expiryDate).format('MM/YYYY')}</span>
+          <span>{dayjs(giftCard.expiryDate).format('MM/YYYY')}</span>
         </Flex>
         <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.batch" defaultMessage="Batch name" />
+            <FormattedMessage id="giftCards.batch" defaultMessage="Batch name" />
           </DetailsColumnHeader>
           <span>
-            {virtualCard.batch || (
+            {giftCard.batch || (
               <Span fontStyle="italic" color="black.500">
-                <FormattedMessage id="virtualCards.notBatched" defaultMessage="Not batched" />
+                <FormattedMessage id="giftCards.notBatched" defaultMessage="Not batched" />
               </Span>
             )}
           </span>
         </Flex>
         <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.description" defaultMessage="DESCRIPTION" />
+            <FormattedMessage id="giftCards.description" defaultMessage="DESCRIPTION" />
           </DetailsColumnHeader>
-          <span>{virtualCard.description}</span>
+          <span>{giftCard.description}</span>
         </Flex>
       </Flex>
     );
   }
 
   renderValue() {
-    const { initialBalance, currency, monthlyLimitPerMember } = this.props.virtualCard;
+    const { initialBalance, currency, monthlyLimitPerMember } = this.props.giftCard;
 
     return monthlyLimitPerMember ? (
       <FormattedMessage
-        id="virtualCards.monthlyValue"
+        id="giftCards.monthlyValue"
         defaultMessage="{value} monthly"
         values={{ value: formatCurrency(monthlyLimitPerMember, currency) }}
       />
@@ -151,7 +151,7 @@ class VirtualCardDetails extends React.Component {
   }
 
   render() {
-    const { isConfirmed, collective, balance, currency, data } = this.props.virtualCard;
+    const { isConfirmed, collective, balance, currency, data } = this.props.giftCard;
 
     return (
       <Flex data-cy="vc-details">
@@ -170,12 +170,12 @@ class VirtualCardDetails extends React.Component {
         <Flex flexDirection="column" p="0.1em">
           <Box>
             <strong>{this.renderValue()}</strong>{' '}
-            <VirtualCardStatus isConfirmed={isConfirmed} collective={collective} data={data} />
+            <GiftCardStatus isConfirmed={isConfirmed} collective={collective} data={data} />
           </Box>
           <Box color={this.props.theme.colors.black[500]} fontSize="0.9em">
             <Flex alignItems="center">
               <FormattedMessage
-                id="virtualCards.balance"
+                id="giftCards.balance"
                 defaultMessage="Balance: {balance}"
                 values={{ balance: formatCurrency(balance, currency) }}
               />
@@ -203,4 +203,4 @@ class VirtualCardDetails extends React.Component {
   }
 }
 
-export default withTheme(VirtualCardDetails);
+export default withTheme(GiftCardDetails);

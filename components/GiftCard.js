@@ -5,7 +5,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fontSize, height, width } from 'styled-system';
 
-import CollectiveCard from './virtual-cards/CollectiveCard';
+import CollectiveCard from './gift-cards/CollectiveCard';
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex } from './Grid';

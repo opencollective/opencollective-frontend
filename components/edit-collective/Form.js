@@ -14,7 +14,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 
 import Container from '../Container';
-import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
+import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 import Link from '../Link';
@@ -32,6 +32,7 @@ import ConnectedAccounts from './sections/ConnectedAccounts';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
+import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostMetrics from './sections/HostMetrics';
 import HostPlan from './sections/HostPlan';
@@ -46,7 +47,6 @@ import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
-import VirtualCards from './sections/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
@@ -81,7 +81,6 @@ class EditCollectiveForm extends React.Component {
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
     this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
-    this.showVirtualCards = collective.type === 'ORGANIZATION';
 
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
@@ -347,7 +346,7 @@ class EditCollectiveForm extends React.Component {
 
   getMenuSelectedSection(section) {
     if (['gift-cards-create', 'gift-cards-send', 'gift-cards'].includes(section)) {
-      return EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS;
+      return EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS;
     } else {
       return section;
     }
@@ -419,8 +418,8 @@ class EditCollectiveForm extends React.Component {
           />
         );
 
-      case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
-        return <VirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
+      case EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS:
+        return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
 
       case 'gift-cards-create':
       case 'gift-cards-send':
@@ -438,7 +437,7 @@ class EditCollectiveForm extends React.Component {
               <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
                 <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
-                  <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
+                  <FormattedMessage id="giftCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
                 </StyledButton>
               </Link>
 
@@ -451,7 +450,7 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
               </StyledLink>
             </Container>
-            <CreateVirtualCardsForm
+            <CreateGiftCardsForm
               collectiveId={collective.id}
               collectiveSlug={collective.slug}
               collectiveSettings={collective.settings}

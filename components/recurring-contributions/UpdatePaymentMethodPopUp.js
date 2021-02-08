@@ -43,7 +43,7 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query UpdatePaymentMethodPopUpPaymentMethod($slug: String) {
     account(slug: $slug) {
       id
-      paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
+      paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
         id
         name
         data
@@ -197,8 +197,7 @@ const UpdatePaymentMethodPopUp = ({
   }, [stripeIsReady]);
 
   // data handling
-  const minBalance = 50; // Minimum usable balance for virtual card
-
+  const minBalance = 50; // Minimum usable balance for gift card
   const paymentMethods = get(data, 'account.paymentMethods', null);
   const paymentOptions = React.useMemo(() => {
     if (!paymentMethods) {
