@@ -11,6 +11,7 @@ import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
@@ -165,6 +166,9 @@ const contributePageQuery = gql`
       isActive
       isHost
       imageUrl
+      features {
+        ...NavbarFields
+      }
       host {
         id
         name
@@ -292,6 +296,7 @@ const contributePageQuery = gql`
       }
     }
   }
+  ${collectiveNavbarFieldsFragment}
 `;
 
 const addContributePageData = graphql(contributePageQuery, {
