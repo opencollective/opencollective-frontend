@@ -50,10 +50,10 @@ exports.REWRITES = [
     source: '/:collectiveSlug?/redeem/:code?',
     destination: '/redeem',
   },
-  // {
-  //   source: '/:collectiveSlug?/redeemed/:code?',
-  //   destination: '/redeemed',
-  // },
+  {
+    source: '/:collectiveSlug?/redeemed/:code?',
+    destination: '/redeemed',
+  },
   // {
   //   source: '/:collectiveSlug/paymentmethod/:id/update',
   //   destination: '/updatePaymentMethod',
