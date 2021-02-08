@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
 import { get, isEmpty } from 'lodash';
+import NextLink from 'next/link';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -13,7 +14,6 @@ import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import HTMLContent from '../../HTMLContent';
-import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -127,14 +127,14 @@ class SectionUpdates extends React.PureComponent {
             <FormattedMessage id="section.updates.subtitle" defaultMessage="Updates on our activities and progress." />
           </P>
           {isAdmin && (
-            <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+            <NextLink href={`${collective.slug}/createUpdate`}>
               <StyledButton data-cy="create-new-update-btn" buttonStyle="primary" my={[2, 0]}>
                 <Span fontSize="16px" fontWeight="bold" mr={2}>
                   +
                 </Span>
                 <FormattedMessage id="updates.new.title" defaultMessage="New update" />
               </StyledButton>
-            </Link>
+            </NextLink>
           )}
         </Flex>
         {isEmpty(updates) ? (
@@ -164,21 +164,16 @@ class SectionUpdates extends React.PureComponent {
                       </LinkCollective>
                     </Box>
                     <Flex flexDirection="column" justifyContent="space-between">
-                      <Link route="update" params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}>
+                      <NextLink href={`${collective.slug}/update/${update.slug}`}>
                         <P color="black.900" fontWeight="600" mb={2}>
                           {update.title}
                         </P>
-                      </Link>
+                      </NextLink>
                       {update.userCanSeeUpdate ? (
                         <Container>
                           <HTMLContent style={{ display: 'inline' }} content={update.summary} />
                           {` `}
-                          <StyledLink
-                            as={Link}
-                            fontSize="12px"
-                            route="update"
-                            params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}
-                          >
+                          <StyledLink as={NextLink} fontSize="12px" href={`${collective.slug}/update/${update.slug}`}>
                             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                           </StyledLink>
                         </Container>
@@ -242,11 +237,11 @@ class SectionUpdates extends React.PureComponent {
               ))}
             </StyledCard>
             {updates.length > 0 && (
-              <Link route="updates" params={{ collectiveSlug: collective.slug }}>
+              <NextLink href={`${collective.slug}/updates`}>
                 <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="14px">
                   <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
                 </StyledButton>
-              </Link>
+              </NextLink>
             )}
           </Box>
         )}

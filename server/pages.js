@@ -8,31 +8,17 @@ const routes = require('next-routes');
 
 const pages = routes()
   .add('home', '/', 'index')
-  .add('become-a-sponsor', '/become-a-sponsor', 'become-a-sponsor')
-  .add('become-a-host', '/:pageSlug(become-a-host|become-a-fiscal-host)', 'become-a-host')
-  .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
-  .add('pricing', '/pricing')
-  .add('pricing-old', '/pricing-old')
-  .add('ocf-host-application', '/foundation/apply/:step(intro|fees|form|success)?', 'ocf-host-application')
   .add('redeem', '/:collectiveSlug?/redeem/:code?')
   .add('redeemed', '/:collectiveSlug?/redeemed/:code?')
   .add('updatePaymentMethod', '/:collectiveSlug/paymentmethod/:id/update')
-  .add('signinLinkSent', '/signin/sent')
-  .add('confirmCollectiveDeletion', '/deleteCollective/confirmed')
   .add('signin', '/signin/:token?')
   .add('confirmEmail', '/confirm/email/:token')
   .add('confirm-guest', '/confirm/guest/:token')
   .add('unsubscribeEmail', '/email/unsubscribe/:email/:slug/:type/:token')
   .add('create-account', '/:form(create-account)', 'signin')
-  .add('guest-join', '/create-account/guest')
-  .add('subscriptions_redirect', '/subscriptions', 'recurring-contributions-redirect')
-  .add('recurring-contributions-redirect', '/recurring-contributions')
-  .add('search', '/search')
-  .add('hosts', '/hosts')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
   .add('create-project', '/:parentCollectiveSlug/projects/(new|create)')
-  .add('createOrganization', '/organizations/new')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit/:section?')
@@ -45,9 +31,6 @@ const pages = routes()
     'host.dashboard',
   )
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions')
-  .add('createUpdate', '/:collectiveSlug/updates/new')
-  .add('updates', '/:collectiveSlug/updates')
-  .add('update', '/:collectiveSlug/updates/:updateSlug')
   .add('create-expense', '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new')
   .add(
     'expense-v2',
@@ -61,9 +44,7 @@ const pages = routes()
   )
   .add('orders', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders')
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)')
-  .add('confirmOrder', '/orders/:id([0-9]+)/confirm')
-  .add('discover', '/discover')
-  .add('member-invitations', '/member-invitations');
+  .add('confirmOrder', '/orders/:id([0-9]+)/confirm');
 
 pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?');
 
@@ -141,11 +122,6 @@ pages.add(
 // -------
 
 pages.add('createPledge', '/pledges/new').add('createCollectivePledge', '/:slug/pledges/new', 'createPledge');
-
-// Application management
-// ----------------------
-
-pages.add('applications', '/applications');
 
 // Marketing Pages
 // ---------------

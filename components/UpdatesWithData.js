@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
 import Error from './Error';
 import { Box, Flex } from './Grid';
-import Link from './Link';
 import StyledButton from './StyledButton';
 import { H1, P } from './Text';
 import Updates from './Updates';
@@ -26,7 +26,7 @@ class UpdatesWithData extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showNewUpdateForm: props.defaultAction === 'new' ? true : false,
+      showNewUpdateForm: props.defaultAction === 'new',
     };
   }
 
@@ -63,11 +63,11 @@ class UpdatesWithData extends React.Component {
               </P>
             </Container>
             {LoggedInUser?.canEditCollective(collective) && (
-              <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+              <NextLink href={`${collective.slug}/createUpdate}`}>
                 <StyledButton buttonStyle="primary" m={2}>
                   <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
                 </StyledButton>
-              </Link>
+              </NextLink>
             )}
           </Flex>
         )}

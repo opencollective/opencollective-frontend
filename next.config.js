@@ -2,6 +2,7 @@ require('./env');
 
 const withSourceMaps = require('@zeit/next-source-maps')();
 const { getCSPHeaderForNextJS } = require('./server/content-security-policy');
+const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
   webpack: (config, { webpack, isServer, buildId }) => {
@@ -115,6 +116,9 @@ const nextConfig = {
     } else {
       return [];
     }
+  },
+  async rewrites() {
+    return REWRITES;
   },
 };
 
