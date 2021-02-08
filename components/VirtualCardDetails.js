@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
+import NextLink from 'next/link';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 
@@ -87,8 +88,6 @@ class VirtualCardDetails extends React.Component {
   renderDetails() {
     const { virtualCard, collectiveSlug } = this.props;
     const redeemCode = virtualCard.uuid.split('-')[0];
-    const email = get(virtualCard, 'data.email');
-    const linkParams = email ? { code: redeemCode, email, collectiveSlug } : { code: redeemCode, collectiveSlug };
 
     return (
       <Flex mt="0.75em" fontSize="0.8em">
@@ -97,9 +96,7 @@ class VirtualCardDetails extends React.Component {
             <DetailsColumnHeader>
               <FormattedMessage id="virtualCards.redeemCode" defaultMessage="REDEEM CODE" />
             </DetailsColumnHeader>
-            <Link route="redeem" params={linkParams}>
-              {redeemCode}
-            </Link>
+            <NextLink href={`${collectiveSlug}/redeem/${redeemCode}`}>{redeemCode}</NextLink>
           </Flex>
         )}
         <Flex flexDirection="column" mr="2em">

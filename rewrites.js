@@ -46,10 +46,10 @@ exports.REWRITES = [
     source: '/:collectiveSlug/updates/:updateSlug',
     destination: '/update',
   },
-  // {
-  //   source: '/:collectiveSlug?/redeem/:code?',
-  //   destination: '/redeem',
-  // },
+  {
+    source: '/:collectiveSlug?/redeem/:code?',
+    destination: '/redeem',
+  },
   // {
   //   source: '/:collectiveSlug?/redeemed/:code?',
   //   destination: '/redeemed',
