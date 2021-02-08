@@ -96,13 +96,14 @@ const CollectiveName = styled(H1)`
 `;
 
 const CategoriesContainer = styled(Container)`
-  @media screen and (min-width: 40em) and (max-width: 64em) {
+  z-index: 2;
+  @media screen and (min-width: 52em) and (max-width: 64em) {
     border: 1px solid rgba(214, 214, 214, 0.3);
     border-radius: 0px 0px 0px 8px;
     box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
     position: absolute;
     right: 0;
-    top: 52px;
+    top: 55px;
     width: 0;
     visibility: hidden;
     opacity: 0;
@@ -415,10 +416,11 @@ const CollectiveNavbar = ({
 
   return (
     <MainContainer
-      flexDirection={['column', 'row']}
-      px={[0, Dimensions.PADDING_X[1]]}
+      position="relative"
+      flexDirection={['column', null, 'row']}
+      px={[0, null, Dimensions.PADDING_X[1]]}
       mx="auto"
-      mt={onlyInfos ? 0 : '50px'}
+      mt={onlyInfos ? 0 : [0, null, '5px', '15px', '50px']}
       maxWidth={Dimensions.MAX_SECTION_WIDTH}
       boxShadow={withShadow ? ' 0px 6px 10px -5px rgba(214, 214, 214, 0.5)' : 'none'}
       maxHeight="100vh"
@@ -427,7 +429,7 @@ const CollectiveNavbar = ({
       <InfosContainer isAnimated={isAnimated} mr={[0, 2]} display="flex" alignItems="center" px={[3, 0]} py={[2, 1]}>
         <Flex alignItems="center" data-hide={hideInfosOnDesktop}>
           {showBackButton && (
-            <Box display={['none', 'block']} mr={2}>
+            <Box display={['none', null, 'block']} mr={2}>
               {collective && (
                 <Link route="collective" params={{ slug: collective.slug }}>
                   <StyledButton px={1} isBorderless>
@@ -464,7 +466,7 @@ const CollectiveNavbar = ({
           </Box>
         </Flex>
         {!onlyInfos && (
-          <Box display={['block', 'none']} marginLeft="auto">
+          <Box display={['block', null, 'none']} marginLeft="auto">
             {isExpanded ? (
               <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
             ) : (
@@ -480,12 +482,12 @@ const CollectiveNavbar = ({
           <CategoriesContainer
             ref={navbarRef}
             backgroundColor="#fff"
-            display={isExpanded ? 'flex' : ['none', 'flex']}
+            display={isExpanded ? 'flex' : ['none', null, 'flex']}
             flexDirection={['column', null, null, 'row']}
             flexShrink={2}
             flexGrow={1}
-            justifyContent={['space-between', null, 'flex-start']}
-            order={[0, 3, 0]}
+            justifyContent={['space-between', null, null, 'flex-start']}
+            order={[0, null, 3, 0]}
             overflowX="auto"
             isExpanded={isExpanded}
           >
@@ -507,15 +509,15 @@ const CollectiveNavbar = ({
 
           {/* CTAs */}
           <Container
-            display={isExpanded ? 'flex' : ['none', 'flex']}
-            flexDirection={['column', 'row']}
+            display={isExpanded ? 'flex' : ['none', null, 'flex']}
+            flexDirection={['column', null, 'row']}
             flexBasis="fit-content"
-            marginLeft={[0, 'auto']}
+            marginLeft={[0, null, 'auto']}
             backgroundColor="#fff"
             zIndex={1}
           >
             {mainAction && (
-              <Container display={['none', 'flex']} alignItems="center">
+              <Container display={['none', null, 'flex']} alignItems="center">
                 {mainAction.component}
                 {secondAction?.component ? <Container ml={2}>{secondAction?.component}</Container> : null}
               </Container>
@@ -525,10 +527,11 @@ const CollectiveNavbar = ({
                 collective={collective}
                 callsToAction={callsToAction}
                 hiddenActionForNonMobile={mainAction?.type}
+                onToggle={() => setExpanded(false)}
               />
             )}
             {!onlyInfos && (
-              <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
+              <Container display={['none', null, 'flex', null, 'none']} alignItems="center">
                 {isExpanded ? (
                   <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
                 ) : (

@@ -103,7 +103,7 @@ const MenuItem = styled('li')`
   & > a {
     padding: 12px;
 
-    @media (max-width: 40em) {
+    @media (max-width: 52em) {
       padding-top: 4px;
     }
   }

@@ -77,20 +77,20 @@ const MenuItem = styled('li')`
   ${props =>
     props.isHiddenOnMobile &&
     css`
-      @media screen and (min-width: 40em) {
+      @media screen and (min-width: 52em) {
         display: none;
       }
     `}
 `;
 
 const ActionsDropdown = styled(Dropdown)`
-  @media screen and (min-width: 40em) and (max-width: 88em) {
+  @media screen and (min-width: 52em) and (max-width: 88em) {
     ${DropdownContent} {
       right: 50px;
     }
   }
 
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     ${DropdownArrow} {
       display: none !important;
     }
@@ -106,7 +106,7 @@ const ActionsDropdown = styled(Dropdown)`
   ${props =>
     props.$isHiddenOnNonMobile &&
     css`
-      @media screen and (min-width: 40em) {
+      @media screen and (min-width: 52em) {
         display: none;
       }
     `}
@@ -146,21 +146,21 @@ const StyledActionButton = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
     margin-right: 4px;
   }
 
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     cursor: none;
     pointer-events: none;
   }
 `;
 
 const StyledChevronDown = styled(ChevronDown)`
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     display: none;
   }
 `;
 
 const ITEM_PADDING = '11px 14px';
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile }) => {
+const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile, onToggle }) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
@@ -176,13 +176,13 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
 
   return (
     <Container
-      display={hasOnlyOneHiddenCTA ? ['flex', 'none'] : 'flex'}
+      display={hasOnlyOneHiddenCTA ? ['flex', null, 'none'] : 'flex'}
       alignItems="center"
-      order={[-1, 0]}
-      borderTop={['1px solid #e1e1e1', 'none']}
+      order={[-1, null, 0]}
+      borderTop={['1px solid #e1e1e1', null, 'none']}
     >
       <Box px={1}>
-        <ActionsDropdown trigger="click" $isHiddenOnNonMobile={enabledCTAs.length <= 2}>
+        <ActionsDropdown trigger="click" onToggle={onToggle} $isHiddenOnNonMobile={enabledCTAs.length <= 2}>
           {({ triggerProps, dropdownProps }) => (
             <React.Fragment>
               <Flex alignItems="center">
@@ -358,6 +358,7 @@ CollectiveNavbarActionsMenu.propTypes = {
     addPrepaidBudget: PropTypes.bool,
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
+  onToggle: PropTypes.func,
 };
 
 CollectiveNavbarActionsMenu.defaultProps = {

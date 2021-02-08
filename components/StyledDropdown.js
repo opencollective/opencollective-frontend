@@ -9,7 +9,7 @@ export const DropdownContent = styled.div`
   position: absolute;
   z-index: 1;
   max-width: 320px;
-  z-index: 1000000;
+  z-index: 1000002;
   border-radius: 4px;
   font-size: 12px;
   text-transform: initial;
@@ -52,7 +52,7 @@ export const DropdownArrow = styled('div')`
  * make sure you pass down the `triggerProps` and `dropdownProps`.
  * The ref must be on the wrapping div in order to work in Firefox (Mac) and Safari.
  */
-export const Dropdown = styled(({ children, trigger, ...props }) => {
+export const Dropdown = styled(({ children, trigger, onToggle, ...props }) => {
   const dropdownRef = useRef();
   const [isDisplayed, setDisplayed] = React.useState(false);
 
@@ -75,6 +75,9 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
           triggerProps: {
             onClick: () => {
               setDisplayed(!isDisplayed);
+              if (onToggle) {
+                onToggle();
+              }
             },
           },
           dropdownProps: {
