@@ -61,6 +61,31 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const applyToHostMutation = gqlV2/* GraphQL */ `
+  mutation ApplyToHost(
+    $collective: AccountReferenceInput!
+    $host: AccountReferenceInput!
+    $message: String
+    $applicationData: JSON
+  ) {
+    applyToHost(collective: $collective, host: $host, message: $message, applicationData: $applicationData) {
+      id
+      slug
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
+    }
+  }
+`;
+
+const useApplicationMutation = canApplyWithCollective =>
+  useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation, {
+    context: API_V2_CONTEXT,
+  });
+
 const ApplicationForm = ({
   LoggedInUser,
   loadingLoggedInUser,
@@ -68,12 +93,10 @@ const ApplicationForm = ({
   setInitialValues,
   loadingCollective,
   canApplyWithCollective,
-  collective,
+  collective: collectiveWithSlug,
 }) => {
   const intl = useIntl();
-  const [createCollective, { loading: submitting, error }] = useMutation(createCollectiveMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
 
   const validate = values => {
     const errors = requireFields(values, [
@@ -105,9 +128,12 @@ const ApplicationForm = ({
       host: { legacyId: OPENCOLLECTIVE_FOUNDATION_ID },
       user,
       applicationData,
+      ...(canApplyWithCollective && { collective: { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug } }),
     };
-    const response = await createCollective({ variables });
-    if (response.data.createCollective) {
+
+    const response = await submitApplication({ variables });
+
+    if (response.data.createCollective || response.data.applyToHost) {
       await Router.pushRoute('/foundation/apply/success');
       window.scrollTo(0, 0);
     }
@@ -184,11 +210,11 @@ const ApplicationForm = ({
                       name: LoggedInUser.collective.name,
                       email: LoggedInUser.email,
                     },
-                    ...(collective && {
+                    ...(collectiveWithSlug && {
                       collective: {
-                        name: collective.name,
-                        slug: collective.slug,
-                        description: collective.description,
+                        name: collectiveWithSlug.name,
+                        slug: collectiveWithSlug.slug,
+                        description: collectiveWithSlug.description,
                       },
                     }),
                   });
