@@ -7,8 +7,8 @@
   },
   "private": true,
   "engines": {
-    "node": "12.13.1",
-    "npm": "6.12.0"
+    "node": "14.x",
+    "npm": "7.x"
   },
   "dependencies": {
     "@apollo/client": "3.3.8",
@@ -54,7 +54,6 @@
     "file-saver": "2.0.5",
     "focus-trap-react": "8.4.2",
     "formik": "2.2.6",
-    "full-icu": "1.3.1",
     "glob": "7.1.6",
     "graphql": "15.3.0",
     "helmet": "4.4.1",
@@ -117,7 +116,7 @@
     "depcheck": "npx depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production master",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging master",
-    "dev": "node --icu-data-dir=node_modules/full-icu server",
+    "dev": "node server",
     "git:clean": "cross-env ./scripts/git_clean.sh",
     "graphql:get-schema": "npm-run-all graphql:updateV1 graphql:updateV2",
     "graphql:update": "npm-run-all graphql:updateV1 graphql:updateV2",
@@ -134,9 +133,9 @@
     "prettier": "prettier \"*.@(js|json|md)\" \"@(components|lib|pages|scripts|server|test)/**/*.@(js|json|md)\"",
     "prettier:check": "npm run prettier -- --check",
     "prettier:write": "npm run prettier -- --write",
-    "start": "node --icu-data-dir=node_modules/full-icu dist/server",
+    "start": "node dist/server",
     "start:ci": "nyc --silent --exclude \".next/**\" node server",
-    "start:e2e": "cross-env TZ=UTC NODE_ENV=production OC_ENV=e2e node --icu-data-dir=node_modules/full-icu server",
+    "start:e2e": "cross-env TZ=UTC NODE_ENV=production OC_ENV=e2e node server",
     "styleguide:build": "styleguidist build",
     "styleguide:dev": "styleguidist server",
     "test": "npm run test:jest",
@@ -257,7 +256,6 @@
   "depcheck": {
     "ignores": [
       "@formatjs/intl-relativetimeformat",
-      "full-icu",
       "imagemin",
       "imagemin-optipng",
       "imagemin-pngquant"
