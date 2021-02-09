@@ -58,7 +58,14 @@ exports.REWRITES = [
     source: '/:collectiveSlug/paymentmethod/:id/update',
     destination: '/updatePaymentMethod',
   },
-
+  {
+    source: '/:collectiveSlug/banner.html',
+    destination: '/banner-iframe',
+  },
+  {
+    source: '/:collectiveSlug/(collectives|widget).html',
+    destination: '/collectives-iframe',
+  },
   // {
   //   source: '/signin/:token?',
   //   destination: '/signin',
@@ -92,14 +99,7 @@ exports.REWRITES = [
   //   source: '/:parentCollectiveSlug/projects/(new|create)',
   //   destination: '/create-project',
   // },
-  // {
-  //   source: '/:collectiveSlug/(collectives|widget).html',
-  //   destination: '/collectives-iframe',
-  // },
-  // {
-  //   source: '/:collectiveSlug/banner.html',
-  //   destination: '/banner-iframe',
-  // },
+
   // {
   //   source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section?',
   //   destination: '/editEvent',
