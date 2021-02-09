@@ -43,8 +43,6 @@ const pages = routes()
 
 pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?');
 
-pages.add('external-redirect', '/redirect');
-
 // New Create Collective Flow
 pages.add(
   'create-collective',

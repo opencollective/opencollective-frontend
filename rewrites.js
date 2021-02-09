@@ -70,6 +70,10 @@ exports.REWRITES = [
     source: '/:collectiveSlug/(collectives|widget).html',
     destination: '/collectives-iframe',
   },
+  {
+    source: '/redirect',
+    destination: '/external-redirect',
+  },
   // {
   //   source: '/signin/:token?',
   //   destination: '/signin',
@@ -158,10 +162,7 @@ exports.REWRITES = [
   //   source: '/fund/:verb(apply|create)/:step(form)?',
   //   destination: '/create-fund',
   // },
-  // {
-  //   source: '/redirect',
-  //   destination: '/external-redirect',
-  // },
+
   // // New Create Collective Flow
   // {
   //   source:
