@@ -129,12 +129,13 @@ ClickableLabel.defaultProps = {
 
 /** Add missing fields to taxInfo and calculate tax amount */
 const prepareTaxInfo = (taxes, userTaxInfo, amount, quantity, taxPercentage, hasForm) => {
+  const isCountryRequired = taxes[0]?.type === TaxType.VAT;
   return {
     ...userTaxInfo,
     taxType: taxes[0]?.type,
     percentage: taxPercentage,
     amount: Math.round(amount * quantity * (taxPercentage / 100)),
-    isReady: Boolean(!hasForm && (!amount || get(userTaxInfo, 'countryISO'))),
+    isReady: Boolean(!hasForm && (!amount || !isCountryRequired || get(userTaxInfo, 'countryISO'))),
   };
 };
 
