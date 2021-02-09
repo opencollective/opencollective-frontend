@@ -160,6 +160,8 @@
   "becomeASponsor.transparency": "Transparency",
   "becomeASponsor.transparency.description": "You can directly see the impact of your contributions, in real time, because Collective budgets are transparent",
   "BillingAddress": "Billing address",
+  "budgetSection-disbursed": "Total Amount Disbursed",
+  "budgetSection-raised": "Total Amount Raised",
   "button.submit": "제출",
   "ByUser": "By {userName}",
   "CancelEdit": "변경 취소",

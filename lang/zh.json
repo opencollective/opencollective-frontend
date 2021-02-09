@@ -160,6 +160,8 @@
   "becomeASponsor.transparency": "透明",
   "becomeASponsor.transparency.description": "您可以实时直接查阅您捐款的影响，因为 Collective 预算是透明的",
   "BillingAddress": "账单地址",
+  "budgetSection-disbursed": "Total Amount Disbursed",
+  "budgetSection-raised": "Total Amount Raised",
   "button.submit": "提交",
   "ByUser": "由 {userName}",
   "CancelEdit": "取消编辑",
