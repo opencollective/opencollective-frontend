@@ -77,7 +77,7 @@
     "react-dnd": "11.1.1",
     "react-dnd-html5-backend": "11.1.1",
     "react-dom": "16.14.0",
-    "react-dropzone": "11.3.0",
+    "react-dropzone": "11.3.1",
     "react-easy-crop": "3.3.1",
     "react-flip-move": "3.0.4",
     "react-geosuggest": "2.14.1",
