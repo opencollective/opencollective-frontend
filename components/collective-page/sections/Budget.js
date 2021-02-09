@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
@@ -6,24 +6,22 @@ import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
 import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
 import Container from '../../Container';
-import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { expensesListFieldsFragment } from '../../expenses/graphql/fragments';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledCard from '../../StyledCard';
 import StyledFilters from '../../StyledFilters';
-import { P, Span } from '../../Text';
+import { P } from '../../Text';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionItem from '../../transactions/TransactionItem';
 import { withUser } from '../../UserProvider';
+import BudgetStats from '../BudgetStats';
 import ContainerSectionContent from '../ContainerSectionContent';
 
 export const budgetSectionQuery = gqlV2/* GraphQL */ `
@@ -117,10 +115,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;
-  const monthlyRecurring =
-    (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
-  const isFund = collective.type === CollectiveType.FUND;
-  const isProject = collective.type === CollectiveType.PROJECT;
+
   const transactions = get(data, 'transactions.nodes') || EMPTY_ARRAY;
   const expenses = get(data, 'expenses.nodes') || EMPTY_ARRAY;
   const budgetItemsParams = [transactions, expenses, filter];
@@ -134,10 +129,12 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
 
   return (
     <ContainerSectionContent pb={4}>
-      <Flex mb={3} flexWrap="wrap" justifyContent="space-between" alignItems="center" maxWidth={720}>
-        <StyledFilters filters={FILTERS} getLabel={geFilterLabel} selected={filter} onChange={setFilter} />
-        <ViewAllLink collective={collective} filter={filter} />
-      </Flex>
+      {Boolean(expenses.length && transactions.length) && (
+        <Flex mb={3} flexWrap="wrap" justifyContent="space-between" alignItems="center" maxWidth={720}>
+          <StyledFilters filters={FILTERS} getLabel={geFilterLabel} selected={filter} onChange={setFilter} />
+          <ViewAllLink collective={collective} filter={filter} />
+        </Flex>
+      )}
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
         <Container flex="10" mb={3} width="100%" maxWidth={800}>
           <StyledCard>
@@ -199,68 +196,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
           mb={2}
           mx={[null, null, 3]}
         >
-          <Box data-cy="budgetSection-today-balance" flex="1" py={16} px={4}>
-            <P fontSize="10px" textTransform="uppercase" color="black.700">
-              <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
-            </P>
-            <P fontSize="20px" mt={1}>
-              {formatCurrency(stats.balance, collective.currency)} <Span color="black.700">{collective.currency}</Span>
-            </P>
-          </Box>
-          {!isFund && !isProject && (
-            <Container data-cy="budgetSection-estimated-budget" flex="1" background="#F5F7FA" py={16} px={4}>
-              <DefinedTerm
-                term={Terms.ESTIMATED_BUDGET}
-                fontSize="10px"
-                textTransform="uppercase"
-                color="black.700"
-                extraTooltipContent={
-                  <Box mt={2}>
-                    <FormattedMessage
-                      id="CollectivePage.SectionBudget.MonthlyRecurringAmount"
-                      defaultMessage="Monthly recurring: {amount}"
-                      values={{ amount: formatCurrency(monthlyRecurring, collective.currency) }}
-                    />
-                    <br />
-                    <FormattedMessage
-                      id="CollectivePage.SectionBudget.TotalAmountReceived"
-                      defaultMessage="Total received in the last 12 months: {amount}"
-                      values={{ amount: formatCurrency(stats?.totalAmountReceived || 0, collective.currency) }}
-                    />
-                  </Box>
-                }
-              />
-              <P fontSize="20px" mt={2}>
-                <Span fontWeight="bold">~ {formatCurrency(stats.yearlyBudget, collective.currency)}</Span>{' '}
-                <Span color="black.700">{collective.currency}</Span>
-              </P>
-            </Container>
-          )}
-          {isFund && (
-            <Fragment>
-              <Container flex="1" background="#F5F7FA" py={16} px={4}>
-                <P fontSize="10px" textTransform="uppercase" color="black.700">
-                  <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total Amount Disbursed" />
-                </P>
-                <P fontSize="20px" mt={2}>
-                  <Span fontWeight="bold">
-                    {formatCurrency(stats.totalAmountRaised - stats.balance, collective.currency)}
-                  </Span>{' '}
-                  <Span color="black.700">{collective.currency}</Span>
-                </P>
-              </Container>
-
-              <Container flex="1" background="#F5F7FA" py={16} px={4}>
-                <P fontSize="10px" textTransform="uppercase" color="black.700">
-                  <FormattedMessage id="budgetSection-raised" defaultMessage="Total Amount Raised" />
-                </P>
-                <P fontSize="20px" mt={2}>
-                  <Span fontWeight="bold">{formatCurrency(stats.totalAmountRaised, collective.currency)}</Span>{' '}
-                  <Span color="black.700">{collective.currency}</Span>
-                </P>
-              </Container>
-            </Fragment>
-          )}
+          <BudgetStats collective={collective} stats={stats} />
         </StyledCard>
       </Flex>
     </ContainerSectionContent>
