@@ -39,6 +39,10 @@ exports.REWRITES = [
     destination: '/createOrganization',
   },
   {
+    source: '/:collectiveSlug/updates',
+    destination: '/updates',
+  },
+  {
     source: '/:collectiveSlug/updates/new',
     destination: '/createUpdate',
   },

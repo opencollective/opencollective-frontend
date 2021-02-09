@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
-import { addCollectiveCoverData } from '../../lib/graphql/queries';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { addCollectiveCoverData } from '../lib/graphql/queries';
 
-import Body from '../../components/Body';
-import CollectiveNavbar from '../../components/collective-navbar';
-import { Sections } from '../../components/collective-page/_constants';
-import ErrorPage from '../../components/ErrorPage';
-import Footer from '../../components/Footer';
-import Header from '../../components/Header';
-import UpdatesWithData from '../../components/UpdatesWithData';
-import { withUser } from '../../components/UserProvider';
+import Body from '../components/Body';
+import CollectiveNavbar from '../components/collective-navbar';
+import { Sections } from '../components/collective-page/_constants';
+import ErrorPage from '../components/ErrorPage';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import UpdatesWithData from '../components/UpdatesWithData';
+import { withUser } from '../components/UserProvider';
 
 class UpdatesPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
