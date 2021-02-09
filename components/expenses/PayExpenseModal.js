@@ -229,7 +229,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
           )}
           <AmountLine borderTop="1px solid #4E5052" pt={11}>
             <Label color="black.900" fontWeight="500">
-              {formik.values.paymentProcessorFee !== null && !formik.values.forceManual ? (
+              {formik.values.paymentProcessorFee !== null ? (
                 <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
               ) : (
                 <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
