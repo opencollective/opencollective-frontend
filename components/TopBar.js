@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { rotateMixin } from '../lib/constants/animations';
 import theme from '../lib/theme';
-import { Link } from '../server/pages';
 
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
@@ -107,7 +107,7 @@ class TopBar extends React.Component {
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
         ref={this.ref}
       >
-        <Link route="home" passHref>
+        <NextLink href="/" passHref>
           <Flex as="a" alignItems="center">
             <Logo width="24" height="24" />
             <Hide xs>
@@ -116,7 +116,7 @@ class TopBar extends React.Component {
               </Box>
             </Hide>
           </Flex>
-        </Link>
+        </NextLink>
 
         {showSearch && (
           <Flex justifyContent="flex-end" flex="1 1 auto">
@@ -131,11 +131,11 @@ class TopBar extends React.Component {
         <Flex alignItems="center" justifyContent={['flex-end', 'flex-start']} flex="1 1 auto">
           <Hide lg>
             <Box mx={3}>
-              <Link href="/search">
+              <NextLink href="/search">
                 <Flex as="a">
                   <SearchIcon fill="#aaaaaa" size={24} />
                 </Flex>
-              </Link>
+              </NextLink>
             </Box>
           </Hide>
 
@@ -143,29 +143,29 @@ class TopBar extends React.Component {
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               {merged.discover && (
                 <NavLinkContainer>
-                  <Link route="discover" passHref>
+                  <NextLink href="/discover" passHref>
                     <NavLink>
                       <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                     </NavLink>
-                  </Link>
+                  </NextLink>
                 </NavLinkContainer>
               )}
               {merged.howItWorks && (
                 <NavLinkContainer>
-                  <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
+                  <NextLink href="/how-it-works" passHref>
                     <NavLink>
                       <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
                     </NavLink>
-                  </Link>
+                  </NextLink>
                 </NavLinkContainer>
               )}
               {merged.pricing && (
                 <NavLinkContainer>
-                  <Link route="pricing" passHref>
+                  <NextLink href="/pricing" passHref>
                     <NavLink>
                       <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
                     </NavLink>
-                  </Link>
+                  </NextLink>
                 </NavLinkContainer>
               )}
               {merged.docs && (
