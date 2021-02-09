@@ -206,7 +206,7 @@ class SignInOrJoinFree extends React.Component {
                       onSubmit={handleSubmit}
                       data-cy="signin-two-factor-auth-button"
                     >
-                      <FormattedMessage id="TwoFactorAuth.Setup.Form.VerifyButton" defaultMessage="Verify" />
+                      <FormattedMessage id="VerifyButton" defaultMessage="Verify" />
                     </StyledButton>
                   </Flex>
                 </Form>
