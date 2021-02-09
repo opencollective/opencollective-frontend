@@ -9,7 +9,6 @@ import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sec
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { GraphQLContext } from '../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 import { Router } from '../server/pages';
@@ -182,117 +181,113 @@ class TransactionsPage extends React.Component {
     return (
       <TransactionPageWrapper>
         <Header collective={collective} LoggedInUser={LoggedInUser} />
-        <GraphQLContext.Provider value={transactionsData}>
-          <Body>
-            <Container mb={4}>
-              <CollectiveNavbar
-                collective={collective}
-                isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
-                selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-                selectedSection={
-                  collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS
-                }
-              />
-            </Container>
-            <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
-              <Flex justifyContent="space-between">
-                <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
-                  <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-                </H1>
-                <Box p={2} flexGrow={[1, 0]}>
-                  <SearchBar
-                    defaultValue={query.searchTerm}
-                    onSubmit={searchTerm =>
-                      Router.pushRoute('transactions', { ...query, searchTerm, offset: null, collectiveSlug: slug })
-                    }
-                  />
-                </Box>
-              </Flex>
-              <StyledHr my="24px" mx="8px" borderWidth="0.5px" />
-              <Flex
-                mb={['8px', '46px']}
-                mx="8px"
-                justifyContent="space-between"
-                flexDirection={['column', 'row']}
-                alignItems={['stretch', 'flex-end']}
-              >
-                <TransactionsFilters
-                  filters={query}
-                  collective={collective}
-                  onChange={queryParams =>
-                    Router.pushRoute('transactions', {
-                      ...query,
-                      ...queryParams,
-                      collectiveSlug: slug,
-                      offset: null,
-                    })
+        <Body>
+          <Container mb={4}>
+            <CollectiveNavbar
+              collective={collective}
+              isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+              selectedCategory={NAVBAR_CATEGORIES.BUDGET}
+              selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
+            />
+          </Container>
+          <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
+            <Flex justifyContent="space-between">
+              <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
+                <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
+              </H1>
+              <Box p={2} flexGrow={[1, 0]}>
+                <SearchBar
+                  defaultValue={query.searchTerm}
+                  onSubmit={searchTerm =>
+                    Router.pushRoute('transactions', { ...query, searchTerm, offset: null, collectiveSlug: slug })
                   }
                 />
-                <Flex>
-                  {canDownloadInvoices && (
-                    <Box mr="8px">
-                      <TransactionsDownloadInvoices collective={collective} />
-                    </Box>
-                  )}
-                  <TransactionsDownloadCSV collective={collective} />
-                </Flex>
+              </Box>
+            </Flex>
+            <StyledHr my="24px" mx="8px" borderWidth="0.5px" />
+            <Flex
+              mb={['8px', '46px']}
+              mx="8px"
+              justifyContent="space-between"
+              flexDirection={['column', 'row']}
+              alignItems={['stretch', 'flex-end']}
+            >
+              <TransactionsFilters
+                filters={query}
+                collective={collective}
+                onChange={queryParams =>
+                  Router.pushRoute('transactions', {
+                    ...query,
+                    ...queryParams,
+                    collectiveSlug: slug,
+                    offset: null,
+                  })
+                }
+              />
+              <Flex>
+                {canDownloadInvoices && (
+                  <Box mr="8px">
+                    <TransactionsDownloadInvoices collective={collective} />
+                  </Box>
+                )}
+                <TransactionsDownloadCSV collective={collective} />
               </Flex>
-              {error ? (
-                <MessageBox type="error" withIcon>
-                  {getErrorFromGraphqlException(error).message}
-                </MessageBox>
-              ) : !loading && !transactions?.nodes?.length ? (
-                <MessageBox type="info" withIcon data-cy="zero-transactions-message">
-                  {hasFilters ? (
-                    <FormattedMessage
-                      id="TransactionsList.Empty"
-                      defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
-                      values={{
-                        ResetLink(text) {
-                          return (
-                            <Link
-                              data-cy="reset-transactions-filters"
-                              route="transactions"
-                              params={{
-                                ...mapValues(query, () => null),
-                                collectiveSlug: collective.slug,
-                                view: 'transactions',
-                              }}
-                            >
-                              {text}
-                            </Link>
-                          );
-                        },
-                      }}
-                    />
-                  ) : (
-                    <FormattedMessage id="transactions.empty" defaultMessage="No transactions" />
-                  )}
-                </MessageBox>
-              ) : (
-                <React.Fragment>
-                  <TransactionsList
-                    isLoading={loading}
-                    collective={collective}
-                    nbPlaceholders={variables.limit}
-                    transactions={transactions?.nodes}
-                    displayActions
-                    onMutationSuccess={() => refetch()}
+            </Flex>
+            {error ? (
+              <MessageBox type="error" withIcon>
+                {getErrorFromGraphqlException(error).message}
+              </MessageBox>
+            ) : !loading && !transactions?.nodes?.length ? (
+              <MessageBox type="info" withIcon data-cy="zero-transactions-message">
+                {hasFilters ? (
+                  <FormattedMessage
+                    id="TransactionsList.Empty"
+                    defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
+                    values={{
+                      ResetLink(text) {
+                        return (
+                          <Link
+                            data-cy="reset-transactions-filters"
+                            route="transactions"
+                            params={{
+                              ...mapValues(query, () => null),
+                              collectiveSlug: collective.slug,
+                              view: 'transactions',
+                            }}
+                          >
+                            {text}
+                          </Link>
+                        );
+                      },
+                    }}
                   />
-                  <Flex mt={5} justifyContent="center">
-                    <Pagination
-                      route="transactions"
-                      total={transactions?.totalCount}
-                      limit={variables.limit}
-                      offset={variables.offset}
-                      scrollToTopOnChange
-                    />
-                  </Flex>
-                </React.Fragment>
-              )}
-            </Box>
-          </Body>
-        </GraphQLContext.Provider>
+                ) : (
+                  <FormattedMessage id="transactions.empty" defaultMessage="No transactions" />
+                )}
+              </MessageBox>
+            ) : (
+              <React.Fragment>
+                <TransactionsList
+                  isLoading={loading}
+                  collective={collective}
+                  nbPlaceholders={variables.limit}
+                  transactions={transactions?.nodes}
+                  displayActions
+                  onMutationSuccess={() => refetch()}
+                />
+                <Flex mt={5} justifyContent="center">
+                  <Pagination
+                    route="transactions"
+                    total={transactions?.totalCount}
+                    limit={variables.limit}
+                    offset={variables.offset}
+                    scrollToTopOnChange
+                  />
+                </Flex>
+              </React.Fragment>
+            )}
+          </Box>
+        </Body>
         <Footer />
       </TransactionPageWrapper>
     );

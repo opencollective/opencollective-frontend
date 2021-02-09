@@ -185,8 +185,11 @@ describe('Collective page with euro currency', () => {
 
     it('Has button to view all transactions and expenses', () => {
       scrollToSection(Sections.BUDGET);
-      cy.get('[data-cy=view-all-transactions-btn]').should('be.visible');
-      cy.get('[data-cy=view-all-expenses-btn]').should('be.visible');
+      cy.get('[data-cy="section-budget"] [data-cy="filter-button expenses"]').click();
+      cy.get('[data-cy="section-budget"] [data-cy=view-all-expenses-link]').should('be.visible');
+
+      cy.get('[data-cy="section-budget"] [data-cy="filter-button transactions"]').click();
+      cy.get('[data-cy="section-budget"] [data-cy=view-all-transactions-link]').should('be.visible');
     });
   });
 });

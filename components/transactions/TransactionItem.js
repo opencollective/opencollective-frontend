@@ -170,7 +170,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               ml="auto"
             >
               <TransactionSign isCredit={isCredit} />
-              <Span fontWeight="bold" mr={1}>
+              <Span fontWeight="bold" color="black.900" mr={1}>
                 {formatCurrency(Math.abs(displayedAmount.valueInCents), displayedAmount.currency)}
               </Span>
               <Span color="black.700" textTransform="uppercase">

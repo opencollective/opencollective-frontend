@@ -93,6 +93,8 @@ export const collectivePageQuery = gql`
         plan {
           id
           hostFees
+          transferwisePayoutsLimit
+          transferwisePayouts
         }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
