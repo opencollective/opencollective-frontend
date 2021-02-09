@@ -54,10 +54,10 @@ exports.REWRITES = [
     source: '/:collectiveSlug?/redeemed/:code?',
     destination: '/redeemed',
   },
-  // {
-  //   source: '/:collectiveSlug/paymentmethod/:id/update',
-  //   destination: '/updatePaymentMethod',
-  // },
+  {
+    source: '/:collectiveSlug/paymentmethod/:id/update',
+    destination: '/updatePaymentMethod',
+  },
 
   // {
   //   source: '/signin/:token?',

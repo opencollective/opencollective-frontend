@@ -8,7 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes()
   .add('home', '/', 'index')
-  .add('updatePaymentMethod', '/:collectiveSlug/paymentmethod/:id/update')
   .add('signin', '/signin/:token?')
   .add('confirmEmail', '/confirm/email/:token')
   .add('confirm-guest', '/confirm/guest/:token')
