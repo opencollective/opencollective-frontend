@@ -160,6 +160,8 @@
   "becomeASponsor.transparency": "Прозорість",
   "becomeASponsor.transparency.description": "Ви можете бачити безпосередній вплив ваших внесків у режимі реального часу, тому що бюджети Колективвів є прозорими",
   "BillingAddress": "Адреса для оплати",
+  "budgetSection-disbursed": "Total Amount Disbursed",
+  "budgetSection-raised": "Total Amount Raised",
   "button.submit": "Підтвердити",
   "ByUser": "Від {userName}",
   "CancelEdit": "Скасувати зміни",

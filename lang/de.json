@@ -160,6 +160,8 @@
   "becomeASponsor.transparency": "Transparenz",
   "becomeASponsor.transparency.description": "You can directly see the impact of your contributions, in real time, because Collective budgets are transparent",
   "BillingAddress": "Rechnungsadresse",
+  "budgetSection-disbursed": "Total Amount Disbursed",
+  "budgetSection-raised": "Total Amount Raised",
   "button.submit": "Absenden",
   "ByUser": "Von {userName}",
   "CancelEdit": "Bearbeitung abbrechen",

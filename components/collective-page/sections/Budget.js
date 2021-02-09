@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
@@ -158,6 +158,31 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
               </P>
             </Container>
           )}
+          {isFund && (
+            <Fragment>
+              <Container flex="1" background="#F5F7FA" py={16} px={4}>
+                <P fontSize="10px" textTransform="uppercase" color="black.700">
+                  <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total Amount Disbursed" />
+                </P>
+                <P fontSize="20px" mt={2}>
+                  <Span fontWeight="bold">
+                    {formatCurrency(stats.totalAmountRaised - stats.balance, collective.currency)}
+                  </Span>{' '}
+                  <Span color="black.700">{collective.currency}</Span>
+                </P>
+              </Container>
+
+              <Container flex="1" background="#F5F7FA" py={16} px={4}>
+                <P fontSize="10px" textTransform="uppercase" color="black.700">
+                  <FormattedMessage id="budgetSection-raised" defaultMessage="Total Amount Raised" />
+                </P>
+                <P fontSize="20px" mt={2}>
+                  <Span fontWeight="bold">{formatCurrency(stats.totalAmountRaised, collective.currency)}</Span>{' '}
+                  <Span color="black.700">{collective.currency}</Span>
+                </P>
+              </Container>
+            </Fragment>
+          )}
         </StyledCard>
       </Flex>
     </ContainerSectionContent>
@@ -181,6 +206,7 @@ SectionBudget.propTypes = {
     yearlyBudget: PropTypes.number.isRequired,
     activeRecurringContributions: PropTypes.object,
     totalAmountReceived: PropTypes.number,
+    totalAmountRaised: PropTypes.number,
   }),
 
   LoggedInUser: PropTypes.object,

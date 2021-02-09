@@ -160,6 +160,8 @@
   "becomeASponsor.transparency": "Transparencia",
   "becomeASponsor.transparency.description": "Puedes ver directamente el impacto de tus contribuciones en tiempo real, porque los presupuestos colectivos son transparentes",
   "BillingAddress": "Dirección de facturación",
+  "budgetSection-disbursed": "Total Amount Disbursed",
+  "budgetSection-raised": "Total Amount Raised",
   "button.submit": "Enviar",
   "ByUser": "Por {userName}",
   "CancelEdit": "Cancelar edición",
