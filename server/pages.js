@@ -7,7 +7,6 @@
 const routes = require('next-routes');
 
 const pages = routes()
-  .add('signin', '/signin/:token?')
   .add('confirmEmail', '/confirm/email/:token')
   .add('confirm-guest', '/confirm/guest/:token')
   .add('unsubscribeEmail', '/email/unsubscribe/:email/:slug/:type/:token')

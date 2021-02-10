@@ -74,10 +74,10 @@ exports.REWRITES = [
     source: '/redirect',
     destination: '/external-redirect',
   },
-  // {
-  //   source: '/signin/:token?',
-  //   destination: '/signin',
-  // },
+  {
+    source: '/signin/:token?',
+    destination: '/signin',
+  },
   // {
   //   source: '/confirm/email/:token',
   //   destination: '/confirmEmail',

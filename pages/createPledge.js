@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -354,9 +355,9 @@ class CreatePledgePage extends React.Component {
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
                     values={{
                       'signin-link': msg => (
-                        <Link route="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
+                        <NextLink href="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
                           {msg}
-                        </Link>
+                        </NextLink>
                       ),
                     }}
                   />
