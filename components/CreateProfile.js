@@ -151,6 +151,11 @@ const useForm = ({ onEmailChange, errors, formatMessage }) => {
   };
 };
 
+const DEFAULT_LABELS = {
+  personal: <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />,
+  organization: <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />,
+};
+
 const CreateProfile = ({
   email,
   submitting,
@@ -159,31 +164,26 @@ const CreateProfile = ({
   onPersonalSubmit,
   onOrgSubmit,
   onSecondaryAction,
-  createPersonalProfileLabel,
-  createOrganizationProfileLabel,
+  labels,
+  tabs,
   ...props
 }) => {
   const { formatMessage } = useIntl();
-  const [tab, setTab] = useState('personal');
+  const [activeTab, setActiveTab] = useState(tabs[0]);
   const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors, formatMessage });
   const isValid = isEmpty(compact(values(state.errors)));
 
   return (
     <StyledCard width={1} maxWidth={480} {...props}>
       <Flex>
-        <Tab active={tab === 'personal'} setActive={() => setTab('personal')}>
-          {createPersonalProfileLabel || (
-            <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
-          )}
-        </Tab>
-        <Tab active={tab === 'organization'} setActive={() => setTab('organization')}>
-          {createOrganizationProfileLabel || (
-            <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />
-          )}
-        </Tab>
+        {tabs.map(tab => (
+          <Tab key={tab} active={activeTab === tab} setActive={() => setActiveTab(tab)}>
+            {labels?.[tab] || DEFAULT_LABELS[tab]}
+          </Tab>
+        ))}
       </Flex>
 
-      {tab === 'personal' && (
+      {activeTab === 'personal' && (
         <Box
           as="form"
           p={4}
@@ -245,7 +245,7 @@ const CreateProfile = ({
         </Box>
       )}
 
-      {tab === 'organization' && (
+      {activeTab === 'organization' && (
         <Box
           as="form"
           p={4}
@@ -413,10 +413,10 @@ CreateProfile.propTypes = {
   email: PropTypes.string.isRequired,
   /** handles changes in the email input */
   onEmailChange: PropTypes.func.isRequired,
-  /** A label to use instead of the default `Create personal profile` */
-  createPersonalProfileLabel: PropTypes.node,
-  /** A label to use instead of the default `Create Organization profile` */
-  createOrganizationProfileLabel: PropTypes.node,
+  /** To customize which forms should be displayed */
+  tabs: PropTypes.arrayOf(PropTypes.oneOf(['personal', 'organization'])).isRequired,
+  /** To replace the default labels */
+  labels: PropTypes.shape({ personal: PropTypes.string, organization: PropTypes.string }),
   /** All props from `StyledCard` */
   ...StyledCard.propTypes,
 };
@@ -424,6 +424,7 @@ CreateProfile.propTypes = {
 CreateProfile.defaultProps = {
   errors: {},
   submitting: false,
+  tabs: ['personal', 'organization'],
 };
 
 export default CreateProfile;
