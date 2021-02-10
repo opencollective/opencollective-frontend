@@ -70,7 +70,7 @@ class SearchForm extends React.Component {
             pl={3}
             width={width}
             fontSize={fontSize}
-        aria-label="Open Collective search input"
+            aria-label="Open Collective search input"
             defaultValue={defaultValue}
             value={value}
             onChange={onChange && (e => onChange(e.target.value))}

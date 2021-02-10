@@ -4,6 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { find, get, intersection, isEmpty, isNil, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -103,6 +104,7 @@ class ContributionFlow extends React.Component {
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
     createCollective: PropTypes.func.isRequired, // from mutation
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -360,7 +362,7 @@ class ContributionFlow extends React.Component {
           websiteUrl: getWebsiteUrl(),
         },
       });
-      await Router.pushRoute('signinLinkSent', { email: user.email });
+      await this.props.router.push({ pathname: 'signinLinkSent', query: { email: user.email } });
     } catch (error) {
       this.setState({ error: error.message, isSubmitting: false });
     } finally {
@@ -828,7 +830,9 @@ const addConfirmOrderMutation = graphql(
 );
 
 export default injectIntl(
-  withUser(
-    addSignupMutation(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(ContributionFlow)))),
+  withRouter(
+    withUser(
+      addSignupMutation(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(ContributionFlow)))),
+    ),
   ),
 );
