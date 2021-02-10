@@ -129,7 +129,7 @@ const ExpenseBudgetItem = ({
   return (
     <ExpenseContainer data-cy={`expense-container-${expense?.legacyId}`}>
       <Flex justifyContent="space-between" flexWrap="wrap">
-        <Flex flex="1" minWidth="max(60%, 300px)" maxWidth={[null, '70%']}>
+        <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px">
           <Box mr={3}>
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
@@ -171,7 +171,7 @@ const ExpenseBudgetItem = ({
                   )}
                 </AutosizeText>
               </ExpenseTitleLink>
-              <P mt="5px" fontSize="12px" color="black.600">
+              <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
                   <LinkCollective collective={collective} />
                 ) : (
@@ -212,7 +212,7 @@ const ExpenseBudgetItem = ({
             ) : (
               <React.Fragment>
                 {showAmountSign && <TransactionSign isCredit={isInverted} />}
-                <Span color="black.500" fontSize="15px">
+                <Span color="black.700" fontSize="16px">
                   <FormattedMoneyAmount amount={expense.amount} currency={expense.currency} precision={2} />
                 </Span>
               </React.Fragment>
