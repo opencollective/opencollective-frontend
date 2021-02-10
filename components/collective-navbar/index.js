@@ -8,6 +8,7 @@ import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Close } from '@styled-icons/material/Close';
 import { Dashboard } from '@styled-icons/material/Dashboard';
+import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
@@ -194,6 +195,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, is
     hasRequestGrant: isFund || get(settings, 'fundingRequest') === true,
     addPrepaidBudget: isRoot && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
+    hasSettings: isAdmin,
   };
 };
 
@@ -332,6 +334,20 @@ const getMainAction = (collective, callsToAction) => {
             </MainActionBtn>
           )}
         </AddPrepaidBudgetBtn>
+      ),
+    };
+  } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
+    return {
+      type: NAVBAR_ACTION_TYPE.SETTINGS,
+      component: (
+        <Link route="editCollective" params={{ collectiveSlug: collective.slug }}>
+          <MainActionBtn tabIndex="-1">
+            <Settings size="1em" />
+            <Span ml={2}>
+              <FormattedMessage id="Settings" defaultMessage="Settings" />
+            </Span>
+          </MainActionBtn>
+        </Link>
       ),
     };
   } else {
@@ -564,6 +580,7 @@ CollectiveNavbar.propTypes = {
     hasApply: PropTypes.bool,
     hasDashboard: PropTypes.bool,
     hasManageSubscriptions: PropTypes.bool,
+    hasSettings: PropTypes.bool,
   }),
   /** Used to check what sections can be used */
   isAdmin: PropTypes.bool,

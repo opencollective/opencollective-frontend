@@ -7,6 +7,7 @@ import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Dashboard } from '@styled-icons/material/Dashboard';
+import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy } from 'lodash';
@@ -313,6 +314,19 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         />
                       </MenuItem>
                     )}
+                    {callsToAction.hasSettings && (
+                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
+                        <StyledLink
+                          as={Link}
+                          route="editCollective"
+                          params={{ slug: collective.slug }}
+                          p={ITEM_PADDING}
+                        >
+                          <Settings size={20} />
+                          <FormattedMessage id="Settings" defaultMessage="Settings" />
+                        </StyledLink>
+                      </MenuItem>
+                    )}
                   </Box>
                 </DropdownContent>
               </div>
@@ -356,6 +370,8 @@ CollectiveNavbarActionsMenu.propTypes = {
     addFunds: PropTypes.bool,
     /** Add prepaid budget to an organization */
     addPrepaidBudget: PropTypes.bool,
+    /** Button to Edit the Collective */
+    hasSettings: PropTypes.bool,
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
 };
