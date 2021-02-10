@@ -1,6 +1,29 @@
+import { defaultTestUserEmail } from '../support/data';
 import { randomEmail } from '../support/faker';
 
 describe('Contribution Flow: Guest contributions', () => {
+  it('Makes a contribution as an existing user', () => {
+    cy.visit('/apex/donate');
+    cy.contains('[data-cy="amount-picker"] button', 'Other').click();
+    cy.get('input[name="custom-amount"]').type('{selectall}4257.42');
+    cy.contains('#interval button', 'Monthly').click();
+    cy.get('button[data-cy="cf-next-step"]').click();
+    cy.contains('Contribute as a guest');
+    cy.get('input[name=email]').type(defaultTestUserEmail);
+    cy.get('input[name=name]').type('Jack London');
+    cy.get('button[data-cy="cf-next-step"]').click();
+    cy.useAnyPaymentMethod();
+    cy.contains('button[data-cy="cf-next-step"]', 'Contribute $4,257.42').click();
+
+    cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
+    cy.contains('[data-cy="order-success"]', '$4,257.42 USD');
+
+    // Open email
+    const expectedEmailSubject = 'Thank you for your $4,257/month contribution to APEX';
+    cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
+    cy.contains('If you need help with this contribution, please do not hesitate to contact');
+  });
+
   it('Joins after a single contribution', () => {
     cy.visit('/apex/donate');
     cy.contains('[data-cy="amount-picker"] button', '$10').click();

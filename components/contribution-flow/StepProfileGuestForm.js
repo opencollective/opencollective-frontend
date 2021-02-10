@@ -55,7 +55,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
             {inputProps => (
               <StyledInput
                 {...inputProps}
-                defaultValue={data?.name}
+                value={data?.name || ''}
                 placeholder="e.g. Thomas Anderson"
                 onChange={e => dispatchChange(e.target.name, e.target.value)}
                 maxLength="255"
@@ -73,7 +73,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
             {inputProps => (
               <StyledInput
                 {...inputProps}
-                defaultValue={data?.email}
+                value={data?.email || ''}
                 placeholder="e.g. tanderson@thematrix.com"
                 type="email"
                 onChange={e => dispatchChange(e.target.name, e.target.value)}
@@ -139,12 +139,12 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
           />
         </P>
       )}
-      <Flex width={1} alignItems="center" justifyContent="center" my={3}>
+      <Flex width={1} alignItems="center" justifyContent="center" mb={3} mt={4}>
         <StyledHr width="100%" borderColor="black.300" />
       </Flex>
       <Flex alignItems="center" mt={3}>
-        <P fontSize="14px" mr={2}>
-          <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
+        <P fontSize="14px" mr={2} color="black.700">
+          <FormattedMessage id="GuestForm.contributeAsOrg" defaultMessage="Want to contribute as an organization?" />
         </P>
         <StyledButton
           onClick={onSignInClick}
@@ -154,7 +154,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
           isBorderless
           data-cy="cf-profile-signin-btn"
         >
-          <FormattedMessage id="signIn" defaultMessage="Sign In" />
+          <FormattedMessage id="signInOrJoinFree" defaultMessage="Sign in or join free" />
           &nbsp;→
         </StyledButton>
       </Flex>

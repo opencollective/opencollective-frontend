@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Envelope } from '@styled-icons/fa-solid/Envelope';
 import { FormattedMessage } from 'react-intl';
 
@@ -9,7 +10,7 @@ import StyledInput from '../StyledInput';
 import { Span } from '../Text';
 import { useUser } from '../UserProvider';
 
-const Newsletter = () => {
+const Newsletter = ({ defaultEmail }) => {
   const { LoggedInUser } = useUser();
   return (
     <Container>
@@ -39,7 +40,7 @@ const Newsletter = () => {
               bare
               fontSize="14px"
               name="EMAIL"
-              defaultValue={LoggedInUser?.email}
+              defaultValue={defaultEmail || LoggedInUser?.email}
               px={3}
               py={2}
               minWidth={[50, 200]}
@@ -67,6 +68,10 @@ const Newsletter = () => {
       </Flex>
     </Container>
   );
+};
+
+Newsletter.propTypes = {
+  defaultEmail: PropTypes.string,
 };
 
 export default Newsletter;

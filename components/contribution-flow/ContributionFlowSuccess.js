@@ -109,17 +109,23 @@ class NewContributionFlowSuccess extends React.Component {
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    router: PropTypes.object,
     data: PropTypes.object,
   };
 
   renderCallsToAction = () => {
-    const { LoggedInUser, data } = this.props;
+    const { LoggedInUser, data, router } = this.props;
     const callsToAction = [SUCCESS_CTA_TYPE.NEWSLETTER];
+    const isGuest = get(data, 'order.fromAccount.isGuest');
+    const email = get(router, 'query.email') ? decodeURIComponent(router.query.email) : null;
 
     if (!LoggedInUser) {
-      // all guest transactions
-      callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
-    } else if (LoggedInUser) {
+      if (isGuest) {
+        callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
+      } else {
+        callsToAction.unshift(SUCCESS_CTA_TYPE.SIGN_IN, SUCCESS_CTA_TYPE.BLOG);
+      }
+    } else {
       // all other logged in recurring/one time contributions
       callsToAction.unshift(SUCCESS_CTA_TYPE.BLOG);
     }
@@ -128,7 +134,7 @@ class NewContributionFlowSuccess extends React.Component {
       <Flex flexDirection="column" justifyContent="center" p={2}>
         {callsToAction.length <= 2 && <SuccessIllustration />}
         {callsToAction.map(type => (
-          <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} />
+          <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} email={email} />
         ))}
       </Flex>
     );
