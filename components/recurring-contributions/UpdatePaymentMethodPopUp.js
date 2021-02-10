@@ -15,6 +15,7 @@ import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/paymen
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 
 import { Box, Flex } from '../Grid';
+import I18nFormatters from '../I18nFormatters';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NewCreditCardForm from '../NewCreditCardForm';
 import { withStripeLoader } from '../StripeProvider';
@@ -23,6 +24,7 @@ import StyledHr from '../StyledHr';
 import StyledRadioList from '../StyledRadioList';
 import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const PaymentMethodBox = styled(Flex)`
   border-top: 1px solid ${themeGet('colors.black.300')};
@@ -109,16 +111,9 @@ export const confirmCreditCardMutation = gqlV2/* GraphQL */ `
 
 const mutationOptions = { context: API_V2_CONTEXT };
 
-const UpdatePaymentMethodPopUp = ({
-  setMenuState,
-  contribution,
-  createNotification,
-  setShowPopup,
-  router,
-  loadStripe,
-  account,
-}) => {
+const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, router, loadStripe, account }) => {
   const intl = useIntl();
+  const { addToast } = useToasts();
 
   // state management
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
@@ -157,7 +152,10 @@ const UpdatePaymentMethodPopUp = ({
     const { message, response } = stripeError;
 
     if (!response) {
-      createNotification('error', message);
+      addToast({
+        type: TOAST_TYPE.ERROR,
+        message: message,
+      });
       setAddingPaymentMethod(false);
       return false;
     }
@@ -165,7 +163,10 @@ const UpdatePaymentMethodPopUp = ({
     const stripe = await getStripe();
     const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
     if (result.error) {
-      createNotification('error', result.error.message);
+      addToast({
+        type: TOAST_TYPE.ERROR,
+        message: result.error.message,
+      });
       setAddingPaymentMethod(false);
       return false;
     } else {
@@ -175,7 +176,10 @@ const UpdatePaymentMethodPopUp = ({
         });
         return handleSuccess(response.data.confirmCreditCard.paymentMethod);
       } catch (error) {
-        createNotification('error', error.message);
+        addToast({
+          type: TOAST_TYPE.ERROR,
+          message: error.message,
+        });
         setAddingPaymentMethod(false);
         return false;
       }
@@ -332,17 +336,25 @@ const UpdatePaymentMethodPopUp = ({
               onClick={async () => {
                 setAddingPaymentMethod(true);
                 if (!stripe) {
-                  createNotification(
-                    'error',
-                    'There was a problem initializing the payment form. Please reload the page and try again',
-                  );
+                  addToast({
+                    type: TOAST_TYPE.ERROR,
+                    message: (
+                      <FormattedMessage
+                        id="Stripe.Initialization.Error"
+                        defaultMessage="There was a problem initializing the payment form. Please reload the page and try again."
+                      />
+                    ),
+                  });
                   setAddingPaymentMethod(false);
                   return false;
                 }
                 const { token, error } = await stripe.createToken();
 
                 if (error) {
-                  createNotification('error', error.message);
+                  addToast({
+                    type: TOAST_TYPE.ERROR,
+                    message: error.message,
+                  });
                   return false;
                 }
                 const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
@@ -358,7 +370,10 @@ const UpdatePaymentMethodPopUp = ({
                   return handleAddPaymentMethodResponse(res.data.addCreditCard);
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
-                  createNotification('error', errorMsg);
+                  addToast({
+                    type: TOAST_TYPE.ERROR,
+                    message: errorMsg,
+                  });
                   setAddingPaymentMethod(false);
                   return false;
                 }
@@ -395,11 +410,23 @@ const UpdatePaymentMethodPopUp = ({
                       },
                     },
                   });
-                  createNotification('update');
+                  addToast({
+                    type: TOAST_TYPE.SUCCESS,
+                    message: (
+                      <FormattedMessage
+                        id="subscription.createSuccessUpdated"
+                        defaultMessage="Your recurring contribution has been <strong>updated</strong>."
+                        values={I18nFormatters}
+                      />
+                    ),
+                  });
                   setShowPopup(false);
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
-                  createNotification('error', errorMsg);
+                  addToast({
+                    type: TOAST_TYPE.ERROR,
+                    message: errorMsg,
+                  });
                   return false;
                 }
               }}
@@ -418,7 +445,6 @@ UpdatePaymentMethodPopUp.propTypes = {
   setMenuState: PropTypes.func,
   router: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
-  createNotification: PropTypes.func,
   setShowPopup: PropTypes.func,
   loadStripe: PropTypes.func.isRequired,
   account: PropTypes.object.isRequired,

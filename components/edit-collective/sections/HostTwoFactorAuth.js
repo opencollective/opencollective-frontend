@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
@@ -16,8 +16,8 @@ import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
 import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
-import TemporaryNotification from '../../TemporaryNotification';
 import { P } from '../../Text';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { editCollectiveSettingsMutation } from '../mutations';
 import SettingsTitle from '../SettingsTitle';
 
@@ -54,7 +54,7 @@ const ScreenshotPreview = styled.div`
 
 const HostTwoFactorAuth = ({ collective }) => {
   const { formatMessage } = useIntl();
-  const [notification, setNotification] = useState(false);
+  const { addToast } = useToasts();
   const [setSettings, { loading, error }] = useMutation(editCollectiveSettingsMutation);
   const doesHostAlreadyHaveTwoFactorAuthEnabled = get(collective, 'settings.payoutsTwoFactorAuth.enabled', false);
   const hostRollingLimitAmount = get(collective, 'settings.payoutsTwoFactorAuth.rollingLimit', 1000000);
@@ -70,27 +70,25 @@ const HostTwoFactorAuth = ({ collective }) => {
       const updatedCollective = cloneDeep(collective);
       set(updatedCollective, 'settings.payoutsTwoFactorAuth.rollingLimit', rollingLimit);
       await setSettings({ variables: pick(updatedCollective, ['id', 'settings']) });
-      setNotification(true);
+      addToast({
+        type: error ? TOAST_TYPE.ERROR : TOAST_TYPE.SUCCESS,
+        message: error ? (
+          <FormattedMessage
+            id="TwoFactorAuth.Setup.FiscalHost.Error"
+            defaultMessage="There was an issue updating your rolling payout limit."
+          />
+        ) : (
+          <FormattedMessage
+            id="TwoFactorAuth.Setup.FiscalHost.Updated"
+            defaultMessage="Your rolling payout limit has been updated."
+          />
+        ),
+      });
     },
   });
 
   return (
     <Fragment>
-      {notification && (
-        <TemporaryNotification type={error ? 'error' : 'default'} position="absolute">
-          {error ? (
-            <FormattedMessage
-              id="TwoFactorAuth.Setup.FiscalHost.Error"
-              defaultMessage="There was an issue updating your rolling payout limit."
-            />
-          ) : (
-            <FormattedMessage
-              id="TwoFactorAuth.Setup.FiscalHost.Updated"
-              defaultMessage="Your rolling payout limit has been updated."
-            />
-          )}
-        </TemporaryNotification>
-      )}
       <Flex flexDirection="column">
         <Container>
           <SettingsTitle>

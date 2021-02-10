@@ -28,15 +28,7 @@ const messages = defineMessages({
   },
 });
 
-const RecurringContributionsCard = ({
-  collective,
-  status,
-  contribution,
-  createNotification,
-  account,
-  LoggedInUser,
-  ...props
-}) => {
+const RecurringContributionsCard = ({ collective, status, contribution, account, LoggedInUser, ...props }) => {
   const [showPopup, setShowPopup] = useState(false);
   const { formatMessage } = useIntl();
   const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
@@ -132,7 +124,6 @@ const RecurringContributionsCard = ({
           contribution={contribution}
           status={status}
           setShowPopup={setShowPopup}
-          createNotification={createNotification}
           account={account}
         />
       )}
@@ -150,7 +141,6 @@ RecurringContributionsCard.propTypes = {
   }),
   status: PropTypes.string.isRequired,
   LoggedInUser: PropTypes.object,
-  createNotification: PropTypes.func,
   account: PropTypes.object.isRequired,
 };
 
