@@ -171,7 +171,7 @@ const getSuccessToast = (intl, action, collective, result) => {
           route="conversation"
           params={{ collectiveSlug: collective.slug, id: conversation.id, slug: conversation.slug }}
         >
-          <FormattedMessage id="Conversation.view" defaultMessage="View conversation" />
+          <FormattedMessage id="Conversation.view" defaultMessage="View Conversation" />
           &nbsp;
           <ExternalLink size="1em" style={{ verticalAlign: 'middle' }} />
         </StyledLink>
@@ -343,7 +343,7 @@ const PendingApplication = ({ host, application, ...props }) => {
             {(application.message || hasNothingToShow) && (
               <Box mb={3}>
                 <InfoSectionHeader icon={<CommentIcon size={16} />}>
-                  <FormattedMessage id="PendingApplication.Message" defaultMessage="Message for fiscal host" />
+                  <FormattedMessage id="PendingApplication.Message" defaultMessage="Message to Fiscal Host" />
                 </InfoSectionHeader>
                 {application.message ? (
                   <UserInputContainer as="q">{application.message}</UserInputContainer>

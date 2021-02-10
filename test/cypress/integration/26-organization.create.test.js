@@ -21,8 +21,6 @@ describe('create an organization', () => {
     cy.get('[data-cy="cof-org-description"]').type('short description for new org');
     cy.get('[data-cy="cof-org-website"]').type('ww.com');
     cy.get('[data-cy="cof-form-submit"]').click();
-    cy.get('[data-cy="cof-error-message"]').contains(
-      'Please verify that you are an authorized representative of this organization',
-    );
+    cy.get('[data-cy="cof-error-message"]').contains('Verify that you are an authorized organization representative');
   });
 });

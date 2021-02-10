@@ -156,7 +156,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
               </Flex>
               <Flex flexDirection="column" p={2}>
                 <Span fontSize="14px" color="black.600" mb={2}>
-                  <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (Optional)" />
+                  <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (optional)" />
                 </Span>
 
                 <StyledInput

@@ -90,7 +90,7 @@ const SectionTransactions = props => {
         </SectionTitle>
         {collectiveHasNoTransactions && (
           <MessageBox type="info" withIcon>
-            <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />
+            <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />
           </MessageBox>
         )}
       </ContainerSectionContent>
@@ -120,7 +120,7 @@ const SectionTransactions = props => {
             <MessageBox type="info">
               <FormattedMessage
                 id="TransactionsList.Empty"
-                defaultMessage="No transaction matches the given filters, <ResetLink>reset them</ResetLink> to see all transactions."
+                defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
                 values={{
                   ResetLink(text) {
                     return <ResetAnchor onClick={() => setFilter(FILTERS.ALL)}>{text}</ResetAnchor>;

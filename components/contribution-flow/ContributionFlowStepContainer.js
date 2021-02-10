@@ -46,12 +46,12 @@ class ContributionFlowStepContainer extends React.Component {
     this.headerMessages = defineMessages({
       details: { id: 'NewContributionFlow.ContributionDetailsTitle', defaultMessage: 'Contribution details' },
       profile: { id: 'contribute.step.contributeAs', defaultMessage: 'Contribute as' },
-      'profile.guest': { id: 'NewContributionFlow.step.contributeAsGuest', defaultMessage: 'Contribute as guest' },
+      'profile.guest': { id: 'NewContributionFlow.step.contributeAsGuest', defaultMessage: 'Contribute as a guest' },
       'profile.guest.recurrent': {
         id: 'NewContributionFlow.step.SignUpToContribute',
-        defaultMessage: 'Sign up to contribute recurrently',
+        defaultMessage: 'Sign up to make a recurring contribution',
       },
-      payment: { id: 'NewContributionFlow.ChoosePaymentMethod', defaultMessage: 'Choose your payment method' },
+      payment: { id: 'NewContributionFlow.ChoosePaymentMethod', defaultMessage: 'Choose payment method' },
       summary: { id: 'Summary', defaultMessage: 'Summary' },
       blockedContributor: {
         id: 'NewContributionFlow.BlockedContributor.Header',

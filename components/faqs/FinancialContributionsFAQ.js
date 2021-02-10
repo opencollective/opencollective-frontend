@@ -17,7 +17,7 @@ const FinancialContributionsFAQ = props => (
       <Content>
         <FormattedMessage
           id="acceptContributions.FAQ.howDoesItWorkDetails"
-          defaultMessage="The instructions for the wire transfer are sent to contributors via email with a unique transaction identifier. Once the money has been received in the Host's bank account, the admin of the Host will be able to mark the transaction as received in the Host Dashboard and the funds will be added to the Collective's budget."
+          defaultMessage="Payment instructions are automatically sent to contributors via email. Once the funds are received, the admin can confirm the transaction and the amount will be credited to the budget."
         />
       </Content>
     </Entry>
@@ -31,7 +31,7 @@ const FinancialContributionsFAQ = props => (
       <Content>
         <FormattedMessage
           id="acceptContributions.FAQ.moneyNotReceivedDetails"
-          defaultMessage="Hosts will only add funds in your Collective when they clear in their bank account. The donation will show as pending until then."
+          defaultMessage="Nothing happens if the funds are never confirmed as received. The transaction will stay pending and not be added to the budget. Admins can mark pending transactions as expired to cancel them if it\'s not likely the money will ever arrive."
         />
       </Content>
     </Entry>
@@ -39,13 +39,13 @@ const FinancialContributionsFAQ = props => (
       <Title>
         <FormattedMessage
           id="acceptContributions.FAQ.idNotIncluded"
-          defaultMessage="What happens if the ID is not included in the transaction?"
+          defaultMessage="What happens if the reference ID is not included?"
         />
       </Title>
       <Content>
         <FormattedMessage
           id="acceptContributions.FAQ.idNotIncludedDetails"
-          defaultMessage="If the ID is not included in the transaction, we can't match it to the donation and it won't show up in the Collective. Please contact {email} if you sent a donation that is not showing up on the Collective so we can trace it."
+          defaultMessage="If the unique ID is not included, it can be hard to find and confirm a transaction. If you sent the money but it has not been confirmed, contact {email} and we will help track it down."
           values={{ email: <a href={`mailto:${supportEmail}`}>{supportEmail}</a> }}
         />
       </Content>

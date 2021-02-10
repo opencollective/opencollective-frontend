@@ -102,7 +102,7 @@ export default class SignIn extends React.Component {
                 event.preventDefault();
                 this.setState({ error: event.target.validationMessage });
               }}
-              placeholder="i.e. yourname@yourhost.com"
+              placeholder="e.g. yourname@yourhost.com"
               required
               value={email}
               type="email"

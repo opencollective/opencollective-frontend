@@ -63,7 +63,7 @@ class SuccessPage extends React.Component {
               ) : (
                 <FormattedMessage
                   id="acceptContributions.success.nowAcceptingContributions"
-                  defaultMessage="Congratulations! {collective} is now accepting financial contributions."
+                  defaultMessage="{collective} is now accepting financial contributions!"
                   values={{
                     collective: collective.name,
                   }}
@@ -83,7 +83,7 @@ class SuccessPage extends React.Component {
                 <P fontSize="16px" lineHeight="24px" color="black.600" textAlign="center">
                   <FormattedMessage
                     id="acceptContributions.notifiedWhen"
-                    defaultMessage="You will be notified when {hostName} has approved or rejected your application. Contribution tiers will only go live once the Collective is approved by the fiscal host."
+                    defaultMessage="You will be notified when {hostName} has approved or rejected your application. Contribution tiers will go live once you have an active Fiscal Host."
                     values={{
                       hostName: chosenHost.name,
                     }}
@@ -94,7 +94,7 @@ class SuccessPage extends React.Component {
               <P fontSize="16px" lineHeight="24px" color="black.600" textAlign="center">
                 <FormattedMessage
                   id="acceptContributions.success.toConsider"
-                  defaultMessage="A few more things you should consider:"
+                  defaultMessage="A few things to consider:"
                 />
               </P>
             )}
@@ -109,16 +109,16 @@ class SuccessPage extends React.Component {
             <img src={successIllustration} width="264px" height="352px" />
             <Flex flexDirection="column" ml={[0, 4, 4]} mx={[2, 0]} mt={[4, 0]} maxWidth={'475px'}>
               <H2 fontSize="13px" fontWeight="bold" color="black.800">
-                <FormattedMessage id="tiers.about" defaultMessage="About contribution tiers" />
+                <FormattedMessage id="tiers.about" defaultMessage="Set up contribution tiers" />
               </H2>
               <P fontSize="13px" lineHeight="20px" mb={3} color="black.800">
                 <FormattedMessage
                   id="acceptContributions.tiers.paragraphOne"
-                  defaultMessage="We created a one-time donation tier for you to begin with. Go ahead and create different one-time and subscription tiers to define the levels or types of financial contributions your collective accepts. {knowMore}."
+                  defaultMessage="Customize your contribution tiers with different names, amounts, frequencies (one-time, monthly, or yearly), goals, and rewards. {knowMore}."
                   values={{
                     knowMore: (
                       <SmallExternalLink href={TIERS_INFO_LINK}>
-                        <FormattedMessage id="tiers.knowMore" defaultMessage="Know more about tiers" />
+                        <FormattedMessage id="tiers.knowMore" defaultMessage="Learn about tiers" />
                       </SmallExternalLink>
                     ),
                   }}
@@ -135,7 +135,7 @@ class SuccessPage extends React.Component {
                   <P fontSize="13px" lineHeight="20px" mb={1} color="black.800">
                     <FormattedMessage
                       id="acceptContributions.success.hostSettingsInfo"
-                      defaultMessage="You can manage your Fiscal Host settings — like adding more payment methods — from your Fiscal Host Organization's profile. {takeMeThere}."
+                      defaultMessage="Add or manage payment methods in your Fiscal Host settings. {takeMeThere}."
                       values={{
                         takeMeThere: (
                           <Link
@@ -179,7 +179,7 @@ class SuccessPage extends React.Component {
               data-cy="afc-success-host-tiers-link"
             >
               <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
-                <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />
+                <FormattedMessage id="createCustomTiers" defaultMessage="Create your own tiers" />
               </StyledButton>
             </Link>
           </Flex>

@@ -430,7 +430,7 @@ class CreatePledgePage extends React.Component {
                           prepend="https://github.com/"
                           id="githubHandle"
                           name="githubHandle"
-                          placeholder="i.e. babel/babel"
+                          placeholder="e.g. babel/babel"
                           defaultValue={githubHandle || ''}
                           data-cy="githubHandleInput"
                         />

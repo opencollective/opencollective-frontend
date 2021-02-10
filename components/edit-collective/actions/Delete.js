@@ -100,7 +100,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           <FormattedMessage
             id="collective.delete.isHost"
             defaultMessage={
-              "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host, please deactivate as Host first."
+              "You can/'t delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
             }
             values={{ type: collective.type }}
           />{' '}

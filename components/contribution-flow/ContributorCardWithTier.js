@@ -75,7 +75,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                   content={() => (
                     <FormattedMessage
                       id="Subscriptions.FeesOnTopTooltip"
-                      defaultMessage="Contribution to collective plus contribution to the platform"
+                      defaultMessage="Contribution plus Platform Tip"
                     />
                   )}
                 >

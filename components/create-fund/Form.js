@@ -34,15 +34,15 @@ const placeholders = {
 
 const messages = defineMessages({
   nameLabel: { id: 'createFund.form.nameLabel', defaultMessage: "What's the name of your fund?" },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'createFund.form.descriptionLabel',
     defaultMessage: 'What does your fund do?',
   },
   descriptionHint: {
-    id: 'createFund.form.descriptionHint',
-    defaultMessage: 'Write a short description of your Fund (150 characters max)',
+    id: 'createCollective.form.descriptionHint',
+    defaultMessage: 'Write a short description (150 characters max)',
   },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',

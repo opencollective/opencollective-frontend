@@ -52,7 +52,7 @@ const SectionEmpty = props => {
             <P fontSize="20px" color="black.600" lineHeight="28px">
               <FormattedMessage
                 id="EmptyCollectivePage"
-                defaultMessage="{collective} is now working on its public profile, and don't have anything to show, yet. Meanwhile, there are dozens of Collectives you can discover, take a look!"
+                defaultMessage="{collective} is still working on its public profile. In the mean time you can check out some other Collectives!"
                 values={{
                   collective: collective.name,
                 }}

@@ -297,8 +297,7 @@ class OnboardingModal extends React.Component {
                       <P fontSize="16px" lineHeight="24px" color="black.900" textAlign="center" mb={4} mx={2}>
                         <FormattedMessage
                           id="onboarding.success.text"
-                          defaultMessage="You're all set! Now you can make this space your own by customizing the look, start
-                        accepting contributions, and interacting with your community."
+                          defaultMessage="You're all set! Customize the look, start accepting contributions, and interact with your community."
                         />
                       </P>
                     </Box>

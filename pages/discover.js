@@ -322,7 +322,7 @@ const DiscoverPage = () => {
                 <MessageBox my={5} type="info">
                   <FormattedMessage
                     id="discover.searchNoResult"
-                    defaultMessage="No collective matches the current search."
+                    defaultMessage="No Collectives match the current search."
                   />
                 </MessageBox>
               )}

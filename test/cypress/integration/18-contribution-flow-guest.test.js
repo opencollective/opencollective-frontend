@@ -5,7 +5,7 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.visit('/apex/donate');
     cy.contains('[data-cy="amount-picker"] button', '$10').click();
     cy.get('button[data-cy="cf-next-step"]').click();
-    cy.contains('Contribute as guest');
+    cy.contains('Contribute as a guest');
 
     // Test validations
     cy.get('button[data-cy="cf-next-step"]').click();
@@ -66,7 +66,7 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.visit('/apex/donate');
       cy.contains('[data-cy="amount-picker"] button', '$10').click();
       cy.get('button[data-cy="cf-next-step"]').click();
-      cy.contains('Contribute as guest');
+      cy.contains('Contribute as a guest');
 
       cy.get('input[name=name]').type('Rick Astley');
       cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
@@ -87,7 +87,7 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('[data-cy="amount-picker-btn-other"]').click();
       cy.get('input[type=number][name=custom-amount]').type('{selectall}500');
       cy.get('button[data-cy="cf-next-step"]').click();
-      cy.contains('Contribute as guest');
+      cy.contains('Contribute as a guest');
 
       // Test validations (name is now required)
       cy.get('button[data-cy="cf-next-step"]').click();
@@ -113,7 +113,7 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('[data-cy="amount-picker-btn-other"]').click();
       cy.get('input[type=number][name=custom-amount]').type('{selectall}5000');
       cy.get('button[data-cy="cf-next-step"]').click();
-      cy.contains('Contribute as guest');
+      cy.contains('Contribute as a guest');
 
       // Test validations (location is now required)
       cy.get('button[data-cy="cf-next-step"]').click();

@@ -30,7 +30,7 @@ class WarnIfUnsavedChanges extends React.Component {
   messages = defineMessages({
     warning: {
       id: 'WarningUnsavedChanges',
-      defaultMessage: 'You are trying to leave this page with un-saved changes. Are you sure?',
+      defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
     },
   });
 

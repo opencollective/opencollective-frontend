@@ -60,7 +60,7 @@ class CollectiveGoals extends React.Component {
       title: { id: 'goal.title.label', defaultMessage: 'Title' },
       description: { id: 'Fields.description', defaultMessage: 'Description' },
       amount: { id: 'Fields.amount', defaultMessage: 'Amount' },
-      showToggle: { id: 'goal.show', defaultMessage: 'Show the goals on my collective page' },
+      showToggle: { id: 'goal.show', defaultMessage: 'Show goals on my Collective page' },
     });
 
     const getOptions = arr => {
@@ -93,7 +93,7 @@ class CollectiveGoals extends React.Component {
         name: 'description',
         type: 'textarea',
         label: intl.formatMessage(this.messages.description),
-        placeholder: 'You can tell your community more details about your goal here.',
+        placeholder: 'Tell your community about your goal.',
       },
     ];
   }
@@ -235,7 +235,7 @@ class CollectiveGoals extends React.Component {
             subtitle={
               <FormattedMessage
                 id="EditGoals.Instructions"
-                defaultMessage="You can define custom goals to share an overview of your financial plan with your community and to track your progress. They will be sent in the emails sent to your contributors. You can choose to display them on your collective page by checking the box below."
+                defaultMessage="You can define custom goals to motivate contributors and track your progress. Goals appear in automated email notifications to your contributors. You can also choose to display them on your Collective by ticking the box below."
               />
             }
           >

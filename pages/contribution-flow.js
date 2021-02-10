@@ -49,7 +49,7 @@ const messages = defineMessages({
   },
   expiredTier: {
     id: 'Tier.Past',
-    defaultMessage: 'This contribution type is not active anymore.',
+    defaultMessage: 'This tier is not active anymore.',
   },
   emptyTier: {
     id: 'Tier.empty',

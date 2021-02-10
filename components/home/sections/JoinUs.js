@@ -149,7 +149,7 @@ const JoinUs = ({ page }) => (
               </H3>
               <Box width={[null, '460px']}>
                 <P fontSize="15px" lineHeight="23px" letterSpacing="-0.12px" color="black.700" display={[null, 'none']}>
-                  <FormattedMessage id="home.joinUsSection.joinTeam" defaultMessage="Know more about our impact." />
+                  <FormattedMessage id="home.joinUsSection.joinTeam" defaultMessage="Learn more about our impact." />
                 </P>
                 <P
                   fontSize="15px"
@@ -160,7 +160,7 @@ const JoinUs = ({ page }) => (
                 >
                   <FormattedMessage
                     id="home.joinUsSection.ourStories"
-                    defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world, see how you could participate."
+                    defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world. See how you can participate."
                   />
                 </P>
               </Box>

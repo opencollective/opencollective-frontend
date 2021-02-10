@@ -151,10 +151,8 @@ const PledgedCollectivePage = ({ collective }) => {
         <P color="black.600" fontSize="12px" lineHeight="18px" my={4}>
           <FormattedMessage
             id="pledge.definition"
-            defaultMessage="A pledge is a way for the community to show interest in supporting a cause or project that is not yet on
-              Open Collective, just like {collective}. This will incentivize them to create a
-              collective for their activities and offer you much more visibility on how your money is spent to advance
-              their cause. Once they create it, you will receive an email to ask you to fulfill your pledge."
+            defaultMessage="A pledge is a way to show interest in supporting a cause or project that is not yet on
+              Open Collective, just like {collective}. If they create a Collective, you will receive an email asking you to fulfill your pledge."
             values={{ collective: <strong>{collective.name}</strong> }}
           />
         </P>

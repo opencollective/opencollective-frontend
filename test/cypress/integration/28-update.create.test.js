@@ -14,7 +14,7 @@ describe('create an update', () => {
     cy.get('[data-cy=updateTitle]', { timeout: 10000 }).contains('New update');
     cy.get('[data-cy=meta]').contains('draft');
     cy.get('[data-cy="privateIcon"]').should('not.exist');
-    cy.get('[data-cy=PublishUpdateBtn]').contains('Your update will be sent to');
+    cy.get('[data-cy=PublishUpdateBtn]').contains('Your Update will be sent to');
     cy.getByDataCy('btn-publish').click();
     cy.get('[data-cy=meta]').contains('draft').should('not.exist');
 
@@ -32,7 +32,7 @@ describe('random user cannot see update', () => {
     cy.visit('/testcollective/updates');
     cy.get('[data-cy=updateTitle]').first().click(); // The update created in the describe block above.
     cy.wait(500);
-    cy.get('[data-cy=mesgBox]').contains('Become a backer of');
-    cy.get('[data-cy=mesgBox]').contains('to see this update');
+    cy.get('[data-cy=mesgBox]').contains('Contribute to');
+    cy.get('[data-cy=mesgBox]').contains('to see this Update');
   });
 });

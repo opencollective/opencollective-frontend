@@ -39,7 +39,8 @@ const messages = defineMessages({
   },
   profileNameError: {
     id: 'CreateProfile.name.conflict',
-    defaultMessage: "You can't use the same name for your Personal profile and your Organization.",
+    defaultMessage:
+      "You can't use the same name for your Personal and Organization profiles. Personal profiles represent individual people, who can be administrators of Organization profiles.",
   },
 });
 
@@ -201,7 +202,7 @@ const CreateProfile = ({
               required
             >
               {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e John Doe" />
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g. John Doe" />
               )}
             </StyledInputField>
           </Box>
@@ -213,7 +214,7 @@ const CreateProfile = ({
                   {...inputProps}
                   {...getFieldProps(inputProps.name)}
                   type="email"
-                  placeholder="i.e. yourname@yourhost.com"
+                  placeholder="e.g. yourname@yourhost.com"
                   value={email}
                   onKeyDown={e => {
                     // See https://github.com/facebook/react/issues/6368
@@ -273,7 +274,7 @@ const CreateProfile = ({
               required
             >
               {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e John Doe" />
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g. John Doe" />
               )}
             </StyledInputField>
           </Box>
@@ -285,7 +286,7 @@ const CreateProfile = ({
                   {...getFieldProps(inputProps.name)}
                   type="email"
                   value={email}
-                  placeholder="i.e. yourname@yourhost.com"
+                  placeholder="e.g. yourname@yourhost.com"
                   onKeyDown={e => {
                     // See https://github.com/facebook/react/issues/6368
                     if (e.key === ' ') {
@@ -299,7 +300,7 @@ const CreateProfile = ({
           </Box>
 
           <P fontSize="16px" lineHeight="24px" color="black.900" mb={24} fontWeight="600">
-            <FormattedMessage id="CreateProfile.OrgInfo" defaultMessage="Organization's information" />
+            <FormattedMessage id="CreateProfile.OrgInfo" defaultMessage="Organization info" />
           </P>
           <Box mb={24}>
             <StyledInputField
@@ -311,7 +312,7 @@ const CreateProfile = ({
                 <StyledInput
                   {...inputProps}
                   {...getFieldProps(inputProps.name)}
-                  placeholder="i.e. AirBnb, Women Who Code"
+                  placeholder="e.g. AirBnb, Women Who Code"
                   required
                 />
               )}
@@ -398,7 +399,7 @@ const CreateProfile = ({
 };
 
 CreateProfile.propTypes = {
-  /** a map of errors to the matching field name, i.e. `{ email: 'Invalid email' }` will display that message until the email field */
+  /** a map of errors to the matching field name, e.g. `{ email: 'Invalid email' }` will display that message until the email field */
   errors: PropTypes.objectOf(PropTypes.string),
   /** handles submissions of personal profile form */
   onPersonalSubmit: PropTypes.func.isRequired,

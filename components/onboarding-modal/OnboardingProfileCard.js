@@ -27,7 +27,7 @@ class OnboardingProfileCard extends React.Component {
         {/* for invited users email is null */}
         {email === null ? (
           <StyledTooltip
-            content={() => <FormattedMessage id="onboarding.admins.pending" defaultMessage="Pending for approval" />}
+            content={() => <FormattedMessage id="onboarding.admins.pending" defaultMessage="Pending approval" />}
           >
             <Admin
               closeButtonProps={{

@@ -82,7 +82,7 @@ const NoReceipts = () => (
   <Flex alignItems="center" justifyContent="center" my={5}>
     <StyledCard height="100px" padding="16px 24px" display="flex" alignItems="center" justifyContent="center">
       <H3 fontSize="15px" lineHeight="24px" color="black.500" textAlign="center">
-        <FormattedMessage id="paymentReceipt.noReceipts" defaultMessage="No receipt available within this period." />
+        <FormattedMessage id="paymentReceipt.noReceipts" defaultMessage="No receipts available in this period." />
       </H3>
     </StyledCard>
   </Flex>
@@ -228,14 +228,11 @@ const PaymentReceipts = ({ collective }) => {
         subtitle={
           <FormattedMessage
             id="paymentReceipts.section.description"
-            defaultMessage="Check the consolidated invoices for your contributions here."
+            defaultMessage="Consolidated receipts for your financial contributions."
           />
         }
       >
-        <FormattedMessage
-          id="paymentReceipts.section.title"
-          defaultMessage="Monthly payment receipts per fiscal host"
-        />
+        <FormattedMessage id="paymentReceipts.section.title" defaultMessage="Monthly payment receipts" />
       </SettingsTitle>
       <Box mt={4}>
         <P
@@ -246,7 +243,7 @@ const PaymentReceipts = ({ collective }) => {
           textTransform="uppercase"
           color="black.800"
         >
-          <FormattedMessage id="paymentReceipts.selectDate.label" defaultMessage="Display receipts of" />
+          <FormattedMessage id="paymentReceipts.selectDate.label" defaultMessage="Time period" />
         </P>
         <StyledSelect
           options={[defaultFilter, ...yearsFilter]}

@@ -139,7 +139,7 @@ const StepPayment = ({
         <MessageBox type="warning" withIcon>
           <FormattedMessage
             id="NewContribute.noPaymentMethodsAvailable"
-            defaultMessage="There are no payment methods available."
+            defaultMessage="No payment methods available."
           />
         </MessageBox>
       ) : (

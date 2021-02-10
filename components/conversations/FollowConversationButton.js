@@ -106,7 +106,7 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
             {isCompact ? (
               <FormattedMessage id="actions.unfollow" defaultMessage="Unfollow" />
             ) : (
-              <FormattedMessage id="conversation.unfollow" defaultMessage="Unfollow this conversation" />
+              <FormattedMessage id="conversation.unfollow" defaultMessage="Unfollow this Conversation" />
             )}
           </ButtonLabel>
         </React.Fragment>
@@ -117,7 +117,7 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
             {isCompact ? (
               <FormattedMessage id="actions.follow" defaultMessage="Follow" />
             ) : (
-              <FormattedMessage id="conversation.follow" defaultMessage="Follow this conversation" />
+              <FormattedMessage id="conversation.follow" defaultMessage="Follow this Conversation" />
             )}
           </ButtonLabel>
         </React.Fragment>

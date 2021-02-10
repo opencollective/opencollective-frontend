@@ -46,13 +46,12 @@ class ExportImages extends React.Component {
             options: [
               {
                 name: 'label',
-                description: 'label of the badge',
-                defaultValue: `name of the tier (${tier.name})`,
+                description: 'badge label',
+                defaultValue: `tier name (${tier.name})`,
               },
               {
                 name: 'color',
-                description:
-                  'color of the badge (brightgreen, green, yellowgreen, yellow, orange, red, lightgrey, blue)',
+                description: 'badge color (brightgreen, green, yellowgreen, yellow, orange, red, lightgrey, blue)',
                 defaultValue: 'brightgreen',
               },
             ],
@@ -64,29 +63,29 @@ class ExportImages extends React.Component {
             options: [
               {
                 name: 'width',
-                description: 'width of the image',
+                description: 'image width',
               },
               {
                 name: 'height',
-                description: 'height of the image',
+                description: 'image height',
               },
               {
                 name: 'limit',
-                description: 'max number of financial contributors to show',
+                description: 'max contributors to show',
                 defaultValue: '(unlimited)',
               },
               {
                 name: 'avatarHeight',
-                description: 'max height of each avatar / logo',
+                description: 'max avatar/logo height',
               },
               {
                 name: 'button',
-                description: 'show "become a backer/sponsor" button',
+                description: 'show "become a contributor" button',
                 defaultValue: 'true',
               },
               {
                 name: 'format',
-                description: 'format of the image (replace .svg with .png or .jpg)',
+                description: 'image format (replace .svg with .png or .jpg)',
               },
             ],
           },
@@ -102,7 +101,7 @@ class ExportImages extends React.Component {
     return (
       <div>
         <SettingsSectionTitle>
-          <FormattedMessage id="export.images.title" defaultMessage="Export tiers images" />
+          <FormattedMessage id="export.images.title" defaultMessage="Export tier images" />
         </SettingsSectionTitle>
         <p>
           <FormattedMessage

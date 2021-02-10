@@ -15,7 +15,7 @@ const getPaypalExpiryInfo = paymentMethod => {
       message: (
         <FormattedMessage
           id="PaypalPreApproval.expired"
-          defaultMessage="Your PayPal pre-approval has expired, please reconnect your account by clicking on {refillBalance}."
+          defaultMessage="Your PayPal pre-approval has expired. To reconnect your account, click {refillBalance}."
           values={{
             refillBalance: (
               <q>

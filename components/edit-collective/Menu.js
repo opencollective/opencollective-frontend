@@ -48,7 +48,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Advanced',
   },
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: {
-    id: 'editCollective.menu.goals',
+    id: 'Goals',
     defaultMessage: 'Goals',
   },
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: {
@@ -136,7 +136,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Tickets',
   },
   [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: {
-    id: 'editCollective.menu.twofa',
+    id: 'TwoFactorAuth',
     defaultMessage: 'Two-factor authentication',
   },
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: {
@@ -144,7 +144,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Payment Receipts',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: {
-    id: 'editCollective.menu.twofa',
+    id: 'TwoFactorAuth',
     defaultMessage: 'Two-factor authentication',
   },
 });

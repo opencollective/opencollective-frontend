@@ -65,7 +65,7 @@ const messages = defineMessages({
   },
   'platform.useCases': {
     id: 'platform.useCases',
-    defaultMessage: 'Use Cases',
+    defaultMessage: 'Use cases',
   },
   'platform.signup': {
     id: 'platform.signup',
@@ -73,7 +73,7 @@ const messages = defineMessages({
   },
   'platform.login': {
     id: 'platform.login',
-    defaultMessage: 'Login',
+    defaultMessage: 'Log in',
   },
   join: {
     id: 'join',
@@ -89,7 +89,7 @@ const messages = defineMessages({
   },
   'join.findAFiscalHost': {
     id: 'join.findAFiscalHost',
-    defaultMessage: 'Find a fiscal host',
+    defaultMessage: 'Find a Fiscal Host',
   },
   'join.becomeASponsor': {
     id: 'join.becomeASponsor',
@@ -97,7 +97,7 @@ const messages = defineMessages({
   },
   'join.becomeAHost': {
     id: 'join.becomeAHost',
-    defaultMessage: 'Become a host',
+    defaultMessage: 'Become a Host',
   },
   community: {
     id: 'community',
@@ -330,10 +330,10 @@ const Footer = () => {
             <SocialLink href="https://github.com/opencollective" aria-label="Open Collective Github link">
               <Github size={16} />
             </SocialLink>
-            <SocialLink href="https://slack.opencollective.com" aria-label="Open Collective Slack Channel link">
+            <SocialLink href="https://slack.opencollective.com" aria-label="Open Collective Slack link">
               <Slack size={16} />
             </SocialLink>
-            <SocialLink href="mailto:info@opencollective.com" aria-label="Email to Open Collective link">
+            <SocialLink href="mailto:info@opencollective.com" aria-label="Open Collective Email link">
               <Mail size={16} />
             </SocialLink>
           </Container>

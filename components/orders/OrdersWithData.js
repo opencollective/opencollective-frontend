@@ -186,7 +186,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
           {hasFilters ? (
             <FormattedMessage
               id="OrdersList.Empty"
-              defaultMessage="No order matches the given filters, <ResetLink>reset them</ResetLink> to see all orders."
+              defaultMessage="No contributions match the given filters. <ResetLink>Reset</ResetLink> to see all."
               values={{
                 ResetLink(text) {
                   return (

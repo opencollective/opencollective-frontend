@@ -40,7 +40,7 @@ describe('Contribution Flow: Sign In', () => {
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
 
     // Test user are logged in directly
-    cy.contains('Contribute As');
+    cy.contains('Contribute as');
     cy.contains('Incognito');
     cy.contains('TestOrg');
   });

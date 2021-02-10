@@ -131,7 +131,9 @@ class StyledUpdate extends Component {
           <Box mr={2}>
             <StyledTooltip
               id="privateLockText"
-              content={() => <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />}
+              content={() => (
+                <FormattedMessage id="update.private.lock_text" defaultMessage="This update is for contributors only" />
+              )}
             >
               <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
             </StyledTooltip>
@@ -185,7 +187,7 @@ class StyledUpdate extends Component {
             </Box>
             <Box mr={2} fontSize="12px">
               <StyledButton buttonSize="tiny" onClick={this.deleteUpdate}>
-                <FormattedMessage id="update.delete" defaultMessage="Delete" />
+                <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </StyledButton>
             </Box>
           </React.Fragment>
@@ -226,7 +228,7 @@ class StyledUpdate extends Component {
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
               id="update.private.cannot_view_message"
-              defaultMessage="Become a backer of {collective} to see this update"
+              defaultMessage="Contribute to {collective} to see this Update"
               values={{ collective: collective.name }}
             />
           </PrivateUpdateMesgBox>
@@ -248,7 +250,7 @@ class StyledUpdate extends Component {
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
               id="update.private.cannot_view_message"
-              defaultMessage="Become a backer of {collective} to see this update"
+              defaultMessage="Contribute to {collective} to see this Update"
               values={{ collective: collective.name }}
             />
           </PrivateUpdateMesgBox>

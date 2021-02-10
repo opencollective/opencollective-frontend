@@ -50,7 +50,7 @@ class HostsContainer extends React.Component {
     this.messages = defineMessages({
       seeMoreHosts: {
         id: 'fiscalHost.seeMoreHosts',
-        defaultMessage: 'See more hosts',
+        defaultMessage: 'See more Hosts',
       },
     });
   }
