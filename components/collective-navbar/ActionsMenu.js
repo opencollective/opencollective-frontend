@@ -10,6 +10,7 @@ import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy } from 'lodash';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -293,14 +294,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
-                        <StyledLink
-                          as={Link}
-                          route="collective-contact"
-                          params={{ collectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Envelope size="20px" />
-                          <FormattedMessage id="Contact" defaultMessage="Contact" />
+                        <StyledLink as={NextLink} href={`${collective.slug}/contact`} p={ITEM_PADDING}>
+                          <span>
+                            <Envelope size="20px" />
+                            <FormattedMessage id="Contact" defaultMessage="Contact" />
+                          </span>
                         </StyledLink>
                       </MenuItem>
                     )}

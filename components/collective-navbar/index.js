@@ -11,6 +11,7 @@ import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
+import NextLink from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { maxWidth } from 'styled-system';
@@ -292,14 +293,14 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
-        <Link route="collective-contact" params={{ collectiveSlug: collective.slug }}>
+        <NextLink href={`${collective.slug}/contact`}>
           <MainActionBtn tabIndex="-1">
             <Envelope size="1em" />
             <Span ml={2}>
               <FormattedMessage id="Contact" defaultMessage="Contact" />
             </Span>
           </MainActionBtn>
-        </Link>
+        </NextLink>
       ),
     };
   } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.ADD_FUNDS) && collective.host) {

@@ -114,10 +114,10 @@ exports.REWRITES = [
     source: '/:slug/edit/:section?',
     destination: '/editCollective',
   },
-  // {
-  //   source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
-  //   destination: '/collective-contact',
-  // },
+  {
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
+    destination: '/collective-contact',
+  },
   // {
   //   source: '/:hostCollectiveSlug/collectives/expenses',
   //   destination: '/host.dashboard',
