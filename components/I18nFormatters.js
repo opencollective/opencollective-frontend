@@ -18,8 +18,16 @@ export const I18nSignInLink = chunks => (
   </NextLink>
 );
 
-export const I18nTOSLink = msg => <NextLink href="tos">{msg}</NextLink>;
-export const I18nPrivacyLink = msg => <NextLink route="privacypolicy">{msg}</NextLink>;
+export const I18nTOSLink = msg => (
+  <NextLink href="tos">
+    <span>{msg}</span>
+  </NextLink>
+);
+export const I18nPrivacyLink = msg => (
+  <NextLink href="privacypolicy">
+    <span>{msg}</span>
+  </NextLink>
+);
 
 const I18nFormatters = {
   strong: I18nBold,

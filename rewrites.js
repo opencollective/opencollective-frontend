@@ -78,22 +78,22 @@ exports.REWRITES = [
     source: '/signin/:token?',
     destination: '/signin',
   },
-  // {
-  //   source: '/confirm/email/:token',
-  //   destination: '/confirmEmail',
-  // },
-  // {
-  //   source: '/confirm/guest/:token',
-  //   destination: '/confirm-guest',
-  // },
-  // {
-  //   source: '/email/unsubscribe/:email/:slug/:type/:token',
-  //   destination: '/unsubscribeEmail',
-  // },
-  // {
-  //   source: '/:form(create-account)',
-  //   destination: '/signin',
-  // },
+  {
+    source: '/confirm/email/:token',
+    destination: '/confirmEmail',
+  },
+  {
+    source: '/confirm/guest/:token',
+    destination: '/confirm-guest',
+  },
+  {
+    source: '/email/unsubscribe/:email/:slug/:type/:token',
+    destination: '/unsubscribeEmail',
+  },
+  {
+    source: '/:form(create-account)',
+    destination: '/signin',
+  },
 
   // {
   //   source: '/:collectiveSlug/:verb(contribute|donate)/button',

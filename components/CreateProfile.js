@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { compact, isEmpty, pick, values } from 'lodash';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-
-import { Link } from '../server/pages';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -69,11 +68,11 @@ Tab.propTypes = {
 
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
-    <Link route={onSecondaryAction} passHref>
+    <NextLink href={onSecondaryAction} passHref>
       <StyledLink disabled={loading} fontSize="14px">
         {children}
       </StyledLink>
-    </Link>
+    </NextLink>
   ) : (
     <StyledButton asLink fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
       {children}
@@ -84,7 +83,7 @@ const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
 SecondaryAction.propTypes = {
   children: PropTypes.node,
   loading: PropTypes.bool,
-  onSecondaryAction: PropTypes.func,
+  onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
 };
 
 const NewsletterCheckBox = ({ onChange, checked }) => {

@@ -7,10 +7,6 @@
 const routes = require('next-routes');
 
 const pages = routes()
-  .add('confirmEmail', '/confirm/email/:token')
-  .add('confirm-guest', '/confirm/guest/:token')
-  .add('unsubscribeEmail', '/email/unsubscribe/:email/:slug/:type/:token')
-  .add('create-account', '/:form(create-account)', 'signin')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
   .add('create-project', '/:parentCollectiveSlug/projects/(new|create)')
