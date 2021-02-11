@@ -94,20 +94,18 @@ exports.REWRITES = [
     source: '/:form(create-account)',
     destination: '/signin',
   },
-
-  // {
-  //   source: '/:collectiveSlug/:verb(contribute|donate)/button',
-  //   destination: '/button',
-  // },
-  // {
-  //   source: '/:parentCollectiveSlug/events/(new|create)',
-  //   destination: '/createEvent',
-  // },
-  // {
-  //   source: '/:parentCollectiveSlug/projects/(new|create)',
-  //   destination: '/create-project',
-  // },
-
+  {
+    source: '/:collectiveSlug/:verb(contribute|donate)/button',
+    destination: '/button',
+  },
+  {
+    source: '/:parentCollectiveSlug/events/(new|create)',
+    destination: '/createEvent',
+  },
+  {
+    source: '/:parentCollectiveSlug/projects/(new|create)',
+    destination: '/create-project',
+  },
   // {
   //   source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section?',
   //   destination: '/editEvent',
