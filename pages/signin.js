@@ -192,15 +192,15 @@ class SigninPage extends React.Component {
           form={form}
           routes={this.getRoutes()}
           enforceTwoFactorAuthForLoggedInUser={enforceTwoFactorAuthForLoggedInUser}
-          submitTwoFactorAuthenticatorCode={values => {
+          submitTwoFactorAuthenticatorCode={twoFactorAuthenticatorCode => {
             const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
             return this.props.login(localStorage2FAToken, {
-              twoFactorAuthenticatorCode: values.twoFactorAuthenticatorCode,
+              twoFactorAuthenticatorCode,
             });
           }}
-          submitRecoveryCode={values => {
+          submitRecoveryCode={recoveryCode => {
             const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            return this.props.login(localStorage2FAToken, { recoveryCode: values.recoveryCode });
+            return this.props.login(localStorage2FAToken, { recoveryCode });
           }}
         />
       </React.Fragment>

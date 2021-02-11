@@ -168,126 +168,57 @@ class SignInOrJoinFree extends React.Component {
     }
   };
 
-  renderTwoFactorAuthBox = () => {
+  renderBoxes = useRecoveryCodes => {
+    const formKey = useRecoveryCodes ? 'recoveryCode' : 'twoFactorAuthenticatorCode';
+
     return (
       <StyledCard maxWidth={480} width={1} boxShadow={'0px 9px 14px 1px #dedede'}>
         <Box py={4} px={[3, 4]}>
-          <H5 as="label" fontWeight="bold" htmlFor="twoFactorAuthenticatorCode" mb={3} textAlign="left" display="block">
-            <FormattedMessage id="TwoFactorAuth.SignIn" defaultMessage="Please verify your login using the 2FA code:" />
+          <H5 as="label" fontWeight="bold" htmlFor={formKey} mb={3} textAlign="left" display="block">
+            {useRecoveryCodes ? (
+              <FormattedMessage
+                id="TwoFactorAuth.SignIn.RecoveryCodes"
+                defaultMessage="Please enter one of your 2FA recovery codes:"
+              />
+            ) : (
+              <FormattedMessage
+                id="TwoFactorAuth.SignIn"
+                defaultMessage="Please verify your login using the 2FA code:"
+              />
+            )}
           </H5>
           <Formik
             initialValues={{
               twoFactorAuthenticatorCode: '',
-            }}
-            onSubmit={(values, actions) => {
-              this.props.submitTwoFactorAuthenticatorCode(values).then(() => {
-                actions.setSubmitting(false);
-              });
-            }}
-          >
-            {formik => {
-              const { values, handleSubmit, errors, touched, isSubmitting } = formik;
-
-              return (
-                <Form>
-                  <StyledInputField
-                    name="twoFactorAuthenticatorCode"
-                    htmlFor="twoFactorAuthenticatorCode"
-                    error={touched.twoFactorAuthenticatorCode && errors.twoFactorAuthenticatorCode}
-                    label={this.props.intl.formatMessage(messages.twoFactorAuthCodeInputLabel)}
-                    value={values.twoFactorAuthenticatorCode}
-                    required
-                    mt={2}
-                    mb={3}
-                  >
-                    {inputProps => (
-                      <Field
-                        as={StyledInput}
-                        {...inputProps}
-                        minWidth={300}
-                        minHeight={75}
-                        fontSize="20px"
-                        placeholder="123456"
-                        pattern="[0-9]{6}"
-                        inputMode="numeric"
-                        autoFocus
-                        data-cy="signin-two-factor-auth-input"
-                      />
-                    )}
-                  </StyledInputField>
-
-                  <Flex justifyContent={['center', 'left']} mb={4}>
-                    <StyledButton
-                      fontSize="13px"
-                      minWidth="148px"
-                      minHeight="36px"
-                      buttonStyle="primary"
-                      type="submit"
-                      disabled={values.twoFactorAuthenticatorCode.length < 6}
-                      loading={isSubmitting}
-                      onSubmit={handleSubmit}
-                      data-cy="signin-two-factor-auth-button"
-                    >
-                      <FormattedMessage id="VerifyButton" defaultMessage="Verify" />
-                    </StyledButton>
-                  </Flex>
-                </Form>
-              );
-            }}
-          </Formik>
-          <Box>
-            <P fontWeight="bold" fontSize={14} mb={1} textAlign="left" display="block">
-              <FormattedMessage id="login.twoFactorAuth.havingTrouble" defaultMessage="Having trouble?" />
-            </P>
-            <StyledButton
-              type="button"
-              buttonSize="tiny"
-              isBorderless
-              buttonStyle="secondary"
-              mb={3}
-              onClick={() => this.setState({ useRecoveryCodes: true })}
-            >
-              <P>
-                <FormattedMessage id="login.twoFactorAuth.useRecoveryCodes" defaultMessage="Use 2FA recovery codes." />
-              </P>
-            </StyledButton>
-          </Box>
-        </Box>
-      </StyledCard>
-    );
-  };
-
-  renderRecoveryCodesBox = () => {
-    return (
-      <StyledCard maxWidth={480} width={1} boxShadow={'0px 9px 14px 1px #dedede'}>
-        <Box py={4} px={[3, 4]}>
-          <H5 as="label" fontWeight="bold" htmlFor="recoveryCode" mb={3} textAlign="left" display="block">
-            <FormattedMessage
-              id="TwoFactorAuth.SignIn.RecoveryCodes"
-              defaultMessage="Please enter one of your 2FA recovery codes:"
-            />
-          </H5>
-          <Formik
-            initialValues={{
               recoveryCode: '',
             }}
             onSubmit={(values, actions) => {
-              this.props.submitRecoveryCode(values).then(() => {
-                actions.setSubmitting(false);
-              });
+              const { twoFactorAuthenticatorCode, recoveryCode } = values;
+              if (recoveryCode) {
+                this.props.submitRecoveryCode(recoveryCode).then(() => {
+                  actions.setSubmitting(false);
+                });
+              } else {
+                this.props.submitTwoFactorAuthenticatorCode(twoFactorAuthenticatorCode).then(() => {
+                  actions.setSubmitting(false);
+                });
+              }
             }}
           >
             {formik => {
-              const { values, handleSubmit, errors, touched, isSubmitting } = formik;
+              const { values, handleSubmit, isSubmitting } = formik;
 
               return (
                 <Form>
                   <StyledInputField
-                    name="recoveryCode"
-                    htmlFor="recoveryCode"
-                    error={touched.recoveryCode && errors.recoveryCode}
-                    label={this.props.intl.formatMessage(messages.recoveryCodeInputLabel)}
-                    value={values.recoveryCode}
+                    name={formKey}
+                    htmlFor={formKey}
+                    label={
+                      useRecoveryCodes
+                        ? this.props.intl.formatMessage(messages.recoveryCodeInputLabel)
+                        : this.props.intl.formatMessage(messages.twoFactorAuthCodeInputLabel)
+                    }
+                    value={values[formKey]}
                     required
                     mt={2}
                     mb={3}
@@ -299,9 +230,10 @@ class SignInOrJoinFree extends React.Component {
                         minWidth={300}
                         minHeight={75}
                         fontSize="20px"
-                        pattern="[a-zA-Z0-9]{16}"
+                        pattern={useRecoveryCodes ? '[a-zA-Z0-9]{16}' : '[0-9]{6}'}
+                        inputMode={useRecoveryCodes ? 'none' : 'numeric'}
                         autoFocus
-                        //data-cy="signin-two-factor-auth-input"
+                        data-cy={useRecoveryCodes ? null : 'signin-two-factor-auth-input'}
                       />
                     )}
                   </StyledInputField>
@@ -313,9 +245,9 @@ class SignInOrJoinFree extends React.Component {
                       minHeight="36px"
                       buttonStyle="primary"
                       type="submit"
-                      //disabled={values.recoveryCode.length < 16}
                       loading={isSubmitting}
                       onSubmit={handleSubmit}
+                      data-cy={useRecoveryCodes ? null : 'signin-two-factor-auth-button'}
                     >
                       <FormattedMessage id="VerifyButton" defaultMessage="Verify" />
                     </StyledButton>
@@ -325,15 +257,38 @@ class SignInOrJoinFree extends React.Component {
             }}
           </Formik>
           <Box>
-            <P>
-              <FormattedMessage
-                id="login.twoFactorAuth.support"
-                defaultMessage="If you can't login with 2FA or recovery codes, please contact <SupportLink></SupportLink>."
-                values={{
-                  SupportLink: I18nSupportLink,
-                }}
-              />
-            </P>
+            {useRecoveryCodes ? (
+              <P>
+                <FormattedMessage
+                  id="login.twoFactorAuth.support"
+                  defaultMessage="If you can't login with 2FA or recovery codes, please contact <SupportLink></SupportLink>."
+                  values={{
+                    SupportLink: I18nSupportLink,
+                  }}
+                />
+              </P>
+            ) : (
+              <Fragment>
+                <P fontWeight="bold" fontSize={14} mb={1} textAlign="left" display="block">
+                  <FormattedMessage id="login.twoFactorAuth.havingTrouble" defaultMessage="Having trouble?" />
+                </P>
+                <StyledButton
+                  type="button"
+                  buttonSize="tiny"
+                  isBorderless
+                  buttonStyle="secondary"
+                  mb={3}
+                  onClick={() => this.setState({ useRecoveryCodes: true })}
+                >
+                  <P>
+                    <FormattedMessage
+                      id="login.twoFactorAuth.useRecoveryCodes"
+                      defaultMessage="Use 2FA recovery codes."
+                    />
+                  </P>
+                </StyledButton>
+              </Fragment>
+            )}
           </Box>
         </Box>
       </StyledCard>
@@ -356,11 +311,7 @@ class SignInOrJoinFree extends React.Component {
       <Flex flexDirection="column" width={1} alignItems="center">
         {error && <MessageBoxGraphqlError error={error} mb={[3, 4]} />}
         {enforceTwoFactorAuthForLoggedInUser ? (
-          useRecoveryCodes ? (
-            this.renderRecoveryCodesBox()
-          ) : (
-            this.renderTwoFactorAuthBox()
-          )
+          this.renderBoxes(useRecoveryCodes)
         ) : (
           <Fragment>
             {displayedForm !== 'create-account' ? (
