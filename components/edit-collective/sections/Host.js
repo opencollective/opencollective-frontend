@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get, groupBy } from 'lodash';
+import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -217,9 +218,9 @@ class Host extends React.Component {
                         values={{
                           type: collective.type,
                           emptyBalanceLink: (
-                            <Link route="editCollective" params={{ slug: collective.slug, section: 'advanced' }}>
+                            <NextLink href={`${collective.slug}/edit/advanced`}>
                               <FormattedMessage id="emptyBalance" defaultMessage="Empty Balance" />
-                            </Link>
+                            </NextLink>
                           ),
                         }}
                       />

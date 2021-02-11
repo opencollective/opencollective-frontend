@@ -4,6 +4,7 @@ import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { cloneDeep, find, get, set } from 'lodash';
+import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -435,12 +436,12 @@ class EditCollectiveForm extends React.Component {
               alignItems="center"
               flexWrap="wrap"
             >
-              <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
+              <NextLink href={`${collective.slug}/edit/gift-cards`}>
                 <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
                 </StyledButton>
-              </Link>
+              </NextLink>
 
               <StyledLink
                 href="https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards#faq"

@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit, update } from 'lodash';
 import memoizeOne from 'memoize-one';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -376,11 +377,7 @@ class Members extends React.Component {
             id="Members.DefinedInParent"
             defaultMessage="Team members are defined in the settings of {parentName}"
             values={{
-              parentName: (
-                <Link route="editCollective" params={{ slug: parent.slug, section: 'members' }}>
-                  {parent.name}
-                </Link>
-              ),
+              parentName: <NextLink href={`${parent.slug}/edit/members`}>{parent.name}</NextLink>,
             }}
           />
         </MessageBox>

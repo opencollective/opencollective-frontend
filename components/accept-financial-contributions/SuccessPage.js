@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -138,16 +139,12 @@ class SuccessPage extends React.Component {
                       defaultMessage="Add or manage payment methods in your Fiscal Host settings. {takeMeThere}."
                       values={{
                         takeMeThere: (
-                          <Link
-                            route="editCollective"
-                            params={{
-                              slug: collective.host.slug,
-                              section: 'fiscal-hosting',
-                            }}
+                          <NextLink
+                            href={`${collective.host.slug}/edit/fiscal-hosting`}
                             data-cy="afc-success-host-settings-link"
                           >
                             <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
-                          </Link>
+                          </NextLink>
                         ),
                       }}
                     />
@@ -170,18 +167,11 @@ class SuccessPage extends React.Component {
                 />
               </StyledButton>
             </Link>
-            <Link
-              route="editCollective"
-              params={{
-                slug: collective.slug,
-                section: 'tiers',
-              }}
-              data-cy="afc-success-host-tiers-link"
-            >
+            <NextLink href={`${collective.slug}/edit/tiers`} data-cy="afc-success-host-tiers-link">
               <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
                 <FormattedMessage id="createCustomTiers" defaultMessage="Create your own tiers" />
               </StyledButton>
-            </Link>
+            </NextLink>
           </Flex>
         </Container>
       </Fragment>

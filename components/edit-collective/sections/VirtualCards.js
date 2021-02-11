@@ -5,13 +5,13 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Add } from '@styled-icons/material/Add';
 import { get, last } from 'lodash';
 import memoizeOne from 'memoize-one';
+import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { Router } from '../../../server/pages';
 
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import Loading from '../../Loading';
 import Pagination from '../../Pagination';
 import StyledButton from '../../StyledButton';
@@ -76,13 +76,13 @@ class VirtualCards extends React.Component {
         display="block"
       >
         {({ item, isSelected }) => (
-          <Link route="editCollective" params={{ ...this.props.router.query, filter: item, offset: 0 }}>
+          <NextLink href={{ pathname: `editCollective`, query: this.props.router.query }}>
             <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
               {item === 'all' && <FormattedMessage id="virtualCards.filterAll" defaultMessage="All" />}
               {item === 'redeemed' && <FormattedMessage id="virtualCards.filterRedeemed" defaultMessage="Redeemed" />}
               {item === 'pending' && <FormattedMessage id="virtualCards.filterPending" defaultMessage="Pending" />}
             </P>
-          </Link>
+          </NextLink>
         )}
       </StyledButtonSet>
     );
@@ -91,9 +91,9 @@ class VirtualCards extends React.Component {
   renderNoVirtualCardMessage(onlyConfirmed) {
     if (onlyConfirmed === undefined) {
       return (
-        <Link route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}>
+        <NextLink href={`${this.props.collectiveSlug}/edit/gift-cards-create`}>
           <FormattedMessage id="virtualCards.createFirst" defaultMessage="Create your first gift card!" />
-        </Link>
+        </NextLink>
       );
     } else if (onlyConfirmed) {
       return <FormattedMessage id="virtualCards.emptyClaimed" defaultMessage="No gift cards claimed yet" />;
@@ -144,13 +144,13 @@ class VirtualCards extends React.Component {
             >
               {this.renderFilters(onlyConfirmed)}
               <Flex justifyContent="center">
-                <Link route="editCollective" params={{ slug: collectiveSlug, section: 'gift-cards-create' }}>
+                <NextLink href={`${collectiveSlug}/edit/gift-cards-create`}>
                   <StyledButton buttonStyle="primary" buttonSize="medium">
                     <Add size="1em" />
                     {'  '}
                     <FormattedMessage id="virtualCards.create" defaultMessage="Create gift cards" />
                   </StyledButton>
-                </Link>
+                </NextLink>
               </Flex>
             </Flex>
             {batchesOptions.length > 1 && (

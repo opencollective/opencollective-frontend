@@ -6,6 +6,7 @@ import { Plus } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
 import { get, uniqBy } from 'lodash';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { createGlobalStyle } from 'styled-components';
 
@@ -176,11 +177,11 @@ class TopBarProfileMenu extends React.Component {
           </StyledLink>
         </Link>
         {isAdmin && (
-          <Link route="editCollective" params={{ slug: membership.collective.slug }} passHref>
+          <NextLink href={`${membership.collective.slug}/edit`} passHref>
             <StyledLink color="black.500" title={intl.formatMessage(this.messages.settings)}>
               <Settings opacity="0" size="1.2em" />
             </StyledLink>
-          </Link>
+          </NextLink>
         )}
       </CollectiveListItem>
     );
@@ -280,11 +281,11 @@ class TopBarProfileMenu extends React.Component {
                 }
               </Query>
               <ListItem py={1}>
-                <Link route="editCollective" params={{ slug: LoggedInUser.collective.slug }} passHref>
+                <NextLink href={`${LoggedInUser.collective.slug}/edit`} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="Settings" defaultMessage="Settings" />
                   </StyledLink>
-                </Link>
+                </NextLink>
               </ListItem>
               {incognitoProfileMembership && (
                 <ListItem py={1}>
