@@ -77,11 +77,12 @@ class UserProvider extends React.Component {
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
   };
 
-  login = async (token, twoFactorAuthenticatorCode) => {
+  login = async (token, options = {}) => {
     const { getLoggedInUser } = this.props;
+    const { twoFactorAuthenticatorCode, recoveryCode } = options;
     try {
       const LoggedInUser = token
-        ? await getLoggedInUser({ token, twoFactorAuthenticatorCode })
+        ? await getLoggedInUser({ token, twoFactorAuthenticatorCode, recoveryCode })
         : await getLoggedInUser();
       this.setState({
         loadingLoggedInUser: false,
