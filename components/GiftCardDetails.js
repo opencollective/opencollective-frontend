@@ -88,9 +88,6 @@ class GiftCardDetails extends React.Component {
   renderDetails() {
     const { giftCard, collectiveSlug } = this.props;
     const redeemCode = giftCard.uuid.split('-')[0];
-    const email = get(giftCard, 'data.email');
-    const linkParams = email ? { code: redeemCode, email, collectiveSlug } : { code: redeemCode, collectiveSlug };
-
     return (
       <Flex mt="0.75em" fontSize="0.8em">
         {!giftCard.isConfirmed && (
