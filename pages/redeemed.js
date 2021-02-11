@@ -15,6 +15,7 @@ import CollectivesWithData from '../components/CollectivesWithData';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import Footer from '../components/Footer';
+import HappyBackground from '../components/gift-cards/HappyBackground';
 import GiftCard from '../components/GiftCard';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
@@ -23,7 +24,6 @@ import MessageBox from '../components/MessageBox';
 import SearchForm from '../components/SearchForm';
 import { H1, H5, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import HappyBackground from '../components/virtual-cards/HappyBackground';
 
 const redeemedPaymentMethodQuery = gql`
   query RedeemedPaymentMethod($code: String) {
