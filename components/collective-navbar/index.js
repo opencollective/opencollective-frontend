@@ -211,14 +211,14 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
-        <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+        <NextLink href={`${collective.slug}/dashboard`}>
           <MainActionBtn tabIndex="-1">
             <Dashboard size="1em" />
             <Span ml={2}>
               <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
             </Span>
           </MainActionBtn>
-        </Link>
+        </NextLink>
       ),
     };
   } else if (callsToAction.includes('hasContribute')) {

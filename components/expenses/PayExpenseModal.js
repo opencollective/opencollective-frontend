@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
+import NextLink from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -250,7 +251,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             <br />
             {/** TODO: Add a proper ID/Type to detect this error */}
             {error.startsWith('Insufficient Paypal balance') && (
-              <StyledLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: host.slug }}>
+              <StyledLink as={NextLink} href={`${host.slug}/dashboard`}>
                 <FormattedMessage
                   id="PayExpenseModal.RefillBalanceError"
                   defaultMessage="Refill your balance from the Host dashboard"

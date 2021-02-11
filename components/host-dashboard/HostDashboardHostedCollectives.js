@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { useRouter } from 'next/router';
+import { useRouter, withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import { Box, Flex, Grid } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -128,7 +127,9 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
         <Box p={2}>
           <SearchBar
             defaultValue={query.searchTerm}
-            onSubmit={searchTerm => Router.pushRoute('host.dashboard', { ...query, searchTerm, offset: null })}
+            onSubmit={searchTerm =>
+              this.props.router.push({ pathname: 'host.dashboard', query: { ...query, searchTerm, offset: null } })
+            }
           />
         </Box>
       </Flex>
@@ -139,10 +140,13 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
             values={query}
             filters={[COLLECTIVE_FILTER.SORT_BY, COLLECTIVE_FILTER.FEE_STRUCTURE]}
             onChange={queryParams =>
-              Router.pushRoute('host.dashboard', {
-                ...query,
-                ...queryParams,
-                offset: null,
+              this.props.router.push({
+                pathname: 'host.dashboard',
+                query: {
+                  ...query,
+                  ...queryParams,
+                  offset: null,
+                },
               })
             }
           />
@@ -195,6 +199,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
 
 HostDashboardHostedCollectives.propTypes = {
   hostSlug: PropTypes.string.isRequired,
+  router: PropTypes.object,
 };
 
-export default HostDashboardHostedCollectives;
+export default withRouter(HostDashboardHostedCollectives);

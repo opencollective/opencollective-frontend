@@ -118,14 +118,14 @@ exports.REWRITES = [
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
     destination: '/collective-contact',
   },
-  // {
-  //   source: '/:hostCollectiveSlug/collectives/expenses',
-  //   destination: '/host.dashboard',
-  // },
-  // {
-  //   source: '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations)?',
-  //   destination: '/host.dashboard',
-  // },
+  {
+    source: '/:hostCollectiveSlug/collectives/expenses',
+    destination: '/host.dashboard',
+  },
+  {
+    source: '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations)?',
+    destination: '/host.dashboard',
+  },
   // {
   //   source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions',
   //   destination: '/transactions',

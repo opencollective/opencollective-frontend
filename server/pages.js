@@ -7,12 +7,6 @@
 const routes = require('next-routes');
 
 const pages = routes()
-  .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
-  .add(
-    'host.dashboard',
-    '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations)?',
-    'host.dashboard',
-  )
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions')
   .add('create-expense', '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new')
   .add(

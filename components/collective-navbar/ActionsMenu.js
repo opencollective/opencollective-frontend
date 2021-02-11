@@ -203,12 +203,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                   <Box as="ul" p={0} m={0} minWidth={184}>
                     {callsToAction.hasDashboard && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
-                        <StyledLink
-                          as={Link}
-                          route="host.dashboard"
-                          params={{ hostCollectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
+                        <StyledLink as={NextLink} href={`${collective.slug}/dashboard`} p={ITEM_PADDING}>
                           <Dashboard size="20px" />
                           <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
                         </StyledLink>
