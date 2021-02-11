@@ -8,6 +8,7 @@ import { Settings } from '@styled-icons/feather/Settings';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -19,7 +20,6 @@ import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
-import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
@@ -153,12 +153,11 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
           </Container>
           {isAdmin && (
             <Box>
-              <Link
-                route={isEvent ? 'editEvent' : 'editCollective'}
-                params={
+              <NextLink
+                href={
                   isEvent
-                    ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
-                    : { slug: collective.slug }
+                    ? `${collective.parentCollective?.slug}/events/${collective.slug}/edit`
+                    : `${collective.slug}/edit`
                 }
               >
                 <StyledButton buttonSize="tiny" minWidth={96} my={3} data-cy="edit-collective-btn" tabIndex="-1">
@@ -167,7 +166,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     <FormattedMessage id="Settings" defaultMessage="Settings" />
                   </Span>
                 </StyledButton>
-              </Link>
+              </NextLink>
             </Box>
           )}
           <Box maxWidth={['70%', '60%', null, '40%', '45%']}>

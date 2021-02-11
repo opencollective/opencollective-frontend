@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { Flex } from '../Grid';
-import Link from '../Link';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
@@ -149,7 +149,7 @@ const SECTION_LABELS = defineMessages({
   },
 });
 
-const MenuItem = styled(Link)`
+const MenuItem = styled(NextLink)`
   display: block;
   border-radius: 5px;
   padding: 5px 10px;
@@ -227,11 +227,10 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
     <MenuItem
       key={section}
       selected={isSelected}
-      route={isEvent ? 'editEvent' : 'editCollective'}
-      params={
+      href={
         isEvent
-          ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug, section }
-          : { slug: collective.slug, section }
+          ? `${collective.parentCollective.slug}/events/${collective.slug}/edit/${section}`
+          : `${collective.slug}/edit/${section}`
       }
       data-cy={`menu-item-${section}`}
     >

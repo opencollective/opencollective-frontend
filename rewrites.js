@@ -106,14 +106,14 @@ exports.REWRITES = [
     source: '/:parentCollectiveSlug/projects/(new|create)',
     destination: '/create-project',
   },
-  // {
-  //   source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section?',
-  //   destination: '/editEvent',
-  // },
-  // {
-  //   source: '/:slug/edit/:section?',
-  //   destination: '/editCollective',
-  // },
+  {
+    source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section?',
+    destination: '/editEvent',
+  },
+  {
+    source: '/:slug/edit/:section?',
+    destination: '/editCollective',
+  },
   // {
   //   source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
   //   destination: '/collective-contact',

@@ -7,7 +7,6 @@
 const routes = require('next-routes');
 
 const pages = routes()
-  .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit/:section?')
   .add('editCollective', '/:slug/edit/:section?')
   .add('collective-contact', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
