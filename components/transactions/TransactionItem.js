@@ -307,7 +307,7 @@ TransactionItem.propTypes = {
     }),
     netAmountInCollectiveCurrency: PropTypes.number,
     refundTransaction: PropTypes.object,
-    usingVirtualCardFromCollective: PropTypes.object,
+    usingGiftCardFromCollective: PropTypes.object,
   }),
   collective: PropTypes.shape({
     id: PropTypes.number,

@@ -17,7 +17,7 @@ import { compose, reportValidityHTML5 } from '../lib/utils';
 
 import CollectivePicker from './CollectivePicker';
 import Container from './Container';
-import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
+import CreateGiftCardsSuccess from './CreateGiftCardsSuccess';
 import { Box, Flex } from './Grid';
 import { I18nSupportLink } from './I18nFormatters';
 import Loading from './Loading';
@@ -34,20 +34,20 @@ const MAX_AMOUNT = 100000000;
 
 const messages = defineMessages({
   emailCustomMessage: {
-    id: 'virtualCards.email.customMessage',
+    id: 'giftCards.email.customMessage',
     defaultMessage: 'Will be sent in the invitation email',
   },
   limitToHostsPlaceholder: {
-    id: 'virtualCards.limitToHosts.placeholder',
+    id: 'giftCards.limitToHosts.placeholder',
     defaultMessage: 'All Hosts',
   },
   limitToCollectivesPlaceholder: {
-    id: 'virtualCards.limitToCollectives.placeholder',
+    id: 'giftCards.limitToCollectives.placeholder',
     defaultMessage:
       'All Collectives {nbHosts, plural, =0 {} =1 {under the selected Host} other {under the selected Hosts}}',
   },
   notBatched: {
-    id: 'virtualCards.notBatched',
+    id: 'giftCards.notBatched',
     defaultMessage: 'Not batched',
   },
 });
@@ -55,10 +55,7 @@ const messages = defineMessages({
 const InlineField = ({ name, children, label, isLabelClickable }) => (
   <Flex flexWrap="wrap" alignItems="center" mb="2.5em" className={`field-${name}`}>
     <Box width={[1, 0.3]}>
-      <label
-        htmlFor={`virtualcard-${name}`}
-        style={{ cursor: isLabelClickable ? 'pointer' : 'inherit', width: '100%' }}
-      >
+      <label htmlFor={`giftcard-${name}`} style={{ cursor: isLabelClickable ? 'pointer' : 'inherit', width: '100%' }}>
         {label}
       </label>
     </Box>
@@ -168,12 +165,12 @@ const FieldLabelDetails = styled.span`
   font-weight: normal;
 `;
 
-class CreateVirtualCardsForm extends Component {
+class CreateGiftCardsForm extends Component {
   static propTypes = {
     collectiveId: PropTypes.number.isRequired,
     collectiveSlug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
-    createVirtualCards: PropTypes.func.isRequired,
+    createGiftCards: PropTypes.func.isRequired,
     collectiveSettings: PropTypes.object.isRequired,
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -204,14 +201,14 @@ class CreateVirtualCardsForm extends Component {
         amount: MIN_AMOUNT,
         emails: [],
         customMessage: '',
-        numberOfVirtualCards: 1,
+        numberOfGiftCards: 1,
         limitedToHosts: [],
         expiryDate: dayjs().add(12, 'month').format('YYYY-MM-DD'),
       },
       errors: { emails: [] },
       multiEmailsInitialState: null,
       submitting: false,
-      createdVirtualCards: null,
+      createdGiftCards: null,
       serverError: null,
     };
   }
@@ -224,9 +221,9 @@ class CreateVirtualCardsForm extends Component {
       const { emails, invalids } = value;
       value = emails;
       errors.emails = invalids;
-    } else if (fieldName === 'numberOfVirtualCards') {
-      const intNumberOfVirtualCards = parseInt(value);
-      value = !isNaN(intNumberOfVirtualCards) ? intNumberOfVirtualCards : 1;
+    } else if (fieldName === 'numberOfGiftCards') {
+      const intNumberOfGiftCards = parseInt(value);
+      value = !isNaN(intNumberOfGiftCards) ? intNumberOfGiftCards : 1;
     }
 
     // Set value
@@ -243,7 +240,7 @@ class CreateVirtualCardsForm extends Component {
     if (deliverType === 'email') {
       return values.emails.length > 0 && errors.emails.length == 0;
     } else {
-      return values.numberOfVirtualCards !== 0;
+      return values.numberOfGiftCards !== 0;
     }
   }
 
@@ -271,13 +268,13 @@ class CreateVirtualCardsForm extends Component {
         variables.emails = values.emails;
         variables.customMessage = values.customMessage;
       } else if (deliverType === 'manual') {
-        variables.numberOfVirtualCards = values.numberOfVirtualCards;
+        variables.numberOfGiftCards = values.numberOfGiftCards;
       }
 
       this.props
-        .createVirtualCards({ variables })
+        .createGiftCards({ variables })
         .then(({ data }) => {
-          this.setState({ createdVirtualCards: data.createVirtualCards, submitting: false });
+          this.setState({ createdGiftCards: data.createGiftCards, submitting: false });
           window.scrollTo(0, 0);
         })
         .catch(e => {
@@ -299,7 +296,7 @@ class CreateVirtualCardsForm extends Component {
       // Use the emails count to pre-fill the number count
       const values = { ...state.values };
       if (state.deliverType === 'email' && deliverType === 'manual' && values.emails.length) {
-        values.numberOfVirtualCards = values.emails.length;
+        values.numberOfGiftCards = values.emails.length;
       }
       return { values, deliverType };
     });
@@ -307,7 +304,7 @@ class CreateVirtualCardsForm extends Component {
 
   renderSubmit() {
     const { submitting, values, deliverType } = this.state;
-    const count = deliverType === 'email' ? values.emails.length : values.numberOfVirtualCards;
+    const count = deliverType === 'email' ? values.emails.length : values.numberOfGiftCards;
     const enable = this.isSubmitEnabled();
     return (
       <StyledButton
@@ -317,9 +314,9 @@ class CreateVirtualCardsForm extends Component {
         minWidth="16em"
         disabled={!submitting && !enable}
         loading={submitting}
-        data-cy="submit-new-virtualcards"
+        data-cy="submit-new-gift-cards"
       >
-        <FormattedMessage id="virtualCards.generate" defaultMessage="Create {count} gift cards" values={{ count }} />
+        <FormattedMessage id="giftCards.generate" defaultMessage="Create {count} gift cards" values={{ count }} />
       </StyledButton>
     );
   }
@@ -330,7 +327,7 @@ class CreateVirtualCardsForm extends Component {
         <NextLink href={`${this.props.collectiveSlug}/edit/payment-methods`}>
           <StyledButton buttonSize="large" mt="2em" justifyContent="center">
             <FormattedMessage
-              id="virtualCards.create.requirePM"
+              id="giftCards.create.requirePM"
               defaultMessage="Add a payment method to create gift cards"
             />
           </StyledButton>
@@ -346,17 +343,17 @@ class CreateVirtualCardsForm extends Component {
         <Flex flexDirection="column" mb="2em">
           <label style={{ width: '100%' }}>
             <Flex flexDirection="column">
-              <FormattedMessage id="virtualCards.create.recipients" defaultMessage="Recipients" />
+              <FormattedMessage id="giftCards.create.recipients" defaultMessage="Recipients" />
               <FieldLabelDetails>
                 <FormattedMessage
-                  id="virtualCards.create.recipientsDetails"
+                  id="giftCards.create.recipientsDetails"
                   defaultMessage="A list of emails that will receive a gift card"
                 />
               </FieldLabelDetails>
             </Flex>
           </label>
           <StyledMultiEmailInput
-            className="virtualcards-recipients"
+            className="gift-cards-recipients"
             mt="0.25em"
             invalids={errors.emails}
             initialState={multiEmailsInitialState}
@@ -369,7 +366,7 @@ class CreateVirtualCardsForm extends Component {
           name="customMessage"
           label={
             <Flex flexDirection="column">
-              <FormattedMessage id="virtualCards.create.customMessage" defaultMessage="Custom message" />
+              <FormattedMessage id="giftCards.create.customMessage" defaultMessage="Custom message" />
               <FieldLabelDetails>
                 <FormattedMessage id="forms.optional" defaultMessage="Optional" />
               </FieldLabelDetails>
@@ -377,7 +374,7 @@ class CreateVirtualCardsForm extends Component {
           }
         >
           <StyledInput
-            id="virtualcard-customMessage"
+            id="giftcard-customMessage"
             type="text"
             maxLength="255"
             placeholder={this.props.intl.formatMessage(messages.emailCustomMessage)}
@@ -392,24 +389,24 @@ class CreateVirtualCardsForm extends Component {
 
   renderManualFields() {
     const { collectiveSettings } = this.props;
-    const virtualCardsMaxDailyCount = get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100;
+    const giftCardsMaxDailyCount = get(collectiveSettings, `giftCardsMaxDailyCount`) || 100;
     return (
       <Container display="flex" flexDirection="column" width={1} justifyContent="center">
         <Flex justifyContent="center" mt={3} mb={4} alignItems="center">
-          <label htmlFor="virtualcard-numberOfVirtualCards">
-            <FormattedMessage id="virtualCards.create.number" defaultMessage="Number of gift cards" />
+          <label htmlFor="giftcard-numberOfGiftCards">
+            <FormattedMessage id="giftCards.create.number" defaultMessage="Number of gift cards" />
           </label>
           <StyledInput
-            id="virtualcard-numberOfVirtualCards"
-            name="virtualcard-numberOfVirtualCards"
+            id="giftcard-numberOfGiftCards"
+            name="giftcard-numberOfGiftCards"
             type="number"
             step="1"
             min="1"
             ml={3}
-            max={virtualCardsMaxDailyCount}
+            max={giftCardsMaxDailyCount}
             maxWidth="6.5em"
-            onChange={e => this.onChange('numberOfVirtualCards', e.target.value)}
-            value={this.state.values.numberOfVirtualCards}
+            onChange={e => this.onChange('numberOfGiftCards', e.target.value)}
+            value={this.state.values.numberOfGiftCards}
             disabled={this.state.submitting}
           />
         </Flex>
@@ -440,11 +437,11 @@ class CreateVirtualCardsForm extends Component {
 
   render() {
     const { data, intl, collectiveSlug, currency, collectiveSettings } = this.props;
-    const { submitting, values, createdVirtualCards, serverError, deliverType } = this.state;
+    const { submitting, values, createdGiftCards, serverError, deliverType } = this.state;
     const loading = get(data, 'loading');
     const error = get(data, 'error');
     const paymentMethods = get(data, 'Collective.paymentMethods', []);
-    const batches = get(data, 'Collective.virtualCardsBatches');
+    const batches = get(data, 'Collective.giftCardsBatches');
     const hosts = get(data, 'allHosts.collectives', []);
     const canLimitToCollectives = this.canLimitToCollectives(values.paymentMethod);
     const batchesOptions = this.getBatchesOptions(batches, intl);
@@ -459,13 +456,9 @@ class CreateVirtualCardsForm extends Component {
       );
     } else if (paymentMethods.length === 0) {
       return this.renderNoPaymentMethodMessage();
-    } else if (createdVirtualCards) {
+    } else if (createdGiftCards) {
       return (
-        <CreateVirtualCardsSuccess
-          cards={createdVirtualCards}
-          deliverType={deliverType}
-          collectiveSlug={collectiveSlug}
-        />
+        <CreateGiftCardsSuccess cards={createdGiftCards} deliverType={deliverType} collectiveSlug={collectiveSlug} />
       );
     }
 
@@ -474,7 +467,7 @@ class CreateVirtualCardsForm extends Component {
         <Flex flexDirection="column">
           <InlineField name="amount" label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}>
             <StyledInputAmount
-              id="virtualcard-amount"
+              id="giftcard-amount"
               currency={currency}
               prepend={currency}
               onChange={value => this.onChange('amount', value)}
@@ -502,10 +495,10 @@ class CreateVirtualCardsForm extends Component {
           <InlineField
             name="expiryDate"
             isLabelClickable
-            label={<FormattedMessage id="virtualCards.create.expiryDate" defaultMessage="Expiry date" />}
+            label={<FormattedMessage id="giftCards.create.expiryDate" defaultMessage="Expiry date" />}
           >
             <StyledInput
-              id="virtualcard-expiryDate"
+              id="giftcard-expiryDate"
               name="expiryDate"
               value={values.expiryDate}
               onChange={e => this.onChange('expiryDate', e.target.value)}
@@ -519,7 +512,7 @@ class CreateVirtualCardsForm extends Component {
             name="batch"
             label={
               <Flex flexDirection="column">
-                <FormattedMessage id="virtualCards.batch" defaultMessage="Batch name" />
+                <FormattedMessage id="giftCards.batch" defaultMessage="Batch name" />
                 <FieldLabelDetails>
                   <FormattedMessage id="forms.optional" defaultMessage="Optional" />
                 </FieldLabelDetails>
@@ -527,7 +520,7 @@ class CreateVirtualCardsForm extends Component {
             }
           >
             <StyledSelectCreatable
-              id="virtualcard-batch"
+              id="giftcard-batch"
               onChange={({ value }) => this.onChange('batch', truncate(value, { length: 200 }))}
               minWidth={300}
               disabled={submitting}
@@ -548,7 +541,7 @@ class CreateVirtualCardsForm extends Component {
                   label={
                     <Flex flexDirection="column">
                       <FormattedMessage
-                        id="virtualCards.create.limitToHosts"
+                        id="giftCards.create.limitToHosts"
                         defaultMessage="Limit to the following Hosts"
                       />
                       <FieldLabelDetails>
@@ -580,24 +573,24 @@ class CreateVirtualCardsForm extends Component {
               checked={deliverType === 'email'}
               onClick={() => this.changeDeliverType('email')}
             >
-              <FormattedMessage id="virtualCards.create.sendEmails" defaultMessage="Send the cards by&#160;email" />
+              <FormattedMessage id="giftCards.create.sendEmails" defaultMessage="Send the cards by&#160;email" />
             </RadioButtonWithLabel>
             <RadioButtonWithLabel
               name="manual"
               checked={deliverType === 'manual'}
               onClick={() => this.changeDeliverType('manual')}
             >
-              <FormattedMessage id="virtualCards.create.generateCodes" defaultMessage="I'll send the codes myself" />
+              <FormattedMessage id="giftCards.create.generateCodes" defaultMessage="I'll send the codes myself" />
             </RadioButtonWithLabel>
           </DeliverTypeRadioSelector>
 
           <MessageBox type="info" fontSize="13px" withIcon mb={4}>
             <FormattedMessage
-              id="VirtualCard.Limitinfo"
+              id="GiftCard.Limitinfo"
               defaultMessage="Your account is currently limited to {limit} gift cards per day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
               values={{
                 SupportLink: I18nSupportLink,
-                limit: get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100,
+                limit: get(collectiveSettings, `giftCardsMaxDailyCount`) || 100,
               }}
             />
           </MessageBox>
@@ -623,14 +616,14 @@ class CreateVirtualCardsForm extends Component {
 
 /**
  * A query to get a collective source payment methods. This will not return
- * virtual cards, as a virtual card cannot be used as a source payment method
+ * gift cards, as a gift card cannot be used as a source payment method
  * for another payment method.
  */
 export const collectiveSourcePaymentMethodsQuery = gql`
   query CollectiveSourcePaymentMethods($id: Int) {
     Collective(id: $id) {
       id
-      virtualCardsBatches {
+      giftCardsBatches {
         id
         name
         count
@@ -668,10 +661,10 @@ const addCollectiveSourcePaymentMethodsQuery = graphql(collectiveSourcePaymentMe
   }),
 });
 
-const createVirtualCardsMutation = gql`
-  mutation CreateVirtualCards(
+const createGiftCardsMutation = gql`
+  mutation CreateGiftCards(
     $CollectiveId: Int!
-    $numberOfVirtualCards: Int
+    $numberOfGiftCards: Int
     $emails: [String]
     $PaymentMethodId: Int
     $amount: Int
@@ -684,7 +677,7 @@ const createVirtualCardsMutation = gql`
     $customMessage: String
     $batch: String
   ) {
-    createVirtualCards(
+    createGiftCards(
       amount: $amount
       monthlyLimitPerMember: $monthlyLimitPerMember
       CollectiveId: $CollectiveId
@@ -694,7 +687,7 @@ const createVirtualCardsMutation = gql`
       currency: $currency
       limitedToTags: $limitedToTags
       limitedToHostCollectiveIds: $limitedToHostCollectiveIds
-      numberOfVirtualCards: $numberOfVirtualCards
+      numberOfGiftCards: $numberOfGiftCards
       emails: $emails
       customMessage: $customMessage
       batch: $batch
@@ -714,10 +707,10 @@ const createVirtualCardsMutation = gql`
   }
 `;
 
-const addCreateVirtualCardsMutation = graphql(createVirtualCardsMutation, {
-  name: 'createVirtualCards',
+const addCreateGiftCardsMutation = graphql(createGiftCardsMutation, {
+  name: 'createGiftCards',
 });
 
-const addGraphql = compose(addCollectiveSourcePaymentMethodsQuery, addCreateVirtualCardsMutation);
+const addGraphql = compose(addCollectiveSourcePaymentMethodsQuery, addCreateGiftCardsMutation);
 
-export default injectIntl(addGraphql(CreateVirtualCardsForm));
+export default injectIntl(addGraphql(CreateGiftCardsForm));

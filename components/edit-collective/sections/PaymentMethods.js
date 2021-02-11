@@ -182,7 +182,7 @@ class EditPaymentMethods extends React.Component {
 
   getPaymentMethodsToDisplay() {
     const paymentMethods = get(this.props, 'data.Collective.paymentMethods', []).filter(
-      pm => pm.balance > 0 || (pm.type === 'virtualcard' && pm.monthlyLimitPerMember),
+      pm => pm.balance > 0 || (pm.type === 'giftcard' && pm.monthlyLimitPerMember),
     );
     return sortBy(paymentMethods, ['type', 'id']);
   }
@@ -344,7 +344,7 @@ const paymentMethodsQuery = gql`
         manualPayments
         name
       }
-      paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
+      paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
         id
         uuid
         name

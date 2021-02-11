@@ -16,6 +16,8 @@ import Body from '../components/Body';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import Footer from '../components/Footer';
+import CollectiveCard from '../components/gift-cards/CollectiveCard';
+import HappyBackground from '../components/gift-cards/HappyBackground';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import LinkCollective from '../components/LinkCollective';
@@ -25,8 +27,6 @@ import RedeemSuccess from '../components/RedeemSuccess';
 import StyledButton from '../components/StyledButton';
 import { H1, H5, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import CollectiveCard from '../components/virtual-cards/CollectiveCard';
-import HappyBackground from '../components/virtual-cards/HappyBackground';
 
 const ShadowBox = styled(Box)`
   box-shadow: 0px 8px 16px rgba(20, 20, 20, 0.12);

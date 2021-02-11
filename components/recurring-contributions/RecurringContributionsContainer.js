@@ -36,13 +36,7 @@ const filterContributions = (contributions, filterName) => {
   }
 };
 
-const RecurringContributionsContainer = ({
-  recurringContributions,
-  filter,
-  createNotification,
-  account,
-  LoggedInUser,
-}) => {
+const RecurringContributionsContainer = ({ recurringContributions, filter, account, LoggedInUser }) => {
   let displayedRecurringContributions = filterContributions(recurringContributions.nodes, filter);
   const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
   displayedRecurringContributions = isAdmin
@@ -60,7 +54,6 @@ const RecurringContributionsContainer = ({
                 status={contribution.status}
                 contribution={contribution}
                 position="relative"
-                createNotification={createNotification}
                 account={account}
                 data-cy="recurring-contribution-card"
               />
@@ -85,7 +78,6 @@ const RecurringContributionsContainer = ({
 RecurringContributionsContainer.propTypes = {
   recurringContributions: PropTypes.object.isRequired,
   filter: PropTypes.string.isRequired,
-  createNotification: PropTypes.func,
   account: PropTypes.object.isRequired,
   LoggedInUser: PropTypes.object,
 };

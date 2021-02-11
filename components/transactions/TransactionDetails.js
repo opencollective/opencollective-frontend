@@ -229,7 +229,7 @@ TransactionDetails.propTypes = {
       canDownloadInvoice: PropTypes.bool,
       canReject: PropTypes.bool,
     }),
-    usingVirtualCardFromCollective: PropTypes.object,
+    usingGiftCardFromCollective: PropTypes.object,
   }),
   isHostAdmin: PropTypes.bool,
   isRoot: PropTypes.bool,

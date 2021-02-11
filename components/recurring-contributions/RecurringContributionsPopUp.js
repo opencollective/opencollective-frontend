@@ -12,9 +12,11 @@ import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
+import I18nFormatters from '../I18nFormatters';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { withUser } from '../UserProvider';
 
 import UpdateOrderPopUp from './UpdateOrderPopUp';
@@ -60,11 +62,12 @@ const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const RecurringContributionsPopUp = ({ contribution, status, createNotification, setShowPopup, account }) => {
+const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, account }) => {
   const [menuState, setMenuState] = useState('mainMenu');
   const [submitCancellation, { loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
   });
+  const { addToast } = useToasts();
 
   const mainMenu = menuState === 'mainMenu' && (status === 'ACTIVE' || status === 'ERROR');
   const cancelMenu = menuState === 'cancelMenu';
@@ -195,10 +198,22 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
                   await submitCancellation({
                     variables: { order: { id: contribution.id } },
                   });
-                  createNotification('cancel');
+                  addToast({
+                    type: TOAST_TYPE.INFO,
+                    message: (
+                      <FormattedMessage
+                        id="subscription.createSuccessCancel"
+                        defaultMessage="Your recurring contribution has been <strong>cancelled</strong>."
+                        values={I18nFormatters}
+                      />
+                    ),
+                  });
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
-                  createNotification('error', errorMsg);
+                  addToast({
+                    type: TOAST_TYPE.ERROR,
+                    message: errorMsg,
+                  });
                 }
               }}
             >
@@ -225,7 +240,6 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
           <UpdatePaymentMethodPopUp
             setMenuState={setMenuState}
             contribution={contribution}
-            createNotification={createNotification}
             setShowPopup={setShowPopup}
             account={account}
           />
@@ -234,12 +248,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
 
       {updateTierMenu && (
         <MenuSection data-cy="recurring-contribution-order-menu">
-          <UpdateOrderPopUp
-            setMenuState={setMenuState}
-            contribution={contribution}
-            createNotification={createNotification}
-            setShowPopup={setShowPopup}
-          />
+          <UpdateOrderPopUp setMenuState={setMenuState} contribution={contribution} setShowPopup={setShowPopup} />
         </MenuSection>
       )}
     </PopUpMenu>
@@ -250,7 +259,6 @@ RecurringContributionsPopUp.propTypes = {
   contribution: PropTypes.object.isRequired,
   LoggedInUser: PropTypes.object.isRequired,
   status: PropTypes.string.isRequired,
-  createNotification: PropTypes.func,
   setShowPopup: PropTypes.func,
   account: PropTypes.object.isRequired,
 };
