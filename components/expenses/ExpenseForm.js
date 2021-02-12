@@ -394,12 +394,14 @@ const ExpenseFormBody = ({
                 <StyledInputTags
                   renderUpdatedTags
                   suggestedTags={expensesTags}
-                  onChange={tags =>
-                    formik.setFieldValue(
-                      'tags',
-                      tags.map(t => t.value.toLowerCase()),
-                    )
-                  }
+                  onChange={tags => {
+                    if (step == STEPS.EXPENSE && hasBaseFormFieldsCompleted) {
+                      formik.setFieldValue(
+                        'tags',
+                        tags.map(t => t.value.toLowerCase()),
+                      );
+                    }
+                  }}
                   value={values.tags}
                 />
               </Flex>
