@@ -20,9 +20,9 @@
     "@sentry/browser": "6.1.0",
     "@sentry/node": "6.1.0",
     "@styled-icons/boxicons-regular": "10.23.0",
+    "@styled-icons/boxicons-solid": "10.23.0",
     "@styled-icons/fa-brands": "10.26.0",
     "@styled-icons/fa-solid": "10.26.0",
-    "@styled-icons/boxicons-solid": "10.23.0",
     "@styled-icons/feather": "10.18.0",
     "@styled-icons/icomoon": "10.18.0",
     "@styled-icons/material": "10.26.0",
@@ -103,8 +103,8 @@
   },
   "scripts": {
     "build": "npm-run-all build:updates build:next build:server",
-    "build:e2e": "cross-env NODE_ENV=development OC_ENV=e2e npm run build",
     "build:clean": "shx rm -rf dist .next",
+    "build:e2e": "cross-env NODE_ENV=development OC_ENV=e2e npm run build",
     "build:langs": "npm run langs:update",
     "build:next": "cross-env scripts/build_next.sh",
     "build:server": "cross-env scripts/build_server.sh",
@@ -130,6 +130,7 @@
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
     "optimize-png": "npm install --no-save imagemin imagemin-optipng imagemin-pngquant && babel-node ./scripts/optimize-png",
+    "postinstall": "husky install",
     "prettier": "prettier \"*.@(js|json|md)\" \"@(components|lib|pages|scripts|server|test)/**/*.@(js|json|md)\"",
     "prettier:check": "npm run prettier -- --check",
     "prettier:write": "npm run prettier -- --write",
@@ -220,11 +221,6 @@
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
