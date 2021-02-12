@@ -8,10 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes();
 
-// Events and Projects using collective page
-pages.add('event', '/:parentCollectiveSlug/events/:slug', 'collective-page');
-pages.add('project', '/:parentCollectiveSlug/projects/:slug', 'collective-page');
-
 // Tier page
 // ---------------
 pages.add('contribute', '/:collectiveSlug/:verb(tiers|contribute)');

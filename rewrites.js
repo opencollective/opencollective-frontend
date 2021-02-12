@@ -166,15 +166,15 @@ exports.REWRITES = [
       '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
     destination: '/create-collective',
   },
-  // // Events and Projects using collective page
-  // {
-  //   source: '/:parentCollectiveSlug/events/:slug',
-  //   destination: '/collective-page',
-  // },
-  // {
-  //   source: '/:parentCollectiveSlug/projects/:slug',
-  //   destination: '/collective-page',
-  // },
+  // Events and Projects using collective page
+  {
+    source: '/:parentCollectiveSlug/events/:slug',
+    destination: '/collective-page',
+  },
+  {
+    source: '/:parentCollectiveSlug/projects/:slug',
+    destination: '/collective-page',
+  },
   // // Tier page
   // {
   //   source: '/:collectiveSlug/:verb(tiers|contribute)',
@@ -243,13 +243,13 @@ exports.REWRITES = [
   //   source: `/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|old-pricing)`,
   //   destination: '/marketingPage',
   // },
-  // // Collective
-  // // ----------
-  // // Collective page
-  // {
-  //   source: '/:slug',
-  //   destination: '/collective-page',
-  // },
+  // Collective
+  // ----------
+  // Collective page
+  {
+    source: '/:slug',
+    destination: '/collective-page',
+  },
   // {
   //   source: '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
   //   destination: '/collective-page',

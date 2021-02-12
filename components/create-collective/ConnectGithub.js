@@ -67,7 +67,7 @@ class ConnectGithub extends React.Component {
       verb: this.props.router.query.verb,
       hostCollectiveSlug: this.props.router.query.hostCollectiveSlug || undefined,
     };
-    await this.props.router.push({pathname: 'create-collective', query: params});
+    await this.props.router.push({ pathname: 'create-collective', query: params });
     window.scrollTo(0, 0);
   };
 
@@ -115,7 +115,7 @@ class ConnectGithub extends React.Component {
                 defaultMessage="Want to apply using {altverification}? {applylink}."
                 values={{
                   applylink: (
-                    <NextLink href={{pathname: `opensource/apply/form`, query: {hostTos: true}}}>
+                    <NextLink href={{ pathname: `opensource/apply/form`, query: { hostTos: true } }}>
                       <FormattedMessage id="clickHere" defaultMessage="Click here" />
                     </NextLink>
                   ),
