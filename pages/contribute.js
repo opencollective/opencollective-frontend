@@ -166,6 +166,11 @@ const contributePageQuery = gql`
       isActive
       isHost
       imageUrl
+      parentCollective {
+        id
+        name
+        slug
+      }
       features {
         ...NavbarFields
       }
