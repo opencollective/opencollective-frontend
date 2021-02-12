@@ -155,10 +155,10 @@ exports.REWRITES = [
     source: '/orders/:id([0-9]+)/confirm',
     destination: '/confirmOrder',
   },
-  // {
-  //   source: '/fund/:verb(apply|create)/:step(form)?',
-  //   destination: '/create-fund',
-  // },
+  {
+    source: '/fund/:verb(apply|create)/:step(form)?',
+    destination: '/create-fund',
+  },
 
   // // New Create Collective Flow
   // {

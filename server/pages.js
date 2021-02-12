@@ -8,8 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes();
 
-pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?');
-
 // New Create Collective Flow
 pages.add(
   'create-collective',
