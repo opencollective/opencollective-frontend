@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { has, mapValues, omit, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
+import NextLink from 'next/link';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -13,7 +15,6 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
@@ -28,7 +29,6 @@ import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
 import { expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
-import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -117,6 +117,7 @@ class ExpensePage extends React.Component {
         limit: PropTypes.number,
       }),
     }),
+    router: PropTypes.object,
   };
 
   componentDidUpdate(oldProps) {
@@ -141,20 +142,27 @@ class ExpensePage extends React.Component {
   });
 
   buildFilterLinkParams(params) {
-    return {
+    const queryParameters = {
       ...pick(this.props, ['collectiveSlug', 'parentCollectiveSlug']),
       ...omit(this.props.query, ['offset']),
       ...params,
     };
+    Object.keys(queryParameters).forEach(
+      k => !queryParameters[k] && queryParameters[k] !== undefined && delete queryParameters[k],
+    );
+    return queryParameters;
   }
 
   updateFilters = queryParams => {
-    return Router.pushRoute('expenses', this.buildFilterLinkParams({ ...queryParams, offset: null }));
+    return this.props.router.push({
+      pathname: 'expenses',
+      query: this.buildFilterLinkParams({ ...queryParams, offset: null }),
+    });
   };
 
   handleSearch = searchTerm => {
     const params = this.buildFilterLinkParams({ searchTerm, offset: null });
-    Router.pushRoute('expenses', params);
+    this.props.router.push({ pathname: 'expenses', query: params });
   };
 
   getTagProps = tag => {
@@ -225,13 +233,15 @@ class ExpensePage extends React.Component {
                         defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
                         values={{
                           ResetLink: text => (
-                            <Link
+                            <NextLink
                               data-cy="reset-expenses-filters"
-                              route="expenses"
-                              params={this.buildFilterLinkParams(mapValues(this.props.query, () => null))}
+                              href={{
+                                pathname: 'expenses',
+                                query: this.buildFilterLinkParams(mapValues(this.props.query, () => null)),
+                              }}
                             >
-                              {text}
-                            </Link>
+                              <span>{text}</span>
+                            </NextLink>
                           ),
                         }}
                       />
@@ -279,14 +289,16 @@ class ExpensePage extends React.Component {
                     data-cy="expense-tags-title"
                   >
                     {({ key, tag, renderedTag, props }) => (
-                      <Link
+                      <NextLink
                         key={key}
-                        route="expenses"
-                        params={this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag })}
+                        href={{
+                          pathname: 'expenses',
+                          query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
+                        }}
                         data-cy="expense-tags-link"
                       >
                         {renderedTag}
-                      </Link>
+                      </NextLink>
                     )}
                   </ExpenseTags>
                 </ExpenseInfoSidebar>
@@ -426,4 +438,4 @@ const addExpensesPageData = graphql(expensesPageQuery, {
   },
 });
 
-export default injectIntl(addExpensesPageData(withUser(ExpensePage)));
+export default injectIntl(addExpensesPageData(withUser(withRouter(ExpensePage))));

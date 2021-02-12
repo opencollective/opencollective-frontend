@@ -13,7 +13,6 @@ import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -377,11 +376,8 @@ class ExpensePage extends React.Component {
 
   onDelete = async expense => {
     const collective = expense.account;
-    return Router.replaceRoute('expenses', {
-      parentCollectiveSlug: collective.parent?.slug,
-      collectiveType: collective.parent ? getCollectiveTypeForUrl(collective) : undefined,
-      collectiveSlug: collective.slug,
-    });
+    const collectiveType = collective.parent ? getCollectiveTypeForUrl(collective) : undefined;
+    return this.props.router.replace(`${collective.parent?.slug}/${collectiveType}/${collective.slug}/expenses`);
   };
 
   render() {

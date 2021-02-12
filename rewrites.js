@@ -139,10 +139,10 @@ exports.REWRITES = [
       '/:parentCollectiveSlug?/:collectiveType(evenExpenseAdminActionsts|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
     destination: '/expense',
   },
-  // {
-  //   source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
-  //   destination: '/expenses',
-  // },
+  {
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
+    destination: '/expenses',
+  },
   // {
   //   source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders',
   //   destination: '/orders',
