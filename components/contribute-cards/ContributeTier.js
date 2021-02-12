@@ -71,7 +71,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
   if (tierType === ContributionTypes.TICKET) {
     route = 'orderEventTier';
     routeParams = {
-      collectiveSlug: collective.parentCollective.slug,
+      collectiveSlug: collective.parentCollective?.slug || 'collective',
       verb: 'events',
       eventSlug: collective.slug,
       tierId: tier.id,
