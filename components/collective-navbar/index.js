@@ -251,28 +251,28 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
+        <NextLink href={`${collective.slug}/expenses/new`}>
           <MainActionBtn tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
             </Span>
           </MainActionBtn>
-        </Link>
+        </NextLink>
       ),
     };
   } else if (callsToAction.includes('hasSubmitExpense')) {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
-        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
+        <NextLink href={`${collective.slug}/expenses/new`}>
           <MainActionBtn tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
             </Span>
           </MainActionBtn>
-        </Link>
+        </NextLink>
       ),
     };
   } else if (callsToAction.includes('hasManageSubscriptions')) {

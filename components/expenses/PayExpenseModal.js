@@ -16,7 +16,6 @@ import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
-import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
@@ -264,9 +263,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
                 defaultMessage="Please go to your <SettingsLink>settings</SettingsLink> to enable two-factor authentication for your account."
                 values={{
                   SettingsLink: getI18nLink({
-                    as: Link,
-                    route: 'editCollective',
-                    params: { slug: LoggedInUser.collective.slug, section: EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH },
+                    as: NextLink,
+                    href: `${LoggedInUser.collective.slug}/edit/${EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH}`,
                     openInNewTab: true,
                   }),
                 }}

@@ -213,27 +213,21 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink
-                          as={Link}
-                          route="create-expense"
-                          params={{ collectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Receipt size="20px" />
-                          <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                        <StyledLink as={NextLink} href={`${collective.slug}/expenses/new`}>
+                          <Container p={ITEM_PADDING}>
+                            <Receipt size="20px" />
+                            <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
-                        <StyledLink
-                          as={Link}
-                          route="create-expense"
-                          params={{ collectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <MoneyCheckAlt size="20px" />
-                          <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
+                        <StyledLink as={NextLink} href={`${collective.slug}/expenses/new`}>
+                          <Container p={ITEM_PADDING}>
+                            <MoneyCheckAlt size="20px" />
+                            <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}

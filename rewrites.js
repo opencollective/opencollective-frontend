@@ -130,11 +130,10 @@ exports.REWRITES = [
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions',
     destination: '/transactions',
   },
-
-  // {
-  //   source: '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new',
-  //   destination: '/create-expense',
-  // },
+  {
+    source: '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new',
+    destination: '/create-expense',
+  },
   // {
   //   source:
   //     '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
