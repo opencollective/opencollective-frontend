@@ -153,7 +153,7 @@
   "devDependencies": {
     "@babel/cli": "^7.12.10",
     "@babel/core": "^7.12.3",
-    "@babel/node": "^7.12.13",
+    "@babel/node": "^7.12.16",
     "@cypress/code-coverage": "^3.9.2",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
