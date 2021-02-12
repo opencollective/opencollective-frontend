@@ -6,10 +6,7 @@
 
 const routes = require('next-routes');
 
-const pages = routes()
-  .add('orders', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders')
-  .add('order', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)')
-  .add('confirmOrder', '/orders/:id([0-9]+)/confirm');
+const pages = routes();
 
 pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?');
 

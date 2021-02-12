@@ -143,18 +143,18 @@ exports.REWRITES = [
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
     destination: '/expenses',
   },
-  // {
-  //   source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders',
-  //   destination: '/orders',
-  // },
-  // {
-  //   source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)',
-  //   destination: '/order',
-  // },
-  // {
-  //   source: '/orders/:id([0-9]+)/confirm',
-  //   destination: '/confirmOrder',
-  // },
+  {
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders',
+    destination: '/orders',
+  },
+  {
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)',
+    destination: '/order',
+  },
+  {
+    source: '/orders/:id([0-9]+)/confirm',
+    destination: '/confirmOrder',
+  },
   // {
   //   source: '/fund/:verb(apply|create)/:step(form)?',
   //   destination: '/create-fund',

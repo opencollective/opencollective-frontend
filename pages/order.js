@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 
 import { Box } from '../components/Grid';
-import Link from '../components/Link';
 import Page from '../components/Page';
 import { P } from '../components/Text';
 
@@ -26,9 +26,7 @@ class OrderPage extends React.Component {
             <strong>This page has moved.</strong>
           </p>
           You can now manage pending bank transfers from{' '}
-          <Link route="orders" params={{ collectiveSlug: this.props.slug }}>
-            the dedicated page.
-          </Link>
+          <NextLink href={`${this.props.slug}/orders`}>the dedicated page.</NextLink>
         </Box>
       </Page>
     );
