@@ -41,7 +41,7 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="EditCollectivePageFAQ.HideBudget" defaultMessage="Why can\'t I hide my budget section?" />
+        <FormattedMessage id="EditCollectivePageFAQ.HideBudget" defaultMessage="Why can't I hide my budget section?" />
       </Title>
       <Content>
         <FormattedMessage
