@@ -84,8 +84,10 @@ const ViewAllLink = ({ collective, filter }) => {
     case 'expenses':
       return (
         <NextLink href={`${collective.slug}/expenses`} data-cy="view-all-expenses-link">
-          <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
-          &rarr;
+          <span>
+            <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
+            &rarr;
+          </span>
         </NextLink>
       );
     case 'transactions':

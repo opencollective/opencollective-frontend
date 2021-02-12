@@ -134,11 +134,11 @@ exports.REWRITES = [
     source: '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new',
     destination: '/create-expense',
   },
-  // {
-  //   source:
-  //     '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
-  //   destination: '/expense',
-  // },
+  {
+    source:
+      '/:parentCollectiveSlug?/:collectiveType(evenExpenseAdminActionsts|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
+    destination: '/expense',
+  },
   // {
   //   source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
   //   destination: '/expenses',

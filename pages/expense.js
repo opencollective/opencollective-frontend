@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
@@ -140,6 +141,7 @@ class ExpensePage extends React.Component {
         tag: PropTypes.string,
       }),
     ),
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -256,13 +258,10 @@ class ExpensePage extends React.Component {
     });
 
     const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
-    Router.pushRoute(`expense-v2`, {
-      parentCollectiveSlug,
-      collectiveSlug,
-      collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined,
-      ExpenseId: legacyExpenseId,
-      createSuccess: true,
-    });
+    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
+    this.props.router.push(
+      `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}?createSuccess=true`,
+    );
   }
 
   onSummarySubmit = async () => {
@@ -358,14 +357,10 @@ class ExpensePage extends React.Component {
     // Replaces the route by the version without `createSuccess=true`
     const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
     this.setState({ successMessageDismissed: true });
-    return Router.replaceRoute(
-      `expense-v2`,
-      {
-        parentCollectiveSlug,
-        collectiveSlug,
-        collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.expense?.account) : undefined,
-        ExpenseId: legacyExpenseId,
-      },
+    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.expense?.account) : undefined;
+    return this.props.router.replace(
+      `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}`,
+      undefined,
       {
         shallow: true, // Do not re-fetch data, do not loose state
       },
@@ -721,5 +716,5 @@ const addVerifyExpenseMutation = graphql(verifyExpenseMutation, {
 });
 
 export default injectIntl(
-  addVerifyExpenseMutation(addExpensePageData(withApollo(withUser(addEditExpenseMutation(ExpensePage))))),
+  addVerifyExpenseMutation(addExpensePageData(withApollo(withUser(withRouter(addEditExpenseMutation(ExpensePage)))))),
 );

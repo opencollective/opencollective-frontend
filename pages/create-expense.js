@@ -13,7 +13,6 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -186,12 +185,10 @@ class CreateExpensePage extends React.Component {
       // Redirect to the expense page
       const legacyExpenseId = result.data.draftExpenseAndInviteUser.legacyId;
       const { collectiveSlug, parentCollectiveSlug, data } = this.props;
-      await Router.pushRoute(`expense-v2`, {
-        parentCollectiveSlug,
-        collectiveSlug,
-        collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined,
-        ExpenseId: legacyExpenseId,
-      });
+      const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
+      await this.props.router.push(
+        `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}`,
+      );
     } else {
       this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
     }
@@ -216,13 +213,10 @@ class CreateExpensePage extends React.Component {
       // Redirect to the expense page
       const legacyExpenseId = result.data.createExpense.legacyId;
       const { collectiveSlug, parentCollectiveSlug, data } = this.props;
-      Router.pushRoute(`expense-v2`, {
-        parentCollectiveSlug,
-        collectiveSlug,
-        collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined,
-        ExpenseId: legacyExpenseId,
-        createSuccess: true,
-      });
+      const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
+      this.props.router.push(
+        `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}?createSuccess=true`,
+      );
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
     }

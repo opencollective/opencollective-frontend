@@ -8,11 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes()
   .add(
-    'expense-v2',
-    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
-    'expense',
-  )
-  .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
     'expenses',
