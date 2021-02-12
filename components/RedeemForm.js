@@ -80,7 +80,7 @@ class RedeemForm extends React.Component {
           {!LoggedInUser && (
             <FormattedMessage
               id="redeem.card.info"
-              defaultMessage="It\'s easy! Just enter your name, email address, and gift card code. We will create an account for you if you don't already have one. Then you'll be able to select the gift card balance as the payment method when making a contribution."
+              defaultMessage="It's easy! Just enter your name, email address, and gift card code. We will create an account for you if you don't already have one. Then you'll be able to select the gift card balance as the payment method when making a contribution."
             />
           )}
           {LoggedInUser && (

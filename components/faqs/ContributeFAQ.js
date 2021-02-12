@@ -69,7 +69,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
       <Content>
         <FormattedMessage
           id="createProfile.faq.persoVsOrg.content"
-          defaultMessage="Organizations represent a company or entity, while individual profiles represent a person. Organization profiles can have multiple team members (individual profiles) who have access to edit it and make financial contributions in its name. If a contribution or expense is for a company, it\'s important to use an organization profile so the correct billing information shows up on receipts and invoices. Organizations can also issue gift cards."
+          defaultMessage="Organizations represent a company or entity, while individual profiles represent a person. Organization profiles can have multiple team members (individual profiles) who have access to edit it and make financial contributions in its name. If a contribution or expense is for a company, it's important to use an organization profile so the correct billing information shows up on receipts and invoices. Organizations can also issue gift cards."
         />
       </Content>
     </Entry>
