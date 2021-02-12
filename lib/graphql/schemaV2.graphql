@@ -5194,6 +5194,11 @@ type Mutation {
     A message to attach for the host to review the application
     """
     message: String
+
+    """
+    Further information about collective applying to host
+    """
+    applicationData: JSON
   ): Account!
 
   """
