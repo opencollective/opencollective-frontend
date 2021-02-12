@@ -15,7 +15,14 @@ const CollapsableText = ({ text, maxLength }) => {
     return (
       <span>
         {truncate(text, { length: maxLength })}{' '}
-        <StyledLink href="#" onClick={() => setCollapsed(false)}>
+        <StyledLink
+          href="#"
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            setCollapsed(false);
+          }}
+        >
           <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
         </StyledLink>
       </span>
@@ -24,7 +31,14 @@ const CollapsableText = ({ text, maxLength }) => {
     return (
       <span>
         {text}{' '}
-        <StyledLink href="#" onClick={() => setCollapsed(true)}>
+        <StyledLink
+          href="#"
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            setCollapsed(true);
+          }}
+        >
           <FormattedMessage id="Hide" defaultMessage="Hide" />
         </StyledLink>
       </span>
