@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, mapValues } from 'lodash';
+import NextLink from 'next/link';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -11,7 +13,6 @@ import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
-import { Router } from '../server/pages';
 
 import Body from '../components/Body';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
@@ -23,7 +24,6 @@ import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
-import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -106,6 +106,7 @@ class TransactionsPage extends React.Component {
     transactionsData: PropTypes.object,
     LoggedInUser: PropTypes.object,
     query: PropTypes.object,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -199,7 +200,10 @@ class TransactionsPage extends React.Component {
                 <SearchBar
                   defaultValue={query.searchTerm}
                   onSubmit={searchTerm =>
-                    Router.pushRoute('transactions', { ...query, searchTerm, offset: null, collectiveSlug: slug })
+                    this.props.router.push({
+                      pathname: `${slug}/transactions`,
+                      query: { ...query, searchTerm, offset: null },
+                    })
                   }
                 />
               </Box>
@@ -215,14 +219,16 @@ class TransactionsPage extends React.Component {
               <TransactionsFilters
                 filters={query}
                 collective={collective}
-                onChange={queryParams =>
-                  Router.pushRoute('transactions', {
-                    ...query,
-                    ...queryParams,
-                    collectiveSlug: slug,
-                    offset: null,
-                  })
-                }
+                onChange={queryParams => {
+                  this.props.router.push({
+                    pathname: `${slug}/transactions`,
+                    query: {
+                      ...query,
+                      ...queryParams,
+                      offset: null,
+                    },
+                  });
+                }}
               />
               <Flex>
                 {canDownloadInvoices && (
@@ -246,17 +252,18 @@ class TransactionsPage extends React.Component {
                     values={{
                       ResetLink(text) {
                         return (
-                          <Link
+                          <NextLink
                             data-cy="reset-transactions-filters"
-                            route="transactions"
-                            params={{
-                              ...mapValues(query, () => null),
-                              collectiveSlug: collective.slug,
-                              view: 'transactions',
+                            href={{
+                              pathname: `${collective.slug}/transactions`,
+                              query: {
+                                ...mapValues(query, () => null),
+                                view: 'transactions',
+                              },
                             }}
                           >
-                            {text}
-                          </Link>
+                            <span>{text}</span>
+                          </NextLink>
                         );
                       },
                     }}
@@ -304,4 +311,4 @@ const addTransactionsData = graphql(transactionsPageQuery, {
   },
 });
 
-export default withUser(addTransactionsData(addCollectiveCoverData(TransactionsPage)));
+export default withUser(addTransactionsData(addCollectiveCoverData(withRouter(TransactionsPage))));

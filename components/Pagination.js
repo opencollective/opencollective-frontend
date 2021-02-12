@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
 import { Flex } from './Grid';
-import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 
@@ -40,15 +40,14 @@ const Pagination = ({ route, limit, offset, total, scrollToTopOnChange, isDisabl
   return (
     <Flex alignItems="center">
       {currentPage > 1 && (
-        <Link
-          route={route || router.route.slice(1)}
+        <NextLink
+          href={{ pathname: route || router.route.slice(1), query: { ...router.query, offset: offset - limit } }}
           scroll={scrollToTopOnChange}
-          params={{ ...router.query, offset: offset - limit }}
         >
           <StyledButton buttonSize="small" disabled={isDisabled}>
             <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
           </StyledButton>
-        </Link>
+        </NextLink>
       )}
       <Container display="inline-block" mx={2}>
         <FormattedMessage
@@ -78,15 +77,14 @@ const Pagination = ({ route, limit, offset, total, scrollToTopOnChange, isDisabl
         />
       </Container>
       {currentPage < totalPages && (
-        <Link
-          route={route || router.route.slice(1)}
+        <NextLink
+          href={{ pathname: route || router.route.slice(1), query: { ...router.query, offset: offset + limit } }}
           scroll={scrollToTopOnChange}
-          params={{ ...router.query, offset: offset + limit }}
         >
           <StyledButton buttonSize="small" disabled={isDisabled}>
             <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
           </StyledButton>
-        </Link>
+        </NextLink>
       )}
     </Flex>
   );

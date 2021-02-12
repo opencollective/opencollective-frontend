@@ -158,7 +158,7 @@ class TopBarProfileMenu extends React.Component {
         justifyContent="space-between"
         alignItems="center"
       >
-        <Link route={`/${get(membership, 'collective.slug')}`} passHref>
+        <NextLink href={`/${get(membership, 'collective.slug')}`} passHref>
           <StyledLink
             title={this.tooltip(membership)}
             color="black.700"
@@ -175,7 +175,7 @@ class TopBarProfileMenu extends React.Component {
               </P>
             </Flex>
           </StyledLink>
-        </Link>
+        </NextLink>
         {isAdmin && (
           <NextLink href={`${membership.collective.slug}/edit`} passHref>
             <StyledLink color="black.500" title={intl.formatMessage(this.messages.settings)}>
@@ -311,11 +311,11 @@ class TopBarProfileMenu extends React.Component {
                 </Link>
               </ListItem>
               <ListItem py={1}>
-                <Link route="transactions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+                <NextLink href={`${LoggedInUser.username}/transactions`} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     {capitalize(intl.formatMessage(this.messages['menu.transactions']))}
                   </StyledLink>
-                </Link>
+                </NextLink>
               </ListItem>
               <ListItem py={1}>
                 <Link route="applications" passHref>

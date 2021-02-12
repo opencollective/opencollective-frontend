@@ -203,9 +203,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                   <Box as="ul" p={0} m={0} minWidth={184}>
                     {callsToAction.hasDashboard && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
-                        <StyledLink as={NextLink} href={`${collective.slug}/dashboard`} p={ITEM_PADDING}>
-                          <Dashboard size="20px" />
-                          <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                        <StyledLink as={NextLink} href={`${collective.slug}/dashboard`}>
+                          <Container p={ITEM_PADDING}>
+                            <Dashboard size="20px" />
+                            <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
@@ -289,11 +291,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
-                        <StyledLink as={NextLink} href={`${collective.slug}/contact`} p={ITEM_PADDING}>
-                          <span>
+                        <StyledLink as={NextLink} href={`${collective.slug}/contact`}>
+                          <Container p={ITEM_PADDING}>
                             <Envelope size="20px" />
                             <FormattedMessage id="Contact" defaultMessage="Contact" />
-                          </span>
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}

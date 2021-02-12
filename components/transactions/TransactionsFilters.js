@@ -27,7 +27,9 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
     inputId: `transactions-filter-${name}`,
     value: filters?.[name],
     onChange: value => {
-      onChange({ ...filters, [name]: value === 'ALL' ? null : value });
+      const obj = { ...filters, [name]: value === 'ALL' ? null : value };
+      Object.keys(obj).forEach(k => !obj[k] && obj[k] !== undefined && delete obj[k]);
+      onChange(obj);
     },
   });
 

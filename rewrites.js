@@ -126,10 +126,10 @@ exports.REWRITES = [
     source: '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations)?',
     destination: '/host.dashboard',
   },
-  // {
-  //   source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions',
-  //   destination: '/transactions',
-  // },
+  {
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions',
+    destination: '/transactions',
+  },
 
   // {
   //   source: '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new',

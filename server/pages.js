@@ -7,7 +7,6 @@
 const routes = require('next-routes');
 
 const pages = routes()
-  .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions')
   .add('create-expense', '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new')
   .add(
     'expense-v2',
