@@ -27,12 +27,16 @@ const EditTag = styled(StyledTag)`
   border-color: ${props => props.theme.colors.black[200]};
   color: ${props => props.theme.colors.black[700]};
 
-  &:hover {
+  &:hover,
+  &:focus {
     background-color: ${props => props.theme.colors.white.full};
     border-color: ${props => props.theme.colors.blue[500]};
     svg {
       color: ${props => props.theme.colors.blue[500]};
     }
+  }
+  &:focus {
+    outline: 0;
   }
 
   ${props =>
@@ -84,12 +88,12 @@ const TagActionButton = styled.button`
   border: none;
   padding: 5px;
   line-height: inherit;
-  outline: none;
 `;
 
 const AddTagButton = styled(TagActionButton)`
   color: ${props => props.theme.colors.blue[400]};
-  &:hover {
+  &:hover,
+  &:focus {
     color: ${props => props.theme.colors.blue[600]};
   }
 `;
@@ -192,6 +196,13 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                 mb="4px"
                 active={isOpen}
                 onClick={handleToggleInput}
+                tabIndex={0}
+                onKeyDown={e => {
+                  if (e.key === ' ') {
+                    e.preventDefault();
+                    handleToggleInput();
+                  }
+                }}
               >
                 <TagIcon size="14px" />{' '}
                 {tags?.length > 0 ? formatMessage(messages.editLabel) : formatMessage(messages.addLabel)}
@@ -210,7 +221,14 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                   zIndex: 9999,
                 }}
               >
-                <StyledCard m={1} overflow="auto" {...props} ref={scrollerRef} boxShadow="0px 4px 10px #C4C7CC">
+                <StyledCard
+                  m={1}
+                  overflow="auto"
+                  overflowY="scroll"
+                  {...props}
+                  ref={scrollerRef}
+                  boxShadow="0px 4px 10px #C4C7CC"
+                >
                   <InputWrapper color="black.400">
                     <TagIcon size="16px" />
                     <Input
@@ -236,6 +254,12 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                               onClick={() => {
                                 addTag(st);
                               }}
+                              onBlur={() => {
+                                if (st === suggestedTags[suggestedTags.length - 1]) {
+                                  handleToggleInput();
+                                }
+                              }}
+                              tabindex="0"
                             >
                               <Plus size="10px" />
                             </AddTagButton>
