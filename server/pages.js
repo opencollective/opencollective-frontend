@@ -8,12 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes();
 
-// New Create Collective Flow
-pages.add(
-  'create-collective',
-  '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
-);
-
 // Events and Projects using collective page
 pages.add('event', '/:parentCollectiveSlug/events/:slug', 'collective-page');
 pages.add('project', '/:parentCollectiveSlug/projects/:slug', 'collective-page');

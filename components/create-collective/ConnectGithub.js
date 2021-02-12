@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
+import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { getGithubRepos } from '../../lib/api';
-import { Router } from '../../server/pages';
 
 import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -68,7 +67,7 @@ class ConnectGithub extends React.Component {
       verb: this.props.router.query.verb,
       hostCollectiveSlug: this.props.router.query.hostCollectiveSlug || undefined,
     };
-    await Router.pushRoute('create-collective', params);
+    await this.props.router.push({pathname: 'create-collective', query: params});
     window.scrollTo(0, 0);
   };
 
@@ -116,17 +115,9 @@ class ConnectGithub extends React.Component {
                 defaultMessage="Want to apply using {altverification}? {applylink}."
                 values={{
                   applylink: (
-                    <Link
-                      route="create-collective"
-                      params={{
-                        hostCollectiveSlug: 'opensource',
-                        verb: 'apply',
-                        step: 'form',
-                        hostTos: true,
-                      }}
-                    >
+                    <NextLink href={{pathname: `opensource/apply/form`, query: {hostTos: true}}}>
                       <FormattedMessage id="clickHere" defaultMessage="Click here" />
-                    </Link>
+                    </NextLink>
                   ),
                   altverification: (
                     <StyledLink href="https://www.oscollective.org/#criteria" openInNewTab>

@@ -160,12 +160,12 @@ exports.REWRITES = [
     destination: '/create-fund',
   },
 
-  // // New Create Collective Flow
-  // {
-  //   source:
-  //     '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
-  //   destination: '/create-collective',
-  // },
+  // New Create Collective Flow
+  {
+    source:
+      '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
+    destination: '/create-collective',
+  },
   // // Events and Projects using collective page
   // {
   //   source: '/:parentCollectiveSlug/events/:slug',
