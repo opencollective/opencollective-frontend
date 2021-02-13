@@ -97,7 +97,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
       </Flex>
       <Container my={4} display="flex" flexDirection="column" alignItems="center">
         <H3 color="black.700" textAlign="center" fontSize="16px" lineHeight="26px" letterSpacing="-0.008em">
-          <FormattedMessage id="pricing.applyFiscalHost" defaultMessage="Apply to a fiscal host" />
+          <FormattedMessage id="pricing.applyFiscalHost" defaultMessage="Apply to a Fiscal Host" />
         </H3>
         <HostsWrapper width={1} justifyContent={['start', null, 'center']} py={4}>
           {hosts.map(collective => (
@@ -153,7 +153,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
         </HostsWrapper>
         <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
           <StyledLink href={'/hosts'}>
-            <FormattedMessage id="pricing.fiscalHost.more" defaultMessage="See more fiscal hosts" />
+            <FormattedMessage id="pricing.fiscalHost.more" defaultMessage="See more Fiscal Hosts" />
           </StyledLink>
         </P>
       </Container>

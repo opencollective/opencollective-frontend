@@ -14,7 +14,7 @@ const BlockedContributorMessage = ({ categories, collective }) => {
     <MessageBox type="warning" withIcon>
       <FormattedMessage
         id="NewContributionFlow.BlockedContributor.Details"
-        defaultMessage="{collective} has requested not to receive donations from this account because it has been categorized as: {categories}"
+        defaultMessage="{collective} has disallowed contributions from this account because it has been categorized as: {categories}"
         values={{
           collective: collective.name,
           categories: (

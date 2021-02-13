@@ -19,7 +19,7 @@ describe('host dashboard', () => {
       cy.getByDataCy('checkbox-tos').click();
       cy.wait(300);
       cy.get('button[type="submit"]').click();
-      cy.contains('The Cavies United Collective has been created!');
+      cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
       cy.get('[data-cy="host-dashboard-menu-bar"]').contains('Pending applications').click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();

@@ -9,11 +9,11 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
 import styled from 'styled-components';
 
-import { confettiFireworks } from '../../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
 
+import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import Loading from '../../Loading';
@@ -48,7 +48,7 @@ const content = () => (
     <P fontSize="12px" lineHeight="18px">
       <FormattedMessage
         id="TwoFactorAuth.Setup.AppInfo"
-        defaultMessage="You can use apps such as Google Authenticator, Authy, 1Password, LastPass, or Microsoft Authenticator to scan the QR code and receive a code to input."
+        defaultMessage="You can use 2FA apps such as Google Authenticator, Authy, 1Password, LastPass, or Microsoft Authenticator to scan the QR code."
       />
     </P>
   </div>
@@ -64,7 +64,7 @@ const Code = styled.code`
   color: ${props => props.theme.colors.black[700]};
 `;
 
-class SetupTwoFactorAuth extends React.Component {
+class UserTwoFactorAuth extends React.Component {
   static propTypes = {
     /** From intl */
     intl: PropTypes.object.isRequired,
@@ -86,6 +86,9 @@ class SetupTwoFactorAuth extends React.Component {
       error: null,
       disablingTwoFactorAuth: false,
       disableError: null,
+      recoveryCodes: null,
+      enablingTwoFactorAuth: false,
+      showRecoveryCodesModal: false,
     };
 
     this.enableTwoFactorAuth = this.enableTwoFactorAuth.bind(this);
@@ -142,10 +145,10 @@ class SetupTwoFactorAuth extends React.Component {
               token: this.state.base32,
             },
           })
-          .then(() => {
-            confettiFireworks(2000, { zIndex: 3000 });
+          .then(data => {
+            this.setState({ recoveryCodes: get(data, 'data.addTwoFactorAuthTokenToIndividual.recoveryCodes') });
           });
-        this.setState({ error: null });
+        this.setState({ error: null, enablingTwoFactorAuth: true });
       }
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
@@ -175,7 +178,17 @@ class SetupTwoFactorAuth extends React.Component {
 
   render() {
     const { intl, data } = this.props;
-    const { error, disableError, secret, base32, otpauth_url, disablingTwoFactorAuth } = this.state;
+    const {
+      error,
+      disableError,
+      secret,
+      base32,
+      otpauth_url,
+      disablingTwoFactorAuth,
+      enablingTwoFactorAuth,
+      recoveryCodes,
+      showRecoveryCodesModal,
+    } = this.state;
 
     const { loading } = data;
 
@@ -219,7 +232,7 @@ class SetupTwoFactorAuth extends React.Component {
           </MessageBox>
         )}
         <Flex flexDirection="column">
-          {doesAccountAlreadyHave2FA ? (
+          {doesAccountAlreadyHave2FA && !enablingTwoFactorAuth ? (
             <Fragment>
               <Flex alignItems="center" mb={3}>
                 <MessageBox type="success" withIcon data-cy="add-two-factor-auth-success">
@@ -324,112 +337,208 @@ class SetupTwoFactorAuth extends React.Component {
             </Fragment>
           ) : (
             <Fragment>
-              <P>
-                <FormattedMessage
-                  id="TwoFactorAuth.Setup.Info"
-                  defaultMessage="Two-factor authentication adds an extra layer of security for your account when logging in."
-                />
-              </P>
-              <Container>
-                <Box>
-                  <Flex alignItems="center" mt={3}>
-                    <H3 fontSize="15px" mr={1}>
-                      <FormattedMessage
-                        id="TwoFactorAuth.Setup.StepOne"
-                        defaultMessage="Step one: scan this QR code with an authenticator app"
-                      />
-                    </H3>
-                    <StyledTooltip content={content}>
-                      <Info size={16} />
-                    </StyledTooltip>
-                  </Flex>
-                  {secret ? (
-                    <Flex flexDirection="column">
-                      <QRCode value={otpauth_url} renderAs="svg" size={256} level="L" includeMargin data-cy="qr-code" />
-                      <TokenBox maxWidth={350} data-cy="manual-entry-2fa-token">
-                        <P>
-                          <FormattedMessage
-                            id="TwoFactorAuth.Setup.ManualEntry"
-                            defaultMessage="Manual entry: {token}"
-                            values={{
-                              token: <Code>{base32}</Code>,
-                            }}
-                          />
-                        </P>
-                      </TokenBox>
-                    </Flex>
-                  ) : (
-                    <LoadingPlaceholder height={256} width={256} />
-                  )}
-                </Box>
-                <Box mt={3}>
-                  <H3 fontSize="15px">
+              {recoveryCodes ? (
+                <Fragment>
+                  <P>
                     <FormattedMessage
-                      id="TwoFactorAuth.Setup.StepTwo"
-                      defaultMessage="Step two: enter the code from your authentication app"
+                      id="TwoFactorAuth.Setup.RecoveryCodes.Info"
+                      defaultMessage="Recovery codes are used to access your account in case you can't access it with your authenticator app (for example, if you have lost your phone). Each code can only be used once. Save your 2FA recovery codes in a safe place, like a password manager app."
                     />
-                  </H3>
+                  </P>
                   <Container>
-                    <Formik
-                      validate={validate}
-                      initialValues={initialSetupFormValues}
-                      onSubmit={this.enableTwoFactorAuth}
-                    >
-                      {formik => {
-                        const { values, handleSubmit, errors, touched, isSubmitting } = formik;
-
-                        return (
-                          <Form>
-                            <StyledInputField
-                              name="twoFactorAuthenticatorCode"
-                              htmlFor="twoFactorAuthenticatorCode"
-                              error={touched.twoFactorAuthenticatorCode && errors.twoFactorAuthenticatorCode}
-                              label={intl.formatMessage(messages.inputLabel)}
-                              value={values.twoFactorAuthenticatorCode}
-                              required
-                              mt={2}
-                              mb={3}
-                            >
-                              {inputProps => (
-                                <Field
-                                  as={StyledInput}
-                                  {...inputProps}
-                                  minWidth={300}
-                                  maxWidth={350}
-                                  minHeight={60}
-                                  fontSize="20px"
-                                  lineHeight="28px"
-                                  placeholder="123456"
-                                  pattern="[0-9]{6}"
-                                  inputMode="numeric"
-                                  autoFocus
-                                  data-cy="add-two-factor-auth-totp-code-field"
-                                />
-                              )}
-                            </StyledInputField>
-
-                            <Flex justifyContent={['center', 'left']} mb={4}>
-                              <StyledButton
-                                fontSize="13px"
-                                minWidth="148px"
-                                minHeight="36px"
-                                buttonStyle="primary"
-                                type="submit"
-                                onSubmit={handleSubmit}
-                                loading={isSubmitting}
-                                disabled={values.twoFactorAuthenticatorCode.length < 6}
-                                data-cy="add-two-factor-auth-totp-code-button"
-                              >
-                                <FormattedMessage id="TwoFactorAuth.Setup.Form.VerifyButton" defaultMessage="Verify" />
-                              </StyledButton>
+                    <Box>
+                      <Flex alignItems="center" mt={3}>
+                        <H3 fontSize="15px" mr={1}>
+                          <FormattedMessage
+                            id="TwoFactorAuth.Setup.StepThree"
+                            defaultMessage="Step three: save your recovery codes"
+                          />
+                        </H3>
+                      </Flex>
+                      <Container
+                        display="flex"
+                        flexWrap="wrap"
+                        p={2}
+                        border="2px solid black"
+                        borderRadius={8}
+                        my={3}
+                        data-cy="recovery-codes-container"
+                      >
+                        {recoveryCodes.map(code => {
+                          return (
+                            <Flex key={code} flex="1 1 250px" my={2} alignItems="center" justifyContent="center">
+                              <P fontSize="20px" fontWeight="700">
+                                {code}
+                              </P>
                             </Flex>
-                          </Form>
-                        );
-                      }}
-                    </Formik>
+                          );
+                        })}
+                      </Container>
+                      <Container>
+                        <Flex justifyContent={['center', 'left']} mb={4}>
+                          <StyledButton
+                            fontSize="13px"
+                            minWidth="148px"
+                            minHeight="36px"
+                            buttonStyle="primary"
+                            onClick={() => this.setState({ showRecoveryCodesModal: true })}
+                            loading={showRecoveryCodesModal}
+                            data-cy="add-two-factor-auth-confirm-recovery-codes-button"
+                          >
+                            <FormattedMessage
+                              id="TwoFactorAuth.Setup.Form.FinishSetup"
+                              defaultMessage="Finish 2FA setup"
+                            />
+                          </StyledButton>
+                        </Flex>
+                      </Container>
+                    </Box>
                   </Container>
-                </Box>
-              </Container>
+                  <ConfirmationModal
+                    show={showRecoveryCodesModal}
+                    isDanger
+                    type="confirm"
+                    onClose={() => this.setState({ showRecoveryCodesModal: false })}
+                    continueHandler={() =>
+                      this.setState({
+                        recoveryCodes: null,
+                        enablingTwoFactorAuth: false,
+                        showRecoveryCodesModal: false,
+                      })
+                    }
+                    header={
+                      <FormattedMessage
+                        id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Header"
+                        defaultMessage="Are you sure?"
+                      />
+                    }
+                  >
+                    <FormattedMessage
+                      id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body"
+                      defaultMessage="Once you click 'Confirm', you will no longer have access to your recovery codes."
+                    />
+                  </ConfirmationModal>
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <P>
+                    <FormattedMessage
+                      id="TwoFactorAuth.Setup.Info"
+                      defaultMessage="Two-factor authentication adds an extra layer of security for your account when logging in."
+                    />
+                  </P>
+                  <Container>
+                    <Box>
+                      <Flex alignItems="center" mt={3}>
+                        <H3 fontSize="15px" mr={1}>
+                          <FormattedMessage
+                            id="TwoFactorAuth.Setup.StepOne"
+                            defaultMessage="Step one: scan this QR code with an authenticator app"
+                          />
+                        </H3>
+                        <StyledTooltip content={content}>
+                          <Info size={16} />
+                        </StyledTooltip>
+                      </Flex>
+                      {secret ? (
+                        <Flex flexDirection="column">
+                          <QRCode
+                            value={otpauth_url}
+                            renderAs="svg"
+                            size={256}
+                            level="L"
+                            includeMargin
+                            data-cy="qr-code"
+                          />
+                          <TokenBox maxWidth={350} data-cy="manual-entry-2fa-token">
+                            <P>
+                              <FormattedMessage
+                                id="TwoFactorAuth.Setup.ManualEntry"
+                                defaultMessage="Manual entry: {token}"
+                                values={{
+                                  token: <Code>{base32}</Code>,
+                                }}
+                              />
+                            </P>
+                          </TokenBox>
+                        </Flex>
+                      ) : (
+                        <LoadingPlaceholder height={256} width={256} />
+                      )}
+                    </Box>
+                    <Box mt={3}>
+                      <H3 fontSize="15px">
+                        <FormattedMessage
+                          id="TwoFactorAuth.Setup.StepTwo"
+                          defaultMessage="Step two: enter the code from your authentication app"
+                        />
+                      </H3>
+                      <Container>
+                        <Formik
+                          validate={validate}
+                          initialValues={initialSetupFormValues}
+                          onSubmit={this.enableTwoFactorAuth}
+                        >
+                          {formik => {
+                            const { values, handleSubmit, errors, touched, isSubmitting } = formik;
+
+                            return (
+                              <Form>
+                                <StyledInputField
+                                  name="twoFactorAuthenticatorCode"
+                                  htmlFor="twoFactorAuthenticatorCode"
+                                  error={touched.twoFactorAuthenticatorCode && errors.twoFactorAuthenticatorCode}
+                                  label={intl.formatMessage(messages.inputLabel)}
+                                  value={values.twoFactorAuthenticatorCode}
+                                  required
+                                  mt={2}
+                                  mb={3}
+                                >
+                                  {inputProps => (
+                                    <Field
+                                      as={StyledInput}
+                                      {...inputProps}
+                                      minWidth={300}
+                                      maxWidth={350}
+                                      minHeight={60}
+                                      fontSize="20px"
+                                      lineHeight="28px"
+                                      placeholder="123456"
+                                      pattern="[0-9]{6}"
+                                      inputMode="numeric"
+                                      autoFocus
+                                      data-cy="add-two-factor-auth-totp-code-field"
+                                    />
+                                  )}
+                                </StyledInputField>
+
+                                <Flex justifyContent={['center', 'left']} mb={4}>
+                                  <StyledButton
+                                    fontSize="13px"
+                                    minWidth="148px"
+                                    minHeight="36px"
+                                    buttonStyle="primary"
+                                    type="submit"
+                                    onSubmit={handleSubmit}
+                                    loading={isSubmitting}
+                                    disabled={values.twoFactorAuthenticatorCode.length < 6}
+                                    data-cy="add-two-factor-auth-totp-code-button"
+                                  >
+                                    <FormattedMessage
+                                      id="TwoFactorAuth.Setup.Form.VerifyButton"
+                                      defaultMessage="Verify & see recovery codes"
+                                    />
+                                  </StyledButton>
+                                </Flex>
+                              </Form>
+                            );
+                          }}
+                        </Formik>
+                      </Container>
+                    </Box>
+                  </Container>
+                </Fragment>
+              )}
             </Fragment>
           )}
         </Flex>
@@ -441,10 +550,13 @@ class SetupTwoFactorAuth extends React.Component {
 const addTwoFactorAuthToIndividualMutation = gqlV2/* GraphQL */ `
   mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
     addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
-      id
-      ... on Individual {
-        hasTwoFactorAuth
+      account {
+        id
+        ... on Individual {
+          hasTwoFactorAuth
+        }
       }
+      recoveryCodes
     }
   }
 `;
@@ -499,4 +611,4 @@ const addGraphql = compose(
   addAccountHasTwoFactorAuthData,
 );
 
-export default injectIntl(withUser(addGraphql(SetupTwoFactorAuth)));
+export default injectIntl(withUser(addGraphql(UserTwoFactorAuth)));

@@ -41,7 +41,7 @@ const msg = defineMessages({
   },
   grantSubjectPlaceholder: {
     id: `ExpenseForm.GrantSubjectPlaceholder`,
-    defaultMessage: 'i.e. research, software development, etc...',
+    defaultMessage: 'e.g. research, software development, etc...',
   },
   addNewReceipt: {
     id: 'ExpenseForm.AddReceipt',
@@ -365,7 +365,7 @@ const ExpenseFormBody = ({
             <P fontSize="12px" color="black.600">
               <FormattedMessage
                 id="Expense.PrivacyWarning"
-                defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
+                defaultMessage="This information is public. Do not put any private details in this field."
               />
             </P>
             <Field
@@ -410,7 +410,7 @@ const ExpenseFormBody = ({
                     description={
                       <FormattedMessage
                         id="UploadInvoiceDescription"
-                        defaultMessage="If you already have an invoice upload it here."
+                        defaultMessage="If you already have an invoice document, you can upload it here."
                       />
                     }
                     onChange={files => formik.setFieldValue('attachedFiles', files)}
@@ -450,7 +450,7 @@ const ExpenseFormBody = ({
                     description={
                       <FormattedMessage
                         id="UploadDocumentationDescription"
-                        defaultMessage="If you want to include any documentation you can upload it here."
+                        defaultMessage="If you want to include any documentation, you can upload it here."
                       />
                     }
                     onChange={files => formik.setFieldValue('attachedFiles', files)}

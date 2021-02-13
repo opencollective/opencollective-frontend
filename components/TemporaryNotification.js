@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { position } from 'styled-system';
 
 import { Box } from './Grid';
@@ -20,7 +20,12 @@ const Notification = styled.div`
   align-items: center;
   z-index: 99;
   background: ${props => (props.type === 'error' ? themeGet('colors.red.600') : '#1869f5')};
-  ${position};
+  ${position}
+  ${props =>
+    props.position === 'absolute' &&
+    css`
+      left: 0;
+    `}
 `;
 
 const DismissButton = styled(StyledButton).attrs({

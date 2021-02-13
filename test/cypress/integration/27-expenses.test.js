@@ -219,7 +219,10 @@ describe('New expense flow', () => {
 
         cy.getByDataCy('expense-status-msg').should('contain', 'DRAFT');
         cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
-        cy.getByDataCy('expense-draft-banner').should('contain', `An email has been sent to ${inviteeEmail}`);
+        cy.getByDataCy('expense-draft-banner').should(
+          'contain',
+          `An invitation to submit this expense has been sent to ${inviteeEmail}`,
+        );
         cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
 
         // Log out and submit as invitee...

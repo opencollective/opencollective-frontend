@@ -46,7 +46,7 @@ class CreateOrganization extends React.Component {
   async createOrganization(organization) {
     if (!organization.authorization) {
       this.setState({
-        result: { error: 'Please verify that you are an authorized representative of this organization' },
+        result: { error: 'Verify that you are an authorized organization representative' },
       });
       return;
     }

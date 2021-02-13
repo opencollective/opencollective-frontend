@@ -15,13 +15,13 @@ const GithubRepositoriesFAQ = props => (
       <Title>
         <FormattedMessage
           id="GithubRepositories.faq.host.title"
-          defaultMessage="Where is my collective going to be hosted (fiscal sponsored)?"
+          defaultMessage="Who will hold money for my Collective?"
         />
       </Title>
       <Content>
         <FormattedMessage
           id="GithubRepositories.faq.host.content"
-          defaultMessage="We have created a non profit, the Open Source Collective 501c6 in the United States to act as a fiscal sponsor to host all open source projects. This makes it easy for companies to donate to your project since they can receive one consolidated invoice."
+          defaultMessage="Open Source Collective 501(c)(6) is a US non-profit that was created to serve as Fiscal Host (aka fiscal sponsor) to open source projects using Open Collective. Learn more about OSC at https://oscollective.org."
         />
       </Content>
     </Entry>
@@ -32,7 +32,7 @@ const GithubRepositoriesFAQ = props => (
       <Content>
         <FormattedMessage
           id="GithubRepositories.faq.cost.content"
-          defaultMessage="The Open Source Collective 501c6 is taking 5% of all donation received (on top of the 5% for the Open Collective platform). This is to cover the administrative overhead, accounting, legal. That way you never have to worry about all that boring stuff and you can focus on your project."
+          defaultMessage="The fee is 10% of funds raised. This fee covers overheads like accounting, banking, legal, admin, and liability, so you don't have to set up your own foundation or take risk on personally."
         />
       </Content>
     </Entry>
@@ -46,7 +46,7 @@ const GithubRepositoriesFAQ = props => (
       <Content>
         <FormattedMessage
           id="GithubRepositories.faq.repoStar.content"
-          defaultMessage="In order to provide fiscal sponsorship to a project, we need to ensure that there is a community around it. If you don’t fit 100 GitHub stars requirement, we will consider your application on a case by case basis, <criteria-link>using this criteria.</criteria-link> If you already have a legal entity (or know a legal entity that could host your collective), then you could directly host your collective independently. Please use the <for-any-community>For any Community</for-any-community> option when creating a collective. Note that in that case you will be responsible for doing the accounting as well as facilitating payments from sponsors. If you have a project with an existing community but don't use GitHub, apply via the <open-source>Open Source</open-source> option and select 'Request manual verification'."
+          defaultMessage="We need to ensure that your project is legitimate and has a community around it. If you don't fit the 100 star requirement, we can consider your application using <criteria-link>alternative criteria.</criteria-link> - select the 'Request manual verification' option instead of verifying through Github."
           values={{
             'criteria-link': function CriteriaLink(msg) {
               return (

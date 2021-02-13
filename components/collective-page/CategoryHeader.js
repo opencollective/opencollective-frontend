@@ -81,7 +81,7 @@ const getCategoryData = (intl, collective, category) => {
         info: (
           <FormattedMessage
             id="CollectivePage.SectionBudget.Description"
-            defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reimbursed and more!"
+            defaultMessage="See how funds circulate through {collectiveName}. Contributions and expenses are transparent. Learn where the money comes from and where it goes."
             values={{ collectiveName: collective.name }}
           />
         ),
@@ -120,12 +120,6 @@ const getCategoryData = (intl, collective, category) => {
       return {
         img: contributeSectionHeaderIcon,
         title: i18nNavbarCategory(intl, category),
-        subtitle: (
-          <FormattedMessage
-            id="CollectivePage.SectionContributions.Subtitle"
-            defaultMessage="How we are supporting other Collectives."
-          />
-        ),
       };
     default:
       return null;

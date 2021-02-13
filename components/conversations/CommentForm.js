@@ -33,7 +33,7 @@ const createCommentMutation = gqlV2/* GraphQL */ `
 const messages = defineMessages({
   placeholder: {
     id: 'CommentForm.placeholder',
-    defaultMessage: 'Type in your message...',
+    defaultMessage: 'Type your message...',
   },
   postReply: {
     id: 'CommentForm.PostReply',

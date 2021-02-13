@@ -110,7 +110,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   </Span>
                 )}
               </P>
-              <P mt="5px" fontSize="12px" lineHeight="16px" color="black.600" data-cy="transaction-details">
+              <P mt="5px" fontSize="12px" lineHeight="16px" color="black.700" data-cy="transaction-details">
                 {hasOrder ? (
                   <FormattedMessage
                     id="Transaction.from"
@@ -170,10 +170,10 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               ml="auto"
             >
               <TransactionSign isCredit={isCredit} />
-              <Span fontWeight="bold" mr={1}>
+              <Span fontWeight="bold" color="black.900" mr={1}>
                 {formatCurrency(Math.abs(displayedAmount.valueInCents), displayedAmount.currency)}
               </Span>
-              <Span color="black.400" textTransform="uppercase">
+              <Span color="black.700" textTransform="uppercase">
                 {displayedAmount.currency}
               </Span>
             </Container>
@@ -307,7 +307,7 @@ TransactionItem.propTypes = {
     }),
     netAmountInCollectiveCurrency: PropTypes.number,
     refundTransaction: PropTypes.object,
-    usingVirtualCardFromCollective: PropTypes.object,
+    usingGiftCardFromCollective: PropTypes.object,
   }),
   collective: PropTypes.shape({
     id: PropTypes.number,

@@ -102,7 +102,7 @@ class Host extends React.Component {
           <p>
             <FormattedMessage
               id="editCollective.selfHost.label"
-              defaultMessage="{type, select, COLLECTIVE {Your Collective} FUND {Your Fund}} is receiving contributions directly, it doesn't use a Fiscal Host."
+              defaultMessage="{type, select, COLLECTIVE {Your Collective} FUND {Your Fund}} hold its own funds; it doesn't use a Fiscal Host."
               values={{
                 type: collective.type,
               }}
@@ -113,7 +113,7 @@ class Host extends React.Component {
               <p>
                 <FormattedMessage
                   id="editCollective.selfHost.balance"
-                  defaultMessage="It currently holds {balance}."
+                  defaultMessage="Current balance: {balance}."
                   values={{
                     balance: formatCurrency(collective.stats.balance, collective.currency),
                     type: collective.type,
@@ -121,7 +121,7 @@ class Host extends React.Component {
                 />{' '}
                 <FormattedMessage
                   id="editCollective.selfHost.change.balanceNotEmpty"
-                  defaultMessage="If you would like to change your Fiscal Host settings, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}}. You can do this by submitting and paying expenses."
+                  defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}} by submitting and paying expenses."
                   values={{
                     type: collective.type,
                   }}
@@ -138,10 +138,7 @@ class Host extends React.Component {
                   onClick={() => this.changeHost()}
                   className="removeHostBtn"
                 >
-                  <FormattedMessage
-                    id="editCollective.selfHost.removeBtn"
-                    defaultMessage="Reset Fiscal Host settings"
-                  />
+                  <FormattedMessage id="editCollective.selfHost.removeBtn" defaultMessage="Reset Fiscal Host" />
                 </StyledButton>
               </p>
             </Fragment>
@@ -165,7 +162,7 @@ class Host extends React.Component {
                   <p>
                     <FormattedMessage
                       id="editCollective.host.pending"
-                      defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed."
+                      defaultMessage="You applied to be hosted by {host} on {date}. Your application is being reviewed."
                       values={{
                         host: get(collective, 'host.name'),
                         date: formatDate(get(hostMembership, 'createdAt'), {
@@ -216,7 +213,7 @@ class Host extends React.Component {
                     <p>
                       <FormattedMessage
                         id="editCollective.host.change.balanceNotEmpty"
-                        defaultMessage="If you would like to change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}}. You can do this by submitting expenses, making financial contributions (select  {type, select, COLLECTIVE {your Collective} FUND {your Fund}} as 'Contribute As') or by donating to your Fiscal Host using the {emptyBalanceLink} feature."
+                        defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}}. You can do this by submitting expenses, making financial contributions, or sending the balance to your Fiscal Host using the {emptyBalanceLink} feature."
                         values={{
                           type: collective.type,
                           emptyBalanceLink: (
@@ -243,7 +240,7 @@ class Host extends React.Component {
                       <Fineprint>
                         <FormattedMessage
                           id="editCollective.host.change.removeFirst"
-                          defaultMessage="Once removed, {type, select, COLLECTIVE {your Collective} FUND {your Fund}} won't be able to accept financial contributions anymore. You will be able to apply to another Fiscal Host."
+                          defaultMessage="Without a Fiscal Host, {type, select, COLLECTIVE {your Collective} FUND {your Fund}} won't be able to accept financial contributions. You will be able to apply to another Fiscal Host."
                           values={{ type: collective.type }}
                         />
                       </Fineprint>
@@ -261,7 +258,7 @@ class Host extends React.Component {
                 <FormattedMessage
                   id="collective.editHost.header"
                   values={{ name }}
-                  defaultMessage={'Withdraw application from {name}'}
+                  defaultMessage={'Withdraw application to {name}'}
                 />
               )}
             </ModalHeader>
@@ -271,7 +268,7 @@ class Host extends React.Component {
                   <FormattedMessage
                     id="collective.editHost.withdrawApp"
                     values={{ name }}
-                    defaultMessage={'Are you sure you want to withdraw application from {name}?'}
+                    defaultMessage={'Are you sure you want to withdraw your application to {name}?'}
                   />
                 )}
                 {action === 'Remove' && (
@@ -361,11 +358,11 @@ class Host extends React.Component {
             </Box>
             <Box mb={4}>
               <OptionLabel htmlFor="host-radio-selfHost">
-                <FormattedMessage id="collective.edit.host.selfHost.title" defaultMessage="Ourselves" />
+                <FormattedMessage id="acceptContributions.picker.ourselves" defaultMessage="Ourselves" />
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.selfHost.description"
-                defaultMessage="No Fiscal Host, simply connect a bank account. You will be responsible for accounting, taxes, payments, and liability."
+                defaultMessage="Simply connect a bank account for a single Collective. You will be responsible for accounting, taxes, payments, and liability."
               />
               {selectedOption === 'selfHost' && LoggedInUser && (
                 <Flex justifyContent="space-between" alignItems="flex-end" mt={3}>
@@ -377,7 +374,7 @@ class Host extends React.Component {
                     >
                       <FormattedMessage
                         id="host.selfHost.confirm"
-                        defaultMessage="Yes, hold money ourselves, no Fiscal Host"
+                        defaultMessage="Yes, hold money for one Collective in our own bank account"
                       />
                     </StyledButton>
                   </Box>
@@ -412,11 +409,11 @@ class Host extends React.Component {
             </Box>
             <Box mb={4}>
               <OptionLabel htmlFor="host-radio-ownHost">
-                <FormattedMessage id="collective.edit.host.useOwn.title" defaultMessage="Our organization" />
+                <FormattedMessage id="acceptContributions.organization.subtitle" defaultMessage="Our organization" />
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.useOwn.description"
-                defaultMessage="Use an organization you own as Fiscal Host so you can host multiple collectives. The organization will be responsible for their accounting, taxes, payments, and liability."
+                defaultMessage="Create or select a Fiscal Host that you manage, to hold funds for multiple Collectives. The organization will be responsible for accounting, taxes, payments, and liability."
               />
               &nbsp;
               <a href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">
@@ -455,7 +452,7 @@ class Host extends React.Component {
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.findHost.description"
-                defaultMessage="You won't need to hold funds yourself, or set up a legal entity and bank account for your project. The Fiscal Host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the Host's page before confirming)."
+                defaultMessage="You won't need to hold funds or set up a legal entity and bank account for your project. The Fiscal Host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (which you can review before choosing a Host)."
               />
               {selectedOption === 'findHost' && (
                 <div>
@@ -463,7 +460,7 @@ class Host extends React.Component {
                     <H4 fontSize="13px" mr={2}>
                       <FormattedMessage
                         id="collective.edit.host.suggestedHosts.title"
-                        defaultMessage="Suggested hosts"
+                        defaultMessage="Suggested Hosts"
                       />
                     </H4>
                     <StyledLink as={Link} fontSize="13px" route="/hosts">
@@ -487,7 +484,7 @@ class Host extends React.Component {
                     empty={
                       <FormattedMessage
                         id="collective.edit.host.suggestedHosts.empty"
-                        defaultMessage="No suggestions. Please look at all available hosts or consider creating a new host."
+                        defaultMessage="No suggestions. Please look at all Hosts or consider creating a new one."
                       />
                     }
                   />

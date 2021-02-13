@@ -83,18 +83,18 @@ describe('Collective page', () => {
 
   describe('Contribute section', () => {
     it('Show tiers with default descriptions', () => {
-      const oneTimeContributionMsg = 'Make a custom one time or recurring contribution.';
+      const oneTimeContributionMsg = 'Make a custom one-time or recurring contribution.';
       cy.contains('#section-contribute', 'Custom contribution');
       cy.contains('#section-contribute', 'Donation');
       cy.contains('#section-contribute', oneTimeContributionMsg);
       cy.contains('#section-contribute', 'backer');
-      cy.contains('#section-contribute', 'Become a backer for $5.00 per month and help us sustain our activities!');
+      cy.contains('#section-contribute', 'Become a backer for $5.00 per month and support us');
       cy.contains('#section-contribute', 'sponsor');
-      cy.contains('#section-contribute', 'Become a sponsor for $100.00 per month and help us sustain our activities!');
+      cy.contains('#section-contribute', 'Become a sponsor for $100.00 per month and support us');
     });
 
     it('Has a link to show all tiers', () => {
-      cy.contains(`#section-contribute a[href="/${collectiveSlug}/contribute"]`, 'View all the ways to contribute');
+      cy.contains(`#section-contribute a[href="/${collectiveSlug}/contribute"]`, 'All ways to contribute');
     });
 
     it('Has a link to create new tiers and events if admin', () => {
@@ -143,7 +143,7 @@ describe('Collective page', () => {
     it('Can add description to about section', () => {
       const richDescription = 'Hello world!';
       scrollToSection(Sections.ABOUT);
-      cy.contains('#section-about button', 'Add a description').click();
+      cy.contains('#section-about button', 'Add description').click();
       // {ctrl}b fails on macos
       // {ctrl} maps control key & {meta} maps command key
       const ctrlOrMetaKey = Cypress.platform === 'darwin' ? '{meta}' : '{ctrl}';
@@ -185,8 +185,11 @@ describe('Collective page with euro currency', () => {
 
     it('Has button to view all transactions and expenses', () => {
       scrollToSection(Sections.BUDGET);
-      cy.get('[data-cy=view-all-transactions-btn]').should('be.visible');
-      cy.get('[data-cy=view-all-expenses-btn]').should('be.visible');
+      cy.get('[data-cy="section-budget"] [data-cy="filter-button expenses"]').click();
+      cy.get('[data-cy="section-budget"] [data-cy=view-all-expenses-link]').should('be.visible');
+
+      cy.get('[data-cy="section-budget"] [data-cy="filter-button transactions"]').click();
+      cy.get('[data-cy="section-budget"] [data-cy=view-all-transactions-link]').should('be.visible');
     });
   });
 });

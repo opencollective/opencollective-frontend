@@ -2,7 +2,7 @@
 
 Support is available from Monday to Friday. We usually answer in less than 24 hours.
 
-We have team members answering from the USA, France, Belgium, Germany and New Zealand.
+We have team members answering from the US, EU, and New Zealand.
 
 To contact support, write by email to:
 

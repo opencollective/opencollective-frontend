@@ -15,7 +15,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { maxWidth } from 'styled-system';
 
-import { getFilteredSectionsForCollective, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
+import { getContributeRoute } from '../../lib/collective.lib';
+import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
@@ -23,7 +24,7 @@ import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Avatar from '../Avatar';
-import { Dimensions } from '../collective-page/_constants';
+import { Dimensions, Sections } from '../collective-page/_constants';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
@@ -33,7 +34,7 @@ import StyledButton from '../StyledButton';
 import { H1, Span } from '../Text';
 import { useUser } from '../UserProvider';
 
-import CollectiveNavbarActionsMenu, { getContributeRoute } from './ActionsMenu';
+import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown from './NavBarCategoryDropdown';
 
@@ -167,23 +168,31 @@ const isFeatureAvailable = (collective, feature) => {
   return status === 'ACTIVE' || status === 'AVAILABLE';
 };
 
-const getDefaultCallsToActions = (collective, isAdmin, isHostAdmin, isRoot) => {
+const getHasContribute = (collective, sections, isAdmin) => {
+  return (
+    [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) &&
+    collective.isActive &&
+    getContributeRoute(collective) &&
+    isSectionEnabled(sections, Sections.CONTRIBUTE, isAdmin)
+  );
+};
+
+const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, isRoot) => {
   if (!collective) {
     return {};
   }
 
   const isFund = collective.type === CollectiveType.FUND;
-  const isProject = collective.type === CollectiveType.PROJECT;
-
+  const { type, features, settings } = collective;
   return {
-    hasContribute: (isFund || isProject) && collective.isActive,
+    hasContribute: getHasContribute(collective, sections, isAdmin),
     hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
     hasSubmitExpense: isFeatureAvailable(collective, 'RECEIVE_EXPENSES'),
-    hasManageSubscriptions: isAdmin && get(collective.features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
+    hasManageSubscriptions: isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
-    hasRequestGrant: isFund || get(collective.settings, 'fundingRequest') === true,
-    addPrepaidBudget: isRoot && collective.type === CollectiveType.ORGANIZATION,
+    hasRequestGrant: isFund || get(settings, 'fundingRequest') === true,
+    addPrepaidBudget: isRoot && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
   };
 };
@@ -211,7 +220,7 @@ const getMainAction = (collective, callsToAction) => {
         </Link>
       ),
     };
-  } else if (callsToAction.includes('hasContribute') && getContributeRoute(collective)) {
+  } else if (callsToAction.includes('hasContribute')) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
@@ -388,7 +397,7 @@ const CollectiveNavbar = ({
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   sections = sections || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   const isRoot = LoggedInUser?.isRoot;
-  callsToAction = { ...getDefaultCallsToActions(collective, isAdmin, isHostAdmin, isRoot), ...callsToAction };
+  callsToAction = { ...getDefaultCallsToActions(collective, sections, isAdmin, isHostAdmin, isRoot), ...callsToAction };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
   const mainAction = getMainAction(collective, actionsArray);
   const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));

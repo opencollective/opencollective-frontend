@@ -69,7 +69,7 @@ const MoreFeatures = () => (
           <P fontSize="18px" lineHeight="32px" fontWeight="400" letterSpacing="-0.16px" color="black.600">
             <FormattedMessage
               id="becomeASponsor.bulkPayments.description"
-              defaultMessage="Instead of paying by credit card to each Collective, you can send a single payment to the fiscal host for credit to your organization on the platform. Then you can use this balance to fund as many Collectives as you wish."
+              defaultMessage="Instead of paying by credit card to each Collective, you can send a single payment to the Fiscal Host for credit to your Organization on the platform. Then you can use this balance to fund as many Collectives as you wish."
             />
           </P>
         </Box>
@@ -93,7 +93,7 @@ const MoreFeatures = () => (
                 knowMore: (
                   <Link route="https://backyourstack.com">
                     <Span color="rgb(220, 95, 125)">
-                      Know more <ArrowRight2 size="18" />
+                      Learn more <ArrowRight2 size="18" />
                     </Span>
                   </Link>
                 ),

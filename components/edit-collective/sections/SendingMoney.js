@@ -39,7 +39,7 @@ class SendingMoney extends React.Component {
             <P>
               <FormattedMessage
                 id="collective.sendMoney.description"
-                defaultMessage={"PayPal is activated by default, you don't have to configure anything."}
+                defaultMessage={"PayPal is active by default. You don't have to configure anything."}
               />
             </P>
           </Fragment>

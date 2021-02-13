@@ -35,12 +35,12 @@ const msg = defineMessages({
     defaultMessage: 'Who will receive the money for this expense?',
   },
   emailLabel: {
-    id: 'ExpenseForm.inviteeEmailLabel',
+    id: 'Form.yourEmail',
     defaultMessage: 'Your email address',
   },
   inviteeType: {
     id: 'ExpenseForm.inviteeIsOrganizationLabel',
-    defaultMessage: 'Are you submitting this expense for your organization/company?',
+    defaultMessage: 'Are you submitting this expense for your organization (company)?',
   },
   orgNameLabel: {
     id: 'ExpenseForm.inviteeOrgNameLabel',
@@ -48,10 +48,10 @@ const msg = defineMessages({
   },
   orgSlugLabel: {
     id: 'createCollective.form.slugLabel',
-    defaultMessage: 'What URL would you like?',
+    defaultMessage: 'Set your URL',
   },
   orgWebsiteLabel: {
-    id: 'ExpenseForm.inviteeOrgWebsiteLabel',
+    id: 'createOrg.form.webstiteLabel',
     defaultMessage: 'Organization website',
   },
   orgDescriptionLabel: {
@@ -218,7 +218,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCanc
             <Field name="payee.organization.name">
               {({ field }) => (
                 <StyledInputField name={field.name} label={formatMessage(msg.orgNameLabel)} labelFontSize="13px" mt={3}>
-                  {inputProps => <StyledInput {...inputProps} {...field} placeholder="i.e. Airbnb, Salesforce" />}
+                  {inputProps => <StyledInput {...inputProps} {...field} placeholder="e.g. Airbnb, Salesforce" />}
                 </StyledInputField>
               )}
             </Field>
@@ -275,7 +275,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCanc
             <Span fontSize="11px" lineHeight="16px" color="black.600">
               <FormattedMessage
                 id="ExpenseForm.SignUp.OrgAdminNote"
-                defaultMessage="You need to be an admin of the organization to submit expenses."
+                defaultMessage="You need to be an admin of the Organization to submit expenses."
               />
             </Span>
           )}

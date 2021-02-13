@@ -157,7 +157,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
               {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
                 <FormattedMessage
                   id="paypal.preApproval.emailWarning"
-                  defaultMessage="Warning: the PayPal email for this account just changed from {oldEmail} to {newEmail}. If it's not the change you intended to do, you can click on {refillBalance} and choose a different one"
+                  defaultMessage="Warning: the associated PayPal email was changed from {oldEmail} to {newEmail}. If this was not intentional, click {refillBalance} and use the correct account."
                   values={{
                     oldEmail: <strong>{query.oldPaypalEmail}</strong>,
                     newEmail: <strong>{query.newPaypalEmail}</strong>,

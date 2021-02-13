@@ -14,7 +14,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 
 import Container from '../Container';
-import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
+import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 import Link from '../Link';
@@ -32,6 +32,7 @@ import ConnectedAccounts from './sections/ConnectedAccounts';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
+import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostMetrics from './sections/HostMetrics';
 import HostPlan from './sections/HostPlan';
@@ -43,10 +44,9 @@ import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
 import SendingMoney from './sections/SendingMoney';
-import SetupTwoFactorAuth from './sections/SetupTwoFactorAuth';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
-import VirtualCards from './sections/VirtualCards';
+import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
@@ -81,7 +81,6 @@ class EditCollectiveForm extends React.Component {
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
     this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
-    this.showVirtualCards = collective.type === 'ORGANIZATION';
 
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
@@ -104,11 +103,11 @@ class EditCollectiveForm extends React.Component {
       },
       'tos.description': {
         id: 'collective.tos.description',
-        defaultMessage: 'Link to the terms by which this host will collect money on behalf of their collectives',
+        defaultMessage: 'Link to the terms under which this Host collects and holds funds.',
       },
       'tags.description': {
         id: 'collective.tags.edit.description',
-        defaultMessage: 'Make your Collective more discoverable',
+        defaultMessage: 'Help people find you',
       },
       'company.label': {
         id: 'collective.company.label',
@@ -116,7 +115,7 @@ class EditCollectiveForm extends React.Component {
       },
       'company.description': {
         id: 'collective.company.description',
-        defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)',
+        defaultMessage: 'Start with @ to reference an organization (e.g. @airbnb)',
       },
       'amount.label': {
         id: 'Fields.amount',
@@ -137,8 +136,7 @@ class EditCollectiveForm extends React.Component {
       },
       'expensePolicy.placeholder': {
         id: 'collective.expensePolicy.placeholder',
-        defaultMessage:
-          'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
+        defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
       },
       'startsAt.label': {
         id: 'startDateAndTime',
@@ -167,16 +165,16 @@ class EditCollectiveForm extends React.Component {
       },
       'application.message.label': {
         id: 'application.message.label',
-        defaultMessage: 'Apply instructions',
+        defaultMessage: 'Application instructions',
       },
       'application.message.description': {
         id: 'application.message.description',
-        defaultMessage:
-          'Custom instructions displayed above the text box that projects see when applying (1000 characters max)',
+        defaultMessage: 'These instructions appear above the text box that applicants see (1000 characters max)',
       },
       'application.message.defaultValue': {
-        id: 'ApplyToHost.WriteMessage',
-        defaultMessage: 'Write a message to fiscal host',
+        id: 'ApplyToHost.DefaultMessage',
+        defaultMessage:
+          'Explain what information applicants should submit for your review (plain text, 3000 characters max), or direct them to an external application form.',
       },
       'hostFeePercent.label': {
         id: 'HostFee',
@@ -184,15 +182,15 @@ class EditCollectiveForm extends React.Component {
       },
       'hostFeePercent.description': {
         id: 'collective.hostFeePercent.description',
-        defaultMessage: 'Commission on financial contributions to Collectives you fiscally host.',
+        defaultMessage: 'Fee on financial contributions to Collectives you fiscally host.',
       },
       'hostFeePercent.warning': {
         id: 'collective.hostFeePercent.warning',
-        defaultMessage: `Open Collective will charge an extra 15% fee on the money raised through Host Fees.`,
+        defaultMessage: `Open Collective will charge 15% of your Host Fee revenue as its Platform Fee.`,
       },
       'hostFeePercent.warning2': {
         id: 'newPricing.tab.hostFeeChargeExample',
-        defaultMessage: `If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform.`,
+        defaultMessage: `If your Host fee is 10% and your Collectives bring in $1,000, your Platform fee will be $15. If you host fee is 0%, your Platform fee will be 0.`,
       },
       'location.label': {
         id: 'collective.location.label',
@@ -212,7 +210,7 @@ class EditCollectiveForm extends React.Component {
       },
       'currency.warning': {
         id: 'collective.currency.warning',
-        defaultMessage: `Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if it's an issue.`,
+        defaultMessage: `Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if this is an issue.`,
       },
       'address.label': {
         id: 'collective.address.label',
@@ -348,7 +346,7 @@ class EditCollectiveForm extends React.Component {
 
   getMenuSelectedSection(section) {
     if (['gift-cards-create', 'gift-cards-send', 'gift-cards'].includes(section)) {
-      return EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS;
+      return EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS;
     } else {
       return section;
     }
@@ -420,8 +418,8 @@ class EditCollectiveForm extends React.Component {
           />
         );
 
-      case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
-        return <VirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
+      case EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS:
+        return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
 
       case 'gift-cards-create':
       case 'gift-cards-send':
@@ -439,7 +437,7 @@ class EditCollectiveForm extends React.Component {
               <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
                 <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
-                  <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
+                  <FormattedMessage id="giftCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
                 </StyledButton>
               </Link>
 
@@ -452,7 +450,7 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
               </StyledLink>
             </Container>
-            <CreateVirtualCardsForm
+            <CreateGiftCardsForm
               collectiveId={collective.id}
               collectiveSlug={collective.slug}
               collectiveSettings={collective.settings}
@@ -514,7 +512,7 @@ class EditCollectiveForm extends React.Component {
 
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
-        return <SetupTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
+        return <UserTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
 
       // Payment Receipts
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS:

@@ -24,7 +24,7 @@ const messages = defineMessages({
   fallbackDescription: {
     id: 'TierCard.DefaultDescription',
     defaultMessage:
-      '{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}}{minAmount, select, 0 {} other { for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and help us sustain our activities!',
+      '{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}}{minAmount, select, 0 {} other { for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and support us',
   },
 });
 
@@ -71,7 +71,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
   if (tierType === ContributionTypes.TICKET) {
     route = 'orderEventTier';
     routeParams = {
-      collectiveSlug: collective.parentCollective.slug,
+      collectiveSlug: collective.parentCollective?.slug || 'collective',
       verb: 'events',
       eventSlug: collective.slug,
       tierId: tier.id,
@@ -176,7 +176,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
         {!isDisabled && minAmount > 0 && (
           <div>
             {isFlexibleAmount && (
-              <P fontSize="10px" color="black.600" textTransform="uppercase" mb={1}>
+              <P fontSize="10px" color="black.700" textTransform="uppercase" mb={1}>
                 <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
               </P>
             )}

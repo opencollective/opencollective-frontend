@@ -116,7 +116,7 @@ const ProcessOrderButtons = ({ order, permissions }) => {
           {selectedAction === 'MARK_AS_PAID' ? (
             <FormattedMessage
               id="Order.MarkPaidConfirmDetails"
-              defaultMessage="By confirming, you acknowledge that you have receive the funds for this order."
+              defaultMessage="Confirm you have received the funds for this contribution."
             />
           ) : null}
         </ConfirmationModal>

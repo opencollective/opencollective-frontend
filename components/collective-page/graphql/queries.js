@@ -52,6 +52,7 @@ export const collectivePageQuery = gql`
         updates
         activeRecurringContributions
         totalAmountReceived(periodInMonths: 12)
+        totalAmountRaised: totalAmountReceived
         backers {
           id
           all
@@ -92,6 +93,8 @@ export const collectivePageQuery = gql`
         plan {
           id
           hostFees
+          transferwisePayoutsLimit
+          transferwisePayouts
         }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {

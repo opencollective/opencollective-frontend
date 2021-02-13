@@ -204,51 +204,42 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                   <StyledLink
                     data-cy="twitterProfileUrl"
                     href={twitterProfileUrl(collective.twitterHandle)}
-                    title="Twitter"
-                    aria-label="Twitter link"
                     openInNewTab
                   >
-                    <StyledRoundButton size={32} mr={3}>
+                    <StyledRoundButton size={32} mr={3} title="Twitter" aria-label="Twitter link">
                       <Twitter size={12} />
                     </StyledRoundButton>
                   </StyledLink>
                 )}
                 {collective.githubHandle && (
-                  <StyledLink
-                    data-cy="githubProfileUrl"
-                    href={githubProfileUrl(collective.githubHandle)}
-                    title="Github"
-                    openInNewTab
-                    aria-label="Github link"
-                  >
-                    <StyledRoundButton size={32} mr={3}>
+                  <StyledLink data-cy="githubProfileUrl" href={githubProfileUrl(collective.githubHandle)} openInNewTab>
+                    <StyledRoundButton size={32} mr={3} title="Github" aria-label="Github link">
                       <Github size={12} />
                     </StyledRoundButton>
                   </StyledLink>
                 )}
                 {collective.website && (
-                  <StyledLink
-                    data-cy="collectiveWebsite"
-                    href={collective.website}
-                    title={intl.formatMessage(Translations.website)}
-                    aria-label="Website link"
-                    openInNewTabNoFollow
-                  >
-                    <StyledRoundButton size={32} mr={3}>
+                  <StyledLink data-cy="collectiveWebsite" href={collective.website} openInNewTabNoFollow>
+                    <StyledRoundButton
+                      size={32}
+                      mr={3}
+                      title={intl.formatMessage(Translations.website)}
+                      aria-label="Website link"
+                    >
                       <Globe size={14} />
                     </StyledRoundButton>
                   </StyledLink>
                 )}
               </Flex>
               {collective.parentCollective && (
-                <Container mx={1} color="#969ba3" my="12px">
+                <Container mx={1} color="black.700" my="12px">
                   <FormattedMessage
                     id="Collective.Hero.ParentCollective"
                     defaultMessage="Part of: {parentName}"
                     values={{
                       parentName: (
                         <LinkCollective collective={collective.parentCollective}>
-                          <Span data-cy="parentCollectiveName" color="black.600">
+                          <Span data-cy="parentCollectiveName" color="black.700">
                             {collective.parentCollective.name}
                           </Span>
                         </LinkCollective>
@@ -259,15 +250,15 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               )}
               {host && collective.isApproved && host.id !== collective.id && !collective.isHost && (
                 <Fragment>
-                  <Container mx={1} color="#969ba3" my={2}>
+                  <Container mx={1} color="black.700" my={2}>
                     <FormattedMessage
                       id="Collective.Hero.Host"
                       defaultMessage="{FiscalHost}: {hostName}"
                       values={{
-                        FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} />,
+                        FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
                         hostName: (
                           <LinkCollective collective={host}>
-                            <Span data-cy="fiscalHostName" color="black.600">
+                            <Span data-cy="fiscalHostName" color="black.700">
                               {host.name}
                             </Span>
                           </LinkCollective>
@@ -276,14 +267,14 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     />
                   </Container>
                   {collective.connectedTo.length !== 0 && (
-                    <Container mx={1} color="#969ba3" my="12px">
+                    <Container mx={1} color="black.700" my="12px">
                       <FormattedMessage
                         id="Collective.Hero.ParentCollective"
                         defaultMessage="Part of: {parentName}"
                         values={{
                           parentName: (
                             <LinkCollective collective={collective.connectedTo[0].collective}>
-                              <Span data-cy="parentCollectiveName" color="black.600">
+                              <Span data-cy="parentCollectiveName" color="black.700">
                                 {collective.connectedTo[0].collective.name}
                               </Span>
                             </LinkCollective>
@@ -310,7 +301,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
                     </StyledLink>
                   )}
-                  <Container ml={2} mr={3} color="black.500" fontSize="12px">
+                  <Container ml={2} mr={3} color="black.700" fontSize="12px">
                     <FormattedMessage
                       id="Hero.HostFee"
                       defaultMessage="Host fee: {fee}"
@@ -324,7 +315,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     />
                   </Container>
                   {collective.platformFeePercent > 0 && (
-                    <Container ml={2} mr={3} color="black.500" fontSize="12px">
+                    <Container ml={2} mr={3} color="black.700" fontSize="12px">
                       <FormattedMessage
                         id="Hero.PlatformFee"
                         defaultMessage="Platform fee: {fee}"

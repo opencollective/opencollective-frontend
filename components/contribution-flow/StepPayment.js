@@ -45,7 +45,7 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query ContributionFlowPaymentMethods($slug: String) {
     account(slug: $slug) {
       id
-      paymentMethods(types: ["creditcard", "virtualcard", "prepaid", "collective"], includeExpired: true) {
+      paymentMethods(types: ["creditcard", "giftcard", "prepaid", "collective"], includeExpired: true) {
         id
         name
         data
@@ -139,7 +139,7 @@ const StepPayment = ({
         <MessageBox type="warning" withIcon>
           <FormattedMessage
             id="NewContribute.noPaymentMethodsAvailable"
-            defaultMessage="There are no payment methods available."
+            defaultMessage="No payment methods available."
           />
         </MessageBox>
       ) : (

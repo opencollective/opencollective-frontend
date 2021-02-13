@@ -126,14 +126,14 @@ export default class SectionContributors extends React.PureComponent {
                   id="CollectivePage.OurContributors"
                   defaultMessage="Our contributors {count}"
                   values={{
-                    count: <Span color="black.400">{stats.backers.all + coreContributors.length}</Span>,
+                    count: <Span color="black.600">{stats.backers.all + coreContributors.length}</Span>,
                   }}
                 />
               </H3>
-              <P color="black.600" mb={4}>
+              <P color="black.700" mb={4}>
                 <FormattedMessage
                   id="CollectivePage.ContributorsDescription"
-                  defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
+                  defaultMessage="Thank you for supporting {collectiveName}."
                   values={{ collectiveName: collective.name }}
                 />
               </P>

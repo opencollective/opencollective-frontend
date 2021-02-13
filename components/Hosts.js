@@ -35,11 +35,11 @@ class Hosts extends React.Component {
       'hosts.description': {
         id: 'hosts.description',
         defaultMessage:
-          "Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services. {findOutMoreLink}",
+          'Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}',
       },
       'hosts.findOutMoreLink': {
         id: 'hosts.description.findOutMoreLink',
-        defaultMessage: 'Find out more about becoming an Open Collective Host.',
+        defaultMessage: 'Find out more about becoming a Fiscal Host.',
       },
     });
   }
@@ -69,7 +69,7 @@ class Hosts extends React.Component {
             <P textAlign="center">
               <FormattedMessage
                 id="hosts.description"
-                defaultMessage="Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services. {findOutMoreLink}"
+                defaultMessage="Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}"
                 values={{ findOutMoreLink }}
               />
             </P>

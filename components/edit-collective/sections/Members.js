@@ -77,11 +77,11 @@ class Members extends React.Component {
       sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },
       memberPendingDetails: {
         id: 'members.pending.details',
-        defaultMessage: 'This member has not approved the invitation to join the collective yet',
+        defaultMessage: 'This person has not accepted their invitation yet',
       },
       cantRemoveLast: {
         id: 'members.remove.cantRemoveLast',
-        defaultMessage: 'The last admin cannot be removed. Please add another admin before doing so.',
+        defaultMessage: 'The last admin cannot be removed. Please add another admin first.',
       },
       removeConfirm: {
         id: 'members.remove.confirm',
@@ -311,7 +311,7 @@ class Members extends React.Component {
                 collective.type === 'COLLECTIVE' && (
                   <FormattedMessage
                     id="members.edit.description"
-                    defaultMessage="Note: Only Collective Admins can edit this Collective and approve or reject expenses."
+                    defaultMessage="Note: Only Collective Admins can edit this Collective and approve expenses."
                   />
                 )
               }
@@ -374,7 +374,7 @@ class Members extends React.Component {
         <MessageBox type="info" withIcon>
           <FormattedMessage
             id="Members.DefinedInParent"
-            defaultMessage="The team for this profile is defined in {parentName}'s settings"
+            defaultMessage="Team members are defined in the settings of {parentName}"
             values={{
               parentName: (
                 <Link route="editCollective" params={{ slug: parent.slug, section: 'members' }}>

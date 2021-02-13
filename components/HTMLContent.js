@@ -112,6 +112,8 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
     font-size: 1em;
     border-left: 5px solid #e9e9e9;
     background-color: #f9f9f9;
+    margin: 0;
+    padding: 8px;
   }
 
   pre {

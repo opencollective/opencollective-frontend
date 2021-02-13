@@ -69,7 +69,7 @@ const I18nContributionType = defineMessages({
   },
   [ContributionTypes.FINANCIAL_ONE_TIME]: {
     id: 'ContributionType.OneTime',
-    defaultMessage: 'One time contribution',
+    defaultMessage: 'One-time contribution',
   },
   [ContributionTypes.FINANCIAL_RECURRING]: {
     id: 'ContributionType.Recurring',
@@ -211,13 +211,13 @@ const ContributeCard = ({
                       </Box>
                     ))}
                     {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
-                      <Container ml={2} pt="0.7em" fontSize="12px" color="black.600">
+                      <Container ml={2} pt="0.7em" fontSize="12px" color="black.700">
                         + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
                       </Container>
                     )}
                   </Flex>
                   {stats && stats.all > 0 && (
-                    <P mt={2} fontSize="10px" color="black.600" letterSpacing="-0.6px">
+                    <P mt={2} fontSize="10px" color="black.700" letterSpacing="-0.6px">
                       {type !== 'TICKET' && (
                         <FormattedMessage
                           id="ContributorsCount"

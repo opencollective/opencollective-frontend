@@ -51,7 +51,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
     <React.Fragment>
       <AmountLine>
         <Label fontWeight={500} color="black.800">
-          <FormattedMessage id="contribution.netAmountForCollective" defaultMessage="Net amount for collective" />
+          <FormattedMessage id="contribution.netAmountForCollective" defaultMessage="Net amount for Collective" />
         </Label>
         <Span fontSize="16px" fontWeight={500} color="black.700">
           {formatCurrency(netAmountForCollective, currency)}
@@ -71,7 +71,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
       {Boolean(hostFeePercent) && (
         <AmountLine>
           <Label color="black.500">
-            <FormattedMessage id="contribution.hostFeePercent" defaultMessage="Fiscal host fee" />
+            <FormattedMessage id="contribution.hostFeePercent" defaultMessage="Fiscal Host fee" />
             {` (-${hostFeePercent}%)`}
           </Label>
           <Span fontSize="16px" color="black.500">
@@ -129,12 +129,13 @@ ClickableLabel.defaultProps = {
 
 /** Add missing fields to taxInfo and calculate tax amount */
 const prepareTaxInfo = (taxes, userTaxInfo, amount, quantity, taxPercentage, hasForm) => {
+  const isCountryRequired = taxes[0]?.type === TaxType.VAT;
   return {
     ...userTaxInfo,
     taxType: taxes[0]?.type,
     percentage: taxPercentage,
     amount: Math.round(amount * quantity * (taxPercentage / 100)),
-    isReady: Boolean(!hasForm && (!amount || get(userTaxInfo, 'countryISO'))),
+    isReady: Boolean(!hasForm && (!amount || !isCountryRequired || get(userTaxInfo, 'countryISO'))),
   };
 };
 

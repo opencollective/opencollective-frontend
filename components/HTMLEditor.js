@@ -148,7 +148,7 @@ class HTMLEditor extends React.Component {
         this.saveToServer(file);
       } else {
         // TODO: this should be reported to the user
-        console.error('HTMLEditor > File not an image', file);
+        console.error('HTMLEditor > File is not an image', file);
       }
     };
   }

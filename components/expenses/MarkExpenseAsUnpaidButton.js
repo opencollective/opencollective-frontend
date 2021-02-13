@@ -45,7 +45,7 @@ const MarkExpenseAsUnpaidButton = ({ onConfirm, ...props }) => {
         <P mb={4}>
           <FormattedMessage
             id="Expense.markAsUnpaid.details"
-            defaultMessage="The balance of the collective will be re-credited with the corresponding amount."
+            defaultMessage="The amount will be credited back to the Collective balance."
           />
         </P>
         <StyledCheckbox
@@ -55,7 +55,7 @@ const MarkExpenseAsUnpaidButton = ({ onConfirm, ...props }) => {
           label={
             <FormattedMessage
               id="processorFeeRefunded.checkbox.label"
-              defaultMessage="Also refund payment processor fees"
+              defaultMessage="Also refund payment processor fees?"
             />
           }
         />

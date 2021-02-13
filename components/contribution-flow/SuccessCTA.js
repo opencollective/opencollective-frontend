@@ -15,12 +15,17 @@ export const SUCCESS_CTA_TYPE = {
   NEWSLETTER: 'NEWSLETTER',
   BLOG: 'BLOG',
   JOIN: 'JOIN',
+  SIGN_IN: 'SIGN_IN',
 };
 
 const headerMessages = defineMessages({
   [SUCCESS_CTA_TYPE.JOIN]: {
     id: 'collective.create.join',
     defaultMessage: 'Join Open Collective',
+  },
+  [SUCCESS_CTA_TYPE.SIGN_IN]: {
+    id: 'signIn',
+    defaultMessage: 'Sign In',
   },
   [SUCCESS_CTA_TYPE.BLOG]: {
     id: 'ReadOurStories',
@@ -35,12 +40,16 @@ const headerMessages = defineMessages({
 const contentMessages = defineMessages({
   [SUCCESS_CTA_TYPE.JOIN]: {
     id: 'NewContributionFlow.Success.CTA.Join.Content',
-    defaultMessage: 'Create an account and show all your contributions to the community.',
+    defaultMessage: 'Create an account and show all your contributions.',
+  },
+  [SUCCESS_CTA_TYPE.SIGN_IN]: {
+    id: 'NewContributionFlow.Success.CTA.SignIn.Content',
+    defaultMessage: 'Sign in with your Open Collective account to edit your profile and manage your contributions.',
   },
   [SUCCESS_CTA_TYPE.BLOG]: {
     id: 'NewContributionFlow.Success.CTA.Read.Content',
     defaultMessage:
-      'Open Collective aims to foster transparency and sustainability in communities around the world. See how you could participate.',
+      "Open Collective aims to foster transparency and sustainability in communities around the world. Here's how you can participate.",
   },
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {
     id: 'home.joinUsSection.weNeedUpdate',
@@ -70,7 +79,7 @@ const CTAContainer = styled(Container)`
     `}
 `;
 
-const SuccessCTAWrapper = ({ type, orderId, ...props }) => {
+const SuccessCTAWrapper = ({ type, orderId, email, ...props }) => {
   switch (type) {
     case SUCCESS_CTA_TYPE.JOIN:
       return (
@@ -79,12 +88,25 @@ const SuccessCTAWrapper = ({ type, orderId, ...props }) => {
           display="block"
           data-cy="join-opencollective-link"
           route="guest-join"
-          params={{ OrderId: orderId }}
+          color="black.800"
+          params={{ OrderId: orderId, email }}
+          {...props}
+        />
+      );
+    case SUCCESS_CTA_TYPE.SIGN_IN:
+      return (
+        <StyledLink
+          as={Link}
+          display="block"
+          color="black.800"
+          data-cy="success-signin-link"
+          route="signin"
+          params={{ email }}
           {...props}
         />
       );
     case SUCCESS_CTA_TYPE.BLOG:
-      return <StyledLink href="https://blog.opencollective.com" openInNewTab color="black.700" {...props} />;
+      return <StyledLink href="https://blog.opencollective.com" openInNewTab color="black.800" {...props} />;
     default:
       return <React.Fragment {...props} />;
   }
@@ -93,14 +115,15 @@ const SuccessCTAWrapper = ({ type, orderId, ...props }) => {
 SuccessCTAWrapper.propTypes = {
   type: PropTypes.string,
   orderId: PropTypes.string,
+  email: PropTypes.string,
 };
 
-const SuccessCTA = ({ type, orderId }) => {
+const SuccessCTA = ({ type, orderId, email }) => {
   const { formatMessage } = useIntl();
   const isNewsletter = type === SUCCESS_CTA_TYPE.NEWSLETTER;
   return (
     <Container px={[3, 0]} my={3} maxWidth={600}>
-      <SuccessCTAWrapper type={type} orderId={orderId}>
+      <SuccessCTAWrapper type={type} orderId={orderId} email={email}>
         <CTAContainer px={4} py={2} hoverable={!isNewsletter}>
           <Flex
             flexDirection="column"
@@ -109,13 +132,15 @@ const SuccessCTA = ({ type, orderId }) => {
             width={[isNewsletter ? 1 : 4 / 5, 4 / 5]}
             my={3}
           >
-            <H3 mb={3}>{formatMessage(headerMessages[type])}</H3>
+            <H3 mb={3} color="black.800">
+              {formatMessage(headerMessages[type])}
+            </H3>
             <P fontSize="14px" lineHeight="24px" fontWeight={300} color="black.700">
               {formatMessage(contentMessages[type])}
             </P>
             {isNewsletter && (
               <Box mt={2}>
-                <Newsletter />
+                <Newsletter defaultEmail={email} />
               </Box>
             )}
           </Flex>
@@ -133,6 +158,7 @@ const SuccessCTA = ({ type, orderId }) => {
 SuccessCTA.propTypes = {
   type: PropTypes.oneOf(Object.values(SUCCESS_CTA_TYPE)),
   orderId: PropTypes.string,
+  email: PropTypes.string,
 };
 
 export default SuccessCTA;

@@ -41,7 +41,7 @@ class OnboardingContentBox extends React.Component {
     this.messages = defineMessages({
       placeholder: {
         id: 'onboarding.contact.placeholder',
-        defaultMessage: 'Write the name of who you want to invite',
+        defaultMessage: 'Who do you want to invite?',
       },
     });
   }
@@ -83,7 +83,7 @@ class OnboardingContentBox extends React.Component {
             >
               <FormattedMessage
                 id="onboarding.collective.created"
-                defaultMessage="The {collective} Collective has been created!"
+                defaultMessage="{collective} has been created!"
                 values={{ collective: collective.name }}
               />
               &nbsp;🎉
@@ -151,7 +151,7 @@ class OnboardingContentBox extends React.Component {
             <P my={2} fontSize="12px" color="black.500" textAlign="center">
               <FormattedMessage
                 id="onboarding.admins.caption"
-                defaultMessage="Admins can modify the Collective page and approve expenses."
+                defaultMessage="Admins can modify settings and approve expenses."
               />
             </P>
           </Fragment>
@@ -190,7 +190,7 @@ class OnboardingContentBox extends React.Component {
               <P my={2} fontSize="12px" color="black.500">
                 <FormattedMessage
                   id="onboarding.contact.social"
-                  defaultMessage="Tell your contributors how to reach your Collective through social media."
+                  defaultMessage="Tell your contributors how to connect with you."
                 />
               </P>
               <Flex alignItems="center">

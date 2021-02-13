@@ -24,15 +24,15 @@ import { Span } from './Text';
 const CollectiveTypesI18n = defineMessages({
   [CollectiveType.COLLECTIVE]: {
     id: 'collective.types.collective',
-    defaultMessage: '{n, plural, one {collective} other {collectives}}',
+    defaultMessage: '{n, plural, one {Collective} other {Collectives}}',
   },
   [CollectiveType.ORGANIZATION]: {
     id: 'collective.types.organization',
-    defaultMessage: '{n, plural, one {organization} other {organizations}}',
+    defaultMessage: '{n, plural, one {Organization} other {Organizations}}',
   },
   [CollectiveType.USER]: {
     id: 'collective.types.user',
-    defaultMessage: '{n, plural, one {people} other {people}}',
+    defaultMessage: '{n, plural, one {person} other {people}}',
   },
 });
 

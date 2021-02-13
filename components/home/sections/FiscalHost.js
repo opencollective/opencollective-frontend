@@ -143,7 +143,7 @@ const FiscalHost = () => {
               >
                 <FormattedMessage
                   id="home.fiscalHostSection.title"
-                  defaultMessage="Do you need a fiscal host for your community?"
+                  defaultMessage="Do you need a Fiscal Host for your community?"
                 />
               </SectionTitle>
               <H2
@@ -153,7 +153,7 @@ const FiscalHost = () => {
                 lineHeight={['40px', '48px', null, null, '56px']}
                 letterSpacing={['-1.2px', '-1.6px', null, null, '-2px']}
               >
-                <FormattedMessage id="home.fiscalHostSection.title.xl" defaultMessage="Do you need a fiscal host?" />
+                <FormattedMessage id="home.fiscalHostSection.title.xl" defaultMessage="Do you need a Fiscal Host?" />
               </H2>
             </Box>
             <Box width={['288px', '477px', null, '456px', '444px']}>
@@ -169,13 +169,13 @@ const FiscalHost = () => {
               >
                 <FormattedMessage
                   id="home.fiscalHostSection.explanation1"
-                  defaultMessage="Are you looking for somewhere to put financial resources and use them in projects or private initiatives?"
+                  defaultMessage="Are you looking for somewhere to hold and distribute money for your project?"
                 />
                 <LineBreak display={[null, 'none']} />
                 <LineBreak display={[null, 'none', 'block']} />
                 <Span>
                   {' '}
-                  <FormattedMessage id="home.fiscalHostSection.weCanHelp" defaultMessage="We can help you!" />
+                  <FormattedMessage id="home.fiscalHostSection.weCanHelp" defaultMessage="We can help!" />
                 </Span>
               </P>
               <P
@@ -190,7 +190,7 @@ const FiscalHost = () => {
               >
                 <FormattedMessage
                   id="home.fiscalHostSection.explanation2"
-                  defaultMessage="Need help holding money on behalf of your project? Fiscal hosts handle taxes, accounting, and payments for you."
+                  defaultMessage="Fiscal Hosts handle banking, taxes, accounting, legal, liability, and payments for you."
                 />
               </P>
             </Box>
@@ -205,7 +205,7 @@ const FiscalHost = () => {
               lineHeight="28px"
               letterSpacing="-0.6px"
             >
-              <FormattedMessage id="home.OC.fiscalHosts" defaultMessage="There are our fiscal hosts:" />
+              <FormattedMessage id="home.OC.fiscalHosts" defaultMessage="There are our Fiscal Hosts:" />
             </H5>
             <H5
               display={['none', null, null, null, 'block']}
@@ -217,7 +217,7 @@ const FiscalHost = () => {
               lineHeight="28px"
               letterSpacing="-0.6px"
             >
-              <FormattedMessage id="home.OC.fiscalHosts.xl" defaultMessage="Find the right fiscal host for you:" />
+              <FormattedMessage id="home.OC.fiscalHosts.xl" defaultMessage="Find the right Fiscal Host for you:" />
             </H5>
             <Container display="flex" flexDirection={['column', 'row', null, 'column']}>
               {featuredHosts.map(host => (
