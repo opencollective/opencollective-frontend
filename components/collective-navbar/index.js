@@ -430,11 +430,11 @@ const CollectiveNavbar = ({
           {showBackButton && (
             <Box display={['none', 'block']} mr={2}>
               {collective && (
-                <Link route="collective" params={{ slug: collective.slug }}>
+                <NextLink href={collective.slug}>
                   <StyledButton px={1} isBorderless>
                     &larr;
                   </StyledButton>
-                </Link>
+                </NextLink>
               )}
             </Box>
           )}

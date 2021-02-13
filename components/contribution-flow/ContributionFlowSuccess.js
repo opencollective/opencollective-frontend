@@ -5,6 +5,7 @@ import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
+import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -184,9 +185,8 @@ class NewContributionFlowSuccess extends React.Component {
               values={{
                 collective: this.props.data.order.toAccount.name,
                 CollectiveLink: getI18nLink({
-                  as: Link,
-                  route: 'collective',
-                  params: { slug: this.props.data.order.toAccount.slug },
+                  as: NextLink,
+                  route: this.props.data.order.toAccount.slug,
                 }),
               }}
             />

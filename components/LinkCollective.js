@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
-
-import Link from './Link';
 
 /**
  * Returns event's parent collective slug. If the parent is not available,
@@ -31,20 +30,19 @@ const LinkCollective = ({ target, title, collective, children, ...props }) => {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
-    <Link route="collective" params={{ slug }} {...props} title={title || name} target={target} passHref>
+    <NextLink href={slug} {...props} title={title || name} target={target} passHref>
       {children || name || slug}
-    </Link>
+    </NextLink>
   ) : (
-    <Link
-      route="event"
-      params={{ slug, parentCollectiveSlug: getEventParentCollectiveSlug(parentCollective) }}
+    <NextLink
+      href={`${getEventParentCollectiveSlug(parentCollective)}/events/${slug}`}
       title={title || name}
       target={target}
       {...props}
       passHref
     >
       {children || name || slug}
-    </Link>
+    </NextLink>
   );
 };
 

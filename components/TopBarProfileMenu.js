@@ -253,11 +253,11 @@ class TopBarProfileMenu extends React.Component {
             </P>
             <Box as="ul" p={0} my={2}>
               <ListItem py={1}>
-                <Link route="collective" params={{ slug: LoggedInUser.username }} passHref>
+                <NextLink href={LoggedInUser.username} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.profile" defaultMessage="Profile" />
                   </StyledLink>
-                </Link>
+                </NextLink>
               </ListItem>
               <Query
                 query={memberInvitationsCountQuery}

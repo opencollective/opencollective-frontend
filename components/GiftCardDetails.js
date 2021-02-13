@@ -11,8 +11,8 @@ import { formatCurrency } from '../lib/currency-utils';
 
 import GiftCard from './icons/GiftCard';
 import Avatar from './Avatar';
+import Container from './Container';
 import { Box, Flex } from './Grid';
-import Link from './Link';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 
@@ -31,11 +31,7 @@ const GiftCardStatus = ({ isConfirmed, collective, data }) => {
         id="giftCards.claimedBy"
         defaultMessage="claimed by {user}"
         values={{
-          user: (
-            <Link route="collective" params={{ slug: collective.slug }}>
-              {collective.name}
-            </Link>
-          ),
+          user: <NextLink href={collective.slug}>{collective.name}</NextLink>,
         }}
       />
     );
@@ -154,10 +150,12 @@ class GiftCardDetails extends React.Component {
         {/* Avatar column */}
         <Box mr="20px">
           {isConfirmed ? (
-            <Link route="collective" params={{ slug: collective.slug }} title={collective.name} passHref>
-              <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
-              <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />
-            </Link>
+            <NextLink href={collective.slug} title={collective.name} passHref>
+              <Container>
+                <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
+                <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />
+              </Container>
+            </NextLink>
           ) : (
             <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
           )}

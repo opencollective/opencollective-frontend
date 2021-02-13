@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import Link from './Link';
+import NextLink from 'next/link';
 
 const UserCompany = ({ company, ...props }) => {
   if (!company || company[0] !== '@') {
@@ -12,9 +11,9 @@ const UserCompany = ({ company, ...props }) => {
   // By splitting on `/` we limit that risk.
   const companySlug = company.split('/')[0].slice(1);
   return (
-    <Link route="collective" params={{ slug: companySlug }} {...props}>
+    <NextLink href={companySlug} {...props}>
       @{companySlug}
-    </Link>
+    </NextLink>
   );
 };
 

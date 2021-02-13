@@ -8,17 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes();
 
-// Collective
-// ----------
-
-// Collective page
-pages.add('collective', '/:slug', 'collective-page');
-pages.add(
-  'collective-with-onboarding',
-  '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
-  'collective-page',
-);
-
 // New accept financial contributions flow
 pages.add(
   'accept-financial-contributions',

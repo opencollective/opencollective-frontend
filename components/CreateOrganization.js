@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import { addEditCollectiveMembersMutation } from './onboarding-modal/OnboardingModal';
 import Container from './Container';
@@ -21,6 +21,7 @@ class CreateOrganization extends React.Component {
     editCollectiveMembers: PropTypes.func,
     LoggedInUser: PropTypes.object,
     refetchLoggedInUser: PropTypes.func.isRequired,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -93,10 +94,9 @@ class CreateOrganization extends React.Component {
       }
       await this.props.refetchLoggedInUser();
 
-      Router.pushRoute('collective', {
-        slug: response.data.createOrganization.slug,
-        status: 'collectiveCreated',
-      }).then(() => window.scrollTo(0, 0));
+      this.props.router
+        .push({ pathname: response.data.createOrganization.slug, query: { status: 'collectiveCreated' } })
+        .then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ result: { error: errorMsg }, status: 'error' });
@@ -165,4 +165,4 @@ const addCreateOrganizationMutation = graphql(createOrganizationMutation, {
 
 const addGraphql = compose(addCreateOrganizationMutation, addEditCollectiveMembersMutation);
 
-export default addGraphql(CreateOrganization);
+export default addGraphql(withRouter(CreateOrganization));

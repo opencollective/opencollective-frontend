@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import { Box, Flex } from '../Grid';
 import SignInOrJoinFree from '../SignInOrJoinFree';
@@ -60,10 +59,14 @@ class CreateFund extends Component {
     try {
       const res = await this.props.createFund({ variables: { fund, host } });
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', {
-        slug: res.data.createFund.slug,
-        status: 'fundCreated',
-      }).then(() => window.scrollTo(0, 0));
+      this.props.router
+        .push({
+          pathname: res.data.createFund.slug,
+          query: {
+            status: 'fundCreated',
+          },
+        })
+        .then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ error: errorMsg, creating: false });

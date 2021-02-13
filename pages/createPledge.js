@@ -5,6 +5,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import NextLink from 'next/link';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -14,7 +15,6 @@ import { getErrorFromGraphqlException } from '../lib/errors';
 import { legacyCollectiveQuery } from '../lib/graphql/queries';
 import { imagePreview } from '../lib/image-utils';
 import { compose } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import Avatar from '../components/Avatar';
 import Body from '../components/Body';
@@ -24,7 +24,6 @@ import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import I18nFormatters from '../components/I18nFormatters';
-import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import { pledgedCollectivePageQuery } from '../components/PledgedCollectivePage';
@@ -166,6 +165,7 @@ class CreatePledgePage extends React.Component {
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     createPledge: PropTypes.func,
+    router: PropTypes.object,
   };
 
   state = {
@@ -234,8 +234,7 @@ class CreatePledgePage extends React.Component {
         data: { createOrder: result },
       } = await this.props.createPledge(order, this.props.data?.Collective);
       if (result.collective.slug) {
-        const params = { slug: result.collective.slug };
-        Router.pushRoute('collective', params);
+        this.props.router.push(result.collective.slug);
       }
     } catch (error) {
       this.setState({
@@ -557,9 +556,9 @@ class CreatePledgePage extends React.Component {
                       .filter(({ fromCollective }) => fromCollective.type === 'USER')
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                          <NextLink href={fromCollective.slug}>
                             <Avatar collective={fromCollective} radius={40} />
-                          </Link>
+                          </NextLink>
                         </Box>
                       ))}
                   </Flex>
@@ -572,7 +571,7 @@ class CreatePledgePage extends React.Component {
                       )
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                          <NextLink href={fromCollective.slug}>
                             <Container
                               backgroundImage={`url(${imagePreview(
                                 fromCollective.image,
@@ -588,7 +587,7 @@ class CreatePledgePage extends React.Component {
                               height={40}
                               width={40}
                             />
-                          </Link>
+                          </NextLink>
                         </Box>
                       ))}
                   </Flex>
@@ -733,4 +732,4 @@ export const addCreatePledgeMutation = graphql(createPledgeMutation, {
 
 const addGraphql = compose(addCreatePledgePageData, addCreatePledgeMutation);
 
-export default injectIntl(withUser(addGraphql(CreatePledgePage)));
+export default injectIntl(withUser(addGraphql(withRouter(CreatePledgePage))));

@@ -10,7 +10,6 @@ import { confettiFireworks } from '../../lib/confettis';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H1, H2, P } from '../Text';
@@ -154,19 +153,14 @@ class SuccessPage extends React.Component {
             </Flex>
           </Flex>
           <Flex flexDirection={['column', 'row']} justifyContent="center" alignItems="center" my={3}>
-            <Link
-              route="collective"
-              params={{
-                slug: collective.slug,
-              }}
-            >
+            <NextLink href={collective.slug}>
               <StyledButton buttonStyle="standard" mt={[2, 3]} mb={[3, 2]} px={3}>
                 <FormattedMessage
                   id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
                   defaultMessage="Go to Collective page"
                 />
               </StyledButton>
-            </Link>
+            </NextLink>
             <NextLink href={`${collective.slug}/edit/tiers`} data-cy="afc-success-host-tiers-link">
               <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
                 <FormattedMessage id="createCustomTiers" defaultMessage="Create your own tiers" />

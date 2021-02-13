@@ -18,7 +18,6 @@ import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
-import Link from '../../Link';
 import Loading from '../../Loading';
 import MemberRoleDescription, { hasRoleDescription } from '../../MemberRoleDescription';
 import MessageBox from '../../MessageBox';
@@ -332,11 +331,11 @@ class Members extends React.Component {
             </MessageBox>
           )}
           <Flex justifyContent="center" flexWrap="wrap" mt={5}>
-            <Link route="collective" params={{ slug: collective.slug }}>
+            <NextLink href={collective.slug}>
               <StyledButton mx={2} minWidth={200}>
                 <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
               </StyledButton>
-            </Link>
+            </NextLink>
             <StyledButton
               buttonStyle="primary"
               onClick={this.handleSubmit}

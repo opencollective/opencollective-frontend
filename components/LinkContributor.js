@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
-
-import Link from './Link';
 
 /**
  * `Contributor` type is meant to surface all types of contributors, even the one that
@@ -18,11 +17,7 @@ const LinkContributor = ({ contributor, children }) => {
   } else if (contributor.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (contributor.collectiveSlug) {
-    return (
-      <Link route="collective" params={{ slug: contributor.collectiveSlug }}>
-        {children || contributor.name}
-      </Link>
-    );
+    return <NextLink href={contributor.collectiveSlug}>{children || contributor.name}</NextLink>;
   } else {
     return children || <span>{contributor.name}</span>;
   }
