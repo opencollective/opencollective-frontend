@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-
-import { Router } from '../../../server/pages';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -83,7 +82,7 @@ const SingleCollectiveWithBankAccount = () => (
   <Container mx={3} my={4}>
     <Container>
       <Box display={['block', null, 'none']}>
-        <BackButton onClick={() => Router.pushRoute('pricing')} />
+        <BackButton onClick={() => this.props.router.push('pricing')} />
       </Box>
     </Container>
     <Flex alignItems="center" justifyContent="center" flexDirection="column">
@@ -186,6 +185,7 @@ const SingleCollectiveWithBankAccount = () => (
 
 SingleCollectiveWithBankAccount.propTypes = {
   onClickBackButton: PropTypes.func,
+  router: PropTypes.object,
 };
 
-export default SingleCollectiveWithBankAccount;
+export default withRouter(SingleCollectiveWithBankAccount);

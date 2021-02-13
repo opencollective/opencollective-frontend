@@ -4,13 +4,13 @@ import { useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
 import { get, map } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { requireFields } from '../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import ApplicationDescription from './ocf-host-application/ApplicationDescription';
 import OCFPrimaryButton from './ocf-host-application/OCFPrimaryButton';
@@ -227,7 +227,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
           }}
           onSubmit={async values => {
             if (isOCFHost) {
-              await Router.pushRoute(`/foundation/apply/form?collectiveSlug=${values.collective.slug}`);
+              await this.props.router.push(`/foundation/apply/form?collectiveSlug=${values.collective.slug}`);
               window.scrollTo(0, 0);
               return;
             }
@@ -447,10 +447,11 @@ ApplyToHostModal.propTypes = {
   onSuccess: PropTypes.func,
   /** Use this to force the value for `collective`. If not specified, user's administrated collectives will be displayed instead */
   collective: PropTypes.object,
+  router: PropTypes.object,
 };
 
 ApplyToHostModal.defaultProps = {
   show: true,
 };
 
-export default ApplyToHostModal;
+export default withRouter(ApplyToHostModal);

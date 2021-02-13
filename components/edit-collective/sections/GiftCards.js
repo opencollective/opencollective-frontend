@@ -8,8 +8,6 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { Router } from '../../../server/pages';
-
 import GiftCardDetails from '../../GiftCardDetails';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
@@ -158,7 +156,7 @@ class GiftCards extends React.Component {
                 <StyledSelect
                   options={batchesOptions}
                   onChange={({ value }) =>
-                    Router.pushRoute('editCollective', { ...this.props.router.query, batch: value })
+                    this.props.router.push('editCollective', { ...this.props.router.query, batch: value })
                   }
                   defaultValue={selectedOption}
                 />

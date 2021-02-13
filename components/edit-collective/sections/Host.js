@@ -7,7 +7,6 @@ import styled from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
 import { formatDate } from '../../../lib/utils';
-import { Router } from '../../../server/pages';
 
 import CollectiveCard from '../../CollectiveCard';
 import Container from '../../Container';
@@ -65,10 +64,11 @@ class Host extends React.Component {
   }
 
   updateSelectedOption(option) {
-    Router.pushRoute('editCollective', {
-      slug: this.props.collective.slug,
-      section: 'host',
-      selectedOption: option,
+    this.props.router.push({
+      pathname: `${this.props.collective.slug}/edit/host`,
+      query: {
+        selectedOption: option,
+      },
     });
   }
 

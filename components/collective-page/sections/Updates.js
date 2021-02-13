@@ -164,7 +164,7 @@ class SectionUpdates extends React.PureComponent {
                       </LinkCollective>
                     </Box>
                     <Flex flexDirection="column" justifyContent="space-between">
-                      <Link href={`${collective.slug}/update/${update.slug}`}>
+                      <Link href={`${collective.slug}/updates/${update.slug}`}>
                         <P color="black.900" fontWeight="600" mb={2}>
                           {update.title}
                         </P>
@@ -173,7 +173,7 @@ class SectionUpdates extends React.PureComponent {
                         <Container>
                           <HTMLContent style={{ display: 'inline' }} content={update.summary} />
                           {` `}
-                          <StyledLink as={Link} fontSize="12px" href={`${collective.slug}/update/${update.slug}`}>
+                          <StyledLink as={Link} fontSize="12px" href={`${collective.slug}/updates/${update.slug}`}>
                             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                           </StyledLink>
                         </Container>

@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { isEqual } from 'lodash';
+import Router from 'next/router';
 
 import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import { Router } from '../server/pages';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,

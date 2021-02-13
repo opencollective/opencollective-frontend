@@ -21,7 +21,6 @@ import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
-import { Router } from '../../server/pages';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Container from '../Container';
@@ -231,7 +230,7 @@ class ContributionFlow extends React.Component {
       if (isAllowedRedirect(url.host)) {
         window.location.href = url.href;
       } else {
-        await Router.pushRoute('external-redirect', { url: url.href, fallback });
+        await this.props.router.push({ pathname: 'external-redirect', query: { url: url.href, fallback } });
         return this.scrollToTop();
       }
     } else {

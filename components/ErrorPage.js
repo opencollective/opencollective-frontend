@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { Support } from '@styled-icons/boxicons-regular/Support';
 import { Redo } from '@styled-icons/fa-solid/Redo';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ERROR } from '../lib/errors';
-import { Router } from '../server/pages';
 
 import Body from './Body';
 import Container from './Container';
@@ -41,6 +41,7 @@ class ErrorPage extends React.Component {
     message: PropTypes.string,
     /** @deprecated please generate errors with the `createError` helper */
     data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
+    router: PropTypes.object,
   };
 
   getErrorComponent() {
@@ -89,7 +90,7 @@ class ErrorPage extends React.Component {
         <MessageBox type="error" withIcon mb={5}>
           {message}
         </MessageBox>
-        <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => Router.back()}>
+        <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => this.props.router.back()}>
           &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to the previous page" />
         </StyledButton>
       </Flex>
@@ -180,4 +181,4 @@ class ErrorPage extends React.Component {
   }
 }
 
-export default withUser(ErrorPage);
+export default withUser(withRouter(ErrorPage));

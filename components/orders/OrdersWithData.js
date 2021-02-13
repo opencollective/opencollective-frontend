@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { mapValues, pick } from 'lodash';
-import { useRouter } from 'next/router';
+import { useRouter, withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { usePrevious } from '../../lib/hooks/usePrevious';
-import { Router } from '../../server/pages';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
@@ -133,7 +132,7 @@ const hasParams = query => {
 
 const updateQuery = (router, queryParams) => {
   const { route, query } = router;
-  return Router.pushRoute(route.slice(1), { ...query, ...queryParams });
+  return this.props.router.push({ pathname: route.slice(1), query: { ...query, ...queryParams } });
 };
 
 const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
@@ -239,6 +238,7 @@ OrdersWithData.propTypes = {
   /** An optional title to be used instead of "Financial contributions" */
   title: PropTypes.node,
   showPlatformTip: PropTypes.bool,
+  router: PropTypes.object,
 };
 
-export default OrdersWithData;
+export default withRouter(OrdersWithData);
