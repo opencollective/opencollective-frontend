@@ -4,6 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get, orderBy, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -369,11 +370,11 @@ class SectionContribute extends React.PureComponent {
             {/* "View all ways to contribute" button */}
             {!isEvent && (
               <ContainerSectionContent pb={4}>
-                <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+                <NextLink href={`${collective.slug}/contribute`}>
                   <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="All ways to contribute" /> →
                   </StyledButton>
-                </Link>
+                </NextLink>
               </ContainerSectionContent>
             )}
           </Fragment>

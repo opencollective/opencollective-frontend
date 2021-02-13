@@ -68,8 +68,7 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
     // Contribute
     if (hasFeature(collective, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS)) {
       links.push({
-        route: 'contribute',
-        params: { collectiveSlug, verb: 'contribute' },
+        route: `${collectiveSlug}/contribute`,
         title: intl.formatMessage(titles.CONTRIBUTE),
       });
     }

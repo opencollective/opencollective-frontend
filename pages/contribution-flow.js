@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -185,11 +186,11 @@ class NewContributionFlowPage extends React.Component {
           {content}
         </MessageBox>
         {showOtherWaysToContribute && (
-          <Link route="contribute" params={{ collectiveSlug, verb: 'contribute' }}>
+          <NextLink href={`${collectiveSlug}/contribute`}>
             <StyledButton buttonStyle="primary" buttonSize="large" mt={5}>
               <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
             </StyledButton>
-          </Link>
+          </NextLink>
         )}
       </Flex>
     );

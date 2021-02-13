@@ -175,15 +175,15 @@ exports.REWRITES = [
     source: '/:parentCollectiveSlug/projects/:slug',
     destination: '/collective-page',
   },
-  // // Tier page
-  // {
-  //   source: '/:collectiveSlug/:verb(tiers|contribute)',
-  //   destination: '/contribute',
-  // },
-  // {
-  //   source: '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
-  //   destination: '/tier',
-  // },
+  // Tier page
+  {
+    source: '/:collectiveSlug/:verb(tiers|contribute)',
+    destination: '/contribute',
+  },
+  {
+    source: '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
+    destination: '/tier',
+  },
   // // Conversations
   // {
   //   source: '/:collectiveSlug/conversations',

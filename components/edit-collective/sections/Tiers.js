@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { cloneDeep, get, set } from 'lodash';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -17,7 +18,6 @@ import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
 import InputFieldPresets from '../../InputFieldPresets';
-import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
@@ -286,12 +286,11 @@ class Tiers extends React.Component {
                 const collectiveSlug = collective.slug;
                 return (
                   <StyledLink
-                    as={Link}
+                    as={NextLink}
                     openInNewTab
-                    route="tier"
-                    params={{ collectiveSlug, verb: 'contribute', tierSlug: tier.slug, tierId: tier.id }}
+                    href={{ pathname: `${collectiveSlug}/contribute/${tier.slug}`, query: { tierId: tier.id } }}
                   >
-                    {msg}
+                    <span>{msg}</span>
                   </StyledLink>
                 );
               }

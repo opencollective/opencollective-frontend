@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import themeGet from '@styled-system/theme-get';
+import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -344,16 +345,13 @@ class TierPage extends Component {
                   {isPassed ? (
                     <P textAlign="center">
                       <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
-                      <Link
-                        route="contribute"
-                        params={{ collectiveSlug: collective.slug, verb: 'contribute', redirect }}
-                      >
+                      <NextLink href={{ pathname: `${collective.slug}/contribute`, query: redirect }}>
                         <FormattedMessage
                           id="createOrder.backToTier"
                           defaultMessage="View all the other ways to contribute"
                         />
                         .
-                      </Link>
+                      </NextLink>
                     </P>
                   ) : (
                     <Link

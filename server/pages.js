@@ -8,11 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes();
 
-// Tier page
-// ---------------
-pages.add('contribute', '/:collectiveSlug/:verb(tiers|contribute)');
-pages.add('tier', '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)');
-
 // Conversations
 // ---------------
 pages.add('conversations', '/:collectiveSlug/conversations');
