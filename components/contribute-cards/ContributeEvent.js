@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Calendar } from '@styled-icons/feather/Calendar';
 import { Clock } from '@styled-icons/feather/Clock';
 import { truncate } from 'lodash';
-import NextLink from 'next/link';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
@@ -12,6 +11,7 @@ import { canOrderTicketsFromEvent, isPastEvent } from '../../lib/events';
 
 import Container from '../Container';
 import { Box } from '../Grid';
+import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
@@ -23,21 +23,19 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const isTruncated = description && description.length < event.description.length;
   const isPassed = isPastEvent(event);
   const canOrderTickets = canOrderTicketsFromEvent(event);
-  const eventRouteParams = { parentCollectiveSlug: collective.slug, slug: event.slug };
   const takesMultipleDays = startsAt && endsAt && !DayJs(startsAt).isSame(endsAt, 'day');
   const showYearOnStartDate = !endsAt || !takesMultipleDays ? 'numeric' : undefined; // only if there's no end date
 
   return (
     <Contribute
-      route="event"
-      routeParams={eventRouteParams}
+      route={`${collective.slug}/events/${event.slug}`}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
       disableCTA={!isPassed && !canOrderTickets}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
       title={
-        <StyledLink as={NextLink} color="black.800" href={`${collective.slug}/events/${event.slug}`}>
+        <StyledLink as={Link} color="black.800" href={`${collective.slug}/events/${event.slug}`}>
           {event.name}
         </StyledLink>
       }
@@ -73,11 +71,11 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       )}
       {description}
       {isTruncated && (
-        <NextLink href={`${collective.slug}/events/${event.slug}`}>
+        <Link href={`${collective.slug}/events/${event.slug}`}>
           <Span textTransform="capitalize" whiteSpace="nowrap">
             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
           </Span>
-        </NextLink>
+        </Link>
       )}
     </Contribute>
   );
