@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
+import NextLink from 'next/link';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -9,7 +10,6 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Flex } from '../Grid';
 import Hide from '../Hide';
 import HorizontalScroller from '../HorizontalScroller';
-import Link from '../Link';
 import Loading from '../Loading';
 import StyledButton from '../StyledButton';
 
@@ -108,11 +108,11 @@ class HostsContainer extends React.Component {
           </AllCardsContainer>
         </Hide>
         <Flex justifyContent="center" mt={[2, 0]} width={['100%', null, '90%']}>
-          <Link route="hosts">
+          <NextLink href="hosts">
             <StyledButton fontSize="13px" buttonStyle="dark" minHeight="36px" mt={[2, 3]} mb={3} px={4}>
               {intl.formatMessage(this.messages.seeMoreHosts)}
             </StyledButton>
-          </Link>
+          </NextLink>
         </Flex>
       </Flex>
     );

@@ -14,7 +14,6 @@ import CollectiveCard from '../../CollectiveCard';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import HostsWithData from '../../HostsWithData';
-import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledLink from '../../StyledLink';
@@ -464,7 +463,7 @@ class Host extends React.Component {
                         defaultMessage="Suggested Hosts"
                       />
                     </H4>
-                    <StyledLink as={Link} fontSize="13px" route="/hosts">
+                    <StyledLink as={NextLink} fontSize="13px" href="/hosts">
                       <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all Fiscal Hosts" />
                     </StyledLink>
                   </Container>

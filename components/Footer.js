@@ -5,11 +5,11 @@ import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/octicons/Mail';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import languages from '../lib/constants/locales';
-import { Link } from '../server/pages';
 
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';
@@ -365,11 +365,11 @@ const Footer = () => {
                 {Object.keys(navigation[key]).map(item => (
                   <ListItem key={item} textAlign={['center', 'left']} mb={2}>
                     {navigation[key][item][0] === '/' ? (
-                      <Link route={navigation[key][item]} passHref>
+                      <NextLink href={navigation[key][item]} passHref>
                         <MenuLink>
                           {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}
                         </MenuLink>
-                      </Link>
+                      </NextLink>
                     ) : (
                       <MenuLink href={navigation[key][item]}>
                         {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}

@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
-import Link from '../Link';
 import StyledCard from '../StyledCard';
 import StyledInputField from '../StyledInputField';
 import StyledRadioList from '../StyledRadioList';
@@ -127,7 +127,7 @@ const PricingTabs = ({ onChange, activeTab }) => {
               defaultMessage="You can check <a>our new pricing page.</a>"
               values={{
                 // eslint-disable-next-line react/display-name
-                a: chunks => <Link route={`/pricing`}>{chunks}</Link>,
+                a: chunks => <NextLink href={`/pricing`}>{chunks}</NextLink>,
               }}
             />
           </P>

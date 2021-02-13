@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
+import NextLink from 'next/link';
 import styled from 'styled-components';
 
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import Link from '../components/Link';
 import NewsletterContainer from '../components/NewsletterContainer';
 import staticPages from '../components/static-pages';
 import { withUser } from '../components/UserProvider';
@@ -118,7 +118,7 @@ class StaticPage extends React.Component {
           <div className="content">
             {path && pageSlug && (
               <div className="path">
-                <Link route={`/${path}`}>{path}</Link>
+                <NextLink href={`/${path}`}>{path}</NextLink>
               </div>
             )}
             <div dangerouslySetInnerHTML={{ __html: this.props.content }} />

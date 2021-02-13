@@ -1,12 +1,12 @@
 import React from 'react';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isURL } from 'validator';
 
 import Container from '../components/Container';
 import { Flex } from '../components/Grid';
-import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
@@ -84,7 +84,7 @@ const ExternalRedirectPage = () => {
                   <FormattedMessage id="actions.continue" defaultMessage="Continue" />
                 </StyledButton>
               </a>
-              <Link route={fallback} onClick={() => setPendingAction('CANCEL')}>
+              <NextLink href={fallback} onClick={() => setPendingAction('CANCEL')}>
                 <StyledButton
                   buttonSize="small"
                   m={2}
@@ -95,7 +95,7 @@ const ExternalRedirectPage = () => {
                 >
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </StyledButton>
-              </Link>
+              </NextLink>
             </Container>
           </StyledCard>
         ) : (

@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import StyledCarousel from '../../StyledCarousel';
 import StyledLink from '../../StyledLink';
 import { P } from '../../Text';
@@ -77,9 +77,9 @@ const User = ({ id, name, picture, type, collectivePath }) => {
   return (
     <Container textAlign="center" display="flex" flexDirection="column" alignItems="center" mx={[null, 3, 3]}>
       <ImgWrapper width={[1, '205px', null, '288px', '368px']}>
-        <Link route={collectivePath}>
+        <NextLink href={collectivePath}>
           <Img alt={name} src={picture} width="100%" />
-        </Link>
+        </NextLink>
       </ImgWrapper>
       <Container
         textAlign="center"

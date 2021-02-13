@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Clock } from '@styled-icons/feather/Clock';
+import NextLink from 'next/link';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fontSize, height, width } from 'styled-system';
@@ -9,10 +10,9 @@ import CollectiveCard from './gift-cards/CollectiveCard';
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex } from './Grid';
-import Link from './Link';
 import { P, Span } from './Text';
 
-const WhiteLink = styled(Link)`
+const WhiteLink = styled(NextLink)`
   color: white;
   text-decoration: underline !important;
   &&:hover {
@@ -86,7 +86,7 @@ class GiftCard extends React.Component {
               id="giftcard.user.text"
               defaultMessage="Contribute on Open Collective with this Gift Card, courtesy of {emitter}."
               values={{
-                emitter: <WhiteLink route={`/${emitter.slug}`}>{emitter.name}</WhiteLink>,
+                emitter: <WhiteLink href={`/${emitter.slug}`}>{emitter.name}</WhiteLink>,
               }}
             />
           </Text>

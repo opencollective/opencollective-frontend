@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as OtherIcon } from '@styled-icons/fa-solid/University';
 import { includes } from 'lodash';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 
 import TransferwiseIcon from '../icons/TransferwiseIcon';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
@@ -44,7 +44,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
           defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with TransferWise"
           values={{
             Link(message) {
-              return <Link route={`/${host.slug}/edit/host-plan`}>{message}</Link>;
+              return <NextLink href={`/${host.slug}/edit/host-plan`}>{message}</NextLink>;
             },
           }}
         />

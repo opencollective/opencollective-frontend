@@ -5,6 +5,7 @@ import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, flatten, isEqual, set } from 'lodash';
 import memoizeOne from 'memoize-one';
+import NextLink from 'next/link';
 import { useDrag, useDrop } from 'react-dnd';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -22,7 +23,6 @@ import Container from '../../Container';
 import DndProviderHTML5Backend from '../../DndProviderHTML5Backend';
 import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -415,11 +415,11 @@ const EditCollectivePage = ({ collective }) => {
                   <FormattedMessage id="save" defaultMessage="Save" />
                 </StyledButton>
                 <Box m={2}>
-                  <Link route="collective" params={{ slug: collective.slug }}>
+                  <NextLink href={collective.slug}>
                     <Span fontSize="14px">
                       <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
                     </Span>
-                  </Link>
+                  </NextLink>
                 </Box>
               </Flex>
             </div>

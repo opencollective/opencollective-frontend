@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
 import { getI18nLink } from '../I18nFormatters';
-import Link from '../Link';
 import StyledCheckbox from '../StyledCheckbox';
 import { H1, P } from '../Text';
 
@@ -70,13 +70,13 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => (
         </Box>
       </Container>
     </Box>
-    <Link route="/foundation/apply/fees">
+    <NextLink href="/foundation/apply/fees">
       <OCFPrimaryButton mb="40px" width={['286px', '100px']} disabled={!checked}>
         <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
         &nbsp;
         <ArrowRight2 size="14px" />
       </OCFPrimaryButton>
-    </Link>
+    </NextLink>
   </Flex>
 );
 

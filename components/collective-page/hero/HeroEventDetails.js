@@ -2,11 +2,11 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Clock } from '@styled-icons/feather/Clock';
 import { MapPin } from '@styled-icons/feather/MapPin';
+import NextLink from 'next/link';
 import { FormattedDate, FormattedMessage, FormattedTime } from 'react-intl';
 
 import dayjs from '../../../lib/dayjs';
 
-import Link from '../../Link';
 import StyledTooltip from '../../StyledTooltip';
 
 import HeroNote from './HeroNote';
@@ -135,9 +135,9 @@ class HeroEventDetails extends React.Component {
         {location.name && (
           <HeroNote>
             <MapPin size={16} />
-            <Link route={locationRoute}>
+            <NextLink href={locationRoute}>
               <span>{location.name}</span>
-            </Link>
+            </NextLink>
           </HeroNote>
         )}
 
@@ -148,7 +148,7 @@ class HeroEventDetails extends React.Component {
                 id="Event.CreatedBy"
                 defaultMessage="Created by: {CollectiveLink}"
                 values={{
-                  CollectiveLink: <Link route={`/${parentCollective.slug}`}>{parentCollective.name}</Link>,
+                  CollectiveLink: <NextLink href={`/${parentCollective.slug}`}>{parentCollective.name}</NextLink>,
                 }}
               />
             </span>

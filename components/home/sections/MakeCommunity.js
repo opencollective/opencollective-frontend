@@ -1,11 +1,11 @@
 import React, { Fragment, useState } from 'react';
 import { RightArrow } from '@styled-icons/boxicons-regular/RightArrow';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import Modal from '../../StyledModal';
 import { H1, H2, P, Span } from '../../Text';
@@ -88,11 +88,11 @@ const MakeCommunity = () => {
             </P>
           </Box>
           <Box display="flex" flexDirection={['column', 'row']} alignItems="center">
-            <Link route="/create">
+            <NextLink href="/create">
               <StyledButton minWidth={158} my={[2, null, 0]} mr={[0, 3]} buttonStyle="dark" whiteSpace="nowrap">
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </StyledButton>
-            </Link>
+            </NextLink>
             <StyledButton onClick={() => setShowModal(true)} my={[2, null, 0]} minWidth={158}>
               <Span mr={2}>
                 <FormattedMessage id="home.makeCommunitySection.watchVideo" defaultMessage="Watch Video" />

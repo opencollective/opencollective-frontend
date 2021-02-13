@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import { H1, H3, P } from '../../Text';
 import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
@@ -102,7 +102,7 @@ const JoinUs = ({ page }) => (
       </Box>
 
       <Container ml={[null, null, null, 3, 6]}>
-        <Link route={page === 'becomeAHost' ? '/organizations/new' : '/create'}>
+        <NextLink href={page === 'becomeAHost' ? '/organizations/new' : '/create'}>
           <Wrapper
             color="black.900"
             className="linkWrapper"
@@ -132,9 +132,9 @@ const JoinUs = ({ page }) => (
               <ArrowRight2 size={'24'} />
             </Box>
           </Wrapper>
-        </Link>
+        </NextLink>
 
-        <Link route="/hiring">
+        <NextLink href="/hiring">
           <Wrapper color="black.900" my={4} width={['288px', '648px', '569px', null, '594px']} className="linkWrapper">
             <Container mb={2} width={['192px', 1]}>
               <H3
@@ -169,7 +169,7 @@ const JoinUs = ({ page }) => (
               <ArrowRight2 size={'24'} />
             </Box>
           </Wrapper>
-        </Link>
+        </NextLink>
 
         <Wrapper
           color="black.900"

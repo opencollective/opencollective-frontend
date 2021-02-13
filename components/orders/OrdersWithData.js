@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { mapValues, pick } from 'lodash';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -13,7 +14,6 @@ import { Router } from '../../server/pages';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -190,16 +190,18 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
               values={{
                 ResetLink(text) {
                   return (
-                    <Link
+                    <NextLink
                       data-cy="reset-orders-filters"
-                      route={router.route.slice(1)}
-                      params={{
-                        ...mapValues(router.query, () => null),
-                        ...pick(router.query, ['slug', 'collectiveSlug', 'hostCollectiveSlug', 'view']),
+                      href={{
+                        pathname: router.route.slice(1),
+                        query: {
+                          ...mapValues(router.query, () => null),
+                          ...pick(router.query, ['slug', 'collectiveSlug', 'hostCollectiveSlug', 'view']),
+                        },
                       }}
                     >
                       {text}
-                    </Link>
+                    </NextLink>
                   );
                 },
               }}

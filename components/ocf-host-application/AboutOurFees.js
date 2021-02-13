@@ -1,13 +1,13 @@
 import React from 'react';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
 import I18nFormatters, { getI18nLink } from '../I18nFormatters';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';
 
@@ -123,20 +123,20 @@ const AboutOurFees = () => (
       </Box>
     </Flex>
     <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center" mb="40px" mt={[null, '48px']}>
-      <Link route="/foundation/apply/intro">
+      <NextLink href="/foundation/apply/intro">
         <StyledButton mb={[3, 0]} width={['286px', '100px']} mr={[null, 3]}>
           <ArrowLeft2 size="14px" />
           &nbsp;
           <FormattedMessage id="Back" defaultMessage="Back" />
         </StyledButton>
-      </Link>
-      <Link route="/foundation/apply/form">
+      </NextLink>
+      <NextLink href="/foundation/apply/form">
         <OCFPrimaryButton width={['286px', '100px']}>
           <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
           &nbsp;
           <ArrowRight2 size="14px" />
         </OCFPrimaryButton>
-      </Link>
+      </NextLink>
     </Flex>
   </Flex>
 );

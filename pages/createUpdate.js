@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -18,7 +19,6 @@ import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
-import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
 import { H1 } from '../components/Text';
@@ -97,14 +97,14 @@ class CreateUpdatePage extends React.Component {
           <CollectiveNavbar collective={collective} isAdmin={isAdmin} />
           <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
             <BackButtonWrapper>
-              <Link href={`/${collective.slug}/updates`}>
+              <NextLink href={`/${collective.slug}/updates`}>
                 <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">
                   <ArrowBack size={18} />
                   <Box as="span" mx={2}>
                     Back
                   </Box>
                 </Container>
-              </Link>
+              </NextLink>
             </BackButtonWrapper>
             <Container width={1}>
               {!isAdmin && (

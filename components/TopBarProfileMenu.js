@@ -14,9 +14,6 @@ import { formatCurrency } from '../lib/currency-utils';
 import { isPastEvent } from '../lib/events';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { capitalize } from '../lib/utils';
-import { Link } from '../server/pages';
-
-import ComponentLink from '../components/Link';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -358,11 +355,11 @@ class TopBarProfileMenu extends React.Component {
                 <FormattedMessage id="collective" defaultMessage="My Collectives" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <ComponentLink route="/create">
+              <NextLink href="/create">
                 <StyledRoundButton ml={2} size={24} color="#C4C7CC">
                   <Plus size={12} color="#76777A" />
                 </StyledRoundButton>
-              </ComponentLink>
+              </NextLink>
             </Flex>
             <Box as="ul" p={0} my={2}>
               {collectives.map(this.renderMembershipLine)}
@@ -415,9 +412,9 @@ class TopBarProfileMenu extends React.Component {
                   </P>
                   <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
                   <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-                    <Link route="/fund/create" passHref>
+                    <NextLink href="/fund/create" passHref>
                       <Plus size={12} color="#76777A" />
-                    </Link>
+                    </NextLink>
                   </StyledRoundButton>
                 </Flex>
                 <Box as="ul" p={0} my={2}>
@@ -439,11 +436,11 @@ class TopBarProfileMenu extends React.Component {
                 <FormattedMessage id="organization" defaultMessage="My Organizations" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <ComponentLink route="/organizations/new">
+              <NextLink href="/organizations/new">
                 <StyledRoundButton ml={2} size={24} color="#C4C7CC">
                   <Plus size={12} color="#76777A" />
                 </StyledRoundButton>
-              </ComponentLink>
+              </NextLink>
             </Flex>
             <Box as="ul" p={0} my={2}>
               {orgs.map(this.renderMembershipLine)}

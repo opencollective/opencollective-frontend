@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import styled from 'styled-components';
 
 import { Flex } from '../Grid';
-import Link from '../Link';
 import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 
@@ -34,7 +34,7 @@ const CreateNew = ({ route, children, ...props }) => {
   return (
     <CreateNewCard {...props}>
       <Flex alignItems="center" justifyContent="center" height="100%">
-        <Link route={route}>
+        <NextLink href={route}>
           <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
             <StyledRoundButton buttonStyle="dark" fontSize={25}>
               +
@@ -43,7 +43,7 @@ const CreateNew = ({ route, children, ...props }) => {
               {children}
             </P>
           </Flex>
-        </Link>
+        </NextLink>
       </Flex>
     </CreateNewCard>
   );

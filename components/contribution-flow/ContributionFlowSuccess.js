@@ -20,7 +20,6 @@ import Container from '../../components/Container';
 import { formatAccountDetails } from '../../components/edit-collective/utils';
 import { Box, Flex } from '../../components/Grid';
 import I18nFormatters, { getI18nLink } from '../../components/I18nFormatters';
-import Link from '../../components/Link';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
@@ -248,7 +247,7 @@ class NewContributionFlowSuccess extends React.Component {
                 </Box>
                 <ContributorCardWithTier width={250} height={380} contribution={order} my={2} />
                 <Box my={4}>
-                  <Link route="discover" params={{ show: getMainTag(order.toAccount) }}>
+                  <NextLink href={{ pathname: 'discover', query: { show: getMainTag(order.toAccount) } }}>
                     <P color="black.800" fontWeight={500}>
                       <FormattedMessage
                         id="NewContributionFlow.Success.DiscoverMore"
@@ -256,7 +255,7 @@ class NewContributionFlowSuccess extends React.Component {
                         values={{ collective: order.toAccount.name }}
                       />
                     </P>
-                  </Link>
+                  </NextLink>
                 </Box>
                 <Flex justifyContent="center" mt={2}>
                   <ShareLink

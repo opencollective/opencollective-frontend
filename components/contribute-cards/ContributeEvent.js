@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Calendar } from '@styled-icons/feather/Calendar';
 import { Clock } from '@styled-icons/feather/Clock';
 import { truncate } from 'lodash';
+import NextLink from 'next/link';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
@@ -11,7 +12,6 @@ import { canOrderTicketsFromEvent, isPastEvent } from '../../lib/events';
 
 import Container from '../Container';
 import { Box } from '../Grid';
-import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
@@ -37,7 +37,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
       title={
-        <StyledLink as={Link} color="black.800" route="event" params={eventRouteParams}>
+        <StyledLink as={NextLink} color="black.800" href={`${collective.slug}/events/${event.slug}`}>
           {event.name}
         </StyledLink>
       }
@@ -73,11 +73,11 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       )}
       {description}
       {isTruncated && (
-        <Link route="event" params={{ parentCollectiveSlug: collective.slug, slug: event.slug }}>
+        <NextLink href={`${collective.slug}/events/${event.slug}`}>
           <Span textTransform="capitalize" whiteSpace="nowrap">
             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
           </Span>
-        </Link>
+        </NextLink>
       )}
     </Contribute>
   );

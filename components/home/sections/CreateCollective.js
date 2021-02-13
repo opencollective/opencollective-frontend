@@ -1,9 +1,9 @@
 import React from 'react';
+import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import { flicker } from '../../StyledKeyframes';
 import { H4 } from '../../Text';
@@ -68,11 +68,11 @@ const CreateCollective = () => {
       <Wrapper width={['288px', '283px']} height={['288px', '294px']}>
         <BackgroundImage />
         <BackgroundImageHover />
-        <Link route="/create">
+        <NextLink href="/create">
           <CreateCollectiveButton buttonStyle="dark" minWidth={'164px'}>
             <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
           </CreateCollectiveButton>
-        </Link>
+        </NextLink>
       </Wrapper>
     </Flex>
   );

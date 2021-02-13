@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { background, display } from 'styled-system';
@@ -7,7 +8,6 @@ import { background, display } from 'styled-system';
 import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
 import { H2, H3, H5, P, Span } from '../../Text';
@@ -235,7 +235,7 @@ const FiscalHost = () => {
                     flexDirection={[null, null, null, 'column']}
                     width={[1, null, null, '292px']}
                   >
-                    <CollectHostPageLink as={Link} route={host.collectivePageLink}>
+                    <CollectHostPageLink as={NextLink} href={host.collectivePageLink}>
                       <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
                         {host.name}
                       </H3>
@@ -259,8 +259,8 @@ const FiscalHost = () => {
                       </Box>
                       <Box my={[3, null, null, 0]}>
                         <StyledLink
-                          as={Link}
-                          route={`${host.collectivePageLink}/apply`}
+                          as={NextLink}
+                          href={`${host.collectivePageLink}/apply`}
                           whiteSpace="nowrap"
                           fontSize="14px"
                           lineHeight="21px"
@@ -284,8 +284,8 @@ const FiscalHost = () => {
             </Container>
             <Box my={2} alignSelf={[null, 'center', null, 'flex-start']}>
               <DiscoverLink
-                as={Link}
-                route="hosts"
+                as={NextLink}
+                href="hosts"
                 fontSize="15px"
                 lineHeight="23px"
                 letterSpacing="-0.12px"
