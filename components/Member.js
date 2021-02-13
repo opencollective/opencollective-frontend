@@ -4,7 +4,6 @@ import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import colors from '../lib/constants/colors';
 import { formatCurrency } from '../lib/currency-utils';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
 
@@ -126,11 +125,19 @@ ${totalDonationsStr}`;
                   <Container fontSize="1.4rem" color="black.600">
                     {firstSentence(description || member.description, 64)}
                   </Container>
-                  <Container className="since" fontSize="1.4rem" style={{ color: colors.darkgray }}>
+                  <Container
+                    className="since"
+                    fontSize="1.4rem"
+                    style={{ color: props => props.theme.colors.darkgray }}
+                  >
                     {memberSinceStr}
                   </Container>
                   {totalDonationsStr && (
-                    <Container className="totalDonations" fontSize="1.4rem" style={{ color: colors.darkgray }}>
+                    <Container
+                      className="totalDonations"
+                      fontSize="1.4rem"
+                      style={{ color: props => props.theme.colors.darkgray }}
+                    >
                       {totalDonationsStr}
                     </Container>
                   )}

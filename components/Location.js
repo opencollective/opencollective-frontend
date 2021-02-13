@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import colors from '../lib/constants/colors';
-
 import Container from './Container';
 import Map from './Map';
 import StyledLink from './StyledLink';

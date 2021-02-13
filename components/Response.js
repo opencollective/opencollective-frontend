@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import colors from '../lib/constants/colors';
-
 import Avatar from './Avatar';
 import Container from './Container';
 
