@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
-import { FormattedMessage } from 'react-intl';
-
 import NextLink from 'next/link';
+import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
 import Currency from './Currency';

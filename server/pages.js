@@ -8,11 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes();
 
-// Marketing Pages
-// ---------------
-
-pages.add('marketing', '/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|old-pricing)', 'marketingPage');
-
 // Collective
 // ----------
 

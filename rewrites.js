@@ -238,11 +238,11 @@ exports.REWRITES = [
     source: `/:slug/pledges/new`,
     destination: '/createPledge',
   },
-  // // Marketing Pages
-  // {
-  //   source: `/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|old-pricing)`,
-  //   destination: '/marketingPage',
-  // },
+  // Marketing Pages
+  {
+    source: `/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|old-pricing)`,
+    destination: '/marketingPage',
+  },
   // Collective
   // ----------
   // Collective page

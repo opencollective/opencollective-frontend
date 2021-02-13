@@ -5,12 +5,12 @@ import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/material/Mail';
+import NextLink from 'next/link';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from './Container';
 import { Box } from './Grid';
-import Link from './Link';
 import StyledLink from './StyledLink';
 import StyledRoundButton from './StyledRoundButton';
 import { withUser } from './UserProvider';
@@ -53,23 +53,23 @@ class TopBarMobileMenu extends React.Component {
         <Box as="ul" my={2} pl={0}>
           {menuItems.discover && (
             <ListItem>
-              <Link route="discover" onClick={closeMenu}>
+              <NextLink href="discover" onClick={closeMenu}>
                 <FormattedMessage id="menu.discover" defaultMessage="Discover" />
-              </Link>
+              </NextLink>
             </ListItem>
           )}
           {menuItems.howItWorks && (
             <ListItem>
-              <Link route="marketing" params={{ pageSlug: 'how-it-works' }} onClick={closeMenu}>
+              <NextLink href="how-it-works" onClick={closeMenu}>
                 <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
-              </Link>
+              </NextLink>
             </ListItem>
           )}
           {menuItems.pricing && (
             <ListItem>
-              <Link route="pricing" onClick={closeMenu}>
+              <NextLink href="pricing" onClick={closeMenu}>
                 <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-              </Link>
+              </NextLink>
             </ListItem>
           )}
           {menuItems.docs && (
