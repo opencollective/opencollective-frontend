@@ -4,7 +4,6 @@ import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import colors from '../lib/constants/colors';
 import { formatCurrency } from '../lib/currency-utils';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
 
@@ -123,14 +122,22 @@ ${totalDonationsStr}`;
                 <Avatar collective={member} radius={45} className="noFrame" />
                 <Container padding="1rem" paddingTop="0" textAlign="left" overflow="hidden" display="none">
                   <Container fontSize="1.7rem">{name}</Container>
-                  <Container fontSize="1.4rem" style={{ color: colors.darkgray }}>
+                  <Container fontSize="1.4rem" style={{ color: props => props.theme.colors.darkgray }}>
                     {firstSentence(description || member.description, 64)}
                   </Container>
-                  <Container className="since" fontSize="1.4rem" style={{ color: colors.darkgray }}>
+                  <Container
+                    className="since"
+                    fontSize="1.4rem"
+                    style={{ color: props => props.theme.colors.darkgray }}
+                  >
                     {memberSinceStr}
                   </Container>
                   {totalDonationsStr && (
-                    <Container className="totalDonations" fontSize="1.4rem" style={{ color: colors.darkgray }}>
+                    <Container
+                      className="totalDonations"
+                      fontSize="1.4rem"
+                      style={{ color: props => props.theme.colors.darkgray }}
+                    >
                       {totalDonationsStr}
                     </Container>
                   )}
