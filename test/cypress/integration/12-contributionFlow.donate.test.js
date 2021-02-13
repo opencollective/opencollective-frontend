@@ -27,14 +27,14 @@ describe('Contribution Flow: Donate', () => {
       cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / mo.');
       cy.contains("Today's charge");
       // next charge in 2 months time, first day, because it was made on or after 15th.
-      cy.contains('Next charge on July 1, 2042');
+      cy.contains('The next charge will be on July 1, 2042');
 
       // Change frequency - yearly
       cy.contains('#interval button', 'Yearly').click();
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / yr.');
       cy.contains("Today's charge");
-      cy.contains('Next charge on May 1, 2043');
+      cy.contains('The next charge will be on May 1, 2043');
 
       cy.get('button[data-cy="cf-next-step"]').click();
 
@@ -118,7 +118,7 @@ describe('Contribution Flow: Donate', () => {
   it('Forces params if given in URL', () => {
     cy.signup({ redirect: `${donateRoute}/42/year`, visitParams }).then(() => {
       cy.clock(Date.parse('2042/05/25'));
-      cy.contains('Next charge on May 1, 2043');
+      cy.contains('The next charge will be on May 1, 2043');
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.checkStepsProgress({ enabled: ['details', 'profile'] });
       cy.get('button[data-cy="cf-next-step"]').click();

@@ -153,7 +153,7 @@ const Transparency = () => (
             >
               <FormattedMessage
                 id="becomeASponsor.paperWork.description"
-                defaultMessage="The fiscal host of the Collective you want to support is an established legal entity who can engage with your vendor systems and purchase order processes, and meet documentation requirements like tax forms and signing agreements. "
+                defaultMessage="The Fiscal Host of the Collective you want to support is an established legal entity who can engage with your vendor systems and purchase order processes, and meet documentation requirements like tax forms and signing agreements. "
               />
             </P>
           </Box>

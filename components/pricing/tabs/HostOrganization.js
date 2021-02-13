@@ -65,7 +65,7 @@ const rows = [
         return (
           <FormattedMessage
             id="newPricingTable.row.minimumRaised"
-            defaultMessage="+ {minimumRaised} total raised"
+            defaultMessage="> {minimumRaised} total processed"
             values={{ minimumRaised: '$150,000' }}
           />
         );
@@ -278,7 +278,7 @@ const HostOrganization = () => (
           (2){' '}
           <FormattedMessage
             id="newPricing.tab.hostFeeChargeExample"
-            defaultMessage="If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform."
+            defaultMessage="If your Host fee is 10% and your Collectives bring in $1,000, your Platform fee will be $15. If you host fee is 0%, your Platform fee will be 0."
           />
         </P>
       </Box>

@@ -4,7 +4,6 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { GraphQLContext } from '../lib/graphql/context';
 import { addEditCollectiveMutation } from '../lib/graphql/mutations';
 import { editCollectivePageQuery } from '../lib/graphql/queries';
 
@@ -93,9 +92,7 @@ class EditCollectivePage extends React.Component {
 
     return (
       <div>
-        <GraphQLContext.Provider value={data}>
-          <EditCollective collective={collective} editCollective={editCollective} />
-        </GraphQLContext.Provider>
+        <EditCollective collective={collective} editCollective={editCollective} />
       </div>
     );
   }

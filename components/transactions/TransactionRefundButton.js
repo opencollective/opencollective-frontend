@@ -68,7 +68,7 @@ const TransactionRefundButton = props => {
                 <MessageBox type="info" mx={2}>
                   <FormattedMessage
                     id="transaction.refund.info"
-                    defaultMessage="This action will reimburse your contributor for the full amount of their contribution and they will still be a member of your Collective."
+                    defaultMessage="The contributor will be refunded the full amount."
                   />
                 </MessageBox>
                 {error && <MessageBoxGraphqlError mt="12px" error={error} />}

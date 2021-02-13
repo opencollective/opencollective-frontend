@@ -16,18 +16,18 @@ const HostPayouts2FARollingLimitFAQ = ({ defaultOpen, currency, ...props }) => (
       <Content>
         <FormattedMessage
           id="RollingLimitFAQ.enable.content"
-          defaultMessage="When you go to make payments from the Host dashboard, you will be asked to authenticate with your 2FA code when you make the first payment. Then you will be allowed to make payments that add up to the rolling limit you've set."
+          defaultMessage="You will be asked to authenticate with your 2FA code when you make the first payment after turning it on, and again once you've hit the rolling limit you've set."
         />
       </Content>
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="RollingLimitFAQ.amount" defaultMessage="How do I set the rolling limit amount?" />
+        <FormattedMessage id="RollingLimitFAQ.amount" defaultMessage="How do I set the rolling limit?" />
       </Title>
       <Content>
         <FormattedMessage
           id="RollingLimitFAQ.amount.content"
-          defaultMessage="The default rolling limit amount is {defaultLimitWithCurrency}. You can reset this using the input field above."
+          defaultMessage="The default rolling limit is {defaultLimitWithCurrency}. You can change this using the input field above."
           values={{
             defaultLimitWithCurrency: <FormattedMoneyAmount amount={1000000} currency={currency} precision={2} />,
           }}
@@ -36,12 +36,15 @@ const HostPayouts2FARollingLimitFAQ = ({ defaultOpen, currency, ...props }) => (
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="RollingLimitFAQ.admins" defaultMessage="Who can make payments with 2FA enabled?" />
+        <FormattedMessage
+          id="RollingLimitFAQ.admins"
+          defaultMessage="Do all admins need to use 2FA if we turn it on?"
+        />
       </Title>
       <Content>
         <FormattedMessage
           id="RollingLimitFAQ.admins.content"
-          defaultMessage="Only host admins will be able to make payments with 2FA enabled. Once 2FA is enabled for payouts, host admins must set up 2FA on their accounts for login before being able to continue making payouts."
+          defaultMessage="Yes. Once 2FA is enabled for payouts, each Host admin must set up 2FA on their accounts for login in order to make payouts."
         />
       </Content>
     </Entry>
@@ -52,7 +55,7 @@ const HostPayouts2FARollingLimitFAQ = ({ defaultOpen, currency, ...props }) => (
       <Content>
         <FormattedMessage
           id="RollingLimitFAQ.disable.content"
-          defaultMessage="For security purposes, 2FA can only be disabled by contacting <I18nSupportLink>support</I18nSupportLink> once it has been enabled."
+          defaultMessage="For security purposes, 2FA can only be disabled by contacting <I18nSupportLink>support</I18nSupportLink>."
           values={{
             I18nSupportLink,
           }}

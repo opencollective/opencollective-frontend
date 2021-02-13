@@ -174,7 +174,7 @@ interface Account {
   """
   paymentMethods(
     """
-    Filter on given types (creditcard, virtualcard...)
+    Filter on given types (creditcard, giftcard...)
     """
     types: [String]
 
@@ -298,6 +298,14 @@ enum AccountType {
   INDIVIDUAL
   ORGANIZATION
   PROJECT
+}
+
+input AccountUpdateInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String!
+  currency: Currency
 }
 
 """
@@ -466,6 +474,21 @@ enum ActivityType {
   DEACTIVATED_COLLECTIVE_AS_HOST
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
+}
+
+"""
+Response for the addTwoFactorAuthTokenToIndividual mutation
+"""
+type AddTwoFactorAuthTokenToIndividualResponse {
+  """
+  The Individual that the 2FA has been enabled for
+  """
+  account: Individual!
+
+  """
+  The recovery codes for the Individual to write down
+  """
+  recoveryCodes: [String]
 }
 
 """
@@ -1080,7 +1103,6 @@ input CommentCreateInput {
   If your comment is linked to an expense, set it here
   """
   expense: ExpenseReferenceInput
-  ExpenseId: Int
   ConversationId: String
   update: UpdateReferenceInput
 }
@@ -3313,12 +3335,6 @@ input ExpenseCreateInput {
   payoutMethod: PayoutMethodInput!
 
   """
-  @deprecated 2020-04-08: Please use the items field - The list of items for
-  this expense. Total amount will be computed from them.
-  """
-  attachments: [ExpenseItemCreateInput]
-
-  """
   The list of items for this expense. Total amount will be computed from them.
   """
   items: [ExpenseItemCreateInput]
@@ -5178,7 +5194,12 @@ type Mutation {
     A message to attach for the host to review the application
     """
     message: String
-  ): Collective!
+
+    """
+    Further information about collective applying to host
+    """
+    applicationData: JSON
+  ): Account!
 
   """
   Reply to a host application
@@ -5246,22 +5267,22 @@ type Mutation {
   ): Account!
 
   """
-  Add 2FA to the Account if it does not have it
+  Add 2FA to the Individual if it does not have it
   """
   addTwoFactorAuthTokenToIndividual(
     """
-    Account that will have 2FA added to it
+    Individual that will have 2FA added to it
     """
     account: AccountReferenceInput!
 
     """
-    The generated secret to save to the Account
+    The generated secret to save to the Individual
     """
     token: String!
-  ): Individual!
+  ): AddTwoFactorAuthTokenToIndividualResponse!
 
   """
-  Remove 2FA from the Account if it has been enabled
+  Remove 2FA from the Individual if it has been enabled
   """
   removeTwoFactorAuthTokenFromIndividual(
     """
@@ -5280,7 +5301,7 @@ type Mutation {
   """
   editHostPlan(
     """
-    Account that will have 2FA added to it
+    Account where the host plan will be edited.
     """
     account: AccountReferenceInput!
 
@@ -5288,6 +5309,16 @@ type Mutation {
     The name of the plan to subscribe to.
     """
     plan: String!
+  ): Host!
+
+  """
+  Edit key properties of an account.
+  """
+  editAccount(
+    """
+    Account to edit.
+    """
+    account: AccountUpdateInput!
   ): Host!
 
   """
@@ -5699,7 +5730,7 @@ input OrderTaxInput {
   """
   Country of the account ordering, to know from where to apply the tax
   """
-  country: CountryISO!
+  country: CountryISO
 
   """
   Tax identification number, if any
@@ -5729,7 +5760,7 @@ type OrderWithPayment {
   order: Order!
 
   """
-  If donating as a guest, this will contain your guest token to contribute again in the future
+  If donating as a guest, this will contain your guest token to confirm your order
   """
   guestToken: String
 

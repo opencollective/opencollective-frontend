@@ -23,21 +23,21 @@ import { H1, H4, P } from './Text';
 import { withUser } from './UserProvider';
 
 const orgMessages = defineMessages({
-  nameLabel: { id: 'createOrg.form.nameLabel', defaultMessage: "What's the name of your organization?" },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
+  nameLabel: { id: 'Organization.Name', defaultMessage: 'Organization name' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
     defaultMessage: 'Making the world a better place',
   },
-  websiteLabel: { id: 'createOrg.form.webstiteLabel', defaultMessage: "What's your Organization's website" },
+  websiteLabel: { id: 'createOrg.form.webstiteLabel', defaultMessage: 'Organization website' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'ExpenseForm.inviteeOrgDescriptionLabel',
     defaultMessage: 'What does your organization do?',
   },
   descriptionHint: {
-    id: 'createOrg.form.descriptionHint',
-    defaultMessage: 'Write a short description of your Organization (150 characters max)',
+    id: 'createCollective.form.descriptionHint',
+    defaultMessage: 'Write a short description (150 characters max)',
   },
   errorName: {
     id: 'createCollective.form.error.name',
@@ -53,19 +53,19 @@ const orgMessages = defineMessages({
   },
   errorSlugHyphen: {
     id: 'createOrg.form.error.slug.hyphen',
-    defaultMessage: 'Organization slug can not start nor end with hyphen',
+    defaultMessage: 'Organization URL slug cannot start or end with a hyphen (-)',
   },
   errorWebsite: {
     id: 'createOrg.form.error.website',
-    defaultMessage: 'Enter valid website format www.test.com or test.org',
+    defaultMessage: 'Enter a valid website, e.g. www.example.com or example.org',
   },
 });
 
 const placeholders = {
-  name: { id: 'placeholder.name', defaultMessage: 'i.e. Salesforce, Airbnb' },
+  name: { id: 'placeholder.name', defaultMessage: 'e.g. Salesforce, Airbnb' },
   slug: { id: 'placeholder.slug', defaultMessage: 'Airbnb' },
   description: { id: 'placeholderdescription', defaultMessage: 'Making a world a better place' },
-  website: { id: 'placeholder.website', defaultMessage: 'www.airbnb.com' },
+  website: { id: 'placeholder.website', defaultMessage: 'www.example.com' },
   username: { id: 'placeholder.username', defaultMessage: 'User name' },
 };
 
@@ -158,7 +158,7 @@ const CreateOrganizationForm = props => {
                         color="black.900"
                         letterSpacing="1px"
                       >
-                        <FormattedMessage id="organization.create" defaultMessage="Create organization" />
+                        <FormattedMessage id="organization.create" defaultMessage="Create Organization" />
                       </H1>
                     </Box>
                     {error && !loading && (
@@ -178,7 +178,7 @@ const CreateOrganizationForm = props => {
                       justifyContent="space-around"
                     >
                       <H4 color="black.900" fontSize="18px">
-                        <FormattedMessage id="CreateProfile.OrgInfo" defaultMessage="Organization's information" />
+                        <FormattedMessage id="CreateProfile.OrgInfo" defaultMessage="Organization info" />
                       </H4>
                       <StyledInputField
                         name="name"
@@ -297,7 +297,7 @@ const CreateOrganizationForm = props => {
                       <P fontSize="14px" mb={3} mt={2} lineHeight="21px" color="black.700">
                         <FormattedMessage
                           id="coAdminsDescription"
-                          defaultMessage="Organization admins can make changes in the profile and interact with other profiles on behalf of this organization."
+                          defaultMessage="Organization admins can make changes and represent this organization on the platform."
                         />
                       </P>
                       <Container border="1px solid #E6E8EB" borderRadius="16px" p={3} height="auto">
@@ -365,8 +365,7 @@ const CreateOrganizationForm = props => {
                       label={
                         <FormattedMessage
                           id="createorganization.authorization.label"
-                          defaultMessage="I verify that I am an authorized representative of this organization and 
-                            have the right to act on its behalf."
+                          defaultMessage="I verify that I am authorized to represent this organization."
                         />
                       }
                       onChange={({ checked }) => {
@@ -384,7 +383,7 @@ const CreateOrganizationForm = props => {
                         onSubmit={handleSubmit}
                         data-cy="cof-form-submit"
                       >
-                        <FormattedMessage id="create.org.title" defaultMessage="Create Organization" />
+                        <FormattedMessage id="organization.create" defaultMessage="Create Organization" />
                       </StyledButton>
                     </Flex>
                   </Flex>

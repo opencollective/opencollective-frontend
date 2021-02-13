@@ -27,7 +27,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   PAYMENT_RECEIPTS: 'payment-receipts',
   TICKETS: 'tickets',
   TIERS: 'tiers',
-  VIRTUAL_CARDS: 'gift-cards',
+  GIFT_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
   PENDING_ORDERS: 'pending-orders',
   TWO_FACTOR_AUTH: 'two-factor-auth',
@@ -48,7 +48,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Advanced',
   },
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: {
-    id: 'editCollective.menu.goals',
+    id: 'Goals',
     defaultMessage: 'Goals',
   },
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: {
@@ -123,8 +123,8 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.tiers',
     defaultMessage: 'Tiers',
   },
-  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: {
-    id: 'editCollective.menu.virtualCards',
+  [EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS]: {
+    id: 'editCollective.menu.giftCards',
     defaultMessage: 'Gift Cards',
   },
   [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: {
@@ -136,7 +136,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Tickets',
   },
   [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: {
-    id: 'editCollective.menu.twofa',
+    id: 'TwoFactorAuth',
     defaultMessage: 'Two-factor authentication',
   },
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: {
@@ -144,7 +144,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Payment Receipts',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: {
-    id: 'editCollective.menu.twofa',
+    id: 'TwoFactorAuth',
     defaultMessage: 'Two-factor authentication',
   },
 });
@@ -188,7 +188,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
     isOneOfTypes(c, COLLECTIVE, FUND, EVENT, PROJECT) || (c.type === ORGANIZATION && c.isActive),
-  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isType(c, ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS]: c => isType(c, ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c => isOneOfTypes(c, COLLECTIVE, ORGANIZATION, USER, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
   [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, USER),

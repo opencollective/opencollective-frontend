@@ -4,7 +4,6 @@ import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { Box } from '../../Grid';
@@ -90,7 +89,7 @@ const SectionTransactions = props => {
         </SectionTitle>
         {collectiveHasNoTransactions && (
           <MessageBox type="info" withIcon>
-            <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />
+            <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />
           </MessageBox>
         )}
       </ContainerSectionContent>
@@ -112,15 +111,13 @@ const SectionTransactions = props => {
           {loading ? (
             <LoadingPlaceholder height={600} borderRadius={8} />
           ) : (
-            <GraphQLContext.Provider value={transactionsQueryResult}>
-              <TransactionsList collective={collective} transactions={data?.transactions?.nodes} displayActions />
-            </GraphQLContext.Provider>
+            <TransactionsList collective={collective} transactions={data?.transactions?.nodes} displayActions />
           )}
           {data?.transactions.totalCount === 0 && (
             <MessageBox type="info">
               <FormattedMessage
                 id="TransactionsList.Empty"
-                defaultMessage="No transaction matches the given filters, <ResetLink>reset them</ResetLink> to see all transactions."
+                defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
                 values={{
                   ResetLink(text) {
                     return <ResetAnchor onClick={() => setFilter(FILTERS.ALL)}>{text}</ResetAnchor>;

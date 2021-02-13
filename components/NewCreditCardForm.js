@@ -116,7 +116,10 @@ class NewCreditCardFormWithoutStripe extends React.Component {
       if (!stripeData.complete) {
         if (!this.props.hidePostalCode && !stripeData.value?.postalCode) {
           return (
-            <FormattedMessage id="NewCreditCardForm.PostalCode" defaultMessage="Credit card ZIP code is required" />
+            <FormattedMessage
+              id="NewCreditCardForm.PostalCode"
+              defaultMessage="Credit card zip/postal code is required"
+            />
           );
         }
       }
@@ -153,7 +156,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
                 <Span fontWeight="normal">
                   <FormattedMessage
                     id="ContributeFAQ.Safe"
-                    defaultMessage="Open Collective doesn't store any credit card number, we're instead relying on our partner Stripe - a secure solution that is widely adopted by the industry. If our systems are compromised, we can't loose your credit card number because we simply don't have it. <LearnMoreLink>Learn more</LearnMoreLink> about the security of Open Collective."
+                    defaultMessage="Open Collective doesn't store credit card numbers, instead relying on our payment processor, Stripe, a secure solution that is widely adopted. If our systems are compromised, your credit card information is not at risk, because we simply don't store it. <LearnMoreLink>Learn more</LearnMoreLink>."
                     values={{
                       LearnMoreLink: getI18nLink({
                         openInNewTab: true,

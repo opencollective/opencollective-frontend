@@ -45,7 +45,7 @@ const messages = defineMessages({
     defaultMessage: 'For open source projects',
   },
   climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
-  covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 initiatives' },
+  covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 groups' },
 });
 
 const CollectiveCategoryPicker = () => {

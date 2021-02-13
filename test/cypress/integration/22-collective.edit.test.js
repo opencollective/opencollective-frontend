@@ -78,9 +78,9 @@ describe('edit collective', () => {
     cy.get('.backToProfile a').click(); // back to profile
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
-    cy.get('[data-cy="collective-hero"] [title="Twitter"][href="https://twitter.com/opencollect"]');
-    cy.get('[data-cy="collective-hero"] [title="Github"][href="https://github.com/AwesomeHandle"]');
-    cy.get('[data-cy="collective-hero"] [title="Website"][href="https://opencollective.com"]');
+    cy.get('[data-cy="collective-hero"] a[href="https://twitter.com/opencollect"] [title="Twitter"]');
+    cy.get('[data-cy="collective-hero"] a[href="https://github.com/AwesomeHandle"] [title="Github"]');
+    cy.get('[data-cy="collective-hero"] a[href="https://opencollective.com"] [title="Website"]');
   });
 
   it('edit tiers', () => {
@@ -172,6 +172,10 @@ describe('edit user collective', () => {
           });
           cy.getByDataCy('add-two-factor-auth-totp-code-field').clear().type(TOTPCode);
           cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
+          cy.getByDataCy('recovery-codes-container').should('exist');
+          cy.getByDataCy('recovery-codes-container').children().should('have.length', 6);
+          cy.getByDataCy('add-two-factor-auth-confirm-recovery-codes-button').click();
+          cy.getByDataCy('confirmation-modal-continue').click();
           cy.getByDataCy('add-two-factor-auth-success').should('exist');
         });
     });

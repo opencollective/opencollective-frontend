@@ -5,6 +5,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Field, Form, Formik } from 'formik';
 import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { isEmail } from 'validator';
 
 import { checkUserExistence, signin } from '../lib/api';
 import { getWebsiteUrl } from '../lib/utils';
@@ -14,6 +15,7 @@ import CreateProfileFAQ from './faqs/CreateProfileFAQ';
 import CreateProfile from './CreateProfile';
 import { Box, Flex } from './Grid';
 import I18nFormatters from './I18nFormatters';
+import Loading from './Loading';
 import MessageBoxGraphqlError from './MessageBoxGraphqlError';
 import SignIn from './SignIn';
 import StyledButton from './StyledButton';
@@ -37,6 +39,10 @@ class SignInOrJoinFree extends React.Component {
   static propTypes = {
     /** Redirect URL */
     redirect: PropTypes.string,
+    /** To pre-fill the "email" field */
+    defaultEmail: PropTypes.string,
+    /** Provide this to automatically sign in the given email */
+    email: PropTypes.string,
     /** createUserQuery binding */
     createUser: PropTypes.func,
     /** Use this prop to use this as a controlled component */
@@ -48,10 +54,10 @@ class SignInOrJoinFree extends React.Component {
       signin: PropTypes.string,
       join: PropTypes.string,
     }),
-    /** A label to use instead of the default `Create personal profile` */
-    createPersonalProfileLabel: PropTypes.node,
-    /** A label to use instead of the default `Create Organization profile` */
-    createOrganizationProfileLabel: PropTypes.node,
+    /** To customize which forms should be displayed */
+    createProfileTabs: PropTypes.arrayOf(PropTypes.oneOf(['personal', 'organization'])),
+    /** To replace the default labels */
+    createProfileLabels: PropTypes.shape({ personal: PropTypes.string, organization: PropTypes.string }),
     /** To display a box shadow below the card */
     withShadow: PropTypes.bool,
     /** Label for signIn, defaults to "Sign in using your email address:" */
@@ -61,13 +67,23 @@ class SignInOrJoinFree extends React.Component {
     submitTwoFactorAuthenticatorCode: PropTypes.func,
   };
 
-  state = {
-    form: this.props.defaultForm || 'signin',
-    error: null,
-    submitting: false,
-    unknownEmailError: false,
-    email: '',
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      form: this.props.defaultForm || 'signin',
+      error: null,
+      submitting: false,
+      unknownEmailError: false,
+      email: props.email || props.defaultEmail || '',
+    };
+  }
+
+  componentDidMount() {
+    // Auto signin if an email is provided
+    if (this.props.email && isEmail(this.props.email)) {
+      this.signIn(this.props.email);
+    }
+  }
 
   switchForm = form => {
     // Update local state
@@ -206,7 +222,7 @@ class SignInOrJoinFree extends React.Component {
                       onSubmit={handleSubmit}
                       data-cy="signin-two-factor-auth-button"
                     >
-                      <FormattedMessage id="TwoFactorAuth.Setup.Form.VerifyButton" defaultMessage="Verify" />
+                      <FormattedMessage id="VerifyButton" defaultMessage="Verify" />
                     </StyledButton>
                   </Flex>
                 </Form>
@@ -223,6 +239,12 @@ class SignInOrJoinFree extends React.Component {
     const displayedForm = this.props.form || this.state.form;
     const routes = this.props.routes || {};
     const { enforceTwoFactorAuthForLoggedInUser } = this.props;
+
+    // No need to show the form if an email is provided
+    const hasError = Boolean(unknownEmailError || error);
+    if (this.props.email && !hasError) {
+      return <Loading />;
+    }
 
     return (
       <Flex flexDirection="column" width={1} alignItems="center">
@@ -254,8 +276,8 @@ class SignInOrJoinFree extends React.Component {
                       onOrgSubmit={this.createProfile}
                       onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                       submitting={submitting}
-                      createPersonalProfileLabel={this.props.createPersonalProfileLabel}
-                      createOrganizationProfileLabel={this.props.createOrganizationProfileLabel}
+                      labels={this.props.createProfileLabels}
+                      tabs={this.props.createProfileTabs}
                     />
                     <P mt={4} color="black.500" fontSize="12px" mb={3} data-cy="join-conditions" textAlign="center">
                       <FormattedMessage

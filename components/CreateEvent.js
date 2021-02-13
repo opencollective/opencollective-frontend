@@ -106,7 +106,7 @@ class CreateEvent extends React.Component {
                 <p>
                   <FormattedMessage
                     id="events.create.login"
-                    defaultMessage="You need to be logged in as a core contributor of this collective to be able to create an event."
+                    defaultMessage="You need to be logged as a team member of this Collective to create an event."
                   />
                 </p>
                 <p>

@@ -87,7 +87,7 @@ const SuccessIllustration = styled.img.attrs({ src: successIllustrationUrl })`
 const successMsgs = defineMessages({
   default: {
     id: 'order.created.tweet',
-    defaultMessage: "I've just donated to {collective}. Consider donating too, every little helps!",
+    defaultMessage: "I've just contributed to {collective}. Consider supporting them too — every little helps!",
   },
   event: {
     id: 'order.created.tweet.event',
@@ -109,17 +109,23 @@ class NewContributionFlowSuccess extends React.Component {
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    router: PropTypes.object,
     data: PropTypes.object,
   };
 
   renderCallsToAction = () => {
-    const { LoggedInUser, data } = this.props;
+    const { LoggedInUser, data, router } = this.props;
     const callsToAction = [SUCCESS_CTA_TYPE.NEWSLETTER];
+    const isGuest = get(data, 'order.fromAccount.isGuest');
+    const email = get(router, 'query.email') ? decodeURIComponent(router.query.email) : null;
 
     if (!LoggedInUser) {
-      // all guest transactions
-      callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
-    } else if (LoggedInUser) {
+      if (isGuest) {
+        callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
+      } else {
+        callsToAction.unshift(SUCCESS_CTA_TYPE.SIGN_IN, SUCCESS_CTA_TYPE.BLOG);
+      }
+    } else {
       // all other logged in recurring/one time contributions
       callsToAction.unshift(SUCCESS_CTA_TYPE.BLOG);
     }
@@ -128,7 +134,7 @@ class NewContributionFlowSuccess extends React.Component {
       <Flex flexDirection="column" justifyContent="center" p={2}>
         {callsToAction.length <= 2 && <SuccessIllustration />}
         {callsToAction.map(type => (
-          <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} />
+          <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} email={email} />
         ))}
       </Flex>
     );
@@ -156,7 +162,7 @@ class NewContributionFlowSuccess extends React.Component {
         <MessageBox type="warning" fontSize="12px" mb={2}>
           <FormattedMessage
             id="collective.user.orderProcessing.manual"
-            defaultMessage="<strong>Your donation is pending.</strong> Please follow the instructions in the confirmation email to manually pay the host of the collective."
+            defaultMessage="<strong>Your contribution is pending.</strong> Please follow the payment instructions in the confirmation email to complete your transaction."
             values={I18nFormatters}
           />
         </MessageBox>
@@ -174,7 +180,7 @@ class NewContributionFlowSuccess extends React.Component {
           <P fontSize="16px" color="black.700">
             <FormattedMessage
               id="NewContributionFlow.InTheMeantime"
-              defaultMessage="In the meantime, you can follow {collective} and see how they are spending the money <CollectiveLink>on their collective page</CollectiveLink>."
+              defaultMessage="In the meantime, you can see what {collective} is up to <CollectiveLink>on their Collective page</CollectiveLink>."
               values={{
                 collective: this.props.data.order.toAccount.name,
                 CollectiveLink: getI18nLink({

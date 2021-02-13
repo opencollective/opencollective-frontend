@@ -400,16 +400,19 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
         const token = secret;
 
         return graphqlV2Query(authToken, {
-          operationName: 'AddTwoFactorAuthToAccount',
+          operationName: 'AddTwoFactorAuthToIndividual',
           query: `
-            mutation AddTwoFactorAuthToAccount($account: AccountReferenceInput!, $token: String!) {
-              addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
+          mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
+            addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
+              account {
                 id
                 ... on Individual {
                   hasTwoFactorAuth
                 }
               }
+              recoveryCodes
             }
+          }
         `,
           variables: { account, token },
           options: { context: API_V2_CONTEXT },

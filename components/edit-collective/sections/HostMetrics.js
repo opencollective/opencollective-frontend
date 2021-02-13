@@ -77,7 +77,7 @@ const HostMetrics = props => {
         <P>
           <FormattedMessage
             id="Host.Metrics.Description"
-            defaultMessage="Host Metrics showing up-to-date values. Pending fees are invoiced at the beginning of every subsequent month."
+            defaultMessage="Host Metrics with current values. Pending fees are charged at the beginning of the following month."
           />
         </P>
         <StyledCard display="flex" width="100%" flexDirection={['column']} my={2}>
@@ -93,7 +93,7 @@ const HostMetrics = props => {
               <P fontSize="10px">
                 <FormattedMessage
                   id="Host.Metrics.TotalMoneyManages.description"
-                  defaultMessage="Total amount held on your bank account for yourself and on behalf of the hosted Collectives."
+                  defaultMessage="Total amount held in your bank account for the Host and its Collectives."
                 />
               </P>
             </Box>
@@ -109,7 +109,7 @@ const HostMetrics = props => {
             <P fontSize="10px">
               <FormattedMessage
                 id="Host.Metrics.HostFees.description"
-                defaultMessage="Total Host Fees collected by you since the first day of the month. They will be added to your budget at the end of the month."
+                defaultMessage="Total Host Fees due since the beginning of the current month. They will be added to your Host budget at the end of the month."
               />
             </P>
           </Box>
@@ -124,7 +124,7 @@ const HostMetrics = props => {
             <P fontSize="10px">
               <FormattedMessage
                 id="Host.Metrics.PlatformFees.description"
-                defaultMessage="Total Platform Fees generated for Open Collective since the first day of the month."
+                defaultMessage="Total Platform Fees since the first of the month."
               />
             </P>
           </Box>
@@ -139,7 +139,7 @@ const HostMetrics = props => {
             <P fontSize="10px">
               <FormattedMessage
                 id="Host.Metrics.PendingPlatformFees.description"
-                defaultMessage="Total Platform Fees collected for Open Collective since the first day of the month. They will be returned through an invoice from Open Collective at the end of the month."
+                defaultMessage="Total Platform Fees collected since the first of the month. They will be invoiced at the end of the month."
               />
             </P>
           </Box>
@@ -154,7 +154,7 @@ const HostMetrics = props => {
             <P fontSize="10px">
               <FormattedMessage
                 id="Host.Metrics.PlatformTips.description"
-                defaultMessage="Total Platform Tips genereated for Open Collective since the first day of the month."
+                defaultMessage="Total Platform Tips since the first of the month."
               />
             </P>
           </Box>
@@ -169,7 +169,7 @@ const HostMetrics = props => {
             <P fontSize="10px">
               <FormattedMessage
                 id="Host.Metrics.PendingPlatformTips.description"
-                defaultMessage="Total Platform Tips collected for Open Collective since the first day of the month. They will be returned through an invoice from Open Collective at the end of the month."
+                defaultMessage="Total Platform Tips collected since the first of the month. They will be invoiced at the end of the month."
               />
             </P>
           </Box>
@@ -177,7 +177,7 @@ const HostMetrics = props => {
             <P fontSize="10px" textTransform="uppercase" color="black.700">
               <FormattedMessage
                 id="Host.Metrics.HostFeeShare"
-                defaultMessage="Host Fee Share ({pct}% over collected host fees)"
+                defaultMessage="Platform fees ({pct}% of Host fees)"
                 values={{ pct: data.host.hostMetrics.hostFeeSharePercent }}
               />
             </P>
@@ -188,13 +188,13 @@ const HostMetrics = props => {
             <P fontSize="10px">
               <FormattedMessage
                 id="Host.Metrics.hostFeeShare.description"
-                defaultMessage="Total Host Fees you are sharing this month with Open Collective as part of your Host Plan. "
+                defaultMessage="Total Platform fees ({pct}% of Host fees). "
               />
             </P>
           </Box>
           <Box flex="1" py={16} px={4}>
             <P fontSize="10px" textTransform="uppercase" color="black.700">
-              <FormattedMessage id="Host.Metrics.PendingHostFeeShare" defaultMessage="Pending Host Fee Share" />
+              <FormattedMessage id="Host.Metrics.PendingHostFeeShare" defaultMessage="Pending Platform fees" />
             </P>
             <P fontSize="20px" mt={1}>
               {formatValueAsCurrency(data.host.hostMetrics.pendingHostFeeShare)}{' '}
@@ -203,7 +203,7 @@ const HostMetrics = props => {
             <P fontSize="10px">
               <FormattedMessage
                 id="Host.Metrics.pendingHostFeeShare.description"
-                defaultMessage="Part of Host Fees that still needs to be shared with with Open Collective as part of your Host Plan. They will be charged through an invoice from Open Collective at the end of the month."
+                defaultMessage="Pending amount of Platform fees, which will be invoiced at the end of the month."
               />
             </P>
           </Box>

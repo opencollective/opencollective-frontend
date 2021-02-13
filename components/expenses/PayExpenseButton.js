@@ -17,14 +17,16 @@ import PayExpenseModal from './PayExpenseModal';
 
 const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   if (!host) {
-    return <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a host" />;
+    return (
+      <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a Fiscal Host" />
+    );
   } else if (collective.balance < expense.amount) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
   } else if (includes(expense.requiredLegalDocuments, 'US_TAX_FORM')) {
     return (
       <FormattedMessage
         id="TaxForm.DisabledPayment"
-        defaultMessage="The payee must submit their tax form info before the expense can be paid."
+        defaultMessage="Unable to pay because tax form has not been submitted."
       />
     );
   } else if (!payoutMethod) {
@@ -39,7 +41,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
       return (
         <FormattedMessage
           id="expense.pay.transferwise.planlimit"
-          defaultMessage="You reached your plan's limit, <Link>upgrade your plan</Link> to continue paying expense with TransferWise"
+          defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with TransferWise"
           values={{
             Link(message) {
               return <Link route={`/${host.slug}/edit/host-plan`}>{message}</Link>;
@@ -53,7 +55,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
       return (
         <FormattedMessage
           id="expense.pay.error.payee.noHost"
-          defaultMessage="The payee needs to have an Host to be able to be paid on its Open Collective balance."
+          defaultMessage="Unable to pay because payee Collective does not have a Fiscal Host."
         />
       );
     }
@@ -61,7 +63,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
       return (
         <FormattedMessage
           id="expense.pay.error.payee.sameHost"
-          defaultMessage="The payee needs to be on the same Host than the payer to be paid on its Open Collective balance."
+          defaultMessage="Payer and payee must have the same Fiscal Host to pay this way."
         />
       );
     }

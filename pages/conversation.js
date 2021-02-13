@@ -350,7 +350,7 @@ class ConversationPage extends React.Component {
                         <Box my={2} mx={2}>
                           <Link route="create-conversation" params={{ collectiveSlug }}>
                             <StyledButton buttonStyle="primary" width="100%" minWidth={170}>
-                              <FormattedMessage id="conversations.create" defaultMessage="Create conversation" />
+                              <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
                             </StyledButton>
                           </Link>
                         </Box>

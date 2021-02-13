@@ -55,7 +55,7 @@ class EditPaymentMethods extends React.Component {
     this.messages = defineMessages({
       removeConfirm: {
         id: 'paymentMethods.removeConfirm',
-        defaultMessage: 'Do you really want to remove this payment method from your account?',
+        defaultMessage: 'Do you really want to remove this payment method?',
       },
     });
   }
@@ -182,7 +182,7 @@ class EditPaymentMethods extends React.Component {
 
   getPaymentMethodsToDisplay() {
     const paymentMethods = get(this.props, 'data.Collective.paymentMethods', []).filter(
-      pm => pm.balance > 0 || (pm.type === 'virtualcard' && pm.monthlyLimitPerMember),
+      pm => pm.balance > 0 || (pm.type === 'giftcard' && pm.monthlyLimitPerMember),
     );
     return sortBy(paymentMethods, ['type', 'id']);
   }
@@ -268,7 +268,7 @@ class EditPaymentMethods extends React.Component {
             <Span fontSize="12px" mt={2} color="black.600">
               <FormattedMessage
                 id="paymentMethods.creditcard.add.info"
-                defaultMessage="To make donations as {contributeAs}"
+                defaultMessage="For making contributions as {contributeAs}"
                 values={{ contributeAs: Collective.name }}
               />
             </Span>
@@ -344,7 +344,7 @@ const paymentMethodsQuery = gql`
         manualPayments
         name
       }
-      paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
+      paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
         id
         uuid
         name

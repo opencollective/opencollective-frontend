@@ -307,7 +307,7 @@ class SectionContributions extends React.PureComponent {
                 ) : (
                   <FormattedMessage
                     id="CP.Contributions.ConnectedCollective"
-                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of what we do"
+                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} connected to us"
                     values={{ n: connectedCollectives.length }}
                   />
                 )}

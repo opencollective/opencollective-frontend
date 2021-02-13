@@ -47,7 +47,7 @@ class Export extends React.Component {
         <P mb={2}>
           <FormattedMessage
             id="ExportContributors.Description"
-            defaultMessage="Export your contributors data in {format} format"
+            defaultMessage="Export your contributor data in {format} format"
             values={{ format: 'CSV' }}
           />
         </P>
@@ -61,7 +61,7 @@ class Export extends React.Component {
         <p>
           <FormattedMessage
             id="ExportContributors.Description"
-            defaultMessage="Export your contributors data in {format} format"
+            defaultMessage="Export your contributor data in {format} format"
             values={{ format: 'JSON' }}
           />
         </p>
@@ -140,7 +140,7 @@ class Export extends React.Component {
               <td>
                 <FormattedMessage
                   id="export.json.parameters.TierId"
-                  defaultMessage="only return contributors that belong to this TierID, which you can find in the URL after selecting a tier on your Collective page."
+                  defaultMessage="only return contributors that belong to this Tier (select a tier on your Collective page and look at the URL to find its ID)."
                 />
               </td>
             </tr>

@@ -132,7 +132,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                         <Span>
                           <FormattedMessage
                             id="Fees.ApproximationDisclaimer"
-                            defaultMessage="This amount could vary due to currency exchange or other payment processor fees that we cannot predict."
+                            defaultMessage="This amount can vary due to currency exchange rates or payment processor fees."
                           />
                           {pmFeeInfo.aboutURL && (
                             <React.Fragment>
@@ -197,7 +197,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
           <FormattedMessage
             id="ContributionSummary.NextCharge"
-            defaultMessage="Next charge on {date} and then the first day of {interval, select, month {each month} year {same month each year}}. You can cancel anytime or edit your contribution in your settings."
+            defaultMessage="The next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year}}. You can cancel or edit this contribution go to 'Manage Contributions'."
             values={{
               date: (
                 <FormattedDate

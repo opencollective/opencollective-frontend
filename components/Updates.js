@@ -81,7 +81,7 @@ class Updates extends React.Component {
           ))}
           {updates.length === 0 && (
             <Container color="black.700" p={4}>
-              <FormattedMessage id="updates.empty" defaultMessage="No updates" />
+              <FormattedMessage id="updates.empty" defaultMessage="No Updates" />
             </Container>
           )}
           {updates.length >= 10 && updates.length % 10 === 0 && (

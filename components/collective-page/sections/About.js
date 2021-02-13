@@ -26,7 +26,7 @@ const HTMLEditor = dynamic(() => import('../../RichTextEditor'), {
 const messages = defineMessages({
   placeholder: {
     id: 'CollectivePage.AddLongDescription',
-    defaultMessage: 'Add a description',
+    defaultMessage: 'Add description',
   },
 });
 
@@ -77,19 +77,19 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                         <MessageBox type="info" withIcon fontStyle="italic" fontSize="14px" mb={4}>
                           <FormattedMessage
                             id="SectionAbout.Why"
-                            defaultMessage="Your collective is unique and wants to achieve great things. Here is the place to explain it!"
+                            defaultMessage="Tell your story and explain your purpose."
                           />
                         </MessageBox>
                       )}
                       <StyledButton buttonSize="large" onClick={enableEditor}>
-                        <FormattedMessage id="CollectivePage.AddLongDescription" defaultMessage="Add a description" />
+                        <FormattedMessage id="CollectivePage.AddLongDescription" defaultMessage="Add description" />
                       </StyledButton>
                     </Flex>
                   ) : (
                     <Span color="black.500" fontStyle="italic">
                       <FormattedMessage
                         id="SectionAbout.MissingDescription"
-                        defaultMessage="{collectiveName} didn't write a presentation yet"
+                        defaultMessage="{collectiveName} hasn't provided this information yet."
                         values={{ collectiveName: collective.name }}
                       />
                     </Span>

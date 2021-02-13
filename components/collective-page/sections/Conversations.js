@@ -63,7 +63,7 @@ class SectionConversations extends React.PureComponent {
           <P color="black.700" my={2} css={{ flex: '1 0 50%', maxWidth: 700 }}>
             <FormattedMessage
               id="conversations.subtitle"
-              defaultMessage="Let’s get the ball rolling! This is where things get planned and sometimes this is where things get done. Ask questions, thank people for their efforts, and contribute your skills to the service of the community."
+              defaultMessage="Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together."
             />
           </P>
           <Link route="create-conversation" params={{ collectiveSlug: collective.slug }}>
@@ -71,7 +71,7 @@ class SectionConversations extends React.PureComponent {
               <Span fontSize="16px" fontWeight="bold" mr={2}>
                 +
               </Span>
-              <FormattedMessage id="conversations.create" defaultMessage="Create conversation" />
+              <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
             </StyledButton>
           </Link>
         </Flex>
@@ -80,7 +80,7 @@ class SectionConversations extends React.PureComponent {
             <MessageBox my={[3, 5]} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="14px">
               <FormattedMessage
                 id="SectionConversations.PostFirst"
-                defaultMessage="Use this section to get your community involved in the conversation."
+                defaultMessage="Use this section to get the community involved in open discussions."
               />
             </MessageBox>
           </div>
@@ -90,7 +90,7 @@ class SectionConversations extends React.PureComponent {
             {conversations.totalCount > 3 && (
               <Link route="conversations" params={{ collectiveSlug: collective.slug }}>
                 <StyledButton width="100%" mt={4} buttonSize="small" fontSize="14px">
-                  <FormattedMessage id="Conversations.ViewAll" defaultMessage="View all conversations" /> →
+                  <FormattedMessage id="Conversations.ViewAll" defaultMessage="View all Conversations" /> →
                 </StyledButton>
               </Link>
             )}

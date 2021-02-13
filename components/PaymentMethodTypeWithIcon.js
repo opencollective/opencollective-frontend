@@ -23,7 +23,7 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
   }
 
   switch (type) {
-    case PaymentMethodType.VIRTUAL_CARD:
+    case PaymentMethodType.GIFT_CARD:
       return (
         <Flex alignItems="center">
           <GiftCard size={iconSize} color="#9D9FA3" />

@@ -53,7 +53,7 @@ class ConnectedCollectives extends React.PureComponent {
               <ContainerSectionContent pb={3}>
                 <Flex justifyContent="space-between" alignItems="center">
                   <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
-                    <FormattedMessage id="ConnectedCollectives" defaultMessage="Connected collectives" />
+                    <FormattedMessage id="ConnectedCollectives" defaultMessage="Connected Collectives" />
                   </H3>
                   <Box m={2} flex="0 0 50px">
                     <Chevrons />

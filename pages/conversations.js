@@ -147,13 +147,13 @@ class ConversationsPage extends React.Component {
                     <P color="black.700" css={{ flex: '0 1 70%' }}>
                       <FormattedMessage
                         id="conversations.subtitle"
-                        defaultMessage="Let’s get the ball rolling! This is where things get planned and sometimes this is where things get done. Ask questions, thank people for their efforts, and contribute your skills to the service of the community."
+                        defaultMessage="Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together."
                       />
                     </P>
                     <Flex flex="0 0 300px" flexWrap="wrap">
                       <Link route="create-conversation" params={{ collectiveSlug }}>
                         <StyledButton buttonStyle="primary" m={2}>
-                          <FormattedMessage id="conversations.create" defaultMessage="Create conversation" />
+                          <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
                         </StyledButton>
                       </Link>
                     </Flex>

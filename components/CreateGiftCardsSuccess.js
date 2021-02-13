@@ -27,7 +27,7 @@ const RedeemLinksTextarea = styled(StyledInput).attrs({ as: 'textarea' })`
 /**
  * Displays created gift cards, with an option to print them.
  */
-export default class CreateVirtualCardsSuccess extends React.Component {
+export default class CreateGiftCardsSuccess extends React.Component {
   static propTypes = {
     cards: PropTypes.arrayOf(
       PropTypes.shape({
@@ -73,7 +73,7 @@ export default class CreateVirtualCardsSuccess extends React.Component {
       <React.Fragment>
         <Box mb={3}>
           <FormattedMessage
-            id="virtualCards.create.successCreate"
+            id="giftCards.create.successCreate"
             defaultMessage="Your {count, plural, one {gift card has} other {{count} gift cards have}} been created."
             values={{ count: this.props.cards.length }}
           />
@@ -90,7 +90,7 @@ export default class CreateVirtualCardsSuccess extends React.Component {
             >
               <Clipboard size="1em" />
               &nbsp;
-              <FormattedMessage id="CreateVirtualCardsSuccess.RedeemLinks" defaultMessage="Copy the links" />
+              <FormattedMessage id="CreateGiftCardsSuccess.RedeemLinks" defaultMessage="Copy links" />
             </StyledButton>
             {this.props.cards.length < 300 && (
               <FileDownloader
@@ -106,7 +106,7 @@ export default class CreateVirtualCardsSuccess extends React.Component {
                   <StyledButton minWidth={270} m={2} buttonSize="large" loading={loading} onClick={downloadFile}>
                     <Printer size="1em" />
                     &nbsp;
-                    <FormattedMessage id="CreateVirtualCardsSuccess.Download" defaultMessage="Download cards" />
+                    <FormattedMessage id="CreateGiftCardsSuccess.Download" defaultMessage="Download cards" />
                   </StyledButton>
                 )}
               </FileDownloader>
@@ -126,7 +126,7 @@ export default class CreateVirtualCardsSuccess extends React.Component {
   renderEmailSuccess() {
     return (
       <FormattedMessage
-        id="virtualCards.create.successSent"
+        id="giftCards.create.successSent"
         defaultMessage="Your {count, plural, one {gift card has} other {{count} gift cards have}} been sent!"
         values={{ count: this.props.cards.length }}
       />

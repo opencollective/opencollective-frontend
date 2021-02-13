@@ -5,7 +5,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fontSize, height, width } from 'styled-system';
 
-import CollectiveCard from './virtual-cards/CollectiveCard';
+import CollectiveCard from './gift-cards/CollectiveCard';
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex } from './Grid';
@@ -84,7 +84,7 @@ class GiftCard extends React.Component {
           <Text fontSize={['12px', '14px']}>
             <FormattedMessage
               id="giftcard.user.text"
-              defaultMessage="You can now support open collectives with this gift card, courtesy of {emitter}."
+              defaultMessage="Contribute on Open Collective with this Gift Card, courtesy of {emitter}."
               values={{
                 emitter: <WhiteLink route={`/${emitter.slug}`}>{emitter.name}</WhiteLink>,
               }}

@@ -12,6 +12,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import I18nFormatters from '../I18nFormatters';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -19,6 +20,7 @@ import StyledInputAmount from '../StyledInputAmount';
 import StyledRadioList from '../StyledRadioList';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const TierBox = styled(Flex)`
   border-top: 1px solid ${themeGet('colors.black.300')};
@@ -77,8 +79,9 @@ const tiersQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setShowPopup }) => {
+const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
   const intl = useIntl();
+  const { addToast } = useToasts();
 
   // state management
   const [loadingDefaultTier, setLoadingDefaultTier] = useState(true);
@@ -312,11 +315,23 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
                   },
                 },
               });
-              createNotification('update');
+              addToast({
+                type: TOAST_TYPE.SUCCESS,
+                message: (
+                  <FormattedMessage
+                    id="subscription.createSuccessUpdated"
+                    defaultMessage="Your recurring contribution has been <strong>updated</strong>."
+                    values={I18nFormatters}
+                  />
+                ),
+              });
               setShowPopup(false);
             } catch (error) {
               const errorMsg = getErrorFromGraphqlException(error).message;
-              createNotification('error', errorMsg);
+              addToast({
+                type: TOAST_TYPE.ERROR,
+                message: errorMsg,
+              });
               return false;
             }
           }}
@@ -332,7 +347,6 @@ UpdateOrderPopUp.propTypes = {
   data: PropTypes.object,
   setMenuState: PropTypes.func,
   contribution: PropTypes.object.isRequired,
-  createNotification: PropTypes.func,
   setShowPopup: PropTypes.func,
 };
 

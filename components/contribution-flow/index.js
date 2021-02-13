@@ -4,7 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { find, get, intersection, isEmpty, isNil, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
@@ -19,7 +19,7 @@ import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
-import { getWebsiteUrl, reportValidityHTML5 } from '../../lib/utils';
+import { reportValidityHTML5 } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -28,7 +28,6 @@ import ContributeFAQ from '../faqs/ContributeFAQ';
 import { Box, Grid } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
-import SignInOrJoinFree, { addSignupMutation } from '../SignInOrJoinFree';
 import Steps from '../Steps';
 import { withUser } from '../UserProvider';
 
@@ -40,6 +39,7 @@ import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
 import SafeTransactionMessage from './SafeTransactionMessage';
+import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
@@ -86,7 +86,6 @@ class ContributionFlow extends React.Component {
     host: PropTypes.object.isRequired,
     tier: PropTypes.object,
     intl: PropTypes.object,
-    createUser: PropTypes.func,
     createOrder: PropTypes.func.isRequired,
     confirmOrder: PropTypes.func.isRequired,
     fixedInterval: PropTypes.string,
@@ -234,7 +233,8 @@ class ContributionFlow extends React.Component {
         return this.scrollToTop();
       }
     } else {
-      return this.pushStepRoute('success', { OrderId: order.id });
+      const email = this.state.stepProfile?.email;
+      return this.pushStepRoute('success', { OrderId: order.id, email });
     }
   };
 
@@ -343,31 +343,6 @@ class ContributionFlow extends React.Component {
     return intersection(rejectedCategories, contributorRejectedCategories);
   };
 
-  createProfileForRecurringContributions = async data => {
-    if (this.state.isSubmitting) {
-      return false;
-    }
-
-    const user = pick(data, ['email', 'name']);
-
-    this.setState({ isSubmitting: true });
-
-    try {
-      await this.props.createUser({
-        variables: {
-          user,
-          redirect: this.getEmailRedirectURL(),
-          websiteUrl: getWebsiteUrl(),
-        },
-      });
-      await Router.pushRoute('signinLinkSent', { email: user.email });
-    } catch (error) {
-      this.setState({ error: error.message, isSubmitting: false });
-    } finally {
-      this.scrollToTop();
-    }
-  };
-
   /** Steps component callback  */
   onStepChange = async step => {
     this.setState({ showSignIn: false });
@@ -376,8 +351,7 @@ class ContributionFlow extends React.Component {
 
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, routeParams = {}) => {
-    const { collective, tier, LoggedInUser } = this.props;
-    const { stepDetails, stepProfile } = this.state;
+    const { collective, tier } = this.props;
 
     const params = {
       verb: this.props.verb || 'donate',
@@ -412,12 +386,7 @@ class ContributionFlow extends React.Component {
     }
 
     // Navigate to the new route
-    if (stepName === 'payment' && !LoggedInUser && stepDetails?.interval) {
-      await this.createProfileForRecurringContributions(stepProfile);
-    } else {
-      await Router.pushRoute(route, params);
-    }
-
+    await Router.pushRoute(route, params);
     this.scrollToTop();
   };
 
@@ -625,21 +594,10 @@ class ContributionFlow extends React.Component {
                 <Loading />
               </Box>
             ) : currentStep.name === STEPS.PROFILE && !LoggedInUser && this.state.showSignIn ? (
-              <SignInOrJoinFree
-                defaultForm={this.state.showSignIn ? 'signin' : 'create-account'}
+              <SignInToContributeAsAnOrganization
+                defaultEmail={stepProfile?.email}
                 redirect={this.getRedirectUrlForSignIn()}
-                createPersonalProfileLabel={
-                  <FormattedMessage
-                    id="ContributionFlow.CreateUserLabel"
-                    defaultMessage="Contribute as an individual"
-                  />
-                }
-                createOrganizationProfileLabel={
-                  <FormattedMessage
-                    id="ContributionFlow.CreateOrganizationLabel"
-                    defaultMessage="Contribute as an organization"
-                  />
-                }
+                onCancel={() => this.setState({ showSignIn: false })}
               />
             ) : (
               <Grid
@@ -679,7 +637,6 @@ class ContributionFlow extends React.Component {
                       step={currentStep}
                       prevStep={prevStep}
                       nextStep={nextStep}
-                      isRecurringContributionLoggedOut={Boolean(!LoggedInUser && stepDetails?.interval)}
                       isValidating={isValidating || isSubmitted || isSubmitting}
                       paypalButtonProps={this.getPaypalButtonProps({ currency })}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
@@ -749,6 +706,9 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
     fromAccount {
       id
       name
+      ... on Individual {
+        isGuest
+      }
     }
     toAccount {
       id
@@ -828,7 +788,5 @@ const addConfirmOrderMutation = graphql(
 );
 
 export default injectIntl(
-  withUser(
-    addSignupMutation(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(ContributionFlow)))),
-  ),
+  withUser(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(ContributionFlow)))),
 );

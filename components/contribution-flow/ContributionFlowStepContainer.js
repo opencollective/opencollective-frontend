@@ -46,12 +46,8 @@ class ContributionFlowStepContainer extends React.Component {
     this.headerMessages = defineMessages({
       details: { id: 'NewContributionFlow.ContributionDetailsTitle', defaultMessage: 'Contribution details' },
       profile: { id: 'contribute.step.contributeAs', defaultMessage: 'Contribute as' },
-      'profile.guest': { id: 'NewContributionFlow.step.contributeAsGuest', defaultMessage: 'Contribute as guest' },
-      'profile.guest.recurrent': {
-        id: 'NewContributionFlow.step.SignUpToContribute',
-        defaultMessage: 'Sign up to contribute recurrently',
-      },
-      payment: { id: 'NewContributionFlow.ChoosePaymentMethod', defaultMessage: 'Choose your payment method' },
+      'profile.guest': { id: 'NewContributionFlow.step.contributeAsGuest', defaultMessage: 'Contribute as a guest' },
+      payment: { id: 'NewContributionFlow.ChoosePaymentMethod', defaultMessage: 'Choose payment method' },
       summary: { id: 'Summary', defaultMessage: 'Summary' },
       blockedContributor: {
         id: 'NewContributionFlow.BlockedContributor.Header',
@@ -61,14 +57,13 @@ class ContributionFlowStepContainer extends React.Component {
   }
 
   renderHeader = (step, LoggedInUser) => {
+    const { intl } = this.props;
     if (step === 'profile' && !LoggedInUser) {
-      return this.props.mainState.stepDetails?.interval
-        ? this.props.intl.formatMessage(this.headerMessages[`profile.guest.recurrent`])
-        : this.props.intl.formatMessage(this.headerMessages[`profile.guest`]);
+      return intl.formatMessage(this.headerMessages[`profile.guest`]);
     } else if (step === 'payment' && this.props.mainState.stepProfile.contributorRejectedCategories) {
-      return this.props.intl.formatMessage(this.headerMessages.blockedContributor);
+      return intl.formatMessage(this.headerMessages.blockedContributor);
     } else if (this.headerMessages[step]) {
-      return this.props.intl.formatMessage(this.headerMessages[step]);
+      return intl.formatMessage(this.headerMessages[step]);
     } else {
       return step;
     }

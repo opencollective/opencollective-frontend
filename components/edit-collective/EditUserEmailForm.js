@@ -149,7 +149,7 @@ class EditUserEmailForm extends React.Component {
             <MessageBox display="inline-block" type="success" fontSize="12px" withIcon mt={2}>
               <FormattedMessage
                 id="EditUserEmailForm.success"
-                defaultMessage="An email with a confirmation link has been sent to {email}."
+                defaultMessage="An email with a confirmation link has been sent to {email}. Please click the link to validate your email address."
                 values={{ email: <strong>{newEmail}</strong> }}
               />
             </MessageBox>

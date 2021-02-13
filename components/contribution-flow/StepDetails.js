@@ -108,7 +108,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
                 <Flex fontSize="14px" color="black.800" flexDirection="column" alignItems="flex-end" mt={1}>
                   <FormattedMessage
                     id="contribution.minimumAmount"
-                    defaultMessage="The minimum amount is: {minAmount} {currency}"
+                    defaultMessage="Minimum amount: {minAmount} {currency}"
                     values={{
                       minAmount: formatCurrency(minAmount, currency),
                       currency,
@@ -123,7 +123,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
         <Box mb={3}>
           <FormattedMessage
             id="contribute.tierDetails"
-            defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month { monthly} year { yearly} other {}}."
+            defaultMessage="You’ll contribute {amount}{interval, select, month { monthly} year { yearly} other {}}."
             values={{
               interval: tier.interval,
               amount: <FormattedMoneyAmount amount={getTotalAmount(data)} currency={currency} />,
@@ -131,10 +131,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           />
         </Box>
       ) : !hasQuantity ? (
-        <FormattedMessage
-          id="contribute.freeTier"
-          defaultMessage="This is a free tier, you can submit your order directly."
-        />
+        <FormattedMessage id="contribute.freeTier" defaultMessage="This is a free tier." />
       ) : null}
 
       {hasQuantity && (
@@ -189,7 +186,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           <P fontSize="14px" lineHeight="20px" fontStyle="italic" color="black.500" letterSpacing="0em">
             <FormattedMessage
               id="platformFee.taxDeductible"
-              defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contribution will be tax-deductible to the extent allowed by the law."
+              defaultMessage="This Collective's Fiscal Host is a registered 501(c)(3) non-profit organization. Your contribution will be tax-deductible in the US, to the extent allowed by the law."
             />
           </P>
           <StyledHr borderColor="black.300" mt={16} mb={32} />

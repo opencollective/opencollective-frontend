@@ -13,6 +13,8 @@ import { get, pickBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { getContributeRoute } from '../../lib/collective.lib';
+
 import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
@@ -158,26 +160,6 @@ const StyledChevronDown = styled(ChevronDown)`
 
 const ITEM_PADDING = '11px 14px';
 
-export const getContributeRoute = collective => {
-  let route = 'orderCollectiveNew';
-  let params = { collectiveSlug: collective.slug, verb: 'donate' };
-  if (collective.settings?.disableCustomContributions) {
-    if (collective.tiers && collective.tiers.length > 0) {
-      const tier = collective.tiers[0];
-      route = 'orderCollectiveTierNew';
-      params = {
-        collectiveSlug: collective.slug,
-        verb: 'contribute',
-        tierSlug: tier.slug,
-        tierId: tier.id,
-      };
-    } else {
-      return null;
-    }
-  }
-  return { route, params };
-};
-
 const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile }) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
@@ -186,7 +168,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
   const hostWithinLimit = hostedCollectivesLimit
     ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
     : true;
-  const contributeRoute = getContributeRoute(collective);
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -271,9 +252,9 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         </StyledLink>
                       </MenuItem>
                     )}
-                    {callsToAction.hasContribute && contributeRoute && (
+                    {callsToAction.hasContribute && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTRIBUTE}>
-                        <StyledLink as={Link} {...contributeRoute} p={ITEM_PADDING}>
+                        <StyledLink as={Link} {...getContributeRoute(collective)} p={ITEM_PADDING}>
                           <Planet size="20px" />
                           <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
                         </StyledLink>

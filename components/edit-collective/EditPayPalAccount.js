@@ -96,7 +96,7 @@ const EditPayPalAccount = props => {
           {isReceiving ? null : (
             <FormattedMessage
               id="collective.create.connectedAccounts.paypal.description"
-              defaultMessage="Connect a PayPal account to pay expenses with one click. For instructions on how to connect to PayPal, please, <a>read our documentation</a>."
+              defaultMessage="Connect a PayPal account to pay expenses with one click. (<a>Instructions</a>)."
               values={{
                 a: getI18nLink({
                   href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-paypal',
@@ -146,7 +146,7 @@ const EditPayPalAccount = props => {
         <P>
           <FormattedMessage
             id="collective.connectedAccounts.paypal.connected"
-            defaultMessage="PayPal account connected on {updatedAt, date, short}"
+            defaultMessage="PayPal connected on {updatedAt, date, short}"
             values={{
               updatedAt: new Date(connectedAccount.updatedAt || connectedAccount.createdAt),
             }}

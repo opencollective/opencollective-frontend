@@ -16,7 +16,6 @@ class NewContributionFlowButtons extends React.Component {
     step: PropTypes.shape({ name: PropTypes.string }),
     prevStep: PropTypes.shape({ name: PropTypes.string }),
     nextStep: PropTypes.shape({ name: PropTypes.string }),
-    isRecurringContributionLoggedOut: PropTypes.bool,
     isValidating: PropTypes.bool,
     /** If provided, the PayPal button will be displayed in place of the regular submit */
     paypalButtonProps: PropTypes.object,
@@ -44,15 +43,6 @@ class NewContributionFlowButtons extends React.Component {
         return <FormattedMessage id="ContributionFlow.Payment" defaultMessage="Payment" />;
       case STEPS.DETAILS:
         return <FormattedMessage id="ContributionFlow.Contribution" defaultMessage="Contribution" />;
-    }
-  }
-
-  getNextButtonLabel() {
-    const { step, nextStep, isRecurringContributionLoggedOut } = this.props;
-    if (step.name === STEPS.PROFILE && isRecurringContributionLoggedOut) {
-      return <FormattedMessage id="NewContributionFlow.JoinAndGoNext" defaultMessage="Join and go next" />;
-    } else {
-      return this.getStepLabel(nextStep) || <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />;
     }
   }
 
@@ -85,7 +75,12 @@ class NewContributionFlowButtons extends React.Component {
               type="submit"
             >
               {nextStep ? (
-                <React.Fragment>{this.getNextButtonLabel()} &rarr;</React.Fragment>
+                <React.Fragment>
+                  {this.getStepLabel(nextStep) || (
+                    <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
+                  )}{' '}
+                  &rarr;
+                </React.Fragment>
               ) : totalAmount ? (
                 <FormattedMessage
                   id="contribute.amount"

@@ -73,7 +73,7 @@ const ApplicationMessageModal = ({ collective, onClose, onConfirm, ...modalProps
         <P color="black.700" lineHeight="20px" mb={2}>
           <FormattedMessage
             id="HostApplicationMessageInfo"
-            defaultMessage="The message will be published as a public conversation. If you want to send a private message, click on the private checkbox."
+            defaultMessage="The message will be public by default. If you want it to be private, tick the private checkbox."
           />
         </P>
         <Container>
@@ -100,7 +100,7 @@ const ApplicationMessageModal = ({ collective, onClose, onConfirm, ...modalProps
                   <Span css={{ verticalAlign: 'middle' }}>
                     <FormattedMessage
                       id="ApplicationMessageModal.Private"
-                      defaultMessage="Private (this will send an email to the Collective admins)"
+                      defaultMessage="Private (email to the Collective admins)"
                     />
                   </Span>
                 </Span>

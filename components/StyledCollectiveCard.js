@@ -190,7 +190,8 @@ StyledCollectiveCard.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
     settings: PropTypes.object,
     host: PropTypes.shape({
-      id: PropTypes.number,
+      // TODO: getCollectiveMainTag should be based on slug
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     }),
     parentCollective: PropTypes.shape({
       backgroundImageUrl: PropTypes.string,
