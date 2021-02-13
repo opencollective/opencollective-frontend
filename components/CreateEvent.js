@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -14,6 +13,7 @@ import Container from './Container';
 import EditEventForm from './EditEventForm';
 import Footer from './Footer';
 import Header from './Header';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import { withUser } from './UserProvider';
 
@@ -112,11 +112,11 @@ class CreateEvent extends React.Component {
                   />
                 </p>
                 <p>
-                  <NextLink href={`/signin?next=/${collective.slug}/events/new`}>
+                  <Link href={`/signin?next=/${collective.slug}/events/new`}>
                     <StyledButton buttonStyle="primary">
                       <FormattedMessage id="signIn" defaultMessage="Sign In" />
                     </StyledButton>
-                  </NextLink>
+                  </Link>
                 </p>
               </Container>
             )}

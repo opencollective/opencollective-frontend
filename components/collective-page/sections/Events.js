@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { partition } from 'lodash';
 import memoizeOne from 'memoize-one';
-import NextLink from 'next/link';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { isPastEvent } from '../../../lib/events';
@@ -13,6 +12,7 @@ import ContributeEvent from '../../contribute-cards/ContributeEvent';
 import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
+import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
@@ -109,11 +109,11 @@ class SectionEvents extends React.PureComponent {
         </HorizontalScroller>
         {Boolean(events?.length) && (
           <ContainerSectionContent>
-            <NextLink href={`${collective.slug}/contribute`}>
+            <Link href={`${collective.slug}/contribute`}>
               <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
                 <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
               </StyledButton>
-            </NextLink>
+            </Link>
           </ContainerSectionContent>
         )}
       </Box>

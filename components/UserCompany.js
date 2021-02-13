@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
+
+import Link from './Link';
 
 const UserCompany = ({ company, ...props }) => {
   if (!company || company[0] !== '@') {
@@ -11,9 +12,9 @@ const UserCompany = ({ company, ...props }) => {
   // By splitting on `/` we limit that risk.
   const companySlug = company.split('/')[0].slice(1);
   return (
-    <NextLink href={companySlug} {...props}>
+    <Link href={companySlug} {...props}>
       @{companySlug}
-    </NextLink>
+    </Link>
   );
 };
 

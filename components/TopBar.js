@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -10,6 +9,7 @@ import theme from '../lib/theme';
 
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
+import Link from './Link';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
 import TopBarMobileMenu from './TopBarMobileMenu';
@@ -107,7 +107,7 @@ class TopBar extends React.Component {
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
         ref={this.ref}
       >
-        <NextLink href="/" passHref>
+        <Link href="/" passHref>
           <Flex as="a" alignItems="center">
             <Logo width="24" height="24" />
             <Hide xs>
@@ -116,7 +116,7 @@ class TopBar extends React.Component {
               </Box>
             </Hide>
           </Flex>
-        </NextLink>
+        </Link>
 
         {showSearch && (
           <Flex justifyContent="flex-end" flex="1 1 auto">
@@ -131,11 +131,11 @@ class TopBar extends React.Component {
         <Flex alignItems="center" justifyContent={['flex-end', 'flex-start']} flex="1 1 auto">
           <Hide lg>
             <Box mx={3}>
-              <NextLink href="/search">
+              <Link href="/search">
                 <Flex as="a">
                   <SearchIcon fill="#aaaaaa" size={24} />
                 </Flex>
-              </NextLink>
+              </Link>
             </Box>
           </Hide>
 
@@ -143,29 +143,29 @@ class TopBar extends React.Component {
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               {merged.discover && (
                 <NavLinkContainer>
-                  <NextLink href="/discover" passHref>
+                  <Link href="/discover" passHref>
                     <NavLink>
                       <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                     </NavLink>
-                  </NextLink>
+                  </Link>
                 </NavLinkContainer>
               )}
               {merged.howItWorks && (
                 <NavLinkContainer>
-                  <NextLink href="/how-it-works" passHref>
+                  <Link href="/how-it-works" passHref>
                     <NavLink>
                       <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
                     </NavLink>
-                  </NextLink>
+                  </Link>
                 </NavLinkContainer>
               )}
               {merged.pricing && (
                 <NavLinkContainer>
-                  <NextLink href="/pricing" passHref>
+                  <Link href="/pricing" passHref>
                     <NavLink>
                       <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
                     </NavLink>
-                  </NextLink>
+                  </Link>
                 </NavLinkContainer>
               )}
               {merged.docs && (

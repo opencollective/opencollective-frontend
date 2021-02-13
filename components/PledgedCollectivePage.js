@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex, Grid } from './Grid';
 import I18nFormatters from './I18nFormatters';
+import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import Page from './Page';
@@ -107,11 +107,11 @@ const PledgedCollectivePage = ({ collective }) => {
       </Container>
 
       <Container display="flex" justifyContent="center" position="relative" top={-30}>
-        <NextLink href={`${collective.slug}/pledges/new`} passHref>
+        <Link href={`${collective.slug}/pledges/new`} passHref>
           <StyledLink buttonStyle="primary" buttonSize="large" data-cy="makeAPledgeButton">
             <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
           </StyledLink>
-        </NextLink>
+        </Link>
       </Container>
 
       <Container

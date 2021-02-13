@@ -6,7 +6,6 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -14,6 +13,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
 
 import ConfirmationModal from '../ConfirmationModal';
+import Link from '../Link';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
 
@@ -85,7 +85,7 @@ const ExpenseAdminActions = ({
           }
         />
       ) : (
-        <NextLink href={`${collective.slug}/expenses/${expense.legacyId}`}>
+        <Link href={`${collective.slug}/expenses/${expense.legacyId}`}>
           <ButtonWithLabel
             onClick={() => copy(window.location.href.replace('?createSuccess=true', ''))}
             disabled={isDisabled}
@@ -97,7 +97,7 @@ const ExpenseAdminActions = ({
             }
             {...buttonProps}
           />
-        </NextLink>
+        </Link>
       )}
       {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
         <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>

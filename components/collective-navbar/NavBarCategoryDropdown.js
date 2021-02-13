@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import NextLink from 'next/link';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -9,6 +8,7 @@ import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import i18nNavbarCategory from '../../lib/i18n/navbar-categories';
 
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledLink from '../StyledLink';
 
@@ -149,7 +149,7 @@ const getLinkProps = (useAnchor, collective, category) => {
   if (useAnchor) {
     return { href: anchor };
   } else {
-    return { as: NextLink, href: `/${collective.slug}${anchor}` };
+    return { as: Link, href: `/${collective.slug}${anchor}` };
   }
 };
 
@@ -183,7 +183,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
             <Box as="ul" p={0} m={0} minWidth={184}>
               {displayedLinks.map(({ route, title }) => (
                 <MenuItem key={route}>
-                  <StyledLink as={NextLink} href={route}>
+                  <StyledLink as={Link} href={route}>
                     {title}
                   </StyledLink>
                 </MenuItem>

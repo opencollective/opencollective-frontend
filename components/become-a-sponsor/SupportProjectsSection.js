@@ -1,11 +1,11 @@
 import React from 'react';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P, Span } from '../Text';
 
@@ -44,7 +44,7 @@ const SupportProjects = () => (
       height={[null, '363px', '488px', null, '414px']}
       ml={[null, null, null, null, '36px']}
     >
-      <NextLink href="/webflow">
+      <Link href="/webflow">
         <SponsorWrapper
           size={['46px', '62px', '75px', null, '80px']}
           left={['9%', '38px', '65px', null, '43px']}
@@ -52,8 +52,8 @@ const SupportProjects = () => (
         >
           <Sponsor as="img" src="/static/images/become-a-sponsor/webflow.png" alt="Webflow logo" />
         </SponsorWrapper>
-      </NextLink>
-      <NextLink href="/airbnb">
+      </Link>
+      <Link href="/airbnb">
         <SponsorWrapper
           size={['37px', '50px', '70px', null, '64px']}
           left={['34.42%', '133px', '186px', null, '388px']}
@@ -61,8 +61,8 @@ const SupportProjects = () => (
         >
           <Sponsor as="img" src="/static/images/become-a-sponsor/airbnb.png" alt="Airbnb logo" />
         </SponsorWrapper>
-      </NextLink>
-      <NextLink href="/fbopensource">
+      </Link>
+      <Link href="/fbopensource">
         <SponsorWrapper
           size={['37px', '50px', '70px', null, '64px']}
           left={['0', null, null, null, '19px']}
@@ -74,8 +74,8 @@ const SupportProjects = () => (
             alt="Facebook Opensource logo"
           />
         </SponsorWrapper>
-      </NextLink>
-      <NextLink href="/shopify">
+      </Link>
+      <Link href="/shopify">
         <SponsorBoxShadowWrapper
           size={['48px', '65px', '83px', null, '84px']}
           left={['27%', '105px', '156px', null, '155px']}
@@ -88,8 +88,8 @@ const SupportProjects = () => (
             alt="Shopify logo"
           />
         </SponsorBoxShadowWrapper>
-      </NextLink>
-      <NextLink href="/trivago">
+      </Link>
+      <Link href="/trivago">
         <SponsorBoxShadowWrapper
           size={['46px', '62px', '77px', null, '80px']}
           right={['5.91%', '0']}
@@ -103,8 +103,8 @@ const SupportProjects = () => (
             alt="Trivago logo"
           />
         </SponsorBoxShadowWrapper>
-      </NextLink>
-      <NextLink href="/salesforce">
+      </Link>
+      <Link href="/salesforce">
         <SponsorBoxShadowWrapper
           size={['48px', '55px', '77px', null, '84px']}
           right={['4.93%', '0']}
@@ -118,7 +118,7 @@ const SupportProjects = () => (
             alt="Sales Force logo"
           />
         </SponsorBoxShadowWrapper>
-      </NextLink>
+      </Link>
       <Box
         width={[1, '324px', '478px', null, 1]}
         height={['229px', '311px', '423px', null, '100%']}
@@ -187,7 +187,7 @@ const SupportProjects = () => (
           </Span>
         </P>
       </Box>
-      <NextLink href="/discover">
+      <Link href="/discover">
         <StyledButton
           minWidth={['185px', '167px', null, null, '185px']}
           my={[2, null, 0]}
@@ -196,7 +196,7 @@ const SupportProjects = () => (
         >
           <FormattedMessage id="home.discoverCollectives" defaultMessage="Discover Collectives" />
         </StyledButton>
-      </NextLink>
+      </Link>
     </Flex>
   </Flex>
 );

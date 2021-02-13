@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import themeGet from '@styled-system/theme-get';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
@@ -161,7 +161,7 @@ const CreateOpenSourceCollective = () => {
                 defaultMessage="Verify using GitHub stars"
               />
             </StyledButton>
-            <NextLink
+            <Link
               href={{ pathname: `opensource/apply/form`, query: { hostTos: true } }}
               onClick={e => {
                 if (!checked) {
@@ -176,7 +176,7 @@ const CreateOpenSourceCollective = () => {
                   defaultMessage="Request manual verification"
                 />
               </StyledButton>
-            </NextLink>
+            </Link>
           </Flex>
         </Box>
       </Flex>

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -16,6 +15,7 @@ import Avatar from './Avatar';
 import Container from './Container';
 import EditUpdateForm from './EditUpdateForm';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import LinkCollective from './LinkCollective';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
@@ -202,9 +202,9 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
     if (mode === 'summary') {
       return (
-        <NextLink href={`/${collective.slug}/updates/${update.slug}`}>
+        <Link href={`/${collective.slug}/updates/${update.slug}`}>
           <H5 data-cy="updateTitle">{update.title}</H5>
-        </NextLink>
+        </Link>
       );
     } else {
       return <H5 data-cy="updateTitle">{update.title}</H5>;
@@ -306,9 +306,9 @@ class StyledUpdate extends Component {
         </UpdateWrapper>
         {update.publishedAt && mode === 'details' && (
           <Flex my={4} justifyContent={['center', 'flex-start']}>
-            <NextLink href={`/${collective.slug}/updates`}>
+            <Link href={`/${collective.slug}/updates`}>
               <StyledButton ml={[0, 5]}>{intl.formatMessage(this.messages['viewLatestUpdates'])}</StyledButton>
-            </NextLink>
+            </Link>
           </Flex>
         )}
       </React.Fragment>

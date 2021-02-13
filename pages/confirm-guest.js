@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import { useMutation } from '@apollo/client';
 import { Email } from '@styled-icons/material/Email';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { useTheme } from 'styled-components';
@@ -12,6 +11,7 @@ import { removeGuestTokens } from '../lib/guest-accounts';
 import Container from '../components/Container';
 import { Box } from '../components/Grid';
 import { getI18nLink } from '../components/I18nFormatters';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import MessageBoxGraphqlError from '../components/MessageBoxGraphqlError';
 import Page from '../components/Page';
@@ -123,7 +123,7 @@ const ConfirmGuestPage = () => {
                     defaultMessage="If you don't wish to wait, click <Link>here</Link>."
                     values={{
                       Link: getI18nLink({
-                        as: NextLink,
+                        as: Link,
                         route: data.confirmGuestAccount?.account.slug,
                       }),
                     }}

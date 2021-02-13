@@ -4,7 +4,6 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
 import { isNil } from 'lodash';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -17,6 +16,7 @@ import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
+import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
@@ -205,7 +205,7 @@ class SearchPage extends React.Component {
                   </em>
                 </P>
                 {
-                  <NextLink href={{ pathname: '/pledges/new', query: { name: term } }} passHref>
+                  <Link href={{ pathname: '/pledges/new', query: { name: term } }} passHref>
                     <StyledLink
                       display="block"
                       fontSize="14px"
@@ -218,7 +218,7 @@ class SearchPage extends React.Component {
                     >
                       <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
                     </StyledLink>
-                  </NextLink>
+                  </Link>
                 }
               </Flex>
             )}
@@ -240,7 +240,7 @@ class SearchPage extends React.Component {
                 </em>
               </P>
               {
-                <NextLink href={{ pathname: '/pledges/new', query: { name: term } }} passHref>
+                <Link href={{ pathname: '/pledges/new', query: { name: term } }} passHref>
                   <StyledLink
                     display="block"
                     fontSize="14px"
@@ -253,7 +253,7 @@ class SearchPage extends React.Component {
                   >
                     <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
                   </StyledLink>
-                </NextLink>
+                </Link>
               }
             </Flex>
           )}

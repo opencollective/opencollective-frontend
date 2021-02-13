@@ -5,7 +5,6 @@ import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/octicons/Mail';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -14,6 +13,7 @@ import languages from '../lib/constants/locales';
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import ListItem from './ListItem';
 import StyledLink from './StyledLink';
 import StyledSelect from './StyledSelect';
@@ -365,11 +365,11 @@ const Footer = () => {
                 {Object.keys(navigation[key]).map(item => (
                   <ListItem key={item} textAlign={['center', 'left']} mb={2}>
                     {navigation[key][item][0] === '/' ? (
-                      <NextLink href={navigation[key][item]} passHref>
+                      <Link href={navigation[key][item]} passHref>
                         <MenuLink>
                           {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}
                         </MenuLink>
-                      </NextLink>
+                      </Link>
                     ) : (
                       <MenuLink href={navigation[key][item]}>
                         {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}

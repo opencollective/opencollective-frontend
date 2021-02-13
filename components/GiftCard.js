@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Clock } from '@styled-icons/feather/Clock';
-import NextLink from 'next/link';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fontSize, height, width } from 'styled-system';
@@ -10,9 +9,10 @@ import CollectiveCard from './gift-cards/CollectiveCard';
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import { P, Span } from './Text';
 
-const WhiteLink = styled(NextLink)`
+const WhiteLink = styled(Link)`
   color: white;
   text-decoration: underline !important;
   &&:hover {

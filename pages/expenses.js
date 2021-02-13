@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { has, mapValues, omit, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -29,6 +28,7 @@ import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
 import { expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
+import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -233,7 +233,7 @@ class ExpensePage extends React.Component {
                         defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
                         values={{
                           ResetLink: text => (
-                            <NextLink
+                            <Link
                               data-cy="reset-expenses-filters"
                               href={{
                                 pathname: 'expenses',
@@ -241,7 +241,7 @@ class ExpensePage extends React.Component {
                               }}
                             >
                               <span>{text}</span>
-                            </NextLink>
+                            </Link>
                           ),
                         }}
                       />
@@ -289,7 +289,7 @@ class ExpensePage extends React.Component {
                     data-cy="expense-tags-title"
                   >
                     {({ key, tag, renderedTag, props }) => (
-                      <NextLink
+                      <Link
                         key={key}
                         href={{
                           pathname: 'expenses',
@@ -298,7 +298,7 @@ class ExpensePage extends React.Component {
                         data-cy="expense-tags-link"
                       >
                         {renderedTag}
-                      </NextLink>
+                      </Link>
                     )}
                   </ExpenseTags>
                 </ExpenseInfoSidebar>

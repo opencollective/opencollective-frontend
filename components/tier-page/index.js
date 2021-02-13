@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import themeGet from '@styled-system/theme-get';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -18,6 +17,7 @@ import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import InlineEditField from '../InlineEditField';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledProgressBar from '../StyledProgressBar';
 import { H1, H2, P } from '../Text';
@@ -344,16 +344,16 @@ class TierPage extends Component {
                   {isPassed ? (
                     <P textAlign="center">
                       <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
-                      <NextLink href={{ pathname: `${collective.slug}/contribute`, query: redirect }}>
+                      <Link href={{ pathname: `${collective.slug}/contribute`, query: redirect }}>
                         <FormattedMessage
                           id="createOrder.backToTier"
                           defaultMessage="View all the other ways to contribute"
                         />
                         .
-                      </NextLink>
+                      </Link>
                     </P>
                   ) : (
-                    <NextLink
+                    <Link
                       href={{
                         pathname: `${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
                         query: { redirect },
@@ -362,7 +362,7 @@ class TierPage extends Component {
                       <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
                         {tier.button ? tier.button : <FormattedMessage id="Contribute" defaultMessage="Contribute" />}
                       </StyledButton>
-                    </NextLink>
+                    </Link>
                   )}
                 </Box>
               </Flex>

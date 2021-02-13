@@ -4,7 +4,6 @@ import { useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
 import { get, map } from 'lodash';
-import NextLink from 'next/link';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../lib/constants/collectives';
@@ -20,6 +19,7 @@ import CollectivePicker from './CollectivePicker';
 import { Box, Flex } from './Grid';
 import HTMLContent from './HTMLContent';
 import { getI18nLink } from './I18nFormatters';
+import Link from './Link';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
@@ -339,7 +339,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                               types={['COLLECTIVE']}
                               creatable
                               renderNewCollectiveOption={() => (
-                                <NextLink
+                                <Link
                                   href={isOCFHost ? `/foundation/apply/intro` : `/${host.slug}/apply`}
                                   data-cy="host-apply-new-collective-link"
                                 >
@@ -354,7 +354,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
                                       </Box>
                                     </Flex>
                                   </StyledButton>
-                                </NextLink>
+                                </Link>
                               )}
                             />
                           </div>

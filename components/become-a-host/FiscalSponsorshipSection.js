@@ -1,10 +1,10 @@
 import React from 'react';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';
 
@@ -64,11 +64,11 @@ const FiscalSponsorship = () => {
             />
           </P>
         </Box>
-        <NextLink href="/organizations/new">
+        <Link href="/organizations/new">
           <StyledButton minWidth={[283, 165, null, null, 183]} buttonStyle="dark" whiteSpace="nowrap">
             <FormattedMessage id="home.createHost" defaultMessage="Create a Fiscal Host" />
           </StyledButton>
-        </NextLink>
+        </Link>
       </Container>
     </Flex>
   );

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { maxWidth } from 'styled-system';
@@ -17,6 +16,7 @@ import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import HappyBackground from '../components/gift-cards/HappyBackground';
 import { Box, Flex } from '../components/Grid';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
 import NewCreditCardForm from '../components/NewCreditCardForm';
 import Page from '../components/Page';
@@ -289,7 +289,7 @@ class UpdatePaymentPage extends React.Component {
                       </StyledButton>
                     )}
                     {!showCreditCardForm && success && (
-                      <NextLink href={`/${this.props.slug}`}>
+                      <Link href={`/${this.props.slug}`}>
                         <StyledButton
                           buttonStyle="primary"
                           buttonSize="large"
@@ -303,7 +303,7 @@ class UpdatePaymentPage extends React.Component {
                             defaultMessage="Go to Collective page"
                           />
                         </StyledButton>
-                      </NextLink>
+                      </Link>
                     )}
                   </Flex>
                 </Flex>

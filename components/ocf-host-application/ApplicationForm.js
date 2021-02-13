@@ -6,7 +6,6 @@ import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
-import NextLink from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '../../lib/collective.lib';
@@ -22,6 +21,7 @@ import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
 import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -576,7 +576,7 @@ const ApplicationForm = ({
                       mb="40px"
                       mt={[null, 3]}
                     >
-                      <NextLink href="/foundation/apply/fees">
+                      <Link href="/foundation/apply/fees">
                         <StyledButton
                           type="button"
                           mb={[3, 0]}
@@ -588,7 +588,7 @@ const ApplicationForm = ({
                           &nbsp;
                           <FormattedMessage id="Back" defaultMessage="Back" />
                         </StyledButton>
-                      </NextLink>
+                      </Link>
                       <OCFPrimaryButton
                         width={['286px', '120px']}
                         type="submit"

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -12,6 +11,7 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import PayPal from '../icons/PayPal';
 import TransferwiseIcon from '../icons/TransferwiseIcon';
+import Link from '../Link';
 import LocationAddress from '../LocationAddress';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
@@ -166,7 +166,7 @@ const HostInfoCard = ({ host }) => {
         <Container fontSize="10px" lineHeight="15px" color="black.500" my={2} minHeight={35}>
           <LocationAddress location={host.location} showMessageIfEmpty />
         </Container>
-        <StyledLink as={NextLink} href={`${host.slug}/edit`} fontSize="10px" lineHeight="15px">
+        <StyledLink as={Link} href={`${host.slug}/edit`} fontSize="10px" lineHeight="15px">
           <FormattedMessage id="Edit" defaultMessage="Edit" />
         </StyledLink>
       </Flex>

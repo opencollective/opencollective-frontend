@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
+import Link from './Link';
 import StyledLink from './StyledLink';
 import StyledSpinner from './StyledSpinner';
 import { withUser } from './UserProvider';
@@ -57,9 +57,9 @@ class LoginBtn extends React.Component {
           py: 2,
         };
     return (
-      <NextLink href="signin" params={{ next: this.redirectAfterSignin }} passHref>
+      <Link href="signin" params={{ next: this.redirectAfterSignin }} passHref>
         <StyledLink {...buttonProps}>{this.renderContent()}</StyledLink>
-      </NextLink>
+      </Link>
     );
   }
 }

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, mapValues } from 'lodash';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -24,6 +23,7 @@ import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -252,7 +252,7 @@ class TransactionsPage extends React.Component {
                     values={{
                       ResetLink(text) {
                         return (
-                          <NextLink
+                          <Link
                             data-cy="reset-transactions-filters"
                             href={{
                               pathname: `${collective.slug}/transactions`,
@@ -263,7 +263,7 @@ class TransactionsPage extends React.Component {
                             }}
                           >
                             <span>{text}</span>
-                          </NextLink>
+                          </Link>
                         );
                       },
                     }}

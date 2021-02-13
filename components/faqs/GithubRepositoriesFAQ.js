@@ -1,7 +1,7 @@
 import React from 'react';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
+import Link from '../Link';
 import StyledLink from '../StyledLink';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
@@ -56,10 +56,10 @@ const GithubRepositoriesFAQ = props => (
               );
             },
             'for-any-community': function CommunityLink(msg) {
-              return <NextLink href="create/community">{msg}</NextLink>;
+              return <Link href="create/community">{msg}</Link>;
             },
             'open-source': function OpenSourceLink(msg) {
-              return <NextLink href="create/opensource">{msg}</NextLink>;
+              return <Link href="create/opensource">{msg}</Link>;
             },
           }}
         />

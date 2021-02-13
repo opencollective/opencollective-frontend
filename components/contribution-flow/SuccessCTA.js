@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import NextLink from 'next/link';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Newsletter from '../home/Newsletter';
+import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { H3, P, Span } from '../Text';
 
@@ -84,7 +84,7 @@ const SuccessCTAWrapper = ({ type, orderId, email, ...props }) => {
     case SUCCESS_CTA_TYPE.JOIN:
       return (
         <StyledLink
-          as={NextLink}
+          as={Link}
           display="block"
           data-cy="join-opencollective-link"
           href="/create-account/guest"
@@ -96,7 +96,7 @@ const SuccessCTAWrapper = ({ type, orderId, email, ...props }) => {
     case SUCCESS_CTA_TYPE.SIGN_IN:
       return (
         <StyledLink
-          as={NextLink}
+          as={Link}
           display="block"
           color="black.800"
           data-cy="success-signin-link"

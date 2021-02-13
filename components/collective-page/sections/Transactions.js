@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { Box } from '../../Grid';
+import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -126,11 +126,11 @@ const SectionTransactions = props => {
               />
             </MessageBox>
           )}
-          <NextLink href={`${collective.slug}/transactions`}>
+          <Link href={`${collective.slug}/transactions`}>
             <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
             </StyledButton>
-          </NextLink>
+          </Link>
         </ContainerSectionContent>
       )}
     </Box>

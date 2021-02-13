@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -19,6 +18,7 @@ import ContributionFlowSuccess from '../components/contribution-flow/Contributio
 import ContributionFlowContainer from '../components/contribution-flow/index';
 import ErrorPage from '../components/ErrorPage';
 import { Flex } from '../components/Grid';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -185,11 +185,11 @@ class NewContributionFlowPage extends React.Component {
           {content}
         </MessageBox>
         {showOtherWaysToContribute && (
-          <NextLink href={`${collectiveSlug}/contribute`}>
+          <Link href={`${collectiveSlug}/contribute`}>
             <StyledButton buttonStyle="primary" buttonSize="large" mt={5}>
               <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
             </StyledButton>
-          </NextLink>
+          </Link>
         )}
       </Flex>
     );
@@ -220,11 +220,11 @@ class NewContributionFlowPage extends React.Component {
           </strong>
           <br />
           {LoggedInUser?.isHostAdmin(account) && (
-            <NextLink href={`${account.slug}/accept-financial-contributions/organization`}>
+            <Link href={`${account.slug}/accept-financial-contributions/organization`}>
               <StyledButton buttonStyle="primary" mt={3}>
                 <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
               </StyledButton>
-            </NextLink>
+            </Link>
           )}
         </React.Fragment>
       );

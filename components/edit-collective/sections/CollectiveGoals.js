@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, sortBy } from 'lodash';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import Container from '../../Container';
 import GoalsCover from '../../GoalsCover';
 import { Box, Flex } from '../../Grid';
+import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
@@ -267,11 +267,11 @@ class CollectiveGoals extends React.Component {
           </MessageBox>
         )}
         <Flex justifyContent="center" flexWrap="wrap" mt={5}>
-          <NextLink href={collective.slug}>
+          <Link href={collective.slug}>
             <StyledButton mx={2} minWidth={200}>
               <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
             </StyledButton>
-          </NextLink>
+          </Link>
           <StyledButton
             buttonStyle="primary"
             onClick={this.handleSubmit}

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, isEmpty } from 'lodash';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
@@ -10,6 +9,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import ConversationsList from '../../conversations/ConversationsList';
 import { conversationListFragment } from '../../conversations/graphql';
 import { Box, Flex } from '../../Grid';
+import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { P, Span } from '../../Text';
@@ -66,14 +66,14 @@ class SectionConversations extends React.PureComponent {
               defaultMessage="Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together."
             />
           </P>
-          <NextLink href={`${collective.slug}/conversations/new`}>
+          <Link href={`${collective.slug}/conversations/new`}>
             <StyledButton buttonStyle="primary" my={[2, 0]}>
               <Span fontSize="16px" fontWeight="bold" mr={2}>
                 +
               </Span>
               <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
             </StyledButton>
-          </NextLink>
+          </Link>
         </Flex>
         {isEmpty(conversations.nodes) ? (
           <div>
@@ -88,11 +88,11 @@ class SectionConversations extends React.PureComponent {
           <Box mt={[3, 5]} mb={[3, 4]}>
             <ConversationsList collectiveSlug={collective.slug} conversations={conversations.nodes} />
             {conversations.totalCount > 3 && (
-              <NextLink href={`${collective.slug}/conversations`}>
+              <Link href={`${collective.slug}/conversations`}>
                 <StyledButton width="100%" mt={4} buttonSize="small" fontSize="14px">
                   <FormattedMessage id="Conversations.ViewAll" defaultMessage="View all Conversations" /> →
                 </StyledButton>
-              </NextLink>
+              </Link>
             )}
           </Box>
         )}

@@ -4,7 +4,6 @@ import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { cloneDeep, find, get, set } from 'lodash';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -18,6 +17,7 @@ import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
+import Link from '../Link';
 import OrdersWithData from '../orders/OrdersWithData';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
@@ -434,12 +434,12 @@ class EditCollectiveForm extends React.Component {
               alignItems="center"
               flexWrap="wrap"
             >
-              <NextLink href={`${collective.slug}/edit/gift-cards`}>
+              <Link href={`${collective.slug}/edit/gift-cards`}>
                 <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="giftCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
                 </StyledButton>
-              </NextLink>
+              </Link>
 
               <StyledLink
                 href="https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards#faq"
@@ -841,7 +841,7 @@ class EditCollectiveForm extends React.Component {
                 </StyledButton>
 
                 <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
-                  <NextLink
+                  <Link
                     href={isEvent ? `${collective.parentCollective.slug}/events/${collective.slug}` : collective.slug}
                   >
                     <FormattedMessage
@@ -849,7 +849,7 @@ class EditCollectiveForm extends React.Component {
                       defaultMessage="view {type} page"
                       values={{ type }}
                     />
-                  </NextLink>
+                  </Link>
                 </Container>
               </Container>
             )}

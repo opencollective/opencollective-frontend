@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -8,6 +7,7 @@ import styled from 'styled-components';
 import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H1, P } from '../Text';
@@ -124,7 +124,7 @@ class ContributionCategoryPicker extends React.Component {
                     <Image src={acceptMyselfIllustration} alt={intl.formatMessage(this.messages.ourselves)} />
                     <HoverImage src={acceptMyselfHoverIllustration} alt={intl.formatMessage(this.messages.ourselves)} />
                   </Box>
-                  <NextLink href={`${router.query.slug}/accept-financial-contributions/ourselves`}>
+                  <Link href={`${router.query.slug}/accept-financial-contributions/ourselves`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"
@@ -136,7 +136,7 @@ class ContributionCategoryPicker extends React.Component {
                     >
                       {intl.formatMessage(this.messages.ourselves)}
                     </StyledButton>
-                  </NextLink>
+                  </Link>
                   <Box minHeight={50} px={3}>
                     <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                       {intl.formatMessage(this.messages.ourselvesInfo)}
@@ -160,7 +160,7 @@ class ContributionCategoryPicker extends React.Component {
                       alt={intl.formatMessage(this.messages.organization)}
                     />
                   </Box>
-                  <NextLink href={`${router.query.slug}/accept-financial-contributions/organization`}>
+                  <Link href={`${router.query.slug}/accept-financial-contributions/organization`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"
@@ -172,7 +172,7 @@ class ContributionCategoryPicker extends React.Component {
                     >
                       {intl.formatMessage(this.messages.organization)}
                     </StyledButton>
-                  </NextLink>
+                  </Link>
                   <Box minHeight={50} px={3}>
                     <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                       {intl.formatMessage(this.messages.organizationInfo)}
@@ -192,7 +192,7 @@ class ContributionCategoryPicker extends React.Component {
                     <Image src={acceptHostIllustration} alt={intl.formatMessage(this.messages.host)} />
                     <HoverImage src={acceptHostHoverIllustration} alt={intl.formatMessage(this.messages.host)} />
                   </Box>
-                  <NextLink href={`${router.query.slug}/accept-financial-contributions/host`}>
+                  <Link href={`${router.query.slug}/accept-financial-contributions/host`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"
@@ -204,7 +204,7 @@ class ContributionCategoryPicker extends React.Component {
                     >
                       {intl.formatMessage(this.messages.host)}
                     </StyledButton>
-                  </NextLink>
+                  </Link>
                   <Box minHeight={50} px={3}>
                     <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                       <FormattedMessage

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { clamp, isNil, round } from 'lodash';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
@@ -11,6 +10,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 import StyledInputGroup from '../StyledInputGroup';
@@ -88,7 +88,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                       defaultMessage="Set the global (default) fee in your <Link>settings</Link>."
                       values={{
                         Link: getI18nLink({
-                          as: NextLink,
+                          as: Link,
                           href: `${host.slug}/edit/${EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING}`,
                           openInNewTab: true,
                         }),

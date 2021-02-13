@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { mapValues, omit } from 'lodash';
-import NextLink from 'next/link';
 import { useRouter, withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -20,6 +19,7 @@ import {
   expensesListFieldsFragment,
 } from '../expenses/graphql/fragments';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -214,7 +214,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
               values={{
                 ResetLink(text) {
                   return (
-                    <NextLink
+                    <Link
                       data-cy="reset-expenses-filters"
                       href={{
                         pathname: `${data.host.slug}/dashboard/expenses`,
@@ -222,7 +222,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                       }}
                     >
                       {text}
-                    </NextLink>
+                    </Link>
                   );
                 },
               }}

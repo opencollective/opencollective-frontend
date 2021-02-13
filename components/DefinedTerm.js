@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
-import NextLink from 'next/link';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { borderColor, color, typography } from 'styled-system';
 
 import { textTransform } from '../lib/styled-system-custom-properties';
 
+import Link from './Link';
 import StyledTooltip from './StyledTooltip';
 
 /**
@@ -80,7 +80,7 @@ const TranslatedDefinitions = defineMessages({
   },
 });
 
-const GiftCardLearnMoreLink = msg => <NextLink href="gift-cards">{msg}</NextLink>;
+const GiftCardLearnMoreLink = msg => <Link href="gift-cards">{msg}</Link>;
 
 const TranslationParams = {
   [Terms.GIFT_CARD]: {

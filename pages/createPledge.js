@@ -4,7 +4,6 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -24,6 +23,7 @@ import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import I18nFormatters from '../components/I18nFormatters';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import { pledgedCollectivePageQuery } from '../components/PledgedCollectivePage';
@@ -354,9 +354,9 @@ class CreatePledgePage extends React.Component {
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
                     values={{
                       'signin-link': msg => (
-                        <NextLink href="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
+                        <Link href="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
                           {msg}
-                        </NextLink>
+                        </Link>
                       ),
                     }}
                   />
@@ -556,9 +556,9 @@ class CreatePledgePage extends React.Component {
                       .filter(({ fromCollective }) => fromCollective.type === 'USER')
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <NextLink href={fromCollective.slug}>
+                          <Link href={fromCollective.slug}>
                             <Avatar collective={fromCollective} radius={40} />
-                          </NextLink>
+                          </Link>
                         </Box>
                       ))}
                   </Flex>
@@ -571,7 +571,7 @@ class CreatePledgePage extends React.Component {
                       )
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <NextLink href={fromCollective.slug}>
+                          <Link href={fromCollective.slug}>
                             <Container
                               backgroundImage={`url(${imagePreview(
                                 fromCollective.image,
@@ -587,7 +587,7 @@ class CreatePledgePage extends React.Component {
                               height={40}
                               width={40}
                             />
-                          </NextLink>
+                          </Link>
                         </Box>
                       ))}
                   </Flex>

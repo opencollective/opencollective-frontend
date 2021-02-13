@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../../Container';
 import { Box } from '../../Grid';
+import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import { flicker } from '../../StyledKeyframes';
 import StyledLink from '../../StyledLink';
@@ -230,11 +230,11 @@ const LearnMore = () => {
         <DonateButtonWrapper width="287px" height="300px" my={3} ml={[null, 4]}>
           <DonateButtonBG />
           <DonateButtonBGHover />
-          <NextLink href="/opencollective/donate">
+          <Link href="/opencollective/donate">
             <DonateButton buttonStyle="dark" minWidth={'97'}>
               <FormattedMessage id="home.donate" defaultMessage="Donate" />
             </DonateButton>
-          </NextLink>
+          </Link>
         </DonateButtonWrapper>
       </Container>
     </Container>

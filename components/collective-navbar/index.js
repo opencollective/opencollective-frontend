@@ -11,7 +11,6 @@ import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
-import NextLink from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { maxWidth } from 'styled-system';
@@ -28,6 +27,7 @@ import Avatar from '../Avatar';
 import { Dimensions, Sections } from '../collective-page/_constants';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
@@ -210,28 +210,28 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
-        <NextLink href={`${collective.slug}/dashboard`}>
+        <Link href={`${collective.slug}/dashboard`}>
           <MainActionBtn tabIndex="-1">
             <Dashboard size="1em" />
             <Span ml={2}>
               <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
             </Span>
           </MainActionBtn>
-        </NextLink>
+        </Link>
       ),
     };
   } else if (callsToAction.includes('hasContribute')) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
-        <NextLink href={getContributeRoute(collective)}>
+        <Link href={getContributeRoute(collective)}>
           <MainActionBtn tabIndex="-1">
             <Planet size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
             </Span>
           </MainActionBtn>
-        </NextLink>
+        </Link>
       ),
     };
   } else if (callsToAction.includes('hasApply')) {
@@ -250,56 +250,56 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <NextLink href={`${collective.slug}/expenses/new`}>
+        <Link href={`${collective.slug}/expenses/new`}>
           <MainActionBtn tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
             </Span>
           </MainActionBtn>
-        </NextLink>
+        </Link>
       ),
     };
   } else if (callsToAction.includes('hasSubmitExpense')) {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
-        <NextLink href={`${collective.slug}/expenses/new`}>
+        <Link href={`${collective.slug}/expenses/new`}>
           <MainActionBtn tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
             </Span>
           </MainActionBtn>
-        </NextLink>
+        </Link>
       ),
     };
   } else if (callsToAction.includes('hasManageSubscriptions')) {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <NextLink href={`${collective.slug}/recurring-contributions`}>
+        <Link href={`${collective.slug}/recurring-contributions`}>
           <MainActionBtn tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
             </Span>
           </MainActionBtn>
-        </NextLink>
+        </Link>
       ),
     };
   } else if (callsToAction.includes('hasContact')) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
-        <NextLink href={`${collective.slug}/contact`}>
+        <Link href={`${collective.slug}/contact`}>
           <MainActionBtn tabIndex="-1">
             <Envelope size="1em" />
             <Span ml={2}>
               <FormattedMessage id="Contact" defaultMessage="Contact" />
             </Span>
           </MainActionBtn>
-        </NextLink>
+        </Link>
       ),
     };
   } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.ADD_FUNDS) && collective.host) {
@@ -429,11 +429,11 @@ const CollectiveNavbar = ({
           {showBackButton && (
             <Box display={['none', 'block']} mr={2}>
               {collective && (
-                <NextLink href={collective.slug}>
+                <Link href={collective.slug}>
                   <StyledButton px={1} isBorderless>
                     &larr;
                   </StyledButton>
-                </NextLink>
+                </Link>
               )}
             </Box>
           )}

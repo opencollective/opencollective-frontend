@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';
 
@@ -60,7 +60,7 @@ const CreateFundCategoryPicker = () => {
                   src="/static/images/create-collective/climateIllustration.png"
                   alt={formatMessage(messages.foundation)}
                 />
-                <NextLink
+                <Link
                   href={{
                     pathname: `fund/${router.query.verb}`,
                     query: { hostCollectiveSlug: router.query.hostCollectiveSlug, category: 'foundation' },
@@ -69,7 +69,7 @@ const CreateFundCategoryPicker = () => {
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.foundation)}
                   </StyledButton>
-                </NextLink>
+                </Link>
                 <P textAlign="center">
                   It will be hosted by
                   <br />

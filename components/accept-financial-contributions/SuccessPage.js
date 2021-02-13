@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -10,6 +9,7 @@ import { confettiFireworks } from '../../lib/confettis';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H1, H2, P } from '../Text';
@@ -138,12 +138,12 @@ class SuccessPage extends React.Component {
                       defaultMessage="Add or manage payment methods in your Fiscal Host settings. {takeMeThere}."
                       values={{
                         takeMeThere: (
-                          <NextLink
+                          <Link
                             href={`${collective.host.slug}/edit/fiscal-hosting`}
                             data-cy="afc-success-host-settings-link"
                           >
                             <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
-                          </NextLink>
+                          </Link>
                         ),
                       }}
                     />
@@ -153,19 +153,19 @@ class SuccessPage extends React.Component {
             </Flex>
           </Flex>
           <Flex flexDirection={['column', 'row']} justifyContent="center" alignItems="center" my={3}>
-            <NextLink href={collective.slug}>
+            <Link href={collective.slug}>
               <StyledButton buttonStyle="standard" mt={[2, 3]} mb={[3, 2]} px={3}>
                 <FormattedMessage
                   id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
                   defaultMessage="Go to Collective page"
                 />
               </StyledButton>
-            </NextLink>
-            <NextLink href={`${collective.slug}/edit/tiers`} data-cy="afc-success-host-tiers-link">
+            </Link>
+            <Link href={`${collective.slug}/edit/tiers`} data-cy="afc-success-host-tiers-link">
               <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
                 <FormattedMessage id="createCustomTiers" defaultMessage="Create your own tiers" />
               </StyledButton>
-            </NextLink>
+            </Link>
           </Flex>
         </Container>
       </Fragment>

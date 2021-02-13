@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
 import Image from 'next/image';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -14,6 +13,7 @@ import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
 import Container from '../../Container';
 import { expensesListFieldsFragment } from '../../expenses/graphql/fragments';
 import { Box, Flex } from '../../Grid';
+import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledCard from '../../StyledCard';
 import StyledFilters from '../../StyledFilters';
@@ -83,18 +83,18 @@ const ViewAllLink = ({ collective, filter }) => {
   switch (filter) {
     case 'expenses':
       return (
-        <NextLink href={`${collective.slug}/expenses`} data-cy="view-all-expenses-link">
+        <Link href={`${collective.slug}/expenses`} data-cy="view-all-expenses-link">
           <span>
             <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
             &rarr;
           </span>
-        </NextLink>
+        </Link>
       );
     case 'transactions':
       return (
-        <NextLink href={`${collective.slug}/transactions`} data-cy="view-all-transactions-link">
+        <Link href={`${collective.slug}/transactions`} data-cy="view-all-transactions-link">
           <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> &rarr;
-        </NextLink>
+        </Link>
       );
     default:
       return null;

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { compact, isEmpty, pick, values } from 'lodash';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledCheckbox from './StyledCheckbox';
@@ -68,11 +68,11 @@ Tab.propTypes = {
 
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
-    <NextLink href={onSecondaryAction} passHref>
+    <Link href={onSecondaryAction} passHref>
       <StyledLink disabled={loading} fontSize="14px">
         {children}
       </StyledLink>
-    </NextLink>
+    </Link>
   ) : (
     <StyledButton asLink fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
       {children}

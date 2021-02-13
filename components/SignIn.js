@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledInput from './StyledInput';
@@ -39,11 +39,11 @@ export default class SignIn extends React.Component {
   renderSecondaryAction(message) {
     const { loading, onSecondaryAction } = this.props;
     return typeof onSecondaryAction === 'string' ? (
-      <NextLink href={onSecondaryAction} passHref>
+      <Link href={onSecondaryAction} passHref>
         <StyledLink disabled={loading} fontSize="14px" data-cy="signin-secondary-action-btn">
           {message}&nbsp;→
         </StyledLink>
-      </NextLink>
+      </Link>
     ) : (
       <StyledButton
         asLink

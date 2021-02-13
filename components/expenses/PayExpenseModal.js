@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
-import NextLink from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -16,6 +15,7 @@ import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
@@ -250,7 +250,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             <br />
             {/** TODO: Add a proper ID/Type to detect this error */}
             {error.startsWith('Insufficient Paypal balance') && (
-              <StyledLink as={NextLink} href={`${host.slug}/dashboard`}>
+              <StyledLink as={Link} href={`${host.slug}/dashboard`}>
                 <FormattedMessage
                   id="PayExpenseModal.RefillBalanceError"
                   defaultMessage="Refill your balance from the Host dashboard"
@@ -263,7 +263,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
                 defaultMessage="Please go to your <SettingsLink>settings</SettingsLink> to enable two-factor authentication for your account."
                 values={{
                   SettingsLink: getI18nLink({
-                    as: NextLink,
+                    as: Link,
                     href: `${LoggedInUser.collective.slug}/edit/${EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH}`,
                     openInNewTab: true,
                   }),

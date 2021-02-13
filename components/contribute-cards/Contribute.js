@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -9,6 +8,7 @@ import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
@@ -183,11 +183,11 @@ const ContributeCard = ({
         </Flex>
         <Box>
           {!disableCTA && (
-            <NextLink href={route}>
+            <Link href={route}>
               <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3} data-cy="contribute-btn">
                 {buttonText || getContributeCTA(type)}
               </StyledButton>
-            </NextLink>
+            </Link>
           )}
           {!hideContributors && (
             <Box mt={2} height={60}>
@@ -197,9 +197,9 @@ const ContributeCard = ({
                     {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
                       <Box key={contributor.id} mx={2}>
                         {contributor.collectiveSlug ? (
-                          <NextLink href={contributor.collectiveSlug} title={contributor.name}>
+                          <Link href={contributor.collectiveSlug} title={contributor.name}>
                             <ContributorAvatar contributor={contributor} radius={32} />
-                          </NextLink>
+                          </Link>
                         ) : (
                           <ContributorAvatar contributor={contributor} radius={32} title={contributor.name} />
                         )}

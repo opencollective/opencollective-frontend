@@ -8,7 +8,6 @@ import { Settings } from '@styled-icons/feather/Settings';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -20,6 +19,7 @@ import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
+import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
@@ -153,7 +153,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
           </Container>
           {isAdmin && (
             <Box>
-              <NextLink
+              <Link
                 href={
                   isEvent
                     ? `${collective.parentCollective?.slug}/events/${collective.slug}/edit`
@@ -166,7 +166,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     <FormattedMessage id="Settings" defaultMessage="Settings" />
                   </Span>
                 </StyledButton>
-              </NextLink>
+              </Link>
             </Box>
           )}
           <Box maxWidth={['70%', '60%', null, '40%', '45%']}>

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import Router from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { Flex } from './Grid';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import { H1, P } from './Text';
 
@@ -22,7 +22,7 @@ const NotFound = ({ searchTerm }) => {
           <StyledButton m={2} onClick={() => Router.back()}>
             &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to the previous page" />
           </StyledButton>
-          <NextLink href="search" params={{ q: searchTerm }}>
+          <Link href="search" params={{ q: searchTerm }}>
             <StyledButton m={2} buttonStyle="primary">
               <FormattedMessage
                 id="notFound.search"
@@ -30,7 +30,7 @@ const NotFound = ({ searchTerm }) => {
                 values={{ term: <strong>{searchTerm}</strong> }}
               />
             </StyledButton>
-          </NextLink>
+          </Link>
         </Flex>
       )}
     </Flex>

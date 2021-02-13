@@ -8,7 +8,6 @@ import themeGet from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -20,6 +19,7 @@ import Container from './Container';
 import CreateGiftCardsSuccess from './CreateGiftCardsSuccess';
 import { Box, Flex } from './Grid';
 import { I18nSupportLink } from './I18nFormatters';
+import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import PaymentMethodSelect from './PaymentMethodSelect';
@@ -324,14 +324,14 @@ class CreateGiftCardsForm extends Component {
   renderNoPaymentMethodMessage() {
     return (
       <Flex justifyContent="center">
-        <NextLink href={`${this.props.collectiveSlug}/edit/payment-methods`}>
+        <Link href={`${this.props.collectiveSlug}/edit/payment-methods`}>
           <StyledButton buttonSize="large" mt="2em" justifyContent="center">
             <FormattedMessage
               id="giftCards.create.requirePM"
               defaultMessage="Add a payment method to create gift cards"
             />
           </StyledButton>
-        </NextLink>
+        </Link>
       </Flex>
     );
   }

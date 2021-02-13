@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import ApplyToHostModal from './ApplyToHostModal';
 import { getI18nLink } from './I18nFormatters';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledTooltip from './StyledTooltip';
 
@@ -81,7 +81,7 @@ class ApplyToHostBtn extends React.Component {
                 defaultMessage="This Fiscal Host has reached its Collective limit. <a>Contact {collectiveName}</a> to request they upgrade, and let them know you want to apply."
                 values={{
                   collectiveName: hostSlug,
-                  a: getI18nLink({ as: NextLink, href: `${hostSlug}/contact` }),
+                  a: getI18nLink({ as: Link, href: `${hostSlug}/contact` }),
                 }}
               />
             }

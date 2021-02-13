@@ -5,7 +5,6 @@ import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
 import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
 import { Grid as HostedCollectivesIcon } from '@styled-icons/feather/Grid';
 import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -19,6 +18,7 @@ import { HOST_SECTIONS } from '../components/host-dashboard/constants';
 import HostDashboardExpenses from '../components/host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../components/host-dashboard/HostDashboardHostedCollectives';
 import PendingApplications from '../components/host-dashboard/PendingApplications';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import OrdersWithData from '../components/orders/OrdersWithData';
@@ -164,30 +164,30 @@ class HostDashboardPage extends React.Component {
               flexWrap="wrap"
               data-cy="host-dashboard-menu-bar"
             >
-              <NextLink href={`${slug}/dashboard/expenses`}>
+              <Link href={`${slug}/dashboard/expenses`}>
                 <LinkContainer isActive={view === 'expenses'}>
                   <ReceiptIcon size="1em" />
                   <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
                 </LinkContainer>
-              </NextLink>
-              <NextLink href={`${slug}/dashboard/donations`}>
+              </Link>
+              <Link href={`${slug}/dashboard/donations`}>
                 <LinkContainer isActive={view === 'donations'}>
                   <DonateIcon size="1em" />
                   <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
                 </LinkContainer>
-              </NextLink>
-              <NextLink href={`${slug}/dashboard/pending-applications`}>
+              </Link>
+              <Link href={`${slug}/dashboard/pending-applications`}>
                 <LinkContainer isActive={view === 'pending-applications'}>
                   <CheckDouble size="1.2em" />
                   <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
                 </LinkContainer>
-              </NextLink>
-              <NextLink href={`${slug}/dashboard/${HOST_SECTIONS.HOSTED_COLLECTIVES}`}>
+              </Link>
+              <Link href={`${slug}/dashboard/${HOST_SECTIONS.HOSTED_COLLECTIVES}`}>
                 <LinkContainer isActive={view === HOST_SECTIONS.HOSTED_COLLECTIVES}>
                   <HostedCollectivesIcon size="1.2em" />
                   <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
                 </LinkContainer>
-              </NextLink>
+              </Link>
             </Container>
             <Box py={['32px', '60px']}>{this.renderView(host)}</Box>
           </React.Fragment>

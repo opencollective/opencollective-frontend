@@ -10,7 +10,6 @@ import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy } from 'lodash';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -21,6 +20,7 @@ import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
@@ -202,7 +202,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                   <Box as="ul" p={0} m={0} minWidth={184}>
                     {callsToAction.hasDashboard && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
-                        <StyledLink as={NextLink} href={`${collective.slug}/dashboard`}>
+                        <StyledLink as={Link} href={`${collective.slug}/dashboard`}>
                           <Container p={ITEM_PADDING}>
                             <Dashboard size="20px" />
                             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
@@ -212,7 +212,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink as={NextLink} href={`${collective.slug}/expenses/new`}>
+                        <StyledLink as={Link} href={`${collective.slug}/expenses/new`}>
                           <Container p={ITEM_PADDING}>
                             <Receipt size="20px" />
                             <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
@@ -222,7 +222,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasRequestGrant && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
-                        <StyledLink as={NextLink} href={`${collective.slug}/expenses/new`}>
+                        <StyledLink as={Link} href={`${collective.slug}/expenses/new`}>
                           <Container p={ITEM_PADDING}>
                             <MoneyCheckAlt size="20px" />
                             <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
@@ -232,7 +232,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasManageSubscriptions && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
-                        <StyledLink as={NextLink} href={`${collective.slug}/recurring-contributions`}>
+                        <StyledLink as={Link} href={`${collective.slug}/recurring-contributions`}>
                           <Container p={ITEM_PADDING}>
                             <Stack size="20px" />
                             <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
@@ -242,7 +242,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasContribute && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTRIBUTE}>
-                        <StyledLink as={NextLink} href={getContributeRoute(collective)}>
+                        <StyledLink as={Link} href={getContributeRoute(collective)}>
                           <Container p={ITEM_PADDING}>
                             <Planet size="20px" />
                             <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
@@ -283,7 +283,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
-                        <StyledLink as={NextLink} href={`${collective.slug}/contact`}>
+                        <StyledLink as={Link} href={`${collective.slug}/contact`}>
                           <Container p={ITEM_PADDING}>
                             <Envelope size="20px" />
                             <FormattedMessage id="Contact" defaultMessage="Contact" />

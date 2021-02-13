@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
 import themeGet from '@styled-system/theme-get';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H1 } from '../Text';
@@ -75,11 +75,11 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/openSourceIllustration.png"
                   alt={formatMessage(messages.opensource)}
                 />
-                <NextLink href={`${hostCollectiveSlug}/${router.query.verb}/opensource`}>
+                <Link href={`${hostCollectiveSlug}/${router.query.verb}/opensource`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.opensource)}
                   </StyledButton>
-                </NextLink>
+                </Link>
                 <ExamplesLink href="/discover?show=opensource" openInNewTab>
                   <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
                 </ExamplesLink>
@@ -97,11 +97,11 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/climateIllustration.png"
                   alt={formatMessage(messages.covid)}
                 />
-                <NextLink href={`${hostCollectiveSlug}/${router.query.verb}/covid-19`}>
+                <Link href={`${hostCollectiveSlug}/${router.query.verb}/covid-19`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.covid)}
                   </StyledButton>
-                </NextLink>
+                </Link>
                 <ExamplesLink href="/discover?show=covid-19" openInNewTab>
                   <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
                 </ExamplesLink>
@@ -118,7 +118,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/communityIllustration.png"
                   alt={formatMessage(messages.community)}
                 />
-                <NextLink href={`${hostCollectiveSlug}/${router.query.verb}/community`}>
+                <Link href={`${hostCollectiveSlug}/${router.query.verb}/community`}>
                   <StyledButton
                     fontSize="13px"
                     buttonStyle="primary"
@@ -130,7 +130,7 @@ const CollectiveCategoryPicker = () => {
                   >
                     {formatMessage(messages.community)}
                   </StyledButton>
-                </NextLink>
+                </Link>
                 <ExamplesLink href="/discover?show=community" openInNewTab>
                   <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
                 </ExamplesLink>

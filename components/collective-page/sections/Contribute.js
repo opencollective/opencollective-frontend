@@ -4,7 +4,6 @@ import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get, orderBy, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -22,6 +21,7 @@ import ContributeTier from '../../contribute-cards/ContributeTier';
 import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
+import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
 import { H3, P } from '../../Text';
@@ -262,11 +262,11 @@ class SectionContribute extends React.PureComponent {
               </P>
             </Flex>
             <Box my={5}>
-              <NextLink href={`${collective.slug}/accept-financial-contributions`}>
+              <Link href={`${collective.slug}/accept-financial-contributions`}>
                 <StyledButton buttonStyle="primary" buttonSize="large">
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
                 </StyledButton>
-              </NextLink>
+              </Link>
             </Box>
           </ContainerSectionContent>
         )}
@@ -369,11 +369,11 @@ class SectionContribute extends React.PureComponent {
             {/* "View all ways to contribute" button */}
             {!isEvent && (
               <ContainerSectionContent pb={4}>
-                <NextLink href={`${collective.slug}/contribute`}>
+                <Link href={`${collective.slug}/contribute`}>
                   <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="All ways to contribute" /> →
                   </StyledButton>
-                </NextLink>
+                </Link>
               </ContainerSectionContent>
             )}
           </Fragment>

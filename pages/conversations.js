@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -20,6 +19,7 @@ import ConversationsList from '../components/conversations/ConversationsList';
 import { conversationListFragment } from '../components/conversations/graphql';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -97,11 +97,11 @@ class ConversationsPage extends React.Component {
               />
             </MessageBox>
           )}
-          <NextLink href={`${collectiveSlug}/conversations/new`}>
+          <Link href={`${collectiveSlug}/conversations/new`}>
             <StyledButton buttonStyle="primary" buttonSize="large">
               <FormattedMessage id="conversations.createFirst" defaultMessage="Start a new conversation" />
             </StyledButton>
-          </NextLink>
+          </Link>
         </div>
       );
     }
@@ -151,11 +151,11 @@ class ConversationsPage extends React.Component {
                       />
                     </P>
                     <Flex flex="0 0 300px" flexWrap="wrap">
-                      <NextLink href={`${collectiveSlug}/conversations/new`}>
+                      <Link href={`${collectiveSlug}/conversations/new`}>
                         <StyledButton buttonStyle="primary" m={2}>
                           <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
                         </StyledButton>
-                      </NextLink>
+                      </Link>
                     </Flex>
                   </Flex>
                   <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between">
@@ -182,14 +182,11 @@ class ConversationsPage extends React.Component {
                                   {tag}
                                 </StyledTag>
                               ) : (
-                                <NextLink
-                                  key={tag}
-                                  href={{ pathname: `${collectiveSlug}/conversations`, query: { tag } }}
-                                >
+                                <Link key={tag} href={{ pathname: `${collectiveSlug}/conversations`, query: { tag } }}>
                                   <StyledTag variant="rounded-right" mb="4px" mr="4px">
                                     {tag}
                                   </StyledTag>
-                                </NextLink>
+                                </Link>
                               ),
                             )}
                           </Flex>

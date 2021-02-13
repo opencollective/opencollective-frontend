@@ -1,18 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+
+import Link from './Link';
 
 const LinkExpense = ({ collective, expense, ...props }) => {
   const collectiveType = collective.parent ? getCollectiveTypeForUrl(collective) : undefined;
   const expenseId = expense.legacyId || expense.id;
 
   return (
-    <NextLink
-      href={`${collective.parent?.slug}/${collectiveType}/${collective.slug}/expenses/${expenseId}`}
-      {...props}
-    />
+    <Link href={`${collective.parent?.slug}/${collectiveType}/${collective.slug}/expenses/${expenseId}`} {...props} />
   );
 };
 

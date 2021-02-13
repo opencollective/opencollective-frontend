@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCurrencySymbol } from '../../lib/currency-utils';
@@ -9,6 +8,7 @@ import { capitalize } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 
@@ -132,11 +132,11 @@ class EditPaymentMethod extends React.Component {
                 </StyledButton>
               )}
               {hasSubscriptions && (
-                <NextLink href={`${this.props.collectiveSlug}/recurring-contributions`} passHref>
+                <Link href={`${this.props.collectiveSlug}/recurring-contributions`} passHref>
                   <StyledLink buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
                     {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}
                   </StyledLink>
-                </NextLink>
+                </Link>
               )}
               {canRemove && (
                 <StyledButton

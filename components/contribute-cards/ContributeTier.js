@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
@@ -14,6 +13,7 @@ import { capitalize } from '../../lib/utils';
 import CollapsableText from '../CollapsableText';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import StyledLink from '../StyledLink';
 import StyledProgressBar from '../StyledProgressBar';
 import { P } from '../Text';
@@ -147,7 +147,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
               <React.Fragment>
                 {truncate(description, { length: 150 })}{' '}
                 <StyledLink
-                  as={NextLink}
+                  as={Link}
                   whiteSpace="nowrap"
                   href={{ pathname: `${collective.slug}/contribute/${tier.slug}`, query: { tierId: tier.id } }}
                 >

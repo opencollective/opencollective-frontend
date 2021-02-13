@@ -4,7 +4,6 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit, update } from 'lodash';
 import memoizeOne from 'memoize-one';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -18,6 +17,7 @@ import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
+import Link from '../../Link';
 import Loading from '../../Loading';
 import MemberRoleDescription, { hasRoleDescription } from '../../MemberRoleDescription';
 import MessageBox from '../../MessageBox';
@@ -331,11 +331,11 @@ class Members extends React.Component {
             </MessageBox>
           )}
           <Flex justifyContent="center" flexWrap="wrap" mt={5}>
-            <NextLink href={collective.slug}>
+            <Link href={collective.slug}>
               <StyledButton mx={2} minWidth={200}>
                 <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
               </StyledButton>
-            </NextLink>
+            </Link>
             <StyledButton
               buttonStyle="primary"
               onClick={this.handleSubmit}
@@ -376,7 +376,7 @@ class Members extends React.Component {
             id="Members.DefinedInParent"
             defaultMessage="Team members are defined in the settings of {parentName}"
             values={{
-              parentName: <NextLink href={`${parent.slug}/edit/members`}>{parent.name}</NextLink>,
+              parentName: <Link href={`${parent.slug}/edit/members`}>{parent.name}</Link>,
             }}
           />
         </MessageBox>

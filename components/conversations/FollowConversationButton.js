@@ -4,13 +4,13 @@ import { useMutation, useQuery } from '@apollo/client';
 import { Bell } from '@styled-icons/feather/Bell';
 import { BellOff } from '@styled-icons/feather/BellOff';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
@@ -57,9 +57,9 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
             values={{
               // eslint-disable-next-line react/display-name
               'login-link': msg => (
-                <NextLink href="signin" params={{ next: Router.asPath }}>
+                <Link href="signin" params={{ next: Router.asPath }}>
                   {msg}
-                </NextLink>
+                </Link>
               ),
             }}
           />

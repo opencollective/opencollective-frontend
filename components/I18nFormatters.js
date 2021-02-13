@@ -1,6 +1,6 @@
 import React from 'react';
-import NextLink from 'next/link';
 
+import Link from './Link';
 import StyledLink from './StyledLink';
 
 // eslint-disable-next-line react/display-name
@@ -13,20 +13,20 @@ export const I18nSupportLink = chunks => (
   </StyledLink>
 );
 export const I18nSignInLink = chunks => (
-  <NextLink href="signin" params={{ next: typeof window !== undefined ? window.location.pathname : '' }}>
+  <Link href="signin" params={{ next: typeof window !== undefined ? window.location.pathname : '' }}>
     {chunks}
-  </NextLink>
+  </Link>
 );
 
 export const I18nTOSLink = msg => (
-  <NextLink href="tos">
+  <Link href="tos">
     <span>{msg}</span>
-  </NextLink>
+  </Link>
 );
 export const I18nPrivacyLink = msg => (
-  <NextLink href="privacypolicy">
+  <Link href="privacypolicy">
     <span>{msg}</span>
-  </NextLink>
+  </Link>
 );
 
 const I18nFormatters = {

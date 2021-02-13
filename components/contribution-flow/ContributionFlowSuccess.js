@@ -5,7 +5,6 @@ import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -25,6 +24,8 @@ import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
 import { H3, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
+
+import Link from '../Link';
 
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
@@ -184,7 +185,7 @@ class NewContributionFlowSuccess extends React.Component {
               values={{
                 collective: this.props.data.order.toAccount.name,
                 CollectiveLink: getI18nLink({
-                  as: NextLink,
+                  as: Link,
                   route: this.props.data.order.toAccount.slug,
                 }),
               }}
@@ -247,7 +248,7 @@ class NewContributionFlowSuccess extends React.Component {
                 </Box>
                 <ContributorCardWithTier width={250} height={380} contribution={order} my={2} />
                 <Box my={4}>
-                  <NextLink href={{ pathname: 'discover', query: { show: getMainTag(order.toAccount) } }}>
+                  <Link href={{ pathname: 'discover', query: { show: getMainTag(order.toAccount) } }}>
                     <P color="black.800" fontWeight={500}>
                       <FormattedMessage
                         id="NewContributionFlow.Success.DiscoverMore"
@@ -255,7 +256,7 @@ class NewContributionFlowSuccess extends React.Component {
                         values={{ collective: order.toAccount.name }}
                       />
                     </P>
-                  </NextLink>
+                  </Link>
                 </Box>
                 <Flex justifyContent="center" mt={2}>
                   <ShareLink

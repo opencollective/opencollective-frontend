@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 
@@ -13,6 +12,7 @@ import GiftCard from './icons/GiftCard';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 
@@ -31,7 +31,7 @@ const GiftCardStatus = ({ isConfirmed, collective, data }) => {
         id="giftCards.claimedBy"
         defaultMessage="claimed by {user}"
         values={{
-          user: <NextLink href={collective.slug}>{collective.name}</NextLink>,
+          user: <Link href={collective.slug}>{collective.name}</Link>,
         }}
       />
     );
@@ -91,7 +91,7 @@ class GiftCardDetails extends React.Component {
             <DetailsColumnHeader>
               <FormattedMessage id="giftCards.redeemCode" defaultMessage="REDEEM CODE" />
             </DetailsColumnHeader>
-            <NextLink href={`${collectiveSlug}/redeem/${redeemCode}`}>{redeemCode}</NextLink>
+            <Link href={`${collectiveSlug}/redeem/${redeemCode}`}>{redeemCode}</Link>
           </Flex>
         )}
         <Flex flexDirection="column" mr="2em">
@@ -150,12 +150,12 @@ class GiftCardDetails extends React.Component {
         {/* Avatar column */}
         <Box mr="20px">
           {isConfirmed ? (
-            <NextLink href={collective.slug} title={collective.name} passHref>
+            <Link href={collective.slug} title={collective.name} passHref>
               <Container>
                 <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
                 <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />
               </Container>
-            </NextLink>
+            </Link>
           ) : (
             <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
           )}

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -10,6 +9,7 @@ import { formatDate } from '../lib/utils';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import StyledCard from './StyledCard';
 import { H5, Span } from './Text';
 import UserCompany from './UserCompany';
@@ -46,17 +46,17 @@ const MemberCard = ({ role, since, collective, ...cardProps }) => (
   <MainContainer {...cardProps}>
     <CollectiveLogoContainer mt={52} mb={2}>
       <Box mt={-32}>
-        <NextLink href={collective.slug}>
+        <Link href={collective.slug}>
           <Avatar collective={collective} radius={64} />
-        </NextLink>
+        </Link>
       </Box>
     </CollectiveLogoContainer>
     <Flex flexDirection="column" alignItems="center" p={2}>
-      <NextLink href={collective.slug}>
+      <Link href={collective.slug}>
         <H5 textAlign="center" fontSize="14px" fontWeight="bold" lineHeight="18px">
           {collective.name}
         </H5>
-      </NextLink>
+      </Link>
       <TruncatedText minHeight={15} fontSize="10px" textAlign="center" color="black.500">
         <UserCompany company={collective.company} />
       </TruncatedText>

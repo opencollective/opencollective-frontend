@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -22,6 +21,8 @@ const Illustration = styled.img`
   width: 248px;
   height: 248px;
 `;
+
+import Link from '../../Link';
 
 import EmptyCollectivePageIllustration from '../../../public/static/images/collective-navigation/EmptyCollectivePageIllustration.png';
 
@@ -58,11 +59,11 @@ const SectionEmpty = props => {
                 }}
               />
             </P>
-            <NextLink href="discover">
+            <Link href="discover">
               <StyledButton mt={[4, 3]} buttonStyle="primary" buttonSize="medium" fontSize="14px" lineHeight="16px">
                 <FormattedMessage id="home.discoverCollectives" defaultMessage="Discover Collectives" /> →
               </StyledButton>
-            </NextLink>
+            </Link>
           </Flex>
         </OutlineContainer>
       </ContainerSectionContent>

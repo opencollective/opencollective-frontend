@@ -4,7 +4,6 @@ import { useMutation } from '@apollo/client';
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Mail } from '@styled-icons/feather/Mail';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { padding } from 'styled-system';
@@ -20,6 +19,7 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import I18nCollectiveTags from '../I18nCollectiveTags';
 import CommentIcon from '../icons/CommentIcon';
+import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledHr from '../StyledHr';
@@ -166,7 +166,7 @@ const getSuccessToast = (intl, action, collective, result) => {
       ),
       message: conversation && (
         <StyledLink
-          as={NextLink}
+          as={Link}
           openInNewTab
           href={`${collective.slug}/conversations/${conversation.slug}-${conversation.id}`}
         >

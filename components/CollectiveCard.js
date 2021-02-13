@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import NextLink from 'next/link';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { width } from 'styled-system';
@@ -13,6 +12,7 @@ import { firstSentence } from '../lib/utils';
 import Avatar from './Avatar';
 import Container from './Container';
 import Currency from './Currency';
+import Link from './Link';
 
 const CardWrapper = styled(Container)`
   display: flex;
@@ -189,7 +189,7 @@ class CollectiveCard extends React.Component {
     }
 
     return (
-      <NextLink href={route} target="_top">
+      <Link href={route} target="_top">
         <CardWrapper className={`CollectiveCard ${collective.type}`} {...this.props}>
           <Container position="relative" overflow="hidden" width="100%" height="14rem" borderBottom="5px solid #46b0ed">
             <Container
@@ -351,7 +351,7 @@ class CollectiveCard extends React.Component {
             )}
           </Container>
         </CardWrapper>
-      </NextLink>
+      </Link>
     );
   }
 }

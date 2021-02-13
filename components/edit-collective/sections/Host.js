@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get, groupBy } from 'lodash';
-import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -14,6 +13,7 @@ import CollectiveCard from '../../CollectiveCard';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import HostsWithData from '../../HostsWithData';
+import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledLink from '../../StyledLink';
@@ -217,9 +217,9 @@ class Host extends React.Component {
                         values={{
                           type: collective.type,
                           emptyBalanceLink: (
-                            <NextLink href={`${collective.slug}/edit/advanced`}>
+                            <Link href={`${collective.slug}/edit/advanced`}>
                               <FormattedMessage id="emptyBalance" defaultMessage="Empty Balance" />
-                            </NextLink>
+                            </Link>
                           ),
                         }}
                       />
@@ -463,7 +463,7 @@ class Host extends React.Component {
                         defaultMessage="Suggested Hosts"
                       />
                     </H4>
-                    <StyledLink as={NextLink} fontSize="13px" href="/hosts">
+                    <StyledLink as={Link} fontSize="13px" href="/hosts">
                       <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all Fiscal Hosts" />
                     </StyledLink>
                   </Container>
