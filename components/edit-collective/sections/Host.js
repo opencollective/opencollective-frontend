@@ -339,7 +339,7 @@ class Host extends React.Component {
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
-                defaultMessage="You can\'t receive financial contributions or use the budget features. You can still edit your profile page, submit expenses to be paid later, and post updates."
+                defaultMessage="You can't receive financial contributions or use the budget features. You can still edit your profile page, submit expenses to be paid later, and post updates."
               />
             </Box>
           </Flex>

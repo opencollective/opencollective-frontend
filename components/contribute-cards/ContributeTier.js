@@ -69,7 +69,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
 
   let route;
   if (tierType === ContributionTypes.TICKET) {
-    route = `${collective.parentCollective.slug}/events/${collective.slug}/order/${tier.id}`;
+    route = `${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/order/${tier.id}`;
   } else {
     route = `${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
   }

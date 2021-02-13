@@ -116,7 +116,6 @@ const CloseButton = styled.button.attrs({
   border: none;
   padding: 0;
   line-height: inherit;
-  outline: none;
 `;
 
 /** Simple tag to display a short string */

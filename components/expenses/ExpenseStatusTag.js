@@ -93,7 +93,7 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
           content={() => (
             <FormattedMessage
               id="expenseNeedsTaxForm.hover"
-              defaultMessage="We can\'t pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact support@opencollective.com"
+              defaultMessage="We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact support@opencollective.com"
             />
           )}
         >

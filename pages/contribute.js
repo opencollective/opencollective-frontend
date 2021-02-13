@@ -138,7 +138,7 @@ class TiersPage extends React.Component {
                     <MessageBox type="info" withIcon>
                       <FormattedMessage
                         id="ContributePage.Inactive"
-                        defaultMessage="This collective can\'t accept financial contributions at the moment."
+                        defaultMessage="This collective can't accept financial contributions at the moment."
                       />
                     </MessageBox>
                   )}
@@ -166,6 +166,11 @@ const contributePageQuery = gql`
       isActive
       isHost
       imageUrl
+      parentCollective {
+        id
+        name
+        slug
+      }
       features {
         ...NavbarFields
       }
