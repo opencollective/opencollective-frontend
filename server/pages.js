@@ -8,11 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes();
 
-// Pledges
-// -------
-
-pages.add('createPledge', '/pledges/new').add('createCollectivePledge', '/:slug/pledges/new', 'createPledge');
-
 // Marketing Pages
 // ---------------
 

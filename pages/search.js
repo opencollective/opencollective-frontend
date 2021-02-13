@@ -4,13 +4,14 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
 import { isNil } from 'lodash';
+import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import colors from '../lib/constants/colors';
 import { parseToBoolean } from '../lib/utils';
-import { Link, Router } from '../server/pages';
+import { Router } from '../server/pages';
 
 import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
@@ -204,7 +205,7 @@ class SearchPage extends React.Component {
                   </em>
                 </P>
                 {
-                  <Link route="createPledge" params={{ name: term }} passHref>
+                  <NextLink href={{ pathname: '/pledges/new', query: { name: term } }} passHref>
                     <StyledLink
                       display="block"
                       fontSize="14px"
@@ -217,7 +218,7 @@ class SearchPage extends React.Component {
                     >
                       <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
                     </StyledLink>
-                  </Link>
+                  </NextLink>
                 }
               </Flex>
             )}
@@ -239,7 +240,7 @@ class SearchPage extends React.Component {
                 </em>
               </P>
               {
-                <Link route="createPledge" params={{ name: term }} passHref>
+                <NextLink href={{ pathname: '/pledges/new', query: { name: term } }} passHref>
                   <StyledLink
                     display="block"
                     fontSize="14px"
@@ -252,7 +253,7 @@ class SearchPage extends React.Component {
                   >
                     <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
                   </StyledLink>
-                </Link>
+                </NextLink>
               }
             </Flex>
           )}

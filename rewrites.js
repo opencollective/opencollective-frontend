@@ -229,15 +229,15 @@ exports.REWRITES = [
     source: `/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
-  // // Pledges
-  // {
-  //   source: `/pledges/new`,
-  //   destination: '/createPledge',
-  // },
-  // {
-  //   source: `/:slug/pledges/new`,
-  //   destination: '/createPledge',
-  // },
+  // Pledges
+  {
+    source: `/pledges/new`,
+    destination: '/createPledge',
+  },
+  {
+    source: `/:slug/pledges/new`,
+    destination: '/createPledge',
+  },
   // // Marketing Pages
   // {
   //   source: `/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|old-pricing)`,
