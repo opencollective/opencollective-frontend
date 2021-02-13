@@ -45,7 +45,7 @@ const DeleteCollective = ({ collective, ...props }) => {
         await deleteCollective({ variables: { id: collective.id } });
         await props.refetchLoggedInUser();
       }
-      await this.props.router.push(`/deleteCollective/confirmed?type=${collective.type}`);
+      await props.router.push(`/deleteCollective/confirmed?type=${collective.type}`);
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       setDeleteStatus({ deleting: false, error: errorMsg });

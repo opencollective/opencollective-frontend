@@ -251,7 +251,7 @@ exports.REWRITES = [
     destination: '/collective-page',
   },
   {
-    source: '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
+    source: '/:slug/:mode(onboarding)?/:step(administrators|contact-info|success)?',
     destination: '/collective-page',
   },
   // New accept financial contributions flow

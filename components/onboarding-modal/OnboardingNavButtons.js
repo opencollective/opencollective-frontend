@@ -17,8 +17,8 @@ const params = {
   },
   1: {
     disabled: false,
-    routerStepBack: undefined,
-    routerStepForward: 'contact',
+    routerStepBack: '',
+    routerStepForward: 'contact-info',
   },
   2: {
     disabled: false,

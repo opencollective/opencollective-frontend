@@ -74,7 +74,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
           show={show}
           onClose={() => setShow(false)}
           onSuccess={() => {
-            return this.props.router
+            return props.router
               .push(`${collective.slug}/accept-financial-contributions/host/success`)
               .then(() => window.scrollTo(0, 0))
               .then(() => {

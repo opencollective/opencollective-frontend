@@ -26,7 +26,7 @@ class ConfirmCollectiveDeletion extends Component {
       res.setHeader('Location', '/');
       res.end();
     } else {
-      router.pushRoute('home');
+      router.push('home');
     }
     return {};
   }

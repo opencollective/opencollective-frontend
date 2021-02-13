@@ -159,7 +159,7 @@ class OnboardingModal extends React.Component {
       this.setState({ step: 0 });
     } else if (queryStep === 'administrators') {
       this.setState({ step: 1 });
-    } else if (queryStep === 'contact') {
+    } else if (queryStep === 'contact-info') {
       this.setState({ step: 2 });
     } else if (queryStep === 'success') {
       this.setState({ step: 3 });
