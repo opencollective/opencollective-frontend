@@ -1,10 +1,10 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { formatCurrency } from '../../lib/currency-utils';
-import { Router } from '../../server/pages';
 
 import ApplyToHostModal from '../ApplyToHostModal';
 import Container from '../Container';
@@ -74,11 +74,8 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
           show={show}
           onClose={() => setShow(false)}
           onSuccess={() => {
-            return Router.pushRoute('accept-financial-contributions', {
-              slug: collective.slug,
-              path: 'host',
-              state: 'success',
-            })
+            return this.props.router
+              .push(`${collective.slug}/accept-financial-contributions/host/success`)
               .then(() => window.scrollTo(0, 0))
               .then(() => {
                 confettiFireworks(5000, { zIndex: 3000 });
@@ -94,6 +91,7 @@ HostCollectiveCard.propTypes = {
   host: PropTypes.object.isRequired,
   collective: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  router: PropTypes.object,
 };
 
-export default HostCollectiveCard;
+export default withRouter(HostCollectiveCard);

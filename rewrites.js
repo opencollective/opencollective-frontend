@@ -254,12 +254,12 @@ exports.REWRITES = [
     source: '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
     destination: '/collective-page',
   },
-  // // New accept financial contributions flow
-  // {
-  //   source:
-  //     '/:slug/accept-financial-contributions/:path(ourselves|myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
-  //   destination: '/accept-financial-contributions',
-  // },
+  // New accept financial contributions flow
+  {
+    source:
+      '/:slug/accept-financial-contributions/:path(ourselves|myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
+    destination: '/accept-financial-contributions',
+  },
   // // New recurring contributions page
   // {
   //   source: '/:slug/recurring-contributions',

@@ -19,7 +19,6 @@ import ContributionFlowSuccess from '../components/contribution-flow/Contributio
 import ContributionFlowContainer from '../components/contribution-flow/index';
 import ErrorPage from '../components/ErrorPage';
 import { Flex } from '../components/Grid';
-import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -221,11 +220,11 @@ class NewContributionFlowPage extends React.Component {
           </strong>
           <br />
           {LoggedInUser?.isHostAdmin(account) && (
-            <Link route="accept-financial-contributions" params={{ slug: account.slug, path: 'organization' }}>
+            <NextLink href={`${account.slug}/accept-financial-contributions/organization`}>
               <StyledButton buttonStyle="primary" mt={3}>
                 <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
               </StyledButton>
-            </Link>
+            </NextLink>
           )}
         </React.Fragment>
       );

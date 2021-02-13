@@ -4,17 +4,16 @@ import { graphql } from '@apollo/client/react/hoc';
 import { CheckboxChecked } from '@styled-icons/boxicons-regular/CheckboxChecked';
 import themeGet from '@styled-system/theme-get';
 import { find, has } from 'lodash';
+import NextLink from 'next/link';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import Loading from '../Loading';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
@@ -177,14 +176,7 @@ class StripeOrBankAccountPicker extends React.Component {
                     </Flex>
                   </ConnectedAccountCard>
                 ) : (
-                  <Link
-                    route="accept-financial-contributions"
-                    params={{
-                      slug: router.query.slug,
-                      path: router.query.path,
-                      method: 'bank',
-                    }}
-                  >
+                  <NextLink href={`${router.query.slug}/accept-financial-contributions/${router.query.path}/bank`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"
@@ -196,7 +188,7 @@ class StripeOrBankAccountPicker extends React.Component {
                     >
                       <FormattedMessage id="acceptContributions.addBankAccount" defaultMessage="Add bank account" />
                     </StyledButton>
-                  </Link>
+                  </NextLink>
                 )}
                 <Box minHeight={50} px={3}>
                   <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
@@ -220,11 +212,9 @@ class StripeOrBankAccountPicker extends React.Component {
             onClick={async () => {
               this.setState({ buttonLoading: true });
               await addHost(collective, host);
-              await Router.pushRoute('accept-financial-contributions', {
-                slug: router.query.slug,
-                path: router.query.path,
-                state: 'success',
-              });
+              await this.props.router.push(
+                `${router.query.slug}/accept-financial-contributions/${router.query.path}/success`,
+              );
               window.scrollTo(0, 0);
             }}
             data-cy="afc-finish-button"

@@ -22,7 +22,6 @@ import ContributeTier from '../../contribute-cards/ContributeTier';
 import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
-import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
 import { H3, P } from '../../Text';
@@ -263,11 +262,11 @@ class SectionContribute extends React.PureComponent {
               </P>
             </Flex>
             <Box my={5}>
-              <Link route={'accept-financial-contributions'} params={{ slug: collective.slug }}>
+              <NextLink href={`${collective.slug}/accept-financial-contributions`}>
                 <StyledButton buttonStyle="primary" buttonSize="large">
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
                 </StyledButton>
-              </Link>
+              </NextLink>
             </Box>
           </ContainerSectionContent>
         )}
