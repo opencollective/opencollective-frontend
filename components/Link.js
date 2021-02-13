@@ -5,8 +5,6 @@ import NextLink from 'next/link';
 import Scrollchor from 'react-scrollchor';
 
 import router from '../server/pages';
-import StyledLink from "./StyledLink";
-import Container from "./Container";
 
 class Link extends React.Component {
   static propTypes = {
