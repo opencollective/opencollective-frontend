@@ -1,5 +1,5 @@
-// const createOrderPage = '/contribution-flow';
-// const contributionFlowSteps = '/profile|details|payment|summary|success';
+const createOrderPage = '/contribution-flow';
+const contributionFlowSteps = '/profile|details|payment|summary|success';
 
 exports.REWRITES = [
   {
@@ -197,38 +197,38 @@ exports.REWRITES = [
     source: '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)',
     destination: '/conversation',
   },
-  // // Contribute Flow
-  // // ---------------
-  // // Legacy create order route. Deprectated on 2019-02-12
-  // {
-  //   source: '/:collectiveSlug/:verb(order)/:tierId/:amount(\\d+)?/:interval(month|monthly|year|yearly)?',
-  //   destination: createOrderPage,
-  // },
-  // // Legacy tier route. Deprectated on 2019-06-07
-  // {
-  //   source: `/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/:step(${contributionFlowSteps})?`,
-  //   destination: createOrderPage,
-  // },
-  // // New Routes -> New flow
-  // {
-  //   source: `/:collectiveSlug/:verb(donate|pay|order|events)/:step(${contributionFlowSteps})?`,
-  //   destination: createOrderPage,
-  // },
-  // {
-  //   source: `/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
-  //   destination: createOrderPage,
-  // },
-  // // Generic Route
-  // {
-  //   source:
-  //     '/:collectiveSlug/:verb(donate|pay|order|events)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
-  //   destination: createOrderPage,
-  // },
-  // // Events
-  // {
-  //   source: `/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(${contributionFlowSteps})?`,
-  //   destination: createOrderPage,
-  // },
+  // Contribute Flow
+  // ---------------
+  // Legacy create order route. Deprectated on 2019-02-12
+  {
+    source: '/:collectiveSlug/:verb(order)/:tierId/:amount(\\d+)?/:interval(month|monthly|year|yearly)?',
+    destination: createOrderPage,
+  },
+  // Legacy tier route. Deprectated on 2019-06-07
+  {
+    source: `/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/:step(${contributionFlowSteps})?`,
+    destination: createOrderPage,
+  },
+  // New Routes -> New flow
+  {
+    source: `/:collectiveSlug/:verb(donate|pay|order|events)/:step(${contributionFlowSteps})?`,
+    destination: createOrderPage,
+  },
+  {
+    source: `/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
+    destination: createOrderPage,
+  },
+  // Generic Route
+  {
+    source:
+      '/:collectiveSlug/:verb(donate|pay|order|events)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
+    destination: createOrderPage,
+  },
+  // Events
+  {
+    source: `/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(${contributionFlowSteps})?`,
+    destination: createOrderPage,
+  },
   // // Pledges
   // {
   //   source: `/pledges/new`,

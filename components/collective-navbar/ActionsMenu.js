@@ -246,9 +246,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasContribute && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTRIBUTE}>
-                        <StyledLink as={Link} {...getContributeRoute(collective)} p={ITEM_PADDING}>
-                          <Planet size="20px" />
-                          <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
+                        <StyledLink as={NextLink} href={getContributeRoute(collective)}>
+                          <Container p={ITEM_PADDING}>
+                            <Planet size="20px" />
+                            <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}

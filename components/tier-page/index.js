@@ -18,7 +18,6 @@ import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import InlineEditField from '../InlineEditField';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledProgressBar from '../StyledProgressBar';
 import { H1, H2, P } from '../Text';
@@ -354,20 +353,16 @@ class TierPage extends Component {
                       </NextLink>
                     </P>
                   ) : (
-                    <Link
-                      route="orderCollectiveTierNew"
-                      params={{
-                        verb: 'contribute',
-                        tierId: tier.id,
-                        tierSlug: tier.slug,
-                        collectiveSlug: collective.slug,
-                        redirect,
+                    <NextLink
+                      href={{
+                        pathname: `${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
+                        query: { redirect },
                       }}
                     >
                       <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
                         {tier.button ? tier.button : <FormattedMessage id="Contribute" defaultMessage="Contribute" />}
                       </StyledButton>
-                    </Link>
+                    </NextLink>
                   )}
                 </Box>
               </Flex>

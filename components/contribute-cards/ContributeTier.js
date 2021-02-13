@@ -67,24 +67,16 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
     });
   }
 
-  let route, routeParams;
+  let route;
   if (tierType === ContributionTypes.TICKET) {
-    route = 'orderEventTier';
-    routeParams = {
-      collectiveSlug: collective.parentCollective.slug,
-      verb: 'events',
-      eventSlug: collective.slug,
-      tierId: tier.id,
-    };
+    route = `${collective.parentCollective.slug}/events/${collective.slug}/order/${tier.id}`;
   } else {
-    route = 'orderCollectiveTierNew';
-    routeParams = { collectiveSlug: collective.slug, verb: 'contribute', tierSlug: tier.slug, tierId: tier.id };
+    route = `${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
   }
 
   return (
     <Contribute
       route={route}
-      routeParams={routeParams}
       title={capitalize(tier.name)}
       type={tierType}
       buttonText={tier.button}

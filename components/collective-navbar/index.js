@@ -225,14 +225,14 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
-        <Link {...getContributeRoute(collective)}>
+        <NextLink href={getContributeRoute(collective)}>
           <MainActionBtn tabIndex="-1">
             <Planet size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
             </Span>
           </MainActionBtn>
-        </Link>
+        </NextLink>
       ),
     };
   } else if (callsToAction.includes('hasApply')) {

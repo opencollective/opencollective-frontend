@@ -20,8 +20,7 @@ const messages = defineMessages({
 const ContributeCustom = ({ intl, collective, contributors, stats, ...props }) => {
   return (
     <Contribute
-      route="orderCollectiveNew"
-      routeParams={{ collectiveSlug: collective.slug, verb: 'donate' }}
+      route={`${collective.slug}/donate`}
       type={ContributionTypes.FINANCIAL_CUSTOM}
       title={intl.formatMessage(messages.title)}
       contributors={contributors}

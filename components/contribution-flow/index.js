@@ -4,6 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { find, get, intersection, isEmpty, isNil, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -102,6 +103,7 @@ class ContributionFlow extends React.Component {
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
     createCollective: PropTypes.func.isRequired, // from mutation
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -362,22 +364,23 @@ class ContributionFlow extends React.Component {
       ...routeParams,
     };
 
-    let route = 'orderCollectiveNew';
+    let route = `${params.collectiveSlug}/${params.verb}/${params.step}`;
     if (tier) {
       params.tierId = tier.legacyId;
       params.tierSlug = tier.slug;
       if (tier.type === 'TICKET' && collective.parent) {
-        route = 'orderEventTier';
         params.verb = 'events';
         params.collectiveSlug = collective.parent.slug;
         params.eventSlug = collective.slug;
+        route = `${params.collectiveSlug}/${params.verb}/${params.eventSlug}/order/${params.tierId}/${params.step}`;
       } else {
-        route = 'orderCollectiveTierNew';
         params.verb = 'contribute'; // Enforce "contribute" verb for ordering tiers
+        route = `${params.collectiveSlug}/${params.verb}/${params.tierSlug}-${params.tierId}/checkout/${params.step}`;
       }
     } else if (params.verb === 'contribute' || params.verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       params.verb = 'donate';
+      route = `${params.collectiveSlug}/${params.verb}/${params.step}`;
     }
 
     // Reset errors if any
@@ -386,7 +389,7 @@ class ContributionFlow extends React.Component {
     }
 
     // Navigate to the new route
-    await Router.pushRoute(route, params);
+    await this.props.router.push(route);
     this.scrollToTop();
   };
 
@@ -788,5 +791,5 @@ const addConfirmOrderMutation = graphql(
 );
 
 export default injectIntl(
-  withUser(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(ContributionFlow)))),
+  withUser(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(withRouter(ContributionFlow))))),
 );

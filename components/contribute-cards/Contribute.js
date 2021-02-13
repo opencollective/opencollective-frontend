@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -8,7 +9,6 @@ import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
@@ -147,7 +147,6 @@ const ContributeCard = ({
   title,
   type,
   route,
-  routeParams,
   buttonText,
   children,
   contributors,
@@ -184,11 +183,11 @@ const ContributeCard = ({
         </Flex>
         <Box>
           {!disableCTA && (
-            <Link route={route} params={routeParams}>
+            <NextLink href={route}>
               <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3} data-cy="contribute-btn">
                 {buttonText || getContributeCTA(type)}
               </StyledButton>
-            </Link>
+            </NextLink>
           )}
           {!hideContributors && (
             <Box mt={2} height={60}>
@@ -198,13 +197,9 @@ const ContributeCard = ({
                     {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
                       <Box key={contributor.id} mx={2}>
                         {contributor.collectiveSlug ? (
-                          <Link
-                            route="collective"
-                            params={{ slug: contributor.collectiveSlug }}
-                            title={contributor.name}
-                          >
+                          <NextLink href={contributor.collectiveSlug} title={contributor.name}>
                             <ContributorAvatar contributor={contributor} radius={32} />
-                          </Link>
+                          </NextLink>
                         ) : (
                           <ContributorAvatar contributor={contributor} radius={32} title={contributor.name} />
                         )}
@@ -265,8 +260,6 @@ ContributeCard.propTypes = {
   buttonText: PropTypes.string,
   /** An image to display on the card hero */
   image: PropTypes.string,
-  /** Params for the route */
-  routeParams: PropTypes.object,
   /** The card body */
   children: PropTypes.node,
   /** If true, the call to action will not be displayed */
@@ -290,6 +283,7 @@ ContributeCard.propTypes = {
   hideContributors: PropTypes.bool,
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
+  router: PropTypes.object,
 };
 
 export default injectIntl(ContributeCard);
