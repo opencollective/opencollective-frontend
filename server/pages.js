@@ -8,12 +8,6 @@ const routes = require('next-routes');
 
 const pages = routes();
 
-// Conversations
-// ---------------
-pages.add('conversations', '/:collectiveSlug/conversations');
-pages.add('create-conversation', '/:collectiveSlug/conversations/new');
-pages.add('conversation', '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)');
-
 // Contribute Flow
 // ---------------
 

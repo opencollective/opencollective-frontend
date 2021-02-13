@@ -184,19 +184,19 @@ exports.REWRITES = [
     source: '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
     destination: '/tier',
   },
-  // // Conversations
-  // {
-  //   source: '/:collectiveSlug/conversations',
-  //   destination: '/conversations',
-  // },
-  // {
-  //   source: '/:collectiveSlug/conversations/new',
-  //   destination: '/create-conversation',
-  // },
-  // {
-  //   source: '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)',
-  //   destination: '/conversation',
-  // },
+  // Conversations
+  {
+    source: '/:collectiveSlug/conversations',
+    destination: '/conversations',
+  },
+  {
+    source: '/:collectiveSlug/conversations/new',
+    destination: '/create-conversation',
+  },
+  {
+    source: '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)',
+    destination: '/conversation',
+  },
   // // Contribute Flow
   // // ---------------
   // // Legacy create order route. Deprectated on 2019-02-12

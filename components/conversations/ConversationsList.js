@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { size } from 'lodash';
+import NextLink from 'next/link';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import CommentIcon from '../icons/CommentIcon';
-import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import StyledCard from '../StyledCard';
 import { H5, P } from '../Text';
@@ -34,11 +34,11 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
         </LinkCollective>
       </Box>
       <div>
-        <Link route="conversation" params={{ collectiveSlug, slug, id }}>
+        <NextLink href={`${collectiveSlug}/conversations/${slug}-${id}`}>
           <H5 wordBreak="break-word" mb={2}>
             {title}
           </H5>
-        </Link>
+        </NextLink>
         <P color="black.500" fontSize="12px">
           <FormattedMessage
             id="update.publishedAtBy"
