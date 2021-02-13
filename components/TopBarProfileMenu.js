@@ -267,7 +267,7 @@ class TopBarProfileMenu extends React.Component {
                 {({ data, loading }) =>
                   loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (
                     <ListItem py={1}>
-                      <Link route="member-invitations" passHref>
+                      <NextLink href="member-invitations" passHref>
                         <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                           <FormattedMessage
                             id="menu.pendingInvitations"
@@ -275,7 +275,7 @@ class TopBarProfileMenu extends React.Component {
                             values={{ numberOfInvitations: data.memberInvitations.length }}
                           />
                         </StyledLink>
-                      </Link>
+                      </NextLink>
                     </ListItem>
                   ) : null
                 }
@@ -289,26 +289,22 @@ class TopBarProfileMenu extends React.Component {
               </ListItem>
               {incognitoProfileMembership && (
                 <ListItem py={1}>
-                  <Link
-                    route="recurring-contributions"
-                    params={{ slug: incognitoProfileMembership.collective.slug }}
-                    passHref
-                  >
+                  <NextLink href={`${incognitoProfileMembership.collective.slug}/recurring-contributions`} passHref>
                     <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                       <FormattedMessage
                         id="menu.incognitoProfileSubscriptions"
                         defaultMessage="Manage incognito Contributions"
                       />
                     </StyledLink>
-                  </Link>
+                  </NextLink>
                 </ListItem>
               )}
               <ListItem py={1}>
-                <Link route="recurring-contributions" params={{ slug: LoggedInUser.username }} passHref>
+                <NextLink href={`${LoggedInUser.username}/recurring-contributions`} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
                   </StyledLink>
-                </Link>
+                </NextLink>
               </ListItem>
               <ListItem py={1}>
                 <NextLink href={`${LoggedInUser.username}/transactions`} passHref>
@@ -318,11 +314,11 @@ class TopBarProfileMenu extends React.Component {
                 </NextLink>
               </ListItem>
               <ListItem py={1}>
-                <Link route="applications" passHref>
+                <NextLink href="applications" passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     {capitalize(intl.formatMessage(this.messages['menu.applications']))}
                   </StyledLink>
-                </Link>
+                </NextLink>
               </ListItem>
               <ListItem py={1}>
                 <StyledLink

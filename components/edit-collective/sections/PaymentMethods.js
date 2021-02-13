@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Add } from '@styled-icons/material/Add';
 import { get, merge, pick, sortBy } from 'lodash';
+import NextLink from 'next/link';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';
@@ -15,7 +16,6 @@ import { compose } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
 import NewCreditCardForm from '../../NewCreditCardForm';
@@ -197,14 +197,14 @@ class EditPaymentMethods extends React.Component {
             id="errors.PM.Remove.HasActiveSubscriptions"
             defaultMessage="This payment method cannot be removed because it has active recurring financial contributions."
           />{' '}
-          <Link route="recurring-contributions" params={{ slug: this.props.collectiveSlug }}>
+          <NextLink href={`${this.props.collectiveSlug}/recurring-contributions`}>
             <Span textTransform="capitalize">
               <FormattedMessage
                 id="paymentMethod.editSubscriptions"
                 defaultMessage="Edit recurring financial contributions"
               />
             </Span>
-          </Link>
+          </NextLink>
         </React.Fragment>
       );
     } else {

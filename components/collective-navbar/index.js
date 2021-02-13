@@ -28,7 +28,6 @@ import Avatar from '../Avatar';
 import { Dimensions, Sections } from '../collective-page/_constants';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
@@ -279,14 +278,14 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link route="recurring-contributions" params={{ slug: collective.slug }}>
+        <NextLink href={`${collective.slug}/recurring-contributions`}>
           <MainActionBtn tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
             </Span>
           </MainActionBtn>
-        </Link>
+        </NextLink>
       ),
     };
   } else if (callsToAction.includes('hasContact')) {

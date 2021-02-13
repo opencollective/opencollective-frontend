@@ -21,7 +21,6 @@ import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
@@ -233,14 +232,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasManageSubscriptions && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
-                        <StyledLink
-                          as={Link}
-                          route="recurring-contributions"
-                          params={{ slug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Stack size="20px" />
-                          <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                        <StyledLink as={NextLink} href={`${collective.slug}/recurring-contributions`}>
+                          <Container p={ITEM_PADDING}>
+                            <Stack size="20px" />
+                            <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}

@@ -8,8 +8,4 @@ const routes = require('next-routes');
 
 const pages = routes();
 
-// New recurring contributions page
-pages.add('recurring-contributions', '/:slug/recurring-contributions');
-pages.add('subscriptions', '/:slug/subscriptions', 'recurring-contributions');
-
 module.exports = pages;

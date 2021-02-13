@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import NextLink from 'next/link';
 import Router from 'next/router';
 
 import { Box } from '../components/Grid';
-import Link from '../components/Link';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
@@ -42,13 +42,13 @@ class RecurringContributionsRedirectPage extends React.Component {
           {LoggedInUser && (
             <div>
               This page has moved. Your recurring financial contributions are now at
-              <Link route="recurring-contributions" params={{ slug: LoggedInUser.collective.slug }}>
+              <NextLink href={`${LoggedInUser.collective.slug}/recurring-contributions`}>
                 <span>
                   {' '}
                   /{LoggedInUser.collective.slug}
                   /recurring-contributions
                 </span>
-              </Link>
+              </NextLink>
             </div>
           )}
         </Box>

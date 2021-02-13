@@ -260,13 +260,13 @@ exports.REWRITES = [
       '/:slug/accept-financial-contributions/:path(ourselves|myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
     destination: '/accept-financial-contributions',
   },
-  // // New recurring contributions page
-  // {
-  //   source: '/:slug/recurring-contributions',
-  //   destination: '/recurring-contributions',
-  // },
-  // {
-  //   source: '/:slug/subscriptions',
-  //   destination: '/recurring-contributions',
-  // },
+  // New recurring contributions page
+  {
+    source: '/:slug/recurring-contributions',
+    destination: '/recurring-contributions',
+  },
+  {
+    source: '/:slug/subscriptions',
+    destination: '/recurring-contributions',
+  },
 ];
