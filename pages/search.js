@@ -8,7 +8,6 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import colors from '../lib/constants/colors';
 import { parseToBoolean } from '../lib/utils';
 import { Link, Router } from '../server/pages';
 
@@ -28,7 +27,7 @@ import { H1, P } from '../components/Text';
 const SearchInput = styled(StyledInput)`
   &&& {
     border: none;
-    border-bottom: 2px solid ${colors.blue};
+    border-bottom: 2px solid ${props => props.theme.colors.blue};
     border-radius: 0;
     box-shadow: none;
     display: block;

@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import colors from '../lib/constants/colors';
-
 import Container from './Container';
 import Map from './Map';
 import StyledLink from './StyledLink';
@@ -32,7 +30,7 @@ class Location extends React.Component {
           <Container font-size="1.7rem" margin="5px 0px">
             {name}
           </Container>
-          <div className="address" style={{ color: colors.darkgray }}>
+          <div className="address" style={{ color: props => props.theme.colors.darkgray }}>
             <StyledLink
               href={`https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${long}#map=16/${lat}/${long}`}
               openInNewTab
