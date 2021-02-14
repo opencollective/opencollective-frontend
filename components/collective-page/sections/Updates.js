@@ -127,7 +127,7 @@ class SectionUpdates extends React.PureComponent {
             <FormattedMessage id="section.updates.subtitle" defaultMessage="Updates on our activities and progress." />
           </P>
           {isAdmin && (
-            <Link href={`${collective.slug}/createUpdate`}>
+            <Link href={`${collective.slug}/updates/new`}>
               <StyledButton data-cy="create-new-update-btn" buttonStyle="primary" my={[2, 0]}>
                 <Span fontSize="16px" fontWeight="bold" mr={2}>
                   +

@@ -357,7 +357,7 @@ class ContributionFlow extends React.Component {
     const params = {
       verb: this.props.verb || 'donate',
       collectiveSlug: collective.slug,
-      step: stepName === 'details' ? undefined : stepName,
+      step: stepName === 'details' ? '' : stepName,
       interval: this.props.fixedInterval || undefined,
       ...pick(this.props, ['interval', 'description', 'redirect', 'contributeAs']),
       ...routeParams,
@@ -388,7 +388,7 @@ class ContributionFlow extends React.Component {
     }
 
     // Navigate to the new route
-    await this.props.router.push(route);
+    await this.props.router.push({ pathname: route, query: params }, route);
     this.scrollToTop();
   };
 
@@ -463,7 +463,7 @@ class ContributionFlow extends React.Component {
       steps.push({
         name: 'payment',
         label: intl.formatMessage(STEP_LABELS.payment),
-        isCompleted: stepProfile?.contributorRejectedCategories ? false : true,
+        isCompleted: !stepProfile?.contributorRejectedCategories,
         validate: action => {
           if (action === 'prev') {
             return true;
