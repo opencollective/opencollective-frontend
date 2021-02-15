@@ -202,10 +202,6 @@ class SectionContribute extends React.PureComponent {
     return waysToContribute;
   });
 
-  hasContributors = memoizeOne(contributors => {
-    return contributors.find(c => c.isBacker);
-  });
-
   sortTicketTiers = memoizeOne(tiers => {
     return orderBy([...tiers], ['endsAt'], ['desc']);
   });
