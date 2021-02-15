@@ -6,7 +6,7 @@ import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 import Link from './Link';
 
 const LinkExpense = ({ collective, expense, ...props }) => {
-  const collectiveType = collective.parent ? getCollectiveTypeForUrl(collective) : undefined;
+  const collectiveType = collective.parent ? getCollectiveTypeForUrl(collective) : '';
   const expenseId = expense.legacyId || expense.id;
 
   return (

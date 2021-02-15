@@ -257,7 +257,7 @@ class ExpensePage extends React.Component {
     });
 
     const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
-    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
+    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : '';
     this.props.router.push(
       `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}?createSuccess=true`,
     );
@@ -356,7 +356,7 @@ class ExpensePage extends React.Component {
     // Replaces the route by the version without `createSuccess=true`
     const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
     this.setState({ successMessageDismissed: true });
-    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.expense?.account) : undefined;
+    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.expense?.account) : '';
     return this.props.router.replace(
       `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}`,
       undefined,

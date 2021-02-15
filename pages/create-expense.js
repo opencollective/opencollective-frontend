@@ -185,7 +185,7 @@ class CreateExpensePage extends React.Component {
       // Redirect to the expense page
       const legacyExpenseId = result.data.draftExpenseAndInviteUser.legacyId;
       const { collectiveSlug, parentCollectiveSlug, data } = this.props;
-      const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
+      const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : '';
       await this.props.router.push(
         `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}`,
       );
@@ -213,7 +213,7 @@ class CreateExpensePage extends React.Component {
       // Redirect to the expense page
       const legacyExpenseId = result.data.createExpense.legacyId;
       const { collectiveSlug, parentCollectiveSlug, data } = this.props;
-      const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
+      const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : '';
       this.props.router.push(
         `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}?createSuccess=true`,
       );
