@@ -18,8 +18,10 @@ export const Terms = {
   FISCAL_HOST: 'FISCAL_HOST',
   GIFT_CARD: 'GIFT_CARD',
   HOST_FEE: 'HOST_FEE',
+  PLATFORM_FEE: 'PLATFORM_FEE',
   ESTIMATED_BUDGET: 'ESTIMATED_BUDGET',
   EXPENSE_TYPE: 'EXPENSE_TYPE',
+  TOTAL_RAISED: 'TOTAL_RAISED',
 };
 
 const TranslatedTerms = defineMessages({
@@ -46,6 +48,10 @@ const TranslatedTerms = defineMessages({
   [Terms.EXPENSE_TYPE]: {
     id: 'expense.type',
     defaultMessage: 'Type',
+  },
+  [Terms.TOTAL_RAISED]: {
+    id: 'budgetSection-raised',
+    defaultMessage: 'Total raised',
   },
 });
 
@@ -77,6 +83,10 @@ const TranslatedDefinitions = defineMessages({
     id: 'expense.type.tooltip',
     defaultMessage:
       "Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt.",
+  },
+  [Terms.TOTAL_RAISED]: {
+    id: 'budgetSection-raised-definition',
+    defaultMessage: 'Total net amount available to spend after fees.',
   },
 });
 
