@@ -1239,7 +1239,7 @@
   "NewContributionFlow.NumberOfFinancialContributors": "Финансовые вкладчики: {contributors}",
   "NewContributionFlow.PaymentInstructions": "Инструкция по оплате",
   "NewContributionFlow.PendingContribution": "Вклад в ожидании",
-  "NewContributionFlow.ProtectTransactionDetails": "Open Collective keeps your transaction is safe. <link>Learn more</link>.",
+  "NewContributionFlow.ProtectTransactionDetails": "Open Collective keeps your transaction safe. <link>Learn more</link>.",
   "NewContributionFlow.ProtectTransactionTitle": "Мы защищаем ваш перевод:",
   "NewContributionFlow.step.contributeAsGuest": "Contribute as a guest",
   "NewContributionFlow.Success.CTA.Join.Content": "Create an account and show all your contributions.",
