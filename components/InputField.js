@@ -255,11 +255,7 @@ class InputField extends React.Component {
                   <label>{capitalize(field.label)}</label>
                 </Box>
                 <Box width={[1, 2 / 12]}>
-                  <StyledInputTags
-                    {...field}
-                    renderUpdatedTags
-                    onChange={entries => field.onChange(entries.map(e => e.value))}
-                  />
+                  <StyledInputTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
                 </Box>
               </Flex>
             )}
@@ -272,11 +268,7 @@ class InputField extends React.Component {
                 )}
                 {field.description && <HelpBlock p={1}>{field.description}</HelpBlock>}
                 <Box width={1}>
-                  <StyledInputTags
-                    {...field}
-                    renderUpdatedTags
-                    onChange={entries => field.onChange(entries.map(e => e.value))}
-                  />
+                  <StyledInputTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
                 </Box>
               </Flex>
             )}

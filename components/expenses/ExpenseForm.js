@@ -392,15 +392,12 @@ const ExpenseFormBody = ({
               <Flex alignItems="flex-start" mt={3}>
                 <ExpenseTypeTag type={values.type} mr="4px" />
                 <StyledInputTags
-                  renderUpdatedTags
                   suggestedTags={expensesTags}
                   onChange={tags => {
-                    if (step == STEPS.EXPENSE && hasBaseFormFieldsCompleted) {
-                      formik.setFieldValue(
-                        'tags',
-                        tags.map(t => t.value.toLowerCase()),
-                      );
-                    }
+                    formik.setFieldValue(
+                      'tags',
+                      tags.map(t => t.value.toLowerCase()),
+                    );
                   }}
                   value={values.tags}
                 />

@@ -173,7 +173,9 @@ class MenuPopover extends React.Component {
   }
 
   hideMenu = () => {
-    this.setState({ showMenu: false });
+    if (this.state.showMenu) {
+      this.setState({ showMenu: false });
+    }
   };
 
   toggleMenu = () => {
