@@ -162,6 +162,8 @@
   "Budget.EmptyComeBackLater": "Come back to this section once there is at least one transaction!",
   "budgetSection-disbursed": "Total disbursed",
   "budgetSection-raised": "Total raised",
+  "budgetSection-raised-definition": "Total net amount available to spend after fees.",
+  "budgetSection-raised-total": "Total contributed before fees: {amount}",
   "button.submit": "Enviar",
   "ByUser": "Por {userName}",
   "CancelEdit": "Cancelar edición",
