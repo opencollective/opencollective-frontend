@@ -25,9 +25,9 @@ import StyledLink from '../../components/StyledLink';
 import { H3, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
-import { orderSuccessFragment } from './graphql/fragments';
 import Link from '../Link';
 
+import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
 import successIllustrationUrl from './success-illustration.jpg';
@@ -255,7 +255,7 @@ class ContributionFlowSuccess extends React.Component {
                 <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={!isEmbed} />
                 {!isEmbed && (
                   <Box my={4}>
-                  <Link href={{ pathname: 'discover', query: { show: getMainTag(order.toAccount) } }}>
+                    <Link href={{ pathname: 'discover', query: { show: getMainTag(order.toAccount) } }}>
                       <P color="black.800" fontWeight={500}>
                         <FormattedMessage
                           id="NewContributionFlow.Success.DiscoverMore"

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty,isNil, omitBy } from 'lodash';
+import { isEmpty, isNil, omitBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
