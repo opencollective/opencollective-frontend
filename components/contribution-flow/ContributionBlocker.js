@@ -67,7 +67,7 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
           </strong>
           <br />
           {loggedInUser?.isHostAdmin(account) && (
-              <Link href={`${account.slug}/accept-financial-contributions/organization`}>
+            <Link href={`${account.slug}/accept-financial-contributions/organization`}>
               <StyledButton buttonStyle="primary" mt={3}>
                 <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
               </StyledButton>
