@@ -826,7 +826,7 @@ type CollectiveStatsType {
   totalAmountSpent: Int
 
   """
-  Net amount received
+  Total amount received
   """
   totalAmountReceived(
     startDate: DateString
@@ -837,6 +837,11 @@ type CollectiveStatsType {
     """
     periodInMonths: Int
   ): Int
+
+  """
+  Total net amount received
+  """
+  totalNetAmountReceived: Int
   yearlyBudget: Int
   yearlyBudgetManaged: Int
   topFundingSources: JSON
