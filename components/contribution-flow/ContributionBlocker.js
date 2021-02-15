@@ -57,26 +57,24 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
   } else if (!account.host.supportedPaymentMethods?.length) {
     return {
       reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
-      content: function NoPaymentProviderMessage() {
-        return (
-          <React.Fragment>
-            <strong>
-              <FormattedMessage
-                id="ContributionFlow.noSupportedPaymentMethods"
-                defaultMessage="There is no payment provider available"
-              />
-            </strong>
-            <br />
-            {loggedInUser?.isHostAdmin(account) && (
-              <Link route="accept-financial-contributions" params={{ slug: account.slug, path: 'organization' }}>
-                <StyledButton buttonStyle="primary" mt={3}>
-                  <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
-                </StyledButton>
-              </Link>
-            )}
-          </React.Fragment>
-        );
-      },
+      content: (
+        <React.Fragment>
+          <strong>
+            <FormattedMessage
+              id="ContributionFlow.noSupportedPaymentMethods"
+              defaultMessage="There is no payment provider available"
+            />
+          </strong>
+          <br />
+          {loggedInUser?.isHostAdmin(account) && (
+            <Link route="accept-financial-contributions" params={{ slug: account.slug, path: 'organization' }}>
+              <StyledButton buttonStyle="primary" mt={3}>
+                <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
+              </StyledButton>
+            </Link>
+          )}
+        </React.Fragment>
+      ),
     };
   } else if (tier?.availableQuantity === 0) {
     const intlParams = { type: tier.type, name: <q>{tier.name}</q> };
