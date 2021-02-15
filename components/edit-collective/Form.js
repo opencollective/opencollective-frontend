@@ -434,7 +434,7 @@ class EditCollectiveForm extends React.Component {
               alignItems="center"
               flexWrap="wrap"
             >
-              <Link href={`${collective.slug}/edit/gift-cards`}>
+              <Link href={`/${collective.slug}/edit/gift-cards`}>
                 <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="giftCards.returnToEdit" defaultMessage="Back to Gift Cards list" />

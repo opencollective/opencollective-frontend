@@ -174,7 +174,7 @@ class TopBarProfileMenu extends React.Component {
           </StyledLink>
         </Link>
         {isAdmin && (
-          <Link href={`${membership.collective.slug}/edit`} passHref>
+          <Link href={`/${membership.collective.slug}/edit`} passHref>
             <StyledLink color="black.500" title={intl.formatMessage(this.messages.settings)}>
               <Settings opacity="0" size="1.2em" />
             </StyledLink>
@@ -250,7 +250,7 @@ class TopBarProfileMenu extends React.Component {
             </P>
             <Box as="ul" p={0} my={2}>
               <ListItem py={1}>
-                <Link href={LoggedInUser.username} passHref>
+                <Link href={`/${LoggedInUser.username}`} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.profile" defaultMessage="Profile" />
                   </StyledLink>
@@ -264,7 +264,7 @@ class TopBarProfileMenu extends React.Component {
                 {({ data, loading }) =>
                   loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (
                     <ListItem py={1}>
-                      <Link href="member-invitations" passHref>
+                      <Link href="/member-invitations" passHref>
                         <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                           <FormattedMessage
                             id="menu.pendingInvitations"
@@ -278,7 +278,7 @@ class TopBarProfileMenu extends React.Component {
                 }
               </Query>
               <ListItem py={1}>
-                <Link href={`${LoggedInUser.collective.slug}/edit`} passHref>
+                <Link href={`/${LoggedInUser.collective.slug}/edit`} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="Settings" defaultMessage="Settings" />
                   </StyledLink>
@@ -286,7 +286,7 @@ class TopBarProfileMenu extends React.Component {
               </ListItem>
               {incognitoProfileMembership && (
                 <ListItem py={1}>
-                  <Link href={`${incognitoProfileMembership.collective.slug}/recurring-contributions`} passHref>
+                  <Link href={`/${incognitoProfileMembership.collective.slug}/recurring-contributions`} passHref>
                     <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                       <FormattedMessage
                         id="menu.incognitoProfileSubscriptions"
@@ -297,21 +297,21 @@ class TopBarProfileMenu extends React.Component {
                 </ListItem>
               )}
               <ListItem py={1}>
-                <Link href={`${LoggedInUser.username}/recurring-contributions`} passHref>
+                <Link href={`/${LoggedInUser.username}/recurring-contributions`} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
                   </StyledLink>
                 </Link>
               </ListItem>
               <ListItem py={1}>
-                <Link href={`${LoggedInUser.username}/transactions`} passHref>
+                <Link href={`/${LoggedInUser.username}/transactions`} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     {capitalize(intl.formatMessage(this.messages['menu.transactions']))}
                   </StyledLink>
                 </Link>
               </ListItem>
               <ListItem py={1}>
-                <Link href="applications" passHref>
+                <Link href="/applications" passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     {capitalize(intl.formatMessage(this.messages['menu.applications']))}
                   </StyledLink>

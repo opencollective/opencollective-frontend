@@ -556,7 +556,7 @@ class CreatePledgePage extends React.Component {
                       .filter(({ fromCollective }) => fromCollective.type === 'USER')
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link href={fromCollective.slug}>
+                          <Link href={`/${fromCollective.slug}`}>
                             <Avatar collective={fromCollective} radius={40} />
                           </Link>
                         </Box>
@@ -571,7 +571,7 @@ class CreatePledgePage extends React.Component {
                       )
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link href={fromCollective.slug}>
+                          <Link href={`/${fromCollective.slug}`}>
                             <Container
                               backgroundImage={`url(${imagePreview(
                                 fromCollective.image,

@@ -126,7 +126,7 @@ const SectionTransactions = props => {
               />
             </MessageBox>
           )}
-          <Link href={`${collective.slug}/transactions`}>
+          <Link href={`/${collective.slug}/transactions`}>
             <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
             </StyledButton>

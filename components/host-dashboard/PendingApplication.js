@@ -168,7 +168,7 @@ const getSuccessToast = (intl, action, collective, result) => {
         <StyledLink
           as={Link}
           openInNewTab
-          href={`${collective.slug}/conversations/${conversation.slug}-${conversation.id}`}
+          href={`/${collective.slug}/conversations/${conversation.slug}-${conversation.id}`}
         >
           <FormattedMessage id="Conversation.view" defaultMessage="View Conversation" />
           &nbsp;

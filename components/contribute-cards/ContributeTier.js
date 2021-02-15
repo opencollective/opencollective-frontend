@@ -149,7 +149,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                 <StyledLink
                   as={Link}
                   whiteSpace="nowrap"
-                  href={{ pathname: `${collective.slug}/contribute/${tier.slug}`, query: { tierId: tier.id } }}
+                  href={{ pathname: `/${collective.slug}/contribute/${tier.slug}`, query: { tierId: tier.id } }}
                 >
                   <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                 </StyledLink>

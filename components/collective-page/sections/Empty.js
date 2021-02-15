@@ -59,7 +59,7 @@ const SectionEmpty = props => {
                 }}
               />
             </P>
-            <Link href="discover">
+            <Link href="/discover">
               <StyledButton mt={[4, 3]} buttonStyle="primary" buttonSize="medium" fontSize="14px" lineHeight="16px">
                 <FormattedMessage id="home.discoverCollectives" defaultMessage="Discover Collectives" /> →
               </StyledButton>

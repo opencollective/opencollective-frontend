@@ -100,7 +100,7 @@ const SuccessCTAWrapper = ({ type, orderId, email, ...props }) => {
           display="block"
           color="black.800"
           data-cy="success-signin-link"
-          href="signin"
+          href="/signin"
           params={{ email }}
           {...props}
         />

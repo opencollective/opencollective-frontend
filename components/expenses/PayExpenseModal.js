@@ -250,7 +250,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             <br />
             {/** TODO: Add a proper ID/Type to detect this error */}
             {error.startsWith('Insufficient Paypal balance') && (
-              <StyledLink as={Link} href={`${host.slug}/dashboard`}>
+              <StyledLink as={Link} href={`/${host.slug}/dashboard`}>
                 <FormattedMessage
                   id="PayExpenseModal.RefillBalanceError"
                   defaultMessage="Refill your balance from the Host dashboard"

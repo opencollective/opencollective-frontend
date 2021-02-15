@@ -288,7 +288,7 @@ class Tiers extends React.Component {
                   <StyledLink
                     as={Link}
                     openInNewTab
-                    href={{ pathname: `${collectiveSlug}/contribute/${tier.slug}`, query: { tierId: tier.id } }}
+                    href={{ pathname: `/${collectiveSlug}/contribute/${tier.slug}`, query: { tierId: tier.id } }}
                   >
                     <span>{msg}</span>
                   </StyledLink>

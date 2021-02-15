@@ -344,7 +344,7 @@ class TierPage extends Component {
                   {isPassed ? (
                     <P textAlign="center">
                       <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
-                      <Link href={{ pathname: `${collective.slug}/contribute`, query: redirect }}>
+                      <Link href={{ pathname: `/${collective.slug}/contribute`, query: redirect }}>
                         <FormattedMessage
                           id="createOrder.backToTier"
                           defaultMessage="View all the other ways to contribute"

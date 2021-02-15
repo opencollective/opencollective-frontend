@@ -90,7 +90,7 @@ const TranslatedDefinitions = defineMessages({
   },
 });
 
-const GiftCardLearnMoreLink = msg => <Link href="gift-cards">{msg}</Link>;
+const GiftCardLearnMoreLink = msg => <Link href="/gift-cards">{msg}</Link>;
 
 const TranslationParams = {
   [Terms.GIFT_CARD]: {

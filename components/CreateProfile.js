@@ -68,7 +68,7 @@ Tab.propTypes = {
 
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
-    <Link href={onSecondaryAction} passHref>
+    <Link href={`/${onSecondaryAction}`} passHref>
       <StyledLink disabled={loading} fontSize="14px">
         {children}
       </StyledLink>

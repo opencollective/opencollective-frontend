@@ -217,7 +217,7 @@ class Host extends React.Component {
                         values={{
                           type: collective.type,
                           emptyBalanceLink: (
-                            <Link href={`${collective.slug}/edit/advanced`}>
+                            <Link href={`/${collective.slug}/edit/advanced`}>
                               <FormattedMessage id="emptyBalance" defaultMessage="Empty Balance" />
                             </Link>
                           ),

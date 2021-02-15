@@ -124,7 +124,7 @@ class ContributionCategoryPicker extends React.Component {
                     <Image src={acceptMyselfIllustration} alt={intl.formatMessage(this.messages.ourselves)} />
                     <HoverImage src={acceptMyselfHoverIllustration} alt={intl.formatMessage(this.messages.ourselves)} />
                   </Box>
-                  <Link href={`${router.query.slug}/accept-financial-contributions/ourselves`}>
+                  <Link href={`/${router.query.slug}/accept-financial-contributions/ourselves`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"
@@ -160,7 +160,7 @@ class ContributionCategoryPicker extends React.Component {
                       alt={intl.formatMessage(this.messages.organization)}
                     />
                   </Box>
-                  <Link href={`${router.query.slug}/accept-financial-contributions/organization`}>
+                  <Link href={`/${router.query.slug}/accept-financial-contributions/organization`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"
@@ -192,7 +192,7 @@ class ContributionCategoryPicker extends React.Component {
                     <Image src={acceptHostIllustration} alt={intl.formatMessage(this.messages.host)} />
                     <HoverImage src={acceptHostHoverIllustration} alt={intl.formatMessage(this.messages.host)} />
                   </Box>
-                  <Link href={`${router.query.slug}/accept-financial-contributions/host`}>
+                  <Link href={`/${router.query.slug}/accept-financial-contributions/host`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"

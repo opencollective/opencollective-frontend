@@ -35,7 +35,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
       title={
-        <StyledLink as={Link} color="black.800" href={`${collective.slug}/events/${event.slug}`}>
+        <StyledLink as={Link} color="black.800" href={`/${collective.slug}/events/${event.slug}`}>
           {event.name}
         </StyledLink>
       }
@@ -71,7 +71,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       )}
       {description}
       {isTruncated && (
-        <Link href={`${collective.slug}/events/${event.slug}`}>
+        <Link href={`/${collective.slug}/events/${event.slug}`}>
           <Span textTransform="capitalize" whiteSpace="nowrap">
             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
           </Span>

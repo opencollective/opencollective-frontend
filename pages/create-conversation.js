@@ -113,7 +113,7 @@ class CreateConversationPage extends React.Component {
                   </ContainerOverlay>
                 )}
                 <Box maxWidth={1160} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
-                  <StyledLink as={Link} color="black.600" href={`${collectiveSlug}/conversations`}>
+                  <StyledLink as={Link} color="black.600" href={`/${collectiveSlug}/conversations`}>
                     &larr; <FormattedMessage id="Conversations.GoBack" defaultMessage="Back to conversations" />
                   </StyledLink>
                   <Box mt={4}>

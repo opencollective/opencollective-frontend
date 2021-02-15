@@ -135,7 +135,7 @@ class HeroEventDetails extends React.Component {
         {location.name && (
           <HeroNote>
             <MapPin size={16} />
-            <Link href={locationRoute}>
+            <Link href={`/${locationRoute}`}>
               <span>{location.name}</span>
             </Link>
           </HeroNote>

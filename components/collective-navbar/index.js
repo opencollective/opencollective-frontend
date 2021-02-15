@@ -210,7 +210,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
-        <Link href={`${collective.slug}/dashboard`}>
+        <Link href={`/${collective.slug}/dashboard`}>
           <MainActionBtn tabIndex="-1">
             <Dashboard size="1em" />
             <Span ml={2}>
@@ -250,7 +250,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <Link href={`${collective.slug}/expenses/new`}>
+        <Link href={`/${collective.slug}/expenses/new`}>
           <MainActionBtn tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
@@ -264,7 +264,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
-        <Link href={`${collective.slug}/expenses/new`}>
+        <Link href={`/${collective.slug}/expenses/new`}>
           <MainActionBtn tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
@@ -278,7 +278,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link href={`${collective.slug}/recurring-contributions`}>
+        <Link href={`/${collective.slug}/recurring-contributions`}>
           <MainActionBtn tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
@@ -292,7 +292,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
-        <Link href={`${collective.slug}/contact`}>
+        <Link href={`/${collective.slug}/contact`}>
           <MainActionBtn tabIndex="-1">
             <Envelope size="1em" />
             <Span ml={2}>
@@ -429,7 +429,7 @@ const CollectiveNavbar = ({
           {showBackButton && (
             <Box display={['none', 'block']} mr={2}>
               {collective && (
-                <Link href={collective.slug}>
+                <Link href={`/${collective.slug}`}>
                   <StyledButton px={1} isBorderless>
                     &larr;
                   </StyledButton>

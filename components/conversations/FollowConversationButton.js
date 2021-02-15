@@ -57,7 +57,7 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
             values={{
               // eslint-disable-next-line react/display-name
               'login-link': msg => (
-                <Link href="signin" params={{ next: Router.asPath }}>
+                <Link href="/signin" params={{ next: Router.asPath }}>
                   {msg}
                 </Link>
               ),

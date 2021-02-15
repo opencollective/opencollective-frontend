@@ -42,7 +42,7 @@ class RecurringContributionsRedirectPage extends React.Component {
           {LoggedInUser && (
             <div>
               This page has moved. Your recurring financial contributions are now at
-              <Link href={`${LoggedInUser.collective.slug}/recurring-contributions`}>
+              <Link href={`/${LoggedInUser.collective.slug}/recurring-contributions`}>
                 <span>
                   {' '}
                   /{LoggedInUser.collective.slug}

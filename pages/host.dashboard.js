@@ -164,25 +164,25 @@ class HostDashboardPage extends React.Component {
               flexWrap="wrap"
               data-cy="host-dashboard-menu-bar"
             >
-              <Link href={`${slug}/dashboard/expenses`}>
+              <Link href={`/${slug}/dashboard/expenses`}>
                 <LinkContainer isActive={view === 'expenses'}>
                   <ReceiptIcon size="1em" />
                   <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
                 </LinkContainer>
               </Link>
-              <Link href={`${slug}/dashboard/donations`}>
+              <Link href={`/${slug}/dashboard/donations`}>
                 <LinkContainer isActive={view === 'donations'}>
                   <DonateIcon size="1em" />
                   <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
                 </LinkContainer>
               </Link>
-              <Link href={`${slug}/dashboard/pending-applications`}>
+              <Link href={`/${slug}/dashboard/pending-applications`}>
                 <LinkContainer isActive={view === 'pending-applications'}>
                   <CheckDouble size="1.2em" />
                   <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
                 </LinkContainer>
               </Link>
-              <Link href={`${slug}/dashboard/${HOST_SECTIONS.HOSTED_COLLECTIVES}`}>
+              <Link href={`/${slug}/dashboard/${HOST_SECTIONS.HOSTED_COLLECTIVES}`}>
                 <LinkContainer isActive={view === HOST_SECTIONS.HOSTED_COLLECTIVES}>
                   <HostedCollectivesIcon size="1.2em" />
                   <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />

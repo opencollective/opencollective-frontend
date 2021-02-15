@@ -66,7 +66,7 @@ class SectionConversations extends React.PureComponent {
               defaultMessage="Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together."
             />
           </P>
-          <Link href={`${collective.slug}/conversations/new`}>
+          <Link href={`/${collective.slug}/conversations/new`}>
             <StyledButton buttonStyle="primary" my={[2, 0]}>
               <Span fontSize="16px" fontWeight="bold" mr={2}>
                 +
@@ -88,7 +88,7 @@ class SectionConversations extends React.PureComponent {
           <Box mt={[3, 5]} mb={[3, 4]}>
             <ConversationsList collectiveSlug={collective.slug} conversations={conversations.nodes} />
             {conversations.totalCount > 3 && (
-              <Link href={`${collective.slug}/conversations`}>
+              <Link href={`/${collective.slug}/conversations`}>
                 <StyledButton width="100%" mt={4} buttonSize="small" fontSize="14px">
                   <FormattedMessage id="Conversations.ViewAll" defaultMessage="View all Conversations" /> →
                 </StyledButton>

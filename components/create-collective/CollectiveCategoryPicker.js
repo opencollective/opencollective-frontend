@@ -75,7 +75,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/openSourceIllustration.png"
                   alt={formatMessage(messages.opensource)}
                 />
-                <Link href={`${hostCollectiveSlug}/${router.query.verb}/opensource`}>
+                <Link href={`/${hostCollectiveSlug}/${router.query.verb}/opensource`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.opensource)}
                   </StyledButton>
@@ -97,7 +97,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/climateIllustration.png"
                   alt={formatMessage(messages.covid)}
                 />
-                <Link href={`${hostCollectiveSlug}/${router.query.verb}/covid-19`}>
+                <Link href={`/${hostCollectiveSlug}/${router.query.verb}/covid-19`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.covid)}
                   </StyledButton>

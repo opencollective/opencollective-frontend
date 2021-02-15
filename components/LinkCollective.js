@@ -31,7 +31,7 @@ const LinkCollective = ({ target, title, collective, children, ...props }) => {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
-    <Link href={slug} {...props} title={title || name} target={target} passHref>
+    <Link href={`/${slug}`} {...props} title={title || name} target={target} passHref>
       {children || name || slug}
     </Link>
   ) : (

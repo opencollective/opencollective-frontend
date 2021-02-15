@@ -287,7 +287,7 @@ class ConversationPage extends React.Component {
                 selectedCategory={NAVBAR_CATEGORIES.CONNECT}
               />
               <Box maxWidth={1160} m="0 auto" px={2} py={[4, 5]}>
-                <StyledLink as={Link} color="black.600" href={`${collectiveSlug}/conversations`}>
+                <StyledLink as={Link} color="black.600" href={`/${collectiveSlug}/conversations`}>
                   &larr; <FormattedMessage id="Conversations.GoBack" defaultMessage="Back to conversations" />
                 </StyledLink>
                 <Box mt={4}>
@@ -348,7 +348,7 @@ class ConversationPage extends React.Component {
                       </Box>
                       <Box display={['none', null, 'block']} flex="0 0 330px" ml={[null, null, null, 4, 5]} mb={4}>
                         <Box my={2} mx={2}>
-                          <Link href={`${collectiveSlug}/conversations/new`}>
+                          <Link href={`/${collectiveSlug}/conversations/new`}>
                             <StyledButton buttonStyle="primary" width="100%" minWidth={170}>
                               <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
                             </StyledButton>

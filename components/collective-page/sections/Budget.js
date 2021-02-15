@@ -83,7 +83,7 @@ const ViewAllLink = ({ collective, filter }) => {
   switch (filter) {
     case 'expenses':
       return (
-        <Link href={`${collective.slug}/expenses`} data-cy="view-all-expenses-link">
+        <Link href={`/${collective.slug}/expenses`} data-cy="view-all-expenses-link">
           <span>
             <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
             &rarr;
@@ -92,7 +92,7 @@ const ViewAllLink = ({ collective, filter }) => {
       );
     case 'transactions':
       return (
-        <Link href={`${collective.slug}/transactions`} data-cy="view-all-transactions-link">
+        <Link href={`/${collective.slug}/transactions`} data-cy="view-all-transactions-link">
           <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> &rarr;
         </Link>
       );

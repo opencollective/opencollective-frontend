@@ -173,7 +173,7 @@ class SectionUpdates extends React.PureComponent {
                         <Container>
                           <HTMLContent style={{ display: 'inline' }} content={update.summary} />
                           {` `}
-                          <StyledLink as={Link} fontSize="12px" href={`${collective.slug}/updates/${update.slug}`}>
+                          <StyledLink as={Link} fontSize="12px" href={`/${collective.slug}/updates/${update.slug}`}>
                             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                           </StyledLink>
                         </Container>

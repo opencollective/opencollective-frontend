@@ -258,7 +258,7 @@ class SectionContribute extends React.PureComponent {
               </P>
             </Flex>
             <Box my={5}>
-              <Link href={`${collective.slug}/accept-financial-contributions`}>
+              <Link href={`/${collective.slug}/accept-financial-contributions`}>
                 <StyledButton buttonStyle="primary" buttonSize="large">
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
                 </StyledButton>
@@ -365,7 +365,7 @@ class SectionContribute extends React.PureComponent {
             {/* "View all ways to contribute" button */}
             {!isEvent && (
               <ContainerSectionContent pb={4}>
-                <Link href={`${collective.slug}/contribute`}>
+                <Link href={`/${collective.slug}/contribute`}>
                   <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="All ways to contribute" /> →
                   </StyledButton>

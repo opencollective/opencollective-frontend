@@ -97,7 +97,7 @@ class ConversationsPage extends React.Component {
               />
             </MessageBox>
           )}
-          <Link href={`${collectiveSlug}/conversations/new`}>
+          <Link href={`/${collectiveSlug}/conversations/new`}>
             <StyledButton buttonStyle="primary" buttonSize="large">
               <FormattedMessage id="conversations.createFirst" defaultMessage="Start a new conversation" />
             </StyledButton>
@@ -151,7 +151,7 @@ class ConversationsPage extends React.Component {
                       />
                     </P>
                     <Flex flex="0 0 300px" flexWrap="wrap">
-                      <Link href={`${collectiveSlug}/conversations/new`}>
+                      <Link href={`/${collectiveSlug}/conversations/new`}>
                         <StyledButton buttonStyle="primary" m={2}>
                           <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
                         </StyledButton>

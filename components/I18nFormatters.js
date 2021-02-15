@@ -13,18 +13,18 @@ export const I18nSupportLink = chunks => (
   </StyledLink>
 );
 export const I18nSignInLink = chunks => (
-  <Link href="signin" params={{ next: typeof window !== undefined ? window.location.pathname : '' }}>
+  <Link href="/signin" params={{ next: typeof window !== undefined ? window.location.pathname : '' }}>
     {chunks}
   </Link>
 );
 
 export const I18nTOSLink = msg => (
-  <Link href="tos">
+  <Link href="/tos">
     <span>{msg}</span>
   </Link>
 );
 export const I18nPrivacyLink = msg => (
-  <Link href="privacypolicy">
+  <Link href="/privacypolicy">
     <span>{msg}</span>
   </Link>
 );

@@ -74,7 +74,7 @@ class GiftCards extends React.Component {
         display="block"
       >
         {({ item, isSelected }) => (
-          <Link href={{ pathname: `editCollective`, query: this.props.router.query }}>
+          <Link href={{ pathname: `/editCollective`, query: this.props.router.query }}>
             <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
               {item === 'all' && <FormattedMessage id="giftCards.filterAll" defaultMessage="All" />}
               {item === 'redeemed' && <FormattedMessage id="giftCards.filterRedeemed" defaultMessage="Redeemed" />}
@@ -89,7 +89,7 @@ class GiftCards extends React.Component {
   renderNoGiftCardMessage(onlyConfirmed) {
     if (onlyConfirmed === undefined) {
       return (
-        <Link href={`${this.props.collectiveSlug}/edit/gift-cards-create`}>
+        <Link href={`/${this.props.collectiveSlug}/edit/gift-cards-create`}>
           <FormattedMessage id="giftCards.createFirst" defaultMessage="Create your first gift card!" />
         </Link>
       );

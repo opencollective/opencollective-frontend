@@ -31,7 +31,7 @@ const GiftCardStatus = ({ isConfirmed, collective, data }) => {
         id="giftCards.claimedBy"
         defaultMessage="claimed by {user}"
         values={{
-          user: <Link href={collective.slug}>{collective.name}</Link>,
+          user: <Link href={`/${collective.slug}`}>{collective.name}</Link>,
         }}
       />
     );
@@ -91,7 +91,7 @@ class GiftCardDetails extends React.Component {
             <DetailsColumnHeader>
               <FormattedMessage id="giftCards.redeemCode" defaultMessage="REDEEM CODE" />
             </DetailsColumnHeader>
-            <Link href={`${collectiveSlug}/redeem/${redeemCode}`}>{redeemCode}</Link>
+            <Link href={`/${collectiveSlug}/redeem/${redeemCode}`}>{redeemCode}</Link>
           </Flex>
         )}
         <Flex flexDirection="column" mr="2em">
@@ -150,7 +150,7 @@ class GiftCardDetails extends React.Component {
         {/* Avatar column */}
         <Box mr="20px">
           {isConfirmed ? (
-            <Link href={collective.slug} title={collective.name} passHref>
+            <Link href={`/${collective.slug}`} title={collective.name} passHref>
               <Container>
                 <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
                 <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />
