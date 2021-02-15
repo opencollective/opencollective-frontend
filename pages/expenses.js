@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { has, mapValues, omit, pick } from 'lodash';
+import { has, isEmpty, isNil, mapValues, omit, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -147,10 +147,7 @@ class ExpensePage extends React.Component {
       ...omit(this.props.query, ['offset']),
       ...params,
     };
-    Object.keys(queryParameters).forEach(
-      k => !queryParameters[k] && queryParameters[k] !== undefined && delete queryParameters[k],
-    );
-    return queryParameters;
+    return omitBy(omitBy(queryParameters, isNil), isEmpty);
   }
 
   updateFilters = queryParams => {
