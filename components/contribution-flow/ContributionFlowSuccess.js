@@ -26,9 +26,9 @@ import StyledLink from '../../components/StyledLink';
 import { H3, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
+import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
-import { orderSuccessFragment } from './index';
 import successIllustrationUrl from './success-illustration.jpg';
 import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
 
@@ -103,31 +103,35 @@ const getMainTag = collective => {
   }
 };
 
-class NewContributionFlowSuccess extends React.Component {
+class ContributionFlowSuccess extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     router: PropTypes.object,
+    isEmbed: PropTypes.bool,
     data: PropTypes.object,
   };
 
   renderCallsToAction = () => {
-    const { LoggedInUser, data, router } = this.props;
-    const callsToAction = [SUCCESS_CTA_TYPE.NEWSLETTER];
+    const { LoggedInUser, data, isEmbed, router } = this.props;
+    const callsToAction = [];
     const isGuest = get(data, 'order.fromAccount.isGuest');
     const email = get(router, 'query.email') ? decodeURIComponent(router.query.email) : null;
 
-    if (!LoggedInUser) {
-      if (isGuest) {
-        callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
+    if (!isEmbed) {
+      callsToAction.push(SUCCESS_CTA_TYPE.NEWSLETTER);
+      if (!LoggedInUser) {
+        if (isGuest) {
+          callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
+        } else {
+          callsToAction.unshift(SUCCESS_CTA_TYPE.SIGN_IN, SUCCESS_CTA_TYPE.BLOG);
+        }
       } else {
-        callsToAction.unshift(SUCCESS_CTA_TYPE.SIGN_IN, SUCCESS_CTA_TYPE.BLOG);
+        // all other logged in recurring/one time contributions
+        callsToAction.unshift(SUCCESS_CTA_TYPE.BLOG);
       }
-    } else {
-      // all other logged in recurring/one time contributions
-      callsToAction.unshift(SUCCESS_CTA_TYPE.BLOG);
     }
 
     return (
@@ -197,7 +201,7 @@ class NewContributionFlowSuccess extends React.Component {
   };
 
   render() {
-    const { LoggedInUser, collective, data, intl } = this.props;
+    const { LoggedInUser, collective, data, intl, isEmbed } = this.props;
     const { order } = data;
     const shareURL = `${process.env.WEBSITE_URL}/${collective.slug}`;
     const pendingOrder = order && order.status === ORDER_STATUS.PENDING;
@@ -214,10 +218,11 @@ class NewContributionFlowSuccess extends React.Component {
 
     return (
       <Flex
-        justifyContent="center"
         width={1}
         minHeight={[400, 800]}
         flexDirection={['column', null, 'row']}
+        justifyContent={[null, null, 'center']}
+        css={{ height: '100%' }}
         data-cy="order-success"
       >
         {data.loading ? (
@@ -231,6 +236,7 @@ class NewContributionFlowSuccess extends React.Component {
               alignItems="center"
               justifyContent="center"
               width={['100%', null, '50%', '762px']}
+              mb={[4, null, 0]}
               flexShrink={0}
             >
               <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
@@ -246,19 +252,21 @@ class NewContributionFlowSuccess extends React.Component {
                     />
                   </P>
                 </Box>
-                <ContributorCardWithTier width={250} height={380} contribution={order} my={2} />
-                <Box my={4}>
-                  <Link route="discover" params={{ show: getMainTag(order.toAccount) }}>
-                    <P color="black.800" fontWeight={500}>
-                      <FormattedMessage
-                        id="NewContributionFlow.Success.DiscoverMore"
-                        defaultMessage="Discover more Collectives like {collective} &rarr;"
-                        values={{ collective: order.toAccount.name }}
-                      />
-                    </P>
-                  </Link>
-                </Box>
-                <Flex justifyContent="center" mt={2}>
+                <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={!isEmbed} />
+                {!isEmbed && (
+                  <Box my={4}>
+                    <Link route="discover" params={{ show: getMainTag(order.toAccount) }}>
+                      <P color="black.800" fontWeight={500}>
+                        <FormattedMessage
+                          id="NewContributionFlow.Success.DiscoverMore"
+                          defaultMessage="Discover more Collectives like {collective} &rarr;"
+                          values={{ collective: order.toAccount.name }}
+                        />
+                      </P>
+                    </Link>
+                  </Box>
+                )}
+                <Flex justifyContent="center" mt={3}>
                   <ShareLink
                     href={tweetURL({
                       url: shareURL,
@@ -310,4 +318,4 @@ const addOrderSuccessQuery = graphql(orderSuccessQuery, {
   }),
 });
 
-export default injectIntl(withUser(withRouter(addOrderSuccessQuery(NewContributionFlowSuccess))));
+export default injectIntl(withUser(withRouter(addOrderSuccessQuery(ContributionFlowSuccess))));

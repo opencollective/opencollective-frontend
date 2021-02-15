@@ -137,6 +137,18 @@ pages.add(
   createOrderPage,
 );
 
+// Embed
+pages.add(
+  'embed-contribution-flow',
+  `/embed/:collectiveSlug/donate/:step(${contributionFlowSteps})?`,
+  'embed/contribution-flow',
+);
+pages.add(
+  'embed-contribution-flow-tier',
+  `/embed/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:step(${contributionFlowSteps})?`,
+  'embed/contribution-flow',
+);
+
 // Pledges
 // -------
 

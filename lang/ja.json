@@ -1239,7 +1239,7 @@
   "NewContributionFlow.NumberOfFinancialContributors": "{contributors} financial contributors",
   "NewContributionFlow.PaymentInstructions": "Payment instructions",
   "NewContributionFlow.PendingContribution": "Pending contribution",
-  "NewContributionFlow.ProtectTransactionDetails": "Open Collective keeps your transaction is safe. <link>Learn more</link>.",
+  "NewContributionFlow.ProtectTransactionDetails": "Open Collective keeps your transaction safe. <link>Learn more</link>.",
   "NewContributionFlow.ProtectTransactionTitle": "あなたの取引は安全に保護されています。",
   "NewContributionFlow.step.contributeAsGuest": "Contribute as a guest",
   "NewContributionFlow.Success.CTA.Join.Content": "Create an account and show all your contributions.",

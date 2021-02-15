@@ -28,12 +28,17 @@ class Header extends React.Component {
     className: PropTypes.string,
     title: PropTypes.string,
     showSearch: PropTypes.bool,
+    withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
     metas: PropTypes.object,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
     /** @ignore from injectIntl */
     intl: PropTypes.object,
+  };
+
+  static defaultProps = {
+    withTopBar: true,
   };
 
   getTitle() {
@@ -90,7 +95,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { css, className, canonicalURL } = this.props;
+    const { css, className, canonicalURL, withTopBar } = this.props;
     return (
       <header>
         <Head>
@@ -107,7 +112,9 @@ class Header extends React.Component {
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
         <div id="top" />
-        <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
+        {withTopBar && (
+          <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
+        )}
         <UserWarnings />
       </header>
     );

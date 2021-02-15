@@ -1239,7 +1239,7 @@
   "NewContributionFlow.NumberOfFinancialContributors": "Colaboradores financieros {contributors}",
   "NewContributionFlow.PaymentInstructions": "Instrucciones de pago",
   "NewContributionFlow.PendingContribution": "Contribución pendiente",
-  "NewContributionFlow.ProtectTransactionDetails": "Open Collective keeps your transaction is safe. <link>Learn more</link>.",
+  "NewContributionFlow.ProtectTransactionDetails": "Open Collective keeps your transaction safe. <link>Learn more</link>.",
   "NewContributionFlow.ProtectTransactionTitle": "Protegemos su transacción:",
   "NewContributionFlow.step.contributeAsGuest": "Contribute as a guest",
   "NewContributionFlow.Success.CTA.Join.Content": "Create an account and show all your contributions.",
