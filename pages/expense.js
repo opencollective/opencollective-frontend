@@ -257,9 +257,11 @@ class ExpensePage extends React.Component {
     });
 
     const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
-    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : '';
+    const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
+    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
+    const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
     this.props.router.push(
-      `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}?createSuccess=true`,
+      `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}?createSuccess=true`,
     );
   }
 
@@ -356,9 +358,11 @@ class ExpensePage extends React.Component {
     // Replaces the route by the version without `createSuccess=true`
     const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
     this.setState({ successMessageDismissed: true });
+    const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
     const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.expense?.account) : '';
+    const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
     return this.props.router.replace(
-      `${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/expenses/${legacyExpenseId}`,
+      `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
       undefined,
       {
         shallow: true, // Do not re-fetch data, do not loose state
@@ -376,8 +380,10 @@ class ExpensePage extends React.Component {
 
   onDelete = async expense => {
     const collective = expense.account;
+    const parentCollectiveSlugRoute = collective.parent?.slug ? `${collective.parent?.slug}/` : '';
     const collectiveType = collective.parent ? getCollectiveTypeForUrl(collective) : undefined;
-    return this.props.router.replace(`${collective.parent?.slug}/${collectiveType}/${collective.slug}/expenses`);
+    const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
+    return this.props.router.replace(`${parentCollectiveSlugRoute}${collectiveTypeRoute}${collective.slug}/expenses`);
   };
 
   render() {
