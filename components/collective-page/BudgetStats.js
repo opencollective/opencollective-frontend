@@ -72,16 +72,30 @@ const BudgetStats = ({ collective, stats }) => {
       <StatContainer>
         <StatTitle>
           <ShowChart size="12px" />
-          <FormattedMessage id="budgetSection-raised" defaultMessage="Total raised" />
+
+          <DefinedTerm
+            term={Terms.TOTAL_RAISED}
+            textTransform="uppercase"
+            color="black.700"
+            extraTooltipContent={
+              <Box mt={2}>
+                <FormattedMessage
+                  id="budgetSection-raised-total"
+                  defaultMessage="Total contributed before fees: {amount}"
+                  values={{ amount: formatCurrency(stats?.totalAmountRaised || 0, collective.currency) }}
+                />
+              </Box>
+            }
+          />
         </StatTitle>
-        <StatAmount amount={stats.totalAmountRaised} currency={collective.currency} />
+        <StatAmount amount={stats.totalNetAmountRaised} currency={collective.currency} />
       </StatContainer>
       <StatContainer>
         <StatTitle>
           <Expand size="12px" />
           <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total disbursed" />
         </StatTitle>
-        <StatAmount amount={stats.totalAmountRaised - stats.balance} currency={collective.currency} />
+        <StatAmount amount={stats.totalNetAmountRaised - stats.balance} currency={collective.currency} />
       </StatContainer>
       {!isFund && !isProject && (
         <StatContainer data-cy="budgetSection-estimated-budget" $isMain>
@@ -134,6 +148,7 @@ BudgetStats.propTypes = {
     activeRecurringContributions: PropTypes.object,
     totalAmountReceived: PropTypes.number,
     totalAmountRaised: PropTypes.number,
+    totalNetAmountRaised: PropTypes.number,
   }),
 
   isLoading: PropTypes.bool,

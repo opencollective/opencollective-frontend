@@ -2756,6 +2756,11 @@ enum Currency {
   MXN
 
   """
+  Malaysian Ringgit
+  """
+  MYR
+
+  """
   Naira
   """
   NGN
@@ -5344,11 +5349,6 @@ type Mutation {
     The key that you want to edit in settings
     """
     emailConfirmationToken: String!
-
-    """
-    This can be used to link the other guest contributions to the user
-    """
-    guestTokens: [String!]
   ): ConfirmGuestAccountResponse!
 
   """
