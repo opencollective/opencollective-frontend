@@ -4,7 +4,6 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import sanitizeHtml from 'sanitize-html';
 import styled from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
@@ -75,18 +74,9 @@ class RedeemedPage extends React.Component {
       code,
       collectiveSlug,
       amount: amount && Number(amount),
-      name: sanitizeHtml(name || '', {
-        allowedTags: [],
-        allowedAttributes: [],
-      }),
-      emitterSlug: sanitizeHtml(emitterSlug, {
-        allowedTags: [],
-        allowedAttributes: [],
-      }),
-      emitterName: sanitizeHtml(emitterName, {
-        allowedTags: [],
-        allowedAttributes: [],
-      }),
+      name: name?.trim(),
+      emitterSlug: emitterSlug?.trim(),
+      emitterName: emitterName?.trim(),
     };
   }
 

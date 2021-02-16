@@ -4,7 +4,6 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import sanitizeHtml from 'sanitize-html';
 import styled from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
@@ -44,18 +43,9 @@ class RedeemPage extends React.Component {
   static getInitialProps({ query: { code, email, name, collectiveSlug } }) {
     return {
       collectiveSlug,
-      code: sanitizeHtml(code || '', {
-        allowedTags: [],
-        allowedAttributes: [],
-      }),
-      email: sanitizeHtml(email || '', {
-        allowedTags: [],
-        allowedAttributes: [],
-      }),
-      name: sanitizeHtml(name || '', {
-        allowedTags: [],
-        allowedAttributes: [],
-      }),
+      code: code?.trim(),
+      email: email?.trim(),
+      name: name?.trim(),
     };
   }
 
