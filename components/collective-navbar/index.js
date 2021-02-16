@@ -213,7 +213,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link route={getSettingsRoute(collective)} data-cy="edit-collective-btn">
+        <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
           <MainActionBtn tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>

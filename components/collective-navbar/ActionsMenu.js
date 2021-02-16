@@ -206,7 +206,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
                         <StyledLink
                           as={Link}
-                          route={getSettingsRoute(collective)}
+                          href={getSettingsRoute(collective)}
                           p={ITEM_PADDING}
                           data-cy="edit-collective-btn"
                         >

@@ -235,7 +235,7 @@ const FiscalHost = () => {
                     flexDirection={[null, null, null, 'column']}
                     width={[1, null, null, '292px']}
                   >
-                    <CollectHostPageLink as={Link} href={`/${host.collectivePageLink}`}>
+                    <CollectHostPageLink as={Link} href={host.collectivePageLink}>
                       <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
                         {host.name}
                       </H3>
@@ -260,7 +260,7 @@ const FiscalHost = () => {
                       <Box my={[3, null, null, 0]}>
                         <StyledLink
                           as={Link}
-                          href={`/${host.collectivePageLink}/apply`}
+                          href={`${host.collectivePageLink}/apply`}
                           whiteSpace="nowrap"
                           fontSize="14px"
                           lineHeight="21px"
