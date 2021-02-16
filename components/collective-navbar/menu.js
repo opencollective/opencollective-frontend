@@ -16,6 +16,7 @@ export const NAVBAR_ACTION_TYPE = {
   CONTRIBUTE: 'hasContribute',
   MANAGE_SUBSCRIPTIONS: 'hasManageSubscriptions',
   REQUEST_GRANT: 'hasRequestGrant',
+  SETTINGS: 'hasSettings',
 };
 
 const titles = defineMessages({

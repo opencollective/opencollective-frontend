@@ -8,6 +8,7 @@ import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Close } from '@styled-icons/material/Close';
 import { Dashboard } from '@styled-icons/material/Dashboard';
+import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
@@ -19,6 +20,7 @@ import { getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
+import { getSettingsRoute } from '../../lib/url_helpers';
 
 import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
@@ -194,6 +196,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, is
     hasRequestGrant: isFund || get(settings, 'fundingRequest') === true,
     addPrepaidBudget: isRoot && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
+    hasSettings: isAdmin,
   };
 };
 
@@ -206,7 +209,21 @@ const getMainAction = (collective, callsToAction) => {
   }
 
   // Order of the condition defines main call to action: first match gets displayed
-  if (callsToAction.includes('hasDashboard')) {
+  if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
+    return {
+      type: NAVBAR_ACTION_TYPE.SETTINGS,
+      component: (
+        <Link route={getSettingsRoute(collective)} data-cy="edit-collective-btn">
+          <MainActionBtn tabIndex="-1">
+            <Settings size="1em" />
+            <Span ml={2}>
+              <FormattedMessage id="Settings" defaultMessage="Settings" />
+            </Span>
+          </MainActionBtn>
+        </Link>
+      ),
+    };
+  } else if (callsToAction.includes('hasDashboard')) {
     return {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
@@ -564,6 +581,7 @@ CollectiveNavbar.propTypes = {
     hasApply: PropTypes.bool,
     hasDashboard: PropTypes.bool,
     hasManageSubscriptions: PropTypes.bool,
+    hasSettings: PropTypes.bool,
   }),
   /** Used to check what sections can be used */
   isAdmin: PropTypes.bool,
