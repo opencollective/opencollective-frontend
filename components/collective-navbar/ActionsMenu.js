@@ -15,6 +15,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective.lib';
+import { getSettingsRoute } from '../../lib/url_helpers';
 
 import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
@@ -201,6 +202,19 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                 <DropdownArrow />
                 <DropdownContent>
                   <Box as="ul" p={0} m={0} minWidth={184}>
+                    {callsToAction.hasSettings && (
+                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
+                        <StyledLink
+                          as={Link}
+                          route={getSettingsRoute(collective)}
+                          p={ITEM_PADDING}
+                          data-cy="edit-collective-btn"
+                        >
+                          <Settings size={20} />
+                          <FormattedMessage id="Settings" defaultMessage="Settings" />
+                        </StyledLink>
+                      </MenuItem>
+                    )}
                     {callsToAction.hasDashboard && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
                         <StyledLink
@@ -312,19 +326,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                           hostWithinLimit={hostWithinLimit}
                           buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
                         />
-                      </MenuItem>
-                    )}
-                    {callsToAction.hasSettings && (
-                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
-                        <StyledLink
-                          as={Link}
-                          route="editCollective"
-                          params={{ slug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Settings size={20} />
-                          <FormattedMessage id="Settings" defaultMessage="Settings" />
-                        </StyledLink>
                       </MenuItem>
                     )}
                   </Box>

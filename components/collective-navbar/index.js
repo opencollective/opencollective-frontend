@@ -20,6 +20,7 @@ import { getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
+import { getSettingsRoute } from '../../lib/url_helpers';
 
 import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
@@ -208,7 +209,21 @@ const getMainAction = (collective, callsToAction) => {
   }
 
   // Order of the condition defines main call to action: first match gets displayed
-  if (callsToAction.includes('hasDashboard')) {
+  if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
+    return {
+      type: NAVBAR_ACTION_TYPE.SETTINGS,
+      component: (
+        <Link route={getSettingsRoute(collective)} data-cy="edit-collective-btn">
+          <MainActionBtn tabIndex="-1">
+            <Settings size="1em" />
+            <Span ml={2}>
+              <FormattedMessage id="Settings" defaultMessage="Settings" />
+            </Span>
+          </MainActionBtn>
+        </Link>
+      ),
+    };
+  } else if (callsToAction.includes('hasDashboard')) {
     return {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
@@ -334,20 +349,6 @@ const getMainAction = (collective, callsToAction) => {
             </MainActionBtn>
           )}
         </AddPrepaidBudgetBtn>
-      ),
-    };
-  } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
-    return {
-      type: NAVBAR_ACTION_TYPE.SETTINGS,
-      component: (
-        <Link route="editCollective" params={{ collectiveSlug: collective.slug }}>
-          <MainActionBtn tabIndex="-1">
-            <Settings size="1em" />
-            <Span ml={2}>
-              <FormattedMessage id="Settings" defaultMessage="Settings" />
-            </Span>
-          </MainActionBtn>
-        </Link>
       ),
     };
   } else {
