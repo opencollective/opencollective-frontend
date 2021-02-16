@@ -122,7 +122,7 @@ ${totalDonationsStr}`;
                 <Avatar collective={member} radius={45} className="noFrame" />
                 <Container padding="1rem" paddingTop="0" textAlign="left" overflow="hidden" display="none">
                   <Container fontSize="1.7rem">{name}</Container>
-                  <Container fontSize="1.4rem" style={{ color: props => props.theme.colors.darkgray }}>
+                  <Container fontSize="1.4rem" color="black.600">
                     {firstSentence(description || member.description, 64)}
                   </Container>
                   <Container
