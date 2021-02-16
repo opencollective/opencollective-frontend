@@ -184,7 +184,7 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
         await this.addHost(collective, organization ? organization : collective);
         await this.props.refetchLoggedInUser();
         await this.props.router.push(
-          `${this.props.collective.slug}/accept-financial-contributions/${this.props.router.query.path}/success`,
+          `/${this.props.collective.slug}/accept-financial-contributions/${this.props.router.query.path}/success`,
         );
         window.scrollTo(0, 0);
       } catch (e) {

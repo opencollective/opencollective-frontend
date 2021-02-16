@@ -65,7 +65,7 @@ class Host extends React.Component {
 
   updateSelectedOption(option) {
     this.props.router.push({
-      pathname: `${this.props.collective.slug}/edit/host`,
+      pathname: `/${this.props.collective.slug}/edit/host`,
       query: {
         selectedOption: option,
       },

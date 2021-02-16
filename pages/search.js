@@ -126,17 +126,17 @@ class SearchPage extends React.Component {
     const { term } = this.props;
 
     if (filter === 'HOST') {
-      this.props.router.push({ pathname: 'search', query: { q: term, isHost: true } });
+      this.props.router.push({ pathname: '/search', query: { q: term, isHost: true } });
     } else if (filter !== 'ALL') {
-      this.props.router.push({ pathname: 'search', query: { q: term, types: filter } });
+      this.props.router.push({ pathname: '/search', query: { q: term, types: filter } });
     } else {
-      this.props.router.push({ pathname: 'search', query: { q: term } });
+      this.props.router.push({ pathname: '/search', query: { q: term } });
     }
   };
 
   changePage = offset => {
     const { router } = this.props;
-    this.props.router.push({ pathname: 'search', query: { ...router.query, offset } });
+    this.props.router.push({ pathname: '/search', query: { ...router.query, offset } });
   };
 
   render() {

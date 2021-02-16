@@ -120,7 +120,7 @@ class SignInOrJoinFree extends React.Component {
         if (response.redirect) {
           await this.props.router.replace(response.redirect);
         } else {
-          await this.props.router.push({ pathname: 'signinLinkSent', query: { email } });
+          await this.props.router.push({ pathname: '/signinLinkSent', query: { email } });
         }
         window.scrollTo(0, 0);
       } else {
@@ -155,7 +155,7 @@ class SignInOrJoinFree extends React.Component {
           websiteUrl: getWebsiteUrl(),
         },
       });
-      await this.props.router.push({ pathname: 'signinLinkSent', query: { email: user.email } });
+      await this.props.router.push({ pathname: '/signinLinkSent', query: { email: user.email } });
       window.scrollTo(0, 0);
     } catch (error) {
       this.setState({ error: error.message, submitting: false });

@@ -142,7 +142,7 @@ class GiftCards extends React.Component {
             >
               {this.renderFilters(onlyConfirmed)}
               <Flex justifyContent="center">
-                <Link href={`${collectiveSlug}/edit/gift-cards-create`}>
+                <Link href={`/${collectiveSlug}/edit/gift-cards-create`}>
                   <StyledButton buttonStyle="primary" buttonSize="medium">
                     <Add size="1em" />
                     {'  '}
@@ -156,7 +156,7 @@ class GiftCards extends React.Component {
                 <StyledSelect
                   options={batchesOptions}
                   onChange={({ value }) =>
-                    this.props.router.push('editCollective', { ...this.props.router.query, batch: value })
+                    this.props.router.push('/editCollective', { ...this.props.router.query, batch: value })
                   }
                   defaultValue={selectedOption}
                 />

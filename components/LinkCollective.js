@@ -36,7 +36,7 @@ const LinkCollective = ({ target, title, collective, children, ...props }) => {
     </Link>
   ) : (
     <Link
-      href={`${getEventParentCollectiveSlug(parentCollective)}/events/${slug}`}
+      href={`/${getEventParentCollectiveSlug(parentCollective)}/events/${slug}`}
       title={title || name}
       target={target}
       {...props}

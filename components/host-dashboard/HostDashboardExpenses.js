@@ -145,7 +145,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
-              this.props.router.push({ pathname: 'host.dashboard', query: { ...query, searchTerm, offset: null } })
+              this.props.router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
             }
           />
         </Box>
@@ -192,7 +192,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             filters={query}
             onChange={queryParams =>
               this.props.router.push({
-                pathname: 'host.dashboard',
+                pathname: '/host.dashboard',
                 query: {
                   ...query,
                   ...queryParams,
@@ -217,7 +217,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                     <Link
                       data-cy="reset-expenses-filters"
                       href={{
-                        pathname: `${data.host.slug}/dashboard/expenses`,
+                        pathname: `/${data.host.slug}/dashboard/expenses`,
                         query: { ...mapValues(query, () => null) },
                       }}
                     >
@@ -245,7 +245,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route="host.dashboard"
+              route="/host.dashboard"
               total={data?.expenses?.totalCount}
               limit={variables.limit}
               offset={variables.offset}

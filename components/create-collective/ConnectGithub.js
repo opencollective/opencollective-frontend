@@ -67,7 +67,7 @@ class ConnectGithub extends React.Component {
       verb: this.props.router.query.verb,
       hostCollectiveSlug: this.props.router.query.hostCollectiveSlug || undefined,
     };
-    await this.props.router.push({ pathname: 'create-collective', query: params });
+    await this.props.router.push({ pathname: '/create-collective', query: params });
     window.scrollTo(0, 0);
   };
 

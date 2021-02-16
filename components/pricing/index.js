@@ -19,7 +19,7 @@ class Pricing extends Component {
   };
 
   handleOnChangeTab = async tab => {
-    await this.props.router.push({ pathname: 'pricing', query: { tab: tab } });
+    await this.props.router.push({ pathname: '/pricing', query: { tab: tab } });
   };
 
   renderContent(tab) {

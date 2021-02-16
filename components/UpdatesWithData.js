@@ -63,7 +63,7 @@ class UpdatesWithData extends React.Component {
               </P>
             </Container>
             {LoggedInUser?.canEditCollective(collective) && (
-              <Link href={`${collective.slug}/updates/new`}>
+              <Link href={`/${collective.slug}/updates/new`}>
                 <StyledButton buttonStyle="primary" m={2}>
                   <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
                 </StyledButton>

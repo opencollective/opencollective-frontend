@@ -40,7 +40,7 @@ const SearchButton = styled(Flex)`
 class SearchForm extends React.Component {
   handleSubmit = event => {
     const searchInput = event.target.elements.q;
-    this.props.router.push({ pathname: 'search', query: { q: searchInput.value } });
+    this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
     event.preventDefault();
   };
 

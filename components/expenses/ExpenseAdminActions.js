@@ -85,7 +85,7 @@ const ExpenseAdminActions = ({
           }
         />
       ) : (
-        <Link href={`${collective.slug}/expenses/${expense.legacyId}`}>
+        <Link href={`/${collective.slug}/expenses/${expense.legacyId}`}>
           <ButtonWithLabel
             onClick={() => copy(window.location.href.replace('?createSuccess=true', ''))}
             disabled={isDisabled}

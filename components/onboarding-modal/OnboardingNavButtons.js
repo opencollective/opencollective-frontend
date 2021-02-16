@@ -56,7 +56,7 @@ class OnboardingNavButtons extends React.Component {
                 buttonStyle="primary"
                 disabled={this.getStepParams(step, 'disabled')}
                 onClick={() => {
-                  this.props.router.push(`${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
                 }}
               >
                 <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
@@ -69,7 +69,7 @@ class OnboardingNavButtons extends React.Component {
                 size={48}
                 disabled={this.getStepParams(step, 'disabled')}
                 onClick={() => {
-                  this.props.router.push(`${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
                 }}
               >
                 ←
@@ -90,7 +90,7 @@ class OnboardingNavButtons extends React.Component {
                 buttonStyle="primary"
                 disabled={this.getStepParams(step, 'disabled')}
                 onClick={() => {
-                  this.props.router.push(`${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
                 }}
               >
                 <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
@@ -103,7 +103,7 @@ class OnboardingNavButtons extends React.Component {
                 size={48}
                 disabled={this.getStepParams(step, 'disabled')}
                 onClick={() => {
-                  this.props.router.push(`${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
                 }}
               >
                 ←
@@ -116,7 +116,7 @@ class OnboardingNavButtons extends React.Component {
                 mx={1}
                 buttonStyle="primary"
                 onClick={() => {
-                  this.props.router.push(`${slug}/${mode}/${this.getStepParams(step, 'routerStepForward')}`);
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepForward')}`);
                 }}
               >
                 <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
@@ -128,7 +128,7 @@ class OnboardingNavButtons extends React.Component {
                 mx={1}
                 size={48}
                 onClick={() => {
-                  this.props.router.push(`${slug}/${mode}/${this.getStepParams(step, 'routerStepForward')}`);
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepForward')}`);
                 }}
               >
                 →

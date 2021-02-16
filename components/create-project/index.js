@@ -44,7 +44,7 @@ class CreateProject extends Component {
       await this.props.refetchLoggedInUser();
       this.props.router
         .push({
-          pathname: `${this.props.parent.slug}/projects/${createdProject.slug}`,
+          pathname: `/${this.props.parent.slug}/projects/${createdProject.slug}`,
           query: {
             status: 'projectCreated',
           },

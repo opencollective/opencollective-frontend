@@ -108,7 +108,7 @@ class StyledUpdate extends Component {
 
     try {
       await this.props.deleteUpdate({ variables: { id: this.props.update.id } });
-      this.props.router.push(this.props.collective.slug);
+      this.props.router.push(`/${this.props.collective.slug}`);
     } catch (err) {
       // TODO: this should be reported to the user
       console.error('Update -> deleteUpdate -> error: ', err);

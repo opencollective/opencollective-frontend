@@ -95,7 +95,7 @@ class CreateOrganization extends React.Component {
       await this.props.refetchLoggedInUser();
 
       this.props.router
-        .push({ pathname: response.data.createOrganization.slug, query: { status: 'collectiveCreated' } })
+        .push({ pathname: `/${response.data.createOrganization.slug}`, query: { status: 'collectiveCreated' } })
         .then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;

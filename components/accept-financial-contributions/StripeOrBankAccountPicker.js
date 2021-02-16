@@ -176,7 +176,7 @@ class StripeOrBankAccountPicker extends React.Component {
                     </Flex>
                   </ConnectedAccountCard>
                 ) : (
-                  <Link href={`${router.query.slug}/accept-financial-contributions/${router.query.path}/bank`}>
+                  <Link href={`/${router.query.slug}/accept-financial-contributions/${router.query.path}/bank`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"
@@ -213,7 +213,7 @@ class StripeOrBankAccountPicker extends React.Component {
               this.setState({ buttonLoading: true });
               await addHost(collective, host);
               await this.props.router.push(
-                `${router.query.slug}/accept-financial-contributions/${router.query.path}/success`,
+                `/${router.query.slug}/accept-financial-contributions/${router.query.path}/success`,
               );
               window.scrollTo(0, 0);
             }}

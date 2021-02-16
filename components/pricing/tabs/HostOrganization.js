@@ -235,7 +235,7 @@ const footings = [
 const HostOrganization = () => (
   <Container mx={3} my={4}>
     <Box display={['block', null, 'none']}>
-      <BackButton onClick={() => this.props.router.push('pricing')} />
+      <BackButton onClick={() => this.props.router.push('/pricing')} />
     </Box>
 
     <Container display="flex" flexDirection="column" alignItems="center">

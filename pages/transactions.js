@@ -201,7 +201,7 @@ class TransactionsPage extends React.Component {
                   defaultValue={query.searchTerm}
                   onSubmit={searchTerm =>
                     this.props.router.push({
-                      pathname: `${slug}/transactions`,
+                      pathname: `/${slug}/transactions`,
                       query: { ...query, searchTerm, offset: null },
                     })
                   }
@@ -221,7 +221,7 @@ class TransactionsPage extends React.Component {
                 collective={collective}
                 onChange={queryParams => {
                   this.props.router.push({
-                    pathname: `${slug}/transactions`,
+                    pathname: `/${slug}/transactions`,
                     query: {
                       ...query,
                       ...queryParams,
@@ -255,7 +255,7 @@ class TransactionsPage extends React.Component {
                           <Link
                             data-cy="reset-transactions-filters"
                             href={{
-                              pathname: `${collective.slug}/transactions`,
+                              pathname: `/${collective.slug}/transactions`,
                               query: {
                                 ...mapValues(query, () => null),
                                 view: 'transactions',
@@ -284,7 +284,7 @@ class TransactionsPage extends React.Component {
                 />
                 <Flex mt={5} justifyContent="center">
                   <Pagination
-                    route="transactions"
+                    route="/transactions"
                     total={transactions?.totalCount}
                     limit={variables.limit}
                     offset={variables.offset}

@@ -66,7 +66,7 @@ class CreateEvent extends React.Component {
       });
       await this.props.refetchLoggedInUser();
       await this.props.router.push({
-        pathname: `${parentCollective.slug}/events/${event.slug}`,
+        pathname: `/${parentCollective.slug}/events/${event.slug}`,
         query: {
           status: 'eventCreated',
         },

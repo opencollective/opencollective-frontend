@@ -234,7 +234,7 @@ class ConversationPage extends React.Component {
   };
 
   onConversationDeleted = () => {
-    return this.props.router.push(`${this.props.collectiveSlug}/conversations`);
+    return this.props.router.push(`/${this.props.collectiveSlug}/conversations`);
   };
 
   getSuggestedTags(collective) {

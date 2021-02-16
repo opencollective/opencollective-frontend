@@ -93,7 +93,7 @@ class EditCollective extends React.Component {
       const currentSlug = this.props.router.query.eventSlug ?? this.props.router.query.slug;
       if (currentSlug !== updatedCollective.slug) {
         this.props.router.replace({
-          pathname: `${updatedCollective.slug}/edit`,
+          pathname: `/${updatedCollective.slug}/edit`,
           query: {
             ...this.props.router.query,
           },

@@ -139,7 +139,7 @@ class SuccessPage extends React.Component {
                       values={{
                         takeMeThere: (
                           <Link
-                            href={`${collective.host.slug}/edit/fiscal-hosting`}
+                            href={`/${collective.host.slug}/edit/fiscal-hosting`}
                             data-cy="afc-success-host-settings-link"
                           >
                             <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />

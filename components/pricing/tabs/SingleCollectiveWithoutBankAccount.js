@@ -45,7 +45,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
   return (
     <Container mx={3} my={4}>
       <Box display={['block', null, 'none']}>
-        <BackButton onClick={() => this.props.router.push('pricing')} />
+        <BackButton onClick={() => this.props.router.push('/pricing')} />
       </Box>
 
       <Flex justifyContent="center">

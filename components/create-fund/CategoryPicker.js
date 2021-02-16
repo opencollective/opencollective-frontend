@@ -62,7 +62,7 @@ const CreateFundCategoryPicker = () => {
                 />
                 <Link
                   href={{
-                    pathname: `fund/${router.query.verb}`,
+                    pathname: `/fund/${router.query.verb}`,
                     query: { hostCollectiveSlug: router.query.hostCollectiveSlug, category: 'foundation' },
                   }}
                 >

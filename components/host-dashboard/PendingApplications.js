@@ -113,7 +113,7 @@ const PendingApplications = ({ hostSlug }) => {
           <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
-              this.props.router.push({ pathname: 'host.dashboard', query: { ...query, searchTerm, offset: null } })
+              this.props.router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
             }
           />
         </Box>
@@ -126,7 +126,7 @@ const PendingApplications = ({ hostSlug }) => {
             values={query}
             onChange={queryParams =>
               this.props.router.push({
-                pathname: 'host.dashboard',
+                pathname: '/host.dashboard',
                 query: {
                   ...query,
                   ...queryParams,
@@ -166,7 +166,7 @@ const PendingApplications = ({ hostSlug }) => {
               ))}
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route="host.dashboard"
+              route="/host.dashboard"
               total={hostApplications?.totalCount}
               limit={variables.limit}
               offset={variables.offset}

@@ -223,7 +223,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           onConfirm={() => {
             dispatchChange('interval', temporaryInterval);
             setTemporaryInterval(undefined);
-            this.props.router.push(`${collective.slug}/donate/details`);
+            this.props.router.push(`/${collective.slug}/donate/details`);
           }}
         />
       )}

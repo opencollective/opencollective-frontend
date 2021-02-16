@@ -67,7 +67,7 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
           </strong>
           <br />
           {loggedInUser?.isHostAdmin(account) && (
-            <Link href={`${account.slug}/accept-financial-contributions/organization`}>
+            <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
               <StyledButton buttonStyle="primary" mt={3}>
                 <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
               </StyledButton>
@@ -100,7 +100,7 @@ const ContributionBlocker = ({ account, blocker }) => {
           blocker.reason}
       </MessageBox>
       {blocker.showOtherWaysToContribute && account && (
-        <Link href={`${account.slug}/contribute`}>
+        <Link href={`/${account.slug}/contribute`}>
           <StyledButton buttonStyle="primary" buttonSize="large" mt={5}>
             <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
           </StyledButton>

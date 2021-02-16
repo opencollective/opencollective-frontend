@@ -84,6 +84,8 @@ class GiftCardDetails extends React.Component {
   renderDetails() {
     const { giftCard, collectiveSlug } = this.props;
     const redeemCode = giftCard.uuid.split('-')[0];
+    const email = get(giftCard, 'data.email');
+
     return (
       <Flex mt="0.75em" fontSize="0.8em">
         {!giftCard.isConfirmed && (
@@ -91,7 +93,7 @@ class GiftCardDetails extends React.Component {
             <DetailsColumnHeader>
               <FormattedMessage id="giftCards.redeemCode" defaultMessage="REDEEM CODE" />
             </DetailsColumnHeader>
-            <Link href={`/${collectiveSlug}/redeem/${redeemCode}`}>{redeemCode}</Link>
+            <Link href={{ pathname: `/${collectiveSlug}/redeem/${redeemCode}`, query: { email } }}>{redeemCode}</Link>
           </Flex>
         )}
         <Flex flexDirection="column" mr="2em">

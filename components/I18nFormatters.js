@@ -13,7 +13,7 @@ export const I18nSupportLink = chunks => (
   </StyledLink>
 );
 export const I18nSignInLink = chunks => (
-  <Link href="/signin" params={{ next: typeof window !== undefined ? window.location.pathname : '' }}>
+  <Link href={{ pathname: '/signin', query: { next: typeof window !== undefined ? window.location.pathname : '' } }}>
     {chunks}
   </Link>
 );

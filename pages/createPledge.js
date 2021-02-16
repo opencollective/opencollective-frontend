@@ -234,7 +234,7 @@ class CreatePledgePage extends React.Component {
         data: { createOrder: result },
       } = await this.props.createPledge(order, this.props.data?.Collective);
       if (result.collective.slug) {
-        this.props.router.push(result.collective.slug);
+        this.props.router.push(`/${result.collective.slug}`);
       }
     } catch (error) {
       this.setState({
@@ -354,7 +354,12 @@ class CreatePledgePage extends React.Component {
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
                     values={{
                       'signin-link': msg => (
-                        <Link href="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
+                        <Link
+                          href={{
+                            pathname: '/signin',
+                            query: { next: slug ? `/${slug}/pledges/new` : '/pledges/new' },
+                          }}
+                        >
                           {msg}
                         </Link>
                       ),

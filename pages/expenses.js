@@ -152,14 +152,14 @@ class ExpensePage extends React.Component {
 
   updateFilters = queryParams => {
     return this.props.router.push({
-      pathname: 'expenses',
+      pathname: '/expenses',
       query: this.buildFilterLinkParams({ ...queryParams, offset: null }),
     });
   };
 
   handleSearch = searchTerm => {
     const params = this.buildFilterLinkParams({ searchTerm, offset: null });
-    this.props.router.push({ pathname: 'expenses', query: params });
+    this.props.router.push({ pathname: '/expenses', query: params });
   };
 
   getTagProps = tag => {
@@ -233,7 +233,7 @@ class ExpensePage extends React.Component {
                             <Link
                               data-cy="reset-expenses-filters"
                               href={{
-                                pathname: 'expenses',
+                                pathname: '/expenses',
                                 query: this.buildFilterLinkParams(mapValues(this.props.query, () => null)),
                               }}
                             >
@@ -257,7 +257,7 @@ class ExpensePage extends React.Component {
                     />
                     <Flex mt={5} justifyContent="center">
                       <Pagination
-                        route="expenses"
+                        route="/expenses"
                         total={data.expenses?.totalCount}
                         limit={data.variables.limit}
                         offset={data.variables.offset}
@@ -289,7 +289,7 @@ class ExpensePage extends React.Component {
                       <Link
                         key={key}
                         href={{
-                          pathname: 'expenses',
+                          pathname: '/expenses',
                           query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
                         }}
                         data-cy="expense-tags-link"

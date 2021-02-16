@@ -77,7 +77,7 @@ class ConversationsPage extends React.Component {
 
   resetTag = () => {
     const { collectiveSlug } = this.props;
-    this.props.router.push(`${collectiveSlug}/conversations`);
+    this.props.router.push(`/${collectiveSlug}/conversations`);
   };
 
   /** Must only be called when dataIsReady */
@@ -182,7 +182,7 @@ class ConversationsPage extends React.Component {
                                   {tag}
                                 </StyledTag>
                               ) : (
-                                <Link key={tag} href={{ pathname: `${collectiveSlug}/conversations`, query: { tag } }}>
+                                <Link key={tag} href={{ pathname: `/${collectiveSlug}/conversations`, query: { tag } }}>
                                   <StyledTag variant="rounded-right" mb="4px" mr="4px">
                                     {tag}
                                   </StyledTag>

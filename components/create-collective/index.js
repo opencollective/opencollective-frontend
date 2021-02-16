@@ -69,7 +69,7 @@ class CreateCollective extends Component {
       if (parseToBoolean(process.env.ONBOARDING_MODAL) === true) {
         this.props.router
           .push({
-            pathname: `${newCollective.slug}/onboarding`,
+            pathname: `/${newCollective.slug}/onboarding`,
             query: {
               CollectiveId: newCollective.legacyId,
               CollectiveSlug: newCollective.slug,
@@ -79,7 +79,7 @@ class CreateCollective extends Component {
       } else {
         this.props.router
           .push({
-            pathname: newCollective.slug,
+            pathname: `/${newCollective.slug}`,
             query: {
               status: 'collectiveCreated',
               CollectiveId: newCollective.legacyId,

@@ -355,7 +355,7 @@ class TierPage extends Component {
                   ) : (
                     <Link
                       href={{
-                        pathname: `${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
+                        pathname: `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
                         query: { redirect },
                       }}
                     >

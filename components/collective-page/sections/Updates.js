@@ -127,7 +127,7 @@ class SectionUpdates extends React.PureComponent {
             <FormattedMessage id="section.updates.subtitle" defaultMessage="Updates on our activities and progress." />
           </P>
           {isAdmin && (
-            <Link href={`${collective.slug}/updates/new`}>
+            <Link href={`/${collective.slug}/updates/new`}>
               <StyledButton data-cy="create-new-update-btn" buttonStyle="primary" my={[2, 0]}>
                 <Span fontSize="16px" fontWeight="bold" mr={2}>
                   +
@@ -164,7 +164,7 @@ class SectionUpdates extends React.PureComponent {
                       </LinkCollective>
                     </Box>
                     <Flex flexDirection="column" justifyContent="space-between">
-                      <Link href={`${collective.slug}/updates/${update.slug}`}>
+                      <Link href={`/${collective.slug}/updates/${update.slug}`}>
                         <P color="black.900" fontWeight="600" mb={2}>
                           {update.title}
                         </P>
@@ -237,7 +237,7 @@ class SectionUpdates extends React.PureComponent {
               ))}
             </StyledCard>
             {updates.length > 0 && (
-              <Link href={`${collective.slug}/updates`}>
+              <Link href={`/${collective.slug}/updates`}>
                 <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="14px">
                   <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
                 </StyledButton>

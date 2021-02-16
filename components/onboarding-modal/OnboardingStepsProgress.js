@@ -55,7 +55,7 @@ class OnboardingStepsProgress extends React.Component {
           focus={steps[this.props.step]}
           onStepSelect={step => {
             const newStep = steps.findIndex(element => element.name === step.name);
-            this.props.router.push(`${slug}/${mode}/${this.getStepParams(newStep, 'routerStep')}`);
+            this.props.router.push(`/${slug}/${mode}/${this.getStepParams(newStep, 'routerStep')}`);
           }}
         >
           {({ step }) => {

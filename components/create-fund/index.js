@@ -61,7 +61,7 @@ class CreateFund extends Component {
       await this.props.refetchLoggedInUser();
       this.props.router
         .push({
-          pathname: res.data.createFund.slug,
+          pathname: `/${res.data.createFund.slug}`,
           query: {
             status: 'fundCreated',
           },

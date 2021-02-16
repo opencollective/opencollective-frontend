@@ -6,17 +6,12 @@ import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 import Link from './Link';
 
 const LinkExpense = ({ collective, expense, ...props }) => {
-  const collectiveType = collective.parent ? getCollectiveTypeForUrl(collective) : '';
-  const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-  const parentCollectiveSlugRoute = collective.parent?.slug ? `${collective.parent?.slug}/` : '';
+  const parentCollectiveSlugRoute = collective.parent?.slug
+    ? `/${collective.parent.slug}/${getCollectiveTypeForUrl(collective)}`
+    : '';
   const expenseId = expense.legacyId || expense.id;
 
-  return (
-    <Link
-      href={`${parentCollectiveSlugRoute}${collectiveTypeRoute}${collective.slug}/expenses/${expenseId}`}
-      {...props}
-    />
-  );
+  return <Link href={`${parentCollectiveSlugRoute}/${collective.slug}/expenses/${expenseId}`} {...props} />;
 };
 
 LinkExpense.propTypes = {

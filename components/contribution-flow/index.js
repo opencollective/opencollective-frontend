@@ -234,7 +234,7 @@ class ContributionFlow extends React.Component {
       if (isAllowedRedirect(url.host)) {
         window.location.href = url.href;
       } else {
-        await this.props.router.push({ pathname: 'external-redirect', query: { url: url.href, fallback } });
+        await this.props.router.push({ pathname: '/external-redirect', query: { url: url.href, fallback } });
         return this.scrollToTop();
       }
     } else {
@@ -375,7 +375,7 @@ class ContributionFlow extends React.Component {
       ...routeParams,
     };
 
-    let route = `${params.collectiveSlug}/${params.verb}/${params.step}`;
+    let route = `/${params.collectiveSlug}/${params.verb}/${params.step}`;
     if (tier) {
       params.tierId = tier.legacyId;
       params.tierSlug = tier.slug;
@@ -383,19 +383,19 @@ class ContributionFlow extends React.Component {
         params.verb = 'events';
         params.collectiveSlug = collective.parent.slug;
         params.eventSlug = collective.slug;
-        route = `${params.collectiveSlug}/${params.verb}/${params.eventSlug}/order/${params.tierId}/${params.step}`;
+        route = `/${params.collectiveSlug}/${params.verb}/${params.eventSlug}/order/${params.tierId}/${params.step}`;
       } else {
         params.verb = 'contribute'; // Enforce "contribute" verb for ordering tiers
-        route = `${params.collectiveSlug}/${params.verb}/${params.tierSlug}-${params.tierId}/checkout/${params.step}`;
+        route = `/${params.collectiveSlug}/${params.verb}/${params.tierSlug}-${params.tierId}/checkout/${params.step}`;
       }
     } else if (params.verb === 'contribute' || params.verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       params.verb = 'donate';
-      route = `${params.collectiveSlug}/${params.verb}/${params.step}`;
+      route = `/${params.collectiveSlug}/${params.verb}/${params.step}`;
     }
 
     if (isEmbed) {
-      route = tier ? 'embed-contribution-flow-tier' : 'embed-contribution-flow';
+      route = tier ? '/embed-contribution-flow-tier' : '/embed-contribution-flow';
     }
 
     // Reset errors if any

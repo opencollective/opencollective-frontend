@@ -70,7 +70,7 @@ class CreateConversationPage extends React.Component {
 
   onCreateSuccess = async conversation => {
     const { collectiveSlug } = this.props;
-    await this.props.router.push(`${collectiveSlug}/conversations/${conversation.slug}-${conversation.id}`);
+    await this.props.router.push(`/${collectiveSlug}/conversations/${conversation.slug}-${conversation.id}`);
   };
 
   getSuggestedTags(collective) {

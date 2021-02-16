@@ -111,7 +111,7 @@ class RedeemPage extends React.Component {
       if (this.props.LoggedInUser) {
         await this.props.redeemPaymentMethod({ variables: { code } });
         await this.props.refetchLoggedInUser();
-        this.props.router.push({ pathname: `${this.props.collectiveSlug}/redeemed/${code}` });
+        this.props.router.push({ pathname: `/${this.props.collectiveSlug}/redeemed/${code}` });
         return;
       } else {
         await this.props.redeemPaymentMethod({ variables: { code, user: { email, name } } });

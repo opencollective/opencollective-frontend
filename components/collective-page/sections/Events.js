@@ -109,7 +109,7 @@ class SectionEvents extends React.PureComponent {
         </HorizontalScroller>
         {Boolean(events?.length) && (
           <ContainerSectionContent>
-            <Link href={`${collective.slug}/contribute`}>
+            <Link href={`/${collective.slug}/contribute`}>
               <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
                 <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
               </StyledButton>

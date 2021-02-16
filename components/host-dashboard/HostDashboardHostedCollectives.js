@@ -128,7 +128,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
-              this.props.router.push({ pathname: 'host.dashboard', query: { ...query, searchTerm, offset: null } })
+              this.props.router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
             }
           />
         </Box>
@@ -141,7 +141,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
             filters={[COLLECTIVE_FILTER.SORT_BY, COLLECTIVE_FILTER.FEE_STRUCTURE]}
             onChange={queryParams =>
               this.props.router.push({
-                pathname: 'host.dashboard',
+                pathname: '/host.dashboard',
                 query: {
                   ...query,
                   ...queryParams,
@@ -184,7 +184,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           </Grid>
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route="host.dashboard"
+              route="/host.dashboard"
               total={hostedMemberships?.totalCount}
               limit={variables.limit}
               offset={variables.offset}

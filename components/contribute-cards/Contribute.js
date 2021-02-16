@@ -197,7 +197,7 @@ const ContributeCard = ({
                     {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
                       <Box key={contributor.id} mx={2}>
                         {contributor.collectiveSlug ? (
-                          <Link href={contributor.collectiveSlug} title={contributor.name}>
+                          <Link href={`/${contributor.collectiveSlug}`} title={contributor.name}>
                             <ContributorAvatar contributor={contributor} radius={32} />
                           </Link>
                         ) : (

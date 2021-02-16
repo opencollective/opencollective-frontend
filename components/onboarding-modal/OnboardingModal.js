@@ -210,7 +210,7 @@ class OnboardingModal extends React.Component {
     try {
       await this.submitContact(values);
       await this.submitAdmins();
-      this.props.router.push(`${this.props.collective.slug}/${this.props.mode}/success`).then(() => {
+      this.props.router.push(`/${this.props.collective.slug}/${this.props.mode}/success`).then(() => {
         confettiFireworks(5000, { zIndex: 3000 });
       });
     } catch (e) {
@@ -225,7 +225,7 @@ class OnboardingModal extends React.Component {
   onClose = () => {
     this.setState({ noOverlay: true });
     this.props.setShowOnboardingModal(false);
-    this.props.router.push(this.props.collective.slug);
+    this.props.router.push(`/${this.props.collective.slug}`);
   };
 
   validateFormik = values => {
