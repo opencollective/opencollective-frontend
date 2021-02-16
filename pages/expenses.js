@@ -257,7 +257,7 @@ class ExpensePage extends React.Component {
                     />
                     <Flex mt={5} justifyContent="center">
                       <Pagination
-                        route="/expenses"
+                        route={`${collectiveSlug}/expenses`}
                         total={data.expenses?.totalCount}
                         limit={data.variables.limit}
                         offset={data.variables.offset}

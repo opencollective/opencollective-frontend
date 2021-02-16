@@ -166,7 +166,7 @@ const PendingApplications = ({ hostSlug }) => {
               ))}
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route="/host.dashboard"
+              route={`${hostSlug}/host.dashboard`}
               total={hostApplications?.totalCount}
               limit={variables.limit}
               offset={variables.offset}

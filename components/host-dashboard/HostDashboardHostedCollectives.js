@@ -184,7 +184,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           </Grid>
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route="/host.dashboard"
+              route={`/${hostSlug}/host.dashboard`}
               total={hostedMemberships?.totalCount}
               limit={variables.limit}
               offset={variables.offset}

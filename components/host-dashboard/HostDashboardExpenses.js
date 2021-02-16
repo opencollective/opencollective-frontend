@@ -245,7 +245,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route="/host.dashboard"
+              route={`${hostSlug}/host.dashboard`}
               total={data?.expenses?.totalCount}
               limit={variables.limit}
               offset={variables.offset}

@@ -29,8 +29,7 @@ const Pagination = ({ route, limit, offset, total, scrollToTopOnChange, isDisabl
       return;
     }
 
-    const { pathname, query } = router;
-    await router.push({ pathname, query: { ...query, offset: (value - 1) * limit } });
+    await router.push({ pathname: route, query: { offset: (value - 1) * limit } });
 
     if (scrollToTopOnChange) {
       window.scrollTo(0, 0);
@@ -41,7 +40,7 @@ const Pagination = ({ route, limit, offset, total, scrollToTopOnChange, isDisabl
     <Flex alignItems="center">
       {currentPage > 1 && (
         <Link
-          href={{ pathname: route || router.route.slice(1), query: { ...router.query, offset: offset - limit } }}
+          href={{ pathname: route || router.route.slice(1), query: { offset: offset - limit } }}
           scroll={scrollToTopOnChange}
         >
           <StyledButton buttonSize="small" disabled={isDisabled}>
@@ -78,7 +77,7 @@ const Pagination = ({ route, limit, offset, total, scrollToTopOnChange, isDisabl
       </Container>
       {currentPage < totalPages && (
         <Link
-          href={{ pathname: route || router.route.slice(1), query: { ...router.query, offset: offset + limit } }}
+          href={{ pathname: route || router.route.slice(1), query: { offset: offset + limit } }}
           scroll={scrollToTopOnChange}
         >
           <StyledButton buttonSize="small" disabled={isDisabled}>
