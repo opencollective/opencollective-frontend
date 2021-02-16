@@ -40,6 +40,7 @@ class NewContributionFlowPage extends React.Component {
         query.data = JSON.parse(query.data);
       } catch (err) {
         // TODO: this should be reported to the user
+        // eslint-disable-next-line no-console
         console.error(err);
       }
     }

@@ -45,7 +45,6 @@ const AlignedBullets = styled.ul`
 
 class UpdatePaymentPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, id } }) {
-    console.log(`Updating Payment Method: ${collectiveSlug} ${id}`);
     return { slug: collectiveSlug, id: Number(id) };
   }
 
