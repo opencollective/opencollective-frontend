@@ -55,6 +55,11 @@ export const DropdownArrow = styled('div')`
 export const Dropdown = styled(({ children, trigger, ...props }) => {
   const dropdownRef = useRef();
   const [isDisplayed, setDisplayed] = React.useState(false);
+  const closeDropdown = React.useCallback(() => {
+    if (isDisplayed) {
+      setDisplayed(false);
+    }
+  }, [isDisplayed]);
 
   useGlobalBlur(dropdownRef, outside => {
     if (outside && isDisplayed) {
@@ -65,7 +70,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
   });
 
   // Closes the modal upon the `ESC` key press.
-  useKeyBoardShortcut({ callback: () => setDisplayed(false), keyMatch: ESCAPE_KEY });
+  useKeyBoardShortcut({ callback: closeDropdown, keyMatch: ESCAPE_KEY });
 
   if (typeof children === 'function' && trigger === 'click') {
     return (
@@ -78,7 +83,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
             },
           },
           dropdownProps: {
-            onClick: () => setTimeout(() => setDisplayed(false), 50),
+            onClick: () => setTimeout(closeDropdown, 50),
           },
         })}
       </div>
@@ -91,7 +96,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
       trigger={trigger}
       {...props}
       onFocus={() => setTimeout(() => setDisplayed(true), 50)}
-      onBlur={() => setTimeout(() => setDisplayed(false), 50)}
+      onBlur={() => setTimeout(closeDropdown, 50)}
       onClick={e => {
         if (isDisplayed) {
           if (document.activeElement?.contains(e.target)) {

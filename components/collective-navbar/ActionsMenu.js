@@ -7,6 +7,7 @@ import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Dashboard } from '@styled-icons/material/Dashboard';
+import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy } from 'lodash';
@@ -14,6 +15,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective.lib';
+import { getSettingsRoute } from '../../lib/url_helpers';
 
 import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
@@ -200,6 +202,19 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                 <DropdownArrow />
                 <DropdownContent>
                   <Box as="ul" p={0} m={0} minWidth={184}>
+                    {callsToAction.hasSettings && (
+                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
+                        <StyledLink
+                          as={Link}
+                          route={getSettingsRoute(collective)}
+                          p={ITEM_PADDING}
+                          data-cy="edit-collective-btn"
+                        >
+                          <Settings size={20} />
+                          <FormattedMessage id="Settings" defaultMessage="Settings" />
+                        </StyledLink>
+                      </MenuItem>
+                    )}
                     {callsToAction.hasDashboard && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
                         <StyledLink as={Link} href={`/${collective.slug}/dashboard`}>
@@ -343,6 +358,8 @@ CollectiveNavbarActionsMenu.propTypes = {
     addFunds: PropTypes.bool,
     /** Add prepaid budget to an organization */
     addPrepaidBudget: PropTypes.bool,
+    /** Button to Edit the Collective */
+    hasSettings: PropTypes.bool,
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
 };

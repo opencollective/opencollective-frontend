@@ -4,7 +4,6 @@ import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
 import { Github } from '@styled-icons/feather/Github';
 import { Globe } from '@styled-icons/feather/Globe';
-import { Settings } from '@styled-icons/feather/Settings';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
@@ -19,7 +18,6 @@ import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
-import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
@@ -151,24 +149,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
           <Container position="relative" mb={2} width={128}>
             <HeroAvatar collective={collective} isAdmin={isAdmin} handleHeroMessage={handleHeroMessage} />
           </Container>
-          {isAdmin && (
-            <Box>
-              <Link
-                href={
-                  isEvent
-                    ? `${collective.parentCollective?.slug}/events/${collective.slug}/edit`
-                    : `${collective.slug}/edit`
-                }
-              >
-                <StyledButton buttonSize="tiny" minWidth={96} my={3} data-cy="edit-collective-btn" tabIndex="-1">
-                  <Settings size={14} />
-                  <Span ml={1} css={{ verticalAlign: 'middle' }}>
-                    <FormattedMessage id="Settings" defaultMessage="Settings" />
-                  </Span>
-                </StyledButton>
-              </Link>
-            </Box>
-          )}
           <Box maxWidth={['70%', '60%', null, '40%', '45%']}>
             <H1
               color="black.800"

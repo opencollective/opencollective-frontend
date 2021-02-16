@@ -9,6 +9,7 @@ import { Manager, Popper, Reference } from 'react-popper';
 import styled, { css } from 'styled-components';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
+import useKeyboardKey, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
 
 import { Box, Flex } from './Grid';
 import StyledCard from './StyledCard';
@@ -135,20 +136,26 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
   const scrollerRef = React.useRef();
   const [isOpen, setOpen] = React.useState(false);
   const [tags, setTags] = React.useState(getOptions(value || defaultValue));
-  useGlobalBlur(wrapperRef, outside => {
-    if (outside) {
-      handleClose();
-    }
-  });
+  const [inputValue, setInputValue] = React.useState('');
+  const availableSuggestedTags = suggestedTags?.filter(st => !tags.some(t => t.value === st));
 
-  const handleClose = () => {
-    onChange(tags);
-    setOpen(false);
+  const handleClose = React.useCallback(() => {
+    if (isOpen) {
+      onChange(tags);
+      setOpen(false);
+    }
+  }, [isOpen]);
+
+  const addTag = tag => {
+    const newTags = uniqBy([...tags, { label: tag.toLowerCase(), value: tag.toLowerCase() }], 'value');
+    setTags(newTags);
+    onChange(newTags);
   };
+
   const handleToggleInput = () => {
     isOpen ? handleClose() : setOpen(true);
   };
-  const addTag = tag => setTags(uniqBy([...tags, { label: tag.toLowerCase(), value: tag.toLowerCase() }], 'value'));
+
   const removeTag = (tag, update) => {
     const updatedTags = tags.filter(v => v.value !== tag);
     setTags(updatedTags);
@@ -156,19 +163,16 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
       onChange(updatedTags);
     }
   };
-  const handleNewValue = e => {
-    if (e.key === 'Enter') {
-      if (e.target.value.length) {
-        e.preventDefault();
-        addTag(e.target.value);
-        e.target.value = null;
-        // Wait until new tag renders, otherwise we'll scroll to the second-last tag
-        requestAnimationFrame(() => scrollerRef.current?.scrollTo(0, Number.MAX_SAFE_INTEGER), 30);
-      } else {
-        handleClose();
-      }
+
+  // Close when clicking outside
+  useGlobalBlur(wrapperRef, outside => {
+    if (outside) {
+      handleClose();
     }
-  };
+  });
+
+  // Closes the modal upon the `ESC` key press.
+  useKeyboardKey({ callback: handleClose, keyMatch: ESCAPE_KEY });
 
   return (
     <Manager>
@@ -224,7 +228,7 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                 <StyledCard
                   m={1}
                   overflow="auto"
-                  overflowY="scroll"
+                  overflowY="auto"
                   {...props}
                   ref={scrollerRef}
                   boxShadow="0px 4px 10px #C4C7CC"
@@ -234,37 +238,57 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                     <Input
                       data-cy="styled-input-tags-input"
                       placeholder={formatMessage(messages.placeholder)}
-                      onKeyPress={e => {
-                        handleNewValue(e);
-                      }}
                       ref={inputRef}
+                      autoFocus
+                      value={inputValue}
+                      onChange={e => setInputValue(e.target.value)}
+                      onBlur={() => {
+                        if (!availableSuggestedTags?.length) {
+                          handleClose();
+                        }
+                      }}
+                      onKeyPress={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const newTag = e.target.value.trim();
+                          if (!newTag) {
+                            return;
+                          }
+
+                          addTag(newTag);
+                          setInputValue('');
+                          if (!renderUpdatedTags) {
+                            // Wait until new tag renders, otherwise we'll scroll to the second-last tag
+                            requestAnimationFrame(() => scrollerRef.current?.scrollTo(0, Number.MAX_SAFE_INTEGER), 30);
+                          }
+                        }
+                      }}
                     />
                   </InputWrapper>
                   {(suggestedTags?.length || tags?.length) > 0 && (
                     <Box flexGrow="1">
-                      {suggestedTags
-                        ?.filter(st => !tags.some(t => t.value === st))
-                        .map(st => (
-                          <TagWrapper key={st} px="16px" py="8px" backgroundColor="blue.50">
-                            <StyledTag type="info" variant="rounded-right">
-                              {st}
-                            </StyledTag>
-                            <AddTagButton
-                              data-cy={`styled-input-tags-add-suggestion-${st}`}
-                              onClick={() => {
-                                addTag(st);
-                              }}
-                              onBlur={() => {
-                                if (st === suggestedTags[suggestedTags.length - 1]) {
-                                  handleToggleInput();
-                                }
-                              }}
-                              tabindex="0"
-                            >
-                              <Plus size="10px" />
-                            </AddTagButton>
-                          </TagWrapper>
-                        ))}
+                      {availableSuggestedTags.map(st => (
+                        <TagWrapper key={st} px="16px" py="8px" backgroundColor="blue.50">
+                          <StyledTag type="info" variant="rounded-right">
+                            {st}
+                          </StyledTag>
+                          <AddTagButton
+                            data-cy={`styled-input-tags-add-suggestion-${st}`}
+                            onClick={() => {
+                              addTag(st);
+                              // When adding the last suggested tag, focus the input
+                              setTimeout(() => inputRef?.current?.focus(), 50);
+                            }}
+                            onBlur={() => {
+                              if (st === suggestedTags[suggestedTags.length - 1]) {
+                                handleToggleInput();
+                              }
+                            }}
+                          >
+                            <Plus size="10px" />
+                          </AddTagButton>
+                        </TagWrapper>
+                      ))}
                       {!renderUpdatedTags &&
                         tags.map(tag => (
                           <TagWrapper key={tag.value} px="16px" py="8px" autoFocus>
@@ -304,7 +328,7 @@ StyledInputTags.propTypes = {
 StyledInputTags.defaultProps = {
   maxHeight: ['50vh', null, '30vh'],
   width: '240px',
-  renderUpdatedTags: false,
+  renderUpdatedTags: true,
 };
 
 export default React.memo(StyledInputTags);

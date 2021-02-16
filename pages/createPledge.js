@@ -319,25 +319,21 @@ class CreatePledgePage extends React.Component {
               <P my={3} color="black.500">
                 <FormattedMessage
                   id="createPledge.why"
-                  defaultMessage="If the cause or collective that you want to support is not yet on Open Collective, you can make a
-                pledge. This will incentivize them to create an open collective for their activities and offer you much
-                more visibility on how your money is spent to advance their cause."
+                  defaultMessage="If the cause or collective that you want to support is not yet on Open Collective, you can make a pledge. This will incentivize them to create an open collective for their activities and offer you much more visibility on how your money is spent to advance their cause."
                 />
               </P>
 
               <P my={3} color="black.500">
                 <FormattedMessage
                   id="createPledge.onceTheyCreateIt"
-                  defaultMessage="Once they create it (and verify that they own the URL you’ll enter in this form), you will receive an
-                email to ask you to fulfill your pledge."
+                  defaultMessage="Once they create it (and verify that they own the URL you’ll enter in this form), you will receive an email to ask you to fulfill your pledge."
                 />
               </P>
 
               <P my={3} color="black.500">
                 <FormattedMessage
                   id="createPledge.conditions"
-                  defaultMessage="At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We
-                request the project to have a least 100 stars on GitHub!"
+                  defaultMessage="At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We request the project to have a least 100 stars on GitHub!"
                 />
               </P>
 
@@ -392,8 +388,7 @@ class CreatePledgePage extends React.Component {
                       <P color="black.500" fontSize="12px" mt={2}>
                         <FormattedMessage
                           id="createPledge.priviledge"
-                          defaultMessage="You’ve earned the privilege to name and describe this awesome cause. We’ll create a pledged
-                        collective page for it so other people can find it and pledge to it too."
+                          defaultMessage="You’ve earned the privilege to name and describe this awesome cause. We’ll create a pledged collective page for it so other people can find it and pledge to it too."
                         />
                       </P>
 
@@ -618,9 +613,7 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.what"
-                  defaultMessage="A pledge allows supporters (companies and individuals) to pledge
-                funds towards a collective that hasn’t been created yet. If you can’t find a collective you want to
-                support, pledge to it!"
+                  defaultMessage="A pledge allows supporters (companies and individuals) to pledge funds towards a collective that hasn’t been created yet. If you can’t find a collective you want to support, pledge to it!"
                 />
               </Details>
 
@@ -633,8 +626,7 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.whatHappens"
-                  defaultMessage="Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam
-                folks, so please help us reach out to the community via twitter / github or, if you can, via email."
+                  defaultMessage="Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam folks, so please help us reach out to the community via twitter / github or, if you can, via email."
                 />
               </Details>
 
