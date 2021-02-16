@@ -32,7 +32,7 @@ class Location extends React.Component {
           <Container font-size="1.7rem" margin="5px 0px">
             {name}
           </Container>
-          <div className="address" style={{ color: colors.darkgray }}>
+          <Container className="address" color="black.600">
             <StyledLink
               href={`https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${long}#map=16/${lat}/${long}`}
               openInNewTab
@@ -40,7 +40,7 @@ class Location extends React.Component {
               {address}
               {country ? `, ${country}` : ''}
             </StyledLink>
-          </div>
+          </Container>
         </Container>
         {lat && long && (
           <div className="map">

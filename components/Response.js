@@ -56,7 +56,7 @@ class Response extends React.Component {
             <Avatar collective={user} radius={40} />
             <Container padding="0.25rem 1rem">
               <Container fontSize="1.5rem">{name}</Container>
-              <Container fontSize="1.2rem" style={{ color: colors.darkgray }}>
+              <Container fontSize="1.2rem" color="black.600">
                 {description || user.description}
               </Container>
             </Container>
