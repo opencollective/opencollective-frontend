@@ -25,6 +25,8 @@ import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
 import { H1, P } from '../components/Text';
 
+import defaultColors from '../lib/theme/colors';
+
 const SearchInput = styled(StyledInput)`
   border: none;
   border-bottom: 2px solid ${props => props.theme.colors.primary[500]};
