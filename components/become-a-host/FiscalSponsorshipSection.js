@@ -43,11 +43,7 @@ const FiscalSponsorship = () => {
             color="black.900"
             whiteSpace={[null, null, 'pre-line']}
           >
-            <FormattedMessage
-              id="becomeAHost.title"
-              defaultMessage="Fiscal 
-              sponsorship has never been easier"
-            />
+            <FormattedMessage id="becomeAHost.title" defaultMessage="Fiscal sponsorship has never been easier" />
           </H1>
         </Box>
         <Box width={['288px', '306px', null, null, '558px']} mb={[3, null, null, null, '24px']}>

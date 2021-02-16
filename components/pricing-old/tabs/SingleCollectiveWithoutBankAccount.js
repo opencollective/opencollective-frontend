@@ -69,7 +69,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.description"
-              defaultMessage="A Fiscal Host is an <strong>organization who offers fund-holding as a service</strong>. They keep your money in their bank account and  <strong>handle things like accounting, taxes, admin, payments, and liability</strong>-so you don’t have to!"
+              defaultMessage="A Fiscal Host is an <strong>organization who offers fund-holding as a service</strong>. They keep your money in their bank account and <strong>handle things like accounting, taxes, admin, payments, and liability</strong>-so you don’t have to!"
               values={I18nFormatters}
             />
           </P>
@@ -83,7 +83,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.applyOpenSource"
-              defaultMessage="If you are an open source project, you can apply to join  the Open Source Collective."
+              defaultMessage="If you are an open source project, you can apply to join the Open Source Collective."
             />
           </P>
           <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
