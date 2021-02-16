@@ -45,8 +45,7 @@ const FiscalSponsorship = () => {
           >
             <FormattedMessage
               id="becomeAHost.title"
-              defaultMessage="Fiscal 
-              sponsorship has never been easier"
+              defaultMessage="Fiscal sponsorship has never been easier"
             />
           </H1>
         </Box>

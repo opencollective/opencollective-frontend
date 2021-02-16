@@ -107,7 +107,7 @@ class ErrorPage extends React.Component {
           <P textAlign="center">
             <FormattedMessage
               id="page.error.networkError.description"
-              defaultMessage="Don't worry! One of our engineers is probably already on it  👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)"
+              defaultMessage="Don't worry! One of our engineers is probably already on it 👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)"
             />
           </P>
         </Flex>
