@@ -267,28 +267,30 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                   </InputWrapper>
                   {(suggestedTags?.length || tags?.length) > 0 && (
                     <Box flexGrow="1">
-                      {availableSuggestedTags.map(st => (
-                        <TagWrapper key={st} px="16px" py="8px" backgroundColor="blue.50">
-                          <StyledTag type="info" variant="rounded-right">
-                            {st}
-                          </StyledTag>
-                          <AddTagButton
-                            data-cy={`styled-input-tags-add-suggestion-${st}`}
-                            onClick={() => {
-                              addTag(st);
-                              // When adding the last suggested tag, focus the input
-                              setTimeout(() => inputRef?.current?.focus(), 50);
-                            }}
-                            onBlur={() => {
-                              if (st === suggestedTags[suggestedTags.length - 1]) {
-                                handleToggleInput();
-                              }
-                            }}
-                          >
-                            <Plus size="10px" />
-                          </AddTagButton>
-                        </TagWrapper>
-                      ))}
+                      {!availableSuggestedTags?.length
+                        ? null
+                        : availableSuggestedTags.map(st => (
+                            <TagWrapper key={st} px="16px" py="8px" backgroundColor="blue.50">
+                              <StyledTag type="info" variant="rounded-right">
+                                {st}
+                              </StyledTag>
+                              <AddTagButton
+                                data-cy={`styled-input-tags-add-suggestion-${st}`}
+                                onClick={() => {
+                                  addTag(st);
+                                  // When adding the last suggested tag, focus the input
+                                  setTimeout(() => inputRef?.current?.focus(), 50);
+                                }}
+                                onBlur={() => {
+                                  if (st === suggestedTags[suggestedTags.length - 1]) {
+                                    handleToggleInput();
+                                  }
+                                }}
+                              >
+                                <Plus size="10px" />
+                              </AddTagButton>
+                            </TagWrapper>
+                          ))}
                       {!renderUpdatedTags &&
                         tags.map(tag => (
                           <TagWrapper key={tag.value} px="16px" py="8px" autoFocus>
