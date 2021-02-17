@@ -4,6 +4,7 @@ describe('Create collective from Github', () => {
     cy.route({
       method: 'GET',
       url: '/api/github-repositories?*',
+      /* eslint-disable camelcase */
       response: [
         {
           description: 'Adblock Plus browser extension',
@@ -23,6 +24,7 @@ describe('Create collective from Github', () => {
           stargazers_count: 103,
         },
       ],
+      /* eslint-enable camelcase */
     });
     cy.login({ email: 'testuser@opencollective.com', redirect: '/create/opensource?token=foofoo' });
     cy.contains('[data-cy=connect-github-header]', 'Pick a repository');

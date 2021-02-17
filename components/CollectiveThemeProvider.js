@@ -43,6 +43,7 @@ export default class CollectiveThemeProvider extends React.PureComponent {
     if (!primaryColor) {
       return defaultTheme;
     } else if (!isHexColor(primaryColor)) {
+      // eslint-disable-next-line no-console
       console.warn(`Invalid custom color: ${primaryColor}`);
       return defaultTheme;
     } else {

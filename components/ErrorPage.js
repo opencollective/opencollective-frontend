@@ -50,6 +50,7 @@ class ErrorPage extends React.Component {
     if (log && get(data, 'error')) {
       if (data.error.message !== 'Test error') {
         // That might not be the right place to log the error. Remove?
+        // eslint-disable-next-line no-console
         console.error(data.error);
       }
     }

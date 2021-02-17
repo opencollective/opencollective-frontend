@@ -57,6 +57,7 @@ export default class CreateGiftCardsSuccess extends React.Component {
       document.execCommand('copy');
     } catch (e) {
       // TODO: this should be reported to the user
+      // eslint-disable-next-line no-console
       console.error('Cannot copy to clipboard', e);
     }
   };

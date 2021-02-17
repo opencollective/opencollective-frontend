@@ -80,6 +80,8 @@ class StripeOrBankAccountPicker extends React.Component {
       const json = await connectAccount(this.props.host.id, service);
       window.location.href = json.redirectUrl;
     } catch (err) {
+      // TODO: this should be reported to the user
+      // eslint-disable-next-line no-console
       console.error(`>>> /api/connected-accounts/${service} error`, err);
     }
   };

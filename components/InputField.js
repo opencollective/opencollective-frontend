@@ -455,6 +455,7 @@ class InputField extends React.Component {
 
       case 'select': {
         if (!field.options || field.options.length === 0) {
+          // eslint-disable-next-line no-console
           console.warn('>>> InputField: options.length needs to be >= 1', field.options);
           return null;
         }

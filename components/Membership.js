@@ -19,6 +19,7 @@ class Membership extends React.Component {
     const { collective } = memberships[0];
 
     if (!collective) {
+      // eslint-disable-next-line no-console
       console.warn('Membership -> no collective attached', memberships[0]);
       return <div />;
     }

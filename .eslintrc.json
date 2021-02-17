@@ -4,7 +4,7 @@
   "plugins": ["graphql", "react-hooks", "simple-import-sort", "formatjs"],
   "rules": {
     "no-console": "warn",
-    "require-atomic-updates": "warn",
+    "require-atomic-updates": "off",
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "no-restricted-imports": [
       "error",

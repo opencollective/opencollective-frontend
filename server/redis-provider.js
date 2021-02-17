@@ -1,6 +1,8 @@
 const Promise = require('bluebird');
 const redis = require('redis');
 
+const logger = require('./logger');
+
 const asyncRedis = Promise.promisifyAll(redis);
 
 const redisProvider = ({ serverUrl }) => {
@@ -14,7 +16,8 @@ const redisProvider = ({ serverUrl }) => {
         try {
           return JSON.parse(value);
         } catch (err) {
-          console.log(`redisProvider: Invalid JSON (${value}): ${err}`);
+          logger.error(`redisProvider: Invalid JSON`);
+          logger.error(value);
         }
       } else {
         return undefined;

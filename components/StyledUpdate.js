@@ -111,6 +111,7 @@ class StyledUpdate extends Component {
       this.props.router.push(`/${this.props.collective.slug}`);
     } catch (err) {
       // TODO: this should be reported to the user
+      // eslint-disable-next-line no-console
       console.error('Update -> deleteUpdate -> error: ', err);
     }
   };
