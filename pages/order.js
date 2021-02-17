@@ -20,7 +20,9 @@ class OrderPage extends React.Component {
       <Page>
         <Box textAlign="center" px={2} py={[4, 5, 6]}>
           <P fontSize="64px" mb={4}>
-            🙈️
+            <span role="img" aria-label="Monkey Face">
+              🙈
+            </span>
           </P>
           <p>
             <strong>This page has moved.</strong>
