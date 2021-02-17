@@ -52,7 +52,7 @@ class Link extends React.Component {
       );
     } else {
       return (
-        <NextLink {...pick(this.props, ['href', 'scroll', 'passHref'])}>
+        <NextLink {...pick(this.props, ['href', 'scroll'])}>
           <a
             className={className}
             title={title}

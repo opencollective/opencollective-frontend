@@ -152,7 +152,7 @@ class GiftCardDetails extends React.Component {
         {/* Avatar column */}
         <Box mr="20px">
           {isConfirmed ? (
-            <Link href={`/${collective.slug}`} title={collective.name} passHref>
+            <Link href={`/${collective.slug}`} title={collective.name}>
               <Container>
                 <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
                 <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />

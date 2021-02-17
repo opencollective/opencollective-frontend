@@ -109,7 +109,7 @@ class TopBar extends React.Component {
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
         ref={this.ref}
       >
-        <Link href="/" passHref>
+        <Link href="/">
           <Flex alignItems="center">
             <Logo width="24" height="24" />
             <Hide xs>
@@ -145,7 +145,7 @@ class TopBar extends React.Component {
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               {merged.discover && (
                 <NavLinkContainer>
-                  <Link href="/discover" passHref>
+                  <Link href="/discover">
                     <NavLink as={Container}>
                       <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                     </NavLink>
@@ -154,7 +154,7 @@ class TopBar extends React.Component {
               )}
               {merged.howItWorks && (
                 <NavLinkContainer>
-                  <Link href="/how-it-works" passHref>
+                  <Link href="/how-it-works">
                     <NavLink as={Container}>
                       <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
                     </NavLink>
@@ -163,7 +163,7 @@ class TopBar extends React.Component {
               )}
               {merged.pricing && (
                 <NavLinkContainer>
-                  <Link href="/pricing" passHref>
+                  <Link href="/pricing">
                     <NavLink as={Container}>
                       <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
                     </NavLink>

@@ -204,7 +204,7 @@ class SearchPage extends React.Component {
                   </em>
                 </P>
                 {
-                  <Link href={{ pathname: '/pledges/new', query: { name: term } }} passHref>
+                  <Link href={{ pathname: '/pledges/new', query: { name: term } }}>
                     <StyledLink
                       display="block"
                       fontSize="14px"
@@ -239,7 +239,7 @@ class SearchPage extends React.Component {
                 </em>
               </P>
               {
-                <Link href={{ pathname: '/pledges/new', query: { name: term } }} passHref>
+                <Link href={{ pathname: '/pledges/new', query: { name: term } }}>
                   <StyledLink
                     as={Container}
                     display="block"

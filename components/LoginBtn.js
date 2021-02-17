@@ -58,7 +58,7 @@ class LoginBtn extends React.Component {
           py: 2,
         };
     return (
-      <Link href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }} passHref>
+      <Link href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}>
         <StyledLink as={Container} {...buttonProps}>
           {this.renderContent()}
         </StyledLink>
