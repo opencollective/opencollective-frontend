@@ -92,7 +92,6 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
 
   return (
     <div
-      tabIndex={0}
       trigger={trigger}
       {...props}
       onFocus={() => setTimeout(() => setDisplayed(true), 50)}

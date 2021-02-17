@@ -189,6 +189,7 @@ const MakeCommunity = () => {
       >
         <Container display="flex" width={1} height={400} maxWidth={712} background="black">
           <iframe
+            title="YouTube Link"
             width="100%"
             height="400px"
             src="https://www.youtube.com/embed/IBU5fSILAe8"

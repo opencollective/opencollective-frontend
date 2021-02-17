@@ -22,10 +22,10 @@ export const getProvider = url => {
   });
 };
 
-/** An iframe that groes with its content */
+/** An iframe that grows with its content */
 const ResponsiveIframe = styled(({ src, ...props }) => (
   <div {...props}>
-    <iframe src={src} allowFullScreen frameBorder="0" allow="fullscreen" />
+    <iframe title="Responsive Iframe" src={src} allowFullScreen frameBorder="0" allow="fullscreen" />
   </div>
 ))`
   position: relative;

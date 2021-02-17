@@ -15,7 +15,7 @@ export const InviteCollectiveDropdownOption = ({ onClick, isSearching }) => (
   <Flex flexDirection="column">
     {isSearching && (
       <Flex mb="16px">
-        <img width="48px" height="48px" src="/static/images/magnifier.png" />
+        <img alt="Magnifier" width="48px" height="48px" src="/static/images/magnifier.png" />
         <Box ml="16px">
           <Span fontSize="12px" fontWeight="700" color="black.800">
             <FormattedMessage

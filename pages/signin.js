@@ -139,7 +139,9 @@ class SigninPage extends React.Component {
       return (
         <Flex flexDirection="column" alignItems="center" px={3} pb={3}>
           <P fontSize="30px" mb={3}>
-            🤖
+            <span role="img" aria-label="Robot Emoji">
+              🤖
+            </span>
           </P>
           <P mb={5} textAlign="center">
             <FormattedMessage

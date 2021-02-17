@@ -125,7 +125,7 @@ class ApplyToHost extends React.Component {
             px={[3, 5]}
             my={3}
           >
-            <img src={umbrellaIllustration} width="160px" height="160px" />
+            <img alt="Accept Contributions Host Illustration" src={umbrellaIllustration} width="160px" height="160px" />
             <Box maxWidth={'480px'} ml={[0, 4]}>
               <H2 fontSize="20px" color="black.900" textAlign={['center', 'left']} my={[3, 0]}>
                 {intl.formatMessage(this.messages.applyToHost)}
@@ -190,7 +190,12 @@ class ApplyToHost extends React.Component {
                 </StyledLink>
               </Box>
               <Box order={[1, 3, 2]}>
-                <img src={becomeFiscalHostIllustration} width="192px" height="192px" />
+                <img
+                  alt="Become Fiscal Host Illustration"
+                  src={becomeFiscalHostIllustration}
+                  width="192px"
+                  height="192px"
+                />
               </Box>
             </InterestedContainer>
           </Container>
