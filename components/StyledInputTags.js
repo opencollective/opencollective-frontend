@@ -265,7 +265,7 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                       }}
                     />
                   </InputWrapper>
-                  {(suggestedTags?.length || tags?.length) > 0 && (
+                  {(availableSuggestedTags?.length || tags?.length) > 0 && (
                     <Box flexGrow="1">
                       {availableSuggestedTags.map(st => (
                         <TagWrapper key={st} px="16px" py="8px" backgroundColor="blue.50">
