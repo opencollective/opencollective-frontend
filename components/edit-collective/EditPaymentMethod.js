@@ -6,6 +6,7 @@ import { getCurrencySymbol } from '../../lib/currency-utils';
 import { paymentMethodLabelWithIcon } from '../../lib/payment_method_label';
 import { capitalize } from '../../lib/utils';
 
+import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 import Link from '../Link';
@@ -133,7 +134,7 @@ class EditPaymentMethod extends React.Component {
               )}
               {hasSubscriptions && (
                 <Link href={`/${this.props.collectiveSlug}/recurring-contributions`} passHref>
-                  <StyledLink buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
+                  <StyledLink as={Container} buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
                     {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}
                   </StyledLink>
                 </Link>

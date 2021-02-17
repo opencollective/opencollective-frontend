@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import Container from './Container';
 import Link from './Link';
 import StyledLink from './StyledLink';
 import StyledSpinner from './StyledSpinner';
@@ -58,7 +59,9 @@ class LoginBtn extends React.Component {
         };
     return (
       <Link href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }} passHref>
-        <StyledLink {...buttonProps}>{this.renderContent()}</StyledLink>
+        <StyledLink as={Container} {...buttonProps}>
+          {this.renderContent()}
+        </StyledLink>
       </Link>
     );
   }

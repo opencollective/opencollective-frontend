@@ -24,7 +24,7 @@ import LoginBtn from './LoginBtn';
 import StyledHr from './StyledHr';
 import StyledLink from './StyledLink';
 import StyledRoundButton from './StyledRoundButton';
-import { P } from './Text';
+import { P, Span } from './Text';
 import { withUser } from './UserProvider';
 
 const memberInvitationsCountQuery = gql`
@@ -157,6 +157,7 @@ class TopBarProfileMenu extends React.Component {
       >
         <Link href={`/${get(membership, 'collective.slug')}`} passHref>
           <StyledLink
+            as={Span}
             title={this.tooltip(membership)}
             color="black.700"
             fontSize="1.2rem"
@@ -175,7 +176,7 @@ class TopBarProfileMenu extends React.Component {
         </Link>
         {isAdmin && (
           <Link href={`/${membership.collective.slug}/edit`} passHref>
-            <StyledLink color="black.500" title={intl.formatMessage(this.messages.settings)}>
+            <StyledLink as={Span} color="black.500" title={intl.formatMessage(this.messages.settings)}>
               <Settings opacity="0" size="1.2em" />
             </StyledLink>
           </Link>
@@ -251,7 +252,7 @@ class TopBarProfileMenu extends React.Component {
             <Box as="ul" p={0} my={2}>
               <ListItem py={1}>
                 <Link href={`/${LoggedInUser.username}`} passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.profile" defaultMessage="Profile" />
                   </StyledLink>
                 </Link>
@@ -265,7 +266,7 @@ class TopBarProfileMenu extends React.Component {
                   loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (
                     <ListItem py={1}>
                       <Link href="/member-invitations" passHref>
-                        <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                        <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                           <FormattedMessage
                             id="menu.pendingInvitations"
                             defaultMessage="Pending Invitations ({numberOfInvitations})"
@@ -279,7 +280,7 @@ class TopBarProfileMenu extends React.Component {
               </Query>
               <ListItem py={1}>
                 <Link href={`/${LoggedInUser.collective.slug}/edit`} passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="Settings" defaultMessage="Settings" />
                   </StyledLink>
                 </Link>
@@ -287,7 +288,7 @@ class TopBarProfileMenu extends React.Component {
               {incognitoProfileMembership && (
                 <ListItem py={1}>
                   <Link href={`/${incognitoProfileMembership.collective.slug}/recurring-contributions`} passHref>
-                    <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                    <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                       <FormattedMessage
                         id="menu.incognitoProfileSubscriptions"
                         defaultMessage="Manage incognito Contributions"
@@ -298,21 +299,21 @@ class TopBarProfileMenu extends React.Component {
               )}
               <ListItem py={1}>
                 <Link href={`/${LoggedInUser.username}/recurring-contributions`} passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
                   </StyledLink>
                 </Link>
               </ListItem>
               <ListItem py={1}>
                 <Link href={`/${LoggedInUser.username}/transactions`} passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     {capitalize(intl.formatMessage(this.messages['menu.transactions']))}
                   </StyledLink>
                 </Link>
               </ListItem>
               <ListItem py={1}>
                 <Link href="/applications" passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     {capitalize(intl.formatMessage(this.messages['menu.applications']))}
                   </StyledLink>
                 </Link>

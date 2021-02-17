@@ -366,7 +366,7 @@ const Footer = () => {
                   <ListItem key={item} textAlign={['center', 'left']} mb={2}>
                     {navigation[key][item][0] === '/' ? (
                       <Link href={navigation[key][item]} passHref>
-                        <MenuLink>
+                        <MenuLink as={Container}>
                           {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}
                         </MenuLink>
                       </Link>

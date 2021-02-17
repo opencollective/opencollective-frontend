@@ -241,6 +241,7 @@ class SearchPage extends React.Component {
               {
                 <Link href={{ pathname: '/pledges/new', query: { name: term } }} passHref>
                   <StyledLink
+                    as={Container}
                     display="block"
                     fontSize="14px"
                     fontWeight="bold"
