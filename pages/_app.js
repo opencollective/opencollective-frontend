@@ -74,6 +74,7 @@ class OpenCollectiveFrontendApp extends App {
             try {
               await loadGoogleMaps();
             } catch (e) {
+              // eslint-disable-next-line no-console
               console.error(e);
             }
           }

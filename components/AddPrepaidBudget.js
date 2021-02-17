@@ -150,6 +150,7 @@ class AddFundsForm extends React.Component {
       return hostFeePercent;
     } catch (error) {
       // TODO: this should be reported to the user
+      // eslint-disable-next-line no-console
       console.error(error);
     }
   };
