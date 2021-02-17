@@ -1,7 +1,7 @@
 {
-  "extends": ["opencollective"],
+  "extends": ["opencollective", "plugin:jsx-a11y/recommended"],
   "env": { "jest": true },
-  "plugins": ["graphql", "react-hooks", "simple-import-sort", "formatjs"],
+  "plugins": ["graphql", "react-hooks", "simple-import-sort", "formatjs", "jsx-a11y"],
   "rules": {
     "no-console": "warn",
     "require-atomic-updates": "warn",
