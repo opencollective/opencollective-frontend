@@ -132,7 +132,7 @@ const hasParams = query => {
 
 const updateQuery = (router, queryParams) => {
   const { route, query } = router;
-  return this.props.router.push({ pathname: route.slice(1), query: { ...query, ...queryParams } });
+  return router.push({ pathname: route.slice(1), query: { ...query, ...queryParams } });
 };
 
 const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {

@@ -23,11 +23,9 @@ import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import OrdersWithData from '../components/orders/OrdersWithData';
 import Page from '../components/Page';
-import StyledLink from '../components/StyledLink';
 import { withUser } from '../components/UserProvider';
 
-// eslint-disable-next-line react/display-name
-const LinkContainer = styled(React.forwardRef((props, ref) => <StyledLink {...props} ref={ref} />))`
+const LinkContainer = styled(props => <Container {...props} />)`
   padding: 4px 20px 0 20px;
   color: #71757a;
   height: 60px;
