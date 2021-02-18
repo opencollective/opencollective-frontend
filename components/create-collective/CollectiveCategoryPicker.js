@@ -51,7 +51,8 @@ const messages = defineMessages({
 const CollectiveCategoryPicker = () => {
   const router = useRouter();
   const { formatMessage } = useIntl();
-  const hostCollectiveSlug = router.query.hostCollectiveSlug ? router.query.hostCollectiveSlug : '';
+  const { hostCollectiveSlug, verb } = router.query;
+  const baseRoute = `/${[hostCollectiveSlug, verb].filter(Boolean).join('/')}`;
 
   return (
     <Fragment>
@@ -75,7 +76,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/openSourceIllustration.png"
                   alt={formatMessage(messages.opensource)}
                 />
-                <Link href={`/${hostCollectiveSlug}/${router.query.verb}/opensource`}>
+                <Link href={`${baseRoute}/opensource`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.opensource)}
                   </StyledButton>
@@ -97,7 +98,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/climateIllustration.png"
                   alt={formatMessage(messages.covid)}
                 />
-                <Link href={`/${hostCollectiveSlug}/${router.query.verb}/covid-19`}>
+                <Link href={`${baseRoute}/covid-19`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.covid)}
                   </StyledButton>
@@ -118,7 +119,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/communityIllustration.png"
                   alt={formatMessage(messages.community)}
                 />
-                <Link href={`${hostCollectiveSlug}/${router.query.verb}/community`}>
+                <Link href={`${baseRoute}/community`}>
                   <StyledButton
                     fontSize="13px"
                     buttonStyle="primary"

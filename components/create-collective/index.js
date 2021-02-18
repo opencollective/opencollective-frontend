@@ -70,10 +70,6 @@ class CreateCollective extends Component {
         this.props.router
           .push({
             pathname: `/${newCollective.slug}/onboarding`,
-            query: {
-              CollectiveId: newCollective.legacyId,
-              CollectiveSlug: newCollective.slug,
-            },
           })
           .then(() => window.scrollTo(0, 0));
       } else {
@@ -82,8 +78,6 @@ class CreateCollective extends Component {
             pathname: `/${newCollective.slug}`,
             query: {
               status: 'collectiveCreated',
-              CollectiveId: newCollective.legacyId,
-              CollectiveSlug: newCollective.slug,
             },
           })
           .then(() => window.scrollTo(0, 0));
