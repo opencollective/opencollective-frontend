@@ -84,7 +84,7 @@ const ExternalRedirectPage = () => {
                   <FormattedMessage id="actions.continue" defaultMessage="Continue" />
                 </StyledButton>
               </a>
-              <Link href={`/${fallback}`} onClick={() => setPendingAction('CANCEL')}>
+              <Link href={fallback} onClick={() => setPendingAction('CANCEL')}>
                 <StyledButton
                   buttonSize="small"
                   m={2}
