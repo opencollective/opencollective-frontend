@@ -61,13 +61,10 @@ class ConnectGithub extends React.Component {
     }
   }
 
-  changeRoute = async params => {
-    params = {
-      ...params,
-      verb: this.props.router.query.verb,
-      hostCollectiveSlug: this.props.router.query.hostCollectiveSlug || undefined,
-    };
-    await this.props.router.push({ pathname: '/create-collective', query: params });
+  changeRoute = async ({ category, step }) => {
+    const { hostCollectiveSlug, verb } = this.props.router.query;
+    const route = [hostCollectiveSlug, verb || 'create', category, step].filter(Boolean).join('/');
+    await this.props.router.push(`/${route}`);
     window.scrollTo(0, 0);
   };
 
