@@ -135,6 +135,7 @@ const GithubRepositories = ({ repositories, submitGithubInfo, ...fieldProps }) =
           disabled={disabled}
           onClick={() => submitGithubInfo(githubInfo)}
           m={2}
+          mt={4}
           px={[2, 3]}
           data-cy="connect-github-continue"
         >

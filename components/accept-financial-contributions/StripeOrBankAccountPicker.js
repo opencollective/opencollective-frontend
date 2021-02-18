@@ -94,7 +94,11 @@ class StripeOrBankAccountPicker extends React.Component {
     const { loading, host } = data;
 
     if (loading) {
-      return <Loading />;
+      return (
+        <Box pb={4}>
+          <Loading />
+        </Box>
+      );
     }
 
     const isBankAccountAlreadyThere = has(host, 'settings.paymentMethods.manual');
