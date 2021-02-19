@@ -43,7 +43,7 @@ function importAll(r) {
 }
 
 function getmenuItem(pageSlug) {
-  if (['how-it-works', 'pricing', 'become-a-sponsor', 'become-a-fiscal-host'].includes(pageSlug)) {
+  if ('how-it-works' === pageSlug) {
     return { pricing: true, howItWorks: true };
   } else {
     return { pricing: false, howItWorks: false };

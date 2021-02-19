@@ -240,7 +240,7 @@ exports.REWRITES = [
   },
   // Marketing Pages
   {
-    source: `/:pageSlug(how-it-works|gift-of-giving|gift-cards|pricing|old-pricing)`,
+    source: `/:pageSlug(how-it-works|gift-of-giving|gift-cards)`,
     destination: '/marketingPage',
   },
   // Collective
@@ -268,5 +268,39 @@ exports.REWRITES = [
   {
     source: '/:slug/subscriptions',
     destination: '/recurring-contributions',
+  },
+  // Path routing: all the rewrites below are ready to be removed as soon as we
+  // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`
+  {
+    source: '/discover',
+    destination: '/discover',
+  },
+  {
+    source: '/search',
+    destination: '/search',
+  },
+  {
+    source: '/hosts',
+    destination: '/hosts',
+  },
+  {
+    source: '/pricing',
+    destination: '/pricing',
+  },
+  {
+    source: '/pricing-old',
+    destination: '/pricing-old',
+  },
+  {
+    source: '/become-a-sponsor',
+    destination: '/become-a-sponsor',
+  },
+  {
+    source: '/member-invitations',
+    destination: '/member-invitations',
+  },
+  {
+    source: '/applications',
+    destination: '/applications',
   },
 ];
