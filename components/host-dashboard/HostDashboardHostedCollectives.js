@@ -130,7 +130,10 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
-              router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
+              router.push({
+                pathname: `/${hostSlug}/dashboard/hosted-collectives`,
+                query: { ...query, searchTerm, offset: null },
+              })
             }
           />
         </Box>
@@ -143,7 +146,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
             filters={[COLLECTIVE_FILTER.SORT_BY, COLLECTIVE_FILTER.FEE_STRUCTURE]}
             onChange={queryParams =>
               router.push({
-                pathname: '/host.dashboard',
+                pathname: `/${hostSlug}/dashboard/hosted-collectives`,
                 query: {
                   ...query,
                   ...queryParams,

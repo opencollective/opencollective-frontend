@@ -132,7 +132,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
       setPaypalPreApprovalError(query.paypalApprovalError);
-      router.replace('host.dashboard', omit(query, 'paypalApprovalError'), { shallow: true });
+      router.replace(`/${hostSlug}/dashboard/expenses`, omit(query, 'paypalApprovalError'), { shallow: true });
     }
   }, [query.paypalApprovalError]);
 
@@ -147,7 +147,10 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
-              router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
+              router.push({
+                pathname: `/${hostSlug}/dashboard/expenses`,
+                query: { ...query, searchTerm, offset: null },
+              })
             }
           />
         </Box>
@@ -194,7 +197,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             filters={query}
             onChange={queryParams =>
               router.push({
-                pathname: '/host.dashboard',
+                pathname: `/${hostSlug}/dashboard/expenses`,
                 query: {
                   ...query,
                   ...queryParams,
@@ -247,7 +250,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route={`/${hostSlug}/host.dashboard`}
+              route={`/${hostSlug}/dashboard/expenses`}
               total={data?.expenses?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
