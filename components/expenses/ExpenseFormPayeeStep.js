@@ -18,7 +18,7 @@ import CollectivePicker, {
 } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
-import I18nAddressFields from '../I18nAddressFields';
+import I18nAddressFields, { serializeAddress } from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -60,6 +60,7 @@ const EMPTY_ARRAY = [];
 const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.country', payee?.location?.country || null);
   formik.setFieldValue('payeeLocation.address', payee?.location?.address || '');
+  formik.setFieldValue('payeeLocation.structured', payee?.location?.structured);
 };
 
 const getPayoutMethodsFromPayee = payee => {
@@ -248,41 +249,47 @@ const ExpenseFormPayeeStep = ({
                   </StyledInputField>
                 )}
               </FastField>
-              <Field name="payeeLocation.address">
-                {({ field }) => (
-                  <I18nAddressFields
-                    selectedCountry={values.payeeLocation?.country}
-                    value={field.value}
-                    onChange={({ name, value }) => {
-                      // If name === field.name we are using fallback textarea,
-                      // so we set payeeLocation.address directly
-                      if (name === field.name) {
-                        formik.setFieldValue(field.name, value);
-                      }
-                      // Otherwise we are setting multiple address fields.
-                      // However, if payeeLocation.address is a string coming
-                      // from the old single address field, we don't want to
-                      // use the spread iterator.
-                      else {
-                        formik.setFieldValue(
-                          'payeeLocation.address',
-                          typeof formik.values.payeeLocation.address === 'object'
-                            ? {
-                                ...formik.values.payeeLocation.address,
-                                [name]: value,
-                              }
-                            : { [name]: value },
-                        );
-                      }
-                    }}
-                    onCountryChange={addressObject => {
-                      if (addressObject) {
-                        formik.setFieldValue('payeeLocation.address', addressObject);
-                      }
-                    }}
-                  />
-                )}
-              </Field>
+              {values.payeeLocation.structured || values.payeeLocation.address === '' ? (
+                <Field name="payeeLocation.structured">
+                  {({ field }) => (
+                    <I18nAddressFields
+                      name={field.name}
+                      selectedCountry={values.payeeLocation?.country}
+                      value={field.value || {}}
+                      onChange={({ name, value }) => {
+                        const address = {
+                          ...(formik.values.payeeLocation?.structured || {}),
+                          [name]: value,
+                        };
+
+                        formik.setFieldValue('payeeLocation.structured', address);
+                        formik.setFieldValue('payeeLocation.address', serializeAddress(address));
+                      }}
+                      onCountryChange={addressObject => {
+                        if (addressObject) {
+                          formik.setFieldValue('payeeLocation.structured', addressObject);
+                        }
+                      }}
+                    />
+                  )}
+                </Field>
+              ) : (
+                <FastField name="payeeLocation.address">
+                  {({ field }) => (
+                    <StyledInputField name={field.name} label="Address" labelFontSize="13px" required mt={3}>
+                      {inputProps => (
+                        <StyledTextarea
+                          {...inputProps}
+                          {...field}
+                          data-cy="payee-address"
+                          minHeight={100}
+                          placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
+                        />
+                      )}
+                    </StyledInputField>
+                  )}
+                </FastField>
+              )}
               <FastField name="invoiceInfo">
                 {({ field }) => (
                   <StyledInputField
