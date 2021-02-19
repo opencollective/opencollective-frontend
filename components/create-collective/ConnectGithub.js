@@ -148,7 +148,11 @@ class ConnectGithub extends React.Component {
             </MessageBox>
           </Flex>
         )}
-        {loadingRepos && <Loading />}
+        {loadingRepos && (
+          <Box pb={4}>
+            <Loading />
+          </Box>
+        )}
         {repositories.length !== 0 && (
           <Flex justifyContent="center" width={1} mb={4} flexDirection={['column', 'row']}>
             <Box width={1 / 5} display={['none', null, 'block']} />
