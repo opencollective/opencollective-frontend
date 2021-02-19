@@ -109,6 +109,14 @@ const getVariablesFromQuery = query => {
   };
 };
 
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'view'];
+
+const updateQuery = (router, newParams) => {
+  const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+  const pathname = router.asPath.split('?')[0];
+  return router.push({ pathname, query });
+};
+
 const HostDashboardHostedCollectives = ({ hostSlug }) => {
   const router = useRouter() || {};
   const query = router.query;
@@ -129,12 +137,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
         <Box p={2}>
           <SearchBar
             defaultValue={query.searchTerm}
-            onSubmit={searchTerm =>
-              router.push({
-                pathname: `/${hostSlug}/dashboard/hosted-collectives`,
-                query: { ...query, searchTerm, offset: null },
-              })
-            }
+            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
           />
         </Box>
       </Flex>
@@ -144,16 +147,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           <HostAdminCollectiveFilters
             values={query}
             filters={[COLLECTIVE_FILTER.SORT_BY, COLLECTIVE_FILTER.FEE_STRUCTURE]}
-            onChange={queryParams =>
-              router.push({
-                pathname: `/${hostSlug}/dashboard/hosted-collectives`,
-                query: {
-                  ...query,
-                  ...queryParams,
-                  offset: null,
-                },
-              })
-            }
+            onChange={queryParams => updateQuery(router, { ...queryParams, offset: null })}
           />
         ) : loading ? (
           <LoadingPlaceholder height={70} />
@@ -189,10 +183,11 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           </Grid>
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route={`/${hostSlug}/dashboard`}
+              route={`/${hostSlug}/dashboard/hosted-collectives`}
               total={hostedMemberships?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
+              ignoredQueryParams={ROUTE_PARAMS}
               scrollToTopOnChange
             />
           </Flex>

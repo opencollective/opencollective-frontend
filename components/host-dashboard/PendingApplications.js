@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -93,6 +94,14 @@ const getVariablesFromQuery = query => {
   };
 };
 
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'view'];
+
+const updateQuery = (router, newParams) => {
+  const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+  const pathname = router.asPath.split('?')[0];
+  return router.push({ pathname, query });
+};
+
 const PendingApplications = ({ hostSlug }) => {
   const router = useRouter() || {};
   const query = router.query;
@@ -113,12 +122,7 @@ const PendingApplications = ({ hostSlug }) => {
         <Box p={2}>
           <SearchBar
             defaultValue={query.searchTerm}
-            onSubmit={searchTerm =>
-              router.push({
-                pathname: `/${hostSlug}/dashboard/pending-applications`,
-                query: { ...query, searchTerm, offset: null },
-              })
-            }
+            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
           />
         </Box>
       </Flex>
@@ -129,13 +133,9 @@ const PendingApplications = ({ hostSlug }) => {
             filters={[COLLECTIVE_FILTER.SORT_BY]}
             values={query}
             onChange={queryParams =>
-              router.push({
-                pathname: `/${hostSlug}/dashboard/pending-applications`,
-                query: {
-                  ...query,
-                  ...queryParams,
-                  offset: null,
-                },
+              updateQuery(router, {
+                ...queryParams,
+                offset: null,
               })
             }
           />
@@ -174,6 +174,7 @@ const PendingApplications = ({ hostSlug }) => {
               total={hostApplications?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
+              ignoredQueryParams={ROUTE_PARAMS}
               scrollToTopOnChange
             />
           </Flex>

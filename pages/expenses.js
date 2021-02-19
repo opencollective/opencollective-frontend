@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { has, isEmpty, isNil, mapValues, omit, omitBy, pick } from 'lodash';
+import { has, mapValues, omit, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -143,23 +143,23 @@ class ExpensePage extends React.Component {
 
   buildFilterLinkParams(params) {
     const queryParameters = {
-      ...pick(this.props, ['collectiveSlug', 'parentCollectiveSlug']),
-      ...omit(this.props.query, ['offset']),
+      ...omit(this.props.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
       ...params,
     };
-    return omitBy(omitBy(queryParameters, isNil), isEmpty);
+
+    return omitBy(queryParameters, value => !value);
   }
 
   updateFilters = queryParams => {
     return this.props.router.push({
-      pathname: '/expenses',
+      pathname: `/${this.props.collectiveSlug}/expenses`,
       query: this.buildFilterLinkParams({ ...queryParams, offset: null }),
     });
   };
 
   handleSearch = searchTerm => {
     const params = this.buildFilterLinkParams({ searchTerm, offset: null });
-    this.props.router.push({ pathname: '/expenses', query: params });
+    this.props.router.push({ pathname: `/${this.props.collectiveSlug}/expenses`, query: params });
   };
 
   getTagProps = tag => {
@@ -261,6 +261,7 @@ class ExpensePage extends React.Component {
                         total={data.expenses?.totalCount}
                         limit={data.variables.limit}
                         offset={data.variables.offset}
+                        ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
                         scrollToTopOnChange
                       />
                     </Flex>
@@ -289,7 +290,7 @@ class ExpensePage extends React.Component {
                       <Link
                         key={key}
                         href={{
-                          pathname: '/expenses',
+                          pathname: `/${this.props.collectiveSlug}/expenses`,
                           query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
                         }}
                         data-cy="expense-tags-link"

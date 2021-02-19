@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { isEmpty, mapValues, omit, omitBy } from 'lodash';
+import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -112,9 +112,14 @@ const getVariablesFromQuery = query => {
   };
 };
 
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'view'];
+
 const HostDashboardExpenses = ({ hostSlug }) => {
   const router = useRouter() || {};
   const query = router.query;
+  const getQueryParams = newParams => {
+    return omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+  };
 
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const { data, error, loading, variables, refetch } = useQuery(hostDashboardExpensesQuery, {
@@ -124,7 +129,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   const hasFilters = React.useMemo(
     () =>
       Object.entries(query).some(([key, value]) => {
-        return !['view', 'offset', 'limit', 'hostCollectiveSlug', 'paypalApprovalError'].includes(key) && value;
+        return ![...ROUTE_PARAMS, 'offset', 'limit', 'paypalApprovalError'].includes(key) && value;
       }),
     [query],
   );
@@ -149,7 +154,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             onSubmit={searchTerm =>
               router.push({
                 pathname: `/${hostSlug}/dashboard/expenses`,
-                query: { ...query, searchTerm, offset: null },
+                query: getQueryParams({ searchTerm, offset: null }),
               })
             }
           />
@@ -198,11 +203,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             onChange={queryParams =>
               router.push({
                 pathname: `/${hostSlug}/dashboard/expenses`,
-                query: {
-                  ...query,
-                  ...queryParams,
-                  offset: null,
-                },
+                query: getQueryParams({ ...queryParams, offset: null }),
               })
             }
           />
@@ -219,13 +220,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
               values={{
                 ResetLink(text) {
                   return (
-                    <Link
-                      data-cy="reset-expenses-filters"
-                      href={{
-                        pathname: `/${data.host.slug}/dashboard`,
-                        query: { ...mapValues(query, () => null) },
-                      }}
-                    >
+                    <Link data-cy="reset-expenses-filters" href={{ pathname: `/${data.host.slug}/dashboard` }}>
                       {text}
                     </Link>
                   );
@@ -254,6 +249,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
               total={data?.expenses?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
+              ignoredQueryParams={ROUTE_PARAMS}
               scrollToTopOnChange
             />
           </Flex>

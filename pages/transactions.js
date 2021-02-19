@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get, mapValues } from 'lodash';
+import { get, omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -153,6 +153,13 @@ class TransactionsPage extends React.Component {
     }
   }
 
+  updateFilters(queryParams) {
+    return this.props.router.push({
+      pathname: `/${this.props.slug}/transactions`,
+      query: omitBy({ ...this.props.query, ...queryParams }, value => !value),
+    });
+  }
+
   render() {
     const { LoggedInUser, query, transactionsData, data, slug } = this.props;
     const collective = get(this.props, 'data.Collective') || this.state.Collective;
@@ -199,12 +206,7 @@ class TransactionsPage extends React.Component {
               <Box p={2} flexGrow={[1, 0]}>
                 <SearchBar
                   defaultValue={query.searchTerm}
-                  onSubmit={searchTerm =>
-                    this.props.router.push({
-                      pathname: `/${slug}/transactions`,
-                      query: { ...query, searchTerm, offset: null },
-                    })
-                  }
+                  onSubmit={searchTerm => this.updateFilters({ searchTerm, offset: null })}
                 />
               </Box>
             </Flex>
@@ -219,16 +221,7 @@ class TransactionsPage extends React.Component {
               <TransactionsFilters
                 filters={query}
                 collective={collective}
-                onChange={queryParams => {
-                  this.props.router.push({
-                    pathname: `/${slug}/transactions`,
-                    query: {
-                      ...query,
-                      ...queryParams,
-                      offset: null,
-                    },
-                  });
-                }}
+                onChange={queryParams => this.updateFilters({ ...queryParams, offset: null })}
               />
               <Flex>
                 {canDownloadInvoices && (
@@ -252,16 +245,7 @@ class TransactionsPage extends React.Component {
                     values={{
                       ResetLink(text) {
                         return (
-                          <Link
-                            data-cy="reset-transactions-filters"
-                            href={{
-                              pathname: `/${collective.slug}/transactions`,
-                              query: {
-                                ...mapValues(query, () => null),
-                                view: 'transactions',
-                              },
-                            }}
-                          >
+                          <Link data-cy="reset-transactions-filters" href={`/${collective.slug}/transactions`}>
                             <span>{text}</span>
                           </Link>
                         );
@@ -288,6 +272,7 @@ class TransactionsPage extends React.Component {
                     total={transactions?.totalCount}
                     limit={variables.limit}
                     offset={variables.offset}
+                    ignoredQueryParams={['collectiveSlug']}
                     scrollToTopOnChange
                   />
                 </Flex>

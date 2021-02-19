@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { mapValues, pick } from 'lodash';
+import { mapValues, omitBy, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -130,9 +130,12 @@ const hasParams = query => {
   });
 };
 
-const updateQuery = (router, queryParams) => {
-  const { route, query } = router;
-  return router.push({ pathname: route.slice(1), query: { ...query, ...queryParams } });
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'collectiveSlug', 'view'];
+
+const updateQuery = (router, newParams) => {
+  const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+  const pathname = router.asPath.split('?')[0];
+  return router.push({ pathname, query });
 };
 
 const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
@@ -222,6 +225,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
               total={data?.orders?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
+              ignoredQueryParams={ROUTE_PARAMS}
               scrollToTopOnChanges
             />
           </Flex>
