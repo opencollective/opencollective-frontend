@@ -199,6 +199,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             amount={data?.amount}
             fees={data?.platformContribution}
             interval={data?.interval}
+            quantity={data?.quantity}
             onChange={value => dispatchChange('platformContribution', value)}
           />
         </Box>
