@@ -243,17 +243,6 @@ exports.REWRITES = [
     source: `/:pageSlug(how-it-works|gift-of-giving|gift-cards)`,
     destination: '/marketingPage',
   },
-  // Collective
-  // ----------
-  // Collective page
-  {
-    source: '/:slug',
-    destination: '/collective-page',
-  },
-  {
-    source: '/:slug/:mode(onboarding)?/:step(administrators|contact-info|success)?',
-    destination: '/collective-page',
-  },
   // New accept financial contributions flow
   {
     source:
@@ -271,6 +260,10 @@ exports.REWRITES = [
   },
   // Path routing: all the rewrites below are ready to be removed as soon as we
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`
+  {
+    source: '/',
+    destination: '/home',
+  },
   {
     source: '/discover',
     destination: '/discover',
@@ -302,5 +295,16 @@ exports.REWRITES = [
   {
     source: '/applications',
     destination: '/applications',
+  },
+  // Collective
+  // ----------
+  // Collective page
+  {
+    source: '/:slug',
+    destination: '/collective-page',
+  },
+  {
+    source: '/:slug/:mode(onboarding)?/:step(administrators|contact-info|success)?',
+    destination: '/collective-page',
   },
 ];
