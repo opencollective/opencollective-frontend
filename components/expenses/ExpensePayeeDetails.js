@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { INVITE, PayoutMethodType } from '../../lib/constants/payout-method';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -110,7 +110,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             <PayoutMethodTypeWithIcon
               type={
                 !expense.payoutMethod?.type && (expense.draft || expense.payee.isInvite)
-                  ? PayoutMethodType.INVITE
+                  ? INVITE
                   : expense.payoutMethod?.type
               }
             />
