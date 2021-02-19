@@ -264,7 +264,8 @@ describe('New expense flow', () => {
 
         cy.getByDataCy('payee-country').click();
         cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
-        cy.get('textarea[data-cy="payee-address"]').type('Street Name, 123');
+        cy.get('[data-cy="payee-address-address1"]').type('Street Name, 123');
+        cy.get('[data-cy="payee-address-city"]').type('City');
 
         cy.getByDataCy('payout-method-select').click();
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
