@@ -94,7 +94,8 @@ const getVariablesFromQuery = query => {
 };
 
 const PendingApplications = ({ hostSlug }) => {
-  const { query } = useRouter() || {};
+  const router = useRouter() || {};
+  const query = router.query;
   const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
   const { data, error, loading, variables } = useQuery(pendingApplicationsQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
@@ -113,7 +114,7 @@ const PendingApplications = ({ hostSlug }) => {
           <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
-              this.props.router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
+              router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
             }
           />
         </Box>
@@ -125,7 +126,7 @@ const PendingApplications = ({ hostSlug }) => {
             filters={[COLLECTIVE_FILTER.SORT_BY]}
             values={query}
             onChange={queryParams =>
-              this.props.router.push({
+              router.push({
                 pathname: '/host.dashboard',
                 query: {
                   ...query,
@@ -166,7 +167,7 @@ const PendingApplications = ({ hostSlug }) => {
               ))}
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route={`${hostSlug}/host.dashboard`}
+              route={`/${hostSlug}/host.dashboard`}
               total={hostApplications?.totalCount}
               limit={variables.limit}
               offset={variables.offset}

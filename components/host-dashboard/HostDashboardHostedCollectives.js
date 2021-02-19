@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { useRouter, withRouter } from 'next/router';
+import { isEmpty, omitBy } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -109,10 +110,11 @@ const getVariablesFromQuery = query => {
 };
 
 const HostDashboardHostedCollectives = ({ hostSlug }) => {
-  const { query } = useRouter() || {};
+  const router = useRouter() || {};
+  const query = router.query;
   const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
   const { data, error, loading, variables } = useQuery(hostedCollectivesQuery, {
-    variables: { hostSlug, ...getVariablesFromQuery(query) },
+    variables: { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) },
     context: API_V2_CONTEXT,
   });
 
@@ -128,7 +130,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
-              this.props.router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
+              router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
             }
           />
         </Box>
@@ -140,7 +142,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
             values={query}
             filters={[COLLECTIVE_FILTER.SORT_BY, COLLECTIVE_FILTER.FEE_STRUCTURE]}
             onChange={queryParams =>
-              this.props.router.push({
+              router.push({
                 pathname: '/host.dashboard',
                 query: {
                   ...query,
@@ -184,7 +186,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           </Grid>
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route={`/${hostSlug}/host.dashboard`}
+              route={`/${hostSlug}/dashboard`}
               total={hostedMemberships?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
@@ -202,4 +204,4 @@ HostDashboardHostedCollectives.propTypes = {
   router: PropTypes.object,
 };
 
-export default withRouter(HostDashboardHostedCollectives);
+export default HostDashboardHostedCollectives;

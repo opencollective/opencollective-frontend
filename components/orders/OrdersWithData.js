@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { mapValues, pick } from 'lodash';
-import { useRouter, withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
@@ -238,7 +238,6 @@ OrdersWithData.propTypes = {
   /** An optional title to be used instead of "Financial contributions" */
   title: PropTypes.node,
   showPlatformTip: PropTypes.bool,
-  router: PropTypes.object,
 };
 
-export default withRouter(OrdersWithData);
+export default OrdersWithData;

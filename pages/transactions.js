@@ -284,7 +284,7 @@ class TransactionsPage extends React.Component {
                 />
                 <Flex mt={5} justifyContent="center">
                   <Pagination
-                    route={`${slug}/transactions`}
+                    route={`/${slug}/transactions`}
                     total={transactions?.totalCount}
                     limit={variables.limit}
                     offset={variables.offset}

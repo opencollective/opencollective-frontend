@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { mapValues, omit } from 'lodash';
-import { useRouter, withRouter } from 'next/router';
+import { isEmpty, mapValues, omit, omitBy } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import EXPENSE_STATUS from '../../lib/constants/expense-status';
@@ -113,10 +113,12 @@ const getVariablesFromQuery = query => {
 };
 
 const HostDashboardExpenses = ({ hostSlug }) => {
-  const { query } = useRouter() || {};
+  const router = useRouter() || {};
+  const query = router.query;
+
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const { data, error, loading, variables, refetch } = useQuery(hostDashboardExpensesQuery, {
-    variables: { hostSlug, ...getVariablesFromQuery(query) },
+    variables: { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) },
     context: API_V2_CONTEXT,
   });
   const hasFilters = React.useMemo(
@@ -130,7 +132,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
       setPaypalPreApprovalError(query.paypalApprovalError);
-      this.props.router.replace('host.dashboard', omit(query, 'paypalApprovalError'), { shallow: true });
+      router.replace('host.dashboard', omit(query, 'paypalApprovalError'), { shallow: true });
     }
   }, [query.paypalApprovalError]);
 
@@ -145,7 +147,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
-              this.props.router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
+              router.push({ pathname: '/host.dashboard', query: { ...query, searchTerm, offset: null } })
             }
           />
         </Box>
@@ -191,7 +193,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             collective={data.host}
             filters={query}
             onChange={queryParams =>
-              this.props.router.push({
+              router.push({
                 pathname: '/host.dashboard',
                 query: {
                   ...query,
@@ -217,7 +219,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                     <Link
                       data-cy="reset-expenses-filters"
                       href={{
-                        pathname: `/${data.host.slug}/dashboard/expenses`,
+                        pathname: `/${data.host.slug}/dashboard`,
                         query: { ...mapValues(query, () => null) },
                       }}
                     >
@@ -245,7 +247,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route={`${hostSlug}/host.dashboard`}
+              route={`/${hostSlug}/host.dashboard`}
               total={data?.expenses?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
@@ -260,7 +262,6 @@ const HostDashboardExpenses = ({ hostSlug }) => {
 
 HostDashboardExpenses.propTypes = {
   hostSlug: PropTypes.string.isRequired,
-  router: PropTypes.object,
 };
 
-export default withRouter(HostDashboardExpenses);
+export default HostDashboardExpenses;
