@@ -1,9 +1,9 @@
 {
   "Accept": "許可",
   "acceptContributions.addBankAccount": "銀行口座を追加",
-  "acceptContributions.bankAccount.info": "Accept contributions via bank transfer. The budget will update when you confirm receipt of funds.",
+  "acceptContributions.bankAccount.info": "銀行振込による貢献を受け入れます。予算は、資金の受領を確認すると更新されます。",
   "acceptContributions.bankAccountSetUp": "銀行口座のセットアップ",
-  "acceptContributions.FAQ.howDoesItWorkDetails": "Payment instructions are automatically sent to contributors via email. Once the funds are received, the admin can confirm the transaction and the amount will be credited to the budget.",
+  "acceptContributions.FAQ.howDoesItWorkDetails": "支払い方法は自動的にメールでコントリビューターに送信されます。 資金が受信されると、管理者は取引を確認でき、金額は予算に入金されます。",
   "acceptContributions.FAQ.idNotIncluded": "What happens if the reference ID is not included?",
   "acceptContributions.FAQ.idNotIncludedDetails": "If the unique ID is not included, it can be hard to find and confirm a transaction. If you sent the money but it has not been confirmed, contact {email} and we will help track it down.",
   "acceptContributions.FAQ.moneyNotReceived": "お金がずっと受け取られないとどうなりますか？",
