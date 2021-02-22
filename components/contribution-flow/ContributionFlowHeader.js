@@ -48,7 +48,7 @@ class NewContributionFlowHeader extends React.Component {
             <FormattedMessage
               id="CreateOrder.Title"
               defaultMessage="Contribute to {collective}"
-              values={{ collective: truncate(collective.name, { length: 30 }) }}
+              values={{ collective: truncate(collective.name, { length: 60 }) }}
             />
           </H1>
           {contributors?.length > 0 && (
