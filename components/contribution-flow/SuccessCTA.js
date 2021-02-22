@@ -87,9 +87,8 @@ const SuccessCTAWrapper = ({ type, orderId, email, ...props }) => {
           as={Link}
           display="block"
           data-cy="join-opencollective-link"
-          href="/create-account/guest"
+          href={{ pathname: '/create-account/guest', query: { OrderId: orderId, email } }}
           color="black.800"
-          params={{ OrderId: orderId, email }}
           {...props}
         />
       );
@@ -100,8 +99,7 @@ const SuccessCTAWrapper = ({ type, orderId, email, ...props }) => {
           display="block"
           color="black.800"
           data-cy="success-signin-link"
-          href="/signin"
-          params={{ email }}
+          href={{ pathname: '/signin', query: { email } }}
           {...props}
         />
       );
