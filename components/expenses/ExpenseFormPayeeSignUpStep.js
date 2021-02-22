@@ -15,6 +15,7 @@ import { formatFormErrorMessage } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex, Grid } from '../Grid';
+import I18nAddressFields, { serializeAddress } from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
 import LoginBtn from '../LoginBtn';
 import StyledButton from '../StyledButton';
@@ -355,28 +356,31 @@ const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCanc
             </StyledInputField>
           )}
         </Field>
-        <FastField name="payeeLocation.address">
-          {({ field }) => (
-            <StyledInputField
-              name={field.name}
-              label={formatMessage(msg.address)}
-              labelFontSize="13px"
-              error={formatFormErrorMessage(intl, errors.payeeLocation?.address)}
-              required
-              mt={3}
-            >
-              {inputProps => (
-                <StyledTextarea
-                  {...inputProps}
-                  {...field}
-                  minHeight={100}
-                  data-cy="payee-address"
-                  placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
-                />
-              )}
-            </StyledInputField>
-          )}
-        </FastField>
+        <Box>
+          <Field name="payeeLocation.structured">
+            {({ field }) => (
+              <I18nAddressFields
+                name={field.name}
+                selectedCountry={values.payeeLocation?.country}
+                value={field.value || {}}
+                onChange={({ name, value }) => {
+                  const address = {
+                    ...(formik.values.payeeLocation?.structured || {}),
+                    [name]: value,
+                  };
+
+                  formik.setFieldValue('payeeLocation.structured', address);
+                  formik.setFieldValue('payeeLocation.address', serializeAddress(address));
+                }}
+                onCountryChange={addressObject => {
+                  if (addressObject) {
+                    formik.setFieldValue('payeeLocation.structured', addressObject);
+                  }
+                }}
+              />
+            )}
+          </Field>
+        </Box>
         <FastField name="invoiceInfo">
           {({ field }) => (
             <StyledInputField
