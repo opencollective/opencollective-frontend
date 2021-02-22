@@ -204,13 +204,12 @@ const ContributeCard = ({
             </Link>
           )}
           {!hideContributors && (
-            <Box mt={2} height={60}>
+            <Box mt={3} height={60}>
               {contributors && contributors.length > 0 && (
                 <React.Fragment>
                   <Flex alignItems="center" mt={3} mb={2}>
                     <P
-                      color="#4E5052"
-                      fontFamily="Inter"
+                      color="black.700"
                       fontSize="9px"
                       fontWeight="500"
                       letterSpacing="0.06em"
@@ -239,7 +238,7 @@ const ContributeCard = ({
                       </Box>
                     ))}
                     {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
-                      <Container ml={2} pt="0.7em" fontSize="11px" fontWeight="bold" color="#76777A">
+                      <Container ml={2} pt="0.7em" fontSize="11px" fontWeight="bold" color="black.600">
                         + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
                       </Container>
                     )}
