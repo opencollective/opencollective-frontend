@@ -4994,6 +4994,7 @@ type Mutation {
     Can only be set if root
     """
     platformFeePercent: Int
+    platformTipPercent: Int
   ): Order!
   createCollective(
     """

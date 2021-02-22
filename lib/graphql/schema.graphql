@@ -3111,7 +3111,7 @@ type Query {
     CREDIT or DEBIT are accepted values
     """
     type: TransactionType
-  ): PaginatedTransactions
+  ): PaginatedTransactions @deprecated(reason: "2021-02-17: Not used anymore")
   Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
     @deprecated(reason: "2021-01-29: Not used anymore")
   Application(id: Int): Application

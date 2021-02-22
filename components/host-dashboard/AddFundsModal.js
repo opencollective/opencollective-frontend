@@ -8,9 +8,8 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import { collectivePageQuery, getCollectivePageQueryVariables } from '../../components/collective-page/graphql/queries';
-import { budgetSectionQuery, getBudgetSectionQueryVariables } from '../../components/collective-page/sections/Budget';
-
+import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
+import { budgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -52,6 +51,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $description: String!
     $hostFeePercent: Int!
     $platformFeePercent: Int
+    $platformTipPercent: Int
   ) {
     addFunds(
       account: $account
@@ -60,6 +60,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       description: $description
       hostFeePercent: $hostFeePercent
       platformFeePercent: $platformFeePercent
+      platformTipPercent: $platformTipPercent
     ) {
       id
       toAccount {
@@ -78,6 +79,7 @@ const getInitialValues = values => ({
   amount: null,
   hostFeePercent: null,
   platformFeePercent: 0,
+  platformTipPercent: 0,
   description: '',
   fromAccount: null,
   ...values,
@@ -115,6 +117,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 
   const canAddPlatformFee = LoggedInUser.isRoot();
   const defaultPlatformFeePercent = 0;
+  const defaultPlatformTipPercent = 0;
 
   if (!LoggedInUser) {
     return null;
@@ -142,8 +145,12 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           const platformFeePercent = isNaN(values.platformFeePercent)
             ? defaultPlatformFeePercent
             : values.platformFeePercent;
+          const platformTipPercent = isNaN(values.platformTipPercent)
+            ? defaultPlatformTipPercent
+            : values.platformTipPercent;
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
           const platformFee = Math.round(values.amount * (platformFeePercent / 100));
+          const platformTip = Math.round(values.amount * (platformTipPercent / 100));
 
           return (
             <Form>
@@ -195,25 +202,44 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     </StyledInputFormikField>
                   )}
                 </Flex>
-                {canAddPlatformFee && (
-                  <StyledInputFormikField
-                    name="platformFeePercent"
-                    htmlFor="addFunds-platformFeePercent"
-                    label={<FormattedMessage id="PlatformFee" defaultMessage="Platform fee" />}
-                    mt={3}
-                  >
-                    {({ form, field }) => (
-                      <StyledInputPercentage
-                        id={field.id}
-                        placeholder="0"
-                        value={field.value}
-                        error={field.error}
-                        onChange={value => form.setFieldValue(field.name, value)}
-                        onBlur={() => form.setFieldTouched(field.name, true)}
-                      />
-                    )}
-                  </StyledInputFormikField>
-                )}
+                <Flex mt={3} flexWrap="wrap">
+                  {canAddPlatformFee && (
+                    <StyledInputFormikField
+                      name="platformFeePercent"
+                      htmlFor="addFunds-platformFeePercent"
+                      label={<FormattedMessage id="PlatformFee" defaultMessage="Platform fee" />}
+                    >
+                      {({ form, field }) => (
+                        <StyledInputPercentage
+                          id={field.id}
+                          placeholder="0"
+                          value={field.value}
+                          error={field.error}
+                          onChange={value => form.setFieldValue(field.name, value)}
+                          onBlur={() => form.setFieldTouched(field.name, true)}
+                        />
+                      )}
+                    </StyledInputFormikField>
+                  )}
+                  {!canAddPlatformFee && (
+                    <StyledInputFormikField
+                      name="platformTipPercent"
+                      htmlFor="addFunds-platformTipPercent"
+                      label={<FormattedMessage id="PlatformTip" defaultMessage="Platform Tip" />}
+                    >
+                      {({ form, field }) => (
+                        <StyledInputPercentage
+                          id={field.id}
+                          placeholder="0"
+                          value={field.value}
+                          error={field.error}
+                          onChange={value => form.setFieldValue(field.name, value)}
+                          onBlur={() => form.setFieldTouched(field.name, true)}
+                        />
+                      )}
+                    </StyledInputFormikField>
+                  )}
+                </Flex>
                 <StyledInputFormikField
                   name="description"
                   htmlFor="addFunds-description"
@@ -276,9 +302,22 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     }
                   />
                 )}
+                {!canAddPlatformFee && (
+                  <AmountDetailsLine
+                    value={platformTip}
+                    currency={collective.currency}
+                    label={
+                      <FormattedMessage
+                        id="addfunds.platformTip"
+                        defaultMessage="Platform Tip ({platformTip})"
+                        values={{ platformTip: `${platformTipPercent}%` }}
+                      />
+                    }
+                  />
+                )}
                 <StyledHr my={2} borderColor="black.300" />
                 <AmountDetailsLine
-                  value={values.amount - hostFee - platformFee}
+                  value={values.amount - hostFee - platformFee - platformTip}
                   currency={collective.currency}
                   label={<FormattedMessage id="addfunds.netAmount" defaultMessage="Net amount" />}
                   isLargeAmount
@@ -331,6 +370,7 @@ AddFundsModal.propTypes = {
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
     platformFeePercent: PropTypes.number,
+    platformTipPercent: PropTypes.number,
     slug: PropTypes.string,
   }).isRequired,
   onClose: PropTypes.func,
