@@ -25,15 +25,17 @@ class Link extends React.Component {
   constructRoutePath(href) {
     if (typeof href === 'string') {
       return href;
-    } else {
+    } else if (href) {
       return href.pathname;
+    } else {
+      return '';
     }
   }
 
   render() {
     const { href, children, className, title, onClick, openInNewTab } = this.props;
-    const route = this.constructRoutePath(href);
     if (this.isHash) {
+      const route = this.constructRoutePath(href);
       const afterAnimate = () => {
         if (window.history) {
           history.pushState({ ...history.state, as: location.pathname + route }, undefined, route);
