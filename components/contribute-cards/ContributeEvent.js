@@ -28,7 +28,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
 
   return (
     <Contribute
-      route={`${collective.slug}/events/${event.slug}`}
+      route={`/${collective.slug}/events/${event.slug}`}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
       disableCTA={!isPassed && !canOrderTickets}
       contributors={event.contributors}
