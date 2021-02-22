@@ -190,7 +190,7 @@ class ContributionFlowSuccess extends React.Component {
                 collective: this.props.data.order.toAccount.name,
                 CollectiveLink: getI18nLink({
                   as: Link,
-                  href: this.props.data.order.toAccount.slug,
+                  href: `/${this.props.data.order.toAccount.slug}`,
                 }),
               }}
             />
