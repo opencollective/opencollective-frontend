@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Add } from '@styled-icons/material/Add';
-import { get, last } from 'lodash';
+import { get, last, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -55,6 +55,10 @@ class GiftCards extends React.Component {
     this.state = { claimedFilter: 'all' };
   }
 
+  getQueryParams(picked, newParams) {
+    return omitBy({ ...this.props.router.query, ...newParams }, (value, key) => !value || !picked.includes(key));
+  }
+
   renderFilters(onlyConfirmed) {
     let selected = 'all';
     if (onlyConfirmed) {
@@ -64,6 +68,7 @@ class GiftCards extends React.Component {
       selected = 'pending';
     }
 
+    const query = this.getQueryParams(['filter', 'batch']);
     return (
       <StyledButtonSet
         justifyContent="center"
@@ -74,7 +79,7 @@ class GiftCards extends React.Component {
         display="block"
       >
         {({ item, isSelected }) => (
-          <Link href={{ pathname: `/editCollective`, query: this.props.router.query }}>
+          <Link href={{ pathname: `/${this.props.collectiveSlug}/edit/gift-cards`, query: { ...query, filter: item } }}>
             <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
               {item === 'all' && <FormattedMessage id="giftCards.filterAll" defaultMessage="All" />}
               {item === 'redeemed' && <FormattedMessage id="giftCards.filterRedeemed" defaultMessage="Redeemed" />}
@@ -156,7 +161,10 @@ class GiftCards extends React.Component {
                 <StyledSelect
                   options={batchesOptions}
                   onChange={({ value }) =>
-                    this.props.router.push('/editCollective', { ...this.props.router.query, batch: value })
+                    this.props.router.push({
+                      pathname: `/${collectiveSlug}/edit/gift-cards`,
+                      query: this.getQueryParams(['filter', 'batch'], { batch: value }),
+                    })
                   }
                   defaultValue={selectedOption}
                 />

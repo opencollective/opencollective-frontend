@@ -124,7 +124,7 @@ const ConfirmGuestPage = () => {
                     values={{
                       Link: getI18nLink({
                         as: Link,
-                        route: data.confirmGuestAccount?.account.slug,
+                        href: `/${data.confirmGuestAccount?.account.slug}`,
                       }),
                     }}
                   />

@@ -89,7 +89,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                       values={{
                         Link: getI18nLink({
                           as: Link,
-                          href: `${host.slug}/edit/${EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING}`,
+                          href: `/${host.slug}/edit/${EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING}`,
                           openInNewTab: true,
                         }),
                       }}

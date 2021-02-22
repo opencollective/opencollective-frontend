@@ -20,7 +20,7 @@ class OnboardingSkipButton extends React.Component {
         width="fit-content"
         buttonStyle="primary"
         onClick={() => {
-          this.props.router.push(slug);
+          this.props.router.push(`/${slug}`);
         }}
       >
         <FormattedMessage id="SkipOnboarding" defaultMessage="Skip onboarding" />

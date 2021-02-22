@@ -26,7 +26,7 @@ class RecurringContributionsRedirectPage extends React.Component {
 
     if (!loadingLoggedInUser) {
       if (!LoggedInUser) {
-        Router.push('/signin', '/signin?next=/recurring-contributions');
+        Router.push('/signin?next=/recurring-contributions');
       } else {
         setTimeout(() => Router.push(`/${LoggedInUser.collective.slug}/recurring-contributions`), 100);
       }

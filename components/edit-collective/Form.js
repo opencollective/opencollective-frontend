@@ -842,7 +842,9 @@ class EditCollectiveForm extends React.Component {
 
                 <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
                   <Link
-                    href={isEvent ? `${collective.parentCollective.slug}/events/${collective.slug}` : collective.slug}
+                    href={
+                      isEvent ? `${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`
+                    }
                   >
                     <FormattedMessage
                       id="collective.edit.backToProfile"
