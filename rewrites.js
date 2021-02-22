@@ -229,6 +229,15 @@ exports.REWRITES = [
     source: `/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
+  // Embed
+  {
+    source: `/embed/:collectiveSlug/donate/:step(${contributionFlowSteps})?`,
+    destination: '/embed/contribution-flow',
+  },
+  {
+    source: `/embed/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:step(${contributionFlowSteps})?`,
+    destination: '/embed/contribution-flow',
+  },
   // Pledges
   {
     source: `/pledges/new`,

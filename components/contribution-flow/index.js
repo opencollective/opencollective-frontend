@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
-import { find, get, intersection, isEmpty, isNil, pick } from 'lodash';
+import { find, get, intersection, isEmpty, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -355,14 +355,12 @@ class ContributionFlow extends React.Component {
   };
 
   /** Navigate to another step, ensuring all route params are preserved */
-  pushStepRoute = async (stepName, routeParams = {}) => {
+  pushStepRoute = async (stepName, queryParams = {}) => {
     const { collective, tier, isEmbed } = this.props;
-
-    const params = {
-      verb: this.props.verb || 'donate',
-      collectiveSlug: collective.slug,
-      step: stepName === 'details' ? '' : stepName,
-      interval: this.props.fixedInterval || undefined,
+    const verb = this.props.verb || 'donate';
+    const step = stepName === 'details' ? '' : stepName;
+    const allQueryParams = {
+      interval: this.props.fixedInterval,
       ...pick(this.props, [
         'interval',
         'description',
@@ -372,30 +370,27 @@ class ContributionFlow extends React.Component {
         'defaultName',
         'useTheme',
       ]),
-      ...routeParams,
+      ...queryParams,
     };
 
-    let route = `/${params.collectiveSlug}/${params.verb}/${params.step}`;
-    if (tier) {
-      params.tierId = tier.legacyId;
-      params.tierSlug = tier.slug;
-      if (tier.type === 'TICKET' && collective.parent) {
-        params.verb = 'events';
-        params.collectiveSlug = collective.parent.slug;
-        params.eventSlug = collective.slug;
-        route = `/${params.collectiveSlug}/${params.verb}/${params.eventSlug}/order/${params.tierId}/${params.step}`;
-      } else {
-        params.verb = 'contribute'; // Enforce "contribute" verb for ordering tiers
-        route = `/${params.collectiveSlug}/${params.verb}/${params.tierSlug}-${params.tierId}/checkout/${params.step}`;
-      }
-    } else if (params.verb === 'contribute' || params.verb === 'new-contribute') {
-      // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
-      params.verb = 'donate';
-      route = `/${params.collectiveSlug}/${params.verb}/${params.step}`;
-    }
+    let route = `/${collective.slug}/${verb}/${step}`;
 
     if (isEmbed) {
-      route = tier ? '/embed-contribution-flow-tier' : '/embed-contribution-flow';
+      if (tier) {
+        route = `/embed/${collective.slug}/contribute/${tier.slug}-${tier.legacyId}/${step}`;
+      } else {
+        route = `/embed/${collective.slug}/donate/${step}`;
+      }
+    } else if (tier) {
+      if (tier.type === 'TICKET' && collective.parent) {
+        route = `/${collective.parent.slug}/events/${collective.slug}/order/${tier.legacyId}/${step}`;
+      } else {
+        // Enforce "contribute" verb for ordering tiers
+        route = `/${collective.slug}/contribute/${tier.slug}-${tier.legacyId}/checkout/${step}`;
+      }
+    } else if (verb === 'contribute' || verb === 'new-contribute') {
+      // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
+      route = `/${collective.slug}/donate/${step}`;
     }
 
     // Reset errors if any
@@ -404,7 +399,7 @@ class ContributionFlow extends React.Component {
     }
 
     // Navigate to the new route
-    await this.props.router.push({ pathname: route, query: params }, route);
+    await this.props.router.push({ pathname: route, query: omitBy(allQueryParams, value => !value) });
     this.scrollToTop();
   };
 
