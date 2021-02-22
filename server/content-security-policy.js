@@ -34,6 +34,7 @@ const COMMON_DIRECTIVES = {
     '*.paypalobjects.com',
     'sentry.io',
     '*.sentry.io',
+    'country-service.shopifycloud.com',
   ],
   scriptSrc: [
     SELF,
