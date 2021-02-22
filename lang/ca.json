@@ -226,7 +226,7 @@
   "collective.create": "Create Collective",
   "collective.create.connectedAccounts.paypal.description": "Connect a PayPal account to pay expenses with one click. (<a>Instructions</a>).",
   "collective.create.connectedAccounts.stripe.description": "Connect a Stripe account to start accepting financial contributions.",
-  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. (<a>Instructions</a>).",
+  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click.",
   "collective.create.createOrSignIn": "Create an account (or sign in) to start a collective.",
   "collective.create.join": "Uniu-vos a Open Collective",
   "collective.created": "Your Collective has been created.",

@@ -1,114 +1,51 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
-import { useFormik } from 'formik';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { editCollectivePageQuery } from '../../lib/graphql/queries';
+import { connectAccount, disconnectAccount } from '../../lib/api';
 
-import { getI18nLink } from '../I18nFormatters';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
-import StyledInput from '../StyledInput';
-import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 
-const createConnectedAccountMutation = gqlV2/* GraphQL */ `
-  mutation CreateConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
-    createConnectedAccount(connectedAccount: $connectedAccount, account: $account) {
-      id
-      settings
-      service
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const deleteConnectedAccountMutation = gqlV2/* GraphQL */ `
-  mutation DeleteConnectedAccount($connectedAccount: ConnectedAccountReferenceInput!) {
-    deleteConnectedAccount(connectedAccount: $connectedAccount) {
-      id
-    }
-  }
-`;
-
-const EditTransferWiseAccount = props => {
-  const mutationOptions = {
-    context: API_V2_CONTEXT,
-    refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: props.collective.slug } }],
-    awaitRefetchQueries: true,
-  };
+const EditTransferWiseAccount = ({ collective, ...props }) => {
+  const router = useRouter();
+  const error = router.query?.error;
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
-  const [createConnectedAccount, { loading: isCreating, error: createError }] = useMutation(
-    createConnectedAccountMutation,
-    mutationOptions,
-  );
-  const [deleteConnectedAccount, { loading: isDeleting }] = useMutation(
-    deleteConnectedAccountMutation,
-    mutationOptions,
-  );
-  const formik = useFormik({
-    initialValues: {
-      token: '',
-    },
-    async onSubmit(values) {
-      const {
-        data: { createConnectedAccount: createdAccount },
-      } = await createConnectedAccount({
-        variables: {
-          connectedAccount: { token: values.token, service: 'transferwise' },
-          account: { slug: props.collective.slug },
-        },
-      });
-      setConnectedAccount(createdAccount);
-    },
-    validate(values) {
-      const errors = {};
-      if (!values.token) {
-        errors.token = 'Required';
-      }
-      return errors;
-    },
-  });
-
-  const handleDelete = async () => {
-    await deleteConnectedAccount({ variables: { connectedAccount: { legacyId: props.connectedAccount.id } } });
-    setConnectedAccount();
+  const handleConnect = async () => {
+    const json = await connectAccount(collective.id, 'transferwise');
+    window.location.href = json.redirectUrl;
+  };
+  const handleDisconnect = async () => {
+    const json = await disconnectAccount(collective.id, 'transferwise');
+    if (json.deleted === true) {
+      setConnectedAccount(null);
+    }
   };
 
   if (!connectedAccount) {
     return (
-      <form onSubmit={formik.handleSubmit}>
+      <React.Fragment>
         <P fontSize="13px" color="black.700" fontWeight="normal" mb={3}>
           <FormattedMessage
             id="collective.create.connectedAccounts.transferwise.description"
-            defaultMessage="Connect a TransferWise account to pay expenses with one click. (<a>Instructions</a>)."
-            values={{
-              a: getI18nLink({
-                href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise',
-                openInNewTab: true,
-              }),
-            }}
+            defaultMessage="Connect a TransferWise account to pay expenses with one click."
           />
         </P>
-        <StyledInputField
-          name="token"
-          label="Token"
-          error={(formik.touched.token && formik.errors.token) || createError?.message}
-          disabled={isCreating}
-        >
-          {inputProps => (
-            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.token} />
-          )}
-        </StyledInputField>
-        <StyledButton mt={10} type="submit" buttonSize="tiny" loading={isCreating}>
+        {error && (
+          <MessageBox withIcon type="error" mb={3}>
+            {error}
+          </MessageBox>
+        )}
+
+        <StyledButton mt={10} type="submit" buttonSize="tiny" onClick={handleConnect}>
           <FormattedMessage
             id="collective.connectedAccounts.transferwise.button"
             defaultMessage="Connect TransferWise"
           />
         </StyledButton>
-      </form>
+      </React.Fragment>
     );
   } else {
     return (
@@ -118,13 +55,17 @@ const EditTransferWiseAccount = props => {
             id="collective.connectedAccounts.transferwise.connected"
             defaultMessage="TransferWise connected on {updatedAt, date, short}"
             values={{
-              updatedAt: new Date(connectedAccount.updatedAt || connectedAccount.createdAt),
+              updatedAt: new Date(connectedAccount.createdAt),
             }}
           />
         </P>
         <P my={1}>
-          <StyledButton type="submit" buttonSize="tiny" loading={isDeleting} onClick={handleDelete}>
-            <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
+          <StyledButton type="submit" buttonSize="tiny" onClick={handleDisconnect}>
+            <FormattedMessage
+              id="collective.connectedAccounts.disconnect.button"
+              defaultMessage="Disconnect"
+              buttonStyle="dangerSecondary"
+            />
           </StyledButton>
         </P>
       </React.Fragment>
