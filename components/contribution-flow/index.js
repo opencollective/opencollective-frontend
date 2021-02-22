@@ -162,6 +162,7 @@ class ContributionFlow extends React.Component {
             paymentMethod: await this.getPaymentMethod(),
             platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
+            context: { isEmbed: this.props.isEmbed || false },
             taxes: stepSummary && [
               {
                 type: stepSummary.taxType,
