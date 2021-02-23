@@ -271,8 +271,7 @@ const ForFiscalHosts = () => {
         <P fontSize="12px" lineHeight="18px" color="black.800">
           <FormattedMessage
             id="pricing.platformTips"
-            defaultMessage="<strong>Open Collective works with platform tips.</strong><br></br> 
-          Your contributors can choose to give a voluntary tip to the platform on each contribution. <a>Know more</a>."
+            defaultMessage="<strong>Open Collective works with platform tips.</strong><br></br> Your contributors can choose to give a voluntary tip to the platform on each contribution. <a>Know more</a>."
             values={{
               a: getI18nLink({
                 href: '#',

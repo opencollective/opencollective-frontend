@@ -120,8 +120,7 @@ const Pricing = () => (
               <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
                 <FormattedMessage
                   id="pricing.collectiveCard.description"
-                  defaultMessage="<strong>Collect, spend and manage money transparently.</strong> Connect your bank account or apply to a Fiscal Host
-              <br></br><a>Read more</a>"
+                  defaultMessage="<strong>Collect, spend and manage money transparently.</strong> Connect your bank account or apply to a Fiscal Host <br></br><a>Read more</a>"
                   values={{
                     a: getI18nLink({
                       href: '#',
