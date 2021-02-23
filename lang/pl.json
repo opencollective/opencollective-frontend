@@ -226,7 +226,7 @@
   "collective.create": "Utwórz nową kolekcję",
   "collective.create.connectedAccounts.paypal.description": "Połącz konto PayPal, aby zapłacić wydatki jednym kliknięciem. (<a>Instrukcje</a>).",
   "collective.create.connectedAccounts.stripe.description": "Połącz konto Stripe, aby zacząć akceptować wkłady finansowe.",
-  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. (<a>Instructions</a>).",
+  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click.",
   "collective.create.createOrSignIn": "Utwórz konto (lub zaloguj się), aby rozpocząć kolekcję.",
   "collective.create.join": "Dołącz do Open Collective",
   "collective.created": "Twój Collective został utworzony.",
