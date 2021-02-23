@@ -226,7 +226,7 @@
   "collective.create": "Create Collective",
   "collective.create.connectedAccounts.paypal.description": "Connect a PayPal account to pay expenses with one click. (<a>Instructions</a>).",
   "collective.create.connectedAccounts.stripe.description": "Stripe 계정을 연결하여 자금 후원을 허용.",
-  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. (<a>Instructions</a>).",
+  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click.",
   "collective.create.createOrSignIn": "계정을 생성해서 (또는 로그인) 콜렉티브를 시작하세요.",
   "collective.create.join": "Open Collective에 참여하기",
   "collective.created": "Your Collective has been created.",
