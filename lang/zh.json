@@ -226,7 +226,7 @@
   "collective.create": "Create Collective",
   "collective.create.connectedAccounts.paypal.description": "Connect a PayPal account to pay expenses with one click. (<a>Instructions</a>).",
   "collective.create.connectedAccounts.stripe.description": "连接 Stripe 帐户以开始接受捐助。",
-  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. (<a>Instructions</a>).",
+  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click.",
   "collective.create.createOrSignIn": "创建帐户 (或登录)以新建社群。",
   "collective.create.join": "加入 Open社群",
   "collective.created": "Your Collective has been created.",
