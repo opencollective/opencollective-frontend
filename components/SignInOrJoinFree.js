@@ -192,16 +192,12 @@ class SignInOrJoinFree extends React.Component {
               twoFactorAuthenticatorCode: '',
               recoveryCode: '',
             }}
-            onSubmit={(values, actions) => {
+            onSubmit={values => {
               const { twoFactorAuthenticatorCode, recoveryCode } = values;
               if (recoveryCode) {
-                this.props.submitRecoveryCode(recoveryCode).then(() => {
-                  actions.setSubmitting(false);
-                });
+                return this.props.submitRecoveryCode(recoveryCode);
               } else {
-                this.props.submitTwoFactorAuthenticatorCode(twoFactorAuthenticatorCode).then(() => {
-                  actions.setSubmitting(false);
-                });
+                return this.props.submitTwoFactorAuthenticatorCode(twoFactorAuthenticatorCode);
               }
             }}
           >

@@ -103,11 +103,12 @@ class UserProvider extends React.Component {
         this.setState({ enforceTwoFactorAuthForLoggedInUser: true });
         throw new Error(error.message);
       }
-      if (error.message.includes('Too many attempts')) {
+      if (error.type === 'too_many_requests') {
         this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
         throw new Error(error.message);
       }
-      if (error.message.includes('Cannot use this token')) {
+      // We don't want to catch "Two-factor authentication code failed. Please try again" here
+      if (error.type === 'unauthorized' && error.message.includes('Cannot use this token')) {
         this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
         throw new Error(error.message);
       }
