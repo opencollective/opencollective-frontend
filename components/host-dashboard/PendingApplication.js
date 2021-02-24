@@ -21,6 +21,7 @@ import I18nCollectiveTags from '../I18nCollectiveTags';
 import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
+import { APPLICATION_DATA_AMOUNT_FIELDS } from '../ocf-host-application/ApplicationForm';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
@@ -214,8 +215,6 @@ const UserInputContainer = styled(P).attrs({
   fontWeight: '400',
 })``;
 
-const AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmountToBeRaised'];
-
 const PendingApplication = ({ host, application, ...props }) => {
   const intl = useIntl();
   const [isDone, setIsDone] = React.useState(false);
@@ -359,8 +358,10 @@ const PendingApplication = ({ host, application, ...props }) => {
                 <Container mb={3} key={key}>
                   <InfoSectionHeader>{i18nOCFApplicationFormLabel(intl, key)}</InfoSectionHeader>
                   <UserInputContainer>
-                    {AMOUNT_FIELDS.includes(key) && '$'}
-                    {application.customData[key]}
+                    {/** Amount was previously stored as a number in cents */}
+                    {APPLICATION_DATA_AMOUNT_FIELDS.includes(key) && typeof application.customData[key] === 'number'
+                      ? `${application.customData[key] / 100}$`
+                      : application.customData[key]}
                   </UserInputContainer>
                 </Container>
               ))}
