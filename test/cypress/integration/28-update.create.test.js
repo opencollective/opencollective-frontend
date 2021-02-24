@@ -16,6 +16,7 @@ describe('create an update', () => {
     cy.get('[data-cy="privateIcon"]').should('not.exist');
     cy.get('[data-cy=PublishUpdateBtn]').contains('Your Update will be sent to');
     cy.getByDataCy('btn-publish').click();
+    cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy=meta]').contains('draft').should('not.exist');
 
     cy.get('[data-cy=toggleEditUpdate').click();
