@@ -93,6 +93,7 @@ const ApplicationForm = ({
   setInitialValues,
   loadingCollective,
   canApplyWithCollective,
+  router,
   collective: collectiveWithSlug,
 }) => {
   const intl = useIntl();
@@ -132,9 +133,8 @@ const ApplicationForm = ({
     };
 
     const response = await submitApplication({ variables });
-
     if (response.data.createCollective || response.data.applyToHost) {
-      await this.props.router.push('/foundation/apply/success');
+      await router.push('/foundation/apply/success');
       window.scrollTo(0, 0);
     }
   };
