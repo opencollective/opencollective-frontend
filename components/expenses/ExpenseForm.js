@@ -557,6 +557,9 @@ ExpenseFormBody.propTypes = {
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
+      settings: PropTypes.shape({
+        fundingRequest: PropTypes.bool,
+      }),
     }),
     settings: PropTypes.object,
     isApproved: PropTypes.bool,

@@ -109,6 +109,9 @@ class ExpensePage extends React.Component {
         id: PropTypes.string.isRequired,
         currency: PropTypes.string.isRequired,
         isArchived: PropTypes.bool,
+        isHost: PropTypes.bool,
+        host: PropTypes.object,
+        expensesTags: PropTypes.array,
       }),
       expenses: PropTypes.shape({
         nodes: PropTypes.array,

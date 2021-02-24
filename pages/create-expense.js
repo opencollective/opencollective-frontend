@@ -84,6 +84,9 @@ class CreateExpensePage extends React.Component {
             tag: PropTypes.string.isRequired,
           }),
         ),
+        host: PropTypes.shape({
+          id: PropTypes.string.isRequired,
+        }),
       }),
       loggedInAccount: PropTypes.shape({
         adminMemberships: PropTypes.shape({

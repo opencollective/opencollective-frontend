@@ -80,6 +80,7 @@ class PayoutMethodSelect extends React.Component {
       host: PropTypes.shape({
         id: PropTypes.string,
         connectedAccounts: PropTypes.arrayOf(PropTypes.shape({ service: PropTypes.string })),
+        supportedPayoutMethods: PropTypes.array,
       }),
     }).isRequired,
     /** The Acccount being paid with the expense */
@@ -195,12 +196,13 @@ class PayoutMethodSelect extends React.Component {
   });
 
   getOptions = memoizeOne((payoutMethods, payee) => {
+    const hostSupportedPayoutMethods = this.props.collective.host?.supportedPayoutMethods || [];
     const groupedPms = groupBy(payoutMethods, 'type');
     const payeeIsSelfHosted = payee && payee.id == payee.host?.id;
     const payeeIsCollectiveFamilyType =
       payee &&
       AccountTypesWithHost.includes(payee.type) &&
-      this.props.collective.host?.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE);
+      hostSupportedPayoutMethods.includes(PayoutMethodType.ACCOUNT_BALANCE);
 
     // If the Account is of the "Collective" family, account balance should be the only option
     const pmTypes =
@@ -210,12 +212,12 @@ class PayoutMethodSelect extends React.Component {
             // Account Balance only on Same Host
             if (
               type === PayoutMethodType.ACCOUNT_BALANCE &&
-              this.props.collective.host?.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
+              hostSupportedPayoutMethods.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
               payee?.host?.id != this.props.collective.host?.id
             ) {
               return false;
             } else {
-              return this.props.collective.host?.supportedPayoutMethods?.includes(type);
+              return hostSupportedPayoutMethods.includes(type);
             }
           });
 
