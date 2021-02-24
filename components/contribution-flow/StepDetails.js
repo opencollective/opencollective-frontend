@@ -257,6 +257,7 @@ StepDetails.propTypes = {
     type: PropTypes.oneOf(Object.values(TierTypes)),
     customFields: PropTypes.array,
     amount: PropTypes.shape({
+      currency: PropTypes.string,
       valueInCents: PropTypes.number,
     }),
     minAmount: PropTypes.shape({
