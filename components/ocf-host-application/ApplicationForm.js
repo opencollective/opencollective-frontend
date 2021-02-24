@@ -6,11 +6,13 @@ import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
+import { isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '../../lib/collective.lib';
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../lib/constants/collectives';
+import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -81,10 +83,23 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+export const APPLICATION_DATA_AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmountToBeRaised'];
+
 const useApplicationMutation = canApplyWithCollective =>
   useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation, {
     context: API_V2_CONTEXT,
   });
+
+const prepareApplicationData = applicationData => {
+  const formattedApplicationData = { ...applicationData };
+  APPLICATION_DATA_AMOUNT_FIELDS.forEach(key => {
+    if (!isNil(applicationData[key])) {
+      formattedApplicationData[key] = formatCurrency(applicationData[key], 'USD');
+    }
+  });
+
+  return formattedApplicationData;
+};
 
 const ApplicationForm = ({
   LoggedInUser,
@@ -128,7 +143,7 @@ const ApplicationForm = ({
       collective,
       host: { legacyId: OPENCOLLECTIVE_FOUNDATION_ID },
       user,
-      applicationData,
+      applicationData: prepareApplicationData(applicationData),
       ...(canApplyWithCollective && { collective: { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug } }),
     };
 
