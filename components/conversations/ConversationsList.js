@@ -34,7 +34,7 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
         </LinkCollective>
       </Box>
       <div>
-        <Link route="conversation" params={{ collectiveSlug, slug, id }}>
+        <Link href={`/${collectiveSlug}/conversations/${slug}-${id}`}>
           <H5 wordBreak="break-word" mb={2}>
             {title}
           </H5>

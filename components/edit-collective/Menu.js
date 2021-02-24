@@ -227,11 +227,10 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
     <MenuItem
       key={section}
       selected={isSelected}
-      route={isEvent ? 'editEvent' : 'editCollective'}
-      params={
+      href={
         isEvent
-          ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug, section }
-          : { slug: collective.slug, section }
+          ? `${collective.parentCollective.slug}/events/${collective.slug}/edit/${section}`
+          : `${collective.slug}/edit/${section}`
       }
       data-cy={`menu-item-${section}`}
     >

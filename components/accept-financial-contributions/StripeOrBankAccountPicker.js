@@ -10,7 +10,6 @@ import styled from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -183,14 +182,7 @@ class StripeOrBankAccountPicker extends React.Component {
                     </Flex>
                   </ConnectedAccountCard>
                 ) : (
-                  <Link
-                    route="accept-financial-contributions"
-                    params={{
-                      slug: router.query.slug,
-                      path: router.query.path,
-                      method: 'bank',
-                    }}
-                  >
+                  <Link href={`/${router.query.slug}/accept-financial-contributions/${router.query.path}/bank`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"
@@ -226,11 +218,9 @@ class StripeOrBankAccountPicker extends React.Component {
             onClick={async () => {
               this.setState({ buttonLoading: true });
               await addHost(collective, host);
-              await Router.pushRoute('accept-financial-contributions', {
-                slug: router.query.slug,
-                path: router.query.path,
-                state: 'success',
-              });
+              await this.props.router.push(
+                `/${router.query.slug}/accept-financial-contributions/${router.query.path}/success`,
+              );
               window.scrollTo(0, 0);
             }}
             data-cy="afc-finish-button"

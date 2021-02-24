@@ -5,7 +5,6 @@ import styled from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
 import { Dimensions } from '../_constants';
@@ -22,6 +21,8 @@ const Illustration = styled.img`
   width: 248px;
   height: 248px;
 `;
+
+import Link from '../../Link';
 
 import EmptyCollectivePageIllustration from '../../../public/static/images/collective-navigation/EmptyCollectivePageIllustration.png';
 
@@ -58,7 +59,7 @@ const SectionEmpty = props => {
                 }}
               />
             </P>
-            <Link route="discover">
+            <Link href="/discover">
               <StyledButton mt={[4, 3]} buttonStyle="primary" buttonSize="medium" fontSize="14px" lineHeight="16px">
                 <FormattedMessage id="home.discoverCollectives" defaultMessage="Discover Collectives" /> →
               </StyledButton>

@@ -206,7 +206,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
                         <StyledLink
                           as={Link}
-                          route={getSettingsRoute(collective)}
+                          href={getSettingsRoute(collective)}
                           p={ITEM_PADDING}
                           data-cy="edit-collective-btn"
                         >
@@ -217,61 +217,51 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasDashboard && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
-                        <StyledLink
-                          as={Link}
-                          route="host.dashboard"
-                          params={{ hostCollectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Dashboard size="20px" />
-                          <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                        <StyledLink as={Link} href={`/${collective.slug}/dashboard`}>
+                          <Container p={ITEM_PADDING}>
+                            <Dashboard size="20px" />
+                            <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink
-                          as={Link}
-                          route="create-expense"
-                          params={{ collectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Receipt size="20px" />
-                          <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                        <StyledLink as={Link} href={`/${collective.slug}/expenses/new`}>
+                          <Container p={ITEM_PADDING}>
+                            <Receipt size="20px" />
+                            <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
-                        <StyledLink
-                          as={Link}
-                          route="create-expense"
-                          params={{ collectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <MoneyCheckAlt size="20px" />
-                          <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
+                        <StyledLink as={Link} href={`/${collective.slug}/expenses/new`}>
+                          <Container p={ITEM_PADDING}>
+                            <MoneyCheckAlt size="20px" />
+                            <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasManageSubscriptions && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
-                        <StyledLink
-                          as={Link}
-                          route="recurring-contributions"
-                          params={{ slug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Stack size="20px" />
-                          <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                        <StyledLink as={Link} href={`/${collective.slug}/recurring-contributions`}>
+                          <Container p={ITEM_PADDING}>
+                            <Stack size="20px" />
+                            <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasContribute && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTRIBUTE}>
-                        <StyledLink as={Link} {...getContributeRoute(collective)} p={ITEM_PADDING}>
-                          <Planet size="20px" />
-                          <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
+                        <StyledLink as={Link} href={getContributeRoute(collective)}>
+                          <Container p={ITEM_PADDING}>
+                            <Planet size="20px" />
+                            <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
@@ -308,14 +298,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
-                        <StyledLink
-                          as={Link}
-                          route="collective-contact"
-                          params={{ collectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Envelope size="20px" />
-                          <FormattedMessage id="Contact" defaultMessage="Contact" />
+                        <StyledLink as={Link} href={`/${collective.slug}/contact`}>
+                          <Container p={ITEM_PADDING}>
+                            <Envelope size="20px" />
+                            <FormattedMessage id="Contact" defaultMessage="Contact" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}

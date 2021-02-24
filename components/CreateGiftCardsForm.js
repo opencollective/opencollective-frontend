@@ -324,7 +324,7 @@ class CreateGiftCardsForm extends Component {
   renderNoPaymentMethodMessage() {
     return (
       <Flex justifyContent="center">
-        <Link route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'payment-methods' }}>
+        <Link href={`/${this.props.collectiveSlug}/edit/payment-methods`}>
           <StyledButton buttonSize="large" mt="2em" justifyContent="center">
             <FormattedMessage
               id="giftCards.create.requirePM"

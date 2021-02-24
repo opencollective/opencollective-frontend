@@ -160,7 +160,6 @@ const ContributeCard = ({
   title,
   type,
   route,
-  routeParams,
   buttonText,
   children,
   contributors,
@@ -197,7 +196,7 @@ const ContributeCard = ({
         </Flex>
         <Box>
           {!disableCTA && (
-            <Link route={route} params={routeParams}>
+            <Link href={route}>
               <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3} data-cy="contribute-btn">
                 {buttonText || getContributeCTA(type)}
               </StyledButton>
@@ -225,11 +224,7 @@ const ContributeCard = ({
                     {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
                       <Box key={contributor.id} mx={1}>
                         {contributor.collectiveSlug ? (
-                          <Link
-                            route="collective"
-                            params={{ slug: contributor.collectiveSlug }}
-                            title={contributor.name}
-                          >
+                          <Link href={`/${contributor.collectiveSlug}`} title={contributor.name}>
                             <ContributorAvatar contributor={contributor} radius={32} />
                           </Link>
                         ) : (
@@ -264,8 +259,6 @@ ContributeCard.propTypes = {
   buttonText: PropTypes.string,
   /** An image to display on the card hero */
   image: PropTypes.string,
-  /** Params for the route */
-  routeParams: PropTypes.object,
   /** The card body */
   children: PropTypes.node,
   /** If true, the call to action will not be displayed */
@@ -289,6 +282,7 @@ ContributeCard.propTypes = {
   hideContributors: PropTypes.bool,
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
+  router: PropTypes.object,
 };
 
 export default injectIntl(ContributeCard);

@@ -4,12 +4,11 @@ import { gql, useQuery } from '@apollo/client';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
 import { FormattedMessage } from 'react-intl';
 
-import { Link } from '../server/pages';
-
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex, Grid } from './Grid';
 import I18nFormatters from './I18nFormatters';
+import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import Page from './Page';
@@ -108,7 +107,7 @@ const PledgedCollectivePage = ({ collective }) => {
       </Container>
 
       <Container display="flex" justifyContent="center" position="relative" top={-30}>
-        <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
+        <Link href={`/${collective.slug}/pledges/new`}>
           <StyledLink buttonStyle="primary" buttonSize="large" data-cy="makeAPledgeButton">
             <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
           </StyledLink>

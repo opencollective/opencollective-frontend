@@ -6,6 +6,7 @@ import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
+import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '../../lib/collective.lib';
@@ -14,7 +15,6 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
-import { Router } from '../../server/pages';
 
 import Container from '../Container';
 import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
@@ -134,7 +134,7 @@ const ApplicationForm = ({
     const response = await submitApplication({ variables });
 
     if (response.data.createCollective || response.data.applyToHost) {
-      await Router.pushRoute('/foundation/apply/success');
+      await this.props.router.push('/foundation/apply/success');
       window.scrollTo(0, 0);
     }
   };
@@ -576,7 +576,7 @@ const ApplicationForm = ({
                       mb="40px"
                       mt={[null, 3]}
                     >
-                      <Link route="/foundation/apply/fees">
+                      <Link href="/foundation/apply/fees">
                         <StyledButton
                           type="button"
                           mb={[3, 0]}
@@ -630,6 +630,7 @@ ApplicationForm.propTypes = {
   }),
   loadingCollective: PropTypes.bool,
   canApplyWithCollective: PropTypes.bool,
+  router: PropTypes.object,
 };
 
-export default ApplicationForm;
+export default withRouter(ApplicationForm);

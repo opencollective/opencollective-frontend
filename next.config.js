@@ -2,8 +2,10 @@ require('./env');
 
 const withSourceMaps = require('@zeit/next-source-maps')();
 const { getCSPHeaderForNextJS } = require('./server/content-security-policy');
+const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
+  useFileSystemPublicRoutes: false,
   webpack: (config, { webpack, isServer, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
@@ -122,6 +124,9 @@ const nextConfig = {
     } else {
       return [];
     }
+  },
+  async rewrites() {
+    return REWRITES;
   },
 };
 

@@ -51,6 +51,8 @@ const messages = defineMessages({
 const CollectiveCategoryPicker = () => {
   const router = useRouter();
   const { formatMessage } = useIntl();
+  const { hostCollectiveSlug, verb } = router.query;
+  const baseRoute = `/${[hostCollectiveSlug, verb].filter(Boolean).join('/')}`;
 
   return (
     <Fragment>
@@ -74,14 +76,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/openSourceIllustration.png"
                   alt={formatMessage(messages.opensource)}
                 />
-                <Link
-                  route="create-collective"
-                  params={{
-                    hostCollectiveSlug: router.query.hostCollectiveSlug,
-                    verb: router.query.verb,
-                    category: 'opensource',
-                  }}
-                >
+                <Link href={`${baseRoute}/opensource`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.opensource)}
                   </StyledButton>
@@ -103,14 +98,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/climateIllustration.png"
                   alt={formatMessage(messages.covid)}
                 />
-                <Link
-                  route="create-collective"
-                  params={{
-                    hostCollectiveSlug: router.query.hostCollectiveSlug,
-                    verb: router.query.verb,
-                    category: 'covid-19',
-                  }}
-                >
+                <Link href={`${baseRoute}/covid-19`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.covid)}
                   </StyledButton>
@@ -131,14 +119,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/communityIllustration.png"
                   alt={formatMessage(messages.community)}
                 />
-                <Link
-                  route="create-collective"
-                  params={{
-                    hostCollectiveSlug: router.query.hostCollectiveSlug,
-                    verb: router.query.verb,
-                    category: 'community',
-                  }}
-                >
+                <Link href={`${baseRoute}/community`}>
                   <StyledButton
                     fontSize="13px"
                     buttonStyle="primary"

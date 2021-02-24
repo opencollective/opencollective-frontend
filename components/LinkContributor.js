@@ -18,11 +18,7 @@ const LinkContributor = ({ contributor, children }) => {
   } else if (contributor.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (contributor.collectiveSlug) {
-    return (
-      <Link route="collective" params={{ slug: contributor.collectiveSlug }}>
-        {children || contributor.name}
-      </Link>
-    );
+    return <Link href={`/${contributor.collectiveSlug}`}>{children || contributor.name}</Link>;
   } else {
     return children || <span>{contributor.name}</span>;
   }

@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import withViewport, { VIEWPORTS } from '../../lib/withViewport';
-import { Router } from '../../server/pages';
 
 import StyledButton from '../../components/StyledButton';
 import StyledRoundButton from '../../components/StyledRoundButton';
@@ -17,8 +17,8 @@ const params = {
   },
   1: {
     disabled: false,
-    routerStepBack: undefined,
-    routerStepForward: 'contact',
+    routerStepBack: '',
+    routerStepForward: 'contact-info',
   },
   2: {
     disabled: false,
@@ -34,6 +34,7 @@ class OnboardingNavButtons extends React.Component {
     loading: PropTypes.bool,
     viewport: PropTypes.object,
     handleSubmit: PropTypes.func,
+    router: PropTypes.object,
   };
 
   getStepParams = (step, param) => {
@@ -55,11 +56,7 @@ class OnboardingNavButtons extends React.Component {
                 buttonStyle="primary"
                 disabled={this.getStepParams(step, 'disabled')}
                 onClick={() => {
-                  Router.pushRoute('collective-with-onboarding', {
-                    slug,
-                    mode,
-                    step: this.getStepParams(step, 'routerStepBack'),
-                  });
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
                 }}
               >
                 <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
@@ -72,11 +69,7 @@ class OnboardingNavButtons extends React.Component {
                 size={48}
                 disabled={this.getStepParams(step, 'disabled')}
                 onClick={() => {
-                  Router.pushRoute('collective-with-onboarding', {
-                    slug,
-                    mode,
-                    step: this.getStepParams(step, 'routerStepBack'),
-                  });
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
                 }}
               >
                 ←
@@ -97,11 +90,7 @@ class OnboardingNavButtons extends React.Component {
                 buttonStyle="primary"
                 disabled={this.getStepParams(step, 'disabled')}
                 onClick={() => {
-                  Router.pushRoute('collective-with-onboarding', {
-                    slug,
-                    mode,
-                    step: this.getStepParams(step, 'routerStepBack'),
-                  });
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
                 }}
               >
                 <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
@@ -114,11 +103,7 @@ class OnboardingNavButtons extends React.Component {
                 size={48}
                 disabled={this.getStepParams(step, 'disabled')}
                 onClick={() => {
-                  Router.pushRoute('collective-with-onboarding', {
-                    slug,
-                    mode,
-                    step: this.getStepParams(step, 'routerStepBack'),
-                  });
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepBack')}`);
                 }}
               >
                 ←
@@ -131,11 +116,7 @@ class OnboardingNavButtons extends React.Component {
                 mx={1}
                 buttonStyle="primary"
                 onClick={() => {
-                  Router.pushRoute('collective-with-onboarding', {
-                    slug,
-                    mode,
-                    step: this.getStepParams(step, 'routerStepForward'),
-                  });
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepForward')}`);
                 }}
               >
                 <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
@@ -147,11 +128,7 @@ class OnboardingNavButtons extends React.Component {
                 mx={1}
                 size={48}
                 onClick={() => {
-                  Router.pushRoute('collective-with-onboarding', {
-                    slug,
-                    mode,
-                    step: this.getStepParams(step, 'routerStepForward'),
-                  });
+                  this.props.router.push(`/${slug}/${mode}/${this.getStepParams(step, 'routerStepForward')}`);
                 }}
               >
                 →
@@ -164,4 +141,4 @@ class OnboardingNavButtons extends React.Component {
   }
 }
 
-export default withViewport(OnboardingNavButtons);
+export default withViewport(withRouter(OnboardingNavButtons));

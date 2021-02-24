@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { compose, isValidEmail } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import Body from '../components/Body';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
@@ -68,6 +68,7 @@ class RedeemPage extends React.Component {
         name: PropTypes.string,
       }),
     }),
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -100,7 +101,7 @@ class RedeemPage extends React.Component {
       if (this.props.LoggedInUser) {
         await this.props.redeemPaymentMethod({ variables: { code } });
         await this.props.refetchLoggedInUser();
-        Router.pushRoute('redeemed', { code, collectiveSlug: this.props.collectiveSlug });
+        this.props.router.push({ pathname: `/${this.props.collectiveSlug}/redeemed/${code}` });
         return;
       } else {
         await this.props.redeemPaymentMethod({ variables: { code, user: { email, name } } });
@@ -290,4 +291,4 @@ const addRedeemPaymentMethodMutation = graphql(redeemPaymentMethodMutation, {
 
 const addGraphql = compose(addRedeemPageData, addRedeemPaymentMethodMutation);
 
-export default injectIntl(withUser(addGraphql(RedeemPage)));
+export default injectIntl(withUser(withRouter(addGraphql(RedeemPage))));

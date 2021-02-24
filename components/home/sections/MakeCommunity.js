@@ -88,7 +88,7 @@ const MakeCommunity = () => {
             </P>
           </Box>
           <Box display="flex" flexDirection={['column', 'row']} alignItems="center">
-            <Link route="/create">
+            <Link href="/create">
               <StyledButton minWidth={158} my={[2, null, 0]} mr={[0, 3]} buttonStyle="dark" whiteSpace="nowrap">
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </StyledButton>

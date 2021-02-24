@@ -6,12 +6,11 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { Link } from '../server/pages';
-
 import Container from '../components/Container';
 import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
 import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import { Box, Flex, Grid } from '../components/Grid';
+import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -219,7 +218,7 @@ const DiscoverPage = () => {
                 <Flex width={[1, 0.8]} my={2}>
                   <NavList as="ul" p={0} justifyContent="space-between" width={1}>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'all', sort: query.sort }}>
+                      <Link href={{ pathname: '/discover', query: { show: 'all', sort: query.sort } }}>
                         <NavLink
                           data-cy="all-collectives-section"
                           className={
@@ -231,7 +230,7 @@ const DiscoverPage = () => {
                       </Link>
                     </NavLinkContainer>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'open source', sort: query.sort }}>
+                      <Link href={{ pathname: '/discover', query: { show: 'open source', sort: query.sort } }}>
                         <NavLink className={query.show == 'open source' ? 'selected' : ''}>
                           <FormattedMessage
                             id="discover.openSourceCollectives"
@@ -241,21 +240,21 @@ const DiscoverPage = () => {
                       </Link>
                     </NavLinkContainer>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'covid-19', sort: query.sort }}>
+                      <Link href={{ pathname: '/discover', query: { show: 'covid-19', sort: query.sort } }}>
                         <NavLink className={query.show == 'covid-19' ? 'selected' : ''}>
                           <FormattedMessage id="discover.covidCollectives" defaultMessage="COVID-19 collectives" />
                         </NavLink>
                       </Link>
                     </NavLinkContainer>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'pledged', sort: query.sort }}>
+                      <Link href={{ pathname: '/discover', query: { show: 'pledged', sort: query.sort } }}>
                         <NavLink className={query.show == 'pledged' ? 'selected' : ''}>
                           <FormattedMessage id="discover.pledgedCollectives" defaultMessage="Pledged collectives" />
                         </NavLink>
                       </Link>
                     </NavLinkContainer>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'other', sort: query.sort }}>
+                      <Link href={{ pathname: '/discover', query: { show: 'other', sort: query.sort } }}>
                         <NavLink className={query.show == 'other' ? 'selected' : ''}>
                           <FormattedMessage id="discover.other" defaultMessage="Other" />
                         </NavLink>

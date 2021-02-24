@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
-import { find, get, intersection, isEmpty, isNil, pick } from 'lodash';
+import { find, get, intersection, isEmpty, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -20,7 +21,6 @@ import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
-import { Router } from '../../server/pages';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Container from '../Container';
@@ -106,6 +106,7 @@ class ContributionFlow extends React.Component {
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
     createCollective: PropTypes.func.isRequired, // from mutation
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -233,7 +234,7 @@ class ContributionFlow extends React.Component {
       if (isAllowedRedirect(url.host)) {
         window.location.href = url.href;
       } else {
-        await Router.pushRoute('external-redirect', { url: url.href, fallback });
+        await this.props.router.push({ pathname: '/external-redirect', query: { url: url.href, fallback } });
         return this.scrollToTop();
       }
     } else {
@@ -354,14 +355,12 @@ class ContributionFlow extends React.Component {
   };
 
   /** Navigate to another step, ensuring all route params are preserved */
-  pushStepRoute = async (stepName, routeParams = {}) => {
+  pushStepRoute = async (stepName, queryParams = {}) => {
     const { collective, tier, isEmbed } = this.props;
-
-    const params = {
-      verb: this.props.verb || 'donate',
-      collectiveSlug: collective.slug,
-      step: stepName === 'details' ? undefined : stepName,
-      interval: this.props.fixedInterval || undefined,
+    const verb = this.props.verb || 'donate';
+    const step = stepName === 'details' ? '' : stepName;
+    const allQueryParams = {
+      interval: this.props.fixedInterval,
       ...pick(this.props, [
         'interval',
         'description',
@@ -371,29 +370,27 @@ class ContributionFlow extends React.Component {
         'defaultName',
         'useTheme',
       ]),
-      ...routeParams,
+      ...queryParams,
     };
 
-    let route = 'orderCollectiveNew';
-    if (tier) {
-      params.tierId = tier.legacyId;
-      params.tierSlug = tier.slug;
-      if (tier.type === 'TICKET' && collective.parent) {
-        route = 'orderEventTier';
-        params.verb = 'events';
-        params.collectiveSlug = collective.parent.slug;
-        params.eventSlug = collective.slug;
-      } else {
-        route = 'orderCollectiveTierNew';
-        params.verb = 'contribute'; // Enforce "contribute" verb for ordering tiers
-      }
-    } else if (params.verb === 'contribute' || params.verb === 'new-contribute') {
-      // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
-      params.verb = 'donate';
-    }
+    let route = `/${collective.slug}/${verb}/${step}`;
 
     if (isEmbed) {
-      route = tier ? 'embed-contribution-flow-tier' : 'embed-contribution-flow';
+      if (tier) {
+        route = `/embed/${collective.slug}/contribute/${tier.slug}-${tier.legacyId}/${step}`;
+      } else {
+        route = `/embed/${collective.slug}/donate/${step}`;
+      }
+    } else if (tier) {
+      if (tier.type === 'TICKET' && collective.parent) {
+        route = `/${collective.parent.slug}/events/${collective.slug}/order/${tier.legacyId}/${step}`;
+      } else {
+        // Enforce "contribute" verb for ordering tiers
+        route = `/${collective.slug}/contribute/${tier.slug}-${tier.legacyId}/checkout/${step}`;
+      }
+    } else if (verb === 'contribute' || verb === 'new-contribute') {
+      // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
+      route = `/${collective.slug}/donate/${step}`;
     }
 
     // Reset errors if any
@@ -402,7 +399,7 @@ class ContributionFlow extends React.Component {
     }
 
     // Navigate to the new route
-    await Router.pushRoute(route, params);
+    await this.props.router.push({ pathname: route, query: omitBy(allQueryParams, value => !value) });
     this.scrollToTop();
   };
 
@@ -477,7 +474,7 @@ class ContributionFlow extends React.Component {
       steps.push({
         name: 'payment',
         label: intl.formatMessage(STEP_LABELS.payment),
-        isCompleted: stepProfile?.contributorRejectedCategories ? false : true,
+        isCompleted: !stepProfile?.contributorRejectedCategories,
         validate: action => {
           if (action === 'prev') {
             return true;
@@ -718,5 +715,5 @@ const addConfirmOrderMutation = graphql(
 );
 
 export default injectIntl(
-  withUser(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(ContributionFlow)))),
+  withUser(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(withRouter(ContributionFlow))))),
 );

@@ -19,12 +19,13 @@ import Container from '../../components/Container';
 import { formatAccountDetails } from '../../components/edit-collective/utils';
 import { Box, Flex } from '../../components/Grid';
 import I18nFormatters, { getI18nLink } from '../../components/I18nFormatters';
-import Link from '../../components/Link';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
 import { H3, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
+
+import Link from '../Link';
 
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
@@ -189,8 +190,7 @@ class ContributionFlowSuccess extends React.Component {
                 collective: this.props.data.order.toAccount.name,
                 CollectiveLink: getI18nLink({
                   as: Link,
-                  route: 'collective',
-                  params: { slug: this.props.data.order.toAccount.slug },
+                  href: `/${this.props.data.order.toAccount.slug}`,
                 }),
               }}
             />
@@ -255,7 +255,7 @@ class ContributionFlowSuccess extends React.Component {
                 <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={!isEmbed} />
                 {!isEmbed && (
                   <Box my={4}>
-                    <Link route="discover" params={{ show: getMainTag(order.toAccount) }}>
+                    <Link href={{ pathname: '/discover', query: { show: getMainTag(order.toAccount) } }}>
                       <P color="black.800" fontWeight={500}>
                         <FormattedMessage
                           id="NewContributionFlow.Success.DiscoverMore"

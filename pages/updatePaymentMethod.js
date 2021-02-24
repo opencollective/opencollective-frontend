@@ -288,7 +288,7 @@ class UpdatePaymentPage extends React.Component {
                       </StyledButton>
                     )}
                     {!showCreditCardForm && success && (
-                      <Link route={`/${this.props.slug}`}>
+                      <Link href={`/${this.props.slug}`}>
                         <StyledButton
                           buttonStyle="primary"
                           buttonSize="large"

@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { getGithubRepos } from '../../lib/api';
-import { Router } from '../../server/pages';
 
 import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
 import { Box, Flex } from '../Grid';
@@ -62,13 +61,10 @@ class ConnectGithub extends React.Component {
     }
   }
 
-  changeRoute = async params => {
-    params = {
-      ...params,
-      verb: this.props.router.query.verb,
-      hostCollectiveSlug: this.props.router.query.hostCollectiveSlug || undefined,
-    };
-    await Router.pushRoute('create-collective', params);
+  changeRoute = async ({ category, step }) => {
+    const { hostCollectiveSlug, verb } = this.props.router.query;
+    const route = [hostCollectiveSlug, verb || 'create', category, step].filter(Boolean).join('/');
+    await this.props.router.push(`/${route}`);
     window.scrollTo(0, 0);
   };
 
@@ -116,15 +112,7 @@ class ConnectGithub extends React.Component {
                 defaultMessage="Want to apply using {altverification}? {applylink}."
                 values={{
                   applylink: (
-                    <Link
-                      route="create-collective"
-                      params={{
-                        hostCollectiveSlug: 'opensource',
-                        verb: 'apply',
-                        step: 'form',
-                        hostTos: true,
-                      }}
-                    >
+                    <Link href={{ pathname: `/opensource/apply/form`, query: { hostTos: true } }}>
                       <FormattedMessage id="clickHere" defaultMessage="Click here" />
                     </Link>
                   ),

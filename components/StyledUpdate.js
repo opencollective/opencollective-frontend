@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { borders } from 'styled-system';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose, formatDate } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -68,6 +68,7 @@ class StyledUpdate extends Component {
     editUpdate: PropTypes.func.isRequired,
     deleteUpdate: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -107,7 +108,7 @@ class StyledUpdate extends Component {
 
     try {
       await this.props.deleteUpdate({ variables: { id: this.props.update.id } });
-      Router.pushRoute('collective', { slug: this.props.collective.slug });
+      this.props.router.push(`/${this.props.collective.slug}`);
     } catch (err) {
       // TODO: this should be reported to the user
       // eslint-disable-next-line no-console
@@ -202,7 +203,7 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
     if (mode === 'summary') {
       return (
-        <Link route={`/${collective.slug}/updates/${update.slug}`}>
+        <Link href={`/${collective.slug}/updates/${update.slug}`}>
           <H5 data-cy="updateTitle">{update.title}</H5>
         </Link>
       );
@@ -306,7 +307,7 @@ class StyledUpdate extends Component {
         </UpdateWrapper>
         {update.publishedAt && mode === 'details' && (
           <Flex my={4} justifyContent={['center', 'flex-start']}>
-            <Link route={`/${collective.slug}/updates`}>
+            <Link href={`/${collective.slug}/updates`}>
               <StyledButton ml={[0, 5]}>{intl.formatMessage(this.messages['viewLatestUpdates'])}</StyledButton>
             </Link>
           </Flex>
@@ -353,4 +354,4 @@ const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
 
 const addGraphql = compose(addEditUpdateMutation, addDeleteUpdateMutation);
 
-export default injectIntl(addGraphql(StyledUpdate));
+export default injectIntl(addGraphql(withRouter(StyledUpdate)));

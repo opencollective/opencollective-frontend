@@ -56,18 +56,10 @@ const GithubRepositoriesFAQ = props => (
               );
             },
             'for-any-community': function CommunityLink(msg) {
-              return (
-                <Link route="create-collective" params={{ category: 'community', verb: 'create' }}>
-                  {msg}
-                </Link>
-              );
+              return <Link href="/create/community">{msg}</Link>;
             },
             'open-source': function OpenSourceLink(msg) {
-              return (
-                <Link route="create-collective" params={{ category: 'opensource', verb: 'create' }}>
-                  {msg}
-                </Link>
-              );
+              return <Link href="/create/opensource">{msg}</Link>;
             },
           }}
         />

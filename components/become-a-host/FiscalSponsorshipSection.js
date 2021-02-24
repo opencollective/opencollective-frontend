@@ -60,7 +60,7 @@ const FiscalSponsorship = () => {
             />
           </P>
         </Box>
-        <Link route="/organizations/new">
+        <Link href="/organizations/new">
           <StyledButton minWidth={[283, 165, null, null, 183]} buttonStyle="dark" whiteSpace="nowrap">
             <FormattedMessage id="home.createHost" defaultMessage="Create a Fiscal Host" />
           </StyledButton>

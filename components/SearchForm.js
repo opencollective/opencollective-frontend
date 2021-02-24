@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import styled from 'styled-components';
 import { borderRadius, fontSize } from 'styled-system';
-
-import { Router } from '../server/pages';
 
 import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
@@ -38,44 +37,49 @@ const SearchButton = styled(Flex)`
   }
 `;
 
-const handleSubmit = event => {
-  const searchInput = event.target.elements.q;
-  Router.pushRoute('search', { q: searchInput.value });
-  event.preventDefault();
-};
+class SearchForm extends React.Component {
+  handleSubmit = event => {
+    const searchInput = event.target.elements.q;
+    this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
+    event.preventDefault();
+  };
 
-const SearchForm = ({
-  fontSize,
-  onSubmit = handleSubmit,
-  placeholder = 'Search...',
-  width = 1,
-  defaultValue,
-  value,
-  onChange,
-  borderRadius = '20px',
-}) => (
-  <form action="/search" method="GET" onSubmit={onSubmit}>
-    <SearchInputContainer borderRadius={borderRadius} alignItems="center" justifyContent="space-between" p={1}>
-      <SearchButton as="button" ml={1} p={1}>
-        <SearchIcon size={16} fill="#aaaaaa" />
-      </SearchButton>
-      <SearchInput
-        as={StyledInput}
-        type="search"
-        name="q"
-        placeholder={placeholder}
-        py={1}
-        pl={3}
-        width={width}
-        fontSize={fontSize}
-        aria-label="Open Collective search input"
-        defaultValue={defaultValue}
-        value={value}
-        onChange={onChange && (e => onChange(e.target.value))}
-      />
-    </SearchInputContainer>
-  </form>
-);
+  render() {
+    const {
+      fontSize,
+      onSubmit = this.handleSubmit,
+      placeholder = 'Search...',
+      width = 1,
+      defaultValue,
+      value,
+      onChange,
+      borderRadius = '20px',
+    } = this.props;
+    return (
+      <form action="/search" method="GET" onSubmit={onSubmit}>
+        <SearchInputContainer borderRadius={borderRadius} alignItems="center" justifyContent="space-between" p={1}>
+          <SearchButton as="button" ml={1} p={1}>
+            <SearchIcon size={16} fill="#aaaaaa" />
+          </SearchButton>
+          <SearchInput
+            as={StyledInput}
+            type="search"
+            name="q"
+            placeholder={placeholder}
+            py={1}
+            pl={3}
+            width={width}
+            fontSize={fontSize}
+            aria-label="Open Collective search input"
+            defaultValue={defaultValue}
+            value={value}
+            onChange={onChange && (e => onChange(e.target.value))}
+          />
+        </SearchInputContainer>
+      </form>
+    );
+  }
+}
 
 SearchForm.propTypes = {
   fontSize: PropTypes.string,
@@ -87,6 +91,7 @@ SearchForm.propTypes = {
   width: PropTypes.number,
   onChange: PropTypes.func,
   borderRadius: PropTypes.string,
+  router: PropTypes.object,
 };
 
-export default SearchForm;
+export default withRouter(SearchForm);

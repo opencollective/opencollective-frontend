@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-
-import { Router } from '../../../server/pages';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -46,7 +45,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
   return (
     <Container mx={3} my={4}>
       <Box display={['block', null, 'none']}>
-        <BackButton onClick={() => Router.pushRoute('pricing')} />
+        <BackButton onClick={() => this.props.router.push('/pricing')} />
       </Box>
 
       <Flex justifyContent="center">
@@ -95,7 +94,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
             <FormattedMessage
               id="pricing.fiscalHost.featured"
               defaultMessage="Below are some of our most popular hosts or <hosts-link>browse all of them</hosts-link>."
-              values={{ 'hosts-link': getI18nLink({ as: Link, route: '/hosts' }) }}
+              values={{ 'hosts-link': getI18nLink({ as: Link, href: '/hosts' }) }}
             />
           </P>
         </Box>
@@ -144,7 +143,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
                       />
                     </P>
                     <Box mx={3} my={3}>
-                      <Link route={`/${collective.slug}/apply`}>
+                      <Link href={`/${collective.slug}/apply`}>
                         <ApplyButton buttonStyle="primary" data-cy="host-apply-btn">
                           <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
                         </ApplyButton>
@@ -200,6 +199,7 @@ const addPricingHostsData = graphql(pricingHostsQuery, {
   options: {
     variables: { slugs: featuredHostsSlugs },
   },
+  router: PropTypes.object,
 });
 
-export default addPricingHostsData(SingleCollectiveWithoutBankAccount);
+export default addPricingHostsData(withRouter(SingleCollectiveWithoutBankAccount));

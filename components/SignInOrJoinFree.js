@@ -4,12 +4,12 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Field, Form, Formik } from 'formik';
 import { pick } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
 import { checkUserExistence, signin } from '../lib/api';
 import { getWebsiteUrl } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import CreateProfileFAQ from './faqs/CreateProfileFAQ';
 import CreateProfile from './CreateProfile';
@@ -70,6 +70,7 @@ class SignInOrJoinFree extends React.Component {
     enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
     submitTwoFactorAuthenticatorCode: PropTypes.func,
     submitRecoveryCode: PropTypes.func,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -123,9 +124,9 @@ class SignInOrJoinFree extends React.Component {
         // In dev/test, API directly returns a redirect URL for emails like
         // test*@opencollective.com.
         if (response.redirect) {
-          await Router.replaceRoute(response.redirect);
+          await this.props.router.replace(response.redirect);
         } else {
-          await Router.pushRoute('signinLinkSent', { email });
+          await this.props.router.push({ pathname: '/signin/sent', query: { email } });
         }
         window.scrollTo(0, 0);
       } else {
@@ -160,7 +161,7 @@ class SignInOrJoinFree extends React.Component {
           websiteUrl: getWebsiteUrl(),
         },
       });
-      await Router.pushRoute('signinLinkSent', { email: user.email });
+      await this.props.router.push({ pathname: '/signin/sent', query: { email: user.email } });
       window.scrollTo(0, 0);
     } catch (error) {
       this.setState({ error: error.message, submitting: false });
@@ -374,4 +375,4 @@ const signupMutation = gql`
 
 export const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
 
-export default injectIntl(addSignupMutation(SignInOrJoinFree));
+export default injectIntl(addSignupMutation(withRouter(SignInOrJoinFree)));

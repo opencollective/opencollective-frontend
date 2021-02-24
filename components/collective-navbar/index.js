@@ -213,7 +213,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link route={getSettingsRoute(collective)} data-cy="edit-collective-btn">
+        <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
           <MainActionBtn tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
@@ -227,7 +227,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
-        <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+        <Link href={`/${collective.slug}/dashboard`}>
           <MainActionBtn tabIndex="-1">
             <Dashboard size="1em" />
             <Span ml={2}>
@@ -241,7 +241,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
-        <Link {...getContributeRoute(collective)}>
+        <Link href={getContributeRoute(collective)}>
           <MainActionBtn tabIndex="-1">
             <Planet size="1em" />
             <Span ml={2}>
@@ -267,7 +267,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
+        <Link href={`/${collective.slug}/expenses/new`}>
           <MainActionBtn tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
@@ -281,7 +281,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
-        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
+        <Link href={`/${collective.slug}/expenses/new`}>
           <MainActionBtn tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
@@ -295,7 +295,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link route="recurring-contributions" params={{ slug: collective.slug }}>
+        <Link href={`/${collective.slug}/recurring-contributions`}>
           <MainActionBtn tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
@@ -309,7 +309,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
-        <Link route="collective-contact" params={{ collectiveSlug: collective.slug }}>
+        <Link href={`/${collective.slug}/contact`}>
           <MainActionBtn tabIndex="-1">
             <Envelope size="1em" />
             <Span ml={2}>
@@ -446,7 +446,7 @@ const CollectiveNavbar = ({
           {showBackButton && (
             <Box display={['none', 'block']} mr={2}>
               {collective && (
-                <Link route="collective" params={{ slug: collective.slug }}>
+                <Link href={`/${collective.slug}`}>
                   <StyledButton px={1} isBorderless>
                     &larr;
                   </StyledButton>

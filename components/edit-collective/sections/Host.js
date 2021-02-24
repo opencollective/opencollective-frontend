@@ -7,7 +7,6 @@ import styled from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
 import { formatDate } from '../../../lib/utils';
-import { Router } from '../../../server/pages';
 
 import CollectiveCard from '../../CollectiveCard';
 import Container from '../../Container';
@@ -65,10 +64,11 @@ class Host extends React.Component {
   }
 
   updateSelectedOption(option) {
-    Router.pushRoute('editCollective', {
-      slug: this.props.collective.slug,
-      section: 'host',
-      selectedOption: option,
+    this.props.router.push({
+      pathname: `/${this.props.collective.slug}/edit/host`,
+      query: {
+        selectedOption: option,
+      },
     });
   }
 
@@ -217,7 +217,7 @@ class Host extends React.Component {
                         values={{
                           type: collective.type,
                           emptyBalanceLink: (
-                            <Link route="editCollective" params={{ slug: collective.slug, section: 'advanced' }}>
+                            <Link href={`/${collective.slug}/edit/advanced`}>
                               <FormattedMessage id="emptyBalance" defaultMessage="Empty Balance" />
                             </Link>
                           ),
@@ -463,7 +463,7 @@ class Host extends React.Component {
                         defaultMessage="Suggested Hosts"
                       />
                     </H4>
-                    <StyledLink as={Link} fontSize="13px" route="/hosts">
+                    <StyledLink as={Link} fontSize="13px" href="/hosts">
                       <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all Fiscal Hosts" />
                     </StyledLink>
                   </Container>

@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { Link } from '../server/pages';
-
+import Container from './Container';
+import Link from './Link';
 import StyledLink from './StyledLink';
 import StyledSpinner from './StyledSpinner';
 import { withUser } from './UserProvider';
@@ -58,8 +58,10 @@ class LoginBtn extends React.Component {
           py: 2,
         };
     return (
-      <Link route="signin" params={{ next: this.redirectAfterSignin }} passHref>
-        <StyledLink {...buttonProps}>{this.renderContent()}</StyledLink>
+      <Link href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}>
+        <StyledLink as={Container} {...buttonProps}>
+          {this.renderContent()}
+        </StyledLink>
       </Link>
     );
   }
