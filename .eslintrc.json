@@ -35,6 +35,7 @@
     "react/react-in-jsx-scope": ["error"],
     "react/prop-types": ["error"],
     "react/sort-comp": ["error"],
+    "react/no-this-in-sfc": ["error"],
     // simple-import-sort
     "simple-import-sort/imports": [
       "error",

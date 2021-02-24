@@ -78,11 +78,11 @@ const rows = [
 
 const footings = ['', ''];
 
-const SingleCollectiveWithBankAccount = () => (
+const SingleCollectiveWithBankAccount = ({ router }) => (
   <Container mx={3} my={4}>
     <Container>
       <Box display={['block', null, 'none']}>
-        <BackButton onClick={() => this.props.router.push('/pricing')} />
+        <BackButton onClick={() => router.push('/pricing')} />
       </Box>
     </Container>
     <Flex alignItems="center" justifyContent="center" flexDirection="column">

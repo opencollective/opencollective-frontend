@@ -183,7 +183,7 @@ ConfirmButtons.propTypes = {
  * A modal to apply to a given host
  * This modal triggers a query when mounted
  */
-const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }) => {
+const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ...props }) => {
   const query = collective ? applyToHostQuery : applyToHostWithAccountsQuery;
   const { data, loading, error } = useQuery(query, {
     ...GQL_CONTEXT,
@@ -227,7 +227,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }
           }}
           onSubmit={async values => {
             if (isOCFHost) {
-              await this.props.router.push(`/foundation/apply/form?collectiveSlug=${values.collective.slug}`);
+              await router.push(`/foundation/apply/form?collectiveSlug=${values.collective.slug}`);
               window.scrollTo(0, 0);
               return;
             }

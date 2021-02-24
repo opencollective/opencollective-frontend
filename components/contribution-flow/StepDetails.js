@@ -27,7 +27,7 @@ import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
+const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }) => {
   const intl = useIntl();
   const amount = data?.amount;
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
@@ -224,7 +224,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           onConfirm={() => {
             dispatchChange('interval', temporaryInterval);
             setTemporaryInterval(undefined);
-            this.props.router.push(`/${collective.slug}/donate/details`);
+            router.push(`/${collective.slug}/donate/details`);
           }}
         />
       )}

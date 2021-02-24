@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -220,10 +221,10 @@ const footings = [
   },
 ];
 
-const HostOrganization = () => (
+const HostOrganization = ({ router }) => (
   <Container mx={3} my={4}>
     <Box display={['block', null, 'none']}>
-      <BackButton onClick={() => this.props.router.push('/pricing')} />
+      <BackButton onClick={() => router.push('/pricing')} />
     </Box>
 
     <Container display="flex" flexDirection="column" alignItems="center">
@@ -373,5 +374,9 @@ const HostOrganization = () => (
     </Container>
   </Container>
 );
+
+HostOrganization.propTypes = {
+  router: PropTypes.object,
+};
 
 export default withRouter(HostOrganization);

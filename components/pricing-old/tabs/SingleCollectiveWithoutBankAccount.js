@@ -32,7 +32,7 @@ const ApplyButton = styled(StyledButton)`
   padding: 10px 20px;
 `;
 
-const SingleCollectiveWithoutBankAccount = ({ data }) => {
+const SingleCollectiveWithoutBankAccount = ({ data, router }) => {
   const hosts = featuredHostsSlugs
     .map(
       slug =>
@@ -45,7 +45,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
   return (
     <Container mx={3} my={4}>
       <Box display={['block', null, 'none']}>
-        <BackButton onClick={() => this.props.router.push('/pricing')} />
+        <BackButton onClick={() => router.push('/pricing')} />
       </Box>
 
       <Flex justifyContent="center">
@@ -194,7 +194,10 @@ const addPricingHostsData = graphql(pricingHostsQuery, {
   options: {
     variables: { slugs: featuredHostsSlugs },
   },
-  router: PropTypes.object,
 });
+
+SingleCollectiveWithoutBankAccount.propTypes = {
+  router: PropTypes.object,
+};
 
 export default addPricingHostsData(withRouter(SingleCollectiveWithoutBankAccount));
