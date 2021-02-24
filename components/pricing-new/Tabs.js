@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -18,6 +19,11 @@ const Tab = styled.button`
   border: none;
   white-space: nowrap;
   text-transform: capitalize;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
 
   @media screen and (min-width: 64em) {
     margin-left: 0;
@@ -27,7 +33,7 @@ const Tab = styled.button`
   }
 `;
 
-const Tabs = () => (
+const Tabs = ({ activeTab }) => (
   <Container
     display="flex"
     px={['16px', null, 0]}
@@ -40,21 +46,25 @@ const Tabs = () => (
     flexDirection={[null, null, 'column']}
   >
     <Link href="#collective">
-      <Tab isBorderless active>
+      <Tab active={activeTab === 'collective'}>
         <FormattedMessage id="pricing.forCollective" defaultMessage="For Collective" />
       </Tab>
     </Link>
     <Link href="#fiscalHost">
-      <Tab isBorderless>
+      <Tab active={activeTab === 'fiscalHost'}>
         <FormattedMessage id="pricing.forFiscalHost" defaultMessage="For fiscal hosts" />
       </Tab>
     </Link>
     <Link href="#faq">
-      <Tab isBorderless>
+      <Tab active={activeTab === 'faq'}>
         <FormattedMessage id="pricing.faq" defaultMessage="FAQ" />
       </Tab>
     </Link>
   </Container>
 );
+
+Tabs.propTypes = {
+  activeTab: PropTypes.oneOf(['collective', 'fiscalHost', 'faq']),
+};
 
 export default Tabs;
