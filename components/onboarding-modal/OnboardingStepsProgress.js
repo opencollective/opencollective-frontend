@@ -22,15 +22,9 @@ StepLabel.defaultProps = {
 const steps = [{ name: 'Welcome' }, { name: 'Administrators' }, { name: 'Contact' }];
 
 const params = {
-  0: {
-    routerStep: undefined,
-  },
-  1: {
-    routerStep: 'administrators',
-  },
-  2: {
-    routerStep: 'contact',
-  },
+  0: undefined,
+  1: 'administrators',
+  2: 'contact-info',
 };
 
 class OnboardingStepsProgress extends React.Component {
@@ -39,10 +33,6 @@ class OnboardingStepsProgress extends React.Component {
     mode: PropTypes.string,
     slug: PropTypes.string,
     router: PropTypes.object,
-  };
-
-  getStepParams = (step, param) => {
-    return params[step][param];
   };
 
   render() {
@@ -55,7 +45,7 @@ class OnboardingStepsProgress extends React.Component {
           focus={steps[this.props.step]}
           onStepSelect={step => {
             const newStep = steps.findIndex(element => element.name === step.name);
-            this.props.router.push(`/${slug}/${mode}/${this.getStepParams(newStep, 'routerStep')}`);
+            this.props.router.push(`/${slug}/${mode}/${params[newStep] || ''}`);
           }}
         >
           {({ step }) => {
