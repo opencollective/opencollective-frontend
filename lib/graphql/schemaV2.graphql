@@ -5662,6 +5662,16 @@ type OrderCollection implements Collection {
 }
 
 """
+Some context about how an order was created
+"""
+input OrderContextInput {
+  """
+  Whether this order was created using the embedded contribution flow
+  """
+  isEmbed: Boolean
+}
+
+"""
 Input to create a new order
 """
 input OrderCreateInput {
@@ -5712,6 +5722,11 @@ input OrderCreateInput {
   If the tier has some "customFields", use this field to set their values
   """
   customData: JSON
+
+  """
+  Some context about how this order was created
+  """
+  context: OrderContextInput
 }
 
 """
