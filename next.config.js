@@ -108,6 +108,13 @@ const nextConfig = {
       config.optimization.minimize = false;
     }
 
+    // mjs
+    config.module.rules.push({
+      test: /\.mjs$/,
+      include: /node_modules/,
+      type: 'javascript/auto',
+    });
+
     return config;
   },
   async headers() {

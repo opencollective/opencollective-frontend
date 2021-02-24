@@ -164,7 +164,10 @@ class ConnectGithub extends React.Component {
               display={['block', null, 'block']}
               width={[1, 1 / 5]}
               maxWidth={[250, null, 335]}
-              alignSelf={['center', 'none']}
+              alignSelf={['center', 'flex-start']}
+              position="sticky"
+              top={0}
+              pt={[0, 3]}
             />
           </Flex>
         )}

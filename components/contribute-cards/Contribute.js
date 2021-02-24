@@ -10,6 +10,7 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
+import StyledHr from '../StyledHr';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
 
@@ -41,7 +42,7 @@ const CoverImage = styled.div`
 
   ${props => {
     const primary = props.theme.colors.primary;
-    const radial = `radial-gradient(circle, ${primary[300]} 0%, ${primary[800]} 150%), `;
+    const radial = `radial-gradient(circle, ${primary[300]} 0%, ${primary[800]} 100%), `;
     const image = props.image ? `url(${props.image}), ` : '';
     return css`
       background: ${image} ${radial} ${primary[500]};
@@ -118,7 +119,7 @@ const getContributeCTA = type => {
     case ContributionTypes.FINANCIAL_GOAL:
       return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute to this goal" />;
     case ContributionTypes.TICKET:
-      return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
+      return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="RVSP" />;
     case ContributionTypes.EVENT_PARTICIPATE:
     case ContributionTypes.EVENT_PASSED:
       return <FormattedMessage id="ContributeCard.BtnViewEvent" defaultMessage="View Event" />;
@@ -131,11 +132,23 @@ const getContributeCTA = type => {
   }
 };
 
+const getFooterHeading = type => {
+  switch (type) {
+    case ContributionTypes.TICKET:
+    case ContributionTypes.EVENT_PARTICIPATE:
+      return <FormattedMessage id="ContributeCard.footer.ticket" defaultMessage="Attending" />;
+    case ContributionTypes.EVENT_PASSED:
+      return <FormattedMessage id="ContributeCard.footer.pastEvent" defaultMessage="Attended by" />;
+    default:
+      return <FormattedMessage id="ContributeCard.contributionsBy" defaultMessage="Contributions by" />;
+  }
+};
+
 const getCTAButtonStyle = type => {
-  if (type === ContributionTypes.EVENT_PASSED) {
-    return 'standard';
-  } else {
+  if (type === ContributionTypes.TICKET) {
     return 'secondary';
+  } else {
+    return 'primary';
   }
 };
 
@@ -190,12 +203,26 @@ const ContributeCard = ({
             </Link>
           )}
           {!hideContributors && (
-            <Box mt={2} height={60}>
+            <Box mt={3} height={60}>
               {contributors && contributors.length > 0 && (
                 <React.Fragment>
+                  <Flex alignItems="center" mt={3} mb={2}>
+                    <P
+                      color="black.700"
+                      fontSize="9px"
+                      fontWeight="500"
+                      letterSpacing="0.06em"
+                      pr={2}
+                      textTransform="uppercase"
+                      whiteSpace="nowrap"
+                    >
+                      {getFooterHeading(type)}
+                    </P>
+                    <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                  </Flex>
                   <Flex>
                     {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
-                      <Box key={contributor.id} mx={2}>
+                      <Box key={contributor.id} mx={1}>
                         {contributor.collectiveSlug ? (
                           <Link href={`/${contributor.collectiveSlug}`} title={contributor.name}>
                             <ContributorAvatar contributor={contributor} radius={32} />
@@ -206,39 +233,11 @@ const ContributeCard = ({
                       </Box>
                     ))}
                     {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
-                      <Container ml={2} pt="0.7em" fontSize="12px" color="black.700">
+                      <Container ml={2} pt="0.7em" fontSize="11px" fontWeight="bold" color="black.600">
                         + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
                       </Container>
                     )}
                   </Flex>
-                  {stats && stats.all > 0 && (
-                    <P mt={2} fontSize="10px" color="black.700" letterSpacing="-0.6px">
-                      {type !== 'TICKET' && (
-                        <FormattedMessage
-                          id="ContributorsCount"
-                          defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed"
-                          values={{
-                            userCount: stats.users,
-                            orgCount: stats.organizations,
-                            totalCount: stats.all,
-                            both: Number(stats.users && stats.organizations),
-                          }}
-                        />
-                      )}
-                      {type === 'TICKET' && (
-                        <FormattedMessage
-                          id="ParticipantsCount"
-                          defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {is} other {are}} participating"
-                          values={{
-                            userCount: stats.users,
-                            orgCount: stats.organizations,
-                            totalCount: stats.all,
-                            both: Number(stats.users && stats.organizations),
-                          }}
-                        />
-                      )}
-                    </P>
-                  )}
                 </React.Fragment>
               )}
             </Box>

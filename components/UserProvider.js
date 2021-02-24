@@ -77,11 +77,12 @@ class UserProvider extends React.Component {
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
   };
 
-  login = async (token, twoFactorAuthenticatorCode) => {
+  login = async (token, options = {}) => {
     const { getLoggedInUser } = this.props;
+    const { twoFactorAuthenticatorCode, recoveryCode } = options;
     try {
       const LoggedInUser = token
-        ? await getLoggedInUser({ token, twoFactorAuthenticatorCode })
+        ? await getLoggedInUser({ token, twoFactorAuthenticatorCode, recoveryCode })
         : await getLoggedInUser();
       this.setState({
         loadingLoggedInUser: false,
@@ -102,7 +103,12 @@ class UserProvider extends React.Component {
         this.setState({ enforceTwoFactorAuthForLoggedInUser: true });
         throw new Error(error.message);
       }
-      if (error.message.includes('Cannot use this token')) {
+      if (error.type === 'too_many_requests') {
+        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
+        throw new Error(error.message);
+      }
+      // We don't want to catch "Two-factor authentication code failed. Please try again" here
+      if (error.type === 'unauthorized' && error.message.includes('Cannot use this token')) {
         this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
         throw new Error(error.message);
       }

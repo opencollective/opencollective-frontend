@@ -123,7 +123,7 @@ export const getTotalAmount = (stepDetails, stepSummary = null) => {
   const amount = get(stepDetails, 'amount') || 0;
   const taxAmount = get(stepSummary, 'amount') || 0;
   const platformFeeAmount = get(stepDetails, 'platformContribution') || 0;
-  return quantity * (amount + platformFeeAmount) + taxAmount;
+  return quantity * amount + platformFeeAmount + taxAmount;
 };
 
 export const getGQLV2AmountInput = (valueInCents, defaultValue) => {

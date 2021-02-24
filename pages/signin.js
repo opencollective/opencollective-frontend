@@ -166,6 +166,7 @@ class SigninPage extends React.Component {
     }
 
     const error = errorLoggedInUser || this.state.error;
+
     return (
       <React.Fragment>
         {error && !error.includes('Two-factor authentication is enabled') && (
@@ -192,9 +193,15 @@ class SigninPage extends React.Component {
           form={form}
           routes={this.getRoutes()}
           enforceTwoFactorAuthForLoggedInUser={enforceTwoFactorAuthForLoggedInUser}
-          submitTwoFactorAuthenticatorCode={values => {
+          submitTwoFactorAuthenticatorCode={twoFactorAuthenticatorCode => {
             const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            return this.props.login(localStorage2FAToken, values.twoFactorAuthenticatorCode);
+            return this.props.login(localStorage2FAToken, {
+              twoFactorAuthenticatorCode,
+            });
+          }}
+          submitRecoveryCode={recoveryCode => {
+            const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+            return this.props.login(localStorage2FAToken, { recoveryCode });
           }}
         />
       </React.Fragment>

@@ -18,6 +18,7 @@ import CollectivePicker, {
 } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
+import I18nAddressFields, { serializeAddress } from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -59,6 +60,7 @@ const EMPTY_ARRAY = [];
 const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.country', payee?.location?.country || null);
   formik.setFieldValue('payeeLocation.address', payee?.location?.address || '');
+  formik.setFieldValue('payeeLocation.structured', payee?.location?.structured);
 };
 
 const getPayoutMethodsFromPayee = payee => {
@@ -237,7 +239,9 @@ const ExpenseFormPayeeStep = ({
                       <InputTypeCountry
                         data-cy="payee-country"
                         inputId={id}
-                        onChange={value => formik.setFieldValue(field.name, value)}
+                        onChange={value => {
+                          formik.setFieldValue(field.name, value);
+                        }}
                         value={field.value}
                         error={error}
                       />
@@ -245,28 +249,47 @@ const ExpenseFormPayeeStep = ({
                   </StyledInputField>
                 )}
               </FastField>
-              <FastField name="payeeLocation.address">
-                {({ field }) => (
-                  <StyledInputField
-                    name={field.name}
-                    label={formatMessage(msg.address)}
-                    labelFontSize="13px"
-                    error={formatFormErrorMessage(intl, errors.payeeLocation?.address)}
-                    required
-                    mt={3}
-                  >
-                    {inputProps => (
-                      <StyledTextarea
-                        {...inputProps}
-                        {...field}
-                        minHeight={100}
-                        data-cy="payee-address"
-                        placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
-                      />
-                    )}
-                  </StyledInputField>
-                )}
-              </FastField>
+              {values.payeeLocation.structured || values.payeeLocation.address === '' ? (
+                <Field name="payeeLocation.structured">
+                  {({ field }) => (
+                    <I18nAddressFields
+                      name={field.name}
+                      selectedCountry={values.payeeLocation?.country}
+                      value={field.value || {}}
+                      onChange={({ name, value }) => {
+                        const address = {
+                          ...(formik.values.payeeLocation?.structured || {}),
+                          [name]: value,
+                        };
+
+                        formik.setFieldValue('payeeLocation.structured', address);
+                        formik.setFieldValue('payeeLocation.address', serializeAddress(address));
+                      }}
+                      onCountryChange={addressObject => {
+                        if (addressObject) {
+                          formik.setFieldValue('payeeLocation.structured', addressObject);
+                        }
+                      }}
+                    />
+                  )}
+                </Field>
+              ) : (
+                <FastField name="payeeLocation.address">
+                  {({ field }) => (
+                    <StyledInputField name={field.name} label="Address" labelFontSize="13px" required mt={3}>
+                      {inputProps => (
+                        <StyledTextarea
+                          {...inputProps}
+                          {...field}
+                          data-cy="payee-address"
+                          minHeight={100}
+                          placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
+                        />
+                      )}
+                    </StyledInputField>
+                  )}
+                </FastField>
+              )}
               <FastField name="invoiceInfo">
                 {({ field }) => (
                   <StyledInputField
