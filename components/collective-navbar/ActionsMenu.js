@@ -269,7 +269,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <AddFundsBtn collective={collective} host={collective.host}>
                         {btnProps => (
                           <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps} data-cy="add-funds-btn">
                               <AttachMoney size="20px" />
                               <Span>
                                 <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />

@@ -172,6 +172,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     {({ form, field }) => (
                       <StyledInputAmount
                         id={field.id}
+                        data-cy="add-funds-amount"
                         currency={collective.currency}
                         placeholder="0.00"
                         error={field.error}
@@ -230,6 +231,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       {({ form, field }) => (
                         <StyledInputPercentage
                           id={field.id}
+                          data-cy="add-funds-platform-tip"
                           placeholder="0"
                           value={field.value}
                           error={field.error}
@@ -246,7 +248,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
                   mt={3}
                 >
-                  {({ field }) => <StyledInput {...field} />}
+                  {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
                 </StyledInputFormikField>
                 <StyledInputFormikField
                   name="fromAccount"
@@ -257,6 +259,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   {({ form, field }) => (
                     <CollectivePickerAsync
                       inputId={field.id}
+                      data-cy="add-funds-source"
                       types={['USER', 'ORGANIZATION']}
                       creatable
                       error={field.error}
@@ -335,6 +338,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 <Flex justifyContent="center" flexWrap="wrap">
                   <StyledButton
                     type="submit"
+                    data-cy="add-funds-submit-btn"
                     buttonStyle="primary"
                     mx={2}
                     mb={1}

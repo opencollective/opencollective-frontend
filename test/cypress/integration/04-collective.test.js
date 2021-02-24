@@ -155,6 +155,35 @@ describe('Collective page', () => {
       cy.get('[data-cy="longDescription"]').should('have.html', '<div><strong>Hello world!</strong></div>');
     });
   });
+
+  describe('Add funds modal', () => {
+    it('Cannot submit incomplete form', () => {
+      cy.get('[data-cy="collective-navbar-actions-btn"]').click();
+      cy.get('[data-cy="add-funds-btn"]').click();
+      cy.wait(300);
+      cy.get('[data-cy="add-funds-submit-btn"]').should('be.disabled');
+    });
+
+    it('Can add funds as collective host', () => {
+      cy.get('[data-cy="collective-navbar-actions-btn"]').click();
+      cy.get('[data-cy="add-funds-btn"]').click();
+      cy.wait(300);
+      cy.get('[data-cy="add-funds-amount"]').type('20');
+      cy.get('[data-cy="add-funds-platform-tip"]').type('13');
+      cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
+      cy.get('[data-cy="add-funds-source"]').click();
+      cy.get('[data-cy="collective-type-picker-USER"]').click();
+      cy.get('[data-cy="mini-form-email-field"]').type('cypress-test@funds.com');
+      cy.get('[data-cy="mini-form-name-field"]').type('cypress user');
+      cy.get('[data-cy="collective-mini-form-scroll"]').scrollTo('bottom', { duration: 5000 });
+      cy.get('[data-cy="mini-form-save-button"]').click();
+      cy.wait(1000);
+      cy.get('[data-cy="add-funds-submit-btn"]').click();
+      cy.wait(300);
+      scrollToSection(Sections.BUDGET);
+      cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');
+    });
+  });
 });
 
 describe('Collective page with euro currency', () => {
