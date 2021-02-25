@@ -84,6 +84,12 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
           },
           dropdownProps: {
             onClick: () => setTimeout(closeDropdown, 50),
+            onBlur: () =>
+              setTimeout(() => {
+                if (!document.activeElement || !dropdownRef.current?.contains(document.activeElement)) {
+                  closeDropdown();
+                }
+              }, 50),
           },
         })}
       </div>
