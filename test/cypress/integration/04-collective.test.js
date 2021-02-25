@@ -169,8 +169,11 @@ describe('Collective page', () => {
       cy.get('[data-cy="add-funds-btn"]').click();
       cy.wait(300);
       cy.get('[data-cy="add-funds-amount"]').type('20');
-      cy.get('[data-cy="add-funds-platform-tip"]').type('13');
+      cy.get('[data-cy="add-funds-platform-tip-percent"]').type('25');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
+      cy.get('[data-cy="add-funds-platform-tip-amount"]')
+        .invoke('val')
+        .then(text => expect(text).to.equal('5'));
       cy.get('[data-cy="add-funds-source"]').click();
       cy.get('[data-cy="collective-type-picker-USER"]').click();
       cy.get('[data-cy="mini-form-email-field"]').type('cypress-test@funds.com');

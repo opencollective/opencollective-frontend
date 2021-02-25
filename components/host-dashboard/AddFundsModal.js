@@ -12,6 +12,7 @@ import { collectivePageQuery, getCollectivePageQueryVariables } from '../collect
 import { budgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -123,6 +124,15 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     return null;
   }
 
+  function calculateTip(form, field, isAmount) {
+    form.setFieldTouched(field.name, true);
+    if (isAmount) {
+      form.values.platformTipPercent = (field.value * 100) / form.values.amount;
+    } else {
+      form.values.platformTipAmount = (form.values.amount * field.value) / 100;
+    }
+  }
+
   return (
     <StyledModal width="100%" maxWidth={435} {...props} trapFocus>
       <CollectiveModalHeader collective={collective} />
@@ -223,23 +233,40 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     </StyledInputFormikField>
                   )}
                   {!canAddPlatformFee && (
-                    <StyledInputFormikField
-                      name="platformTipPercent"
-                      htmlFor="addFunds-platformTipPercent"
-                      label={<FormattedMessage id="PlatformTip" defaultMessage="Platform Tip" />}
-                    >
-                      {({ form, field }) => (
-                        <StyledInputPercentage
-                          id={field.id}
-                          data-cy="add-funds-platform-tip"
-                          placeholder="0"
-                          value={field.value}
-                          error={field.error}
-                          onChange={value => form.setFieldValue(field.name, value)}
-                          onBlur={() => form.setFieldTouched(field.name, true)}
-                        />
-                      )}
-                    </StyledInputFormikField>
+                    <Container>
+                      <Flex>
+                        <FormattedMessage id="PlatformTip" defaultMessage="Platform Tips" />
+                      </Flex>
+                      <Flex mt={2}>
+                        <StyledInputFormikField name="platformTipAmount" htmlFor="addFunds-platformTipAmount">
+                          {({ form, field }) => (
+                            <StyledInputAmount
+                              id={field.id}
+                              data-cy="add-funds-platform-tip-amount"
+                              currency={collective.currency}
+                              placeholder="0.00"
+                              error={field.error}
+                              value={field.value}
+                              onChange={value => form.setFieldValue(field.name, value)}
+                              onBlur={() => calculateTip(form, field, true)}
+                            />
+                          )}
+                        </StyledInputFormikField>
+                        <StyledInputFormikField name="platformTipPercent" htmlFor="addFunds-platformTipPercent" ml={3}>
+                          {({ form, field }) => (
+                            <StyledInputPercentage
+                              id={field.id}
+                              data-cy="add-funds-platform-tip-percent"
+                              placeholder="0"
+                              value={field.value}
+                              error={field.error}
+                              onChange={value => form.setFieldValue(field.name, value)}
+                              onBlur={() => calculateTip(form, field, false)}
+                            />
+                          )}
+                        </StyledInputFormikField>
+                      </Flex>
+                    </Container>
                   )}
                 </Flex>
                 <StyledInputFormikField
@@ -313,7 +340,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       <FormattedMessage
                         id="addfunds.platformTip"
                         defaultMessage="Platform Tip ({platformTip})"
-                        values={{ platformTip: `${platformTipPercent}%` }}
+                        values={{ platformTip: `${platformTipPercent.toFixed(2)}%` }}
                       />
                     }
                   />
@@ -343,7 +370,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     mx={2}
                     mb={1}
                     minWidth={120}
-                    disabled={!dirty || !isValid}
+                    disabled={!dirty || !isValid || values.amount - hostFee - platformFee - platformTip <= 0}
                     loading={isSubmitting}
                   >
                     <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
