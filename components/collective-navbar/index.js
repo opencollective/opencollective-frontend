@@ -40,7 +40,15 @@ import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown from './NavBarCategoryDropdown';
 
-const MainContainer = styled(Container)`
+const NavBarContainer = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: white;
+  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
+`;
+
+const NavbarContentContainer = styled(Container)`
   background: white;
   display: flex;
   justify-content: flex-start;
@@ -64,18 +72,17 @@ const AvatarBox = styled(Box)`
 
 const InfosContainer = styled(Container)`
   [data-hide='false'] {
-    width: 1;
+    width: 48px;
     opacity: 1;
     visibility: visible;
-    transform: translateX(0);
-    transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out, width 0.1s ease-in-out;
+    transition: opacity 0.1s ease-out, visibility 0.2s ease-out, width 0.075s ease-in-out;
   }
 
   [data-hide='true'] {
-    width: 0;
+    width: 0px;
     visibility: hidden;
     opacity: 0;
-    transform: translateX(-20px);
+    transition: opacity 0.1s ease-out, visibility 0.2s ease-out, width 0.075s ease-in-out;
   }
 `;
 
@@ -404,7 +411,6 @@ const CollectiveNavbar = ({
   onlyInfos,
   isAnimated,
   showBackButton,
-  withShadow,
   useAnchorsForCategories,
 }) => {
   const intl = useIntl();
@@ -431,132 +437,132 @@ const CollectiveNavbar = ({
   });
 
   return (
-    <MainContainer
-      flexDirection={['column', 'row']}
-      px={[0, Dimensions.PADDING_X[1]]}
-      mx="auto"
-      mt={onlyInfos ? 0 : '50px'}
-      maxWidth={Dimensions.MAX_SECTION_WIDTH}
-      boxShadow={withShadow ? ' 0px 6px 10px -5px rgba(214, 214, 214, 0.5)' : 'none'}
-      maxHeight="100vh"
-    >
-      {/** Collective info */}
-      <InfosContainer isAnimated={isAnimated} mr={[0, 2]} display="flex" alignItems="center" px={[3, 0]} py={[2, 1]}>
-        <Flex alignItems="center" data-hide={hideInfosOnDesktop}>
-          {showBackButton && (
-            <Box display={['none', 'block']} mr={2}>
-              {collective && (
-                <Link href={`/${collective.slug}`}>
-                  <StyledButton px={1} isBorderless>
-                    &larr;
-                  </StyledButton>
-                </Link>
-              )}
-            </Box>
-          )}
-          <AvatarBox>
-            <LinkCollective collective={collective} onClick={onCollectiveClick}>
-              <Container borderRadius="25%" mr={2}>
-                <Avatar collective={collective} radius={40} />
-              </Container>
-            </LinkCollective>
-          </AvatarBox>
-          <Box display={['block', null, null, onlyInfos ? 'block' : 'none']}>
-            <CollectiveName
-              mx={2}
-              py={2}
-              fontSize={['16px', '20px']}
-              lineHeight={['24px', '28px']}
-              textAlign="center"
-              fontWeight="500"
-              color="black.800"
-              maxWidth={[200, 280, 500]}
-            >
-              {isLoading ? (
-                <LoadingPlaceholder height={14} minWidth={100} />
-              ) : (
-                <LinkCollective collective={collective} onClick={onCollectiveClick} />
-              )}
-            </CollectiveName>
-          </Box>
-        </Flex>
-        {!onlyInfos && (
-          <Box display={['block', 'none']} marginLeft="auto">
-            {isExpanded ? (
-              <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
-            ) : (
-              <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
-            )}
-          </Box>
-        )}
-      </InfosContainer>
-      {/** Main navbar items */}
-
-      {!onlyInfos && (
-        <Fragment>
-          <CategoriesContainer
-            ref={navbarRef}
-            backgroundColor="#fff"
-            display={isExpanded ? 'flex' : ['none', 'flex']}
-            flexDirection={['column', null, null, 'row']}
-            flexShrink={2}
-            flexGrow={1}
-            justifyContent={['space-between', null, 'flex-start']}
-            order={[0, 3, 0]}
-            overflowX="auto"
-            isExpanded={isExpanded}
-          >
-            {isLoading ? (
-              <LoadingPlaceholder height={43} minWidth={150} mb={2} />
-            ) : (
-              getNavBarMenu(intl, collective, sections).map(({ category, links }) => (
-                <NavBarCategoryDropdown
-                  key={category}
-                  collective={collective}
-                  category={category}
-                  links={links}
-                  isSelected={selectedCategory === category}
-                  useAnchor={useAnchorsForCategories}
-                />
-              ))
-            )}
-          </CategoriesContainer>
-
-          {/* CTAs */}
-          <Container
-            display={isExpanded ? 'flex' : ['none', 'flex']}
-            flexDirection={['column', 'row']}
-            flexBasis="fit-content"
-            marginLeft={[0, 'auto']}
-            backgroundColor="#fff"
-            zIndex={1}
-          >
-            {mainAction && (
-              <Container display={['none', 'flex']} alignItems="center">
-                {mainAction.component}
-                {secondAction?.component ? <Container ml={2}>{secondAction?.component}</Container> : null}
-              </Container>
-            )}
-            {!isLoading && (
-              <CollectiveNavbarActionsMenu
-                collective={collective}
-                callsToAction={callsToAction}
-                hiddenActionForNonMobile={mainAction?.type}
-              />
-            )}
-            {!onlyInfos && (
-              <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
-                {isExpanded ? (
-                  <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
-                ) : (
-                  <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+    <NavBarContainer>
+      <NavbarContentContainer
+        flexDirection={['column', 'row']}
+        px={[0, Dimensions.PADDING_X[1]]}
+        mx="auto"
+        maxWidth={Dimensions.MAX_SECTION_WIDTH}
+        maxHeight="100vh"
+      >
+        {/** Collective info */}
+        <InfosContainer isAnimated={isAnimated} mr={[0, 2]} display="flex" alignItems="center" px={[3, 0]} py={[2, 1]}>
+          <Flex alignItems="center" data-hide={hideInfosOnDesktop}>
+            {showBackButton && (
+              <Container display={['none', null, null, null, 'block']} position="absolute" left={-30}>
+                {collective && (
+                  <Link href={`/${collective.slug}`}>
+                    <StyledButton px={1} isBorderless>
+                      &larr;
+                    </StyledButton>
+                  </Link>
                 )}
               </Container>
             )}
-          </Container>
-        </Fragment>
-      )}
-    </MainContainer>
+            <AvatarBox>
+              <LinkCollective collective={collective} onClick={onCollectiveClick}>
+                <Container borderRadius="25%" mr={2}>
+                  <Avatar collective={collective} radius={40} />
+                </Container>
+              </LinkCollective>
+            </AvatarBox>
+            <Box display={['block', null, null, onlyInfos ? 'block' : 'none']}>
+              <CollectiveName
+                mx={2}
+                py={2}
+                fontSize={['16px', '20px']}
+                lineHeight={['24px', '28px']}
+                textAlign="center"
+                fontWeight="500"
+                color="black.800"
+                maxWidth={[200, 280, 500]}
+              >
+                {isLoading ? (
+                  <LoadingPlaceholder height={14} minWidth={100} />
+                ) : (
+                  <LinkCollective collective={collective} onClick={onCollectiveClick} />
+                )}
+              </CollectiveName>
+            </Box>
+          </Flex>
+          {!onlyInfos && (
+            <Box display={['block', 'none']} marginLeft="auto">
+              {isExpanded ? (
+                <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+              ) : (
+                <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+              )}
+            </Box>
+          )}
+        </InfosContainer>
+        {/** Main navbar items */}
+
+        {!onlyInfos && (
+          <Fragment>
+            <CategoriesContainer
+              ref={navbarRef}
+              backgroundColor="#fff"
+              display={isExpanded ? 'flex' : ['none', 'flex']}
+              flexDirection={['column', null, null, 'row']}
+              flexShrink={2}
+              flexGrow={1}
+              justifyContent={['space-between', null, 'flex-start']}
+              order={[0, 3, 0]}
+              overflowX="auto"
+              isExpanded={isExpanded}
+            >
+              {isLoading ? (
+                <LoadingPlaceholder height={34} minWidth={100} maxWidth={200} my={15} />
+              ) : (
+                getNavBarMenu(intl, collective, sections).map(({ category, links }) => (
+                  <NavBarCategoryDropdown
+                    key={category}
+                    collective={collective}
+                    category={category}
+                    links={links}
+                    isSelected={selectedCategory === category}
+                    useAnchor={useAnchorsForCategories}
+                  />
+                ))
+              )}
+            </CategoriesContainer>
+
+            {/* CTAs */}
+            <Container
+              display={isExpanded ? 'flex' : ['none', 'flex']}
+              flexDirection={['column', 'row']}
+              flexBasis="fit-content"
+              marginLeft={[0, 'auto']}
+              backgroundColor="#fff"
+              zIndex={1}
+            >
+              {mainAction && (
+                <Container display={['none', 'flex']} alignItems="center">
+                  {mainAction.component}
+                  {secondAction?.component ? <Container ml={2}>{secondAction?.component}</Container> : null}
+                </Container>
+              )}
+              {!isLoading && (
+                <CollectiveNavbarActionsMenu
+                  collective={collective}
+                  callsToAction={callsToAction}
+                  hiddenActionForNonMobile={mainAction?.type}
+                />
+              )}
+              {!onlyInfos && (
+                <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
+                  {isExpanded ? (
+                    <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                  ) : (
+                    <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                  )}
+                </Container>
+              )}
+            </Container>
+          </Fragment>
+        )}
+      </NavbarContentContainer>
+    </NavBarContainer>
   );
 };
 
