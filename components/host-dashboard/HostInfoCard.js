@@ -166,7 +166,7 @@ const HostInfoCard = ({ host }) => {
         <Container fontSize="10px" lineHeight="15px" color="black.500" my={2} minHeight={35}>
           <LocationAddress location={host.location} showMessageIfEmpty />
         </Container>
-        <StyledLink as={Link} route="editCollective" params={{ slug: host.slug }} fontSize="10px" lineHeight="15px">
+        <StyledLink as={Link} href={`/${host.slug}/edit`} fontSize="10px" lineHeight="15px">
           <FormattedMessage id="Edit" defaultMessage="Edit" />
         </StyledLink>
       </Flex>

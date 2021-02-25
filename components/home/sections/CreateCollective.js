@@ -68,7 +68,7 @@ const CreateCollective = () => {
       <Wrapper width={['288px', '283px']} height={['288px', '294px']}>
         <BackgroundImage />
         <BackgroundImageHover />
-        <Link route="/create">
+        <Link href="/create">
           <CreateCollectiveButton buttonStyle="dark" minWidth={'164px'}>
             <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
           </CreateCollectiveButton>

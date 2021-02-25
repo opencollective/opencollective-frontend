@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { mapValues, omit } from 'lodash';
+import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
@@ -113,17 +112,24 @@ const getVariablesFromQuery = query => {
   };
 };
 
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'view'];
+
 const HostDashboardExpenses = ({ hostSlug }) => {
-  const { query } = useRouter() || {};
+  const router = useRouter() || {};
+  const query = router.query;
+  const getQueryParams = newParams => {
+    return omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+  };
+
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const { data, error, loading, variables, refetch } = useQuery(hostDashboardExpensesQuery, {
-    variables: { hostSlug, ...getVariablesFromQuery(query) },
+    variables: { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) },
     context: API_V2_CONTEXT,
   });
   const hasFilters = React.useMemo(
     () =>
       Object.entries(query).some(([key, value]) => {
-        return !['view', 'offset', 'limit', 'hostCollectiveSlug', 'paypalApprovalError'].includes(key) && value;
+        return ![...ROUTE_PARAMS, 'offset', 'limit', 'paypalApprovalError'].includes(key) && value;
       }),
     [query],
   );
@@ -131,7 +137,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
       setPaypalPreApprovalError(query.paypalApprovalError);
-      Router.replaceRoute('host.dashboard', omit(query, 'paypalApprovalError'), { shallow: true });
+      router.replace(`/${hostSlug}/dashboard/expenses`, omit(query, 'paypalApprovalError'), { shallow: true });
     }
   }, [query.paypalApprovalError]);
 
@@ -145,7 +151,12 @@ const HostDashboardExpenses = ({ hostSlug }) => {
         <Box p={2}>
           <SearchBar
             defaultValue={query.searchTerm}
-            onSubmit={searchTerm => Router.pushRoute('host.dashboard', { ...query, searchTerm, offset: null })}
+            onSubmit={searchTerm =>
+              router.push({
+                pathname: `/${hostSlug}/dashboard/expenses`,
+                query: getQueryParams({ searchTerm, offset: null }),
+              })
+            }
           />
         </Box>
       </Flex>
@@ -190,10 +201,9 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             collective={data.host}
             filters={query}
             onChange={queryParams =>
-              Router.pushRoute('host.dashboard', {
-                ...query,
-                ...queryParams,
-                offset: null,
+              router.push({
+                pathname: `/${hostSlug}/dashboard/expenses`,
+                query: getQueryParams({ ...queryParams, offset: null }),
               })
             }
           />
@@ -210,15 +220,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
               values={{
                 ResetLink(text) {
                   return (
-                    <Link
-                      data-cy="reset-expenses-filters"
-                      route="host.dashboard"
-                      params={{
-                        ...mapValues(query, () => null),
-                        hostCollectiveSlug: data.host.slug,
-                        view: 'expenses',
-                      }}
-                    >
+                    <Link data-cy="reset-expenses-filters" href={{ pathname: `/${data.host.slug}/dashboard` }}>
                       {text}
                     </Link>
                   );
@@ -243,10 +245,11 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route="host.dashboard"
+              route={`/${hostSlug}/dashboard/expenses`}
               total={data?.expenses?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
+              ignoredQueryParams={ROUTE_PARAMS}
               scrollToTopOnChange
             />
           </Flex>

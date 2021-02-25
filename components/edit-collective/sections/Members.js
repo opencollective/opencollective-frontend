@@ -331,7 +331,7 @@ class Members extends React.Component {
             </MessageBox>
           )}
           <Flex justifyContent="center" flexWrap="wrap" mt={5}>
-            <Link route="collective" params={{ slug: collective.slug }}>
+            <Link href={`/${collective.slug}`}>
               <StyledButton mx={2} minWidth={200}>
                 <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
               </StyledButton>
@@ -376,11 +376,7 @@ class Members extends React.Component {
             id="Members.DefinedInParent"
             defaultMessage="Team members are defined in the settings of {parentName}"
             values={{
-              parentName: (
-                <Link route="editCollective" params={{ slug: parent.slug, section: 'members' }}>
-                  {parent.name}
-                </Link>
-              ),
+              parentName: <Link href={`/${parent.slug}/edit/members`}>{parent.name}</Link>,
             }}
           />
         </MessageBox>

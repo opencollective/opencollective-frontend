@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-
-import { Router } from '../../../server/pages';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -33,7 +32,7 @@ const ApplyButton = styled(StyledButton)`
   padding: 10px 20px;
 `;
 
-const SingleCollectiveWithoutBankAccount = ({ data }) => {
+const SingleCollectiveWithoutBankAccount = ({ data, router }) => {
   const hosts = featuredHostsSlugs
     .map(
       slug =>
@@ -46,7 +45,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
   return (
     <Container mx={3} my={4}>
       <Box display={['block', null, 'none']}>
-        <BackButton onClick={() => Router.pushRoute('pricing')} />
+        <BackButton onClick={() => router.push('/pricing')} />
       </Box>
 
       <Flex justifyContent="center">
@@ -69,7 +68,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.description"
-              defaultMessage="A Fiscal Host is an <strong>organization who offers fund-holding as a service</strong>. They keep your money in their bank account and  <strong>handle things like accounting, taxes, admin, payments, and liability</strong>-so you don’t have to!"
+              defaultMessage="A Fiscal Host is an <strong>organization who offers fund-holding as a service</strong>. They keep your money in their bank account and <strong>handle things like accounting, taxes, admin, payments, and liability</strong>-so you don’t have to!"
               values={I18nFormatters}
             />
           </P>
@@ -83,14 +82,14 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.applyOpenSource"
-              defaultMessage="If you are an open source project, you can apply to join  the Open Source Collective."
+              defaultMessage="If you are an open source project, you can apply to join the Open Source Collective."
             />
           </P>
           <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.featured"
               defaultMessage="Below are some of our most popular hosts or <hosts-link>browse all of them</hosts-link>."
-              values={{ 'hosts-link': getI18nLink({ as: Link, route: '/hosts' }) }}
+              values={{ 'hosts-link': getI18nLink({ as: Link, href: '/hosts' }) }}
             />
           </P>
         </Box>
@@ -139,7 +138,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
                       />
                     </P>
                     <Box mx={3} my={3}>
-                      <Link route={`/${collective.slug}/apply`}>
+                      <Link href={`/${collective.slug}/apply`}>
                         <ApplyButton buttonStyle="primary" data-cy="host-apply-btn">
                           <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
                         </ApplyButton>
@@ -197,4 +196,8 @@ const addPricingHostsData = graphql(pricingHostsQuery, {
   },
 });
 
-export default addPricingHostsData(SingleCollectiveWithoutBankAccount);
+SingleCollectiveWithoutBankAccount.propTypes = {
+  router: PropTypes.object,
+};
+
+export default addPricingHostsData(withRouter(SingleCollectiveWithoutBankAccount));

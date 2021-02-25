@@ -1,6 +1,6 @@
 import React from 'react';
 import { find, get, sortBy, uniqBy } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
@@ -123,7 +123,7 @@ export const getTotalAmount = (stepDetails, stepSummary = null) => {
   const amount = get(stepDetails, 'amount') || 0;
   const taxAmount = get(stepSummary, 'amount') || 0;
   const platformFeeAmount = get(stepDetails, 'platformContribution') || 0;
-  return quantity * (amount + platformFeeAmount) + taxAmount;
+  return quantity * amount + platformFeeAmount + taxAmount;
 };
 
 export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
@@ -138,4 +138,43 @@ export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
 
 export const isAllowedRedirect = host => {
   return ['octobox.io', 'dotnetfoundation.org', 'hopin.com'].includes(host);
+};
+
+const getCanonicalURL = (collective, tier) => {
+  if (!tier) {
+    return `${process.env.WEBSITE_URL}/${collective.slug}/donate`;
+  } else if (collective.type === CollectiveType.EVENT) {
+    const parentSlug = get(collective.parent, 'slug', collective.slug);
+    return `${process.env.WEBSITE_URL}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
+  } else {
+    return `${process.env.WEBSITE_URL}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
+  }
+};
+
+const PAGE_META_MSGS = defineMessages({
+  collectiveTitle: {
+    id: 'CreateOrder.Title',
+    defaultMessage: 'Contribute to {collective}',
+  },
+  eventTitle: {
+    id: 'CreateOrder.TitleForEvent',
+    defaultMessage: 'Order tickets for {event}',
+  },
+});
+
+export const getContributionFlowMetadata = (intl, account, tier) => {
+  if (!account) {
+    return { title: 'Contribute' };
+  }
+
+  return {
+    canonicalURL: getCanonicalURL(account, tier),
+    description: account.description,
+    twitterHandle: account.twitterHandle,
+    image: account.imageUrl || account.backgroundImageUrl,
+    title:
+      account.type === CollectiveType.EVENT
+        ? intl.formatMessage(PAGE_META_MSGS.eventTitle, { event: account.name })
+        : intl.formatMessage(PAGE_META_MSGS.collectiveTitle, { collective: account.name }),
+  };
 };

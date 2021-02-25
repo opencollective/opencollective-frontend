@@ -8,7 +8,6 @@ import Container from './Container';
 import Footer from './Footer';
 import Header from './Header';
 import HostsWithData from './HostsWithData';
-import Link from './Link';
 import { H1, P } from './Text';
 
 const CoverSmallCTA = styled.span`
@@ -53,7 +52,7 @@ class Hosts extends React.Component {
 
     const findOutMoreLink = (
       <CoverSmallCTA>
-        <Link route="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">{findOutMoreMessage}</Link>
+        <a href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">{findOutMoreMessage}</a>
       </CoverSmallCTA>
     );
 

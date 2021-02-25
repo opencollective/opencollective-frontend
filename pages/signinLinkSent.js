@@ -27,7 +27,7 @@ class SignInLinkSent extends Component {
       res.setHeader('Location', '/signin');
       res.end();
     } else {
-      router.pushRoute('signin');
+      router.push('/signin');
     }
     return {};
   }

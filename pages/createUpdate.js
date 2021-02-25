@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 import { compose } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -51,6 +51,7 @@ class CreateUpdatePage extends React.Component {
     createUpdate: PropTypes.func, // from addMutation/createUpdateQuery
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -66,7 +67,7 @@ class CreateUpdatePage extends React.Component {
       update.account = { legacyId: Collective.id };
       const res = await this.props.createUpdate({ variables: { update } });
       this.setState({ isModified: false });
-      return Router.pushRoute(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
+      return this.props.router.push(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
       this.setState({ status: 'error', error: e.message });
     }
@@ -185,4 +186,4 @@ const addCreateUpdateMutation = graphql(createUpdateMutation, {
 
 const addGraphql = compose(addCollectiveCoverData, addCreateUpdateMutation);
 
-export default withUser(addGraphql(CreateUpdatePage));
+export default withUser(addGraphql(withRouter(CreateUpdatePage)));

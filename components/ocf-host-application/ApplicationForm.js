@@ -6,15 +6,17 @@ import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
+import { isNil } from 'lodash';
+import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '../../lib/collective.lib';
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../lib/constants/collectives';
+import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
-import { Router } from '../../server/pages';
 
 import Container from '../Container';
 import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
@@ -81,10 +83,23 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+export const APPLICATION_DATA_AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmountToBeRaised'];
+
 const useApplicationMutation = canApplyWithCollective =>
   useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation, {
     context: API_V2_CONTEXT,
   });
+
+const prepareApplicationData = applicationData => {
+  const formattedApplicationData = { ...applicationData };
+  APPLICATION_DATA_AMOUNT_FIELDS.forEach(key => {
+    if (!isNil(applicationData[key])) {
+      formattedApplicationData[key] = formatCurrency(applicationData[key], 'USD');
+    }
+  });
+
+  return formattedApplicationData;
+};
 
 const ApplicationForm = ({
   LoggedInUser,
@@ -93,6 +108,7 @@ const ApplicationForm = ({
   setInitialValues,
   loadingCollective,
   canApplyWithCollective,
+  router,
   collective: collectiveWithSlug,
 }) => {
   const intl = useIntl();
@@ -127,14 +143,13 @@ const ApplicationForm = ({
       collective,
       host: { legacyId: OPENCOLLECTIVE_FOUNDATION_ID },
       user,
-      applicationData,
+      applicationData: prepareApplicationData(applicationData),
       ...(canApplyWithCollective && { collective: { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug } }),
     };
 
     const response = await submitApplication({ variables });
-
     if (response.data.createCollective || response.data.applyToHost) {
-      await Router.pushRoute('/foundation/apply/success');
+      await router.push('/foundation/apply/success');
       window.scrollTo(0, 0);
     }
   };
@@ -576,7 +591,7 @@ const ApplicationForm = ({
                       mb="40px"
                       mt={[null, 3]}
                     >
-                      <Link route="/foundation/apply/fees">
+                      <Link href="/foundation/apply/fees">
                         <StyledButton
                           type="button"
                           mb={[3, 0]}
@@ -630,6 +645,7 @@ ApplicationForm.propTypes = {
   }),
   loadingCollective: PropTypes.bool,
   canApplyWithCollective: PropTypes.bool,
+  router: PropTypes.object,
 };
 
-export default ApplicationForm;
+export default withRouter(ApplicationForm);

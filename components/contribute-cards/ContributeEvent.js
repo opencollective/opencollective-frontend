@@ -23,21 +23,19 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const isTruncated = description && description.length < event.description.length;
   const isPassed = isPastEvent(event);
   const canOrderTickets = canOrderTicketsFromEvent(event);
-  const eventRouteParams = { parentCollectiveSlug: collective.slug, slug: event.slug };
   const takesMultipleDays = startsAt && endsAt && !DayJs(startsAt).isSame(endsAt, 'day');
   const showYearOnStartDate = !endsAt || !takesMultipleDays ? 'numeric' : undefined; // only if there's no end date
 
   return (
     <Contribute
-      route="event"
-      routeParams={eventRouteParams}
+      route={`/${collective.slug}/events/${event.slug}`}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
       disableCTA={!isPassed && !canOrderTickets}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
       title={
-        <StyledLink as={Link} color="black.800" route="event" params={eventRouteParams}>
+        <StyledLink as={Link} color="black.800" href={`/${collective.slug}/events/${event.slug}`}>
           {event.name}
         </StyledLink>
       }
@@ -73,7 +71,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       )}
       {description}
       {isTruncated && (
-        <Link route="event" params={{ parentCollectiveSlug: collective.slug, slug: event.slug }}>
+        <Link href={`/${collective.slug}/events/${event.slug}`}>
           <Span textTransform="capitalize" whiteSpace="nowrap">
             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
           </Span>

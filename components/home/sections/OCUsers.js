@@ -77,7 +77,7 @@ const User = ({ id, name, picture, type, collectivePath }) => {
   return (
     <Container textAlign="center" display="flex" flexDirection="column" alignItems="center" mx={[null, 3, 3]}>
       <ImgWrapper width={[1, '205px', null, '288px', '368px']}>
-        <Link route={collectivePath}>
+        <Link href={collectivePath}>
           <Img alt={name} src={picture} width="100%" />
         </Link>
       </ImgWrapper>

@@ -68,6 +68,7 @@ export const tierPageQuery = gql`
         }
         parentCollective {
           id
+          slug
           twitterHandle
           image
         }

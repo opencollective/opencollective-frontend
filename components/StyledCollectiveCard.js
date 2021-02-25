@@ -119,10 +119,27 @@ const getBackground = collective => {
   return backgroundImage ? `url(${backgroundImage}) 0 0 / cover no-repeat, ${primaryColor}` : primaryColor;
 };
 
+const CollectiveContainer = ({ useLink, collective, children }) => {
+  if (useLink) {
+    return <LinkCollective collective={collective}>{children}</LinkCollective>;
+  } else {
+    return children;
+  }
+};
+
 /**
  * A card to show a collective that supports including a custom body.
  */
-const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, borderRadius, showWebsite, ...props }) => {
+const StyledCollectiveCard = ({
+  collective,
+  tag,
+  bodyHeight,
+  children,
+  borderRadius,
+  showWebsite,
+  useLink,
+  ...props
+}) => {
   return (
     <StyledCard {...props} position="relative" borderRadius={borderRadius}>
       <Container
@@ -137,18 +154,18 @@ const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, borderRad
       <Container position="relative">
         <Container height={74} px={3} pt={26}>
           <Container borderRadius={borderRadius} background="white" width={48} border="3px solid white">
-            <LinkCollective collective={collective}>
+            <CollectiveContainer useLink={useLink} collective={collective}>
               <Avatar collective={collective} radius={48} />
-            </LinkCollective>
+            </CollectiveContainer>
           </Container>
         </Container>
         <Container display="flex" flexDirection="column" justifyContent="space-between" height={bodyHeight}>
           <Container p={3}>
-            <LinkCollective collective={collective}>
+            <CollectiveContainer useLink={useLink} collective={collective}>
               <P fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
                 {collective.name}
               </P>
-            </LinkCollective>
+            </CollectiveContainer>
             {showWebsite && collective.website && (
               <P fontSize="11px" fontWeight="400" title={collective.website} truncateOverflow mt={1}>
                 <StyledLink color="black.600" href={collective.website} openInNewTabNoFollow>
@@ -199,11 +216,13 @@ StyledCollectiveCard.propTypes = {
   }).isRequired,
   borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showWebsite: PropTypes.bool,
+  useLink: PropTypes.bool,
 };
 
 StyledCollectiveCard.defaultProps = {
   bodyHeight: 260,
   borderRadius: 16,
+  useLink: true,
 };
 
 export default injectIntl(StyledCollectiveCard);

@@ -127,7 +127,7 @@ const PricingTabs = ({ onChange, activeTab }) => {
               defaultMessage="You can check <a>our new pricing page.</a>"
               values={{
                 // eslint-disable-next-line react/display-name
-                a: chunks => <Link route={`/pricing`}>{chunks}</Link>,
+                a: chunks => <Link href={`/pricing`}>{chunks}</Link>,
               }}
             />
           </P>

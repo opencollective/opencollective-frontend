@@ -6,12 +6,14 @@ import styled from 'styled-components';
 
 import { rotateMixin } from '../lib/constants/animations';
 import theme from '../lib/theme';
-import { Link } from '../server/pages';
 
+import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
+import Link from './Link';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
+import StyledLink from './StyledLink';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import { withUser } from './UserProvider';
@@ -43,7 +45,7 @@ NavLinkContainer.defaultProps = {
   px: [1, 2, 3],
 };
 
-const NavLink = styled.a`
+const NavLink = styled(StyledLink)`
   color: #313233;
   font-weight: 500;
   font-size: 1.4rem;
@@ -107,8 +109,8 @@ class TopBar extends React.Component {
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
         ref={this.ref}
       >
-        <Link route="home" passHref>
-          <Flex as="a" alignItems="center">
+        <Link href="/">
+          <Flex alignItems="center">
             <Logo width="24" height="24" />
             <Hide xs>
               <Box mx={2}>
@@ -132,7 +134,7 @@ class TopBar extends React.Component {
           <Hide lg>
             <Box mx={3}>
               <Link href="/search">
-                <Flex as="a">
+                <Flex>
                   <SearchIcon fill="#aaaaaa" size={24} />
                 </Flex>
               </Link>
@@ -143,8 +145,8 @@ class TopBar extends React.Component {
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               {merged.discover && (
                 <NavLinkContainer>
-                  <Link route="discover" passHref>
-                    <NavLink>
+                  <Link href="/discover">
+                    <NavLink as={Container}>
                       <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                     </NavLink>
                   </Link>
@@ -152,8 +154,8 @@ class TopBar extends React.Component {
               )}
               {merged.howItWorks && (
                 <NavLinkContainer>
-                  <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
-                    <NavLink>
+                  <Link href="/how-it-works">
+                    <NavLink as={Container}>
                       <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
                     </NavLink>
                   </Link>
@@ -161,8 +163,8 @@ class TopBar extends React.Component {
               )}
               {merged.pricing && (
                 <NavLinkContainer>
-                  <Link route="pricing" passHref>
-                    <NavLink>
+                  <Link href="/pricing">
+                    <NavLink as={Container}>
                       <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
                     </NavLink>
                   </Link>

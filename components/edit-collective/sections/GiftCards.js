@@ -3,12 +3,10 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Add } from '@styled-icons/material/Add';
-import { get, last } from 'lodash';
+import { get, last, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-
-import { Router } from '../../../server/pages';
 
 import GiftCardDetails from '../../GiftCardDetails';
 import { Box, Flex } from '../../Grid';
@@ -57,6 +55,10 @@ class GiftCards extends React.Component {
     this.state = { claimedFilter: 'all' };
   }
 
+  getQueryParams(picked, newParams) {
+    return omitBy({ ...this.props.router.query, ...newParams }, (value, key) => !value || !picked.includes(key));
+  }
+
   renderFilters(onlyConfirmed) {
     let selected = 'all';
     if (onlyConfirmed) {
@@ -66,6 +68,7 @@ class GiftCards extends React.Component {
       selected = 'pending';
     }
 
+    const query = this.getQueryParams(['filter', 'batch']);
     return (
       <StyledButtonSet
         justifyContent="center"
@@ -76,7 +79,7 @@ class GiftCards extends React.Component {
         display="block"
       >
         {({ item, isSelected }) => (
-          <Link route="editCollective" params={{ ...this.props.router.query, filter: item, offset: 0 }}>
+          <Link href={{ pathname: `/${this.props.collectiveSlug}/edit/gift-cards`, query: { ...query, filter: item } }}>
             <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
               {item === 'all' && <FormattedMessage id="giftCards.filterAll" defaultMessage="All" />}
               {item === 'redeemed' && <FormattedMessage id="giftCards.filterRedeemed" defaultMessage="Redeemed" />}
@@ -91,7 +94,7 @@ class GiftCards extends React.Component {
   renderNoGiftCardMessage(onlyConfirmed) {
     if (onlyConfirmed === undefined) {
       return (
-        <Link route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}>
+        <Link href={`/${this.props.collectiveSlug}/edit/gift-cards-create`}>
           <FormattedMessage id="giftCards.createFirst" defaultMessage="Create your first gift card!" />
         </Link>
       );
@@ -144,7 +147,7 @@ class GiftCards extends React.Component {
             >
               {this.renderFilters(onlyConfirmed)}
               <Flex justifyContent="center">
-                <Link route="editCollective" params={{ slug: collectiveSlug, section: 'gift-cards-create' }}>
+                <Link href={`/${collectiveSlug}/edit/gift-cards-create`}>
                   <StyledButton buttonStyle="primary" buttonSize="medium">
                     <Add size="1em" />
                     {'  '}
@@ -158,7 +161,10 @@ class GiftCards extends React.Component {
                 <StyledSelect
                   options={batchesOptions}
                   onChange={({ value }) =>
-                    Router.pushRoute('editCollective', { ...this.props.router.query, batch: value })
+                    this.props.router.push({
+                      pathname: `/${collectiveSlug}/edit/gift-cards`,
+                      query: this.getQueryParams(['filter', 'batch'], { batch: value }),
+                    })
                   }
                   defaultValue={selectedOption}
                 />

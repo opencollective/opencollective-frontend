@@ -181,20 +181,15 @@ class CollectiveCard extends React.Component {
     const truncatedDescription = collective.description && firstSentence(collective.description, 80);
     const description = collective.description;
 
-    let route, params;
+    let route;
     if (collective.type === 'EVENT') {
-      route = 'event';
-      params = {
-        parentCollectiveSlug: collective.parentCollective?.slug || 'collective',
-        slug: collective.slug,
-      };
+      route = `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}`;
     } else {
-      route = 'collective';
-      params = { slug: collective.slug };
+      route = `/${collective.slug}`;
     }
 
     return (
-      <Link route={route} target="_top" params={params}>
+      <Link href={route} target="_top">
         <CardWrapper className={`CollectiveCard ${collective.type}`} {...this.props}>
           <Container position="relative" overflow="hidden" width="100%" height="14rem" borderBottom="5px solid #46b0ed">
             <Container

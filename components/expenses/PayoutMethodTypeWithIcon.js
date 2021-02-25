@@ -5,7 +5,7 @@ import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
 import { University as BankIcon } from '@styled-icons/fa-solid/University';
 import { FormattedMessage } from 'react-intl';
 
-import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { INVITE, PayoutMethodType } from '../../lib/constants/payout-method';
 
 import Avatar from '../Avatar';
 import { Flex } from '../Grid';
@@ -48,7 +48,7 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
           </Span>
         </Flex>
       );
-    case PayoutMethodType.INVITE:
+    case INVITE:
       return (
         <Flex alignItems="center">
           <Avatar name="?" size={iconSize} backgroundColor="blue.100" color="blue.400" fontWeight="500" />
@@ -72,7 +72,7 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
 
 PayoutMethodTypeWithIcon.propTypes = {
   isLoading: PropTypes.bool,
-  type: PropTypes.oneOf(Object.values(PayoutMethodType)),
+  type: PropTypes.oneOf([...Object.values(PayoutMethodType), INVITE]),
   fontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   fontWeight: PropTypes.string,
   color: PropTypes.string,

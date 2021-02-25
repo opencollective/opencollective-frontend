@@ -83,14 +83,16 @@ const ViewAllLink = ({ collective, filter }) => {
   switch (filter) {
     case 'expenses':
       return (
-        <Link route="expenses" params={{ collectiveSlug: collective.slug }} data-cy="view-all-expenses-link">
-          <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
-          &rarr;
+        <Link href={`/${collective.slug}/expenses`} data-cy="view-all-expenses-link">
+          <span>
+            <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
+            &rarr;
+          </span>
         </Link>
       );
     case 'transactions':
       return (
-        <Link route="transactions" params={{ collectiveSlug: collective.slug }} data-cy="view-all-transactions-link">
+        <Link href={`/${collective.slug}/transactions`} data-cy="view-all-transactions-link">
           <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> &rarr;
         </Link>
       );

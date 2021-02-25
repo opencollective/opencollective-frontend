@@ -10,6 +10,7 @@ import { formatCurrency } from '../lib/currency-utils';
 
 import GiftCard from './icons/GiftCard';
 import Avatar from './Avatar';
+import Container from './Container';
 import { Box, Flex } from './Grid';
 import Link from './Link';
 import StyledButton from './StyledButton';
@@ -30,11 +31,7 @@ const GiftCardStatus = ({ isConfirmed, collective, data }) => {
         id="giftCards.claimedBy"
         defaultMessage="claimed by {user}"
         values={{
-          user: (
-            <Link route="collective" params={{ slug: collective.slug }}>
-              {collective.name}
-            </Link>
-          ),
+          user: <Link href={`/${collective.slug}`}>{collective.name}</Link>,
         }}
       />
     );
@@ -88,7 +85,6 @@ class GiftCardDetails extends React.Component {
     const { giftCard, collectiveSlug } = this.props;
     const redeemCode = giftCard.uuid.split('-')[0];
     const email = get(giftCard, 'data.email');
-    const linkParams = email ? { code: redeemCode, email, collectiveSlug } : { code: redeemCode, collectiveSlug };
 
     return (
       <Flex mt="0.75em" fontSize="0.8em">
@@ -97,9 +93,7 @@ class GiftCardDetails extends React.Component {
             <DetailsColumnHeader>
               <FormattedMessage id="giftCards.redeemCode" defaultMessage="REDEEM CODE" />
             </DetailsColumnHeader>
-            <Link route="redeem" params={linkParams}>
-              {redeemCode}
-            </Link>
+            <Link href={{ pathname: `/${collectiveSlug}/redeem/${redeemCode}`, query: { email } }}>{redeemCode}</Link>
           </Flex>
         )}
         <Flex flexDirection="column" mr="2em">
@@ -158,9 +152,11 @@ class GiftCardDetails extends React.Component {
         {/* Avatar column */}
         <Box mr="20px">
           {isConfirmed ? (
-            <Link route="collective" params={{ slug: collective.slug }} title={collective.name} passHref>
-              <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
-              <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />
+            <Link href={`/${collective.slug}`} title={collective.name}>
+              <Container>
+                <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
+                <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />
+              </Container>
             </Link>
           ) : (
             <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />

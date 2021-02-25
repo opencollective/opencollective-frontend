@@ -255,11 +255,7 @@ class InputField extends React.Component {
                   <label>{capitalize(field.label)}</label>
                 </Box>
                 <Box width={[1, 2 / 12]}>
-                  <StyledInputTags
-                    {...field}
-                    renderUpdatedTags
-                    onChange={entries => field.onChange(entries.map(e => e.value))}
-                  />
+                  <StyledInputTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
                 </Box>
               </Flex>
             )}
@@ -272,11 +268,7 @@ class InputField extends React.Component {
                 )}
                 {field.description && <HelpBlock p={1}>{field.description}</HelpBlock>}
                 <Box width={1}>
-                  <StyledInputTags
-                    {...field}
-                    renderUpdatedTags
-                    onChange={entries => field.onChange(entries.map(e => e.value))}
-                  />
+                  <StyledInputTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
                 </Box>
               </Flex>
             )}
@@ -463,6 +455,7 @@ class InputField extends React.Component {
 
       case 'select': {
         if (!field.options || field.options.length === 0) {
+          // eslint-disable-next-line no-console
           console.warn('>>> InputField: options.length needs to be >= 1', field.options);
           return null;
         }

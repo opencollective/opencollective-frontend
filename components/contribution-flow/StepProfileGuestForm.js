@@ -36,12 +36,23 @@ export const validateGuestProfile = (stepProfile, stepDetails) => {
   }
 };
 
-const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) => {
+const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defaultName, isEmbed, onSignInClick }) => {
   const totalAmount = getTotalAmount(stepDetails);
   const dispatchChange = (field, value) => {
     const newData = set({ ...data, isGuest: true }, field, value);
     onChange({ stepProfile: newData });
   };
+
+  React.useEffect(() => {
+    if (!data) {
+      if (defaultName) {
+        dispatchChange('name', defaultName);
+      }
+      if (defaultEmail) {
+        dispatchChange('email', defaultEmail);
+      }
+    }
+  }, [defaultEmail, defaultName]);
 
   return (
     <Container border="none" width={1} py={3}>
@@ -63,7 +74,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
             )}
           </StyledInputField>
         </Box>
-        <Box width={1 / 2} mb={3} ml={1}>
+        <Box width="50%" minWidth={185} flex="1 1 50%" mb={3} mr={1}>
           <StyledInputField
             label={<FormattedMessage id="Email" defaultMessage="Email" />}
             htmlFor="email"
@@ -130,34 +141,39 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, onSignInClick }) =>
         />
       </P>
       <StepProfileInfoMessage amount={totalAmount} interval={stepDetails.interval} />
-      {stepDetails.interval && (
-        <P color="black.500" fontSize="12px" my={3} data-cy="join-conditions">
-          <FormattedMessage
-            id="SignIn.legal"
-            defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
-            values={I18nFormatters}
-          />
-        </P>
+      <P color="black.500" fontSize="12px" mt={4} data-cy="join-conditions">
+        <FormattedMessage
+          id="SignIn.legal"
+          defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
+          values={I18nFormatters}
+        />
+      </P>
+      {!isEmbed && (
+        <React.Fragment>
+          <Flex width={1} alignItems="center" justifyContent="center" mb={3} mt={3}>
+            <StyledHr width="100%" borderColor="black.300" />
+          </Flex>
+          <Flex alignItems="center" mt={3}>
+            <P fontSize="14px" mr={2} color="black.700">
+              <FormattedMessage
+                id="GuestForm.contributeAsOrg"
+                defaultMessage="Want to contribute as an organization?"
+              />
+            </P>
+            <StyledButton
+              onClick={onSignInClick}
+              type="button"
+              buttonStyle="secondary"
+              buttonSize="tiny"
+              isBorderless
+              data-cy="cf-profile-signin-btn"
+            >
+              <FormattedMessage id="signInOrJoinFree" defaultMessage="Sign in or join free" />
+              &nbsp;→
+            </StyledButton>
+          </Flex>
+        </React.Fragment>
       )}
-      <Flex width={1} alignItems="center" justifyContent="center" mb={3} mt={4}>
-        <StyledHr width="100%" borderColor="black.300" />
-      </Flex>
-      <Flex alignItems="center" mt={3}>
-        <P fontSize="14px" mr={2} color="black.700">
-          <FormattedMessage id="GuestForm.contributeAsOrg" defaultMessage="Want to contribute as an organization?" />
-        </P>
-        <StyledButton
-          onClick={onSignInClick}
-          type="button"
-          buttonStyle="secondary"
-          buttonSize="tiny"
-          isBorderless
-          data-cy="cf-profile-signin-btn"
-        >
-          <FormattedMessage id="signInOrJoinFree" defaultMessage="Sign in or join free" />
-          &nbsp;→
-        </StyledButton>
-      </Flex>
     </Container>
   );
 };
@@ -170,6 +186,9 @@ StepProfileGuestForm.propTypes = {
   data: PropTypes.object,
   onChange: PropTypes.func,
   onSignInClick: PropTypes.func,
+  defaultEmail: PropTypes.string,
+  defaultName: PropTypes.string,
+  isEmbed: PropTypes.bool,
 };
 
 export default StepProfileGuestForm;

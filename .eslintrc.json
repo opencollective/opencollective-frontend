@@ -1,10 +1,10 @@
 {
   "extends": ["opencollective"],
   "env": { "jest": true },
-  "plugins": ["graphql", "react-hooks", "simple-import-sort"],
+  "plugins": ["graphql", "react-hooks", "simple-import-sort", "formatjs"],
   "rules": {
     "no-console": "warn",
-    "require-atomic-updates": "warn",
+    "require-atomic-updates": "off",
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "no-restricted-imports": [
       "error",
@@ -35,6 +35,7 @@
     "react/react-in-jsx-scope": ["error"],
     "react/prop-types": ["error"],
     "react/sort-comp": ["error"],
+    "react/no-this-in-sfc": ["error"],
     // simple-import-sort
     "simple-import-sort/imports": [
       "error",
@@ -64,6 +65,15 @@
           ["public/static/images", "^.+\\.svg$", "^.+\\.png$"]
         ]
       }
-    ]
+    ],
+    // formatjs
+    "formatjs/enforce-default-message": ["error"],
+    "formatjs/enforce-plural-rules": ["error"],
+    "formatjs/no-multiple-whitespaces": ["error"],
+    "formatjs/no-offset": ["error"],
+    "formatjs/enforce-placeholders": ["off"],
+    "formatjs/no-camel-case": ["off"],
+    "formatjs/no-emoji": ["off"],
+    "formatjs/no-multiple-plurals": ["off"]
   }
 }

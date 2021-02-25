@@ -52,14 +52,6 @@ You can target them with CSS to customize them:
       color: black;
     }
 
-### Show next events
-
-    <script src="https://opencollective.com/:collectiveSlug/events.js" width="500"></script>
-
-Example:
-
-<script src="https://opencollective.com/brusselstogether/events.js" width="500"></script>
-
 ## For backers, sponsors and core contributors
 
 To show the list of collectives that you are backing or managing on your website, just add this script:

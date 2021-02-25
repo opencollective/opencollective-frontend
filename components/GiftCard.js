@@ -86,7 +86,7 @@ class GiftCard extends React.Component {
               id="giftcard.user.text"
               defaultMessage="Contribute on Open Collective with this Gift Card, courtesy of {emitter}."
               values={{
-                emitter: <WhiteLink route={`/${emitter.slug}`}>{emitter.name}</WhiteLink>,
+                emitter: <WhiteLink href={`/${emitter.slug}`}>{emitter.name}</WhiteLink>,
               }}
             />
           </Text>

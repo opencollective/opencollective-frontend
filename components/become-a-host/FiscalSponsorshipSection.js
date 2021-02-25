@@ -43,11 +43,7 @@ const FiscalSponsorship = () => {
             color="black.900"
             whiteSpace={[null, null, 'pre-line']}
           >
-            <FormattedMessage
-              id="becomeAHost.title"
-              defaultMessage="Fiscal 
-              sponsorship has never been easier"
-            />
+            <FormattedMessage id="becomeAHost.title" defaultMessage="Fiscal sponsorship has never been easier" />
           </H1>
         </Box>
         <Box width={['288px', '306px', null, null, '558px']} mb={[3, null, null, null, '24px']}>
@@ -64,7 +60,7 @@ const FiscalSponsorship = () => {
             />
           </P>
         </Box>
-        <Link route="/organizations/new">
+        <Link href="/organizations/new">
           <StyledButton minWidth={[283, 165, null, null, 183]} buttonStyle="dark" whiteSpace="nowrap">
             <FormattedMessage id="home.createHost" defaultMessage="Create a Fiscal Host" />
           </StyledButton>

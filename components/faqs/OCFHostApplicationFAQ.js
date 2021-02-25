@@ -33,13 +33,7 @@ const OCFHostApplicationFAQ = props => (
       <Content>
         <FormattedMessage
           id="OCFHostApplication.faq.missionImpact.content"
-          defaultMessage="
-          <b>Increasing access to educational resources and training:</b> With the advance of technology and the movement towards a society where people work together to enhance and develop the future, there has been an increase in the number of organizations and groups that are coming together to promote education.
-          {lineBreak}{lineBreak}
-          <b>Creating a positive social impact:</b> Sponsor’s social impact purpose is aimed at finding ways to (i) eliminate prejudice and discrimination; (ii) combat community deterioration; (iii) decrease juvenile delinquency; (iv) serve the less fortunate or distressed; (v) serve to prevent animal or child cruelty; or (vi) create a positive impact on society.
-          {lineBreak}{lineBreak}
-          <b>Developing tools to improve civic participation within cities or communities:</b> Sponsor host projects aimed at fostering civic participation, democratic debate and rebuilding community ties and strengths.
-          "
+          defaultMessage=" <b>Increasing access to educational resources and training:</b> With the advance of technology and the movement towards a society where people work together to enhance and develop the future, there has been an increase in the number of organizations and groups that are coming together to promote education. {lineBreak}{lineBreak} <b>Creating a positive social impact:</b> Sponsor’s social impact purpose is aimed at finding ways to (i) eliminate prejudice and discrimination; (ii) combat community deterioration; (iii) decrease juvenile delinquency; (iv) serve the less fortunate or distressed; (v) serve to prevent animal or child cruelty; or (vi) create a positive impact on society. {lineBreak}{lineBreak} <b>Developing tools to improve civic participation within cities or communities:</b> Sponsor host projects aimed at fostering civic participation, democratic debate and rebuilding community ties and strengths. "
           values={{
             // eslint-disable-next-line react/display-name
             b: chunks => <b>{chunks}</b>,

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
+import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
@@ -9,7 +10,6 @@ import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
-import { Router } from '../../server/pages';
 
 import { Box, Flex } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
@@ -27,7 +27,7 @@ import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
+const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }) => {
   const intl = useIntl();
   const amount = data?.amount;
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
@@ -199,6 +199,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
             amount={data?.amount}
             fees={data?.platformContribution}
             interval={data?.interval}
+            quantity={data?.quantity}
             onChange={value => dispatchChange('platformContribution', value)}
           />
         </Box>
@@ -223,11 +224,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
           onConfirm={() => {
             dispatchChange('interval', temporaryInterval);
             setTemporaryInterval(undefined);
-            Router.pushRoute('orderCollectiveNew', {
-              collectiveSlug: collective.slug,
-              verb: 'donate',
-              step: 'details',
-            });
+            router.push(`/${collective.slug}/donate/details`);
           }}
         />
       )}
@@ -260,12 +257,14 @@ StepDetails.propTypes = {
     type: PropTypes.oneOf(Object.values(TierTypes)),
     customFields: PropTypes.array,
     amount: PropTypes.shape({
+      currency: PropTypes.string,
       valueInCents: PropTypes.number,
     }),
     minAmount: PropTypes.shape({
       valueInCents: PropTypes.number,
     }),
   }),
+  router: PropTypes.object,
 };
 
-export default StepDetails;
+export default withRouter(StepDetails);

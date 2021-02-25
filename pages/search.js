@@ -9,12 +9,12 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { parseToBoolean } from '../lib/utils';
-import { Link, Router } from '../server/pages';
 
 import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
+import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
@@ -24,12 +24,10 @@ import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
 import { H1, P } from '../components/Text';
 
-import defaultColors from '../lib/theme/colors';
-
 const SearchInput = styled(StyledInput)`
   &&& {
     border: none;
-    border-bottom: 2px solid ${defaultColors.blue};
+    border-bottom: 2px solid ${props => props.theme.colors.blue[20]};
     border-radius: 0;
     box-shadow: none;
     display: block;
@@ -127,17 +125,17 @@ class SearchPage extends React.Component {
     const { term } = this.props;
 
     if (filter === 'HOST') {
-      Router.pushRoute('search', { q: term, isHost: true });
+      this.props.router.push({ pathname: '/search', query: { q: term, isHost: true } });
     } else if (filter !== 'ALL') {
-      Router.pushRoute('search', { q: term, types: filter });
+      this.props.router.push({ pathname: '/search', query: { q: term, types: filter } });
     } else {
-      Router.pushRoute('search', { q: term });
+      this.props.router.push({ pathname: '/search', query: { q: term } });
     }
   };
 
   changePage = offset => {
     const { router } = this.props;
-    Router.pushRoute('search', { ...router.query, offset });
+    this.props.router.push({ pathname: '/search', query: { ...router.query, offset } });
   };
 
   render() {
@@ -205,7 +203,7 @@ class SearchPage extends React.Component {
                   </em>
                 </P>
                 {
-                  <Link route="createPledge" params={{ name: term }} passHref>
+                  <Link href={{ pathname: '/pledges/new', query: { name: term } }}>
                     <StyledLink
                       display="block"
                       fontSize="14px"
@@ -240,8 +238,9 @@ class SearchPage extends React.Component {
                 </em>
               </P>
               {
-                <Link route="createPledge" params={{ name: term }} passHref>
+                <Link href={{ pathname: '/pledges/new', query: { name: term } }}>
                   <StyledLink
+                    as={Container}
                     display="block"
                     fontSize="14px"
                     fontWeight="bold"

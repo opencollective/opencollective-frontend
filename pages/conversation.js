@@ -9,7 +9,6 @@ import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -161,6 +160,7 @@ class ConversationPage extends React.Component {
         }),
       }),
     }).isRequired, // from withData
+    router: PropTypes.object,
   };
 
   static MAX_NB_FOLLOWERS_AVATARS = 4;
@@ -234,7 +234,7 @@ class ConversationPage extends React.Component {
   };
 
   onConversationDeleted = () => {
-    return Router.pushRoute('conversations', { collectiveSlug: this.props.collectiveSlug });
+    return this.props.router.push(`/${this.props.collectiveSlug}/conversations`);
   };
 
   getSuggestedTags(collective) {
@@ -287,7 +287,7 @@ class ConversationPage extends React.Component {
                 selectedCategory={NAVBAR_CATEGORIES.CONNECT}
               />
               <Box maxWidth={1160} m="0 auto" px={2} py={[4, 5]}>
-                <StyledLink as={Link} color="black.600" route="conversations" params={{ collectiveSlug }}>
+                <StyledLink as={Link} color="black.600" href={`/${collectiveSlug}/conversations`}>
                   &larr; <FormattedMessage id="Conversations.GoBack" defaultMessage="Back to conversations" />
                 </StyledLink>
                 <Box mt={4}>
@@ -348,7 +348,7 @@ class ConversationPage extends React.Component {
                       </Box>
                       <Box display={['none', null, 'block']} flex="0 0 330px" ml={[null, null, null, 4, 5]} mb={4}>
                         <Box my={2} mx={2}>
-                          <Link route="create-conversation" params={{ collectiveSlug }}>
+                          <Link href={`/${collectiveSlug}/conversations/new`}>
                             <StyledButton buttonStyle="primary" width="100%" minWidth={170}>
                               <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
                             </StyledButton>
@@ -412,7 +412,6 @@ class ConversationPage extends React.Component {
                                   ) : (
                                     <Box mx={2}>
                                       <StyledInputTags
-                                        renderUpdatedTags
                                         suggestedTags={this.getSuggestedTags(collective)}
                                         defaultValue={conversation.tags}
                                         onChange={options => this.handleTagsChange(options, setValue)}

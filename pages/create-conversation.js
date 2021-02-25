@@ -8,7 +8,6 @@ import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -71,7 +70,7 @@ class CreateConversationPage extends React.Component {
 
   onCreateSuccess = async conversation => {
     const { collectiveSlug } = this.props;
-    await Router.pushRoute('conversation', { collectiveSlug, slug: conversation.slug, id: conversation.id });
+    await this.props.router.push(`/${collectiveSlug}/conversations/${conversation.slug}-${conversation.id}`);
   };
 
   getSuggestedTags(collective) {
@@ -114,7 +113,7 @@ class CreateConversationPage extends React.Component {
                   </ContainerOverlay>
                 )}
                 <Box maxWidth={1160} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
-                  <StyledLink as={Link} color="black.600" route="conversations" params={{ collectiveSlug }}>
+                  <StyledLink as={Link} color="black.600" href={`/${collectiveSlug}/conversations`}>
                     &larr; <FormattedMessage id="Conversations.GoBack" defaultMessage="Back to conversations" />
                   </StyledLink>
                   <Box mt={4}>

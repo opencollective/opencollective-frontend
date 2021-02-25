@@ -106,11 +106,14 @@ export const prepareExpenseForSubmit = expenseData => {
     expenseData.payee?.isNewUser || expenseData.payee?.isInvite
       ? pick(expenseData.payee, ['name', 'email', 'organization', 'newsletterOptIn'])
       : { [payeeIdField]: expenseData.payee.id };
+
+  const payeeLocation = isInvoice ? pick(expenseData.payeeLocation, ['address', 'country', 'structured']) : null;
+
   return {
     ...pick(expenseData, ['id', 'description', 'longDescription', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
     payee,
+    payeeLocation,
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-    payeeLocation: isInvoice ? pick(expenseData.payeeLocation, ['address', 'country']) : null,
     attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
     // Omit item's ids that were created for keying purposes
     items: expenseData.items.map(item => {
@@ -162,6 +165,7 @@ const validate = expense => {
 const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.country', payee.location.country || null);
   formik.setFieldValue('payeeLocation.address', payee.location.address || '');
+  formik.setFieldValue('payeeLocation.structured', payee.location.structured);
 };
 
 const HiddenFragment = styled.div`
@@ -392,14 +396,13 @@ const ExpenseFormBody = ({
               <Flex alignItems="flex-start" mt={3}>
                 <ExpenseTypeTag type={values.type} mr="4px" />
                 <StyledInputTags
-                  renderUpdatedTags
                   suggestedTags={expensesTags}
-                  onChange={tags =>
+                  onChange={tags => {
                     formik.setFieldValue(
                       'tags',
                       tags.map(t => t.value.toLowerCase()),
-                    )
-                  }
+                    );
+                  }}
                   value={values.tags}
                 />
               </Flex>
@@ -553,6 +556,9 @@ ExpenseFormBody.propTypes = {
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
+      }),
+      settings: PropTypes.shape({
+        fundingRequest: PropTypes.bool,
       }),
     }),
     settings: PropTypes.object,

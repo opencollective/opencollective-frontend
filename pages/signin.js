@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { mapValues } from 'lodash';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -48,6 +48,7 @@ class SigninPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
     isSuspiciousUserAgent: PropTypes.bool,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -75,7 +76,7 @@ class SigninPage extends React.Component {
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
       const redirect = next && next.match(/^\/?signin[?/]?/) ? null : next;
-      await Router.replaceRoute(redirect || '/');
+      await this.props.router.replace(redirect || '/');
       window.scroll(0, 0);
     } else if (this.props.token && oldProps.token !== this.props.token) {
       // --- There's a new token in town 🤠 ---
@@ -165,6 +166,7 @@ class SigninPage extends React.Component {
     }
 
     const error = errorLoggedInUser || this.state.error;
+
     return (
       <React.Fragment>
         {error && !error.includes('Two-factor authentication is enabled') && (
@@ -191,9 +193,15 @@ class SigninPage extends React.Component {
           form={form}
           routes={this.getRoutes()}
           enforceTwoFactorAuthForLoggedInUser={enforceTwoFactorAuthForLoggedInUser}
-          submitTwoFactorAuthenticatorCode={values => {
+          submitTwoFactorAuthenticatorCode={twoFactorAuthenticatorCode => {
             const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            return this.props.login(localStorage2FAToken, values.twoFactorAuthenticatorCode);
+            return this.props.login(localStorage2FAToken, {
+              twoFactorAuthenticatorCode,
+            });
+          }}
+          submitRecoveryCode={recoveryCode => {
+            const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+            return this.props.login(localStorage2FAToken, { recoveryCode });
           }}
         />
       </React.Fragment>
@@ -218,4 +226,4 @@ class SigninPage extends React.Component {
   }
 }
 
-export default withUser(SigninPage);
+export default withUser(withRouter(SigninPage));

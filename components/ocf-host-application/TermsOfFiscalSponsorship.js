@@ -70,7 +70,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => (
         </Box>
       </Container>
     </Box>
-    <Link route="/foundation/apply/fees">
+    <Link href="/foundation/apply/fees">
       <OCFPrimaryButton mb="40px" width={['286px', '100px']} disabled={!checked}>
         <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
         &nbsp;

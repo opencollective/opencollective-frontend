@@ -5,10 +5,11 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { getCurrencySymbol } from '../../lib/currency-utils';
 import { paymentMethodLabelWithIcon } from '../../lib/payment_method_label';
 import { capitalize } from '../../lib/utils';
-import { Link } from '../../server/pages';
 
+import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 
@@ -132,8 +133,8 @@ class EditPaymentMethod extends React.Component {
                 </StyledButton>
               )}
               {hasSubscriptions && (
-                <Link route="recurring-contributions" params={{ slug: this.props.collectiveSlug }} passHref>
-                  <StyledLink buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
+                <Link href={`/${this.props.collectiveSlug}/recurring-contributions`}>
+                  <StyledLink as={Container} buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
                     {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}
                   </StyledLink>
                 </Link>

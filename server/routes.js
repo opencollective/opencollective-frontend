@@ -6,7 +6,6 @@ const proxy = require('express-http-proxy');
 const { template, trim } = require('lodash');
 
 const intl = require('./intl');
-const pages = require('./pages');
 
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
@@ -157,5 +156,5 @@ module.exports = (expressApp, nextApp) => {
     );
   });
 
-  return pages.getRequestHandler(nextApp);
+  return nextApp.getRequestHandler();
 };

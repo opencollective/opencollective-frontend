@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H2, P } from '../Text';
 
@@ -60,11 +59,11 @@ const GiftOFGiving = () => (
         </P>
       </Box>
       <Box alignSelf={['center', 'flex-start']}>
-        <Link route="https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards">
+        <a href="https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards">
           <StyledButton whiteSpace="nowrap" letterSpacing="normal">
             <FormattedMessage id="becomeASponsor.learnMore" defaultMessage="Learn More" />
           </StyledButton>
-        </Link>
+        </a>
       </Box>
     </Flex>
 

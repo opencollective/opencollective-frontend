@@ -60,9 +60,10 @@ const getOptions = (amount, currency, intl) => {
   ];
 };
 
-const FeesOnTopInput = ({ currency, amount, fees, onChange }) => {
+const FeesOnTopInput = ({ currency, amount, quantity, fees, onChange }) => {
   const intl = useIntl();
-  const options = React.useMemo(() => getOptions(amount, currency, intl), [amount, currency]);
+  const orderAmount = amount * quantity;
+  const options = React.useMemo(() => getOptions(orderAmount, currency, intl), [orderAmount, currency]);
   const formatOptionLabel = option => {
     if (option.currency) {
       return (
@@ -94,13 +95,13 @@ const FeesOnTopInput = ({ currency, amount, fees, onChange }) => {
     } else if (selectedOption.value === 0 && fees) {
       onChange(0);
     } else if (selectedOption.percentage) {
-      const newOption = getOptionFromPercentage(amount, currency, selectedOption.percentage);
+      const newOption = getOptionFromPercentage(orderAmount, currency, selectedOption.percentage);
       if (newOption.value !== fees) {
         onChange(newOption.value);
         setSelectedOption(newOption);
       }
     }
-  }, [selectedOption, amount, isReady]);
+  }, [selectedOption, orderAmount, isReady]);
 
   return (
     <div>
@@ -143,6 +144,7 @@ FeesOnTopInput.propTypes = {
   currency: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   amount: PropTypes.number,
+  quantity: PropTypes.number,
   fees: PropTypes.number,
   interval: PropTypes.oneOf(Object.values(INTERVALS)),
 };

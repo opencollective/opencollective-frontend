@@ -2,64 +2,29 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { injectIntl } from 'react-intl';
 
-import { CollectiveType } from '../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { floatAmountToCents } from '../lib/math';
-import { isTierExpired } from '../lib/tier-utils';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
 import { STEPS } from '../components/contribution-flow/constants';
+import ContributionBlocker, { getContributionBlocker } from '../components/contribution-flow/ContributionBlocker';
 import ContributionFlowSuccess from '../components/contribution-flow/ContributionFlowSuccess';
+import {
+  contributionFlowAccountQuery,
+  contributionFlowAccountWithTierQuery,
+} from '../components/contribution-flow/graphql/queries';
 import ContributionFlowContainer from '../components/contribution-flow/index';
+import { getContributionFlowMetadata } from '../components/contribution-flow/utils';
 import ErrorPage from '../components/ErrorPage';
-import { Flex } from '../components/Grid';
-import Link from '../components/Link';
 import Loading from '../components/Loading';
-import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import { withStripeLoader } from '../components/StripeProvider';
-import StyledButton from '../components/StyledButton';
 import { withUser } from '../components/UserProvider';
-
-const messages = defineMessages({
-  collectiveTitle: {
-    id: 'CreateOrder.Title',
-    defaultMessage: 'Contribute to {collective}',
-  },
-  eventTitle: {
-    id: 'CreateOrder.TitleForEvent',
-    defaultMessage: 'Order tickets for {event}',
-  },
-  missingHost: {
-    id: 'createOrder.missingHost',
-    defaultMessage: "This collective doesn't have a host and can't accept financial contributions",
-  },
-  inactiveCollective: {
-    id: 'createOrder.inactiveCollective',
-    defaultMessage: "This collective is not active and can't accept financial contributions",
-  },
-  missingTier: {
-    id: 'createOrder.missingTier',
-    defaultMessage: "Oops! This tier doesn't exist or has been removed by the collective admins.",
-  },
-  expiredTier: {
-    id: 'Tier.Past',
-    defaultMessage: 'This tier is not active anymore.',
-  },
-  emptyTier: {
-    id: 'Tier.empty',
-    defaultMessage: 'There are no more {type, select, TICKET {tickets} other {units}} for {name}',
-  },
-  disableCustomContributions: {
-    id: 'Tier.disableCustomContirbution',
-    defaultMessage: 'This collective requires you to select a tier to contribute.',
-  },
-});
 
 class NewContributionFlowPage extends React.Component {
   static getInitialProps({ query }) {
@@ -75,6 +40,7 @@ class NewContributionFlowPage extends React.Component {
         query.data = JSON.parse(query.data);
       } catch (err) {
         // TODO: this should be reported to the user
+        // eslint-disable-next-line no-console
         console.error(err);
       }
     }
@@ -146,57 +112,13 @@ class NewContributionFlowPage extends React.Component {
     }
   }
 
-  getCanonicalURL(collective, tier) {
-    if (!tier) {
-      return `${process.env.WEBSITE_URL}/${collective.slug}/donate`;
-    } else if (collective.type === CollectiveType.EVENT) {
-      const parentSlug = get(collective.parent, 'slug', collective.slug);
-      return `${process.env.WEBSITE_URL}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
-    } else {
-      return `${process.env.WEBSITE_URL}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
-    }
-  }
-
   getPageMetadata() {
     const { intl, data } = this.props;
-
-    if (!data || !data.account) {
-      return { title: 'Contribute' };
-    }
-
-    const collective = data.account;
-    return {
-      canonicalURL: this.getCanonicalURL(collective, data.tier),
-      description: collective.description,
-      twitterHandle: collective.twitterHandle,
-      image: collective.imageUrl || collective.backgroundImageUrl,
-      title:
-        collective.type === CollectiveType.EVENT
-          ? intl.formatMessage(messages.eventTitle, { event: collective.name })
-          : intl.formatMessage(messages.collectiveTitle, { collective: collective.name }),
-    };
-  }
-
-  renderMessage(type, content, showOtherWaysToContribute = false) {
-    const { collectiveSlug } = this.props;
-    return (
-      <Flex flexDirection="column" alignItems="center" py={[5, null, 6]}>
-        <MessageBox type={type} withIcon maxWidth={800}>
-          {content}
-        </MessageBox>
-        {showOtherWaysToContribute && (
-          <Link route="contribute" params={{ collectiveSlug, verb: 'contribute' }}>
-            <StyledButton buttonStyle="primary" buttonSize="large" mt={5}>
-              <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
-            </StyledButton>
-          </Link>
-        )}
-      </Flex>
-    );
+    return getContributionFlowMetadata(intl, data?.account, data?.tier);
   }
 
   renderPageContent() {
-    const { data = {}, intl, step, LoggedInUser } = this.props;
+    const { data = {}, step, LoggedInUser } = this.props;
     const { account, tier } = data;
 
     if (data.loading) {
@@ -205,39 +127,11 @@ class NewContributionFlowPage extends React.Component {
           <Loading />
         </Container>
       );
-    } else if (!account.host) {
-      return this.renderMessage('info', intl.formatMessage(messages.missingHost));
-    } else if (!account.isActive) {
-      return this.renderMessage('info', intl.formatMessage(messages.inactiveCollective));
-    } else if (!account.host.supportedPaymentMethods.length) {
-      const content = (
-        <React.Fragment>
-          <strong>
-            <FormattedMessage
-              id="ContributionFlow.noSupportedPaymentMethods"
-              defaultMessage="There is no payment provider available"
-            />
-          </strong>
-          <br />
-          {LoggedInUser?.isHostAdmin(account) && (
-            <Link route="accept-financial-contributions" params={{ slug: account.slug, path: 'organization' }}>
-              <StyledButton buttonStyle="primary" mt={3}>
-                <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
-              </StyledButton>
-            </Link>
-          )}
-        </React.Fragment>
-      );
-      return this.renderMessage('info', content);
-    } else if (tier?.availableQuantity === 0) {
-      const intlParams = { type: tier.type, name: <q>{tier.name}</q> };
-      return this.renderMessage('info', intl.formatMessage(messages.emptyTier, intlParams), true);
-    } else if (this.props.tierId && !tier) {
-      return this.renderMessage('warning', intl.formatMessage(messages.missingTier), true);
-    } else if (tier && isTierExpired(tier)) {
-      return this.renderMessage('warning', intl.formatMessage(messages.expiredTier), true);
-    } else if (account.settings.disableCustomContributions && !tier) {
-      return this.renderMessage('warning', intl.formatMessage(messages.disableCustomContributions), true);
+    }
+
+    const contributionBLocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    if (contributionBLocker) {
+      return <ContributionBlocker blocker={contributionBLocker} account={account} />;
     } else if (step === 'success') {
       return <ContributionFlowSuccess collective={account} />;
     } else {
@@ -276,138 +170,7 @@ class NewContributionFlowPage extends React.Component {
   }
 }
 
-const hostFieldsFragment = gqlV2/* GraphQL */ `
-  fragment ContributionFlowHostFields on Host {
-    id
-    legacyId
-    slug
-    name
-    settings
-    contributionPolicy
-    location {
-      country
-    }
-    supportedPaymentMethods
-    payoutMethods {
-      id
-      name
-      data
-      type
-    }
-  }
-`;
-
-const accountFieldsFragment = gqlV2/* GraphQL */ `
-  fragment ContributionFlowAccountFields on Account {
-    id
-    legacyId
-    slug
-    type
-    name
-    currency
-    settings
-    twitterHandle
-    description
-    imageUrl(height: 192)
-    isHost
-    isActive
-    settings
-    location {
-      country
-    }
-    ... on Organization {
-      platformFeePercent
-      platformContributionAvailable
-      host {
-        ...ContributionFlowHostFields
-      }
-    }
-    ... on AccountWithContributions {
-      contributionPolicy
-      platformFeePercent
-      platformContributionAvailable
-      contributors(limit: 6) {
-        totalCount
-        nodes {
-          id
-          name
-          image
-          collectiveSlug
-        }
-      }
-    }
-    ... on AccountWithHost {
-      hostFeePercent
-      host {
-        ...ContributionFlowHostFields
-      }
-    }
-    ... on Event {
-      parent {
-        id
-        slug
-        settings
-        location {
-          country
-        }
-      }
-    }
-    ... on Project {
-      parent {
-        id
-        slug
-        settings
-        location {
-          country
-        }
-      }
-    }
-  }
-  ${hostFieldsFragment}
-`;
-
-const accountQuery = gqlV2/* GraphQL */ `
-  query ContributionFlowAccountQuery($collectiveSlug: String!) {
-    account(slug: $collectiveSlug, throwIfMissing: false) {
-      ...ContributionFlowAccountFields
-    }
-  }
-  ${accountFieldsFragment}
-`;
-
-const accountWithTierQuery = gqlV2/* GraphQL */ `
-  query ContributionFlowAccountQuery($collectiveSlug: String!, $tier: TierReferenceInput!) {
-    account(slug: $collectiveSlug, throwIfMissing: false) {
-      ...ContributionFlowAccountFields
-    }
-    tier(tier: $tier, throwIfMissing: false) {
-      id
-      legacyId
-      type
-      name
-      slug
-      description
-      customFields
-      availableQuantity
-      maxQuantity
-      endsAt
-      amount {
-        valueInCents
-        currency
-      }
-      amountType
-      minimumAmount {
-        valueInCents
-        currency
-      }
-      interval
-      presets
-    }
-  }
-  ${accountFieldsFragment}
-`;
-
-const addAccountData = graphql(accountQuery, {
+const addAccountData = graphql(contributionFlowAccountQuery, {
   skip: props => Boolean(props.tierId),
   options: props => ({
     variables: { collectiveSlug: props.collectiveSlug },
@@ -415,7 +178,7 @@ const addAccountData = graphql(accountQuery, {
   }),
 });
 
-const addAccountWithTierData = graphql(accountWithTierQuery, {
+const addAccountWithTierData = graphql(contributionFlowAccountWithTierQuery, {
   skip: props => !props.tierId,
   options: props => ({
     variables: { collectiveSlug: props.collectiveSlug, tier: { legacyId: props.tierId } },

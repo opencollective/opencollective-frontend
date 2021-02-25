@@ -149,7 +149,7 @@ const getLinkProps = (useAnchor, collective, category) => {
   if (useAnchor) {
     return { href: anchor };
   } else {
-    return { as: Link, route: `/${collective.slug}${anchor}` };
+    return { as: Link, href: `/${collective.slug}${anchor}` };
   }
 };
 
@@ -181,9 +181,9 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
           <DropdownArrow />
           <DropdownContent>
             <Box as="ul" p={0} m={0} minWidth={184}>
-              {displayedLinks.map(({ route, title, params }) => (
+              {displayedLinks.map(({ route, title }) => (
                 <MenuItem key={route}>
-                  <StyledLink as={Link} route={route} params={params}>
+                  <StyledLink as={Link} href={route}>
                     {title}
                   </StyledLink>
                 </MenuItem>

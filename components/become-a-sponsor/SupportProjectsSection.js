@@ -44,7 +44,7 @@ const SupportProjects = () => (
       height={[null, '363px', '488px', null, '414px']}
       ml={[null, null, null, null, '36px']}
     >
-      <Link route="/webflow">
+      <Link href="/webflow">
         <SponsorWrapper
           size={['46px', '62px', '75px', null, '80px']}
           left={['9%', '38px', '65px', null, '43px']}
@@ -53,7 +53,7 @@ const SupportProjects = () => (
           <Sponsor as="img" src="/static/images/become-a-sponsor/webflow.png" alt="Webflow logo" />
         </SponsorWrapper>
       </Link>
-      <Link route="/airbnb">
+      <Link href="/airbnb">
         <SponsorWrapper
           size={['37px', '50px', '70px', null, '64px']}
           left={['34.42%', '133px', '186px', null, '388px']}
@@ -62,7 +62,7 @@ const SupportProjects = () => (
           <Sponsor as="img" src="/static/images/become-a-sponsor/airbnb.png" alt="Airbnb logo" />
         </SponsorWrapper>
       </Link>
-      <Link route="/fbopensource">
+      <Link href="/fbopensource">
         <SponsorWrapper
           size={['37px', '50px', '70px', null, '64px']}
           left={['0', null, null, null, '19px']}
@@ -75,7 +75,7 @@ const SupportProjects = () => (
           />
         </SponsorWrapper>
       </Link>
-      <Link route="/shopify">
+      <Link href="/shopify">
         <SponsorBoxShadowWrapper
           size={['48px', '65px', '83px', null, '84px']}
           left={['27%', '105px', '156px', null, '155px']}
@@ -89,7 +89,7 @@ const SupportProjects = () => (
           />
         </SponsorBoxShadowWrapper>
       </Link>
-      <Link route="/trivago">
+      <Link href="/trivago">
         <SponsorBoxShadowWrapper
           size={['46px', '62px', '77px', null, '80px']}
           right={['5.91%', '0']}
@@ -104,7 +104,7 @@ const SupportProjects = () => (
           />
         </SponsorBoxShadowWrapper>
       </Link>
-      <Link route="/salesforce">
+      <Link href="/salesforce">
         <SponsorBoxShadowWrapper
           size={['48px', '55px', '77px', null, '84px']}
           right={['4.93%', '0']}
@@ -187,7 +187,7 @@ const SupportProjects = () => (
           </Span>
         </P>
       </Box>
-      <Link route="/discover">
+      <Link href="/discover">
         <StyledButton
           minWidth={['185px', '167px', null, null, '185px']}
           my={[2, null, 0]}

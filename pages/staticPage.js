@@ -118,7 +118,7 @@ class StaticPage extends React.Component {
           <div className="content">
             {path && pageSlug && (
               <div className="path">
-                <Link route={`/${path}`}>{path}</Link>
+                <Link href={`/${path}`}>{path}</Link>
               </div>
             )}
             <div dangerouslySetInnerHTML={{ __html: this.props.content }} />

@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { getGithubRepos } from '../../lib/api';
-import { Router } from '../../server/pages';
 
 import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
 import { Box, Flex } from '../Grid';
@@ -62,13 +61,10 @@ class ConnectGithub extends React.Component {
     }
   }
 
-  changeRoute = async params => {
-    params = {
-      ...params,
-      verb: this.props.router.query.verb,
-      hostCollectiveSlug: this.props.router.query.hostCollectiveSlug || undefined,
-    };
-    await Router.pushRoute('create-collective', params);
+  changeRoute = async ({ category, step }) => {
+    const { hostCollectiveSlug, verb } = this.props.router.query;
+    const route = [hostCollectiveSlug, verb || 'create', category, step].filter(Boolean).join('/');
+    await this.props.router.push(`/${route}`);
     window.scrollTo(0, 0);
   };
 
@@ -116,15 +112,7 @@ class ConnectGithub extends React.Component {
                 defaultMessage="Want to apply using {altverification}? {applylink}."
                 values={{
                   applylink: (
-                    <Link
-                      route="create-collective"
-                      params={{
-                        hostCollectiveSlug: 'opensource',
-                        verb: 'apply',
-                        step: 'form',
-                        hostTos: true,
-                      }}
-                    >
+                    <Link href={{ pathname: `/opensource/apply/form`, query: { hostTos: true } }}>
                       <FormattedMessage id="clickHere" defaultMessage="Click here" />
                     </Link>
                   ),
@@ -148,7 +136,11 @@ class ConnectGithub extends React.Component {
             </MessageBox>
           </Flex>
         )}
-        {loadingRepos && <Loading />}
+        {loadingRepos && (
+          <Box pb={4}>
+            <Loading />
+          </Box>
+        )}
         {repositories.length !== 0 && (
           <Flex justifyContent="center" width={1} mb={4} flexDirection={['column', 'row']}>
             <Box width={1 / 5} display={['none', null, 'block']} />
@@ -172,7 +164,10 @@ class ConnectGithub extends React.Component {
               display={['block', null, 'block']}
               width={[1, 1 / 5]}
               maxWidth={[250, null, 335]}
-              alignSelf={['center', 'none']}
+              alignSelf={['center', 'flex-start']}
+              position="sticky"
+              top={0}
+              pt={[0, 3]}
             />
           </Flex>
         )}

@@ -12,6 +12,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
     location {
       address
       country
+      structured
     }
     payoutMethods {
       id
@@ -47,6 +48,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
           location {
             address
             country
+            structured
           }
           payoutMethods {
             id
@@ -146,6 +148,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     payeeLocation {
       address
       country
+      structured
     }
     createdByAccount {
       id

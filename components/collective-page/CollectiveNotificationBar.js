@@ -131,7 +131,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
   } else if (status === 'collectiveArchived' || collective.isArchived) {
     return {
       title: intl.formatMessage(messages.collectiveArchived, { name: collective.name }),
-      description: intl.formatMessage(messages.collectiveArchivedDescription),
+      description: intl.formatMessage(messages.collectiveArchivedDescription, { name: collective.name }),
       status: 'collectiveArchived',
     };
   } else if (!collective.isApproved && collective.host && collective.type === CollectiveType.COLLECTIVE) {

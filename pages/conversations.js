@@ -9,7 +9,6 @@ import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -65,6 +64,7 @@ class ConversationsPage extends React.Component {
         ).isRequired,
       }),
     }).isRequired, // from withData
+    router: PropTypes.object,
   };
 
   getPageMetaData(collective) {
@@ -77,7 +77,7 @@ class ConversationsPage extends React.Component {
 
   resetTag = () => {
     const { collectiveSlug } = this.props;
-    Router.pushRoute('conversations', { collectiveSlug });
+    this.props.router.push(`/${collectiveSlug}/conversations`);
   };
 
   /** Must only be called when dataIsReady */
@@ -97,7 +97,7 @@ class ConversationsPage extends React.Component {
               />
             </MessageBox>
           )}
-          <Link route="create-conversation" params={{ collectiveSlug }}>
+          <Link href={`/${collectiveSlug}/conversations/new`}>
             <StyledButton buttonStyle="primary" buttonSize="large">
               <FormattedMessage id="conversations.createFirst" defaultMessage="Start a new conversation" />
             </StyledButton>
@@ -151,7 +151,7 @@ class ConversationsPage extends React.Component {
                       />
                     </P>
                     <Flex flex="0 0 300px" flexWrap="wrap">
-                      <Link route="create-conversation" params={{ collectiveSlug }}>
+                      <Link href={`/${collectiveSlug}/conversations/new`}>
                         <StyledButton buttonStyle="primary" m={2}>
                           <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
                         </StyledButton>
@@ -182,7 +182,7 @@ class ConversationsPage extends React.Component {
                                   {tag}
                                 </StyledTag>
                               ) : (
-                                <Link key={tag} route="conversations" params={{ collectiveSlug, tag }}>
+                                <Link key={tag} href={{ pathname: `/${collectiveSlug}/conversations`, query: { tag } }}>
                                   <StyledTag variant="rounded-right" mb="4px" mr="4px">
                                     {tag}
                                   </StyledTag>

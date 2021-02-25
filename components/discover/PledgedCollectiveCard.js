@@ -171,7 +171,7 @@ class PledgedCollectiveCard extends React.Component {
           </CollectiveDescriptionText>
           <CollectiveWebsiteText className="website">{website}</CollectiveWebsiteText>
 
-          <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
+          <Link href={`/${collective.slug}/pledges/new`}>
             <StyledButton mt={4} width={1} buttonStyle="primary" buttonSize="small" minWidth={150}>
               <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
             </StyledButton>

@@ -34,9 +34,9 @@ const CreateNew = ({ route, children, ...props }) => {
   return (
     <CreateNewCard {...props}>
       <Flex alignItems="center" justifyContent="center" height="100%">
-        <Link route={route}>
+        <Link href={route}>
           <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
-            <StyledRoundButton buttonStyle="dark" fontSize={25}>
+            <StyledRoundButton buttonStyle="primary" fontSize={25}>
               +
             </StyledRoundButton>
             <P mt={3} color="black.700">

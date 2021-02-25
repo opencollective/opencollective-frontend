@@ -489,8 +489,7 @@ const WhatAreTheBenefits = () => {
             >
               <FormattedMessage
                 id="becomeAHost.benefit.inDepthReports.description"
-                defaultMessage="No need to spend time creating reports for funders—it’s all documented automatically and transparently as you go. In addition, you'll receive a consolidated report every month with all transactions and documentation included. 
-                Your accountant will thank you!"
+                defaultMessage="No need to spend time creating reports for funders—it’s all documented automatically and transparently as you go. In addition, you'll receive a consolidated report every month with all transactions and documentation included. Your accountant will thank you!"
               />
             </P>
           </Box>

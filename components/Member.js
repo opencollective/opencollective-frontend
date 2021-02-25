@@ -125,19 +125,11 @@ ${totalDonationsStr}`;
                   <Container fontSize="1.4rem" color="black.600">
                     {firstSentence(description || member.description, 64)}
                   </Container>
-                  <Container
-                    className="since"
-                    fontSize="1.4rem"
-                    style={{ color: props => props.theme.colors.darkgray }}
-                  >
+                  <Container className="since" fontSize="1.4rem" col>
                     {memberSinceStr}
                   </Container>
                   {totalDonationsStr && (
-                    <Container
-                      className="totalDonations"
-                      fontSize="1.4rem"
-                      style={{ color: props => props.theme.colors.darkgray }}
-                    >
+                    <Container className="totalDonations" fontSize="1.4rem" color="black.600">
                       {totalDonationsStr}
                     </Container>
                   )}
