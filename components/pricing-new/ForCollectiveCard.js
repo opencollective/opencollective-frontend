@@ -176,15 +176,15 @@ const ForCollectiveCard = () => {
               defaultMessage="(1) Payment processor fees apply. See <stripeLink>stripe.com/pricing</stripeLink>, <paypalLink>paypal.com/pricing</paypalLink>, <transferwiseLink>transferwise.com/pricing</transferwiseLink>"
               values={{
                 stripeLink: getI18nLink({
-                  href: 'stripe.com/pricing',
+                  href: 'https://stripe.com/pricing',
                   openInNewTab: true,
                 }),
                 paypalLink: getI18nLink({
-                  href: 'paypal.com/pricing',
+                  href: 'https://paypal.com/pricing',
                   openInNewTab: true,
                 }),
                 transferwiseLink: getI18nLink({
-                  href: 'transferwise.com/pricing',
+                  href: 'https://transferwise.com/pricing',
                   openInNewTab: true,
                 }),
               }}
@@ -206,7 +206,7 @@ const ForCollectiveCard = () => {
                 defaultMessage="<strong>Open Collective works with platform tips.</strong><br></br> Your contributors can choose to give a voluntary tip to the platform on each contribution. <a>Know more</a>."
                 values={{
                   a: getI18nLink({
-                    href: '#',
+                    href: 'https://docs.opencollective.com/help/financial-contributors/financial-contributors',
                     openInNewTab: true,
                   }),
                   strong: I18nBold,
@@ -245,7 +245,7 @@ const ForCollectiveCard = () => {
             </ListItem>
           </ListWrapper>
           <Container display="flex">
-            <Link href="#">
+            <Link href="/create">
               <StyledButton
                 buttonStyle="primary"
                 width={['224px', '226px', '139px']}
@@ -258,7 +258,7 @@ const ForCollectiveCard = () => {
                 <FormattedMessage id="pricing.createCollective" defaultMessage="Create Collective" />
               </StyledButton>
             </Link>
-            <Link href="#">
+            <Link href="/hosts">
               <StyledButton
                 buttonStyle="secondary"
                 width="127px"

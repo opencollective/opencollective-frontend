@@ -25,10 +25,9 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-// TODO - Adjust the bg image to fit correctly
 const Wrapper = styled(Flex)`
-  /* background: url('/static/images/pricing/pricing-page-top-bg1.png') no-repeat right,
-    url('/static/images/pricing/pricing-page-top-bg2.png') no-repeat left; */
+  background: url('/static/images/pricing/pricing-page-top-bg.png') no-repeat 0px 80%;
+  background-size: cover;
   justify-content: center;
   align-items: center;
 `;
@@ -158,7 +157,7 @@ const Pricing = () => {
                     defaultMessage="<strong>Collect, spend and manage money transparently.</strong> Connect your bank account or apply to a Fiscal Host <br></br><a>Read more</a>"
                     values={{
                       a: getI18nLink({
-                        href: '#',
+                        href: 'https://docs.opencollective.com/help/collectives/quick-start-guide',
                         openInNewTab: true,
                       }),
                       // eslint-disable-next-line react/display-name
@@ -203,7 +202,7 @@ const Pricing = () => {
             </ListWrapper>
           </Box>
           <Container display="flex" flexDirection={['column', null, 'row']} alignItems={['center', null, 'flex-start']}>
-            <Link href="#">
+            <Link href="/create">
               <StyledButton
                 buttonStyle="primary"
                 width={['224px', null, '139px']}
@@ -216,7 +215,7 @@ const Pricing = () => {
                 <FormattedMessage id="pricing.createCollective" defaultMessage="Create Collective" />
               </StyledButton>
             </Link>
-            <Link href="#">
+            <Link href="https://docs.opencollective.com/help/collectives/collectives" openInNewTab>
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
                 <FormattedMessage id="pricing.knowMore" defaultMessage="Know more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
@@ -294,7 +293,7 @@ const Pricing = () => {
             </ListWrapper>
           </Box>
           <Container display="flex" flexDirection={['column', null, 'row']} alignItems="center">
-            <Link href="#">
+            <Link href="/organizations/new">
               <StyledButton
                 buttonStyle="primary"
                 width={['224px', null, '103px']}
@@ -307,7 +306,7 @@ const Pricing = () => {
                 <FormattedMessage id="pricing.getStarted" defaultMessage="Get started" />
               </StyledButton>
             </Link>
-            <Link href="#">
+            <Link href="https://docs.opencollective.com/help/fiscal-hosts/fiscal-hosts" openInNewTab>
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
                 <FormattedMessage id="pricing.knowMore" defaultMessage="Know more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
