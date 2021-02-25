@@ -26,7 +26,7 @@ class UpdatesWithData extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showNewUpdateForm: props.defaultAction === 'new' ? true : false,
+      showNewUpdateForm: props.defaultAction === 'new',
     };
   }
 
@@ -63,7 +63,7 @@ class UpdatesWithData extends React.Component {
               </P>
             </Container>
             {LoggedInUser?.canEditCollective(collective) && (
-              <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+              <Link href={`/${collective.slug}/updates/new`}>
                 <StyledButton buttonStyle="primary" m={2}>
                   <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
                 </StyledButton>

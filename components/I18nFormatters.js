@@ -13,13 +13,21 @@ export const I18nSupportLink = chunks => (
   </StyledLink>
 );
 export const I18nSignInLink = chunks => (
-  <Link route="signin" params={{ next: typeof window !== undefined ? window.location.pathname : '' }}>
+  <Link href={{ pathname: '/signin', query: { next: typeof window !== undefined ? window.location.pathname : '' } }}>
     {chunks}
   </Link>
 );
 
-export const I18nTOSLink = msg => <Link route="tos">{msg}</Link>;
-export const I18nPrivacyLink = msg => <Link route="privacypolicy">{msg}</Link>;
+export const I18nTOSLink = msg => (
+  <Link href="/tos">
+    <span>{msg}</span>
+  </Link>
+);
+export const I18nPrivacyLink = msg => (
+  <Link href="/privacypolicy">
+    <span>{msg}</span>
+  </Link>
+);
 
 const I18nFormatters = {
   strong: I18nBold,

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { Router } from '../../../server/pages';
 
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
@@ -45,7 +45,7 @@ const DeleteCollective = ({ collective, ...props }) => {
         await deleteCollective({ variables: { id: collective.id } });
         await props.refetchLoggedInUser();
       }
-      await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
+      await props.router.push(`/deleteCollective/confirmed?type=${collective.type}`);
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       setDeleteStatus({ deleting: false, error: errorMsg });
@@ -175,6 +175,7 @@ const DeleteCollective = ({ collective, ...props }) => {
 DeleteCollective.propTypes = {
   collective: PropTypes.object.isRequired,
   refetchLoggedInUser: PropTypes.func,
+  router: PropTypes.object,
 };
 
-export default withUser(DeleteCollective);
+export default withUser(withRouter(DeleteCollective));

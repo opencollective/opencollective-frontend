@@ -162,13 +162,7 @@ const CreateOpenSourceCollective = () => {
               />
             </StyledButton>
             <Link
-              route="create-collective"
-              params={{
-                hostCollectiveSlug: 'opensource',
-                verb: 'apply',
-                step: 'form',
-                hostTos: true,
-              }}
+              href={{ pathname: `/opensource/apply/form`, query: { hostTos: true } }}
               onClick={e => {
                 if (!checked) {
                   e.preventDefault();

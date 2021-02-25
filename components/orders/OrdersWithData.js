@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { mapValues, pick } from 'lodash';
+import { mapValues, omitBy, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { usePrevious } from '../../lib/hooks/usePrevious';
-import { Router } from '../../server/pages';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
@@ -131,9 +130,12 @@ const hasParams = query => {
   });
 };
 
-const updateQuery = (router, queryParams) => {
-  const { route, query } = router;
-  return Router.pushRoute(route.slice(1), { ...query, ...queryParams });
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'collectiveSlug', 'view'];
+
+const updateQuery = (router, newParams) => {
+  const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+  const pathname = router.asPath.split('?')[0];
+  return router.push({ pathname, query });
 };
 
 const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
@@ -192,10 +194,12 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
                   return (
                     <Link
                       data-cy="reset-orders-filters"
-                      route={router.route.slice(1)}
-                      params={{
-                        ...mapValues(router.query, () => null),
-                        ...pick(router.query, ['slug', 'collectiveSlug', 'hostCollectiveSlug', 'view']),
+                      href={{
+                        pathname: router.route.slice(1),
+                        query: {
+                          ...mapValues(router.query, () => null),
+                          ...pick(router.query, ['slug', 'collectiveSlug', 'hostCollectiveSlug', 'view']),
+                        },
                       }}
                     >
                       {text}
@@ -221,6 +225,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
               total={data?.orders?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
+              ignoredQueryParams={ROUTE_PARAMS}
               scrollToTopOnChanges
             />
           </Flex>

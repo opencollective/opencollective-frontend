@@ -7,6 +7,7 @@ import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Dashboard } from '@styled-icons/material/Dashboard';
+import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy } from 'lodash';
@@ -14,6 +15,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective.lib';
+import { getSettingsRoute } from '../../lib/url_helpers';
 
 import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
@@ -200,63 +202,66 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                 <DropdownArrow />
                 <DropdownContent>
                   <Box as="ul" p={0} m={0} minWidth={184}>
-                    {callsToAction.hasDashboard && (
-                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
+                    {callsToAction.hasSettings && (
+                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
                         <StyledLink
                           as={Link}
-                          route="host.dashboard"
-                          params={{ hostCollectiveSlug: collective.slug }}
+                          href={getSettingsRoute(collective)}
                           p={ITEM_PADDING}
+                          data-cy="edit-collective-btn"
                         >
-                          <Dashboard size="20px" />
-                          <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                          <Settings size={20} />
+                          <FormattedMessage id="Settings" defaultMessage="Settings" />
+                        </StyledLink>
+                      </MenuItem>
+                    )}
+                    {callsToAction.hasDashboard && (
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
+                        <StyledLink as={Link} href={`/${collective.slug}/dashboard`}>
+                          <Container p={ITEM_PADDING}>
+                            <Dashboard size="20px" />
+                            <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink
-                          as={Link}
-                          route="create-expense"
-                          params={{ collectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Receipt size="20px" />
-                          <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                        <StyledLink as={Link} href={`/${collective.slug}/expenses/new`}>
+                          <Container p={ITEM_PADDING}>
+                            <Receipt size="20px" />
+                            <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
-                        <StyledLink
-                          as={Link}
-                          route="create-expense"
-                          params={{ collectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <MoneyCheckAlt size="20px" />
-                          <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
+                        <StyledLink as={Link} href={`/${collective.slug}/expenses/new`}>
+                          <Container p={ITEM_PADDING}>
+                            <MoneyCheckAlt size="20px" />
+                            <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasManageSubscriptions && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
-                        <StyledLink
-                          as={Link}
-                          route="recurring-contributions"
-                          params={{ slug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Stack size="20px" />
-                          <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                        <StyledLink as={Link} href={`/${collective.slug}/recurring-contributions`}>
+                          <Container p={ITEM_PADDING}>
+                            <Stack size="20px" />
+                            <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasContribute && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTRIBUTE}>
-                        <StyledLink as={Link} {...getContributeRoute(collective)} p={ITEM_PADDING}>
-                          <Planet size="20px" />
-                          <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
+                        <StyledLink as={Link} href={getContributeRoute(collective)}>
+                          <Container p={ITEM_PADDING}>
+                            <Planet size="20px" />
+                            <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
@@ -293,14 +298,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
-                        <StyledLink
-                          as={Link}
-                          route="collective-contact"
-                          params={{ collectiveSlug: collective.slug }}
-                          p={ITEM_PADDING}
-                        >
-                          <Envelope size="20px" />
-                          <FormattedMessage id="Contact" defaultMessage="Contact" />
+                        <StyledLink as={Link} href={`/${collective.slug}/contact`}>
+                          <Container p={ITEM_PADDING}>
+                            <Envelope size="20px" />
+                            <FormattedMessage id="Contact" defaultMessage="Contact" />
+                          </Container>
                         </StyledLink>
                       </MenuItem>
                     )}
@@ -356,6 +358,8 @@ CollectiveNavbarActionsMenu.propTypes = {
     addFunds: PropTypes.bool,
     /** Add prepaid budget to an organization */
     addPrepaidBudget: PropTypes.bool,
+    /** Button to Edit the Collective */
+    hasSettings: PropTypes.bool,
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
 };

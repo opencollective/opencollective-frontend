@@ -177,9 +177,14 @@ ModalFooter.defaultProps = {
  */
 const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }) => {
   const TrapContainer = trapFocus ? FocusTrap : React.Fragment;
+  const onEscape = React.useCallback(() => {
+    if (show) {
+      onClose();
+    }
+  }, [show]);
 
   // Closes the modal upon the `ESC` key press.
-  useKeyBoardShortcut({ callback: () => onClose(), keyMatch: ESCAPE_KEY });
+  useKeyBoardShortcut({ callback: onEscape, keyMatch: ESCAPE_KEY });
 
   if (show && usePortal === false) {
     return (

@@ -53,21 +53,21 @@ class TopBarMobileMenu extends React.Component {
         <Box as="ul" my={2} pl={0}>
           {menuItems.discover && (
             <ListItem>
-              <Link route="discover" onClick={closeMenu}>
+              <Link href="/discover" onClick={closeMenu}>
                 <FormattedMessage id="menu.discover" defaultMessage="Discover" />
               </Link>
             </ListItem>
           )}
           {menuItems.howItWorks && (
             <ListItem>
-              <Link route="marketing" params={{ pageSlug: 'how-it-works' }} onClick={closeMenu}>
+              <Link href="/how-it-works" onClick={closeMenu}>
                 <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
               </Link>
             </ListItem>
           )}
           {menuItems.pricing && (
             <ListItem>
-              <Link route="pricing" onClick={closeMenu}>
+              <Link href="/pricing" onClick={closeMenu}>
                 <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
               </Link>
             </ListItem>

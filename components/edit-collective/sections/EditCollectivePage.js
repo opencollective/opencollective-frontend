@@ -415,7 +415,7 @@ const EditCollectivePage = ({ collective }) => {
                   <FormattedMessage id="save" defaultMessage="Save" />
                 </StyledButton>
                 <Box m={2}>
-                  <Link route="collective" params={{ slug: collective.slug }}>
+                  <Link href={`/${collective.slug}`}>
                     <Span fontSize="14px">
                       <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
                     </Span>

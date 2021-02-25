@@ -5,7 +5,6 @@ import styled from 'styled-components';
 
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
-import Link from '../Link';
 import { H2, H3, P, Span } from '../Text';
 
 const SectionWrapper = styled(Flex)`
@@ -91,11 +90,11 @@ const MoreFeatures = () => (
               defaultMessage="Discover your Open Source dependencies and support them. {knowMore}"
               values={{
                 knowMore: (
-                  <Link route="https://backyourstack.com">
+                  <a href="https://backyourstack.com">
                     <Span color="rgb(220, 95, 125)">
                       Learn more <ArrowRight2 size="18" />
                     </Span>
-                  </Link>
+                  </a>
                 ),
               }}
             />
@@ -127,9 +126,9 @@ const MoreFeatures = () => (
             defaultMessage="We know making the case up the chain is not always easy. For all you heroes inside companies, we put together {resourcesLink}"
             values={{
               resourcesLink: (
-                <Link route="https://docs.opencollective.com/help/financial-contributors/organizations/sustainer-resources">
+                <a href="https://docs.opencollective.com/help/financial-contributors/organizations/sustainer-resources">
                   <Span color="rgb(220, 95, 125)">some resources to help you succeed.</Span>
-                </Link>
+                </a>
               ),
             }}
           />

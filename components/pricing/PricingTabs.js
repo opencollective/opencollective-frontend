@@ -127,7 +127,7 @@ const PricingTabs = ({ onChange, activeTab }) => {
               defaultMessage="For reference, you can check <a>our old pricing page.</a>"
               values={{
                 // eslint-disable-next-line react/display-name
-                a: chunks => <Link route={`/pricing-old`}>{chunks}</Link>,
+                a: chunks => <Link href={`/pricing-old`}>{chunks}</Link>,
               }}
             />
           </P>

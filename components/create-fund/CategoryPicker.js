@@ -61,11 +61,9 @@ const CreateFundCategoryPicker = () => {
                   alt={formatMessage(messages.foundation)}
                 />
                 <Link
-                  route="create-fund"
-                  params={{
-                    hostCollectiveSlug: router.query.hostCollectiveSlug,
-                    verb: router.query.verb,
-                    category: 'foundation',
+                  href={{
+                    pathname: `/fund/${router.query.verb}`,
+                    query: { hostCollectiveSlug: router.query.hostCollectiveSlug, category: 'foundation' },
                   }}
                 >
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>

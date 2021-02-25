@@ -135,7 +135,7 @@ class HeroEventDetails extends React.Component {
         {location.name && (
           <HeroNote>
             <MapPin size={16} />
-            <Link route={locationRoute}>
+            <Link href={locationRoute}>
               <span>{location.name}</span>
             </Link>
           </HeroNote>
@@ -148,7 +148,7 @@ class HeroEventDetails extends React.Component {
                 id="Event.CreatedBy"
                 defaultMessage="Created by: {CollectiveLink}"
                 values={{
-                  CollectiveLink: <Link route={`/${parentCollective.slug}`}>{parentCollective.name}</Link>,
+                  CollectiveLink: <Link href={`/${parentCollective.slug}`}>{parentCollective.name}</Link>,
                 }}
               />
             </span>

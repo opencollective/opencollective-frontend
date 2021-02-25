@@ -13,20 +13,18 @@ import { formatCurrency } from '../lib/currency-utils';
 import { isPastEvent } from '../lib/events';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { capitalize } from '../lib/utils';
-import { Link } from '../server/pages';
-
-import ComponentLink from '../components/Link';
 
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
+import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
 import StyledHr from './StyledHr';
 import StyledLink from './StyledLink';
 import StyledRoundButton from './StyledRoundButton';
-import { P } from './Text';
+import { P, Span } from './Text';
 import { withUser } from './UserProvider';
 
 const memberInvitationsCountQuery = gql`
@@ -157,8 +155,9 @@ class TopBarProfileMenu extends React.Component {
         justifyContent="space-between"
         alignItems="center"
       >
-        <Link route={`/${get(membership, 'collective.slug')}`} passHref>
+        <Link href={`/${get(membership, 'collective.slug')}`}>
           <StyledLink
+            as={Span}
             title={this.tooltip(membership)}
             color="black.700"
             fontSize="1.2rem"
@@ -176,8 +175,8 @@ class TopBarProfileMenu extends React.Component {
           </StyledLink>
         </Link>
         {isAdmin && (
-          <Link route="editCollective" params={{ slug: membership.collective.slug }} passHref>
-            <StyledLink color="black.500" title={intl.formatMessage(this.messages.settings)}>
+          <Link href={`/${membership.collective.slug}/edit`}>
+            <StyledLink as={Span} color="black.500" title={intl.formatMessage(this.messages.settings)}>
               <Settings opacity="0" size="1.2em" />
             </StyledLink>
           </Link>
@@ -252,8 +251,8 @@ class TopBarProfileMenu extends React.Component {
             </P>
             <Box as="ul" p={0} my={2}>
               <ListItem py={1}>
-                <Link route="collective" params={{ slug: LoggedInUser.username }} passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                <Link href={`/${LoggedInUser.username}`}>
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.profile" defaultMessage="Profile" />
                   </StyledLink>
                 </Link>
@@ -266,8 +265,8 @@ class TopBarProfileMenu extends React.Component {
                 {({ data, loading }) =>
                   loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (
                     <ListItem py={1}>
-                      <Link route="member-invitations" passHref>
-                        <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                      <Link href="/member-invitations">
+                        <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                           <FormattedMessage
                             id="menu.pendingInvitations"
                             defaultMessage="Pending Invitations ({numberOfInvitations})"
@@ -280,20 +279,16 @@ class TopBarProfileMenu extends React.Component {
                 }
               </Query>
               <ListItem py={1}>
-                <Link route="editCollective" params={{ slug: LoggedInUser.collective.slug }} passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                <Link href={`/${LoggedInUser.collective.slug}/edit`}>
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="Settings" defaultMessage="Settings" />
                   </StyledLink>
                 </Link>
               </ListItem>
               {incognitoProfileMembership && (
                 <ListItem py={1}>
-                  <Link
-                    route="recurring-contributions"
-                    params={{ slug: incognitoProfileMembership.collective.slug }}
-                    passHref
-                  >
-                    <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <Link href={`/${incognitoProfileMembership.collective.slug}/recurring-contributions`}>
+                    <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                       <FormattedMessage
                         id="menu.incognitoProfileSubscriptions"
                         defaultMessage="Manage incognito Contributions"
@@ -303,22 +298,22 @@ class TopBarProfileMenu extends React.Component {
                 </ListItem>
               )}
               <ListItem py={1}>
-                <Link route="recurring-contributions" params={{ slug: LoggedInUser.username }} passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                <Link href={`/${LoggedInUser.username}/recurring-contributions`}>
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
                   </StyledLink>
                 </Link>
               </ListItem>
               <ListItem py={1}>
-                <Link route="transactions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                <Link href={`/${LoggedInUser.username}/transactions`}>
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     {capitalize(intl.formatMessage(this.messages['menu.transactions']))}
                   </StyledLink>
                 </Link>
               </ListItem>
               <ListItem py={1}>
-                <Link route="applications" passHref>
-                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                <Link href="/applications">
+                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     {capitalize(intl.formatMessage(this.messages['menu.applications']))}
                   </StyledLink>
                 </Link>
@@ -361,11 +356,11 @@ class TopBarProfileMenu extends React.Component {
                 <FormattedMessage id="collective" defaultMessage="My Collectives" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <ComponentLink route="/create">
+              <Link href="/create">
                 <StyledRoundButton ml={2} size={24} color="#C4C7CC">
                   <Plus size={12} color="#76777A" />
                 </StyledRoundButton>
-              </ComponentLink>
+              </Link>
             </Flex>
             <Box as="ul" p={0} my={2}>
               {collectives.map(this.renderMembershipLine)}
@@ -418,7 +413,7 @@ class TopBarProfileMenu extends React.Component {
                   </P>
                   <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
                   <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-                    <Link route="/fund/create" passHref>
+                    <Link href="/fund/create">
                       <Plus size={12} color="#76777A" />
                     </Link>
                   </StyledRoundButton>
@@ -442,11 +437,11 @@ class TopBarProfileMenu extends React.Component {
                 <FormattedMessage id="organization" defaultMessage="My Organizations" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <ComponentLink route="/organizations/new">
+              <Link href="/organizations/new">
                 <StyledRoundButton ml={2} size={24} color="#C4C7CC">
                   <Plus size={12} color="#76777A" />
                 </StyledRoundButton>
-              </ComponentLink>
+              </Link>
             </Flex>
             <Box as="ul" p={0} my={2}>
               {orgs.map(this.renderMembershipLine)}

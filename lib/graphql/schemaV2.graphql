@@ -578,7 +578,17 @@ type Bot implements Account {
   """
   Get all members (admins, members, backers, followers)
   """
-  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection
   memberOf(
     limit: Int
     offset: Int
@@ -797,7 +807,17 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   Get all members (admins, members, backers, followers)
   """
-  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection
   memberOf(
     limit: Int
     offset: Int
@@ -2756,6 +2776,11 @@ enum Currency {
   MXN
 
   """
+  Malaysian Ringgit
+  """
+  MYR
+
+  """
   Naira
   """
   NGN
@@ -2919,7 +2944,17 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   """
   Get all members (admins, members, backers, followers)
   """
-  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection
   memberOf(
     limit: Int
     offset: Int
@@ -3785,7 +3820,17 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   Get all members (admins, members, backers, followers)
   """
-  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection
   memberOf(
     limit: Int
     offset: Int
@@ -4081,7 +4126,17 @@ type Host implements Account & AccountWithContributions {
   """
   Get all members (admins, members, backers, followers)
   """
-  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection
   memberOf(
     limit: Int
     offset: Int
@@ -4578,7 +4633,17 @@ type Individual implements Account {
   """
   Get all members (admins, members, backers, followers)
   """
-  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection
   memberOf(
     limit: Int
     offset: Int
@@ -4788,6 +4853,11 @@ type Location {
   Longitude
   """
   long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 """
@@ -4818,6 +4888,11 @@ input LocationInput {
   Longitude
   """
   long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 """
@@ -5344,11 +5419,6 @@ type Mutation {
     The key that you want to edit in settings
     """
     emailConfirmationToken: String!
-
-    """
-    This can be used to link the other guest contributions to the user
-    """
-    guestTokens: [String!]
   ): ConfirmGuestAccountResponse!
 
   """
@@ -5448,31 +5518,6 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): CreditCardWithStripeError!
-
-  """
-  Add a new payment method to be used with an Order
-  """
-  addStripeCreditCard(
-    """
-    The credit card info
-    """
-    creditCardInfo: CreditCardCreateInput!
-
-    """
-    Name associated to this credit card
-    """
-    name: String!
-
-    """
-    Whether this credit card should be saved for future payments
-    """
-    isSavedForLater: Boolean = true
-
-    """
-    Account to add the credit card to
-    """
-    account: AccountReferenceInput!
-  ): CreditCardWithStripeError! @deprecated(reason: "2020-10-23: Use addCreditCard")
 
   """
   Confirm a credit card is ready for use after strong customer authentication
@@ -5617,6 +5662,16 @@ type OrderCollection implements Collection {
 }
 
 """
+Some context about how an order was created
+"""
+input OrderContextInput {
+  """
+  Whether this order was created using the embedded contribution flow
+  """
+  isEmbed: Boolean
+}
+
+"""
 Input to create a new order
 """
 input OrderCreateInput {
@@ -5667,6 +5722,11 @@ input OrderCreateInput {
   If the tier has some "customFields", use this field to set their values
   """
   customData: JSON
+
+  """
+  Some context about how this order was created
+  """
+  context: OrderContextInput
 }
 
 """
@@ -5828,7 +5888,17 @@ type Organization implements Account & AccountWithContributions {
   """
   Get all members (admins, members, backers, followers)
   """
-  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection
   memberOf(
     limit: Int
     offset: Int
@@ -6287,7 +6357,17 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   """
   Get all members (admins, members, backers, followers)
   """
-  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection
   memberOf(
     limit: Int
     offset: Int

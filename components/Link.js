@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { pick } from 'lodash';
+import NextLink from 'next/link';
 import Scrollchor from 'react-scrollchor';
-
-import router from '../server/pages';
 
 class Link extends React.Component {
   static propTypes = {
-    route: PropTypes.string,
-    params: PropTypes.object,
+    href: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     target: PropTypes.string,
     animate: PropTypes.object,
     className: PropTypes.string,
@@ -21,16 +19,23 @@ class Link extends React.Component {
 
   constructor(props) {
     super(props);
-    this.isHash = props.route && props.route.substr(0, 1) === '#';
+    this.isHash = props.href && this.constructRoutePath(props.href).substr(0, 1) === '#';
   }
 
-  componentDidMount() {
-    this.isIframe = window.self !== window.top && window.location.hostname !== 'localhost'; // cypress is using an iframe for e2e testing
+  constructRoutePath(href) {
+    if (typeof href === 'string') {
+      return href;
+    } else if (href) {
+      return href.pathname;
+    } else {
+      return '';
+    }
   }
 
   render() {
-    const { route, params, children, className, title, onClick, openInNewTab, ...otherProps } = this.props;
+    const { href, children, className, title, onClick, openInNewTab } = this.props;
     if (this.isHash) {
+      const route = this.constructRoutePath(href);
       const afterAnimate = () => {
         if (window.history) {
           history.pushState({ ...history.state, as: location.pathname + route }, undefined, route);
@@ -47,17 +52,9 @@ class Link extends React.Component {
           {children}
         </Scrollchor>
       );
-    } else if (this.isIframe) {
-      const routeFromRouter = router.findByName(route);
-      const path = routeFromRouter ? routeFromRouter.getAs(params) : `https://opencollective.com${route}`;
-      return (
-        <a href={path} title={title} target="_top" className={className} {...otherProps}>
-          {children}
-        </a>
-      );
     } else {
       return (
-        <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
+        <NextLink {...pick(this.props, ['href', 'scroll'])}>
           <a
             className={className}
             title={title}
@@ -67,7 +64,7 @@ class Link extends React.Component {
           >
             {children}
           </a>
-        </router.Link>
+        </NextLink>
       );
     }
   }

@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import { Box, Flex } from '../Grid';
 import SignInOrJoinFree from '../SignInOrJoinFree';
@@ -21,6 +20,7 @@ class CreateProject extends Component {
     LoggedInUser: PropTypes.object, // from withUser
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     createProject: PropTypes.func.isRequired, // addCreateProjectMutation
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -42,11 +42,14 @@ class CreateProject extends Component {
       });
       const createdProject = res.data.createProject;
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('project', {
-        parentCollectiveSlug: this.props.parent.slug,
-        slug: createdProject.slug,
-        status: 'projectCreated',
-      }).then(() => window.scrollTo(0, 0));
+      this.props.router
+        .push({
+          pathname: `/${this.props.parent.slug}/projects/${createdProject.slug}`,
+          query: {
+            status: 'projectCreated',
+          },
+        })
+        .then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ error: errorMsg, creating: false });

@@ -1,9 +1,8 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-
-import { Router } from '../../server/pages';
 
 import { Flex } from '../Grid';
 import StepsProgress from '../StepsProgress';
@@ -23,15 +22,9 @@ StepLabel.defaultProps = {
 const steps = [{ name: 'Welcome' }, { name: 'Administrators' }, { name: 'Contact' }];
 
 const params = {
-  0: {
-    routerStep: undefined,
-  },
-  1: {
-    routerStep: 'administrators',
-  },
-  2: {
-    routerStep: 'contact',
-  },
+  0: undefined,
+  1: 'administrators',
+  2: 'contact-info',
 };
 
 class OnboardingStepsProgress extends React.Component {
@@ -39,10 +32,7 @@ class OnboardingStepsProgress extends React.Component {
     step: PropTypes.number,
     mode: PropTypes.string,
     slug: PropTypes.string,
-  };
-
-  getStepParams = (step, param) => {
-    return params[step][param];
+    router: PropTypes.object,
   };
 
   render() {
@@ -55,11 +45,7 @@ class OnboardingStepsProgress extends React.Component {
           focus={steps[this.props.step]}
           onStepSelect={step => {
             const newStep = steps.findIndex(element => element.name === step.name);
-            Router.pushRoute('collective-with-onboarding', {
-              slug,
-              mode,
-              step: this.getStepParams(newStep, 'routerStep'),
-            });
+            this.props.router.push(`/${slug}/${mode}/${params[newStep] || ''}`);
           }}
         >
           {({ step }) => {
@@ -85,4 +71,4 @@ class OnboardingStepsProgress extends React.Component {
   }
 }
 
-export default OnboardingStepsProgress;
+export default withRouter(OnboardingStepsProgress);

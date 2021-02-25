@@ -85,7 +85,7 @@ const ExpenseAdminActions = ({
           }
         />
       ) : (
-        <Link route="expense-v2" params={{ collectiveSlug: collective.slug, ExpenseId: expense.legacyId }}>
+        <Link href={`/${collective.slug}/expenses/${expense.legacyId}`}>
           <ButtonWithLabel
             onClick={() => copy(window.location.href.replace('?createSuccess=true', ''))}
             disabled={isDisabled}

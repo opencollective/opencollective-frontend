@@ -61,9 +61,7 @@ const YourInitiativeIsNearlyThere = () => (
         <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.600">
           <FormattedMessage
             id="OCFHostApplication.yourInitiativeIsNearlyThere.description"
-            defaultMessage="We need to undertake our internal process to get everything ready.
-            {lineBreak}{lineBreak}
-            In the meantime, check out these useful links."
+            defaultMessage="We need to undertake our internal process to get everything ready. {lineBreak}{lineBreak} In the meantime, check out these useful links."
             values={{
               lineBreak: <br />,
             }}

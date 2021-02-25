@@ -81,7 +81,7 @@ class ApplyToHostBtn extends React.Component {
                 defaultMessage="This Fiscal Host has reached its Collective limit. <a>Contact {collectiveName}</a> to request they upgrade, and let them know you want to apply."
                 values={{
                   collectiveName: hostSlug,
-                  a: getI18nLink({ as: Link, route: 'collective-contact', params: { collectiveSlug: hostSlug } }),
+                  a: getI18nLink({ as: Link, href: `${hostSlug}/contact` }),
                 }}
               />
             }

@@ -123,14 +123,14 @@ const AboutOurFees = () => (
       </Box>
     </Flex>
     <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center" mb="40px" mt={[null, '48px']}>
-      <Link route="/foundation/apply/intro">
+      <Link href="/foundation/apply/intro">
         <StyledButton mb={[3, 0]} width={['286px', '100px']} mr={[null, 3]}>
           <ArrowLeft2 size="14px" />
           &nbsp;
           <FormattedMessage id="Back" defaultMessage="Back" />
         </StyledButton>
       </Link>
-      <Link route="/foundation/apply/form">
+      <Link href="/foundation/apply/form">
         <OCFPrimaryButton width={['286px', '100px']}>
           <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
           &nbsp;

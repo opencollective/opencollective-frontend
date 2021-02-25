@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -13,7 +14,6 @@ import { getErrorFromGraphqlException } from '../lib/errors';
 import { legacyCollectiveQuery } from '../lib/graphql/queries';
 import { imagePreview } from '../lib/image-utils';
 import { compose } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import Avatar from '../components/Avatar';
 import Body from '../components/Body';
@@ -165,6 +165,7 @@ class CreatePledgePage extends React.Component {
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     createPledge: PropTypes.func,
+    router: PropTypes.object,
   };
 
   state = {
@@ -233,8 +234,7 @@ class CreatePledgePage extends React.Component {
         data: { createOrder: result },
       } = await this.props.createPledge(order, this.props.data?.Collective);
       if (result.collective.slug) {
-        const params = { slug: result.collective.slug };
-        Router.pushRoute('collective', params);
+        this.props.router.push(`/${result.collective.slug}`);
       }
     } catch (error) {
       this.setState({
@@ -319,25 +319,21 @@ class CreatePledgePage extends React.Component {
               <P my={3} color="black.500">
                 <FormattedMessage
                   id="createPledge.why"
-                  defaultMessage="If the cause or collective that you want to support is not yet on Open Collective, you can make a
-                pledge. This will incentivize them to create an open collective for their activities and offer you much
-                more visibility on how your money is spent to advance their cause."
+                  defaultMessage="If the cause or collective that you want to support is not yet on Open Collective, you can make a pledge. This will incentivize them to create an open collective for their activities and offer you much more visibility on how your money is spent to advance their cause."
                 />
               </P>
 
               <P my={3} color="black.500">
                 <FormattedMessage
                   id="createPledge.onceTheyCreateIt"
-                  defaultMessage="Once they create it (and verify that they own the URL you’ll enter in this form), you will receive an
-                email to ask you to fulfill your pledge."
+                  defaultMessage="Once they create it (and verify that they own the URL you’ll enter in this form), you will receive an email to ask you to fulfill your pledge."
                 />
               </P>
 
               <P my={3} color="black.500">
                 <FormattedMessage
                   id="createPledge.conditions"
-                  defaultMessage="At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We
-                request the project to have a least 100 stars on GitHub!"
+                  defaultMessage="At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We request the project to have a least 100 stars on GitHub!"
                 />
               </P>
 
@@ -354,7 +350,12 @@ class CreatePledgePage extends React.Component {
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
                     values={{
                       'signin-link': msg => (
-                        <Link route="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
+                        <Link
+                          href={{
+                            pathname: '/signin',
+                            query: { next: slug ? `/${slug}/pledges/new` : '/pledges/new' },
+                          }}
+                        >
                           {msg}
                         </Link>
                       ),
@@ -387,8 +388,7 @@ class CreatePledgePage extends React.Component {
                       <P color="black.500" fontSize="12px" mt={2}>
                         <FormattedMessage
                           id="createPledge.priviledge"
-                          defaultMessage="You’ve earned the privilege to name and describe this awesome cause. We’ll create a pledged
-                        collective page for it so other people can find it and pledge to it too."
+                          defaultMessage="You’ve earned the privilege to name and describe this awesome cause. We’ll create a pledged collective page for it so other people can find it and pledge to it too."
                         />
                       </P>
 
@@ -556,7 +556,7 @@ class CreatePledgePage extends React.Component {
                       .filter(({ fromCollective }) => fromCollective.type === 'USER')
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                          <Link href={`/${fromCollective.slug}`}>
                             <Avatar collective={fromCollective} radius={40} />
                           </Link>
                         </Box>
@@ -571,7 +571,7 @@ class CreatePledgePage extends React.Component {
                       )
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                          <Link href={`/${fromCollective.slug}`}>
                             <Container
                               backgroundImage={`url(${imagePreview(
                                 fromCollective.image,
@@ -613,9 +613,7 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.what"
-                  defaultMessage="A pledge allows supporters (companies and individuals) to pledge
-                funds towards a collective that hasn’t been created yet. If you can’t find a collective you want to
-                support, pledge to it!"
+                  defaultMessage="A pledge allows supporters (companies and individuals) to pledge funds towards a collective that hasn’t been created yet. If you can’t find a collective you want to support, pledge to it!"
                 />
               </Details>
 
@@ -628,8 +626,7 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.whatHappens"
-                  defaultMessage="Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam
-                folks, so please help us reach out to the community via twitter / github or, if you can, via email."
+                  defaultMessage="Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam folks, so please help us reach out to the community via twitter / github or, if you can, via email."
                 />
               </Details>
 
@@ -732,4 +729,4 @@ export const addCreatePledgeMutation = graphql(createPledgeMutation, {
 
 const addGraphql = compose(addCreatePledgePageData, addCreatePledgeMutation);
 
-export default injectIntl(withUser(addGraphql(CreatePledgePage)));
+export default injectIntl(withUser(addGraphql(withRouter(CreatePledgePage))));

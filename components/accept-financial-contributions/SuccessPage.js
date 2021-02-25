@@ -139,11 +139,7 @@ class SuccessPage extends React.Component {
                       values={{
                         takeMeThere: (
                           <Link
-                            route="editCollective"
-                            params={{
-                              slug: collective.host.slug,
-                              section: 'fiscal-hosting',
-                            }}
+                            href={`/${collective.host.slug}/edit/fiscal-hosting`}
                             data-cy="afc-success-host-settings-link"
                           >
                             <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
@@ -157,12 +153,7 @@ class SuccessPage extends React.Component {
             </Flex>
           </Flex>
           <Flex flexDirection={['column', 'row']} justifyContent="center" alignItems="center" my={3}>
-            <Link
-              route="collective"
-              params={{
-                slug: collective.slug,
-              }}
-            >
+            <Link href={`/${collective.slug}`}>
               <StyledButton buttonStyle="standard" mt={[2, 3]} mb={[3, 2]} px={3}>
                 <FormattedMessage
                   id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
@@ -170,14 +161,7 @@ class SuccessPage extends React.Component {
                 />
               </StyledButton>
             </Link>
-            <Link
-              route="editCollective"
-              params={{
-                slug: collective.slug,
-                section: 'tiers',
-              }}
-              data-cy="afc-success-host-tiers-link"
-            >
+            <Link href={`/${collective.slug}/edit/tiers`} data-cy="afc-success-host-tiers-link">
               <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
                 <FormattedMessage id="createCustomTiers" defaultMessage="Create your own tiers" />
               </StyledButton>

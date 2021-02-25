@@ -256,6 +256,7 @@ TransactionItem.propTypes = {
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       imageUrl: PropTypes.string,
+      isIncognito: PropTypes.bool,
     }).isRequired,
     host: PropTypes.shape({
       id: PropTypes.string,

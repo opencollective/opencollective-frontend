@@ -2,6 +2,7 @@ const hyperwatch = require('@hyperwatch/hyperwatch');
 const expressBasicAuth = require('express-basic-auth');
 const expressWs = require('express-ws');
 
+const logger = require('./logger');
 const redisProvider = require('./redis-provider');
 const { parseToBooleanDefaultFalse } = require('./utils');
 
@@ -99,7 +100,7 @@ const load = async app => {
   // Configure access Logs in dev and production
 
   const consoleLogOutput = process.env.OC_ENV === 'development' ? 'console' : 'text';
-  pipeline.getNode('main').map(log => console.log(lib.logger.defaultFormatter.format(log, consoleLogOutput)));
+  pipeline.getNode('main').map(log => logger.info(lib.logger.defaultFormatter.format(log, consoleLogOutput)));
 
   // Start
 

@@ -107,6 +107,8 @@ class EditConnectedAccount extends React.Component {
         return (window.location.href = json.redirectUrl);
       })
       .catch(err => {
+        // TODO: this should be reported to the user
+        // eslint-disable-next-line no-console
         console.error(`>>> /api/connected-accounts/${service} error`, err);
       });
   }
@@ -123,6 +125,8 @@ class EditConnectedAccount extends React.Component {
         }
       })
       .catch(err => {
+        // TODO: this should be reported to the user
+        // eslint-disable-next-line no-console
         console.error(`>>> /api/connected-accounts/${service}/disconnect error`, err);
       });
   }

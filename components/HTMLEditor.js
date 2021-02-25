@@ -148,6 +148,7 @@ class HTMLEditor extends React.Component {
         this.saveToServer(file);
       } else {
         // TODO: this should be reported to the user
+        // eslint-disable-next-line no-console
         console.error('HTMLEditor > File is not an image', file);
       }
     };
@@ -165,6 +166,7 @@ class HTMLEditor extends React.Component {
       })
       .catch(e => {
         // TODO: this should be reported to the user
+        // eslint-disable-next-line no-console
         console.error('HTMLEditor > Error uploading image', e);
       });
   }

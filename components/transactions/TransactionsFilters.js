@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { omitBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -27,7 +28,8 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
     inputId: `transactions-filter-${name}`,
     value: filters?.[name],
     onChange: value => {
-      onChange({ ...filters, [name]: value === 'ALL' ? null : value });
+      const obj = { ...filters, [name]: value === 'ALL' ? null : value };
+      onChange(omitBy(obj, value => !value));
     },
   });
 

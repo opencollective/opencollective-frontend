@@ -11,11 +11,9 @@ import Contribute from './Contribute';
  */
 const ContributeProject = ({ collective, project, ...props }) => {
   const description = truncate(project.description, { length: 100 });
-  const projectRouteParams = { parentCollectiveSlug: collective.slug, slug: project.slug };
   return (
     <Contribute
-      route="project"
-      routeParams={projectRouteParams}
+      route={`/${collective.slug}/projects/${project.slug}`}
       type={ContributionTypes.PROJECT}
       title={project.name}
       contributors={project.contributors}

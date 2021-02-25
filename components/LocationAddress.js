@@ -28,7 +28,7 @@ const LocationAddress = ({ location, isLoading, showMessageIfEmpty }) => {
   return (
     <React.Fragment>
       {location.address}
-      {location.address && location.country && <br />}
+      <br />
       {location.country}
     </React.Fragment>
   );

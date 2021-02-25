@@ -11,7 +11,6 @@ import styled from 'styled-components';
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import Avatar from '../Avatar';
 import CollectiveNavbar from '../collective-navbar';
@@ -184,11 +183,9 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
         await this.submitBankAccountInformation(data);
         await this.addHost(collective, organization ? organization : collective);
         await this.props.refetchLoggedInUser();
-        await Router.pushRoute('accept-financial-contributions', {
-          slug: this.props.collective.slug,
-          path: this.props.router.query.path,
-          state: 'success',
-        });
+        await this.props.router.push(
+          `/${this.props.collective.slug}/accept-financial-contributions/${this.props.router.query.path}/success`,
+        );
         window.scrollTo(0, 0);
       } catch (e) {
         this.setState({ loading: false });
@@ -313,7 +310,7 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
           )}
           {router.query.method === 'bank' && (
             <Flex flexDirection={['column', 'row']} justifyContent={'space-evenly'} mx={[2, 4]} my={3}>
-              <Box width={1 / 5} display={['none', null, 'block']}></Box>
+              <Box width={1 / 5} display={['none', null, 'block']} />
               <Flex width={[1, 1 / 2]} flexDirection="column" justifyContent="center" alignItems="center" px={3}>
                 <Box alignItems="center">
                   <P color="black.900" textAlign="left" mt={[2, 3]} fontWeight="bold" fontSize="14px">
@@ -358,10 +355,11 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
                               minHeight="36px"
                               type="button"
                               onClick={() => {
-                                Router.pushRoute('accept-financial-contributions', {
-                                  slug: this.props.collective.slug,
-                                  path: this.props.router.query.path,
-                                }).then(() => window.scrollTo(0, 0));
+                                this.props.router
+                                  .push(
+                                    `${this.props.collective.slug}/accept-financial-contributions/${this.props.router.query.path}`,
+                                  )
+                                  .then(() => window.scrollTo(0, 0));
                               }}
                             >
                               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />

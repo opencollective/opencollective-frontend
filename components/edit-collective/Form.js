@@ -434,7 +434,7 @@ class EditCollectiveForm extends React.Component {
               alignItems="center"
               flexWrap="wrap"
             >
-              <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
+              <Link href={`/${collective.slug}/edit/gift-cards`}>
                 <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="giftCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
@@ -842,11 +842,8 @@ class EditCollectiveForm extends React.Component {
 
                 <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
                   <Link
-                    route={isEvent ? 'event' : 'collective'}
-                    params={
-                      isEvent
-                        ? { parentCollectiveSlug: collective.parentCollective.slug, slug: collective.slug }
-                        : { slug: collective.slug }
+                    href={
+                      isEvent ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`
                     }
                   >
                     <FormattedMessage

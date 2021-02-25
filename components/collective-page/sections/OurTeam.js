@@ -9,7 +9,6 @@ import { H2 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 
 const COLLECTIVE_CARD_WIDTH = 144;
-const COLLECTIVE_CARD_HEIGHT = 190;
 
 /**
  * Our Team section for the About section category
@@ -29,7 +28,7 @@ const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
               key={contributor.id}
               m={2}
               width={COLLECTIVE_CARD_WIDTH}
-              height={COLLECTIVE_CARD_HEIGHT}
+              height="auto"
               contributor={contributor}
               currency={collective.currency}
               collectiveId={collective.id}

@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import { compact, isEmpty, pick, values } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { Link } from '../server/pages';
-
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledCheckbox from './StyledCheckbox';
@@ -69,7 +68,7 @@ Tab.propTypes = {
 
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
-    <Link route={onSecondaryAction} passHref>
+    <Link href={onSecondaryAction}>
       <StyledLink disabled={loading} fontSize="14px">
         {children}
       </StyledLink>
@@ -84,7 +83,7 @@ const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
 SecondaryAction.propTypes = {
   children: PropTypes.node,
   loading: PropTypes.bool,
-  onSecondaryAction: PropTypes.func,
+  onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
 };
 
 const NewsletterCheckBox = ({ onChange, checked }) => {

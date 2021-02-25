@@ -112,8 +112,8 @@ class UserTwoFactorAuth extends React.Component {
       length: 64,
     };
     const secret = speakeasy.generateSecret(options);
-    const fullOTPUrl = secret.otpauth_url + issuer;
-    this.setState({ secret, base32: secret.base32, otpauth_url: fullOTPUrl });
+    const otpAuthUrl = secret.otpauth_url + issuer;
+    this.setState({ secret, base32: secret.base32, otpAuthUrl });
   }
 
   async enableTwoFactorAuth(values) {
@@ -183,7 +183,7 @@ class UserTwoFactorAuth extends React.Component {
       disableError,
       secret,
       base32,
-      otpauth_url,
+      otpAuthUrl,
       disablingTwoFactorAuth,
       enablingTwoFactorAuth,
       recoveryCodes,
@@ -443,7 +443,7 @@ class UserTwoFactorAuth extends React.Component {
                       {secret ? (
                         <Flex flexDirection="column">
                           <QRCode
-                            value={otpauth_url}
+                            value={otpAuthUrl}
                             renderAs="svg"
                             size={256}
                             level="L"

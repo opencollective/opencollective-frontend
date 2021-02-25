@@ -46,13 +46,13 @@ const MemberCard = ({ role, since, collective, ...cardProps }) => (
   <MainContainer {...cardProps}>
     <CollectiveLogoContainer mt={52} mb={2}>
       <Box mt={-32}>
-        <Link route="collective" params={{ slug: collective.slug }}>
+        <Link href={`/${collective.slug}`}>
           <Avatar collective={collective} radius={64} />
         </Link>
       </Box>
     </CollectiveLogoContainer>
     <Flex flexDirection="column" alignItems="center" p={2}>
-      <Link route="collective" params={{ slug: collective.slug }}>
+      <Link href={`/${collective.slug}`}>
         <H5 textAlign="center" fontSize="14px" fontWeight="bold" lineHeight="18px">
           {collective.name}
         </H5>

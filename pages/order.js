@@ -26,9 +26,7 @@ class OrderPage extends React.Component {
             <strong>This page has moved.</strong>
           </p>
           You can now manage pending bank transfers from{' '}
-          <Link route="orders" params={{ collectiveSlug: this.props.slug }}>
-            the dedicated page.
-          </Link>
+          <Link href={`/${this.props.slug}/orders`}>the dedicated page.</Link>
         </Box>
       </Page>
     );

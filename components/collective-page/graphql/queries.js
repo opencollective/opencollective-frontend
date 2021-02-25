@@ -53,6 +53,7 @@ export const collectivePageQuery = gql`
         activeRecurringContributions
         totalAmountReceived(periodInMonths: 12)
         totalAmountRaised: totalAmountReceived
+        totalNetAmountRaised: totalNetAmountReceived
         backers {
           id
           all
