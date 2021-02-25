@@ -16,7 +16,7 @@
     "@hyperwatch/hyperwatch": "3.8.1",
     "@material-ui/core": "4.11.3",
     "@opencollective/taxes": "3.1.0",
-    "@popperjs/core": "2.8.3",
+    "@popperjs/core": "2.8.4",
     "@sentry/browser": "6.2.0",
     "@sentry/node": "6.2.0",
     "@shopify/address": "2.10.2",
