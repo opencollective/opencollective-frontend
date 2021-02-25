@@ -52,7 +52,7 @@ const Map = ({ lat, long }) => {
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <iframe width="100%" height="100%" frameBorder="0" scrolling="no" src={src}></iframe>
+      <iframe title="Open Street Map" width="100%" height="100%" frameBorder="0" scrolling="no" src={src}></iframe>
       <StyledLink
         openInNewTab
         href={`https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${long}#map=16/${lat}/${long}`}
