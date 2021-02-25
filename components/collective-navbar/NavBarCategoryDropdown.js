@@ -47,7 +47,8 @@ const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
 
   &:focus {
     color: ${themeGet('colors.primary.700')};
-    text-decoration: none;
+    text-decoration: underline;
+    outline: 0;
   }
 
   &:hover {
@@ -119,7 +120,8 @@ const MenuItem = styled('li')`
     letter-spacing: -0.4px;
     outline: none;
 
-    &:hover {
+    &:hover,
+    &:focus {
       text-decoration: underline;
     }
 
