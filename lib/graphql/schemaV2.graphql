@@ -2701,9 +2701,19 @@ All supported currencies
 """
 enum Currency {
   """
+  Argentine Peso
+  """
+  ARS
+
+  """
   Australian Dollar
   """
   AUD
+
+  """
+  Taka
+  """
+  BDT
 
   """
   Bulgarian Lev
@@ -2744,6 +2754,11 @@ enum Currency {
   Pound Sterling
   """
   GBP
+
+  """
+  Hong Kong Dollar
+  """
+  HKD
 
   """
   Kuna
@@ -2791,6 +2806,11 @@ enum Currency {
   NOK
 
   """
+  Nepalese Rupee
+  """
+  NPR
+
+  """
   New Zealand Dollar
   """
   NZD
@@ -2811,6 +2831,11 @@ enum Currency {
   SEK
 
   """
+  Singapore Dollar
+  """
+  SGD
+
+  """
   US Dollar
   """
   USD
@@ -2819,6 +2844,11 @@ enum Currency {
   Peso Uruguayo
   """
   UYU
+
+  """
+  Rand
+  """
+  ZAR
 }
 
 scalar DateString
@@ -4994,7 +5024,7 @@ type Mutation {
     Can only be set if root
     """
     platformFeePercent: Int
-    platformTipPercent: Int
+    platformTip: AmountInput
   ): Order!
   createCollective(
     """

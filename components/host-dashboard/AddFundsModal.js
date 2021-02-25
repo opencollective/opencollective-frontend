@@ -52,7 +52,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $description: String!
     $hostFeePercent: Int!
     $platformFeePercent: Int
-    $platformTipPercent: Int
+    $platformTip: AmountInput
   ) {
     addFunds(
       account: $account
@@ -61,7 +61,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       description: $description
       hostFeePercent: $hostFeePercent
       platformFeePercent: $platformFeePercent
-      platformTipPercent: $platformTipPercent
+      platformTip: $platformTip
     ) {
       id
       toAccount {
@@ -80,7 +80,7 @@ const getInitialValues = values => ({
   amount: null,
   hostFeePercent: null,
   platformFeePercent: 0,
-  platformTipPercent: 0,
+  platformTip: null,
   description: '',
   fromAccount: null,
   ...values,
@@ -127,9 +127,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   function calculateTip(form, field, isAmount) {
     form.setFieldTouched(field.name, true);
     if (isAmount) {
-      form.values.platformTipPercent = (field.value * 100) / form.values.amount;
+      form.values.platformTipPercent = Math.round((field.value * 100) / form.values.amount);
     } else {
-      form.values.platformTipAmount = (form.values.amount * field.value) / 100;
+      form.values.platformTip = (form.values.amount * field.value) / 100;
     }
   }
 
@@ -146,6 +146,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
               amount: { valueInCents: values.amount },
               fromAccount: buildAccountReference(values.fromAccount),
               account: buildAccountReference(values.account),
+              platformTip: { valueInCents: values.platformTip },
             },
           }).then(props.onClose)
         }
@@ -160,7 +161,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
             : values.platformTipPercent;
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
           const platformFee = Math.round(values.amount * (platformFeePercent / 100));
-          const platformTip = Math.round(values.amount * (platformTipPercent / 100));
 
           return (
             <Form>
@@ -238,7 +238,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         <FormattedMessage id="PlatformTip" defaultMessage="Platform Tips" />
                       </Flex>
                       <Flex mt={2}>
-                        <StyledInputFormikField name="platformTipAmount" htmlFor="addFunds-platformTipAmount">
+                        <StyledInputFormikField name="platformTip" htmlFor="addFunds-platformTip">
                           {({ form, field }) => (
                             <StyledInputAmount
                               id={field.id}
@@ -334,20 +334,20 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 )}
                 {!canAddPlatformFee && (
                   <AmountDetailsLine
-                    value={platformTip}
+                    value={values.platformTip}
                     currency={collective.currency}
                     label={
                       <FormattedMessage
                         id="addfunds.platformTip"
-                        defaultMessage="Platform Tip ({platformTip})"
-                        values={{ platformTip: `${platformTipPercent.toFixed(2)}%` }}
+                        defaultMessage="Platform Tip ({platformTipPercent})"
+                        values={{ platformTipPercent: `${platformTipPercent.toFixed(2)}%` }}
                       />
                     }
                   />
                 )}
                 <StyledHr my={2} borderColor="black.300" />
                 <AmountDetailsLine
-                  value={values.amount - hostFee - platformFee - platformTip}
+                  value={values.amount - hostFee - platformFee - values.platformTip}
                   currency={collective.currency}
                   label={<FormattedMessage id="addfunds.netAmount" defaultMessage="Net amount" />}
                   isLargeAmount
@@ -370,7 +370,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     mx={2}
                     mb={1}
                     minWidth={120}
-                    disabled={!dirty || !isValid || values.amount - hostFee - platformFee - platformTip <= 0}
+                    disabled={!dirty || !isValid || values.amount - hostFee - platformFee - values.platformTip <= 0}
                     loading={isSubmitting}
                   >
                     <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />

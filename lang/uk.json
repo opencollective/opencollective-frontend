@@ -47,7 +47,7 @@
   "addfunds.netAmount": "Чиста сума",
   "addfunds.organization.label": "організація",
   "addfunds.platformFees": "Платня платформі ({platformFees})",
-  "addfunds.platformTip": "Platform Tip ({platformTip})",
+  "addfunds.platformTip": "Platform Tip ({platformTipPercent})",
   "AddFunds.source": "Джерело",
   "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fee and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
   "AddFundsToCollectiveModal.Title": "Додати кошти для Колективу:",

@@ -47,7 +47,7 @@
   "addfunds.netAmount": "Importo netto",
   "addfunds.organization.label": "organizzazione",
   "addfunds.platformFees": "Compensi piattaforma ({platformFees})",
-  "addfunds.platformTip": "Platform Tip ({platformTip})",
+  "addfunds.platformTip": "Platform Tip ({platformTipPercent})",
   "AddFunds.source": "Fonte",
   "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fee and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
   "AddFundsToCollectiveModal.Title": "Aggiungi fondi al collettivo:",

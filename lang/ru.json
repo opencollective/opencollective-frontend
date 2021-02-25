@@ -47,7 +47,7 @@
   "addfunds.netAmount": "Чистая сумма",
   "addfunds.organization.label": "организация",
   "addfunds.platformFees": "Комиссия платформы ({platformFees})",
-  "addfunds.platformTip": "Platform Tip ({platformTip})",
+  "addfunds.platformTip": "Platform Tip ({platformTipPercent})",
   "AddFunds.source": "Источник",
   "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fee and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
   "AddFundsToCollectiveModal.Title": "Добавить средства Коллективу:",
