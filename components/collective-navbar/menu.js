@@ -67,7 +67,7 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
     addSectionLink(intl, links, collective, sections, Sections.GOALS);
   } else if (category === NAVBAR_CATEGORIES.CONTRIBUTE) {
     // Contribute
-    if (hasFeature(collective, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS)) {
+    if (hasFeature(collective, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS) && hasSection(sections, Sections.CONTRIBUTE)) {
       links.push({
         route: `/${collectiveSlug}/contribute`,
         title: intl.formatMessage(titles.CONTRIBUTE),
@@ -93,13 +93,13 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
     }
   } else if (category === NAVBAR_CATEGORIES.CONNECT) {
     // Connect
-    if (hasFeature(collective, FEATURES.UPDATES)) {
+    if (hasFeature(collective, FEATURES.UPDATES) && hasSection(sections, Sections.UPDATES)) {
       links.push({
         route: `/${collectiveSlug}/updates`,
         title: intl.formatMessage(titles.UPDATES),
       });
     }
-    if (hasFeature(collective, FEATURES.CONVERSATIONS)) {
+    if (hasFeature(collective, FEATURES.CONVERSATIONS) && hasSection(sections, Sections.CONVERSATIONS)) {
       links.push({
         route: `/${collectiveSlug}/conversations`,
         title: intl.formatMessage(titles.CONVERSATIONS),

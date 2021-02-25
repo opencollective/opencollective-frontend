@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, flatten, isEqual, set } from 'lodash';
@@ -14,6 +14,7 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { editCollectivePageQuery } from '../../../lib/graphql/queries';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 
@@ -40,6 +41,15 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
       id
       type
       isActive
+      settings
+    }
+  }
+`;
+
+const collectiveSettingsV1Query = gql`
+  query EditCollectivePage($slug: String) {
+    Collective(slug: $slug) {
+      id
       settings
     }
   }
@@ -300,6 +310,8 @@ const EditCollectivePage = ({ collective }) => {
 
   const [submitSetting, { loading: isSubmitting, error }] = useMutation(editAccountSettingsMutation, {
     context: API_V2_CONTEXT,
+    // Refresh the settings for GQLV1 cache, to refresh the navbar
+    refetchQueries: [{ query: collectiveSettingsV1Query, variables: { slug: collective.slug } }],
   });
 
   // Load sections from fetched collective

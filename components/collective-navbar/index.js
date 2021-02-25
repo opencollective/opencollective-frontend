@@ -403,7 +403,7 @@ const CollectiveNavbar = ({
   collective,
   isAdmin,
   isLoading,
-  sections,
+  sections: sectionsFromParent,
   selectedCategory,
   callsToAction,
   onCollectiveClick,
@@ -418,7 +418,9 @@ const CollectiveNavbar = ({
   const { LoggedInUser } = useUser();
   isAdmin = isAdmin || LoggedInUser?.canEditCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
-  sections = sections || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
+  const sections = React.useMemo(() => {
+    return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
+  }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   const isRoot = LoggedInUser?.isRoot;
   callsToAction = { ...getDefaultCallsToActions(collective, sections, isAdmin, isHostAdmin, isRoot), ...callsToAction };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
