@@ -27,7 +27,9 @@ const PageFeatureNotSupported = ({ showContactSupportLink, ...props }) => {
           {title}
         </H1>
         <P fontSize="64px" mt={3} mb={5}>
-          🙈️
+          <span role="img" aria-label="Monkey Face">
+            🙈️
+          </span>
         </P>
         <P>
           <FormattedMessage

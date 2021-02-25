@@ -22,10 +22,10 @@ export const getProvider = url => {
   });
 };
 
-/** An iframe that groes with its content */
+/** An iframe that grows with its content */
 const ResponsiveIframe = styled(({ src, ...props }) => (
   <div {...props}>
-    <iframe src={src} allowFullScreen frameBorder="0" allow="fullscreen" />
+    <iframe title="Responsive Frame" src={src} allowFullScreen frameBorder="0" allow="fullscreen" />
   </div>
 ))`
   position: relative;
@@ -44,7 +44,7 @@ const ResponsiveIframe = styled(({ src, ...props }) => (
 
 /**
  * A video player that supports YouTube and Vimeo.
- * Implemented as a pure component to avoir re-checking the URL and re-rendering
+ * Implemented as a pure component to avoid re-checking the URL and re-rendering
  * the iframe on each update.
  */
 const VideoPlayer = React.memo(({ url, placeholder }) => {
