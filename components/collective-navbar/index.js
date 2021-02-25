@@ -370,25 +370,26 @@ export const MainActionBtn = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
   padding: 5px 10px;
   text-transform: uppercase;
   background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
-    linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
+    linear-gradient(${themeGet('colors.primary.500')}, ${themeGet('colors.primary.500')});
   border-radius: 8px;
-  border: 2px solid white;
   color: ${themeGet('colors.primary.600')};
+  border: none;
 
-  &:focus {
-    border: 2px solid #050505;
+  &,
+  span {
+    letter-spacing: 0.01em;
   }
 
   &:hover {
-    background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
-      linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
-    border: 2px solid white;
+    background: linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)),
+      linear-gradient(${themeGet('colors.primary.500')}, ${themeGet('colors.primary.500')});
   }
 
-  &:active {
+  &:active,
+  &:focus {
     background: ${themeGet('colors.primary.600')};
     color: ${themeGet('colors.white.full')};
-    border: 2px solid white;
+    box-shadow: none;
   }
 
   span {
