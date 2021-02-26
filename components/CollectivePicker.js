@@ -12,7 +12,7 @@ import { CollectiveType } from '../lib/constants/collectives';
 import { mergeRefs } from '../lib/react-utils';
 
 import Avatar from './Avatar';
-import { InviteCollectiveDropdownOption, InviteCollectiveForm } from './CollectivePickerInviteMenu';
+import { InviteCollectiveDropdownOption } from './CollectivePickerInviteMenu';
 import CollectiveTypePicker from './CollectiveTypePicker';
 import Container from './Container';
 import CreateCollectiveMiniForm from './CreateCollectiveMiniForm';
@@ -231,10 +231,6 @@ class CollectivePicker extends React.PureComponent {
     this.setState({ createFormCollectiveType: type || null });
   };
 
-  setDisplayInviteMenu = isOpen => {
-    this.setState({ displayInviteMenu: isOpen || null, menuIsOpen: !isOpen });
-  };
-
   getMenuIsOpen(menuIsOpenFromProps) {
     if (this.state.createFormCollectiveType || this.props.isDisabled) {
       return false;
@@ -276,6 +272,7 @@ class CollectivePicker extends React.PureComponent {
       getDefaultOptions,
       groupByType,
       onChange,
+      onInvite,
       sortFunc,
       types,
       isDisabled,
@@ -327,8 +324,9 @@ class CollectivePicker extends React.PureComponent {
                       <InviteCollectiveDropdownOption
                         isSearching={!!searchText && !collectives.length}
                         onClick={() => {
-                          this.setDisplayInviteMenu(true);
+                          onInvite?.(true);
                           onChange?.({ label: null, value: null });
+                          this.setState({ menuIsOpen: false });
                         }}
                       />
                     );
@@ -342,7 +340,7 @@ class CollectivePicker extends React.PureComponent {
             </Container>
           )}
         </Reference>
-        {(createFormCollectiveType || displayInviteMenu) &&
+        {createFormCollectiveType &&
           ReactDOM.createPortal(
             <Popper placement="bottom">
               {({ placement, ref, style }) => (
@@ -382,17 +380,6 @@ class CollectivePicker extends React.PureComponent {
                           }));
                         }}
                         {...prefillValue}
-                      />
-                    )}
-                    {displayInviteMenu && (
-                      <InviteCollectiveForm
-                        onSave={value => {
-                          onChange?.({ label: value.name, value });
-                          this.setState({ displayInviteMenu: false });
-                        }}
-                        onCancel={() => {
-                          this.setState({ displayInviteMenu: false });
-                        }}
                       />
                     )}
                   </StyledCard>
@@ -444,6 +431,7 @@ CollectivePicker.propTypes = {
   renderNewCollectiveOption: PropTypes.node,
   /** If true, a permanent option to invite a new user will be displayed in the select */
   invitable: PropTypes.bool,
+  onInvite: PropTypes.func,
   /** If true, logged in user will be added as an admin of the created account */
   addLoggedInUserAsAdmin: PropTypes.bool,
   excludeAdminFields: PropTypes.bool,

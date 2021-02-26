@@ -104,6 +104,7 @@ const ExpenseFormPayeeStep = ({
   collective,
   onCancel,
   onNext,
+  onInvite,
   isOnBehalf,
   loggedInAccount,
 }) => {
@@ -183,6 +184,7 @@ const ExpenseFormPayeeStep = ({
           customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
           getDefaultOptions={build => values.payee && build(values.payee)}
           invitable
+          onInvite={onInvite}
           LoggedInUser={loggedInAccount}
           addLoggedInUserAsAdmin
           excludeAdminFields
@@ -423,6 +425,7 @@ ExpenseFormPayeeStep.propTypes = {
   payoutProfiles: PropTypes.array,
   onCancel: PropTypes.func,
   onNext: PropTypes.func,
+  onInvite: PropTypes.func,
   isOnBehalf: PropTypes.bool,
   loggedInAccount: PropTypes.object,
   collective: PropTypes.shape({

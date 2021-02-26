@@ -177,6 +177,7 @@ class CreateExpensePage extends React.Component {
         'attachedFiles',
         'payee',
         'payeeLocation',
+        'payoutMethod',
       ]);
       const result = await this.props.draftExpenseAndInviteUser({
         variables: {

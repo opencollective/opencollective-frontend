@@ -153,6 +153,7 @@ CollectivePickerAsync.propTypes = {
   creatable: PropTypes.bool,
   /** If true, a permanent option to invite a new user will be displayed in the select */
   invitable: PropTypes.bool,
+  onInvite: PropTypes.func,
 };
 
 CollectivePickerAsync.defaultProps = {
