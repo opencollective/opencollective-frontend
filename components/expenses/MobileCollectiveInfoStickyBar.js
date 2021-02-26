@@ -47,8 +47,8 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
           ) : (
             <Span color="black.500" fontSize="16px">
               <FormattedMoneyAmount
-                currency={collective.currency}
-                amount={collective.balance}
+                currency={collective.stats.balanceWithBlockedFunds.currency}
+                amount={collective.stats.balanceWithBlockedFunds.valueInCents}
                 precision={CurrencyPrecision.DEFAULT}
               />
             </Span>
@@ -94,6 +94,12 @@ MobileCollectiveInfoStickyBar.propTypes = {
     balance: PropTypes.number.isRequired,
     type: PropTypes.string,
     isApproved: PropTypes.bool,
+    stats: PropTypes.shape({
+      balanceWithBlockedFunds: PropTypes.shape({
+        valueInCents: PropTypes.number.isRequired,
+        currency: PropTypes.string.isRequired,
+      }),
+    }),
   }),
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,

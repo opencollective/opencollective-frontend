@@ -343,8 +343,11 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         ...NavbarFields
       }
 
-      ... on AccountWithContributions {
-        balance
+      stats {
+        balanceWithBlockedFunds {
+          valueInCents
+          currency
+        }
       }
 
       ... on AccountWithHost {
@@ -365,7 +368,6 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       }
 
       ... on Organization {
-        balance
         # We add that for hasFeature
         isHost
         isActive

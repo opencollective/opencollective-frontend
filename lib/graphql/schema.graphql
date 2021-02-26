@@ -727,6 +727,11 @@ type CollectiveStatsType {
   """
   Amount of money in cents in the currency of the collective currently available to spend
   """
+  balanceWithBlockedFunds: Int
+
+  """
+  Amount of money in cents in the currency of the collective.
+  """
   balance: Int
 
   """
@@ -2671,16 +2676,6 @@ type PaginatedPaymentMethod {
 }
 
 """
-List of transactions with pagination data
-"""
-type PaginatedTransactions {
-  transactions: [Transaction]
-  limit: Int
-  offset: Int
-  total: Int
-}
-
-"""
 Properties by which PaymenMethods can be ordered
 """
 enum PaymenMethodOrderField {
@@ -3099,19 +3094,6 @@ type Query {
     fetchDataFromLedger: Boolean
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
-  transactions(
-    """
-    Defaults to 100
-    """
-    limit: Int = 100
-    offset: Int = 0
-    orderBy: TransactionOrder = { field: CREATED_AT, direction: DESC }
-
-    """
-    CREDIT or DEBIT are accepted values
-    """
-    type: TransactionType
-  ): PaginatedTransactions
   Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
     @deprecated(reason: "2021-01-29: Not used anymore")
   Application(id: Int): Application
@@ -3567,31 +3549,6 @@ interface Transaction {
 }
 
 """
-Ordering options for transactions
-"""
-input TransactionOrder {
-  """
-  The field to order transactions by.
-  """
-  field: TransactionOrderField = CREATED_AT
-
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection = DESC
-}
-
-"""
-Properties by which transactions can be ordered.
-"""
-enum TransactionOrderField {
-  """
-  Order transactions by creation time.
-  """
-  CREATED_AT
-}
-
-"""
 Breakdown of transactions per type (ALL/CREDIT/DEBIT)
 """
 type TransactionsStatsType {
@@ -3607,14 +3564,6 @@ type TransactionsStatsType {
   Returns the number of DEBIT transactions
   """
   debit: Int
-}
-
-"""
-Type of transaction in the ledger
-"""
-enum TransactionType {
-  CREDIT
-  DEBIT
 }
 
 enum TypeOfCollective {
