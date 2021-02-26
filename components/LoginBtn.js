@@ -47,7 +47,7 @@ class LoginBtn extends React.Component {
 
   render() {
     const buttonProps = this.props.asLink
-      ? {}
+      ? { display: 'inline' }
       : {
           border: '1px solid #D5DAE0',
           borderRadius: '20px',
