@@ -9,7 +9,8 @@ import { P } from '../Text';
 
 import { CONTRIBUTE_CARD_BORDER_RADIUS, CONTRIBUTE_CARD_WIDTH } from './Contribute';
 
-const CreateNewCard = styled.div`
+const CreateNewCard = styled(Link)`
+  display: block;
   background: white;
   height: 100%;
   width: ${CONTRIBUTE_CARD_WIDTH}px;
@@ -32,18 +33,16 @@ const CreateNewCard = styled.div`
  */
 const CreateNew = ({ route, children, ...props }) => {
   return (
-    <CreateNewCard {...props}>
+    <CreateNewCard {...props} href={route}>
       <Flex alignItems="center" justifyContent="center" height="100%">
-        <Link href={route}>
-          <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
-            <StyledRoundButton buttonStyle="primary" fontSize={25}>
-              +
-            </StyledRoundButton>
-            <P mt={3} color="black.700">
-              {children}
-            </P>
-          </Flex>
-        </Link>
+        <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
+          <StyledRoundButton buttonStyle="primary" fontSize={25}>
+            +
+          </StyledRoundButton>
+          <P mt={3} color="black.700">
+            {children}
+          </P>
+        </Flex>
       </Flex>
     </CreateNewCard>
   );
