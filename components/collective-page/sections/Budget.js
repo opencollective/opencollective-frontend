@@ -79,30 +79,32 @@ const getBudgetItems = (transactions, expenses, filter) => {
   }
 };
 
-const ViewAllLink = ({ collective, filter }) => {
-  switch (filter) {
-    case 'expenses':
-      return (
-        <Link href={`/${collective.slug}/expenses`} data-cy="view-all-expenses-link">
-          <span>
-            <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
-            &rarr;
-          </span>
-        </Link>
-      );
-    case 'transactions':
-      return (
-        <Link href={`/${collective.slug}/transactions`} data-cy="view-all-transactions-link">
-          <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> &rarr;
-        </Link>
-      );
-    default:
-      return null;
+const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
+  const isFilterAll = filter === 'all';
+  if (filter === 'expenses' || (isFilterAll && hasExpenses && !hasTransactions)) {
+    return (
+      <Link href={`/${collective.slug}/expenses`} data-cy="view-all-expenses-link">
+        <span>
+          <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
+          &rarr;
+        </span>
+      </Link>
+    );
+  } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
+    return (
+      <Link href={`/${collective.slug}/transactions`} data-cy="view-all-transactions-link">
+        <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> &rarr;
+      </Link>
+    );
+  } else {
+    return null;
   }
 };
 
 ViewAllLink.propTypes = {
   collective: PropTypes.object,
+  hasExpenses: PropTypes.boolean,
+  hasTransactions: PropTypes.boolean,
   filter: PropTypes.oneOf(FILTERS),
 };
 
@@ -123,6 +125,8 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const budgetItemsParams = [transactions, expenses, filter];
   const allItems = React.useMemo(() => getBudgetItems(...budgetItemsParams), budgetItemsParams);
   const isLoading = !allItems.length && data?.loading;
+  const hasExpenses = Boolean(expenses.length);
+  const hasTransactions = Boolean(transactions.length);
 
   // Refetch data when used logs in to refresh permissions
   React.useEffect(() => {
@@ -131,10 +135,15 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
 
   return (
     <ContainerSectionContent pb={4}>
-      {Boolean(expenses.length && transactions.length) && (
+      {(hasExpenses || hasTransactions) && (
         <Flex mb={3} flexWrap="wrap" justifyContent="space-between" alignItems="center" maxWidth={720}>
           <StyledFilters filters={FILTERS} getLabel={geFilterLabel} selected={filter} onChange={setFilter} />
-          <ViewAllLink collective={collective} filter={filter} />
+          <ViewAllLink
+            collective={collective}
+            filter={filter}
+            hasExpenses={hasExpenses}
+            hasTransactions={hasTransactions}
+          />
         </Flex>
       )}
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
