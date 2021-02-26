@@ -5,6 +5,7 @@ import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/octicons/Mail';
+import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -189,9 +190,8 @@ const FooterContainer = styled.footer.attrs({
   padding: 1rem;
 `;
 
-const Footer = () => {
-  const intl = useIntl();
-  const languageOptions = Object.keys(languages).map(key => {
+const generateLanguageOptions = () => {
+  return Object.keys(languages).map(key => {
     const language = languages[key];
     return {
       value: key,
@@ -204,15 +204,21 @@ const Footer = () => {
           lineHeight="18px"
           fontWeight="500"
           letterSpacing="-0.04px"
+          title={`${language.name} - ${language.nativeName} (${language.completion})`}
         >
           <Span fontSize="24px">{language.flag}</Span>&nbsp;
           <Span whiteSpace="nowrap" ml={1}>
-            {language.name} - {language.nativeName} ({language.completion})
+            {truncate(`${language.name} - ${language.nativeName}`, { length: 23 })} ({language.completion})
           </Span>
         </Flex>
       ),
     };
   });
+};
+
+const Footer = () => {
+  const intl = useIntl();
+  const languageOptions = React.useMemo(generateLanguageOptions);
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
 
   return (
