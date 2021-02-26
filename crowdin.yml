@@ -1,10 +1,10 @@
 files:
   - source: /lang/en.json
-    translation: /lang/%two_letters_code%.json
+    translation: /lang/%locale%.json
   - source: /public/**/*.html
     ignore:
       - '*.test.html'
       - '*.??.html'
-    translation: /%original_path%/%file_name%.%two_letters_code%.html
+    translation: /%original_path%/%file_name%.%locale%.html
 commit_message: 'i18n(%language%): update %original_file_name%'
 append_commit_message: false
