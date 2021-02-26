@@ -176,6 +176,8 @@ class CollectivePage extends React.Component {
     }
 
     const collective = data && data.Collective;
+    const isMember =
+      LoggedInUser && LoggedInUser.memberOf.filter(member => member.collective.id === collective.id).length > 0;
 
     return (
       <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)}>
@@ -220,7 +222,7 @@ class CollectivePage extends React.Component {
                 />
               )}
             </CollectiveThemeProvider>
-            {LoggedInUser && mode === 'onboarding' && (
+            {isMember && mode === 'onboarding' && (
               <OnboardingModal
                 showOnboardingModal={showOnboardingModal}
                 setShowOnboardingModal={this.setShowOnboardingModal}
