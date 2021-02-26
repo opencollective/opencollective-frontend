@@ -13,6 +13,7 @@ import { requireFields } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
+import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
@@ -247,6 +248,12 @@ const ExpenseFormBody = ({
       formik.setFieldValue('payee', null);
     }
   }, [values.type]);
+
+  React.useEffect(() => {
+    if (values.payeeLocation?.structured) {
+      formik.setFieldValue('payeeLocation.address', serializeAddress(values.payeeLocation.structured));
+    }
+  }, [values.payeeLocation]);
 
   // Load values from localstorage
   React.useEffect(() => {

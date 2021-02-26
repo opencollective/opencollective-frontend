@@ -18,7 +18,7 @@ import CollectivePicker, {
 } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
-import I18nAddressFields, { serializeAddress } from '../I18nAddressFields';
+import I18nAddressFields from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -252,29 +252,15 @@ const ExpenseFormPayeeStep = ({
                 )}
               </FastField>
               {values.payeeLocation?.structured || !values.payeeLocation?.address ? (
-                <Field name="payeeLocation.structured">
-                  {({ field }) => (
-                    <I18nAddressFields
-                      name={field.name}
-                      selectedCountry={values.payeeLocation?.country}
-                      value={field.value || {}}
-                      onChange={({ name, value }) => {
-                        const address = {
-                          ...(formik.values.payeeLocation?.structured || {}),
-                          [name]: value,
-                        };
-
-                        formik.setFieldValue('payeeLocation.structured', address);
-                        formik.setFieldValue('payeeLocation.address', serializeAddress(address));
-                      }}
-                      onCountryChange={addressObject => {
-                        if (addressObject) {
-                          formik.setFieldValue('payeeLocation.structured', addressObject);
-                        }
-                      }}
-                    />
-                  )}
-                </Field>
+                <I18nAddressFields
+                  prefix="payeeLocation.structured"
+                  selectedCountry={values.payeeLocation?.country}
+                  onCountryChange={addressObject => {
+                    if (addressObject) {
+                      formik.setFieldValue('payeeLocation.structured', addressObject);
+                    }
+                  }}
+                />
               ) : (
                 <FastField name="payeeLocation.address">
                   {({ field }) => (
@@ -400,7 +386,9 @@ const ExpenseFormPayeeStep = ({
               onClick={async () => {
                 const allErrors = await formik.validateForm();
                 // Get the relevant errors for the payee step, ignores data.currency in the because it is related to expense amount.
-                const errors = omit(pick(allErrors, ['payee', 'payoutMethod']), ['payoutMethod.data.currency']);
+                const errors = omit(pick(allErrors, ['payee', 'payoutMethod', 'payeeLocation']), [
+                  'payoutMethod.data.currency',
+                ]);
                 if (isEmpty(flattenObjectDeep(errors))) {
                   onNext?.();
                 } else {
