@@ -1229,6 +1229,7 @@
   "mustBeAdmin": "Вы должны быть администратором этого коллектива, чтобы увидеть эту страницу",
   "mustBeLoggedIn": "Вы должны быть авторизованы, чтобы просматривать эту страницу",
   "mustBeLoggedInWithLink": "Вы должны <login-link>войти в систему</login-link>",
+  "NavBar.ThisIsCollective": "This is {collectiveName}'s page",
   "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
   "NetAmountFor": "Net amount for {name}",
   "NewContribute.noPaymentMethodsAvailable": "No payment methods available.",

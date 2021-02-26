@@ -141,6 +141,7 @@ class HostDashboardPage extends React.Component {
       <Page collective={host} title={host.name || 'Host Dashboard'}>
         {data.account && (
           <Container>
+            {/** Container here is important to make sure navbar doesn't stay fixed at the top (sticky must be at the same DOM nesting level to work) */}
             <CollectiveNavbar collective={host} isAdmin={canEdit} onlyInfos={true} />
           </Container>
         )}

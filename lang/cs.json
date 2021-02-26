@@ -1229,6 +1229,7 @@
   "mustBeAdmin": "Pro zobrazení této stránky musíte být administrátorem této skupiny",
   "mustBeLoggedIn": "Pro zobrazení této stránky musíte být přihlášeni",
   "mustBeLoggedInWithLink": "Musíte být <login-link>přihlášeni</login-link>",
+  "NavBar.ThisIsCollective": "This is {collectiveName}'s page",
   "NCP.SectionFetchError": "Při načítání dat v této sekci došlo k chybě.",
   "NetAmountFor": "Net amount for {name}",
   "NewContribute.noPaymentMethodsAvailable": "No payment methods available.",
