@@ -1229,6 +1229,7 @@
   "mustBeAdmin": "Você deve ser um administrador deste Coletivo para ver esta página",
   "mustBeLoggedIn": "Você precisa estar logado para ver esta página",
   "mustBeLoggedInWithLink": "Você precisa estar <login-link>logado</login-link>",
+  "NavBar.ThisIsCollective": "This is {collectiveName}'s page",
   "NCP.SectionFetchError": "Encontramos um erro ao procurar dados para esta seção.",
   "NetAmountFor": "Net amount for {name}",
   "NewContribute.noPaymentMethodsAvailable": "No payment methods available.",

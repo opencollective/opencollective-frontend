@@ -14,7 +14,7 @@ import themeGet from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
-import { maxWidth } from 'styled-system';
+import { display } from 'styled-system';
 
 import { getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
@@ -33,12 +33,13 @@ import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
-import { H1, Span } from '../Text';
+import { fadeIn } from '../StyledKeyframes';
+import { Span } from '../Text';
 import { useUser } from '../UserProvider';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
-import NavBarCategoryDropdown from './NavBarCategoryDropdown';
+import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
 
 const NavBarContainer = styled.div`
   position: sticky;
@@ -70,36 +71,54 @@ const AvatarBox = styled(Box)`
   }
 `;
 
-const InfosContainer = styled(Container)`
-  [data-hide='false'] {
-    width: 48px;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.1s ease-out, visibility 0.2s ease-out, width 0.075s ease-in-out;
-  }
+const BackButtonAndAvatar = styled.div`
+  display: flex;
 
-  [data-hide='true'] {
-    width: 0px;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.1s ease-out, visibility 0.2s ease-out, width 0.075s ease-in-out;
+  @media (min-width: 64em) {
+    &[data-hide-on-desktop='false'] {
+      width: 48px;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, width 0.075s ease-in-out;
+    }
+
+    &[data-hide-on-desktop='true'] {
+      width: 0px;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, width 0.075s ease-in-out;
+    }
   }
 `;
 
-const CollectiveName = styled(H1)`
-  letter-spacing: -0.8px;
+const InfosContainer = styled(Container)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+`;
 
+const CollectiveName = styled(LinkCollective).attrs({
+  fontSize: ['16px', '18px'],
+  color: 'black.800',
+})`
+  ${display}
+  letter-spacing: -0.8px;
+  margin: 8px;
+  min-width: 0;
+  text-decoration: none;
+  text-align: center;
+  font-weight: 500;
+  line-height: 24px;
+
+  &,
   a {
-    ${maxWidth}
-    display: block;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    min-width: 0;
-    text-decoration: none;
   }
 
-  a:not(:hover) {
+  &:not(:hover) {
     color: #313233;
   }
 `;
@@ -111,7 +130,7 @@ const CategoriesContainer = styled(Container)`
     box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
     position: absolute;
     right: 0;
-    top: 52px;
+    top: 64px;
     width: 0;
     visibility: hidden;
     opacity: 0;
@@ -125,6 +144,11 @@ const CategoriesContainer = styled(Container)`
         opacity: 1;
       `}
   }
+`;
+
+const MobileCategoryContainer = styled(Container).attrs({ display: ['block', null, null, 'none'] })`
+  animation: ${fadeIn} 0.2s;
+  margin-left: 8px;
 `;
 
 /** Displayed on mobile & tablet to toggle the menu */
@@ -368,6 +392,7 @@ export const MainActionBtn = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
   font-size: 14px;
   line-height: 16px;
   padding: 5px 10px;
+  white-space: nowrap;
   text-transform: uppercase;
   background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
     linear-gradient(${themeGet('colors.primary.500')}, ${themeGet('colors.primary.500')});
@@ -408,11 +433,11 @@ const CollectiveNavbar = ({
   selectedCategory,
   callsToAction,
   onCollectiveClick,
-  hideInfosOnDesktop,
+  isInHero,
   onlyInfos,
-  isAnimated,
   showBackButton,
   useAnchorsForCategories,
+  showSelectedCategoryOnMobile,
 }) => {
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
@@ -443,53 +468,61 @@ const CollectiveNavbar = ({
     <NavBarContainer>
       <NavbarContentContainer
         flexDirection={['column', 'row']}
-        px={[0, Dimensions.PADDING_X[1]]}
+        px={[0, 3, null, Dimensions.PADDING_X[1]]}
         mx="auto"
         maxWidth={Dimensions.MAX_SECTION_WIDTH}
         maxHeight="100vh"
+        minHeight={[56, 64]}
       >
         {/** Collective info */}
-        <InfosContainer isAnimated={isAnimated} mr={[0, 2]} display="flex" alignItems="center" px={[3, 0]} py={[2, 1]}>
-          <Flex alignItems="center" data-hide={hideInfosOnDesktop}>
-            {showBackButton && (
-              <Container display={['none', null, null, null, 'block']} position="absolute" left={-30}>
-                {collective && (
-                  <Link href={`/${collective.slug}`}>
-                    <StyledButton px={1} isBorderless>
-                      &larr;
-                    </StyledButton>
-                  </Link>
-                )}
-              </Container>
-            )}
-            <AvatarBox>
-              <LinkCollective collective={collective} onClick={onCollectiveClick}>
-                <Container borderRadius="25%" mr={2}>
-                  <Avatar collective={collective} radius={40} />
+        <InfosContainer px={[3, 0]} py={[2, 1]}>
+          <Flex alignItems="center" maxWidth={['90%', '100%']} flex="1 1">
+            <BackButtonAndAvatar data-hide-on-desktop={isInHero}>
+              {showBackButton && (
+                <Container display={['none', null, null, null, 'block']} position="absolute" left={-30}>
+                  {collective && (
+                    <Link href={`/${collective.slug}`}>
+                      <StyledButton px={1} isBorderless>
+                        &larr;
+                      </StyledButton>
+                    </Link>
+                  )}
                 </Container>
-              </LinkCollective>
-            </AvatarBox>
-            <Box display={['block', null, null, onlyInfos ? 'block' : 'none']}>
-              <CollectiveName
-                mx={2}
-                py={2}
-                fontSize={['16px', '20px']}
-                lineHeight={['24px', '28px']}
-                textAlign="center"
-                fontWeight="500"
-                color="black.800"
-                maxWidth={[200, 280, 500]}
-              >
-                {isLoading ? (
-                  <LoadingPlaceholder height={14} minWidth={100} />
-                ) : (
-                  <LinkCollective collective={collective} onClick={onCollectiveClick} />
-                )}
-              </CollectiveName>
-            </Box>
+              )}
+              <AvatarBox>
+                <LinkCollective collective={collective} onClick={onCollectiveClick}>
+                  <Container borderRadius="25%" mr={2}>
+                    <Avatar collective={collective} radius={40} />
+                  </Container>
+                </LinkCollective>
+              </AvatarBox>
+            </BackButtonAndAvatar>
+
+            <Container display={onlyInfos ? 'flex' : ['flex', null, null, 'none']} minWidth={0}>
+              {isLoading ? (
+                <LoadingPlaceholder height={14} minWidth={100} />
+              ) : isInHero ? (
+                <React.Fragment>
+                  <CollectiveName collective={collective} display={['block', 'none']}>
+                    <FormattedMessage
+                      id="NavBar.ThisIsCollective"
+                      defaultMessage="This is {collectiveName}'s page"
+                      values={{ collectiveName: collective.name }}
+                    />
+                  </CollectiveName>
+                  <CollectiveName collective={collective} display={['none', 'block']} />
+                </React.Fragment>
+              ) : selectedCategory && showSelectedCategoryOnMobile ? (
+                <MobileCategoryContainer>
+                  <NavBarCategory category={selectedCategory} />
+                </MobileCategoryContainer>
+              ) : (
+                <CollectiveName collective={collective} onClick={onCollectiveClick} />
+              )}
+            </Container>
           </Flex>
           {!onlyInfos && (
-            <Box display={['block', 'none']} marginLeft="auto">
+            <Box display={['block', 'none']} flex="0 0 32px">
               {isExpanded ? (
                 <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
               ) : (
@@ -607,29 +640,25 @@ CollectiveNavbar.propTypes = {
   onCollectiveClick: PropTypes.func,
   /** Currently selected category */
   selectedCategory: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)),
-  /** If true, the collective infos (avatar + name) will be hidden with css `visibility` */
-  hideInfosOnDesktop: PropTypes.bool,
+  /** The behavior of the navbar is slightly different when integrated in a hero (in the collective page) */
+  isInHero: PropTypes.bool,
   /** If true, the CTAs will be hidden on mobile */
   hideButtonsOnMobile: PropTypes.bool,
   /** If true, the Navbar items and buttons will be skipped  */
   onlyInfos: PropTypes.bool,
-  /** If true, the collective infos will fadeInDown and fadeOutUp when transitioning */
-  isAnimated: PropTypes.bool,
   /** Set this to true to make the component smaller in height */
   isSmall: PropTypes.bool,
   showBackButton: PropTypes.bool,
-  withShadow: PropTypes.bool,
+  showSelectedCategoryOnMobile: PropTypes.bool,
   /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */
   useAnchorsForCategories: PropTypes.bool,
 };
 
 CollectiveNavbar.defaultProps = {
-  hideInfosOnDesktop: false,
-  isAnimated: false,
+  isInHero: false,
   onlyInfos: false,
   callsToAction: {},
   showBackButton: true,
-  withShadow: true,
 };
 
 export default React.memo(CollectiveNavbar);

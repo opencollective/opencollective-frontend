@@ -260,21 +260,18 @@ class CollectivePage extends Component {
         <Box mb={3}>
           <Hero collective={collective} host={host} isAdmin={isAdmin} onPrimaryColorChange={onPrimaryColorChange} />
         </Box>
-        {/* <NavBarContainer mt={[0, -30]} ref={this.navbarRef}> */}
         <CollectiveNavbar
           collective={collective}
           sections={sections}
           isAdmin={isAdmin}
           selectedCategory={selectedCategory}
           onCollectiveClick={this.onCollectiveClick}
-          isAnimated={true}
           showBackButton={false}
           isFullWidth
           useAnchorsForCategories
-          withShadow={false}
-          hideInfosOnDesktop={!isFixed}
+          isInHero={!isFixed}
+          showSelectedCategoryOnMobile
         />
-        {/* </NavBarContainer> */}
 
         <div ref={this.sectionsContainerRef}>
           {isEmpty(sections) ? (

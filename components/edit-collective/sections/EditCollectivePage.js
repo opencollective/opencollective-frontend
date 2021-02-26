@@ -14,7 +14,6 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import { editCollectivePageQuery } from '../../../lib/graphql/queries';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 

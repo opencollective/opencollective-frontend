@@ -11,6 +11,7 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledLink from '../StyledLink';
+import { Span } from '../Text';
 
 import aboutNavbarIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconAbout.png';
 import budgetNavbarIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconBudget.png';
@@ -150,8 +151,27 @@ const getLinkProps = (useAnchor, collective, category) => {
   }
 };
 
-const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, links }) => {
+export const NavBarCategory = ({ category }) => {
   const intl = useIntl();
+  return (
+    <Flex>
+      <Flex alignItems="center" mr={2}>
+        <IconIllustration src={CATEGORY_ICON[category] || CATEGORY_ICON.CONTRIBUTE} />
+      </Flex>
+      <Flex alignItems="center">
+        <Span textTransform="uppercase" fontSize="14px" fontWeight="500" color="black.800" letterSpacing="0.02em">
+          {i18nNavbarCategory(intl, category)}
+        </Span>
+      </Flex>
+    </Flex>
+  );
+};
+
+NavBarCategory.propTypes = {
+  category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
+};
+
+const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, links }) => {
   const displayedLinks = links.filter(link => !link.hide);
   return (
     <CategoryDropdown trigger="hover" tabIndex="-1">
@@ -167,10 +187,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
         }}
       >
         <Flex pt="15px" pb="14px" px={[3, 1, 3, 1]}>
-          <Flex alignItems="center" mr={2}>
-            <IconIllustration src={CATEGORY_ICON[category] || CATEGORY_ICON.CONTRIBUTE} />
-          </Flex>
-          <Flex alignItems="center">{i18nNavbarCategory(intl, category)}</Flex>
+          <NavBarCategory category={category} />{' '}
         </Flex>
       </CategoryContainer>
       {displayedLinks.length > 0 && (
