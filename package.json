@@ -29,7 +29,7 @@
     "@styled-icons/ionicons-solid": "10.28.0",
     "@styled-icons/material": "10.28.0",
     "@styled-icons/octicons": "10.28.0",
-    "@styled-icons/remix-line": "^10.18.0",
+    "@styled-icons/remix-line": "10.18.0",
     "@styled-system/css": "5.1.5",
     "@styled-system/prop-types": "5.1.5",
     "@styled-system/theme-get": "5.1.2",
