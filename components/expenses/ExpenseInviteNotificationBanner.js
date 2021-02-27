@@ -100,7 +100,7 @@ const ExpenseInviteNotificationBanner = props => {
   return (
     <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'} data-cy="expense-draft-banner">
       <Flex>
-        <PidgeonIllustration />
+        <PidgeonIllustration alt="Pigeon Illustration" />
         <Flex ml={[0, 2]} maxWidth="448px" flexDirection="column">
           <H4 mb="10px" fontWeight="500">
             {props.createdUser ? (

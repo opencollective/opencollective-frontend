@@ -344,6 +344,7 @@ class OnboardingModal extends React.Component {
                     <ResponsiveModalBody>
                       <Flex flexDirection="column" alignItems="center">
                         <img
+                          alt="OnBoarding Image"
                           width={'160px'}
                           height={this.getStepParams(step, 'height')}
                           src={this.getStepParams(step, 'src')}

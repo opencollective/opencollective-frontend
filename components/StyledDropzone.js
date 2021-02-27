@@ -241,7 +241,7 @@ const StyledDropzone = ({
               ) : (
                 <React.Fragment>
                   <UploadedFilePreview size={size} url={value} hasLink border="none" />
-                  <ReplaceContainer onClick={dropProps.onClick}>
+                  <ReplaceContainer onClick={dropProps.onClick} role="button">
                     <FormattedMessage id="Image.Replace" defaultMessage="Replace" />
                   </ReplaceContainer>
                 </React.Fragment>

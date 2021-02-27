@@ -195,6 +195,7 @@ class MenuPopover extends React.Component {
               ) : (
                 <ChildrenContainer
                   ref={ref}
+                  role="button"
                   as={this.props.childrenContainer}
                   display={this.props.display}
                   onClick={this.toggleMenu}

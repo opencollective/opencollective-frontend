@@ -109,7 +109,7 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
                   </a>
                 </li>
                 <li>
-                  <a onClick={() => exportRSVPs(event)}>
+                  <a role="button" onClick={() => exportRSVPs(event)}>
                     <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
                   </a>
                 </li>

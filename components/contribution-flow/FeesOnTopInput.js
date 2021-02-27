@@ -113,7 +113,7 @@ const FeesOnTopInput = ({ currency, amount, quantity, fees, onChange }) => {
       </P>
       <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
         <Flex alignItems="center">
-          <Illustration />
+          <Illustration alt="Thank You Illustration" />
           <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
             <FormattedMessage id="platformFee.thankYou" defaultMessage="Thank you for your contribution:" />
           </P>

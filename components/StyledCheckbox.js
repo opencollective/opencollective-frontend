@@ -161,6 +161,7 @@ class StyledCheckbox extends React.Component {
 
     return (
       <CheckboxContainer
+        role="button"
         onClick={() => this.onChange(!realChecked)}
         fontSize={fontSize || size}
         size={size}

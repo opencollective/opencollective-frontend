@@ -98,6 +98,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
 
   return (
     <div
+      role="button"
       tabIndex={0}
       trigger={trigger}
       {...props}

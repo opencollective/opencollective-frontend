@@ -220,7 +220,7 @@ const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }
               })}
             </Modal>
           </TrapContainer>
-          <ModalOverlay onClick={onClose} />
+          <ModalOverlay role="button" onClick={onClose} />
         </Wrapper>
       </React.Fragment>,
       document.body,

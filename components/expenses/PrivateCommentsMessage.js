@@ -24,7 +24,7 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
   return (
     <MessageBox type="info" {...props}>
       <Flex alignItems="center" my={1}>
-        <PrivateLockIcon />
+        <PrivateLockIcon alt="Private Lock Icon" />
         <Box ml={3}>
           <P fontWeight="bold" fontSize="12px" lineHeight="20px">
             {isAllowed ? (

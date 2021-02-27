@@ -120,7 +120,11 @@ const SectionTransactions = props => {
                 defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
                 values={{
                   ResetLink(text) {
-                    return <ResetAnchor onClick={() => setFilter(FILTERS.ALL)}>{text}</ResetAnchor>;
+                    return (
+                      <ResetAnchor role="button" onClick={() => setFilter(FILTERS.ALL)}>
+                        {text}
+                      </ResetAnchor>
+                    );
                   },
                 }}
               />
