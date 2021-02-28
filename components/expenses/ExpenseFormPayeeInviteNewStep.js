@@ -75,8 +75,7 @@ const msg = defineMessages({
   },
   additionalInfo: {
     id: 'ExpenseForm.inviteAdditionalInfo',
-    defaultMessage:
-      'If you have additional information about the payee’s payment details, you can add them by clicking bellow.',
+    defaultMessage: 'If you have additional information about the payment details, you can add them by clicking below.',
   },
   additionalInfoBtn: {
     id: 'ExpenseForm.inviteAdditionalInfoBtn',

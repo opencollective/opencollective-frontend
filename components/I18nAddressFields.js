@@ -200,7 +200,7 @@ const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange, 
                         onChange={v => {
                           field.onChange({ target: { name: field.name, value: v.value } });
                         }}
-                        value={zoneOptions.find(option => option?.value == field.value) || null}
+                        value={zoneOptions.find(option => option?.value === field.value) || null}
                       />
                     )
                   : inputProps => (
@@ -223,7 +223,7 @@ I18nAddressFields.propTypes = {
   required: PropTypes.bool,
   /** String if using old address textarea; object if using new address fields. */
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   onCountryChange: PropTypes.func.isRequired,
 };
 

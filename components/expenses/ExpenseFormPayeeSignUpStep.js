@@ -409,8 +409,6 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
                   formik.setTouched(errors);
                   formik.setErrors(errors);
                 }
-
-                // onNext?.();
               }}
             >
               <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
