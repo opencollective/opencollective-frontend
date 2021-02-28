@@ -137,7 +137,7 @@ class ContributionFlowSuccess extends React.Component {
 
     return (
       <Flex flexDirection="column" justifyContent="center" p={2}>
-        {callsToAction.length <= 2 && <SuccessIllustration alt="Success Illustration" />}
+        {callsToAction.length <= 2 && <SuccessIllustration alt="" />}
         {callsToAction.map(type => (
           <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} email={email} />
         ))}

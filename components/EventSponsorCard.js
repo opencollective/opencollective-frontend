@@ -33,7 +33,7 @@ const CollectiveImage = styled.img`
 const EventSponsorCard = ({ sponsor }) => (
   <a href={`/${sponsor.slug}`}>
     <EventSponsorCardContainer>
-      <CollectiveImage alt="Collective Logo" className="logo" src={getCollectiveImage(sponsor, { name: 'logo' })} />
+      <CollectiveImage alt="" className="logo" src={getCollectiveImage(sponsor, { name: 'logo' })} />
       <P color="#7fadf2" fontSize="1.2rem" m={2}>
         {sponsor.name}
       </P>
