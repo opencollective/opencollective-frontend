@@ -56,7 +56,7 @@ describe('event.create.test.js', () => {
     cy.get('.actions > [data-cy="collective-save"]').click();
     cy.get('.actions > [data-cy="collective-save"]').contains('Saved');
     // verify update
-    cy.get('h1 a').click();
+    cy.contains('a', 'view event page').click();
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 1);
     cy.wait(100);
     cy.get('[data-cy="financial-contributions"] [data-cy=contribute-card-tier]').should('have.length', 1);

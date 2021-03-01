@@ -2,13 +2,12 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
-import styled from 'styled-components';
-import { space } from 'styled-system';
 
 import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
 
 import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
+import { Box } from '../Grid';
 
 import Hero from './hero/Hero';
 import SectionAbout from './sections/About';
@@ -33,15 +32,6 @@ import { Sections } from './_constants';
 import CategoryHeader from './CategoryHeader';
 import SectionContainer from './SectionContainer';
 import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
-
-const NavBarContainer = styled.div`
-  ${space}
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  background: white;
-  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
-`;
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -82,10 +72,8 @@ class CollectivePage extends Component {
 
   constructor(props) {
     super(props);
-    // @deprecated This will be useless once new navbar will be the default
-    this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
     this.sectionCategoriesRefs = {}; // This will store a map of category => ref
-    this.navbarRef = React.createRef();
+    this.sectionsContainerRef = React.createRef();
     this.state = { isFixed: false, selectedCategory: null };
   }
 
@@ -102,32 +90,29 @@ class CollectivePage extends Component {
     return getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   });
 
+  getSectionsCategories = memoizeOne((collective, isAdmin, isHostAdmin) => {
+    const sections = this.getSections(collective, isAdmin, isHostAdmin);
+    return sections.filter(s => s.type === 'CATEGORY');
+  });
+
   onScroll = throttle(() => {
-    // Ref may be null when NextJS hot reloads the page
-    if (!this.navbarRef.current) {
-      return;
-    }
-
     let { isFixed, selectedCategory } = this.state;
-
     // Fixes the Hero when a certain scroll threshold is reached
-    if (this.navbarRef.current.getBoundingClientRect().top <= 0) {
-      isFixed = true;
-    } else if (isFixed) {
-      isFixed = false;
+    if (this.sectionsContainerRef.current) {
+      if (this.sectionsContainerRef.current.getBoundingClientRect().top <= 50) {
+        isFixed = true;
+      } else if (isFixed) {
+        isFixed = false;
+      }
     }
 
-    // Get the currently section that is at the top of the screen.
+    // Get the currently category that is at the top of the screen.
     const distanceThreshold = 200;
     const breakpoint = window.scrollY + distanceThreshold;
-    const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
+    const categories = this.getSectionsCategories(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
 
-    for (let i = sections.length - 1; i >= 0; i--) {
-      if (sections[i].type !== 'CATEGORY') {
-        continue;
-      }
-
-      const categoryName = sections[i].name;
+    for (let i = categories.length - 1; i >= 0; i--) {
+      const categoryName = categories[i].name;
       const categoryRef = this.sectionCategoriesRefs[categoryName];
       if (categoryRef && breakpoint >= categoryRef.offsetTop) {
         selectedCategory = categoryName;
@@ -138,6 +123,9 @@ class CollectivePage extends Component {
     // Update the state only if necessary
     if (this.state.isFixed !== isFixed || this.state.selectedCategory !== selectedCategory) {
       this.setState({ isFixed, selectedCategory });
+    } else if (!selectedCategory && categories?.length) {
+      // Select first category by default
+      this.setState({ isFixed, selectedCategory: categories[0].name });
     }
   }, 100);
 
@@ -269,64 +257,64 @@ class CollectivePage extends Component {
         css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
         data-cy="collective-page-main"
       >
-        <Hero collective={collective} host={host} isAdmin={isAdmin} onPrimaryColorChange={onPrimaryColorChange} />
-        <NavBarContainer mt={[0, -30]} ref={this.navbarRef}>
-          <CollectiveNavbar
-            collective={collective}
-            sections={sections}
-            isAdmin={isAdmin}
-            selectedCategory={selectedCategory}
-            onCollectiveClick={this.onCollectiveClick}
-            hideInfosOnDesktop={!isFixed}
-            isAnimated={true}
-            showBackButton={false}
-            isFullWidth
-            useAnchorsForCategories
-            withShadow={false}
-          />
-        </NavBarContainer>
+        <Box mb={3}>
+          <Hero collective={collective} host={host} isAdmin={isAdmin} onPrimaryColorChange={onPrimaryColorChange} />
+        </Box>
+        <CollectiveNavbar
+          collective={collective}
+          sections={sections}
+          isAdmin={isAdmin}
+          selectedCategory={selectedCategory}
+          onCollectiveClick={this.onCollectiveClick}
+          showBackButton={false}
+          isFullWidth
+          useAnchorsForCategories
+          isInHero={!isFixed}
+          showSelectedCategoryOnMobile
+        />
 
-        {isEmpty(sections) ? (
-          <SectionEmpty collective={this.props.collective} />
-        ) : (
-          sections.map((entry, entryIdx) =>
-            entry.type === 'CATEGORY' ? (
-              <Fragment key={`category-${entry.name}`}>
-                <CategoryHeader
-                  id={`category-${entry.name}`}
-                  ref={categoryRef => (this.sectionCategoriesRefs[entry.name] = categoryRef)}
-                  collective={collective}
-                  category={entry.name}
-                  isAdmin={isAdmin}
-                />
-                {entry.sections.map((section, idx) => (
-                  <SectionContainer
-                    key={section.name}
-                    ref={sectionRef => (this.sectionsRefs[section.name] = sectionRef)}
-                    id={`section-${section.name}`}
-                    data-cy={`section-${section.name}`}
-                    withPaddingBottom={
-                      idx === entry.sections.length - 1 &&
-                      entryIdx === sections.length - 1 &&
-                      !sectionsWithoutPaddingBottom[section.name]
-                    }
-                  >
-                    {this.renderSection(section.name)}
-                  </SectionContainer>
-                ))}
-              </Fragment>
-            ) : entry.type === 'SECTION' ? (
-              <SectionContainer
-                key={`section-${entry.name}`}
-                id={`section-${entry.name}`}
-                data-cy={`section-${entry.name}`}
-                withPaddingBottom={entryIdx === sections.length - 1 && !sectionsWithoutPaddingBottom[entry.name]}
-              >
-                {this.renderSection(entry.name)}
-              </SectionContainer>
-            ) : null,
-          )
-        )}
+        <div ref={this.sectionsContainerRef}>
+          {isEmpty(sections) ? (
+            <SectionEmpty collective={this.props.collective} />
+          ) : (
+            sections.map((entry, entryIdx) =>
+              entry.type === 'CATEGORY' ? (
+                <Fragment key={`category-${entry.name}`}>
+                  <CategoryHeader
+                    id={`category-${entry.name}`}
+                    ref={categoryRef => (this.sectionCategoriesRefs[entry.name] = categoryRef)}
+                    collective={collective}
+                    category={entry.name}
+                    isAdmin={isAdmin}
+                  />
+                  {entry.sections.map((section, idx) => (
+                    <SectionContainer
+                      key={section.name}
+                      id={`section-${section.name}`}
+                      data-cy={`section-${section.name}`}
+                      withPaddingBottom={
+                        idx === entry.sections.length - 1 &&
+                        entryIdx === sections.length - 1 &&
+                        !sectionsWithoutPaddingBottom[section.name]
+                      }
+                    >
+                      {this.renderSection(section.name)}
+                    </SectionContainer>
+                  ))}
+                </Fragment>
+              ) : entry.type === 'SECTION' ? (
+                <SectionContainer
+                  key={`section-${entry.name}`}
+                  id={`section-${entry.name}`}
+                  data-cy={`section-${entry.name}`}
+                  withPaddingBottom={entryIdx === sections.length - 1 && !sectionsWithoutPaddingBottom[entry.name]}
+                >
+                  {this.renderSection(entry.name)}
+                </SectionContainer>
+              ) : null,
+            )
+          )}
+        </div>
       </Container>
     );
   }

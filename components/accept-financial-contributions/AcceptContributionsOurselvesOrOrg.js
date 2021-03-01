@@ -203,7 +203,7 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
 
     return (
       <Fragment>
-        <CollectiveNavbar collective={collective} onlyInfos={true} />
+        <CollectiveNavbar collective={collective} />
         <Box mb={2} mt={5} mx={[2, 6]}>
           <H1
             fontSize={['20px', '32px']}

@@ -15,9 +15,17 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box } from '../Grid';
 import { P } from '../Text';
 
-const StatTitle = props => (
-  <P fontSize="11px" lineHeight="12px" fontWeight="500" color="black.700" textTransform="uppercase" mb={2} {...props} />
-);
+const StatTitle = styled(Container)`
+  font-size: 11px;
+  line-height: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+`;
+
+StatTitle.defaultProps = {
+  color: 'black.700',
+};
 
 const StatAmount = ({ amount, ...props }) => (
   <P fontSize="16px" lineHeight="24px" color="black.700">

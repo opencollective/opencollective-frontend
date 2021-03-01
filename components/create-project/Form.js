@@ -108,6 +108,7 @@ class CreateProjectForm extends React.Component {
     return (
       <Flex flexDirection="column" m={[3, 0]}>
         <Container mb={4}>
+          {/** Container here is important to make sure navbar doesn't stay fixed at the top (sticky must be at the same DOM nesting level to work) */}
           <CollectiveNavbar collective={parent} onlyInfos={true} />
         </Container>
         <Flex flexDirection="column" my={[2, 4]}>

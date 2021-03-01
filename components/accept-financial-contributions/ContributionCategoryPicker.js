@@ -100,7 +100,7 @@ class ContributionCategoryPicker extends React.Component {
 
     return (
       <div>
-        <CollectiveNavbar collective={collective} onlyInfos={true} />
+        <CollectiveNavbar collective={collective} />
         <Box mb={4} mt={5}>
           <H1
             fontSize={['20px', '32px']}

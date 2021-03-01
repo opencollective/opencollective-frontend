@@ -196,7 +196,7 @@ class PayoutMethodSelect extends React.Component {
   });
 
   getOptions = memoizeOne((payoutMethods, payee) => {
-    const hostSupportedPayoutMethods = this.props.collective.host?.supportedPayoutMethods || [];
+    const hostSupportedPayoutMethods = this.props.collective.host?.supportedPayoutMethods || [PayoutMethodType.OTHER];
     const groupedPms = groupBy(payoutMethods, 'type');
     const payeeIsSelfHosted = payee && payee.id == payee.host?.id;
     const payeeIsCollectiveFamilyType =

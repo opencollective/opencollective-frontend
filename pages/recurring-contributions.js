@@ -93,7 +93,7 @@ class recurringContributionsPage extends React.Component {
           </Container>
         ) : (
           <Fragment>
-            <CollectiveNavbar collective={collective} onlyInfos={true} />
+            <CollectiveNavbar collective={collective} />
             <MainContainer py={[3, 4]} px={[2, 3]}>
               <SectionTitle textAlign="left" mb={1}>
                 <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />

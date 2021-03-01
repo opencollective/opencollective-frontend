@@ -186,7 +186,7 @@ class SectionUpdates extends React.PureComponent {
                           />
                         </PrivateUpdateMesgBox>
                       )}
-                      <Container color="black.400" mt={2} fontSize="12px">
+                      <Container color="black.600" mt={2} fontSize="12px">
                         {update.isPrivate && (
                           <StyledTooltip
                             content={() => (
