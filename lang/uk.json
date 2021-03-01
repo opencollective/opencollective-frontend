@@ -49,7 +49,6 @@
   "addfunds.platformFees": "Платня платформі ({platformFees})",
   "AddFunds.source": "Джерело",
   "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fee and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
-  "AddFundsToCollectiveModal.Title": "Додати кошти для Колективу:",
   "AddPrepaidBudget.Success": "Prepaid budget added successfully",
   "addPrepaidBudget.title": "Додати передплачений бюджет до {collective}",
   "administrators": "Адміністратори",
