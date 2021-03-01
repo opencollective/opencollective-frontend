@@ -151,8 +151,8 @@ class CreateHostForm extends React.Component {
         )}
 
         {host && (
-          <Flex justifyContent="space-between" alignItems="flex-end">
-            <Box>
+          <Flex flexDirection={['column', 'row', 'row']} justifyContent="space-between" alignItems="flex-end">
+            <Box my={[3]}>
               <StyledButton buttonStyle="primary" type="submit" onClick={() => this.props.onSubmit(host)}>
                 <FormattedMessage id="host.link" defaultMessage="Yes, use this Organization as the Fiscal Host" />
               </StyledButton>
