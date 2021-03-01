@@ -365,8 +365,13 @@ class Host extends React.Component {
                 defaultMessage="Simply connect a bank account for a single Collective. You will be responsible for accounting, taxes, payments, and liability."
               />
               {selectedOption === 'selfHost' && LoggedInUser && (
-                <Flex justifyContent="space-between" alignItems="flex-end" mt={3}>
-                  <Box>
+                <Flex
+                  flexDirection={['column', 'row', 'row']}
+                  justifyContent="space-between"
+                  alignItems="flex-end"
+                  mt={3}
+                >
+                  <Box mb={[3]}>
                     <StyledButton
                       buttonStyle="primary"
                       type="submit"
