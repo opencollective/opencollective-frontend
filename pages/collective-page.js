@@ -220,7 +220,7 @@ class CollectivePage extends React.Component {
                 />
               )}
             </CollectiveThemeProvider>
-            {LoggedInUser && mode === 'onboarding' && (
+            {mode === 'onboarding' && LoggedInUser?.canEditCollective(collective) && (
               <OnboardingModal
                 showOnboardingModal={showOnboardingModal}
                 setShowOnboardingModal={this.setShowOnboardingModal}
