@@ -143,10 +143,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           submitAddFunds({
             variables: {
               ...values,
-              amount: { valueInCents: values.amount },
+              amount: { valueInCents: values.amount + values.platformTip },
               fromAccount: buildAccountReference(values.fromAccount),
               account: buildAccountReference(values.account),
-              platformTip: { valueInCents: values.platformTip },
+              platformTip: { valueInCents: values.platformTip || 0 },
             },
           }).then(props.onClose)
         }
@@ -334,7 +334,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 )}
                 {!canAddPlatformFee && (
                   <AmountDetailsLine
-                    value={values.platformTip}
+                    value={values.platformTip || 0}
                     currency={collective.currency}
                     label={
                       <FormattedMessage
@@ -347,7 +347,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 )}
                 <StyledHr my={2} borderColor="black.300" />
                 <AmountDetailsLine
-                  value={values.amount - hostFee - platformFee - values.platformTip}
+                  value={values.amount - hostFee - platformFee + values.platformTip}
                   currency={collective.currency}
                   label={<FormattedMessage id="addfunds.netAmount" defaultMessage="Net amount" />}
                   isLargeAmount
@@ -356,7 +356,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   <FormattedMessage
                     id="addfunds.disclaimer"
                     defaultMessage="You will set aside {amount} in your bank account for this purpose."
-                    values={{ amount: formatCurrency(values.amount, collective.currency) }}
+                    values={{ amount: formatCurrency(values.amount + values.platformTip, collective.currency) }}
                   />
                 </P>
                 {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
@@ -370,7 +370,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     mx={2}
                     mb={1}
                     minWidth={120}
-                    disabled={!dirty || !isValid || values.amount - hostFee - platformFee - values.platformTip <= 0}
+                    disabled={!dirty || !isValid}
                     loading={isSubmitting}
                   >
                     <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
@@ -401,7 +401,6 @@ AddFundsModal.propTypes = {
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
     platformFeePercent: PropTypes.number,
-    platformTipPercent: PropTypes.number,
     slug: PropTypes.string,
   }).isRequired,
   onClose: PropTypes.func,
