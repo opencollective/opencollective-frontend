@@ -49,7 +49,6 @@
   "addfunds.platformFees": "平台费用（{platformFees}）",
   "AddFunds.source": "来源",
   "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fee and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
-  "AddFundsToCollectiveModal.Title": "向社群添加资金：",
   "AddPrepaidBudget.Success": "预付预算已成功添加",
   "addPrepaidBudget.title": "添加预付预算到 {collective}",
   "administrators": "管理员",
