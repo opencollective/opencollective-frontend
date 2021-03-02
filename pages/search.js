@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
+import { themeGet } from '@styled-system/theme-get';
 import { isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import colors from '../lib/constants/colors';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveCard from '../components/CollectiveCard';
@@ -26,15 +26,18 @@ import StyledLink from '../components/StyledLink';
 import { H1, P } from '../components/Text';
 
 const SearchInput = styled(StyledInput)`
-  &&& {
-    border: none;
-    border-bottom: 2px solid ${colors.blue};
-    border-radius: 0;
-    box-shadow: none;
-    display: block;
-    height: 3.4rem;
-    width: 100%;
-    padding: 0;
+  border: none;
+  border-bottom: 2px solid ${themeGet('colors.primary.600')};
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
+  height: 3.4rem;
+  width: 100%;
+  padding: 0 4px;
+  font-size: 16px;
+  margin-right: 8px;
+
+  @media (min-width: 64em) {
     font-size: 18px;
   }
 
