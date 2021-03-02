@@ -96,6 +96,7 @@ export const collectivePageQuery = gql`
           hostFees
           transferwisePayoutsLimit
           transferwisePayouts
+          hostFeeSharePercent
         }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {

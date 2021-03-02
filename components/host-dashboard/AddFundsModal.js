@@ -113,7 +113,8 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
   const defaultHostFeePercent = canAddHostFee ? collective.hostFeePercent : 0;
 
-  const canAddPlatformFee = LoggedInUser.isRoot();
+  // We don't want to use Platform Fees anymore for Hosts that switched to the new model
+  const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0;
   const defaultPlatformFeePercent = 0;
 
   if (!LoggedInUser) {
@@ -324,6 +325,7 @@ AddFundsModal.propTypes = {
     name: PropTypes.string,
     plan: PropTypes.shape({
       hostFees: PropTypes.bool,
+      hostFeeSharePercent: PropTypes.number,
     }),
   }).isRequired,
   collective: PropTypes.shape({
