@@ -1838,6 +1838,8 @@
   "update.private.description": "Лише помічники зможуть бачити вміст цього оновлення",
   "update.private.lock_text": "Оновлення лише для помічників",
   "update.publish.btn": "Опублікувати",
+  "update.publish.modal.body": "Are you sure you want to publish this update?",
+  "update.publish.modal.header": "Publish update",
   "update.publish.notify.Everyone": "Ваше оновлення буде надіслано адміністраторам {m} обслуговуваних Колективів та {n} фінансовим помічникам",
   "update.publish.notify.financialContributors": "Ваше оновлення буде надіслано {n} фінансовим помічникам",
   "update.publish.notify.hostedCollectiveAdmins": "Ваше оновлення буде надіслано адміністраторам {m} обслуговуваних Колективів",

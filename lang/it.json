@@ -1838,6 +1838,8 @@
   "update.private.description": "Only contributors will be able to see the content of this update",
   "update.private.lock_text": "This update is for contributors only",
   "update.publish.btn": "Publish",
+  "update.publish.modal.body": "Are you sure you want to publish this update?",
+  "update.publish.modal.header": "Publish update",
   "update.publish.notify.Everyone": "Your Update will be sent to the admins of {m} hosted Collectives and {n} financial contributors",
   "update.publish.notify.financialContributors": "Your Update will be sent to {n} financial contributors",
   "update.publish.notify.hostedCollectiveAdmins": "Your Update will be sent to the admins of {m} hosted Collectives",
