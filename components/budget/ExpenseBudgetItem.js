@@ -182,7 +182,7 @@ const ExpenseBudgetItem = ({
                   />
                 )}
                 {' • '}
-                <FormattedDate value={expense.createdAt} />
+                <FormattedDate value={expense.createdAt} year="numeric" month="long" day="2-digit" />
                 {isAdminView && (
                   <React.Fragment>
                     {' • '}
