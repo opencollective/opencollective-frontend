@@ -49,7 +49,6 @@
   "addfunds.platformFees": "プラットフォーム手数料 ({platformFees})",
   "AddFunds.source": "支払方法",
   "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fee and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
-  "AddFundsToCollectiveModal.Title": "Collective に資金を追加",
   "AddPrepaidBudget.Success": "Prepaid budget added successfully",
   "addPrepaidBudget.title": "Add Prepaid Budget to {collective}",
   "administrators": "管理者",
