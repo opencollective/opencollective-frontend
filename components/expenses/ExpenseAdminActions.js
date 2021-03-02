@@ -72,7 +72,7 @@ const ExpenseAdminActions = ({
     <React.Fragment>
       {linkAction === 'copy' ? (
         <ButtonWithLabel
-          onClick={() => copy(window.location.href.replace('?createSuccess=true', ''))}
+          onClick={() => copy(window.location.href)}
           disabled={isDisabled}
           icon={isCopied ? <Check size="50%" /> : <IconLink size="50%" />}
           {...buttonProps}
@@ -87,7 +87,7 @@ const ExpenseAdminActions = ({
       ) : (
         <Link href={`/${collective.slug}/expenses/${expense.legacyId}`}>
           <ButtonWithLabel
-            onClick={() => copy(window.location.href.replace('?createSuccess=true', ''))}
+            onClick={() => copy(window.location.href)}
             disabled={isDisabled}
             icon={<IconLink size="50%" />}
             label={

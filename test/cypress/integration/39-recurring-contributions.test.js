@@ -36,7 +36,7 @@ describe.skip('Recurring contributions', () => {
         cy.getByDataCy('radio-select').check();
       });
       cy.getByDataCy('recurring-contribution-update-pm-button').click();
-      cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been updated.');
+      cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
     });
   });
 
@@ -49,7 +49,7 @@ describe.skip('Recurring contributions', () => {
         cy.getByDataCy('radio-select').check();
       });
       cy.getByDataCy('recurring-contribution-update-order-button').click();
-      cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been updated.');
+      cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
       cy.getByDataCy('recurring-contribution-amount-contributed').contains('$2.00 USD / month');
     });
   });
@@ -66,7 +66,7 @@ describe.skip('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-cancel-yes')
         .click()
         .then(() => {
-          cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been cancelled');
+          cy.getByDataCy('toast-notification').contains('Your recurring contribution has been cancelled');
           cy.getByDataCy('filter-button cancelled').click();
           cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
         });

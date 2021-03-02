@@ -66,6 +66,7 @@ export const withToasts = WrappedComponent => {
     <ToastContext.Consumer>{context => <WrappedComponent {...context} {...props} />}</ToastContext.Consumer>
   );
 
+  WithToasts.getInitialProps = WrappedComponent.getInitialProps;
   return WithToasts;
 };
 
