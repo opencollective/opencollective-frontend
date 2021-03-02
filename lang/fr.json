@@ -49,7 +49,6 @@
   "addfunds.platformFees": "Commission de la plateforme ({platformFees})",
   "AddFunds.source": "Source",
   "AddFundsForm.PutAside": "Veuillez mettre de côté {hostFeePercent}% ({hostFeeAmount}) pour vos frais d'hôte et {platformFeePercent}% ({platformFeeAmount}) pour les frais de plateforme.",
-  "AddFundsToCollectiveModal.Title": "Ajouter des fonds au Collectif :",
   "AddPrepaidBudget.Success": "Solde prépayé ajouté avec succès",
   "addPrepaidBudget.title": "Ajouter un solde prépayé à {collective}",
   "administrators": "Administrateurs",
