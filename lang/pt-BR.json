@@ -1837,6 +1837,8 @@
   "update.private.description": "Somente colaboradores poderão ver o conteúdo desta atualização",
   "update.private.lock_text": "Esta atualização é apenas para colaboradores",
   "update.publish.btn": "Publicar",
+  "update.publish.modal.body": "Are you sure you want to publish this update?",
+  "update.publish.modal.header": "Publish update",
   "update.publish.notify.Everyone": "Sua atualização será enviada aos administradores de {m} Coletivos hospedados e {n} colaboradores financeiros",
   "update.publish.notify.financialContributors": "Sua atualização será enviada para {n} colaboradores financeiros",
   "update.publish.notify.hostedCollectiveAdmins": "Sua atualização será enviada aos administradores de {m} Coletivos hospedados",
