@@ -116,7 +116,8 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
   const defaultHostFeePercent = canAddHostFee ? collective.hostFeePercent : 0;
 
-  const canAddPlatformFee = LoggedInUser.isRoot();
+  // We don't want to use Platform Fees anymore for Hosts that switched to the new model
+  const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0;
   const defaultPlatformFeePercent = 0;
   const defaultPlatformTipPercent = 0;
 
@@ -162,15 +163,15 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
           const platformFee = Math.round(values.amount * (platformFeePercent / 100));
 
+          const defaultSources = [];
+          defaultSources.push({ value: host, label: <DefaultCollectiveLabel value={host} /> });
+          if (host.id !== collective.id) {
+            defaultSources.push({ value: collective, label: <DefaultCollectiveLabel value={collective} /> });
+          }
+
           return (
             <Form>
               <ModalBody>
-                <P fontSize="16px" lineHeight="24px" fontWeight="500" mt={3}>
-                  <FormattedMessage
-                    id="AddFundsToCollectiveModal.Title"
-                    defaultMessage="Add funds to the Collective:"
-                  />
-                </P>
                 <Flex mt={3} flexWrap="wrap">
                   <StyledInputFormikField
                     name="amount"
@@ -292,7 +293,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       error={field.error}
                       createCollectiveOptionalFields={['location.address', 'location.country']}
                       onBlur={() => form.setFieldTouched(field.name, true)}
-                      customOptions={[{ value: host, label: <DefaultCollectiveLabel value={host} /> }]}
+                      customOptions={defaultSources}
                       onChange={({ value }) => form.setFieldValue(field.name, value)}
                     />
                   )}
@@ -394,6 +395,7 @@ AddFundsModal.propTypes = {
     name: PropTypes.string,
     plan: PropTypes.shape({
       hostFees: PropTypes.bool,
+      hostFeeSharePercent: PropTypes.number,
     }),
   }).isRequired,
   collective: PropTypes.shape({

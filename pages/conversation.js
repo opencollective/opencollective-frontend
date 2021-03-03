@@ -275,12 +275,12 @@ class ConversationPage extends React.Component {
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)}>
         {data.loading ? (
-          <Container borderTop="1px solid #E8E9EB">
+          <Container>
             <Loading />
           </Container>
         ) : (
           <CollectiveThemeProvider collective={collective}>
-            <Container borderTop="1px solid #E8E9EB" data-cy="conversation-page">
+            <Container data-cy="conversation-page">
               <CollectiveNavbar
                 collective={collective}
                 selected={Sections.CONVERSATIONS}

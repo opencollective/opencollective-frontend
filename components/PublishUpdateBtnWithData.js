@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
+import ConfirmationModal from './ConfirmationModal';
 import Container from './Container';
 import StyledButton from './StyledButton';
 import StyledSelect from './StyledSelect';
@@ -38,6 +39,7 @@ class PublishUpdateBtn extends React.Component {
     this.onClick = this.onClick.bind(this);
     this.state = {
       notificationAudience: 'FINANCIAL_CONTRIBUTORS',
+      showModal: false,
     };
   }
 
@@ -45,6 +47,10 @@ class PublishUpdateBtn extends React.Component {
     const { id } = this.props;
     const { notificationAudience } = this.state;
     await this.props.publishUpdate({ variables: { id, notificationAudience } });
+  }
+
+  handleShowModalChange(value) {
+    this.setState({ showModal: value });
   }
 
   handleNotificationChange(selected) {
@@ -127,17 +133,35 @@ class PublishUpdateBtn extends React.Component {
             </Span>
           )}
           {!isLoading && <Notice>{notice}</Notice>}
-          <Container mt="3" display="flex" alignItems="center">
-            <StyledButton
-              buttonStyle="primary"
-              onClick={this.onClick}
-              loading={isLoading}
-              minWidth={100}
-              data-cy="btn-publish"
-            >
-              <FormattedMessage id="update.publish.btn" defaultMessage="Publish" />
-            </StyledButton>
-          </Container>
+          {this.state.showModal ? (
+            <ConfirmationModal
+              show
+              header={<FormattedMessage id="update.publish.modal.header" defaultMessage="Publish update" />}
+              body={
+                <FormattedMessage
+                  id="update.publish.modal.body"
+                  defaultMessage="Are you sure you want to publish this update?"
+                />
+              }
+              onClose={() => this.handleShowModalChange(false)}
+              cancelLabel={<FormattedMessage id="no" defaultMessage="No" />}
+              cancelHandler={() => this.handleShowModalChange(false)}
+              continueLabel={<FormattedMessage id="yes" defaultMessage="Yes" />}
+              continueHandler={this.onClick}
+            />
+          ) : (
+            <Container mt="3" display="flex" alignItems="center">
+              <StyledButton
+                buttonStyle="primary"
+                onClick={() => this.handleShowModalChange(true)}
+                loading={isLoading}
+                minWidth={100}
+                data-cy="btn-publish"
+              >
+                <FormattedMessage id="update.publish.btn" defaultMessage="Publish" />
+              </StyledButton>
+            </Container>
+          )}
         </Container>
       </StyledPublishUpdateBtn>
     );

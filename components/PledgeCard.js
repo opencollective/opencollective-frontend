@@ -51,7 +51,7 @@ PledgeCard.propTypes = {
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     imageUrl: PropTypes.string,
-    isIncognito: PropTypes.boolean,
+    isIncognito: PropTypes.bool,
   }).isRequired,
   interval: PropTypes.string,
   publicMessage: PropTypes.string,

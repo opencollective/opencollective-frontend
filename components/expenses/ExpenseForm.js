@@ -192,6 +192,7 @@ const ExpenseFormBody = ({
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
+  const formRef = React.useRef();
   const { values, handleChange, errors, setValues, dirty, touched, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const isInvite = values.payee?.isInvite;
@@ -206,6 +207,15 @@ const ExpenseFormBody = ({
   const [step, setStep] = React.useState(stepOneCompleted ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
   const isOnBehalf = values.payee?.isInvite;
+
+  // Scroll to top when step changes
+  React.useEffect(() => {
+    const boundingRect = formRef.current?.getBoundingClientRect();
+    if (boundingRect) {
+      const elemTop = boundingRect.top + window.scrollY;
+      window.scroll({ top: elemTop - 75 });
+    }
+  }, [step]);
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
@@ -283,7 +293,7 @@ const ExpenseFormBody = ({
         }}
       />
       {values.type && (
-        <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
+        <StyledCard mt={4} p={[16, 16, 32]} overflow="initial" ref={formRef}>
           <HiddenFragment show={step == STEPS.PAYEE}>
             <Flex alignItems="center" mb={16}>
               <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">

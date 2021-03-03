@@ -18,7 +18,6 @@ import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
@@ -190,15 +189,13 @@ class TransactionsPage extends React.Component {
       <TransactionPageWrapper>
         <Header collective={collective} LoggedInUser={LoggedInUser} />
         <Body>
-          <Container mb={4}>
-            <CollectiveNavbar
-              collective={collective}
-              isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
-              selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-              selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
-            />
-          </Container>
-          <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
+          <CollectiveNavbar
+            collective={collective}
+            isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+            selectedCategory={NAVBAR_CATEGORIES.BUDGET}
+            selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
+          />
+          <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]} mt={3}>
             <Flex justifyContent="space-between">
               <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
                 <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />

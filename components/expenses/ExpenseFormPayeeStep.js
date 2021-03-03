@@ -249,7 +249,7 @@ const ExpenseFormPayeeStep = ({
                   </StyledInputField>
                 )}
               </FastField>
-              {values.payeeLocation.structured || values.payeeLocation.address === '' ? (
+              {values.payeeLocation?.structured || !values.payeeLocation?.address ? (
                 <Field name="payeeLocation.structured">
                   {({ field }) => (
                     <I18nAddressFields
