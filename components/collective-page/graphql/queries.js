@@ -48,6 +48,7 @@ export const collectivePageQuery = gql`
       stats {
         id
         balance
+        balanceWithBlockedFunds
         yearlyBudget
         updates
         activeRecurringContributions
