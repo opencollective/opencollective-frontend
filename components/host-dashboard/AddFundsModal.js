@@ -143,7 +143,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           submitAddFunds({
             variables: {
               ...values,
-              amount: { valueInCents: values.amount + values.platformTip },
+              amount: { valueInCents: values.amount },
               fromAccount: buildAccountReference(values.fromAccount),
               account: buildAccountReference(values.account),
               platformTip: { valueInCents: values.platformTip || 0 },
