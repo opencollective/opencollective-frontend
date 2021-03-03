@@ -74,8 +74,9 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
           currency
           type
           stats {
-            balance {
+            balanceWithBlockedFunds {
               valueInCents
+              currency
             }
           }
         }

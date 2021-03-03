@@ -441,8 +441,11 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         tag
       }
 
-      ... on AccountWithContributions {
-        balance
+      stats {
+        balanceWithBlockedFunds {
+          valueInCents
+          currency
+        }
       }
 
       ... on AccountWithHost {
@@ -455,9 +458,9 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       # For Hosts with Budget capabilities
 
       ... on Organization {
-        balance
         isHost
         isActive
+        # NOTE: This will be the account itself in this case
         host {
           ...CreateExpenseHostFields
         }

@@ -16,11 +16,12 @@ import { Span } from '../Text';
 import PayExpenseModal from './PayExpenseModal';
 
 const getDisabledMessage = (expense, collective, host, payoutMethod) => {
+  const balance = collective.stats.balanceWithBlockedFunds.valueInCents;
   if (!host) {
     return (
       <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a Fiscal Host" />
     );
-  } else if (collective.balance < expense.amount) {
+  } else if (balance < expense.amount) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
   } else if (includes(expense.requiredLegalDocuments, 'US_TAX_FORM')) {
     return (
@@ -141,10 +142,14 @@ PayExpenseButton.propTypes = {
     }),
   }).isRequired,
   collective: PropTypes.shape({
-    balance: PropTypes.number,
-    currency: PropTypes.string,
     host: PropTypes.shape({
       plan: PropTypes.object,
+    }),
+    stats: PropTypes.shape({
+      balanceWithBlockedFunds: PropTypes.shape({
+        valueInCents: PropTypes.number.isRequired,
+        currency: PropTypes.string.isRequired,
+      }),
     }),
   }).isRequired,
   host: PropTypes.shape({

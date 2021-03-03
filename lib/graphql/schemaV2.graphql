@@ -267,6 +267,11 @@ type AccountStats {
   """
   Amount of money in cents in the currency of the collective currently available to spend
   """
+  balanceWithBlockedFunds: Amount!
+
+  """
+  Amount of money in cents in the currency of the collective
+  """
   balance: Amount!
 
   """
@@ -2701,9 +2706,19 @@ All supported currencies
 """
 enum Currency {
   """
+  Argentine Peso
+  """
+  ARS
+
+  """
   Australian Dollar
   """
   AUD
+
+  """
+  Taka
+  """
+  BDT
 
   """
   Bulgarian Lev
@@ -2744,6 +2759,11 @@ enum Currency {
   Pound Sterling
   """
   GBP
+
+  """
+  Hong Kong Dollar
+  """
+  HKD
 
   """
   Kuna
@@ -2791,6 +2811,11 @@ enum Currency {
   NOK
 
   """
+  Nepalese Rupee
+  """
+  NPR
+
+  """
   New Zealand Dollar
   """
   NZD
@@ -2811,6 +2836,11 @@ enum Currency {
   SEK
 
   """
+  Singapore Dollar
+  """
+  SGD
+
+  """
   US Dollar
   """
   USD
@@ -2819,6 +2849,11 @@ enum Currency {
   Peso Uruguayo
   """
   UYU
+
+  """
+  Rand
+  """
+  ZAR
 }
 
 scalar DateString
