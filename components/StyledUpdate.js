@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Head from 'next/head';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
@@ -284,6 +285,10 @@ class StyledUpdate extends Component {
 
     return (
       <React.Fragment>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <title>{`${update.title} - ${collective.name} - Open Collective`}</title>
+        </Head>
         <UpdateWrapper {...props}>
           {mode !== 'edit' && (
             <Container width="100%">
