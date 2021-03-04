@@ -19,6 +19,12 @@ const metricsQuery = gqlV2/* GraphQL */ `
       id
       slug
       hostFeePercent
+      platformFeePercent
+      plan {
+        id
+        name
+        hostFeeSharePercent
+      }
       hostMetrics {
         hostFees {
           value
@@ -52,7 +58,6 @@ const metricsQuery = gqlV2/* GraphQL */ `
           value
           currency
         }
-        hostFeeSharePercent
       }
     }
   }
@@ -68,6 +73,29 @@ const HostMetrics = props => {
     return <Loading />;
   }
 
+  const displayHostFees = data.host.hostFeePercent || data.host.hostMetrics.hostFees.value ? true : false;
+
+  const displayPlatformFees =
+    data.host.platformFeePercent ||
+    data.host.hostMetrics.platformFees.value ||
+    data.host.hostMetrics.pendingPlatformFees.value
+      ? true
+      : false;
+
+  const displayPlatformTips =
+    data.host.platformFeePercent === 0 ||
+    data.host.hostMetrics.platformTips.value ||
+    data.host.hostMetrics.pendingPlatformTips.value
+      ? true
+      : false;
+
+  const displayHostFeeShare =
+    data.host.hostMetrics.hostFeeSharePercent ||
+    data.host.hostMetrics.hostFeeShare.value ||
+    data.host.hostMetrics.pendingHostFeeShare.value
+      ? true
+      : false;
+
   return (
     <Fragment>
       <SettingsTitle>
@@ -81,7 +109,7 @@ const HostMetrics = props => {
             defaultMessage="Host Metrics with current values. Pending fees are charged at the beginning of the following month."
           />
         </P>
-        <StyledCard display="flex" width="100%" flexDirection={['column']} my={2}>
+        <StyledCard display="flex" width="100%" flexDirection={['column']} my={2} mt={3}>
           <Container background="#F5F7FA">
             <Box flex="1" py={16} px={4}>
               <P fontSize="10px" textTransform="uppercase" color="black.700">
@@ -99,7 +127,7 @@ const HostMetrics = props => {
               </P>
             </Box>
           </Container>
-          {(data.host.hostMetrics.hostFees || data.host.hostFeePercent) && (
+          {displayHostFees && (
             <Box flex="1" py={16} px={4}>
               <P fontSize="10px" textTransform="uppercase" color="black.700">
                 <FormattedMessage id="Host.Metrics.HostFees" defaultMessage="Host Fees" />
@@ -116,9 +144,7 @@ const HostMetrics = props => {
               </P>
             </Box>
           )}
-          {(data.host.hostMetrics.platformFees ||
-            data.host.hostMetrics.pendingPlatformFees ||
-            data.platformFeePercent) && (
+          {displayPlatformFees && (
             <Fragment>
               <Box flex="1" py={16} px={4}>
                 <P fontSize="10px" textTransform="uppercase" color="black.700">
@@ -131,7 +157,7 @@ const HostMetrics = props => {
                 <P fontSize="10px">
                   <FormattedMessage
                     id="Host.Metrics.PlatformFees.description"
-                    defaultMessage="Total Platform Fees since the first of the month."
+                    defaultMessage="Total Platform Fees contributed since the first of the month."
                   />
                 </P>
               </Box>
@@ -146,76 +172,84 @@ const HostMetrics = props => {
                 <P fontSize="10px">
                   <FormattedMessage
                     id="Host.Metrics.PendingPlatformFees.description"
-                    defaultMessage="Total Platform Fees collected since the first of the month. They will be invoiced at the end of the month."
+                    defaultMessage="Platform Fees that still need to be given back to Open Collective. They will be invoiced at the end of the month."
                   />
                 </P>
               </Box>
             </Fragment>
           )}
-          <Box flex="1" py={16} px={4}>
-            <P fontSize="10px" textTransform="uppercase" color="black.700">
-              <FormattedMessage id="Host.Metrics.PlatformTips" defaultMessage="Platform Tips" />
-            </P>
-            <P fontSize="20px" mt={1}>
-              {formatValueAsCurrency(data.host.hostMetrics.platformTips)}{' '}
-              <Span color="black.400">{data.host.hostMetrics.platformTips.currency}</Span>
-            </P>
-            <P fontSize="10px">
-              <FormattedMessage
-                id="Host.Metrics.PlatformTips.description"
-                defaultMessage="Total Platform Tips since the first of the month."
-              />
-            </P>
-          </Box>
-          <Box flex="1" py={16} px={4}>
-            <P fontSize="10px" textTransform="uppercase" color="black.700">
-              <FormattedMessage id="Host.Metrics.PendingPlatformTips" defaultMessage="Pending Platform Tips" />
-            </P>
-            <P fontSize="20px" mt={1}>
-              {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformTips)}{' '}
-              <Span color="black.400">{data.host.hostMetrics.pendingPlatformTips.currency}</Span>
-            </P>
-            <P fontSize="10px">
-              <FormattedMessage
-                id="Host.Metrics.PendingPlatformTips.description"
-                defaultMessage="Total Platform Tips collected since the first of the month. They will be invoiced at the end of the month."
-              />
-            </P>
-          </Box>
-          <Box flex="1" py={16} px={4}>
-            <P fontSize="10px" textTransform="uppercase" color="black.700">
-              <FormattedMessage
-                id="Host.Metrics.HostFeeShare"
-                defaultMessage="Host Fee Share ({pct}% of collected Host Fees)"
-                values={{ pct: data.host.hostMetrics.hostFeeSharePercent }}
-              />
-            </P>
-            <P fontSize="20px" mt={1}>
-              {formatValueAsCurrency(data.host.hostMetrics.hostFeeShare)}{' '}
-              <Span color="black.400">{data.host.hostMetrics.hostFeeShare.currency}</Span>
-            </P>
-            <P fontSize="10px">
-              <FormattedMessage
-                id="Host.Metrics.hostFeeShare.description"
-                defaultMessage="Part of Host Fees you are sharing this month with Open Collective as part of your Host Plan."
-              />
-            </P>
-          </Box>
-          <Box flex="1" py={16} px={4}>
-            <P fontSize="10px" textTransform="uppercase" color="black.700">
-              <FormattedMessage id="Host.Metrics.PendingHostFeeShare" defaultMessage="Pending Host Fee Share" />
-            </P>
-            <P fontSize="20px" mt={1}>
-              {formatValueAsCurrency(data.host.hostMetrics.pendingHostFeeShare)}{' '}
-              <Span color="black.400">{data.host.hostMetrics.pendingHostFeeShare.currency}</Span>
-            </P>
-            <P fontSize="10px">
-              <FormattedMessage
-                id="Host.Metrics.pendingHostFeeShare.description"
-                defaultMessage="Part of Host Fees that still needs to be shared with with Open Collective as part of your Host Plan. They will be charged through an invoice from Open Collective at the end of the month."
-              />
-            </P>
-          </Box>
+          {displayPlatformTips && (
+            <Fragment>
+              <Box flex="1" py={16} px={4}>
+                <P fontSize="10px" textTransform="uppercase" color="black.700">
+                  <FormattedMessage id="Host.Metrics.PlatformTips" defaultMessage="Platform Tips" />
+                </P>
+                <P fontSize="20px" mt={1}>
+                  {formatValueAsCurrency(data.host.hostMetrics.platformTips)}{' '}
+                  <Span color="black.400">{data.host.hostMetrics.platformTips.currency}</Span>
+                </P>
+                <P fontSize="10px">
+                  <FormattedMessage
+                    id="Host.Metrics.PlatformTips.description"
+                    defaultMessage="Total Platform Tips contributed since the first of the month."
+                  />
+                </P>
+              </Box>
+              <Box flex="1" py={16} px={4}>
+                <P fontSize="10px" textTransform="uppercase" color="black.700">
+                  <FormattedMessage id="Host.Metrics.PendingPlatformTips" defaultMessage="Pending Platform Tips" />
+                </P>
+                <P fontSize="20px" mt={1}>
+                  {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformTips)}{' '}
+                  <Span color="black.400">{data.host.hostMetrics.pendingPlatformTips.currency}</Span>
+                </P>
+                <P fontSize="10px">
+                  <FormattedMessage
+                    id="Host.Metrics.PendingPlatformTips.description"
+                    defaultMessage="Platform Tips that still need to be given back to Open Collective. They will be invoiced at the end of the month."
+                  />
+                </P>
+              </Box>
+            </Fragment>
+          )}
+          {displayHostFeeShare && (
+            <Fragment>
+              <Box flex="1" py={16} px={4}>
+                <P fontSize="10px" textTransform="uppercase" color="black.700">
+                  <FormattedMessage
+                    id="Host.Metrics.HostFeeShare"
+                    defaultMessage="Host Fee Share ({pct}% of collected Host Fees)"
+                    values={{ pct: data.host.plan.hostFeeSharePercent }}
+                  />
+                </P>
+                <P fontSize="20px" mt={1}>
+                  {formatValueAsCurrency(data.host.hostMetrics.hostFeeShare)}{' '}
+                  <Span color="black.400">{data.host.hostMetrics.hostFeeShare.currency}</Span>
+                </P>
+                <P fontSize="10px">
+                  <FormattedMessage
+                    id="Host.Metrics.hostFeeShare.description"
+                    defaultMessage="Part of Host Fees you are sharing this month with Open Collective as part of your Host Plan."
+                  />
+                </P>
+              </Box>
+              <Box flex="1" py={16} px={4}>
+                <P fontSize="10px" textTransform="uppercase" color="black.700">
+                  <FormattedMessage id="Host.Metrics.PendingHostFeeShare" defaultMessage="Pending Host Fee Share" />
+                </P>
+                <P fontSize="20px" mt={1}>
+                  {formatValueAsCurrency(data.host.hostMetrics.pendingHostFeeShare)}{' '}
+                  <Span color="black.400">{data.host.hostMetrics.pendingHostFeeShare.currency}</Span>
+                </P>
+                <P fontSize="10px">
+                  <FormattedMessage
+                    id="Host.Metrics.pendingHostFeeShare.description"
+                    defaultMessage="Part of Host Fees that still need to be shared with Open Collective as part of your Host Plan. They will be invoiced at the end of the month."
+                  />
+                </P>
+              </Box>
+            </Fragment>
+          )}
         </StyledCard>
       </Box>
     </Fragment>
