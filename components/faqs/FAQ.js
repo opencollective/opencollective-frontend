@@ -94,6 +94,7 @@ export const Title = styled(({ children, ...props }) => (
   cursor: pointer;
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
 `;
 
 /** Entry content (hidden by default) */

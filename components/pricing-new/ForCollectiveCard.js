@@ -6,13 +6,14 @@ import styled from 'styled-components';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
-import { getI18nLink, I18nBold } from '../I18nFormatters';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledHR from '../StyledHr';
 import { H3, H4, H5, P } from '../Text';
 
 import { COLLECTIVE_ACCESS } from './constants';
+import PlatformTip from './PlatformTip';
 
 const ListWrapper = styled(Box)`
   list-style: none;
@@ -35,18 +36,15 @@ const ListItem = styled.li`
   }
 `;
 
-const FeeData = styled.td`
+const FeeData = styled(P)`
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
   color: ${themeGet('colors.blue.700')};
-  width: ${props => props.width};
+  margin-right: 8px;
 `;
 
-const FeeDescription = styled.td`
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 22px;
+const FeeDescription = styled(FeeData)`
   color: ${themeGet('colors.black.900')};
 `;
 
@@ -139,36 +137,29 @@ const ForCollectiveCard = () => {
         <FormattedMessage id="pricing.forCollective.fees.header" defaultMessage="We want to see you thrive" />
       </H5>
       <Flex flexDirection={['column', 'row']} alignItems="flex-start" mr={[null, '30px', '42px']}>
-        <Container mr={[null, '41px']}>
+        <Container mr={[null, '41px', '72px']}>
           <Box mb="16px">
-            <table>
-              <tbody>
-                <tr>
-                  <FeeData>0$</FeeData>
-                  <FeeDescription>
-                    <FormattedMessage
-                      id="pricing.platformFees"
-                      defaultMessage="Platform Fees (on incoming contributions)₁"
-                    />
-                  </FeeDescription>
-                </tr>
-                <tr>
-                  <FeeData>0$</FeeData>
-                  <FeeDescription>
-                    <FormattedMessage id="pricing.payoutFees" defaultMessage="Payout Fees (on outgoing payments)₁	" />
-                  </FeeDescription>
-                </tr>
-                <tr>
-                  <FeeData>Host fees</FeeData>
-                  <FeeDescription>
-                    <FormattedMessage
-                      id="pricing.forCollective.hostFees"
-                      defaultMessage="apply depending on your host"
-                    />
-                  </FeeDescription>
-                </tr>
-              </tbody>
-            </table>
+            <Flex mb={3}>
+              <FeeData>0$</FeeData>
+              <FeeDescription>
+                <FormattedMessage
+                  id="pricing.platformFees"
+                  defaultMessage="Platform Fees (on incoming contributions)₁"
+                />
+              </FeeDescription>
+            </Flex>
+            <Flex my={3}>
+              <FeeData>0$</FeeData>
+              <FeeDescription>
+                <FormattedMessage id="pricing.payoutFees" defaultMessage="Payout Fees (on outgoing payments)₁	" />
+              </FeeDescription>
+            </Flex>
+            <Flex my={3}>
+              <FeeData whiteSpace="nowrap">Host fees</FeeData>
+              <FeeDescription>
+                <FormattedMessage id="pricing.forCollective.hostFees" defaultMessage="apply depending on your host" />
+              </FeeDescription>
+            </Flex>
           </Box>
           <P fontSize="12px" lineHeight="18px" color="black.700">
             <FormattedMessage
@@ -190,32 +181,7 @@ const ForCollectiveCard = () => {
               }}
             />
           </P>
-          <Container
-            my="16px"
-            display="flex"
-            alignItems="center"
-            padding="12px 16px"
-            border="1px solid #C2E2FF"
-            borderRadius="8px"
-            width={[null, null, '451px']}
-          >
-            <Illustration src="/static/images/pricing/platform-tip.svg" />
-            <P fontSize="12px" lineHeight="18px" color="black.800">
-              <FormattedMessage
-                id="pricing.platformTips"
-                defaultMessage="<strong>Open Collective works with platform tips.</strong><br></br> Your contributors can choose to give a voluntary tip to the platform on each contribution. <a>Know more</a>."
-                values={{
-                  a: getI18nLink({
-                    href: 'https://docs.opencollective.com/help/financial-contributors/financial-contributors',
-                    openInNewTab: true,
-                  }),
-                  strong: I18nBold,
-                  // eslint-disable-next-line react/display-name
-                  br: () => <br />,
-                }}
-              />
-            </P>
-          </Container>
+          <PlatformTip />
         </Container>
         <Box>
           <ListWrapper as="ul" mt={['32px', 0]}>

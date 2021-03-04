@@ -25,11 +25,39 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-const Wrapper = styled(Flex)`
-  background: url('/static/images/pricing/pricing-page-top-bg.png') no-repeat 0px 80%;
-  background-size: cover;
-  justify-content: center;
-  align-items: center;
+const TopBackgroundIllustration = styled(Box)`
+  background: url('/static/images/pricing/pricing-page-top-bg.png') no-repeat;
+  background-size: 100%;
+  position: absolute;
+  top: -110px;
+  z-index: -99;
+  width: 100%;
+  height: 434px;
+
+  @media screen and (min-width: 40em) {
+    background: url('/static/images/pricing/pricing-page-top-sm-bg.png') no-repeat;
+    background-size: 100%;
+  }
+
+  @media screen and (min-width: 64em) {
+    background: url('/static/images/pricing/pricing-page-top-md-bg.png') no-repeat;
+    background-size: 100%;
+    top: -90px;
+    height: 500px;
+  }
+
+  @media screen and (min-width: 88em) {
+    background: url('/static/images/pricing/pricing-page-top-lg-bg.png') no-repeat;
+    background-size: 100%;
+    top: -110px;
+    height: 600px;
+    width: 1200px;
+    background-position: center;
+    left: 0;
+    right: 0;
+    margin-right: auto;
+    margin-left: auto;
+  }
 `;
 
 const ListWrapper = styled(Box)`
@@ -86,7 +114,8 @@ const Pricing = () => {
   return (
     <React.Fragment>
       <GlobalStyles />
-      <Wrapper px="16px" pt="20px" pb="70px">
+      <TopBackgroundIllustration />
+      <Flex px="16px" pt="20px" pb={['40px', '20px']} justifyContent="center" alignItems="center">
         <Container
           textAlign="center"
           display="flex"
@@ -115,8 +144,9 @@ const Pricing = () => {
             />
           </P>
         </Container>
-      </Wrapper>
-      <Flex
+      </Flex>
+      <Container
+        display="flex"
         px="16px"
         mb="40px"
         flexDirection={['column', 'row']}
@@ -124,12 +154,13 @@ const Pricing = () => {
         justifyContent="center"
       >
         <Container
-          width={['288px', null, '468px', null, '486px']}
+          width={['288px', '308px', '468px', null, '486px']}
           padding={['24px', null, '32px 36px']}
           border="1px solid #DCDEE0"
           borderRadius="8px"
           mb={['20px', 0]}
           mr={[null, '10px']}
+          background="white"
         >
           <Flex flexDirection={['column', 'row']} alignItems="center">
             <Box width="144px" height="144px" display={['none', null, 'block']} mr={[null, null, '24px']}>
@@ -215,7 +246,7 @@ const Pricing = () => {
                 <FormattedMessage id="pricing.createCollective" defaultMessage="Create Collective" />
               </StyledButton>
             </Link>
-            <Link href="https://docs.opencollective.com/help/collectives/collectives" openInNewTab>
+            <Link href="#collective">
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
                 <FormattedMessage id="pricing.knowMore" defaultMessage="Know more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
@@ -223,11 +254,12 @@ const Pricing = () => {
           </Container>
         </Container>
         <Container
-          width={['288px', null, '468px', null, '486px']}
+          width={['288px', '308px', '468px', null, '486px']}
           padding={['24px', null, '32px 36px']}
           border="1px solid #DCDEE0"
           borderRadius="8px"
-          ml={['10px', null]}
+          ml={[null, '10px']}
+          background="white"
         >
           <Flex flexDirection={['column', null, 'row']}>
             <Box width="144px" height="144px" display={['none', null, 'block']} mr={[null, null, '24px']}>
@@ -306,14 +338,14 @@ const Pricing = () => {
                 <FormattedMessage id="pricing.getStarted" defaultMessage="Get started" />
               </StyledButton>
             </Link>
-            <Link href="https://docs.opencollective.com/help/fiscal-hosts/fiscal-hosts" openInNewTab>
+            <Link href="#fiscalHost">
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
                 <FormattedMessage id="pricing.knowMore" defaultMessage="Know more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
             </Link>
           </Container>
         </Container>
-      </Flex>
+      </Container>
       <Flex
         flexDirection={['column', null, 'row-reverse']}
         justifyContent="center"

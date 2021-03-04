@@ -6,13 +6,14 @@ import styled from 'styled-components';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
-import { getI18nLink, I18nBold } from '../I18nFormatters';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledHR from '../StyledHr';
 import { H3, H4, H5, P } from '../Text';
 
 import { FEATURES, FISCAL_HOST_ACCESS, PLANS } from './constants';
+import PlatformTip from './PlatformTip';
 
 const ListWrapper = styled(Box)`
   list-style: none;
@@ -32,14 +33,15 @@ const ListItem = styled.li`
   padding-left: 26px;
 `;
 
-const FeeData = styled.td`
+const FeeData = styled(P)`
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
   color: ${themeGet('colors.blue.700')};
+  margin-right: 8px;
 `;
 
-const FeeDescription = styled.td`
+const FeeDescription = styled(P)`
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
@@ -188,27 +190,23 @@ const ForFiscalHosts = () => {
         <FormattedMessage id="pricing.forFiscalHost.fees.header" defaultMessage="Valid for all plans" />
       </H5>
       <Flex flexDirection={['column', 'row']} alignItems="flex-start">
-        <Box>
+        <Box mr={[null, '41px', '72px']}>
           <Box mb="16px">
-            <table>
-              <tbody>
-                <tr>
-                  <FeeData>0$</FeeData>
-                  <FeeDescription>
-                    <FormattedMessage
-                      id="pricing.platformFees"
-                      defaultMessage="Platform Fees (on incoming contributions)₁"
-                    />
-                  </FeeDescription>
-                </tr>
-                <tr>
-                  <FeeData>0$</FeeData>
-                  <FeeDescription>
-                    <FormattedMessage id="pricing.payoutFees" defaultMessage="Payout Fees (on outgoing payments)₁	" />
-                  </FeeDescription>
-                </tr>
-              </tbody>
-            </table>
+            <Flex mb={3}>
+              <FeeData>0$</FeeData>
+              <FeeDescription>
+                <FormattedMessage
+                  id="pricing.platformFees"
+                  defaultMessage="Platform Fees (on incoming contributions)₁"
+                />
+              </FeeDescription>
+            </Flex>
+            <Flex my={3}>
+              <FeeData>0$</FeeData>
+              <FeeDescription>
+                <FormattedMessage id="pricing.payoutFees" defaultMessage="Payout Fees (on outgoing payments)₁	" />
+              </FeeDescription>
+            </Flex>
           </Box>
           <P fontSize="12px" lineHeight="18px" color="black.700">
             <FormattedMessage
@@ -230,6 +228,7 @@ const ForFiscalHosts = () => {
               }}
             />
           </P>
+          <PlatformTip mt={[3, 4]} my={4} width={[null, null, '451px']} display={['none', null, 'flex']} />
         </Box>
         <ListWrapper as="ul" mt={['16px', 0]}>
           <ListItem>
@@ -258,32 +257,7 @@ const ForFiscalHosts = () => {
           </ListItem>
         </ListWrapper>
       </Flex>
-      <Container
-        my={4}
-        display="flex"
-        alignItems="center"
-        padding="12px 16px"
-        border="1px solid #C2E2FF"
-        borderRadius="8px"
-        mt={[3, 4]}
-      >
-        <Illustration src="/static/images/pricing/platform-tip.svg" />
-        <P fontSize="12px" lineHeight="18px" color="black.800">
-          <FormattedMessage
-            id="pricing.platformTips"
-            defaultMessage="<strong>Open Collective works with platform tips.</strong><br></br> Your contributors can choose to give a voluntary tip to the platform on each contribution. <a>Know more</a>."
-            values={{
-              a: getI18nLink({
-                href: 'https://docs.opencollective.com/help/financial-contributors/financial-contributors',
-                openInNewTab: true,
-              }),
-              strong: I18nBold,
-              // eslint-disable-next-line react/display-name
-              br: () => <br />,
-            }}
-          />
-        </P>
-      </Container>
+      <PlatformTip mt={[3, 4]} my={4} width={[null, '419px']} display={['flex', null, 'none']} />
 
       <PlansWrapper display="flex" overflow="auto" justifyContent="space-between">
         {PLANS.map(plan => (

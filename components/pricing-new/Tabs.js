@@ -64,7 +64,7 @@ const Tabs = ({ activeTab }) => (
 );
 
 Tabs.propTypes = {
-  activeTab: PropTypes.oneOf(['collective', 'fiscalHost', 'faq']),
+  activeTab: PropTypes.string,
 };
 
 export default Tabs;
