@@ -37,6 +37,7 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import { H1 } from '../components/Text';
+import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
@@ -65,6 +66,8 @@ class CreateExpensePage extends React.Component {
     createExpense: PropTypes.func.isRequired,
     /** from apollo */
     draftExpenseAndInviteUser: PropTypes.func.isRequired,
+    /** from withToast */
+    addToast: PropTypes.func.isRequired,
     /** from apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -221,9 +224,17 @@ class CreateExpensePage extends React.Component {
       const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
       const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
       const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-      this.props.router.push(
-        `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}?createSuccess=true`,
+      await this.props.router.push(
+        `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
       );
+      this.props.addToast({
+        type: TOAST_TYPE.SUCCESS,
+        title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
+        message: (
+          <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
+        ),
+      });
+      window.scrollTo(0, 0);
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
     }
@@ -517,6 +528,7 @@ const addHoc = compose(
   addCreateExpensePageData,
   addCreateExpenseMutation,
   addDraftExpenseAndInviteUserMutation,
+  withToasts,
   injectIntl,
 );
 
