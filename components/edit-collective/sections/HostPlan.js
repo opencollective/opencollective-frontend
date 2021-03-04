@@ -168,9 +168,14 @@ const editHostPlanMutation = gqlV2/* GraphQL */ `
     editHostPlan(account: $account, plan: $plan) {
       id
       slug
+      hostFeePercent
+      platformFeePercent
       plan {
         id
         name
+      }
+      hostMetrics {
+        hostFeeSharePercent
       }
     }
   }
