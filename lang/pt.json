@@ -1849,7 +1849,7 @@
   "updatePaymentMethod.form.success": "Seu novo cartão foi adicionado",
   "updatePaymentMethod.form.updatePaymentMethod.btn": "atualizar",
   "updatePaymentMethod.form.updatePaymentMethodError.btn": "Tente novamente",
-  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Ver página do Coletivo",
+  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Go to profile page",
   "updatePaymentMethod.subtitle.line": "Por favor, adicione um novo método de pagamento para as seguintes assinaturas antes que o atual vença.",
   "updatePaymentMethod.title": "Atualizar método de pagamento",
   "updates": "Atualizações",

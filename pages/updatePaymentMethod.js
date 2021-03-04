@@ -299,7 +299,7 @@ class UpdatePaymentPage extends React.Component {
                         >
                           <FormattedMessage
                             id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
-                            defaultMessage="Go to Collective page"
+                            defaultMessage="Go to profile page"
                           />
                         </StyledButton>
                       </Link>

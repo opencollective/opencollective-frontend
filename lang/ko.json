@@ -1849,7 +1849,7 @@
   "updatePaymentMethod.form.success": "Your new card info has been added",
   "updatePaymentMethod.form.updatePaymentMethod.btn": "업데이트",
   "updatePaymentMethod.form.updatePaymentMethodError.btn": "다시 시도",
-  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Go to Collective page",
+  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Go to profile page",
   "updatePaymentMethod.subtitle.line": "Please add a new payment method for the following subscriptions before your current one expires.",
   "updatePaymentMethod.title": "Update Payment Method",
   "updates": "업데이트",

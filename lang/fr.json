@@ -1849,7 +1849,7 @@
   "updatePaymentMethod.form.success": "Les informations de votre nouvelle carte ont été ajoutées",
   "updatePaymentMethod.form.updatePaymentMethod.btn": "Mettre à jour",
   "updatePaymentMethod.form.updatePaymentMethodError.btn": "Réessayer",
-  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Voir la page du Collectif",
+  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Go to profile page",
   "updatePaymentMethod.subtitle.line": "Veuillez ajouter un nouveau mode de paiement pour les abonnements suivants avant que votre abonnement actuel n'expire.",
   "updatePaymentMethod.title": "Mettre à jour le moyen de paiement",
   "updates": "Actualités",

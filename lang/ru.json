@@ -1849,7 +1849,7 @@
   "updatePaymentMethod.form.success": "Информация о вашей новой карте добавлена",
   "updatePaymentMethod.form.updatePaymentMethod.btn": "обновить",
   "updatePaymentMethod.form.updatePaymentMethodError.btn": "Попробуйте еще раз",
-  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Перейти на страницу Коллектива",
+  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Go to profile page",
   "updatePaymentMethod.subtitle.line": "Пожалуйста, добавьте новый способ оплаты для следующих подписок до истечения вашего текущего срока оплаты.",
   "updatePaymentMethod.title": "Обновить способ оплаты",
   "updates": "Обновления",

@@ -1849,7 +1849,7 @@
   "updatePaymentMethod.form.success": "Your new card info has been added",
   "updatePaymentMethod.form.updatePaymentMethod.btn": "actualizar",
   "updatePaymentMethod.form.updatePaymentMethodError.btn": "Inténtalo de nuevo",
-  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Ir a la página del Colectivo",
+  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Go to profile page",
   "updatePaymentMethod.subtitle.line": "Por favor, añade un nuevo método de pago para las siguientes suscripciones antes de que caduque tu método de pago actual.",
   "updatePaymentMethod.title": "Actualizar Método de Pago",
   "updates": "Actualizaciones",

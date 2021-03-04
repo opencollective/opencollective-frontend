@@ -1849,7 +1849,7 @@
   "updatePaymentMethod.form.success": "Дані Вашої нової картки додано",
   "updatePaymentMethod.form.updatePaymentMethod.btn": "оновити",
   "updatePaymentMethod.form.updatePaymentMethodError.btn": "Спробувати знову",
-  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Перейти на сторінку Колективу",
+  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Go to profile page",
   "updatePaymentMethod.subtitle.line": "Please add a new payment method for the following subscriptions before your current one expires.",
   "updatePaymentMethod.title": "Update Payment Method",
   "updates": "Оновлення",

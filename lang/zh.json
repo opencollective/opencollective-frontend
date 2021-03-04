@@ -1849,7 +1849,7 @@
   "updatePaymentMethod.form.success": "您的新卡片信息已被添加",
   "updatePaymentMethod.form.updatePaymentMethod.btn": "更新",
   "updatePaymentMethod.form.updatePaymentMethodError.btn": "重试",
-  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "前往社群页",
+  "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Go to profile page",
   "updatePaymentMethod.subtitle.line": "Please add a new payment method for the following subscriptions before your current one expires.",
   "updatePaymentMethod.title": "更新付款方式",
   "updates": "更新",
