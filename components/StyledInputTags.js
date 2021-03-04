@@ -141,7 +141,6 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
 
   const handleClose = React.useCallback(() => {
     if (isOpen) {
-      onChange(tags);
       setOpen(false);
     }
   }, [isOpen]);
