@@ -125,15 +125,14 @@ const StyledActionButton = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
   background: white;
   border-radius: 8px;
   border: 2px solid white;
-  color: ${themeGet('colors.primary.600')};
+  color: ${themeGet('colors.primary.700')};
 
   svg {
     stroke-width: 2;
   }
 
   &:hover {
-    background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
-      linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
+    background: ${themeGet('colors.primary.100')};
   }
 
   &:hover:not(:focus) {
@@ -143,14 +142,13 @@ const StyledActionButton = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
   &:active,
   &:focus,
   &:hover {
-    background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
-      linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
-    color: ${themeGet('colors.primary.600')};
+    background: ${themeGet('colors.primary.100')};
+    color: ${themeGet('colors.primary.700')};
   }
 
   &:active,
   &:focus {
-    border: 2px solid ${themeGet('colors.primary.600')};
+    border: 2px solid ${themeGet('colors.primary.700')};
     box-shadow: none;
   }
 
