@@ -131,6 +131,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
       slug: router.query.slug,
     },
     context: API_V2_CONTEXT,
+    fetchPolicy: 'network-only',
   });
   const [submitUpdatePaymentMethod, { loading: loadingUpdatePaymentMethod }] = useMutation(
     updatePaymentMethodMutation,
