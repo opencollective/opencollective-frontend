@@ -8,6 +8,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -31,6 +32,8 @@ import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
 import acceptOrganizationIllustration from '../../public/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png';
 
 const { TW_API_COLLECTIVE_SLUG } = process.env;
+
+const { ORGANIZATION } = CollectiveType;
 
 const CreateNewOrg = styled(Flex)`
   border: 1px solid lightgray;
@@ -166,7 +169,7 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
     );
 
     const orgs = memberships
-      .filter(m => m.collective.type === 'ORGANIZATION')
+      .filter(m => m.collective.type === ORGANIZATION)
       .sort((a, b) => {
         return a.collective.slug.localeCompare(b.collective.slug);
       });
@@ -181,7 +184,17 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
         this.setState({ loading: true });
         const { data } = values;
         await this.submitBankAccountInformation(data);
-        await this.addHost(collective, organization ? organization : collective);
+        // At this point, we don't need to do anything for Organization
+        // they're supposed to be already a Fiscal Host with budget activated
+        if (collective.type !== ORGANIZATION) {
+          if (organization) {
+            // Apply to the Host organization
+            await this.addHost(collective, organization);
+          } else {
+            // Activate Self Hosting
+            await this.addHost(collective, collective);
+          }
+        }
         await this.props.refetchLoggedInUser();
         await this.props.router.push(
           `/${this.props.collective.slug}/accept-financial-contributions/${this.props.router.query.path}/success`,
