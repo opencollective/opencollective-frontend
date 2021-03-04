@@ -172,6 +172,16 @@ class ExpensePage extends React.Component {
       }));
     }
 
+    const expense = this.props.data?.expense;
+    if (
+      expense?.status == expenseStatus.UNVERIFIED &&
+      expense?.permissions?.canEdit &&
+      this.props.LoggedInUser &&
+      expense?.createdByAccount?.slug == this.props.LoggedInUser?.collective?.slug
+    ) {
+      this.handleExpenseVerification();
+    }
+
     this.handlePolling();
     document.addEventListener('mousemove', this.handlePolling);
   }
@@ -185,16 +195,6 @@ class ExpensePage extends React.Component {
     // Scroll to expense's top when changing status
     if (oldState.status !== this.state.status) {
       this.scrollToExpenseTop();
-    }
-
-    const expense = this.props.data?.expense;
-    if (
-      expense?.status == expenseStatus.UNVERIFIED &&
-      expense?.permissions?.canEdit &&
-      this.props.LoggedInUser &&
-      expense?.createdByAccount?.slug == this.props.LoggedInUser?.collective?.slug
-    ) {
-      this.handleExpenseVerification();
     }
   }
 
@@ -256,6 +256,7 @@ class ExpensePage extends React.Component {
     await this.props.router.push(
       `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
     );
+    this.props.data.refetch();
     this.props.addToast({
       type: TOAST_TYPE.SUCCESS,
       title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,

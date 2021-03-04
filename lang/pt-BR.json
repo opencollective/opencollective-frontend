@@ -839,6 +839,8 @@
   "ExpenseForm.DescriptionPlaceholder": "Insira o título da despesa aqui...",
   "ExpenseForm.FundingRequestDescription": "Solicite um subsídio para seu projeto ou iniciativa.",
   "ExpenseForm.GrantSubjectPlaceholder": "por exemplo, pesquisa, desenvolvimento de software, etc...",
+  "ExpenseForm.inviteAdditionalInfo": "If you have additional information about the payment details, you can add them by clicking below.",
+  "ExpenseForm.inviteAdditionalInfoBtn": "Add Additional Details",
   "ExpenseForm.inviteeIsOrganizationLabel": "Você está enviando essa despesa para a sua organização (empresa)?",
   "ExpenseForm.inviteeLabel": "Quem receberá o dinheiro por esta despesa?",
   "ExpenseForm.inviteeOrgDescriptionLabel": "O que a sua organização faz?",

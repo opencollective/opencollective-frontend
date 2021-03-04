@@ -233,9 +233,9 @@ describe('New expense flow', () => {
 
         cy.getByDataCy('select-expense-payee').click();
         cy.getByDataCy('collective-picker-invite-button').click();
-        cy.get('[data-cy="collective-picker-invite-form"] input[name="name"]').type('Nicolas Cage');
-        cy.get('[data-cy="collective-picker-invite-form"] input[name="email"]').type(inviteeEmail);
-        cy.get('[data-cy="collective-picker-invite-form"] [type="submit"]').click();
+        cy.get('input[name="payee.name"]').type('Nicolas Cage');
+        cy.get('input[name="payee.email"]').type(inviteeEmail);
+        cy.get('[data-cy="expense-next"]').click();
 
         cy.get('input[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
