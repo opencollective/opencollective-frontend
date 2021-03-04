@@ -85,7 +85,7 @@ FormattedMoneyAmount.propTypes = {
   /** Whether to show the full currency code (ie. USD) */
   showCurrencyCode: PropTypes.bool,
   /** How many numbers should we display after the comma */
-  precision: PropTypes.number,
+  precision: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf(['auto'])]),
   /** An interval that goes with the amount */
   interval: PropTypes.oneOf(['month', 'year']),
   /** ContributionFrequency from GQLV2 */
