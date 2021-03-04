@@ -65,6 +65,10 @@ const CollapseBtn = styled.div`
   border-radius: 50%;
   border: 1px solid #dcdee0;
 
+  svg {
+    stroke-width: 1.5;
+  }
+
   [data-item='chevron-up'] {
     margin-top: -5%;
   }

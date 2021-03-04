@@ -12,6 +12,7 @@ export const Details = styled(Container).attrs({
   as: 'details',
 })`
   summary {
+    list-style-type: none;
     > div {
       display: flex;
       cursor: pointer;
@@ -55,8 +56,11 @@ export const Details = styled(Container).attrs({
     outline-offset: ${themeGet('space.1')}px;
   }
 
-  /* Remove arrow on Chrome */
+  /* Remove arrow */
   summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::marker {
     display: none;
   }
 `;
@@ -67,6 +71,10 @@ const CollapseBtn = styled.div`
   align-items: center;
   border-radius: 50%;
   border: 1px solid #dcdee0;
+
+  svg {
+    stroke-width: 1.5;
+  }
 
   [data-item='chevron-up'] {
     margin-top: -5%;
