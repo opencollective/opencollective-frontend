@@ -164,42 +164,46 @@ class CreateExpensePage extends React.Component {
   }
 
   onFormSubmit = async expense => {
-    if (expense.payee.isInvite) {
-      const expenseDraft = pick(expense, [
-        'description',
-        'longDescription',
-        'tags',
-        'type',
-        'privateMessage',
-        'invoiceInfo',
-        'recipientNote',
-        'items',
-        'attachedFiles',
-        'payee',
-        'payeeLocation',
-        'payoutMethod',
-      ]);
-      const result = await this.props.draftExpenseAndInviteUser({
-        variables: {
-          account: { id: this.props.data.account.id },
-          expense: expenseDraft,
-        },
-      });
-      if (this.state.formPersister) {
-        this.state.formPersister.clearValues();
-      }
+    try {
+      if (expense.payee.isInvite) {
+        const expenseDraft = pick(expense, [
+          'description',
+          'longDescription',
+          'tags',
+          'type',
+          'privateMessage',
+          'invoiceInfo',
+          'recipientNote',
+          'items',
+          'attachedFiles',
+          'payee',
+          'payeeLocation',
+          'payoutMethod',
+        ]);
+        const result = await this.props.draftExpenseAndInviteUser({
+          variables: {
+            account: { id: this.props.data.account.id },
+            expense: expenseDraft,
+          },
+        });
+        if (this.state.formPersister) {
+          this.state.formPersister.clearValues();
+        }
 
-      // Redirect to the expense page
-      const legacyExpenseId = result.data.draftExpenseAndInviteUser.legacyId;
-      const { collectiveSlug, parentCollectiveSlug, data } = this.props;
-      const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
-      const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
-      const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-      await this.props.router.push(
-        `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-      );
-    } else {
-      this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
+        // Redirect to the expense page
+        const legacyExpenseId = result.data.draftExpenseAndInviteUser.legacyId;
+        const { collectiveSlug, parentCollectiveSlug, data } = this.props;
+        const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
+        const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
+        const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
+        await this.props.router.push(
+          `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
+        );
+      } else {
+        this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
+      }
+    } catch (e) {
+      this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
     }
   };
 

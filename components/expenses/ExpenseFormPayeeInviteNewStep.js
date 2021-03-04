@@ -8,7 +8,6 @@ import { formatFormErrorMessage } from '../../lib/form-utils';
 
 import { Box, Flex, Grid } from '../Grid';
 import I18nAddressFields from '../I18nAddressFields';
-import { getI18nLink } from '../I18nFormatters';
 import InputTypeCountry from '../InputTypeCountry';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -19,6 +18,8 @@ import StyledTextarea from '../StyledTextarea';
 
 import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
+
+const EMPTY_ARRAY = [];
 
 const msg = defineMessages({
   nameLabel: {
@@ -77,10 +78,6 @@ const msg = defineMessages({
     id: 'ExpenseForm.inviteAdditionalInfo',
     defaultMessage: 'If you have additional information about the payment details, you can add them by clicking below.',
   },
-  additionalInfoBtn: {
-    id: 'ExpenseForm.inviteAdditionalInfoBtn',
-    defaultMessage: '<Link>Add Additional Details</Link>',
-  },
 });
 
 const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext }) => {
@@ -129,9 +126,9 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
             <MessageBox type="info" fontSize="12px">
               {formatMessage(msg.additionalInfo)}
               <br />
-              {formatMessage(msg.additionalInfoBtn, {
-                Link: getI18nLink({ onClick: () => setAdditionalInfo(true) }),
-              })}
+              <a href="#" onClick={() => setAdditionalInfo(true)}>
+                <FormattedMessage id="ExpenseForm.inviteAdditionalInfoBtn" defaultMessage="Add Additional Details" />
+              </a>
             </MessageBox>
           </Box>
         ) : (
@@ -191,7 +188,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
                         error={error}
                         onChange={setPayoutMethod}
                         payoutMethod={values.payoutMethod}
-                        payoutMethods={[]}
+                        payoutMethods={EMPTY_ARRAY}
                         payee={values.payee}
                         disabled={!values.payee}
                         collective={collective}

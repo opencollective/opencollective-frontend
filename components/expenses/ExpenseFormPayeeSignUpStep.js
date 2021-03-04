@@ -28,6 +28,8 @@ import { Span } from '../Text';
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
+const EMPTY_ARRAY = [];
+
 const msg = defineMessages({
   nameLabel: {
     id: `ExpenseForm.inviteeLabel`,
@@ -318,7 +320,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
                     error={error}
                     onChange={setPayoutMethod}
                     payoutMethod={values.payoutMethod}
-                    payoutMethods={[]}
+                    payoutMethods={EMPTY_ARRAY}
                     payee={values.payee}
                     disabled={!values.payee}
                     collective={collective}
