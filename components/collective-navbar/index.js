@@ -447,7 +447,7 @@ const CollectiveNavbar = ({
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
-  const isRoot = LoggedInUser?.isRoot;
+  const isRoot = LoggedInUser?.isRoot();
   callsToAction = { ...getDefaultCallsToActions(collective, sections, isAdmin, isHostAdmin, isRoot), ...callsToAction };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
   const mainAction = getMainAction(collective, actionsArray);
