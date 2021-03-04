@@ -158,6 +158,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
               </FastField>
               <I18nAddressFields
                 prefix="payeeLocation.structured"
+                required={false}
                 selectedCountry={values.payeeLocation?.country}
                 onCountryChange={addressObject => {
                   if (addressObject) {
