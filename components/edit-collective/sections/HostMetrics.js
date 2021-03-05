@@ -139,7 +139,7 @@ const HostMetrics = props => {
               <P fontSize="10px">
                 <FormattedMessage
                   id="Host.Metrics.HostFees.description"
-                  defaultMessage="Total Host Fees due since the beginning of the current month. They will be added to your Host budget at the end of the month."
+                  defaultMessage="Total Host Fees collected since the beginning of the current month. They will be added to your Host budget at the end of the month."
                 />
               </P>
             </Box>
@@ -157,7 +157,7 @@ const HostMetrics = props => {
                 <P fontSize="10px">
                   <FormattedMessage
                     id="Host.Metrics.PlatformFees.description"
-                    defaultMessage="Total Platform Fees contributed since the first of the month."
+                    defaultMessage="Total Platform Fees collected since the first of the month."
                   />
                 </P>
               </Box>
@@ -191,7 +191,7 @@ const HostMetrics = props => {
                 <P fontSize="10px">
                   <FormattedMessage
                     id="Host.Metrics.PlatformTips.description"
-                    defaultMessage="Total Platform Tips contributed since the first of the month."
+                    defaultMessage="Total Platform Tips collected since the first of the month."
                   />
                 </P>
               </Box>
