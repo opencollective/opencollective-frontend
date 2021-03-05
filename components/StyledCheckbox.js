@@ -151,6 +151,12 @@ class StyledCheckbox extends React.Component {
       <CheckboxContainer
         role="button"
         onClick={() => this.onChange(!realChecked)}
+        onKeyDown={event => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            this.onChange(!realChecked);
+          }
+        }}
         fontSize={fontSize || size}
         size={size}
         width={width}

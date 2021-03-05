@@ -220,7 +220,16 @@ const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }
               })}
             </Modal>
           </TrapContainer>
-          <ModalOverlay role="button" onClick={onClose} />
+          <ModalOverlay
+            role="button"
+            onClick={onClose}
+            onKeyDown={event => {
+              if (event.key === 'Escape') {
+                event.preventDefault();
+                onClose();
+              }
+            }}
+          />
         </Wrapper>
       </React.Fragment>,
       document.body,

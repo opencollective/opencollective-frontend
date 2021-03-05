@@ -78,10 +78,6 @@
 
     // styled-components-a11y
     // TODO: needs to be removed after fixing the issues
-    "jsx-a11y/no-static-element-interactions": ["warn"],
-    "styled-components-a11y/no-static-element-interactions": ["warn"],
-    "jsx-a11y/click-events-have-key-events": ["warn"],
-    "styled-components-a11y/click-events-have-key-events": ["warn"],
     "styled-components-a11y/no-autofocus": ["warn"],
     "jsx-a11y/no-noninteractive-tabindex": ["warn"],
     "styled-components-a11y/no-noninteractive-element-interactions": ["warn"],

@@ -113,6 +113,18 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
           }
         }
       }}
+      onKeyDown={e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (isDisplayed) {
+            if (document.activeElement?.contains(e.target)) {
+              document.activeElement.blur();
+            } else {
+              e.target.blur();
+            }
+          }
+        }
+      }}
     >
       {children}
     </div>

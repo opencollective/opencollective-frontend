@@ -60,6 +60,12 @@ class Link extends React.Component {
             className={className}
             title={title}
             onClick={onClick}
+            onKeyDown={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                onClick();
+              }
+            }}
             data-cy={this.props['data-cy']}
             {...(!openInNewTab ? null : { target: '_blank', rel: 'noopener noreferrer' })}
           >

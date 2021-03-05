@@ -143,7 +143,16 @@ const RadioButtonContainer = styled.label`
 const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   const icon = checked ? <RadioButtonChecked /> : <RadioButtonUnchecked />;
   return (
-    <RadioButtonContainer data-name={name} onClick={onClick}>
+    <RadioButtonContainer
+      data-name={name}
+      onClick={onClick}
+      onKeyDown={event => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
+    >
       <Box className="radio-btn">{icon}</Box>
       <div style={{ marginTop: 8, cursor: 'pointer' }}>{children}</div>
     </RadioButtonContainer>

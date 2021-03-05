@@ -67,7 +67,17 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
     <div>
       <DisplayBox collapsed={collapsable && !isOpen} dangerouslySetInnerHTML={{ __html }} {...props} />
       {!isOpen && collapsable && (
-        <ReadFullLink onClick={() => setOpen(true)} {...props}>
+        <ReadFullLink
+          onClick={() => setOpen(true)}
+          {...props}
+          role="button"
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              setOpen(true);
+            }
+          }}
+        >
           &nbsp;
           <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
           <CaretDown size="10px" />
