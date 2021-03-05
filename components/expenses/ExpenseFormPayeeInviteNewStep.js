@@ -2,6 +2,8 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
+import { isEmail } from 'validator';
 
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -15,9 +17,14 @@ import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
+import { P } from '../Text';
 
 import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
+
+const Link = styled.a`
+  cursor: pointer;
+`;
 
 const EMPTY_ARRAY = [];
 
@@ -80,17 +87,20 @@ const msg = defineMessages({
   },
 });
 
-const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext }) => {
+const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
-  const stepOneCompleted = values.payee?.name && values.payee?.email;
+  const stepOneCompleted = values.payee?.name && values.payee?.email && isEmail(values.payee.email);
 
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const [showAdditionalInfo, setAdditionalInfo] = React.useState(false);
 
   return (
     <Fragment>
+      <P fontSize="11px" color="black.600">
+        <FormattedMessage id="form.requiredFields" defaultMessage="Fields marked with (*) are mandatory." />
+      </P>
       <Grid
         gridTemplateColumns={['100%', 'calc(50% - 8px) calc(50% - 8px)']}
         gridColumnGap={[null, 2, null, 3]}
@@ -99,7 +109,14 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
         <Box>
           <Field name="payee.name">
             {({ field }) => (
-              <StyledInputField name={field.name} label={formatMessage(msg.nameLabel)} labelFontSize="13px" mt={3}>
+              <StyledInputField
+                name={field.name}
+                label={formatMessage(msg.nameLabel)}
+                labelFontSize="13px"
+                mt={3}
+                hideOptionalLabel
+                required
+              >
                 {inputProps => <StyledInput {...inputProps} {...field} />}
               </StyledInputField>
             )}
@@ -114,6 +131,8 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
                 labelFontSize="13px"
                 error={errors.payee?.email}
                 mt={3}
+                hideOptionalLabel
+                required
               >
                 {inputProps => <StyledInput {...inputProps} {...field} type="email" />}
               </StyledInputField>
@@ -123,12 +142,13 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
 
         {!showAdditionalInfo ? (
           <Box gridColumn={[null, '1 / span 2']} mt={3}>
-            <MessageBox type="info" fontSize="12px">
-              {formatMessage(msg.additionalInfo)}
-              <br />
-              <a href="#" onClick={() => setAdditionalInfo(true)}>
-                <FormattedMessage id="ExpenseForm.inviteAdditionalInfoBtn" defaultMessage="Add Additional Details" />
-              </a>
+            <MessageBox type="info">
+              <P fontSize="12px">{formatMessage(msg.additionalInfo)}</P>
+              <P fontSize="12px" mt={2}>
+                <Link onClick={() => setAdditionalInfo(true)}>
+                  <FormattedMessage id="ExpenseForm.inviteAdditionalInfoBtn" defaultMessage="Add Additional Details" />
+                </Link>
+              </P>
             </MessageBox>
           </Box>
         ) : (
@@ -223,6 +243,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
                   required={false}
                   mt={3}
                   gridColumn={1}
+                  hideOptionalLabel
                 >
                   {inputProps => (
                     <Field
@@ -247,6 +268,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
               label={formatMessage(msg.recipientNoteLabel)}
               labelFontSize="13px"
               required={false}
+              hideOptionalLabel
               mt={3}
             >
               {inputProps => <Field as={StyledTextarea} {...inputProps} {...field} minHeight={80} />}
@@ -258,7 +280,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
         <Fragment>
           <StyledHr flex="1" mt={4} borderColor="black.300" />
           <Flex mt={3} flexWrap="wrap">
-            {onCancel && (
+            {onBack && (
               <StyledButton
                 type="button"
                 width={['100%', 'auto']}
@@ -267,12 +289,12 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
                 mt={2}
                 whiteSpace="nowrap"
                 data-cy="expense-cancel"
-                disabled={!stepOneCompleted}
                 onClick={() => {
-                  onCancel?.();
+                  onBack?.();
                 }}
               >
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                ←&nbsp;
+                <FormattedMessage id="Back" defaultMessage="Back" />
               </StyledButton>
             )}
             <StyledButton
@@ -302,7 +324,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onCancel, onNext })
 ExpenseFormPayeeInviteNewStep.propTypes = {
   formik: PropTypes.object,
   payoutProfiles: PropTypes.array,
-  onCancel: PropTypes.func,
+  onBack: PropTypes.func,
   onNext: PropTypes.func,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,

@@ -299,7 +299,13 @@ const ExpenseFormBody = ({
       <ExpenseFormPayeeInviteNewStep
         collective={collective}
         formik={formik}
-        onCancel={onCancel}
+        onBack={() => {
+          setStep(STEPS.PAYEE);
+          setOnBehalf(false);
+          formik.setFieldValue('payee', null);
+          formik.setFieldValue('payoutMethod', null);
+          formik.setFieldValue('payeeLocation', null);
+        }}
         onNext={() => {
           formik.setFieldValue('payee', { ...values.payee, isInvite: true });
         }}

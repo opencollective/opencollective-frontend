@@ -924,6 +924,7 @@
   "footer.OC.description": "Зробіть вашу спільноту стійкою.",
   "form.cancel": "скасувати",
   "form.processing": "обробка",
+  "form.requiredFields": "Fields marked with (*) are mandatory.",
   "Form.yourEmail": "Your email address",
   "FormError.InvalidValue": "Хибне значення",
   "FormError.max": "Значення зависоке",

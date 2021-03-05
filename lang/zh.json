@@ -924,6 +924,7 @@
   "footer.OC.description": "让你的社区可持续发展。",
   "form.cancel": "取消",
   "form.processing": "处理中",
+  "form.requiredFields": "Fields marked with (*) are mandatory.",
   "Form.yourEmail": "Your email address",
   "FormError.InvalidValue": "无效的值",
   "FormError.max": "数值过高",

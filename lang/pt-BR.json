@@ -924,6 +924,7 @@
   "footer.OC.description": "Torne sua comunidade sustentável.",
   "form.cancel": "cancelar",
   "form.processing": "processando",
+  "form.requiredFields": "Fields marked with (*) are mandatory.",
   "Form.yourEmail": "Seu endereço de e-mail",
   "FormError.InvalidValue": "Valor inválido",
   "FormError.max": "O valor é muito alto",

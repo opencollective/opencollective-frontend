@@ -924,6 +924,7 @@
   "footer.OC.description": "Make your community sustainable.",
   "form.cancel": "キャンセル",
   "form.processing": "処理中",
+  "form.requiredFields": "Fields marked with (*) are mandatory.",
   "Form.yourEmail": "Your email address",
   "FormError.InvalidValue": "Invalid value",
   "FormError.max": "The value is too high",

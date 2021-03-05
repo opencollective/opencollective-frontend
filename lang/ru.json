@@ -924,6 +924,7 @@
   "footer.OC.description": "Сделайте ваше сообщество устойчивым.",
   "form.cancel": "отмена",
   "form.processing": "обрабатываем",
+  "form.requiredFields": "Fields marked with (*) are mandatory.",
   "Form.yourEmail": "Your email address",
   "FormError.InvalidValue": "Неверное значение",
   "FormError.max": "Значение слишком большое",
