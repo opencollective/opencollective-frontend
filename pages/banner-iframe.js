@@ -392,7 +392,7 @@ class BannerIframe extends React.Component {
               collective={collective}
               onChange={this.onChange}
               type="ORGANIZATION,COLLECTIVE"
-              role="BACKER"
+              memberRole="BACKER"
               limit={100}
               orderBy="totalDonations"
             />
@@ -426,7 +426,7 @@ class BannerIframe extends React.Component {
               collective={collective}
               onChange={this.onChange}
               type="USER"
-              role="BACKER"
+              memberRole="BACKER"
               limit={100}
               orderBy="totalDonations"
             />
