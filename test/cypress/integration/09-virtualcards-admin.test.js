@@ -22,7 +22,7 @@ describe('Gift cards admin', () => {
 
     // Fill form
     cy.get('#giftcard-amount').type('42');
-    cy.get('.deliver-type-selector label[data-name="manual"] .radio-btn').click();
+    cy.get('.deliver-type-selector strong[data-name="manual"] .radio-btn').click();
     cy.get('#giftcard-numberOfGiftCards').type(`{selectall}${numberOfGiftCards}`);
     cy.getByDataCy('submit-new-gift-cards').click();
 
