@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 import { size, typography } from 'styled-system';
 
 import StyledSpinner from './StyledSpinner';
+import { Label } from './Text';
 
 const IconCheckmark = () => {
   return (
@@ -173,7 +174,7 @@ class StyledCheckbox extends React.Component {
         <CustomCheckbox data-cy="custom-checkbox">
           {isLoading ? <StyledSpinner size={size} /> : <IconCheckmark />}
         </CustomCheckbox>
-        {label && <label htmlFor={inputId}>{label}</label>}
+        {label && <Label htmlFor={inputId}>{label}</Label>}
       </CheckboxContainer>
     );
   }

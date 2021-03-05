@@ -28,6 +28,7 @@ import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
+import { Label } from './Text';
 
 const MIN_AMOUNT = 500;
 const MAX_AMOUNT = 100000000;
@@ -55,9 +56,9 @@ const messages = defineMessages({
 const InlineField = ({ name, children, label, isLabelClickable }) => (
   <Flex flexWrap="wrap" alignItems="center" mb="2.5em" className={`field-${name}`}>
     <Box width={[1, 0.3]}>
-      <label htmlFor={`giftcard-${name}`} style={{ cursor: isLabelClickable ? 'pointer' : 'inherit', width: '100%' }}>
+      <Label htmlFor={`giftcard-${name}`} style={{ cursor: isLabelClickable ? 'pointer' : 'inherit', width: '100%' }}>
         {label}
-      </label>
+      </Label>
     </Box>
     {children}
   </Flex>
@@ -146,9 +147,9 @@ const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   return (
     <RadioButtonContainer data-name={name} onClick={onClick}>
       <Box className="radio-btn">{icon}</Box>
-      <label textAlign="center" px={2} style={{ marginTop: 8, cursor: 'pointer' }}>
+      <Label textAlign="center" px={2} style={{ marginTop: 8, cursor: 'pointer' }}>
         {children}
-      </label>
+      </Label>
     </RadioButtonContainer>
   );
 };
@@ -341,7 +342,7 @@ class CreateGiftCardsForm extends Component {
     return (
       <Box>
         <Flex flexDirection="column" mb="2em">
-          <label style={{ width: '100%' }}>
+          <Label style={{ width: '100%' }}>
             <Flex flexDirection="column">
               <FormattedMessage id="giftCards.create.recipients" defaultMessage="Recipients" />
               <FieldLabelDetails>
@@ -351,7 +352,7 @@ class CreateGiftCardsForm extends Component {
                 />
               </FieldLabelDetails>
             </Flex>
-          </label>
+          </Label>
           <StyledMultiEmailInput
             className="gift-cards-recipients"
             mt="0.25em"
@@ -393,9 +394,9 @@ class CreateGiftCardsForm extends Component {
     return (
       <Container display="flex" flexDirection="column" width={1} justifyContent="center">
         <Flex justifyContent="center" mt={3} mb={4} alignItems="center">
-          <label htmlFor="giftcard-numberOfGiftCards">
+          <Label htmlFor="giftcard-numberOfGiftCards">
             <FormattedMessage id="giftCards.create.number" defaultMessage="Number of gift cards" />
-          </label>
+          </Label>
           <StyledInput
             id="giftcard-numberOfGiftCards"
             name="giftcard-numberOfGiftCards"

@@ -137,9 +137,9 @@ class ExportImages extends React.Component {
                   {image.code}
                 </Container>
                 <Container fontSize="14px" mt={3}>
-                  <label>
+                  <Label>
                     <FormattedMessage id="export.json.parameters.title" defaultMessage="Parameters" />
-                  </label>
+                  </Label>
                   <Container as="table" width="100%" css={{ borderSpacing: 16 }}>
                     <tbody>
                       <tr>

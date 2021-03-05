@@ -15,7 +15,7 @@ import Container from './Container';
 import { Box, Flex } from './Grid';
 import InputField from './InputField';
 import StyledButton from './StyledButton';
-import { H2 } from './Text';
+import { H2, Label } from './Text';
 
 const addFundsHostQuery = gql`
   query AddFundsHost($CollectiveId: Int) {
@@ -252,9 +252,9 @@ class AddFundsForm extends React.Component {
           )}
           <Flex flexWrap="wrap">
             <Box width={[1, 2 / 12]}>
-              <label>
+              <Label>
                 <FormattedMessage id="Details" defaultMessage="Details" />
-              </label>
+              </Label>
             </Box>
             <Box width={[1, 10 / 12]}>
               <TableContainer>

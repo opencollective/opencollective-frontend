@@ -91,8 +91,6 @@
     "styled-components-a11y/click-events-have-key-events": ["warn"],
     "styled-components-a11y/no-autofocus": ["warn"],
     "jsx-a11y/no-noninteractive-tabindex": ["warn"],
-    "jsx-a11y/label-has-associated-control": ["warn"],
-    "jsx-a11y/label-has-for": ["warn"],
     "styled-components-a11y/no-noninteractive-element-interactions": ["warn"]
   }
 }
