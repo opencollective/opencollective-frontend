@@ -93,8 +93,6 @@
     "jsx-a11y/no-noninteractive-tabindex": ["warn"],
     "styled-components-a11y/no-noninteractive-element-interactions": ["warn"],
     "styled-components-a11y/interactive-supports-focus": ["warn"],
-    "jsx-a11y/interactive-supports-focus": ["warn"],
-    "jsx-a11y/label-has-associated-control": ["warn"],
-    "jsx-a11y/label-has-for": ["warn"]
+    "jsx-a11y/interactive-supports-focus": ["warn"]
   }
 }

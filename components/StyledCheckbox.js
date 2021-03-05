@@ -57,7 +57,7 @@ const CheckboxContainer = styled.div`
     width: 0;
   }
 
-  label {
+  .label {
     cursor: pointer;
     margin: 0;
     margin-left: 2.2rem;
@@ -144,19 +144,7 @@ class StyledCheckbox extends React.Component {
   }
 
   render() {
-    const {
-      name,
-      checked,
-      label,
-      disabled,
-      size,
-      inputId,
-      width,
-      alignItems,
-      isLoading,
-      fontSize,
-      ...props
-    } = this.props;
+    const { name, checked, label, disabled, size, width, alignItems, isLoading, fontSize, ...props } = this.props;
     const realChecked = checked === undefined ? this.state.checked : checked;
 
     return (
@@ -170,11 +158,11 @@ class StyledCheckbox extends React.Component {
         data-cy={`checkbox-${name}`}
         {...props}
       >
-        <input id={inputId} name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
+        <input name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
         <CustomCheckbox data-cy="custom-checkbox">
           {isLoading ? <StyledSpinner size={size} /> : <IconCheckmark />}
         </CustomCheckbox>
-        {label && <label htmlFor={inputId}>{label}</label>}
+        {label && <div className="label">{label}</div>}
       </CheckboxContainer>
     );
   }
@@ -196,8 +184,6 @@ StyledCheckbox.propTypes = {
   checked: PropTypes.bool,
   /** Wether the checkbox should be checked by default. Ignored if `checked` is provided. */
   defaultChecked: PropTypes.bool,
-  /** And optional ID for the `<input/>` */
-  inputId: PropTypes.string,
   /** Wether checkbox should be disabled */
   disabled: PropTypes.bool,
   /** An optional label to display next to checkbox */
