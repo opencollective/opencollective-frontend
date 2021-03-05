@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import StyledLinkButton from './StyledLinkButton';
+
 export class CustomToggle extends React.Component {
   static propTypes = {
     onClick: PropTypes.func,
@@ -19,10 +21,6 @@ export class CustomToggle extends React.Component {
   }
 
   render() {
-    return (
-      <a href="" onClick={this.handleClick}>
-        {this.props.children}
-      </a>
-    );
+    return <StyledLinkButton onClick={this.handleClick}>{this.props.children}</StyledLinkButton>;
   }
 }

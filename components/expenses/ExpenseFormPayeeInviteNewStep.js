@@ -16,6 +16,7 @@ import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
+import StyledLinkButton from '../StyledLinkButton';
 import StyledTextarea from '../StyledTextarea';
 import { P } from '../Text';
 

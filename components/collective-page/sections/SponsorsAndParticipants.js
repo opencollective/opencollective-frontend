@@ -9,6 +9,7 @@ import { exportRSVPs } from '../../../lib/export_file';
 import { Box } from '../../Grid';
 import Responses from '../../Responses';
 import Sponsors from '../../Sponsors';
+import StyledLinkButton from '../../StyledLinkButton';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
@@ -109,9 +110,9 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
                   </a>
                 </li>
                 <li>
-                  <a role="button" onClick={() => exportRSVPs(event)}>
+                  <StyledLinkButton onClick={() => exportRSVPs(event)}>
                     <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-                  </a>
+                  </StyledLinkButton>
                 </li>
               </ul>
             </StyledAdminActions>

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
@@ -12,6 +11,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
+import StyledLinkButton from '../../StyledLinkButton';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionsList from '../../transactions/TransactionsList';
 import { Dimensions } from '../_constants';
@@ -48,10 +48,6 @@ export const transactionsSectionQuery = gqlV2/* GraphQL */ `
 export const getTransactionsSectionQueryVariables = slug => {
   return { slug, limit: NB_DISPLAYED };
 };
-
-const ResetAnchor = styled.a`
-  cursor: pointer;
-`;
 
 const SectionTransactions = props => {
   const transactionsQueryResult = useQuery(transactionsSectionQuery, {
@@ -120,11 +116,7 @@ const SectionTransactions = props => {
                 defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
                 values={{
                   ResetLink(text) {
-                    return (
-                      <ResetAnchor role="button" onClick={() => setFilter(FILTERS.ALL)}>
-                        {text}
-                      </ResetAnchor>
-                    );
+                    return <StyledLinkButton onClick={() => setFilter(FILTERS.ALL)}>{text}</StyledLinkButton>;
                   },
                 }}
               />

@@ -78,8 +78,6 @@
 
     // styled-components-a11y
     // TODO: needs to be removed after fixing the issues
-    "jsx-a11y/anchor-is-valid": ["warn"],
-    "styled-components-a11y/anchor-is-valid": ["warn"],
     "styled-components-a11y/anchor-has-content": ["warn"],
     "jsx-a11y/no-static-element-interactions": ["warn"],
     "styled-components-a11y/no-static-element-interactions": ["warn"],
