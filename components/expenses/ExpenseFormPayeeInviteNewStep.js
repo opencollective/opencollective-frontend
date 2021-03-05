@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 import { isEmail } from 'validator';
 
 import { ERROR, isErrorType } from '../../lib/errors';
@@ -22,10 +21,6 @@ import { P } from '../Text';
 
 import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
-
-const Link = styled.a`
-  cursor: pointer;
-`;
 
 const EMPTY_ARRAY = [];
 
@@ -146,9 +141,9 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
             <MessageBox type="info">
               <P fontSize="12px">{formatMessage(msg.additionalInfo)}</P>
               <P fontSize="12px" mt={2}>
-                <Link onClick={() => setAdditionalInfo(true)}>
+                <StyledLinkButton onClick={() => setAdditionalInfo(true)}>
                   <FormattedMessage id="ExpenseForm.inviteAdditionalInfoBtn" defaultMessage="Add Additional Details" />
-                </Link>
+                </StyledLinkButton>
               </P>
             </MessageBox>
           </Box>

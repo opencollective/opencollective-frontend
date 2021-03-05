@@ -238,7 +238,6 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                       data-cy="styled-input-tags-input"
                       placeholder={formatMessage(messages.placeholder)}
                       ref={inputRef}
-                      autoFocus
                       value={inputValue}
                       onChange={e => setInputValue(e.target.value)}
                       onBlur={() => {

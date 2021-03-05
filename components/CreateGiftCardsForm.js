@@ -153,7 +153,9 @@ const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
           }
         }}
       >
-        <Box className="radio-btn" textAlign="center">{icon}</Box>
+        <Box className="radio-btn" textAlign="center">
+          {icon}
+        </Box>
         <div style={{ marginTop: 8, cursor: 'pointer' }}>{children}</div>
       </div>
     </RadioButtonContainer>
