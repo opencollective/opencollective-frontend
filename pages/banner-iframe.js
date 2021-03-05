@@ -50,7 +50,7 @@ const topContributorsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const Button = styled.a`
+const ContributeButton = styled.div`
   width: 338px;
   height: 50px;
   overflow: hidden;
@@ -353,12 +353,9 @@ class BannerIframe extends React.Component {
           <title>{`${collectiveSlug} collectives`}</title>
         </Head>
         {backers.organizations + backers.collectives + backers.users === 0 && (
-          <Button
-            type="button"
-            target="_blank"
-            rel="noopener noreferrer"
-            href={`https://opencollective.com/${collectiveSlug}`}
-          />
+          <a target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}`}>
+            <ContributeButton />
+          </a>
         )}
 
         {backers.organizations + backers.collectives > 0 && (

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-const CollectButton = styled.a`
+const CollectButton = styled.div`
   background-color: transparent;
   background-image: ${({ color, verb }) => `url(/static/images/buttons/${verb}-button-${color}.svg)`};
   background-repeat: no-repeat;
@@ -47,14 +47,9 @@ class ButtonPage extends React.Component {
     const { color = 'white', collectiveSlug, verb = 'donate' } = this.props;
 
     return (
-      <CollectButton
-        type="button"
-        target="_blank"
-        rel="noopener noreferrer"
-        href={`https://opencollective.com/${collectiveSlug}/${verb}`}
-        color={color}
-        verb={verb}
-      />
+      <a target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}/${verb}`}>
+        <CollectButton color={color} verb={verb} />
+      </a>
     );
   }
 }
