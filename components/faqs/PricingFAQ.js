@@ -30,7 +30,7 @@ const PricingFAQ = props => (
         <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
           <FormattedMessage
             id="OCFHostApplication.faq.collective.content"
-            defaultMessage="Community is about trust and sharing. Open Collective lets you manage your finances so everyone can see where money comes from and where it goes. Collect and spend money transparently."
+            defaultMessage="A group seeking to raise and spend money transparently using the Open Collective platform, representing a community, project, or initiative."
           />
         </P>
       </Content>
@@ -46,7 +46,7 @@ const PricingFAQ = props => (
         <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
           <FormattedMessage
             id="OCFHostApplication.faq.fiscalHost.content"
-            defaultMessage="Fiscal hosting enables Collectives to transact financially without needing to legally incorporate. In other contexts, this is sometimes called fiscal sponsorship. "
+            defaultMessage="A Fiscal Host holds funds on behalf of Collectives, enabling them to operate using the Host's bank account and legal entity."
           />
         </P>
       </Content>
@@ -61,8 +61,8 @@ const PricingFAQ = props => (
       <Content>
         <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
           <FormattedMessage
-            id="OCFHostApplication.faq.collective.content"
-            defaultMessage="Community is about trust and sharing. Open Collective lets you manage your finances so everyone can see where money comes from and where it goes. Collect and spend money transparently."
+            id="OCFHostApplication.faq.platform.content"
+            defaultMessage="Platform Tips support development of the Open Collective software platform. Contributors to Collectives see the option to give a voluntary Platform Tip at checkout."
           />
         </P>
       </Content>
