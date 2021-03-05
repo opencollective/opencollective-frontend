@@ -222,6 +222,7 @@ const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }
           </TrapContainer>
           <ModalOverlay
             role="button"
+            tabIndex={0}
             onClick={onClose}
             onKeyDown={event => {
               if (event.key === 'Escape') {

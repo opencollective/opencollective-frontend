@@ -244,6 +244,7 @@ const StyledDropzone = ({
                   <ReplaceContainer
                     onClick={dropProps.onClick}
                     role="button"
+                    tabIndex={0}
                     onKeyDown={event => {
                       if (event.key === 'Enter') {
                         event.preventDefault();

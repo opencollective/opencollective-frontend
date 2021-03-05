@@ -71,6 +71,7 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
           onClick={() => setOpen(true)}
           {...props}
           role="button"
+          tabIndex={0}
           onKeyDown={event => {
             if (event.key === 'Enter') {
               event.preventDefault();

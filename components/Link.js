@@ -57,6 +57,7 @@ class Link extends React.Component {
         <NextLink {...pick(this.props, ['href', 'scroll'])}>
           <a
             role="button"
+            tabIndex={0}
             className={className}
             title={title}
             onClick={onClick}

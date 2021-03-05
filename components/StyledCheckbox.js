@@ -150,6 +150,7 @@ class StyledCheckbox extends React.Component {
     return (
       <CheckboxContainer
         role="button"
+        tabIndex={0}
         onClick={() => this.onChange(!realChecked)}
         onKeyDown={event => {
           if (event.key === 'Enter') {

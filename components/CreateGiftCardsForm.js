@@ -123,10 +123,9 @@ const DeliverTypeRadioSelector = styled(Flex)`
   border-bottom: 1px solid ${themeGet('colors.black.200')};
 `;
 
-const RadioButtonContainer = styled.label`
+const RadioButtonContainer = styled(Strong)`
   display: flex;
   flex-direction: column;
-  align-items: center;
   cursor: pointer;
   width: auto;
   svg {
@@ -143,18 +142,20 @@ const RadioButtonContainer = styled.label`
 const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   const icon = checked ? <RadioButtonChecked /> : <RadioButtonUnchecked />;
   return (
-    <RadioButtonContainer
-      data-name={name}
-      onClick={onClick}
-      onKeyDown={event => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          onClick();
-        }
-      }}
-    >
-      <Box className="radio-btn">{icon}</Box>
-      <div style={{ marginTop: 8, cursor: 'pointer' }}>{children}</div>
+    <RadioButtonContainer data-name={name}>
+      <div
+        role="presentation"
+        onClick={onClick}
+        onKeyDown={event => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            onClick();
+          }
+        }}
+      >
+        <Box className="radio-btn" textAlign="center">{icon}</Box>
+        <div style={{ marginTop: 8, cursor: 'pointer' }}>{children}</div>
+      </div>
     </RadioButtonContainer>
   );
 };

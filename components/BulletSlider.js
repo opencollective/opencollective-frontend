@@ -39,6 +39,7 @@ const BulletSlider = ({ nbItems, selectedIndex, onChange }) => {
         <Bullet
           key={index}
           role="button"
+          tabIndex={0}
           isSelected={index === selectedIndex}
           onClick={() => onChange(index)}
           onKeyDown={event => {
