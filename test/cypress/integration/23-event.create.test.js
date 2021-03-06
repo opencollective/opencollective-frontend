@@ -20,7 +20,7 @@ describe('event.create.test.js', () => {
     cy.get('.rdtNext span').click;
     cy.get('.endsAt .rdtDay:not(.rdtOld):not(.rdtDisabled)').first().click();
     cy.get('.geosuggest__input').type('Superfilles');
-    cy.wait(100);
+    cy.wait(700);
     cy.get('.geosuggest__suggests > :nth-child(1)').click();
     cy.get('#location .address').contains('Lesbroussart');
     cy.get('#location .address').contains('1050');
@@ -30,7 +30,7 @@ describe('event.create.test.js', () => {
     cy.get('.addTier').click();
     cy.get('.EditTiers .tier').last().find('.inputField.name input').type('Paid ticket');
     cy.get('.EditTiers .tier').last().find('.inputField.amount input').type(15).blur();
-    cy.get('button.save').click();
+    cy.contains('button', 'Create Event').click();
     cy.get('#location .address').contains('Lesbroussart');
     cy.get('#location .address').contains('1050');
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 2);
