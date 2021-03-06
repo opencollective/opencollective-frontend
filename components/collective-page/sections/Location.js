@@ -16,7 +16,11 @@ const Location = ({ collective: event }) =>
         <SectionTitle textAlign="center">
           <FormattedMessage id="SectionLocation.Title" defaultMessage="Location" />
         </SectionTitle>
-        <LocationComponent location={event.location} showTitle={false} />
+        <LocationComponent
+          location={event.location}
+          privateInstructions={event.privateInstructions}
+          showTitle={false}
+        />
       </ContainerSectionContent>
     </Box>
   );
@@ -24,6 +28,7 @@ const Location = ({ collective: event }) =>
 Location.propTypes = {
   collective: PropTypes.shape({
     location: PropTypes.object,
+    privateInstructions: PropTypes.string,
   }).isRequired,
 };
 
