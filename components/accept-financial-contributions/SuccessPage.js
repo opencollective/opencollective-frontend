@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import Image from 'next/image';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -100,7 +101,7 @@ class SuccessPage extends React.Component {
             mx={[2, 4, 0]}
             my={[2, 4]}
           >
-            <img src={successIllustration} width="264px" height="352px" />
+            <Image alt="" src={successIllustration} width={264} height={352} />
             <Flex flexDirection="column" ml={[0, 4, 4]} mx={[2, 0]} mt={[4, 0]} maxWidth={'475px'}>
               <H2 fontSize="13px" fontWeight="bold" color="black.800">
                 <FormattedMessage id="tiers.about" defaultMessage="Set up contribution tiers" />

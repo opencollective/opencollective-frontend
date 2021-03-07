@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -179,7 +180,12 @@ class ExportImages extends React.Component {
             {`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
           </StyledLink>
         </Box>
-        <img alt="open collective badge" src={`https://opencollective.com/${collective.slug}/tiers/badge.svg`} />
+        <Image
+          alt="open collective badge"
+          src={`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
+          height={20}
+          width={144}
+        />
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
+import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
 import { Box, Flex } from './Grid';
@@ -11,7 +12,7 @@ export const InviteCollectiveDropdownOption = ({ onClick, isSearching }) => (
   <Flex flexDirection="column">
     {isSearching && (
       <Flex mb="16px">
-        <img width="48px" height="48px" src="/static/images/magnifier.png" />
+        <Image alt="Magnifier" width={48} height={48} src="/static/images/magnifier.png" />
         <Box ml="16px">
           <Span fontSize="12px" fontWeight="700" color="black.800">
             <FormattedMessage

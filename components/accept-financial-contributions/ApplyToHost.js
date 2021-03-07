@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import Image from 'next/image';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -125,7 +126,7 @@ class ApplyToHost extends React.Component {
             px={[3, 5]}
             my={3}
           >
-            <img src={umbrellaIllustration} width="160px" height="160px" />
+            <Image alt="" src={umbrellaIllustration} width={160} height={160} />
             <Box maxWidth={'480px'} ml={[0, 4]}>
               <H2 fontSize="20px" color="black.900" textAlign={['center', 'left']} my={[3, 0]}>
                 {intl.formatMessage(this.messages.applyToHost)}
@@ -190,7 +191,7 @@ class ApplyToHost extends React.Component {
                 </StyledLink>
               </Box>
               <Box order={[1, 3, 2]}>
-                <img src={becomeFiscalHostIllustration} width="192px" height="192px" />
+                <Image alt="" src={becomeFiscalHostIllustration} width={192} height={192} />
               </Box>
             </InterestedContainer>
           </Container>

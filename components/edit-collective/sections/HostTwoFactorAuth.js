@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { cloneDeep, get, pick, set } from 'lodash';
+import Image from 'next/image';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -170,10 +171,10 @@ const HostTwoFactorAuth = ({ collective }) => {
           )}
           <Flex flexWrap="wrap" justifyContent="space-between" width="100%">
             <ScreenshotPreview>
-              <img src={imgPreviewModal} alt="Preview host payouts rolling limit" />
+              <Image src={imgPreviewModal} alt="Preview host payouts rolling limit" width={395} height={222} />
             </ScreenshotPreview>
             <ScreenshotPreview>
-              <img src={imgPreviewPrompt} alt="Preview host payouts rolling limit" />
+              <Image src={imgPreviewPrompt} alt="Preview host payouts rolling limit" width={348} height={222} />
             </ScreenshotPreview>
             <hr />
           </Flex>

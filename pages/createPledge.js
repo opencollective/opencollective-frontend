@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
+import Image from 'next/image';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -377,7 +378,7 @@ class CreatePledgePage extends React.Component {
 
                       <Container position="relative">
                         <Container position="absolute" left={-45} top={0}>
-                          <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />
+                          <Image src="/static/icons/first-pledge-badge.svg" alt="first pledge" height={32} width={32} />
                         </Container>
 
                         <P fontWeight="bold">
@@ -514,8 +515,7 @@ class CreatePledgePage extends React.Component {
                   order={[1, null, 2]}
                   width={[1, null, 0.5]}
                 >
-                  <img src={defaultPledgedLogo} alt="Pledged Collective" />
-
+                  <Image src={defaultPledgedLogo} alt="Pledged Collective" width={128} height={128} />
                   <H3 mt={3} mb={1}>
                     {data.Collective.name}
                   </H3>

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
+import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -94,7 +95,7 @@ const PledgedCollectivePage = ({ collective }) => {
         py={4}
       >
         <Flex alignItems="center" flexDirection="column">
-          <img src={defaultPledgedLogo} alt="Pledged Collective" />
+          <Image src={defaultPledgedLogo} alt="Pledged Collective" height={128} width={128} />
 
           <H2 as="h1">{collective.name}</H2>
 
@@ -169,7 +170,7 @@ const PledgedCollectivePage = ({ collective }) => {
           <Container position="relative" key={pledge.id} data-cy="contributers">
             {index === 0 && (
               <Container position="absolute" right={15} top={-10}>
-                <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />
+                <Image src="/static/icons/first-pledge-badge.svg" alt="first pledge" width={32} height={32} />
               </Container>
             )}
             <PledgeCard {...pledge} />
