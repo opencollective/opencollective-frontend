@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Head from 'next/head';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
@@ -38,6 +39,10 @@ class UpdatePage extends React.Component {
     return (
       <div className="UpdatePage">
         <Header collective={collective} LoggedInUser={LoggedInUser} />
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <title>{`${updateSlug} - ${collective.name} - Open Collective`}</title>
+        </Head>
 
         <Body>
           <CollectiveNavbar
