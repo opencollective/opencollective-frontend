@@ -29,7 +29,7 @@ OC_SLACK_DEPLOY_WEBHOOK=https://hooks.slack.com/services/....
 # Before first deployment, configure staging remote
 git remote add staging https://git.heroku.com/oc-staging-frontend.git
 
-# Then deploy master with
+# Then deploy main with
 npm run deploy:staging
 ```
 
@@ -41,7 +41,7 @@ URL: https://staging.opencollective.com/
 # Before first deployment, configure production remote
 git remote add production https://git.heroku.com/oc-prod-frontend.git
 
-# Then deploy master with
+# Then deploy main with
 npm run deploy:production
 ```
 
