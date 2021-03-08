@@ -42,6 +42,8 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
       src = defaultImage.ANONYMOUS;
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
       src = defaultImage.GUEST;
+    } else if (type === 'VENDOR') {
+      src = defaultImage.ORGANIZATION;
     } else {
       src = getCollectiveImage(collective);
     }
@@ -68,7 +70,7 @@ Avatar.propTypes = {
   /** Collective image url */
   src: PropTypes.string,
   /** Collective type */
-  type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+  type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS', 'VENDOR']),
   /** Avatar size */
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** Duration to transition size. Disabled if 0, null or undefined */
