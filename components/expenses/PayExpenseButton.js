@@ -47,7 +47,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
       return (
         <FormattedMessage
           id="expense.pay.transferwise.planlimit"
-          defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with TransferWise"
+          defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with Wise"
           values={{
             Link(message) {
               return <Link href={`/${host.slug}/edit/host-plan`}>{message}</Link>;

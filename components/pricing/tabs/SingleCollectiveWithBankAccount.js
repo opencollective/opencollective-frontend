@@ -172,7 +172,7 @@ const SingleCollectiveWithBankAccount = ({ router }) => (
             <Box as="li" my={3}>
               <FormattedMessage
                 id="newPricing.starterPlans.transferwisePayouts"
-                defaultMessage="Expense payouts in local currency with one-click using the <strong>TransferWise</strong> integration."
+                defaultMessage="Expense payouts in local currency with one-click using the <strong>Wise</strong> integration."
                 values={I18nFormatters}
               />
             </Box>
