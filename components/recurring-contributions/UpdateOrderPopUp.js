@@ -223,6 +223,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
                   {checked && flexible ? (
                     <Fragment>
                       <StyledSelect
+                        inputId="tier-amount-select"
                         data-cy="tier-amount-select"
                         onChange={setSelectedAmountOption}
                         value={selectedAmountOption}

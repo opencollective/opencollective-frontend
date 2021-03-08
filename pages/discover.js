@@ -267,6 +267,7 @@ const DiscoverPage = () => {
                   <StyledSelect
                     name="sort"
                     id="sort"
+                    inputId="sort-select"
                     options={sortOptions}
                     defaultValue={selectedSort}
                     placeholder={'Sort by'}

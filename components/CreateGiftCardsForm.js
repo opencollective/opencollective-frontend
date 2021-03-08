@@ -521,6 +521,7 @@ class CreateGiftCardsForm extends Component {
           >
             <StyledSelectCreatable
               id="giftcard-batch"
+              inputId="giftcard-batch"
               onChange={({ value }) => this.onChange('batch', truncate(value, { length: 200 }))}
               minWidth={300}
               disabled={submitting}

@@ -245,6 +245,7 @@ class PayoutMethodSelect extends React.Component {
     return (
       <React.Fragment>
         <StyledSelect
+          inputId="payout-method-select"
           data-cy="payout-method-select"
           {...props}
           options={this.getOptions(payoutMethods, props.payee)}

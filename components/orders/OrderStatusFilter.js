@@ -13,6 +13,7 @@ const OrderStatusFilter = ({ onChange, value, ...props }) => {
 
   return (
     <StyledSelectFilter
+      inputId="order-status-filter"
       isSearchable={false}
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}

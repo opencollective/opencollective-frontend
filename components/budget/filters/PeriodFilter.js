@@ -66,6 +66,7 @@ const PeriodFilter = ({ onChange, value, ...props }) => {
 
   return (
     <StyledSelectFilter
+      inputId="expenses-period-filter"
       data-cy="expenses-filter-period"
       value={selected ? getOption(...selected) : allPeriodsOption}
       onChange={({ value }) => onChange(value)}

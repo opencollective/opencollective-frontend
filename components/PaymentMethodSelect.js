@@ -33,6 +33,7 @@ class PaymentMethodSelect extends Component {
 
     return (
       <StyledSelect
+        inputId="payment-method"
         name="paymentMethod"
         options={options}
         minWidth={300}

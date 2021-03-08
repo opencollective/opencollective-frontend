@@ -89,6 +89,7 @@ class InputTypeCountry extends Component {
     return (
       <StyledSelect
         name={name}
+        inputId="country-input"
         minWidth={150}
         options={this.getOptions(locale || intl.locale, defaultValue)}
         onChange={({ value }) => onChange(value)}

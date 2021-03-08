@@ -495,6 +495,7 @@ class InputField extends React.Component {
 
         const StyledSelectComponent = (
           <StyledSelect
+            inputId={`input-field-${field.name}`}
             name={field.name}
             data-cy={field.name}
             type="select"

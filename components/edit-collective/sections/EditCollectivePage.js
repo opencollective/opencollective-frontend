@@ -145,11 +145,11 @@ const CollectiveSectionEntry = ({
 
   let defaultValue;
   if (!isEnabled) {
-    defaultValue = options.find(({ value }) => value == 'DISABLED');
+    defaultValue = options.find(({ value }) => value === 'DISABLED');
   } else if (restrictedTo && restrictedTo.includes('ADMIN')) {
-    defaultValue = options.find(({ value }) => value == 'ADMIN');
+    defaultValue = options.find(({ value }) => value === 'ADMIN');
   } else {
-    defaultValue = options.find(({ value }) => value == 'ALWAYS');
+    defaultValue = options.find(({ value }) => value === 'ALWAYS');
   }
 
   return (
@@ -164,6 +164,7 @@ const CollectiveSectionEntry = ({
       </P>
 
       <StyledSelect
+        inputId={`section-select-${section}`}
         fontSize="11px"
         name={`show-section-${section}`}
         defaultValue={defaultValue}

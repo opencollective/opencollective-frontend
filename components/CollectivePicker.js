@@ -302,6 +302,7 @@ class CollectivePicker extends React.PureComponent {
               ref={mergeRefs([this.containerRef, ref])}
             >
               <StyledSelect
+                inputId="collective-picker"
                 options={allOptions}
                 defaultValue={getDefaultOptions && getDefaultOptions(this.buildCollectiveOption, allOptions)}
                 menuIsOpen={this.getMenuIsOpen(menuIsOpen)}

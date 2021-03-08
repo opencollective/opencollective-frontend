@@ -108,6 +108,8 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     intl,
     placeholder,
     disabled,
+    inputId,
+    instanceId,
     isDisabled,
     useSearchIcon,
     hideDropdownIndicator,
@@ -123,6 +125,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     loadingMessage: () => intl.formatMessage(Messages.loading),
     noOptionsMessage: () => intl.formatMessage(Messages.noOptions),
     components: useSearchIcon ? searchableCustomComponents : customComponents,
+    instanceId: instanceId ? instanceId : inputId,
     styles: {
       control: (baseStyles, state) => {
         const customStyles = { borderColor: theme.colors.black[300] };
@@ -209,6 +212,11 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
 const StyledSelect = makeStyledSelect(Select);
 
 StyledSelect.propTypes = {
+  /** The id of the search input */
+  inputId: PropTypes.string.isRequired,
+  /** Define an id prefix for the select components e.g. {your-id}-value */
+  instanceId: PropTypes.string,
+  /** Placeholder for the select value */
   placeholder: PropTypes.node,
   /** Wether the component is disabled */
   disabled: PropTypes.bool,

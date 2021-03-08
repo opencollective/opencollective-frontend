@@ -22,6 +22,7 @@ const ExpenseStatusFilter = ({ value, onChange, ...props }) => {
 
   return (
     <StyledSelectFilter
+      inputId="expenses-status-filter"
       data-cy="expenses-filter-status"
       options={options}
       onChange={({ value }) => onChange(value)}

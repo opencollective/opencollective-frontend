@@ -181,6 +181,7 @@ class CollectiveGoals extends React.Component {
           <Box mb={4}>
             <StyledInputField name={this.fields[1].name} label={this.fields[1].label}>
               <StyledSelect
+                inputId="collective-goals"
                 options={this.fields[1].options}
                 onChange={obj => this.editGoal(index, this.fields[1].name, obj.value)}
                 isSearchable={false}
