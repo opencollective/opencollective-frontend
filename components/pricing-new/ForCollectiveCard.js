@@ -236,7 +236,6 @@ const ForCollectiveCard = () => {
             <Link href="/hosts">
               <StyledButton
                 buttonStyle="secondary"
-                width="127px"
                 py="8px"
                 px="16px"
                 my="8px"
