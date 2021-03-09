@@ -189,7 +189,7 @@ const Pricing = () => {
                 color="black.900"
                 mb="8px"
               >
-                <FormattedMessage id="pricing.collectiveCard" defaultMessage="For Collective" />
+                <FormattedMessage id="pricing.collectiveCard" defaultMessage="For Collectives" />
               </P>
               <StyledHR />
               <Box width="144px" height="144px" my="8px" display={[null, null, 'none']}>
@@ -282,7 +282,7 @@ const Pricing = () => {
                 color="black.900"
                 mb="8px"
               >
-                <FormattedMessage id="pricing.fiscalHost" defaultMessage="For FiscalHost" />
+                <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
               </P>
               <StyledHR />
               <Box width="144px" height="144px" my="8px" display={[null, null, 'none']}>
