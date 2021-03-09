@@ -14,7 +14,6 @@ const PlatformTip = ({ ...props }) => (
     padding="12px 16px"
     border="1px solid #C2E2FF"
     borderRadius="8px"
-    width={[null, null, '451px']}
     {...props}
   >
     <Illustration src="/static/images/pricing/platform-tip.svg" />

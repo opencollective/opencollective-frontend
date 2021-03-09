@@ -24,8 +24,8 @@ const ListItem = styled.li`
   font-size: 13px;
   line-height: 16px;
   color: ${themeGet('colors.black.900')};
-  margin-top: 11px;
-  margin-bottom: 11px;
+  margin-top: 15px;
+  margin-bottom: 15px;
   background: url('/static/images/pricing/checkMark.svg') no-repeat left center;
   padding-left: 26px;
 
@@ -52,6 +52,20 @@ const AccessToWrapper = styled(Container)`
   :nth-child(1),
   :nth-child(2) {
     margin-bottom: 46px;
+  }
+`;
+
+const Card = styled(Container)`
+  @media screen and (min-width: 52em) {
+    width: 700px;
+  }
+
+  @media screen and (min-width: 64em) {
+    width: 832px;
+  }
+
+  @media screen and (min-width: 88em) {
+    width: 862px;
   }
 `;
 
@@ -98,12 +112,7 @@ const ForCollectiveCard = () => {
   const intl = useIntl();
 
   return (
-    <Container
-      padding={['24px', null, '32px']}
-      width={['288px', '636px', '832px', null, '862px']}
-      borderRadius="8px"
-      border="1px solid #DCDEE0"
-    >
+    <Card padding={['24px', null, '32px']} width={['288px', '636px']} borderRadius="8px" border="1px solid #DCDEE0">
       <Flex justifyContent="center" alignItems="center" mb={['32px', '35px']}>
         <Box width="72px" height="72px" mr="16px">
           <Illustration src="/static/images/pricing/for-collective-illustration.png" alt="Collective Illustration" />
@@ -127,17 +136,17 @@ const ForCollectiveCard = () => {
           </P>
         </Box>
       </Flex>
-      <H5
-        fontSize={['18px', '20px']}
-        lineHeight={['26px', '28px']}
-        letterSpacing={[null, '-0.008em']}
-        color="blue.700"
-        mb="16px"
-      >
-        <FormattedMessage id="pricing.forCollective.fees.header" defaultMessage="We want to see you thrive" />
-      </H5>
-      <Flex flexDirection={['column', 'row']} alignItems="flex-start" mr={[null, '30px', '42px']}>
+      <Flex flexDirection={['column', 'row']} alignItems={['flex-start', null, 'center']}>
         <Container mr={[null, '41px', '72px']}>
+          <H5
+            fontSize={['18px', '20px']}
+            lineHeight={['26px', '28px']}
+            letterSpacing={[null, '-0.008em']}
+            color="blue.700"
+            mb="16px"
+          >
+            <FormattedMessage id="pricing.forCollective.fees.header" defaultMessage="We want to see you thrive" />
+          </H5>
           <Box mb="16px">
             <Flex mb={3}>
               <FeeData>0$</FeeData>
@@ -181,7 +190,7 @@ const ForCollectiveCard = () => {
               }}
             />
           </P>
-          <PlatformTip />
+          <PlatformTip width={[null, null, null, '451px']} minWidth={[null, null, '325px']} />
         </Container>
         <Box>
           <ListWrapper as="ul" mt={['32px', 0]}>
@@ -210,11 +219,11 @@ const ForCollectiveCard = () => {
               />
             </ListItem>
           </ListWrapper>
-          <Container display="flex">
+          <Container display="flex" flexDirection={['column', null, null, null, 'row']}>
             <Link href="/create">
               <StyledButton
                 buttonStyle="primary"
-                width={['224px', '226px', '139px']}
+                width={['224px', '226px', null, '237px', '139px']}
                 py="8px"
                 my="8px"
                 px={[null, null, '16px']}
@@ -231,8 +240,8 @@ const ForCollectiveCard = () => {
                 py="8px"
                 px="16px"
                 my="8px"
-                display={['none', null, null, null, 'inline-block']}
                 whiteSpace="nowrap"
+                width={['224px', '226px', null, '237px', '139px']}
               >
                 <FormattedMessage id="pricing.findHost" defaultMessage="Find fiscal host" />
               </StyledButton>
@@ -278,7 +287,7 @@ const ForCollectiveCard = () => {
           </React.Fragment>
         ))}
       </Flex>
-    </Container>
+    </Card>
   );
 };
 

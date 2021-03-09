@@ -36,14 +36,14 @@ const Tab = styled.button`
 const Tabs = ({ activeTab }) => (
   <Container
     display="flex"
-    px={['16px', null, 0]}
-    py={['15px', null, 0]}
-    pt={[null, null, 3]}
-    width={[null, '636px', '113px']}
+    px={['16px', null, null, 0]}
+    py={['15px', null, null, 0]}
+    pt={[null, null, null, 3]}
+    width={[null, '636px', null, '113px']}
     background="white"
     justifyContent={['center', 'flex-start']}
-    alignItems={['center', null, 'flex-start']}
-    flexDirection={[null, null, 'column']}
+    alignItems={['center', null, null, 'flex-start']}
+    flexDirection={[null, null, null, 'column']}
   >
     <Link href="#collective">
       <Tab active={activeTab === 'collective'}>

@@ -10,7 +10,6 @@ const PricingFAQ = props => (
     withNewButtons
     {...props}
     title="FAQ's"
-    width={['288px', '564px', '796px']}
     titleProps={{
       color: '#1153D6',
       fontSize: '28px',
@@ -19,6 +18,7 @@ const PricingFAQ = props => (
       letterSpacing: '-0.008em',
       marginBottom: '32px',
     }}
+    width="100%"
   >
     <Entry>
       <Title>

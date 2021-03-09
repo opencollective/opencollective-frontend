@@ -24,13 +24,19 @@ const ListItem = styled.li`
   font-size: 13px;
   line-height: 16px;
   color: ${props => (props.uncheck ? themeGet('colors.black.500') : themeGet('colors.black.900'))};
-  margin-top: 11px;
-  margin-bottom: 11px;
+  margin-top: 19px;
+  margin-bottom: 19px;
   background: ${props =>
     props.uncheck
       ? "url('/static/images/pricing/minusIcon.svg') no-repeat left center"
       : "url('/static/images/pricing/checkMark.svg') no-repeat left center"};
   padding-left: 26px;
+
+  :first-of-type,
+  :last-of-type {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
 `;
 
 const FeeData = styled(P)`
@@ -59,6 +65,20 @@ const PlansWrapper = styled(Container)`
   ${Flex}:not(:first-of-type, :last-of-type) {
     margin-left: 32px;
     margin-right: 32px;
+  }
+`;
+
+const Card = styled(Container)`
+  @media screen and (min-width: 52em) {
+    width: 700px;
+  }
+
+  @media screen and (min-width: 64em) {
+    width: 832px;
+  }
+
+  @media screen and (min-width: 88em) {
+    width: 862px;
   }
 `;
 
@@ -153,12 +173,7 @@ const ForFiscalHosts = () => {
   const intl = useIntl();
 
   return (
-    <Container
-      padding={['24px', null, '32px']}
-      width={['288px', '636px', '832px', null, '862px']}
-      borderRadius="8px"
-      border="1px solid #DCDEE0"
-    >
+    <Card padding={['24px', null, '32px']} width={['288px', '636px']} borderRadius="8px" border="1px solid #DCDEE0">
       <Flex justifyContent="center" alignItems="center" mb="32px">
         <Box width="72px" height="72px" mr="16px">
           <Illustration src="/static/images/pricing/for-fiscalHost-illustration.png" alt="FiscalHost Illustration" />
@@ -185,12 +200,12 @@ const ForFiscalHosts = () => {
         fontWeight="500"
         letterSpacing="-0.008emd"
         color="blue.700"
-        mb="16px"
+        mb={['16px', '0']}
       >
         <FormattedMessage id="pricing.forFiscalHost.fees.header" defaultMessage="Valid for all plans" />
       </H5>
-      <Flex flexDirection={['column', 'row']} alignItems="flex-start">
-        <Box mr={[null, '41px', '72px']}>
+      <Flex flexDirection={['column', 'row']} alignItems={['flex-start', 'center']}>
+        <Box mr={[null, '33px', '72px']}>
           <Box mb="16px">
             <Flex mb={3}>
               <FeeData>0$</FeeData>
@@ -228,7 +243,7 @@ const ForFiscalHosts = () => {
               }}
             />
           </P>
-          <PlatformTip mt={[3, 4]} my={4} width={[null, null, '451px']} display={['none', null, 'flex']} />
+          <PlatformTip mt={[3, 4]} my={4} width={[null, null, null, '451px']} display={['none', null, null, 'flex']} />
         </Box>
         <ListWrapper as="ul" mt={['16px', 0]}>
           <ListItem>
@@ -257,7 +272,7 @@ const ForFiscalHosts = () => {
           </ListItem>
         </ListWrapper>
       </Flex>
-      <PlatformTip mt={[3, 4]} my={4} width={[null, '419px']} display={['flex', null, 'none']} />
+      <PlatformTip mt={[3, 4]} my={4} width={[null, '588px']} display={['flex', null, null, 'none']} />
 
       <PlansWrapper display="flex" overflow="auto" justifyContent="space-between">
         {PLANS.map(plan => (
@@ -392,7 +407,7 @@ const ForFiscalHosts = () => {
           </React.Fragment>
         ))}
       </Flex>
-    </Container>
+    </Card>
   );
 };
 

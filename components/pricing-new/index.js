@@ -82,6 +82,28 @@ const ListItem = styled.li`
   }
 `;
 
+const Card = styled(Container)`
+  width: 288px;
+  padding: 24px;
+
+  @media screen and (min-width: 40em) {
+    width: 308px;
+  }
+
+  @media screen and (min-width: 52em) {
+    width: 380px;
+  }
+
+  @media screen and (min-width: 64em) {
+    width: 468px;
+    padding: 32px 36px;
+  }
+
+  @media screen and (min-width: 88em) {
+    width: 486px;
+  }
+`;
+
 const Pricing = () => {
   const [activeTab, setActiveTab] = React.useState('');
   const tabRef = React.useRef(null);
@@ -153,15 +175,7 @@ const Pricing = () => {
         alignItems={['center', 'baseline', 'flex-start']}
         justifyContent="center"
       >
-        <Container
-          width={['288px', '308px', '468px', null, '486px']}
-          padding={['24px', null, '32px 36px']}
-          border="1px solid #DCDEE0"
-          borderRadius="8px"
-          mb={['20px', 0]}
-          mr={[null, '10px']}
-          background="white"
-        >
+        <Card border="1px solid #DCDEE0" borderRadius="8px" mb={['20px', 0]} mr={[null, '10px']} background="white">
           <Flex flexDirection={['column', 'row']} alignItems="center">
             <Box width="144px" height="144px" display={['none', null, 'block']} mr={[null, null, '24px']}>
               <Illustration src="/static/images/pricing/for-collective-illustration.png" alt="For Collective" />
@@ -200,7 +214,7 @@ const Pricing = () => {
               </Box>
             </Box>
           </Flex>
-          <Box minHeight={['252px', null, '150px']} mb={[null, null, '24px']} mt={[null, null, '40px']}>
+          <Box minHeight={['252px', null, '150px']} mb={[null, null, '24px']} mt={[null, null, '24px', '40px']}>
             <H4 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="blue.700" fontWeight="500">
               <FormattedMessage id="pricing.collectiveCard.free" defaultMessage="Free – forever" />
             </H4>
@@ -252,15 +266,8 @@ const Pricing = () => {
               </StyledButton>
             </Link>
           </Container>
-        </Container>
-        <Container
-          width={['288px', '308px', '468px', null, '486px']}
-          padding={['24px', null, '32px 36px']}
-          border="1px solid #DCDEE0"
-          borderRadius="8px"
-          ml={[null, '10px']}
-          background="white"
-        >
+        </Card>
+        <Card border="1px solid #DCDEE0" borderRadius="8px" ml={[null, '10px']} background="white">
           <Flex flexDirection={['column', null, 'row']}>
             <Box width="144px" height="144px" display={['none', null, 'block']} mr={[null, null, '24px']}>
               <Illustration src="/static/images/pricing/for-fiscalHost-illustration.png" alt="For FiscalHost" />
@@ -295,7 +302,7 @@ const Pricing = () => {
             </Box>
           </Flex>
 
-          <Box minHeight={['252px', null, '150px']} mb={[null, null, '24px']} mt={[null, null, '40px']}>
+          <Box minHeight={['252px', null, '150px']} mb={[null, null, '24px']} mt={[null, null, '24px', '40px']}>
             <H4 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="blue.700" fontWeight="500">
               <FormattedMessage id="pricing.fiscalHost.weSucceed" defaultMessage="We succeed if you succeed" />
             </H4>
@@ -324,7 +331,7 @@ const Pricing = () => {
               </ListItem>
             </ListWrapper>
           </Box>
-          <Container display="flex" flexDirection={['column', null, 'row']} alignItems="center">
+          <Container display="flex" flexDirection={['column', null, 'row']} alignItems={['center', null, 'flex-start']}>
             <Link href="/organizations/new">
               <StyledButton
                 buttonStyle="primary"
@@ -344,12 +351,12 @@ const Pricing = () => {
               </StyledButton>
             </Link>
           </Container>
-        </Container>
+        </Card>
       </Container>
       <Flex
-        flexDirection={['column', null, 'row-reverse']}
+        flexDirection={['column', null, null, 'row-reverse']}
         justifyContent="center"
-        alignItems={[null, null, 'flex-start']}
+        alignItems={[null, null, 'center', 'flex-start']}
       >
         <Container
           zIndex="999"
@@ -357,15 +364,17 @@ const Pricing = () => {
           top="0"
           display="flex"
           justifyContent="center"
-          borderBottom={['1px solid rgba(49, 50, 51, 0.1)', null, 'none']}
+          borderBottom={['1px solid rgba(49, 50, 51, 0.1)', null, null, 'none']}
           ref={tabRef}
+          width={[1, null, null, 'fit-content']}
+          background="white"
         >
           <Tabs activeTab={activeTab} />
         </Container>
         <Box ref={sectionContainerRef}>
           <Container
             id="collective"
-            pt={['64px', null, 3]}
+            pt={['64px', null, null, 3]}
             display="flex"
             px="16px"
             flexDirection="column"
@@ -375,23 +384,26 @@ const Pricing = () => {
           </Container>
           <Container
             id="fiscalHost"
-            pt={['64px', null, 3]}
+            pt={['64px', null, null, 3]}
             display="flex"
             px="16px"
             flexDirection="column"
             alignItems="center"
-            my={[null, null, 4]}
+            my={[null, null, null, 4]}
           >
             <ForFiscalHosts />
           </Container>
           <Container
             id="faq"
-            pt={['64px', null, 3]}
+            pt={['64px', null, null, 3]}
             display="flex"
             px="16px"
-            flexDirection="column"
             alignItems="center"
-            mb={['72px', null, '120px']}
+            justifyContent="center"
+            mb={['72px', null, null, '120px']}
+            width={['288px', '636px', '700px', '832px', '862px']}
+            marginLeft="auto"
+            marginRight="auto"
           >
             <PricingFAQ />
           </Container>
