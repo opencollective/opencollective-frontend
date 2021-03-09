@@ -44,6 +44,7 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
       plan {
         id
         hostFees
+        hostFeeSharePercent
       }
       memberOf(
         role: HOST
