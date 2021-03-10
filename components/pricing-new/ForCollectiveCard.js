@@ -108,6 +108,8 @@ const messages = defineMessages({
   },
 });
 
+const displayPlatformTipBox = false;
+
 const ForCollectiveCard = () => {
   const intl = useIntl();
 
@@ -153,14 +155,15 @@ const ForCollectiveCard = () => {
               <FeeDescription>
                 <FormattedMessage
                   id="pricing.platformFees"
-                  defaultMessage="Platform Fees (on incoming contributions)₁"
-                />
+                  defaultMessage="Platform Fees (on incoming contributions)"
+                />{' '}
+                ¹ ²
               </FeeDescription>
             </Flex>
             <Flex my={3}>
               <FeeData>0$</FeeData>
               <FeeDescription>
-                <FormattedMessage id="pricing.payoutFees" defaultMessage="Payout Fees (on outgoing payments)₁	" />
+                <FormattedMessage id="pricing.payoutFees" defaultMessage="Payout Fees (on outgoing payments)" /> ¹
               </FeeDescription>
             </Flex>
             <Flex my={3}>
@@ -171,9 +174,10 @@ const ForCollectiveCard = () => {
             </Flex>
           </Box>
           <P fontSize="12px" lineHeight="18px" color="black.700">
+            (1){' '}
             <FormattedMessage
-              id="pricing.paymentProcessor"
-              defaultMessage="(1) Payment processor fees apply. See <stripeLink>stripe.com/pricing</stripeLink>, <paypalLink>paypal.com/pricing</paypalLink>, <transferwiseLink>transferwise.com/pricing</transferwiseLink>"
+              id="pricing.notes.paymentProcessor"
+              defaultMessage="Payment processor fees apply. See <stripeLink>stripe.com/pricing</stripeLink>, <paypalLink>paypal.com/pricing</paypalLink>, <transferwiseLink>transferwise.com/pricing</transferwiseLink>"
               values={{
                 stripeLink: getI18nLink({
                   href: 'https://stripe.com/pricing',
@@ -190,7 +194,16 @@ const ForCollectiveCard = () => {
               }}
             />
           </P>
-          <PlatformTip width={[null, null, null, '451px']} minWidth={[null, null, '325px']} />
+          <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
+            (2){' '}
+            <FormattedMessage
+              id="pricing.notes.platformFees"
+              defaultMessage="Some Fiscal Hosts like the Open Source Collective are still applying Platform Fees for a limited time as they switch to the new pricing."
+            />
+          </P>
+          {displayPlatformTipBox && (
+            <PlatformTip width={[null, null, null, '451px']} minWidth={[null, null, '325px']} />
+          )}
         </Container>
         <Box>
           <ListWrapper as="ul" mt={['32px', 0]}>

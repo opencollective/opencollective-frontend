@@ -142,15 +142,15 @@ const messages = defineMessages({
   },
   'pricing.start.feeNote': {
     id: 'pricing.start.feeNote',
-    defaultMessage: '*You wont be able to charge Collectives or set any Host Fee.',
+    defaultMessage: 'You wont be able to charge Collectives or set any Host Fee.',
   },
   'pricing.grow.fee': {
     id: 'pricing.grow.fee',
-    defaultMessage: 'Of the revenue your organization make through Host Fees',
+    defaultMessage: 'Of the revenue your organization make through Host Fees ¹',
   },
   'pricing.grow.feeNote': {
     id: 'pricing.grow.feeNote',
-    defaultMessage: '*Only if you charge for your services (1)',
+    defaultMessage: 'Only if you charge for your services',
   },
   'pricing.scale.fee': {
     id: 'pricing.scale.fee',
@@ -217,14 +217,15 @@ const ForFiscalHosts = () => {
               <FeeDescription>
                 <FormattedMessage
                   id="pricing.platformFees"
-                  defaultMessage="Platform Fees (on incoming contributions)₁"
-                />
+                  defaultMessage="Platform Fees (on incoming contributions)"
+                />{' '}
+                ¹
               </FeeDescription>
             </Flex>
             <Flex my={3}>
               <FeeData>0$</FeeData>
               <FeeDescription>
-                <FormattedMessage id="pricing.payoutFees" defaultMessage="Payout Fees (on outgoing payments)₁	" />
+                <FormattedMessage id="pricing.payoutFees" defaultMessage="Payout Fees (on outgoing payments)" /> ¹
               </FeeDescription>
             </Flex>
           </Box>
@@ -377,12 +378,6 @@ const ForFiscalHosts = () => {
           <FormattedMessage
             id="pricing.hostFee.note"
             defaultMessage="(1) If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform."
-          />
-        </P>
-        <P fontSize="12px" lineHeight="18px" color="black.700">
-          <FormattedMessage
-            id="pricing.stripeFee.note"
-            defaultMessage="Stripe Fees (2.9% + 30¢) (1)	Pricing for US based organizations - For details see stripe.com/pricing"
           />
         </P>
       </Box>
