@@ -152,7 +152,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.12.17",
-    "@babel/core": "^7.12.17",
+    "@babel/core": "^7.13.10",
     "@babel/node": "^7.12.17",
     "@cypress/code-coverage": "^3.9.2",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.4.1",
