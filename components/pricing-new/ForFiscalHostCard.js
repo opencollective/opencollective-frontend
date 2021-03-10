@@ -65,6 +65,11 @@ const PlansWrapper = styled(Container)`
   ${Flex}:not(:first-of-type, :last-of-type) {
     margin-left: 32px;
     margin-right: 32px;
+
+    @media screen and (min-width: 40em) {
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 `;
 
@@ -276,7 +281,12 @@ const ForFiscalHosts = () => {
 
       <PlansWrapper display="flex" overflow="auto" justifyContent="space-between">
         {PLANS.map(plan => (
-          <Flex key={plan.id} flexDirection="column" alignItems="flex-start">
+          <Flex
+            key={plan.id}
+            flexDirection="column"
+            alignItems="flex-start"
+            maxWidth={['180px', '185px', null, '246px', '257px']}
+          >
             <Box width="112px" height="112px" mb={3}>
               <Illustration
                 alt={`${plan.id} illustration`}
@@ -362,7 +372,7 @@ const ForFiscalHosts = () => {
         ))}
       </PlansWrapper>
 
-      <Box my={4}>
+      <Box mb={4} mt="56px">
         <P fontSize="12px" lineHeight="18px" color="black.700" mb="24px">
           <FormattedMessage
             id="pricing.hostFee.note"
