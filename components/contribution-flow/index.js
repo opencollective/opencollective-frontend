@@ -84,7 +84,11 @@ class ContributionFlow extends React.Component {
         slug: PropTypes.string,
       }),
     }).isRequired,
-    host: PropTypes.object.isRequired,
+    host: PropTypes.shape({
+      plan: PropTypes.shape({
+        platformTips: PropTypes.bool,
+      }),
+    }).isRequired,
     tier: PropTypes.object,
     intl: PropTypes.object,
     createOrder: PropTypes.func.isRequired,
@@ -418,7 +422,7 @@ class ContributionFlow extends React.Component {
   getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
   canHaveFeesOnTop() {
-    if (!this.props.collective.platformContributionAvailable) {
+    if (!this.props.collective.platformContributionAvailable || !this.props.host.plan.platformTips) {
       return false;
     } else if (this.props.tier?.type === TierTypes.TICKET) {
       return false;

@@ -2811,6 +2811,7 @@ type PlanType {
   transferwisePayoutsLimit: Int
   hostFees: Boolean
   hostFeeSharePercent: Int
+  platformTips: Boolean
 }
 
 """
