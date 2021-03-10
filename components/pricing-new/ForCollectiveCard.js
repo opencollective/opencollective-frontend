@@ -10,7 +10,7 @@ import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledHR from '../StyledHr';
-import { H3, H4, H5, P } from '../Text';
+import { H3, H4, H5, P, Span } from '../Text';
 
 import { COLLECTIVE_ACCESS } from './constants';
 import PlatformTip from './PlatformTip';
@@ -36,7 +36,7 @@ const ListItem = styled.li`
   }
 `;
 
-const FeeData = styled(P)`
+const FeeData = styled(Span)`
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
@@ -151,25 +151,34 @@ const ForCollectiveCard = () => {
           </H5>
           <Box mb="16px">
             <Flex mb={3}>
-              <FeeData>0$</FeeData>
               <FeeDescription>
                 <FormattedMessage
                   id="pricing.platformFees"
-                  defaultMessage="Platform Fees (on incoming contributions)"
+                  defaultMessage="{fee} Platform Fees (on incoming contributions)"
+                  values={{
+                    fee: <FeeData>0$</FeeData>,
+                  }}
                 />{' '}
                 ¹ ²
               </FeeDescription>
             </Flex>
             <Flex my={3}>
-              <FeeData>0$</FeeData>
               <FeeDescription>
-                <FormattedMessage id="pricing.payoutFees" defaultMessage="Payout Fees (on outgoing payments)" /> ¹
+                <FormattedMessage
+                  id="pricing.payoutFees"
+                  defaultMessage="{fee} Payout Fees (on outgoing payments)"
+                  values={{ fee: <FeeData>0$</FeeData> }}
+                />{' '}
+                ¹
               </FeeDescription>
             </Flex>
             <Flex my={3}>
-              <FeeData whiteSpace="nowrap">Host fees</FeeData>
               <FeeDescription>
-                <FormattedMessage id="pricing.forCollective.hostFees" defaultMessage="apply depending on your host" />
+                <FormattedMessage
+                  id="pricing.forCollective.hostFees"
+                  defaultMessage="{fee} apply depending on your host"
+                  values={{ fee: <FeeData whiteSpace="nowrap">Host fees</FeeData> }}
+                />
               </FeeDescription>
             </Flex>
           </Box>
