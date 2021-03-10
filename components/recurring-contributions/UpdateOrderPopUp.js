@@ -210,6 +210,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
           onChange={setSelectedTier}
           value={selectedTier?.key}
         >
+          {/* TODO add fix here */}
           {({ radio, checked, value: { title, subtitle, amount, flexible, currency, interval, minimumAmount } }) => (
             <TierBox minheight={50} py={2} px={3} bg="white.full" data-cy="recurring-contribution-tier-box">
               <Flex alignItems="center">
