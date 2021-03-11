@@ -10,7 +10,6 @@ import StyledSelect from './StyledSelect';
 export const StyledSelectFilter = props => {
   return (
     <StyledSelect
-      inputId={props.inputId}
       minWidth={80}
       fontSize="12px"
       lineHeight="14px"

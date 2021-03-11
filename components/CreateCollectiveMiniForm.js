@@ -352,6 +352,7 @@ const CreateCollectiveMiniForm = ({
                         return (
                           <InputTypeCountry
                             {...field}
+                            inputId="location.country"
                             onChange={country => form.setFieldValue(name, country)}
                             maxMenuHeight={95}
                           />

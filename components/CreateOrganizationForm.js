@@ -332,6 +332,7 @@ const CreateOrganizationForm = props => {
                           <StyledHr flex="1" borderStyle="solid" borderColor="black.300" width={[100, 110, 120]} />
                         </Flex>
                         <CollectivePickerAsync
+                          inputId="admin-picker-org"
                           mt={2}
                           creatable
                           collective={null}

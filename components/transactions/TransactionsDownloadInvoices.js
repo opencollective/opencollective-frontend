@@ -146,6 +146,7 @@ const TransactionsDownloadInvoices = ({ collective }) => {
             />
           )}
           <CollectivePicker
+            inputId="transactions-download-invoices"
             customOptions={options}
             onChange={({ value }) =>
               downloadInvoice({

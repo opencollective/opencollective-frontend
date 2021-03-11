@@ -87,6 +87,7 @@ const getPlaceholder = (intl, types) => {
  * A specialization of `CollectivePicker` that fetches the data based on user search.
  */
 const CollectivePickerAsync = ({
+  inputId,
   types,
   limit,
   hostCollectiveIds,
@@ -113,6 +114,7 @@ const CollectivePickerAsync = ({
 
   return (
     <CollectivePicker
+      inputId={inputId}
       isLoading={loading}
       collectives={filteredCollectives}
       groupByType={!types || types.length > 1}
@@ -133,6 +135,8 @@ const CollectivePickerAsync = ({
 };
 
 CollectivePickerAsync.propTypes = {
+  /** The id of the search input */
+  inputId: PropTypes.string.isRequired,
   /** The types of collectives to retrieve */
   types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))),
   /** Whether we should group collectives by type. By default, this is true when there's more than one type */

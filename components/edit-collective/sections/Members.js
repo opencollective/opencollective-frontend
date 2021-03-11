@@ -231,6 +231,7 @@ class Members extends React.Component {
             <Flex flex="1" justifyContent="space-between" alignItems="center" flexWrap="wrap" mb={2}>
               <Box ml={1} my={1}>
                 <CollectivePickerAsync
+                  inputId="member-collective-picker"
                   creatable
                   width="100%"
                   minWidth={325}

@@ -28,6 +28,8 @@ const getCountryName = (locale, country) => {
 
 class InputTypeCountry extends Component {
   static propTypes = {
+    /** The id of the search input */
+    inputId: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
     name: PropTypes.string,
     /** To force a specific locale */
@@ -85,11 +87,11 @@ class InputTypeCountry extends Component {
   });
 
   render() {
-    const { defaultValue, value, intl, onChange, locale, name, ...props } = this.props;
+    const { defaultValue, value, intl, onChange, locale, name, inputId, ...props } = this.props;
     return (
       <StyledSelect
         name={name}
-        inputId="country-input"
+        inputId={inputId}
         minWidth={150}
         options={this.getOptions(locale || intl.locale, defaultValue)}
         onChange={({ value }) => onChange(value)}

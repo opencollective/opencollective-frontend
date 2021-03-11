@@ -8,6 +8,8 @@ import StyledSelect from './StyledSelect';
 
 class PaymentMethodSelect extends Component {
   static propTypes = {
+    /** The id of the search input */
+    inputId: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
     /** To control the component state */
     value: PropTypes.object,
@@ -27,13 +29,13 @@ class PaymentMethodSelect extends Component {
   };
 
   render() {
-    const { intl, paymentMethods, defaultPaymentMethod, value, onChange, ...props } = this.props;
+    const { intl, paymentMethods, defaultPaymentMethod, value, onChange, inputId, ...props } = this.props;
 
     const options = paymentMethods.map(paymentMethod => this.paymentMethodValueAndLabel(intl, paymentMethod));
 
     return (
       <StyledSelect
-        inputId="payment-method"
+        inputId={inputId}
         name="paymentMethod"
         options={options}
         minWidth={300}

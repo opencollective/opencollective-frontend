@@ -389,6 +389,7 @@ class InputField extends React.Component {
                 <Box width={[1, 10 / 12]}>
                   <InputTypeCountry
                     name={field.name}
+                    inputId={field.name}
                     value={field.value}
                     defaultValue={field.defaultValue}
                     onChange={this.handleChange}
@@ -406,6 +407,7 @@ class InputField extends React.Component {
                 <Box width={1}>
                   <InputTypeCountry
                     name={field.name}
+                    inputId={field.name}
                     value={field.value}
                     defaultValue={field.defaultValue}
                     onChange={this.handleChange}
