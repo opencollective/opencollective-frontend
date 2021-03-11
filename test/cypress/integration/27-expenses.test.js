@@ -139,6 +139,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('mini-form-name-field').type('Dummy Expense Org');
       cy.getByDataCy('mini-form-website-field').type('dummy.com');
       cy.getByDataCy('mini-form-save-button').click();
+      cy.wait(250);
 
       // Select Payout Method
       cy.getByDataCy('payout-method-select').click();
