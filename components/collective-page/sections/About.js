@@ -62,7 +62,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                   defaultValue={collective.longDescription}
                   onChange={e => setValue(e.target.value)}
                   placeholder={intl.formatMessage(messages.placeholder)}
-                  toolbarTop={[60, null, 119]}
+                  toolbarTop={[56, 64]}
                   toolbarBackgroundColor="#F7F8FA"
                   withStickyToolbar
                   autoFocus
