@@ -4642,6 +4642,11 @@ type HostPlan {
   Charge on revenues made through Host Fees.
   """
   hostFeeSharePercent: Int
+
+  """
+  Ability to collect Platform Tips.
+  """
+  platformTips: Boolean
 }
 
 enum ImageFormat {
