@@ -43,7 +43,7 @@ import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
-import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
+import { BRAINTREE_KEY, getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -120,6 +120,7 @@ class ContributionFlow extends React.Component {
     this.state = {
       error: null,
       stripe: null,
+      braintree: null,
       isSubmitted: false,
       isSubmitting: false,
       stepProfile: null,
@@ -255,7 +256,21 @@ class ContributionFlow extends React.Component {
 
   getPaymentMethod = async () => {
     const { stepPayment, stripe } = this.state;
-    if (!stepPayment?.paymentMethod) {
+
+    if (stepPayment.key === BRAINTREE_KEY) {
+      return new Promise((resolve, reject) => {
+        this.state.braintree.requestPaymentMethod((requestPaymentMethodErr, payload) => {
+          if (requestPaymentMethodErr) {
+            reject(requestPaymentMethodErr);
+          } else {
+            return resolve({
+              type: 'BRAINTREE_PAYPAL',
+              braintreeInfo: payload, // TODO(Braintree): Should be sanitized so new keys don't break the mutation
+            });
+          }
+        });
+      });
+    } else if (!stepPayment?.paymentMethod) {
       return null;
     } else if (stepPayment.paymentMethod.id) {
       return pick(stepPayment.paymentMethod, ['id']);
@@ -554,7 +569,6 @@ class ContributionFlow extends React.Component {
   render() {
     const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails, isEmbed } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
-
     const currency = tier?.amount.currency || collective.currency;
 
     return (
@@ -643,6 +657,7 @@ class ContributionFlow extends React.Component {
                     step={currentStep}
                     showFeesOnTop={this.canHaveFeesOnTop()}
                     onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+                    setBraintree={braintree => this.setState({ braintree })}
                     defaultProfileSlug={this.props.contributeAs}
                     defaultEmail={this.props.defaultEmail}
                     defaultName={this.props.defaultName}
@@ -662,6 +677,7 @@ class ContributionFlow extends React.Component {
                       paypalButtonProps={this.getPaypalButtonProps({ currency })}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
+                      disableNext={stepPayment?.key === 'braintree' && !stepPayment.isReady}
                     />
                   </Box>
                 </Box>

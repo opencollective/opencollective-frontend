@@ -741,6 +741,23 @@ type Bot implements Account {
   features: CollectiveFeatures!
 }
 
+input BraintreePaymentInput {
+  nonce: String!
+  type: BraintreePaymentInputType!
+  details: JSON
+  binData: JSON
+  deviceData: JSON
+  description: String
+  vaulted: Boolean
+}
+
+"""
+Type of account used to pay with Braintree
+"""
+enum BraintreePaymentInputType {
+  PayPalAccount
+}
+
 """
 Input to order results chronologically
 """
@@ -1262,6 +1279,7 @@ enum ConnectedAccountService {
   twitter
   transferwise
   privacy
+  braintree
   meetup @deprecated(reason: "Not using this service anymore")
 }
 
@@ -6193,13 +6211,13 @@ type PaymentMethod {
   id: String
   legacyId: Int
   name: String
-  service: String @deprecated(reason: "2020-08-18: This field is being deprecated in favor of providerType")
-  type: String @deprecated(reason: "2020-08-18: This field is being deprecated in favor of providerType")
+  service: PaymentMethodService
+  type: String
 
   """
   Defines the type of the payment method. Meant to be moved to "type" in the future.
   """
-  providerType: PaymentMethodType
+  providerType: PaymentMethodType @deprecated(reason: "2021-03-02: Please use service + type")
 
   """
   Returns the balance amount and the currency of this paymentMethod
@@ -6232,6 +6250,13 @@ input PaymentMethodInput {
   type: PaymentMethodType
 
   """
+  Type of this payment method
+  """
+  legacyType: PaymentMethodType
+  service: PaymentMethodService
+  newType: String
+
+  """
   Name of this payment method
   """
   name: String
@@ -6250,6 +6275,11 @@ input PaymentMethodInput {
   To pass when type is PAYPAL
   """
   paypalInfo: PaypalPaymentInput
+
+  """
+  To pass when type is BRAINTREE
+  """
+  braintreeInfo: BraintreePaymentInput
 }
 
 input PaymentMethodReferenceInput {
@@ -6259,12 +6289,21 @@ input PaymentMethodReferenceInput {
   id: String
 }
 
+enum PaymentMethodService {
+  PAYPAL
+  BRAINTREE
+  STRIPE
+  OPENCOLLECTIVE
+  PREPAID
+}
+
 enum PaymentMethodType {
   CREDIT_CARD
   GIFT_CARD
   PREPAID_BUDGET
   ACCOUNT_BALANCE
   PAYPAL
+  BRAINTREE_PAYPAL
   BANK_TRANSFER
   ADDED_FUNDS
 }
@@ -7056,6 +7095,18 @@ type Query {
     """
     account: AccountReferenceInput
   ): Update
+  thirdPartyApiClientToken(
+    """
+    The account that serves as a payment target
+    """
+    account: AccountReferenceInput!
+
+    """
+    The account that is contributing
+    """
+    fromAccount: AccountReferenceInput
+    service: ThirdPartyApiWithClientToken!
+  ): String!
   loggedInAccount: Account
 }
 
@@ -7083,6 +7134,13 @@ type TagStat {
   Number of entries for this tag
   """
   count: Int!
+}
+
+"""
+Third party APIs for which Open Collective API can generate tokens
+"""
+enum ThirdPartyApiWithClientToken {
+  BRAINTREE
 }
 
 """
