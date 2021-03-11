@@ -125,7 +125,7 @@ const TrixEditorContainer = styled.div`
         position: 'sticky',
         top: props.toolbarTop || 0,
         marginTop: props.toolbarOffsetY,
-        py: '10px',
+        p: '10px',
       })}
 
     /** Custom icons */
@@ -206,6 +206,7 @@ export default class RichTextEditor extends React.Component {
   constructor(props) {
     super(props);
     this.editorRef = React.createRef();
+    this.mainContainerRef = React.createRef();
     this.state = { id: props.id, error: null };
     this.isReady = false;
 
@@ -251,6 +252,19 @@ export default class RichTextEditor extends React.Component {
       this.editorRef.current.addEventListener('trix-attachment-add', this.handleUpload);
       this.editorRef.current.addEventListener('trix-file-accept', this.handleFileAccept);
 
+      // Some special handling for links
+      if (this.mainContainerRef.current) {
+        // We must listen when the user presses the 'Enter' key and when the user clicks the 'Link' button as well
+        this.mainContainerRef.current.querySelector("[data-trix-input][name='href']").addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            this.handleLink();
+          }
+        });
+        this.mainContainerRef.current
+          .querySelector("[data-trix-method='setAttribute']")
+          .addEventListener('click', this.handleLink);
+      }
+
       // Component ready!
       this.isReady = true;
     }
@@ -295,6 +309,22 @@ export default class RichTextEditor extends React.Component {
     const onFailure = () => this.setState({ error: 'File upload failed' });
     uploadImageWithXHR(attachment.file, { onProgress, onSuccess, onFailure });
     return e;
+  };
+
+  handleLink = () => {
+    const urlInput = this.mainContainerRef.current?.querySelector("[data-trix-input][name='href']");
+    const urlInputValue = urlInput?.value?.trim();
+
+    // Ignore missing input or empty values
+    if (!urlInputValue) {
+      return;
+    }
+
+    // Automatically add 'https://' to the url
+    // eslint-disable-next-line camelcase
+    if (isURL(urlInputValue, { require_protocol: false }) && !isURL(urlInputValue, { require_protocol: true })) {
+      urlInput.value = `https://${urlInputValue}`;
+    }
   };
 
   /** Automatically create anchors with hrefs for links */
@@ -431,6 +461,7 @@ export default class RichTextEditor extends React.Component {
         isDisabled={disabled}
         error={error}
         data-cy={this.props['data-cy']}
+        ref={this.mainContainerRef}
       >
         {this.state.error && (
           <MessageBox type="error" withIcon>
