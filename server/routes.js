@@ -87,13 +87,14 @@ module.exports = (expressApp, nextApp) => {
    * Prevent indexation from search engines
    * (out of 'production' environment)
    */
-  app.get('/robots.txt', (req, res) => {
+  app.get('/robots.txt', (req, res, next) => {
     const hostname = req.get('original-hostname') || req.hostname;
-    res.setHeader('Content-Type', 'text/plain');
     if (hostname !== 'opencollective.com') {
+      res.setHeader('Content-Type', 'text/plain');
       res.send('User-agent: *\nDisallow: /');
     } else {
-      res.send('User-agent: *\nAllow: /');
+      // Will send public/robots.txt
+      next();
     }
   });
 
