@@ -45,7 +45,7 @@ class UpdatePage extends React.Component {
           selectedCategory={NAVBAR_CATEGORIES.CONNECT}
         />
 
-        <Container py={4} maxWidth={1260} m="0 auto" className="content">
+        <Container py={4} maxWidth={1260} m="0 auto" px={[0, null, null, 4]}>
           <UpdateWithData
             collectiveSlug={collective.slug}
             updateSlug={updateSlug}

@@ -126,12 +126,13 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
   }
 
   pre {
-    font-size: 0.9em;
+    font-size: 0.85em;
     background: #f6f8fa;
     color: #333;
     border: none;
     padding: 16px;
-    font-familly: Helvetica, Arial, sans-serif;
+    font-family: monospace;
+    overflow-x: auto;
   }
 
   ${typography}

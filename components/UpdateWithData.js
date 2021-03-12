@@ -11,6 +11,7 @@ import CommentForm from './conversations/CommentForm';
 import { commentFieldsFragment } from './conversations/graphql';
 import Thread from './conversations/Thread';
 import CommentIcon from './icons/CommentIcon';
+import Container from './Container';
 import { Box, Flex } from './Grid';
 import Loading from './Loading';
 import NotFound from './NotFound';
@@ -96,9 +97,9 @@ class UpdateWithData extends React.Component {
         {update.userCanSeeUpdate && (
           <Box pl={[0, 5]}>
             {comments.length > 0 && (
-              <Box mb={3} pt={3} maxWidth={700}>
+              <Container mb={3} pt={3} maxWidth={700} borderTop="1px solid #eee">
                 <Thread collective={collective} items={comments} onCommentDeleted={this.onCommentDeleted} />
-              </Box>
+              </Container>
             )}
             {update.publishedAt && (
               <Flex mt="40px" maxWidth={700}>
