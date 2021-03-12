@@ -251,19 +251,21 @@ export default class RichTextEditor extends React.Component {
       this.editorRef.current.addEventListener('trix-change', this.handleChange, false);
       this.editorRef.current.addEventListener('trix-attachment-add', this.handleUpload);
       this.editorRef.current.addEventListener('trix-file-accept', this.handleFileAccept);
+      this.editorRef.current.addEventListener('trix-initialize', () => {
+        // Some special handling for links
+        if (this.mainContainerRef.current) {
+          // We must listen when the user presses the 'Enter' key and when the user clicks the 'Link' button as well
+          const linkInput = this.mainContainerRef.current.querySelector("[data-trix-input][name='href']");
+          linkInput?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+              this.handleLink();
+            }
+          });
 
-      // Some special handling for links
-      if (this.mainContainerRef.current) {
-        // We must listen when the user presses the 'Enter' key and when the user clicks the 'Link' button as well
-        this.mainContainerRef.current.querySelector("[data-trix-input][name='href']").addEventListener('keydown', e => {
-          if (e.key === 'Enter') {
-            this.handleLink();
-          }
-        });
-        this.mainContainerRef.current
-          .querySelector("[data-trix-method='setAttribute']")
-          .addEventListener('click', this.handleLink);
-      }
+          const addLinkBtn = this.mainContainerRef.current.querySelector("[data-trix-method='setAttribute']");
+          addLinkBtn?.addEventListener('click', this.handleLink);
+        }
+      });
 
       // Component ready!
       this.isReady = true;
