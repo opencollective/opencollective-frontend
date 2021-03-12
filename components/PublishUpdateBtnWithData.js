@@ -174,6 +174,7 @@ const publishUpdateMutation = gqlV2/* GraphQL */ `
       id
       publishedAt
       notificationAudience
+      userCanPublishUpdate
     }
   }
 `;
@@ -182,6 +183,8 @@ const updateQuery = gqlV2/* GraphQL */ `
   query Update($id: String!) {
     update(id: $id) {
       id
+      userCanPublishUpdate
+      publishedAt
       account {
         id
         isHost

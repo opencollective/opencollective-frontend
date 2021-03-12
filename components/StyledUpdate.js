@@ -241,8 +241,7 @@ class StyledUpdate extends Component {
   }
 
   renderFullContent() {
-    const { update, collective, LoggedInUser, isReloadingData } = this.props;
-    const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
+    const { update, collective, isReloadingData } = this.props;
 
     return (
       <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]} maxWidth={676}>
@@ -260,7 +259,7 @@ class StyledUpdate extends Component {
         ) : isReloadingData ? (
           <LoadingPlaceholder height={300} />
         ) : null}
-        {canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
+        {update.userCanPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
       </Container>
     );
   }
@@ -327,6 +326,7 @@ const editUpdateMutation = gqlV2/* GraphQL */ `
       html
       isPrivate
       makePublicOn
+      userCanPublishUpdate
     }
   }
 `;

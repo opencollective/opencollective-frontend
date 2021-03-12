@@ -149,6 +149,7 @@ const updateQuery = gqlV2/* GraphQL */ `
       isPrivate
       makePublicOn
       userCanSeeUpdate
+      userCanPublishUpdate
       account {
         id
         slug
