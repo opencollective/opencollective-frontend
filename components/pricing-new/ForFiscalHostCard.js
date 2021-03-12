@@ -102,7 +102,7 @@ const messages = defineMessages({
     defaultMessage: 'Outside funds',
   },
   'pricing.outsideFunds.description': {
-    id: 'pricing.outsideFunds.description',
+    id: 'pricing.accessTo.manuallyCredit',
     defaultMessage:
       "Manually credit Collective budgets with funds received outside the platform (e.g. payments you've invoiced, cash, or third party channels like a shop).",
   },
@@ -111,7 +111,7 @@ const messages = defineMessages({
     defaultMessage: 'Bank transfer payments',
   },
   'pricing.bankTransfer.description': {
-    id: 'pricing.bankTransfer.description',
+    id: 'pricing.accessTo.bankTransfer',
     defaultMessage:
       'Enable bank transfer payments to automatically provide financial contributors with wire instructions and a reference number for tracking.',
   },
@@ -125,15 +125,15 @@ const messages = defineMessages({
       'Receive financial contributions to you via credit card, automatically updating your budget for transparent tracking. *Stripe fees apply',
   },
   'pricing.plan.start': {
-    id: 'pricing.plan.start',
+    id: 'table.head.start',
     defaultMessage: 'Start',
   },
   'pricing.plan.grow': {
-    id: 'pricing.plan.grow',
+    id: 'table.head.grow',
     defaultMessage: 'Grow',
   },
   'pricing.plan.scale': {
-    id: 'pricing.plan.scale',
+    id: 'table.head.scale',
     defaultMessage: 'Scale',
   },
   'pricing.start.fee': {
@@ -158,7 +158,7 @@ const messages = defineMessages({
   },
   'pricing.scale.feeNote': {
     id: 'pricing.scale.feeNote',
-    defaultMessage: '*Depends on volume and amount of transactions',
+    defaultMessage: 'Depends on volume and amount of transactions',
   },
   'pricing.unlimitedCollectives': {
     id: 'pricing.unlimitedCollectives',
@@ -191,7 +191,7 @@ const ForFiscalHosts = () => {
             letterSpacing={[null, '-0.00em']}
             color="black.900"
           >
-            <FormattedMessage id="pricing.fiscalHostCard" defaultMessage="For Fiscal Hosts" />
+            <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
           </H3>
           <StyledHR my="8px" />
           <P fontSize="14px" lineHeight="20px" color="black.800">
@@ -264,10 +264,7 @@ const ForFiscalHosts = () => {
             <FormattedMessage id="pricing.fundraising" defaultMessage="Fundraising capabilities" />
           </ListItem>
           <ListItem>
-            <FormattedMessage
-              id="pricing.forCollective.addFunds"
-              defaultMessage="Manually add funds from other channels"
-            />
+            <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other channels" />
           </ListItem>
           <ListItem>
             <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other channels" />
@@ -344,7 +341,7 @@ const ForFiscalHosts = () => {
               mb={2}
               textTransform="uppercase"
             >
-              <FormattedMessage id="pricing.mangedFunds" defaultMessage="Managed Funds" />
+              <FormattedMessage id="newPricingTable.row.revenues" defaultMessage="Managed Funds" />
             </P>
             <StyledHR width="156px" mb={3} />
             <P fontSize="13px" lineHeight="16px" color="black.900" mb={4}>
@@ -355,7 +352,7 @@ const ForFiscalHosts = () => {
                   values={{ totalRaised: '$150,000' }}
                 />
               ) : (
-                <FormattedMessage id="pricing.noMinimum" defaultMessage="No minimum" />
+                <FormattedMessage id="newPricingTable.row.noMinimum" defaultMessage="No minimum" />
               )}
             </P>
             <P

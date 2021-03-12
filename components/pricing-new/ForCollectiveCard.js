@@ -84,7 +84,7 @@ const messages = defineMessages({
     defaultMessage: 'Outside funds',
   },
   'pricing.outsideFunds.description': {
-    id: 'pricing.outsideFunds.description',
+    id: 'pricing.accessTo.manuallyCredit',
     defaultMessage:
       "Manually credit Collective budgets with funds received outside the platform (e.g. payments you've invoiced, cash, or third party channels like a shop).",
   },
@@ -93,12 +93,12 @@ const messages = defineMessages({
     defaultMessage: 'Bank transfer payments',
   },
   'pricing.bankTransfer.description': {
-    id: 'pricing.bankTransfer.description',
+    id: 'pricing.accessTo.bankTransfer',
     defaultMessage:
       'Enable bank transfer payments to automatically provide financial contributors with wire instructions and a reference number for tracking.',
   },
   'pricing.creditCard': {
-    id: 'pricing.forCollective.creditCard',
+    id: 'pricing.creditCard',
     defaultMessage: 'Credit card processing',
   },
   'pricing.creditCard.description': {
@@ -223,12 +223,6 @@ const ForCollectiveCard = () => {
               <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other channels" />
             </ListItem>
             <ListItem>
-              <FormattedMessage
-                id="pricing.forCollective.addFunds"
-                defaultMessage="Manually add funds from other channels"
-              />
-            </ListItem>
-            <ListItem>
               <FormattedMessage id="pricing.communicationTools" defaultMessage="Communication tools" />
             </ListItem>
             <ListItem>
@@ -252,7 +246,7 @@ const ForCollectiveCard = () => {
                 whiteSpace="nowrap"
                 mr={[null, null, null, null, 2]}
               >
-                <FormattedMessage id="pricing.createCollective" defaultMessage="Create Collective" />
+                <FormattedMessage id="collective.create" defaultMessage="Create Collective" />
               </StyledButton>
             </Link>
             <Link href="/hosts">

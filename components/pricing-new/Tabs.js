@@ -57,7 +57,7 @@ const Tabs = ({ activeTab }) => (
     </Link>
     <Link href="#faq">
       <Tab active={activeTab === 'faq'}>
-        <FormattedMessage id="pricing.faq" defaultMessage="FAQ" />
+        <FormattedMessage id="FAQ" defaultMessage="FAQ" />
       </Tab>
     </Link>
   </Container>
