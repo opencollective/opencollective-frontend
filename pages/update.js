@@ -5,6 +5,7 @@ import { cloneDeep, get, uniqBy, update } from 'lodash';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -20,7 +21,6 @@ import NotFound from '../components/NotFound';
 import Page from '../components/Page';
 import StyledUpdate from '../components/StyledUpdate';
 import { withUser } from '../components/UserProvider';
-import { stripHTML } from '../lib/utils';
 
 class UpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, updateSlug } }) {
@@ -85,7 +85,7 @@ class UpdatePage extends React.Component {
     const { account, update } = data;
     const comments = get(update, 'comments.nodes', []);
     return (
-      <Page collective={account}>
+      <Page collective={account} title={update.title} description={stripHTML(update.summary)}>
         <CollectiveNavbar
           collective={account}
           isAdmin={LoggedInUser && LoggedInUser.canEditCollective(account)}
