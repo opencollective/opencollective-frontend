@@ -65,7 +65,7 @@ class StyledUpdate extends Component {
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
-    isReloadingData: PropTypes.object,
+    isReloadingData: PropTypes.bool,
     editUpdate: PropTypes.func.isRequired,
     deleteUpdate: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
