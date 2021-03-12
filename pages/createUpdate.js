@@ -63,6 +63,9 @@ class CreateUpdatePage extends React.Component {
     const {
       data: { Collective },
     } = this.props;
+
+    this.setState({ error: '', status: 'submitting' });
+
     try {
       update.account = { legacyId: Collective.id };
       const res = await this.props.createUpdate({ variables: { update } });

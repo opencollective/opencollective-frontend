@@ -81,7 +81,7 @@ class EditUpdateForm extends React.Component {
   }
 
   async onSubmit(e) {
-    this.setState({ loading: true });
+    this.setState({ loading: true, error: '' });
     if (e) {
       e.preventDefault();
     }
@@ -207,7 +207,7 @@ class EditUpdateForm extends React.Component {
               buttonSize="large"
               buttonStyle="primary"
               type="submit"
-              disabled={this.state.loading}
+              disabled={this.state.loading || !this.state.update.title || !this.state.update.html}
             >
               {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
               {!this.state.loading &&

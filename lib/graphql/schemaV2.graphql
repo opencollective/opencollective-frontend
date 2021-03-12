@@ -4429,7 +4429,7 @@ type Host implements Account & AccountWithContributions {
   """
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
   """
-  supportedPaymentMethods: [PaymentMethodType]
+  supportedPaymentMethods: [PaymentMethodLegacyType]
   bankAccount: PayoutMethod
 
   """
@@ -6212,12 +6212,12 @@ type PaymentMethod {
   legacyId: Int
   name: String
   service: PaymentMethodService
-  type: String
+  type: PaymentMethodType
 
   """
   Defines the type of the payment method. Meant to be moved to "type" in the future.
   """
-  providerType: PaymentMethodType @deprecated(reason: "2021-03-02: Please use service + type")
+  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
 
   """
   Returns the balance amount and the currency of this paymentMethod
@@ -6247,14 +6247,14 @@ input PaymentMethodInput {
   """
   Type of this payment method
   """
-  type: PaymentMethodType
+  type: PaymentMethodLegacyType
 
   """
   Type of this payment method
   """
-  legacyType: PaymentMethodType
+  legacyType: PaymentMethodLegacyType
   service: PaymentMethodService
-  newType: String
+  newType: PaymentMethodType
 
   """
   Name of this payment method
@@ -6282,6 +6282,17 @@ input PaymentMethodInput {
   braintreeInfo: BraintreePaymentInput
 }
 
+enum PaymentMethodLegacyType {
+  CREDIT_CARD
+  GIFT_CARD
+  PREPAID_BUDGET
+  ACCOUNT_BALANCE
+  PAYPAL
+  BRAINTREE_PAYPAL
+  BANK_TRANSFER
+  ADDED_FUNDS
+}
+
 input PaymentMethodReferenceInput {
   """
   The id assigned to the payment method
@@ -6298,14 +6309,15 @@ enum PaymentMethodService {
 }
 
 enum PaymentMethodType {
-  CREDIT_CARD
-  GIFT_CARD
-  PREPAID_BUDGET
-  ACCOUNT_BALANCE
-  PAYPAL
-  BRAINTREE_PAYPAL
-  BANK_TRANSFER
-  ADDED_FUNDS
+  creditcard
+  prepaid
+  payment
+  collective
+  host
+  adaptive
+  paypal
+  giftcard
+  manual
 }
 
 """
@@ -7363,6 +7375,11 @@ type Update {
   Indicates whether or not the user is allowed to see the content of this update
   """
   userCanSeeUpdate: Boolean!
+
+  """
+  Indicates whether or not the user is allowed to publish this update
+  """
+  userCanPublishUpdate: Boolean!
   isPrivate: Boolean!
   title: String!
   createdAt: DateTime!
