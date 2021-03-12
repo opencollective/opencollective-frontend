@@ -7,10 +7,11 @@ import { addCollectiveCoverData } from '../lib/graphql/queries';
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
+import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import { Box } from '../components/Grid';
-import Header from '../components/Header';
+import Page from '../components/Page';
 import UpdateWithData from '../components/UpdateWithData';
 import { withUser } from '../components/UserProvider';
 
@@ -36,29 +37,23 @@ class UpdatePage extends React.Component {
     const collective = data.Collective;
 
     return (
-      <div className="UpdatePage">
-        <Header collective={collective} LoggedInUser={LoggedInUser} />
+      <Page collective={collective}>
+        <CollectiveNavbar
+          collective={collective}
+          isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+          selected={Sections.UPDATES}
+          selectedCategory={NAVBAR_CATEGORIES.CONNECT}
+        />
 
-        <Body>
-          <CollectiveNavbar
-            collective={collective}
-            isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
-            selected={Sections.UPDATES}
-            selectedCategory={NAVBAR_CATEGORIES.CONNECT}
+        <Container py={4} maxWidth={1260} m="0 auto" className="content">
+          <UpdateWithData
+            collectiveSlug={collective.slug}
+            updateSlug={updateSlug}
+            editable={true}
+            LoggedInUser={LoggedInUser}
           />
-
-          <Box className="content" py={4}>
-            <UpdateWithData
-              collectiveSlug={collective.slug}
-              updateSlug={updateSlug}
-              editable={true}
-              LoggedInUser={LoggedInUser}
-            />
-          </Box>
-        </Body>
-
-        <Footer />
-      </div>
+        </Container>
+      </Page>
     );
   }
 }
