@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import Container from '../../Container';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 
-// Dynamicly load HTMLEditor to download it only if user can edit the page
+// Dynamicly load Goals cover to download it if enabled
 const GoalsCoverLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
 const GoalsCover = dynamic(() => import('../../GoalsCover'), {
   loading: GoalsCoverLoadingPlaceholder,

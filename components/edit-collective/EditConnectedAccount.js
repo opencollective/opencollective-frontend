@@ -11,6 +11,7 @@ import StyledButton from '../StyledButton';
 import { P } from '../Text';
 
 import EditPayPalAccount from './EditPayPalAccount';
+import EditPrivacyAccount from './EditPrivacyAccount';
 import EditTransferWiseAccount from './EditTransferWiseAccount';
 import EditTwitterAccount from './EditTwitterAccount';
 
@@ -82,7 +83,7 @@ class EditConnectedAccount extends React.Component {
         defaultMessage: 'GitHub account {username} connected on {updatedAt, date, short}',
       },
     });
-    this.services = ['stripe', 'paypal', 'twitter', 'github', 'transferwise'];
+    this.services = ['stripe', 'paypal', 'twitter', 'github', 'transferwise', 'privacy'];
   }
 
   connect(service) {
@@ -159,6 +160,8 @@ class EditConnectedAccount extends React.Component {
           intl={intl}
         />
       );
+    } else if (service === 'privacy') {
+      return <EditPrivacyAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />;
     }
 
     return (
