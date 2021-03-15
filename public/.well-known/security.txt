@@ -1,4 +1,4 @@
 Contact: security@opencollective.com
 Preferred-Languages: en
 Canonical: https://opencollective.com/.well-known/security.txt
-Policy: https://github.com/opencollective/opencollective/blob/master/SECURITY.md
+Policy: https://github.com/opencollective/opencollective/blob/main/SECURITY.md
