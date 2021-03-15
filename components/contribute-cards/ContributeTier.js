@@ -4,6 +4,7 @@ import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import INTERVALS from '../../lib/constants/intervals';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, getPrecisionFromAmount } from '../../lib/currency-utils';
 import { isPastEvent } from '../../lib/events';
@@ -40,7 +41,11 @@ const getContributionTypeFromTier = (tier, isPassed) => {
   } else if (tier.type === TierTypes.MEMBERSHIP) {
     return ContributionTypes.MEMBERSHIP;
   } else if (tier.interval) {
-    return ContributionTypes.FINANCIAL_RECURRING;
+    if (tier.interval === INTERVALS.flexible) {
+      return ContributionTypes.FINANCIAL_CUSTOM;
+    } else {
+      return ContributionTypes.FINANCIAL_RECURRING;
+    }
   } else {
     return ContributionTypes.FINANCIAL_ONE_TIME;
   }
@@ -136,7 +141,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                         amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
                         amount={tier.goal}
                         currency={currency}
-                        interval={tier.interval}
+                        interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                         precision={getPrecisionFromAmount(tier.goal)}
                       />
                     ),
@@ -160,7 +165,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
             <P color="black.700" data-cy="amount">
               <FormattedMoneyAmount
                 amount={minAmount}
-                interval={tier.interval}
+                interval={tier.interval && tier.interval !== INTERVALS.flexible ? tier.interval : null}
                 currency={currency}
                 amountStyles={{ fontSize: '20px', fontWeight: 'bold', color: 'black.900' }}
                 precision={getPrecisionFromAmount(minAmount)}
