@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
-import { themeGet } from '@styled-system/theme-get';
 import { isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -27,7 +26,7 @@ import { H1, P } from '../components/Text';
 
 const SearchInput = styled(StyledInput)`
   border: none;
-  border-bottom: 2px solid ${themeGet('colors.primary.600')};
+  border-bottom: 2px solid ${props => props.theme.colors.primary[500]};
   border-radius: 0;
   box-shadow: none;
   display: block;
