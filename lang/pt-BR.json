@@ -94,7 +94,7 @@
   "bankaccount.instructions.variables": "Este é o e-mail que os contribuintes receberão automaticamente quando fizerem uma contribuição por transferência bancária. Inclua os detalhes necessários para completar o pagamento, incluindo informações de referência, para que você possa corresponder à transação pendente. Uma variável é como uma lacuna que é preenchida automaticamente. Você pode usar as variáveis a seguir nas instruções:",
   "BankInfo.AccountHolder": "Titular da Conta: {name}",
   "BankInfo.Type": "Tipo: {type}",
-  "becomeAHost.aBetterExperience": "Uma melhor experiência",
+  "becomeAHost.aBetterExperience": "Uma experiência melhor.",
   "becomeAHost.aBetterExperience.description": "Os relatórios são automáticos e em tempo real para que todos possam ver o orçamento atualizado a qualquer momento. Projetos podem ter mais controle direto sobre seus fundos, enquanto patrocinadores fiscais podem assegurar que tudo está sendo feito de acordo com suas políticas. ",
   "becomeAHost.benefit.combineFunding": "Combine {lineBreak} fontes de financiamento",
   "becomeAHost.benefit.combineFunding.description": "Coletivos podem buscar apoio através de diversos canais enquanto rastreiam tudo em um só orçamento. Financiamento colaborativo, pagamentos de cartão de crédito, e vendas de ingressos de eventos são incluidos, e você pode facilmente creditar fundos vindos de qualquer outro meio para o orçamento correto.",
