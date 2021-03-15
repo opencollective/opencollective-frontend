@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
+import Router from 'next/router';
 import { injectIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
@@ -149,7 +150,7 @@ class NewContributionFlowPage extends React.Component {
 
     const contributionBLocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
     if (contributionBLocker) {
-      return <ContributionBlocker blocker={contributionBLocker} account={account} />;
+      return <ContributionBlocker blocker={contributionBLocker} account={account} tier={tier} />;
     } else if (step === 'success') {
       return <ContributionFlowSuccess collective={account} isEmbed />;
     } else {

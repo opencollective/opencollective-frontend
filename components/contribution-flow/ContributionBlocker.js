@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isTierExpired } from '../../lib/tier-utils';
@@ -49,6 +50,16 @@ const msg = defineMessages({
 /**
  * From received params, see if there's anything preventing the contribution
  */
+const Redirect = ({ to }) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push(to);
+  }, [to]);
+
+  return null;
+};
+
 export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier) => {
   if (!account.host) {
     return { reason: CONTRIBUTION_BLOCKER.NO_HOST };
@@ -83,15 +94,18 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.TIER_MISSING, type: 'warning', showOtherWaysToContribute: true };
   } else if (tier && isTierExpired(tier)) {
     return { reason: CONTRIBUTION_BLOCKER.TIER_EXPIRED, type: 'warning', showOtherWaysToContribute: true };
-  } else if (account.settings.disableCustomContributions && !tier) {
-    return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
   } else {
     return null;
   }
 };
 
-const ContributionBlocker = ({ account, blocker }) => {
+const ContributionBlocker = ({ account, blocker, tier }) => {
   const intl = useIntl();
+
+  if (account.settings.disableCustomContributions && !tier) {
+    return <Redirect to={`${account.slug}/contribute`} />;
+  }
+
   return (
     <Flex flexDirection="column" alignItems="center" py={[5, null, 6]}>
       <MessageBox type={blocker.type || 'info'} withIcon maxWidth={800}>
@@ -120,6 +134,7 @@ ContributionBlocker.propTypes = {
     showOtherWaysToContribute: PropTypes.bool,
   }).isRequired,
   account: PropTypes.object,
+  tier: PropTypes.object,
 };
 
 export default ContributionBlocker;
