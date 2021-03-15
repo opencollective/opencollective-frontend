@@ -199,7 +199,6 @@
     "raw-loader": "^4.0.2",
     "react-styleguidist": "11.1.5",
     "react-test-renderer": "^17.0.1",
-    "sharp": "^0.27.2",
     "shx": "^0.3.3",
     "style-loader": "^2.0.0",
     "url-loader": "^4.1.1",
