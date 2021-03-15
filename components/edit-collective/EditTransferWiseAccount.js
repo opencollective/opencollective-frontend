@@ -30,7 +30,7 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
         <P fontSize="13px" color="black.700" fontWeight="normal" mb={3}>
           <FormattedMessage
             id="collective.create.connectedAccounts.transferwise.description"
-            defaultMessage="Connect a TransferWise account to pay expenses with one click."
+            defaultMessage="Connect a Wise account to pay expenses with one click."
           />
         </P>
         {error && (
@@ -40,10 +40,7 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
         )}
 
         <StyledButton mt={10} type="submit" buttonSize="tiny" onClick={handleConnect}>
-          <FormattedMessage
-            id="collective.connectedAccounts.transferwise.button"
-            defaultMessage="Connect TransferWise"
-          />
+          <FormattedMessage id="collective.connectedAccounts.transferwise.button" defaultMessage="Connect Wise" />
         </StyledButton>
       </React.Fragment>
     );
@@ -53,7 +50,7 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
         <P my={1}>
           <FormattedMessage
             id="collective.connectedAccounts.transferwise.connected"
-            defaultMessage="TransferWise connected on {updatedAt, date, short}"
+            defaultMessage="Wise connected on {updatedAt, date, short}"
             values={{
               updatedAt: new Date(connectedAccount.createdAt),
             }}

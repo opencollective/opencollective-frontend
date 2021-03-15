@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, pick } from 'lodash';
-import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -10,6 +9,7 @@ import storage from '../lib/storage';
 
 import Container from './Container';
 import { Box } from './Grid';
+import RichTextEditor from './RichTextEditor';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInput from './StyledInput';
@@ -24,15 +24,6 @@ const ActionButtonWrapper = styled(Container)`
     justify-content: center;
   }
 `;
-
-// Dynamic imports: this components have a huge impact on bundle size and are externalized
-// We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-let HTMLEditor;
-if (process.env.DYNAMIC_IMPORT) {
-  HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'));
-} else {
-  HTMLEditor = require('./HTMLEditor').default;
-}
 
 class EditUpdateForm extends React.Component {
   static propTypes = {
@@ -90,7 +81,7 @@ class EditUpdateForm extends React.Component {
   }
 
   async onSubmit(e) {
-    this.setState({ loading: true });
+    this.setState({ loading: true, error: '' });
     if (e) {
       e.preventDefault();
     }
@@ -129,6 +120,7 @@ class EditUpdateForm extends React.Component {
                     width="100%"
                     maxWidth="40em"
                     placeHolder="Normal"
+                    maxLength={250}
                     data-cy="titleInput"
                     required
                   />
@@ -140,7 +132,14 @@ class EditUpdateForm extends React.Component {
             <Container fontWeight="500" mb={2} mt={3} fontSize="1.6rem" lineHeight="1.7">
               <Box as="span">Message</Box>
             </Container>
-            <HTMLEditor onChange={html => this.handleChange('html', html)} defaultValue={update.html} />
+            <RichTextEditor
+              onChange={e => this.handleChange('html', e.target.value)}
+              defaultValue={update.html}
+              editorMinHeight={300}
+              editorMaxHeight={600}
+              withBorders
+              data-cy="update-content-editor"
+            />
           </Container>
           {(!collective.isHost || update.isPrivate) && (
             <Container
@@ -208,7 +207,7 @@ class EditUpdateForm extends React.Component {
               buttonSize="large"
               buttonStyle="primary"
               type="submit"
-              disabled={this.state.loading}
+              disabled={this.state.loading || !this.state.update.title || !this.state.update.html}
             >
               {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
               {!this.state.loading &&

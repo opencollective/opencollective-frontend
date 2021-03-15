@@ -13,7 +13,7 @@ const COMMON_DIRECTIVES = {
     SELF,
     process.env.IMAGES_URL,
     'data:',
-    't.paypal.com',
+    '*.paypal.com',
     'opencollective.com', // for widgets on /edit/export
     'blob:', // For upload images previews
   ],
@@ -24,6 +24,7 @@ const COMMON_DIRECTIVES = {
   styleSrc: [
     SELF,
     UNSAFE_INLINE, // For styled-components. TODO: Limit for nonce
+    '*.braintreegateway.com',
   ],
   connectSrc: [
     SELF,
@@ -35,6 +36,8 @@ const COMMON_DIRECTIVES = {
     'sentry.io',
     '*.sentry.io',
     'country-service.shopifycloud.com',
+    '*.braintreegateway.com',
+    '*.braintree-api.com',
   ],
   scriptSrc: [
     SELF,
@@ -43,8 +46,16 @@ const COMMON_DIRECTIVES = {
     'js.stripe.com',
     '*.paypal.com',
     '*.paypalobjects.com',
+    'js.braintreegateway.com',
   ],
-  frameSrc: ['www.youtube.com', 'opencollective.com', 'js.stripe.com', '*.paypal.com', '*.openstreetmap.org'],
+  frameSrc: [
+    'www.youtube.com',
+    'opencollective.com',
+    'js.stripe.com',
+    '*.paypal.com',
+    '*.openstreetmap.org',
+    'assets.braintreegateway.com',
+  ],
   objectSrc: ['opencollective.com'],
 };
 
@@ -103,12 +114,14 @@ const getContentSecurityPolicyConfig = () => {
       directives: generateDirectives({
         blockAllMixedContent: false,
         scriptSrc: [UNSAFE_INLINE, UNSAFE_EVAL], // For NextJS scripts
+        connectSrc: ['*.sandbox.braintree-api.com'],
       }),
     };
   } else if (env === 'staging') {
     return {
       reportOnly: false,
       directives: generateDirectives({
+        connectSrc: ['*.sandbox.braintree-api.com'],
         imgSrc: [
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',

@@ -168,7 +168,7 @@ const rows = [
         return (
           <FormattedMessage
             id="pricingTable.row.transferwisePayouts"
-            defaultMessage="Enable one-click payout with TransferWise"
+            defaultMessage="Enable one-click payout with Wise"
           />
         );
       },
@@ -310,7 +310,7 @@ const HostOrganization = ({ router }) => (
             <Box as="li" my={3}>
               <FormattedMessage
                 id="pricing.starterPlans.transferwisePayouts"
-                defaultMessage="Pay expenses in local currency with one-click using the <strong>TransferWise</strong> integration."
+                defaultMessage="Pay expenses in local currency with one-click using the <strong>Wise</strong> integration."
                 values={I18nFormatters}
               />
             </Box>

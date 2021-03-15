@@ -16,10 +16,10 @@ import { Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 
-// Dynamicly load HTMLEditor to download it only if user can edit the page
-const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
-const HTMLEditor = dynamic(() => import('../../RichTextEditor'), {
-  loading: HTMLEditorLoadingPlaceholder,
+// Dynamicly load RichTextEditor to download it only if user can edit the page
+const RichTextEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
+const RichTextEditor = dynamic(() => import('../../RichTextEditor'), {
+  loading: RichTextEditorLoadingPlaceholder,
   ssr: false, // No need for SSR as user needs to be logged in
 });
 
@@ -58,11 +58,11 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           {({ isEditing, value, setValue, enableEditor }) => {
             if (isEditing) {
               return (
-                <HTMLEditor
+                <RichTextEditor
                   defaultValue={collective.longDescription}
                   onChange={e => setValue(e.target.value)}
                   placeholder={intl.formatMessage(messages.placeholder)}
-                  toolbarTop={[60, null, 119]}
+                  toolbarTop={[56, 64]}
                   toolbarBackgroundColor="#F7F8FA"
                   withStickyToolbar
                   autoFocus

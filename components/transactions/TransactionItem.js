@@ -153,7 +153,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
                 {INFO_SEPARATOR}
                 <span data-cy="transaction-date">
-                  <time>
+                  <time title={createdAt}>
                     <FormattedDate value={createdAt} year="numeric" month="long" day="2-digit" />
                   </time>
                 </span>

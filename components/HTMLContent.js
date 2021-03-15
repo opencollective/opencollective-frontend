@@ -44,7 +44,7 @@ const DisplayBox = styled.div`
 `;
 
 /**
- * `HTMLEditor`'s associate, this component will display raw HTML with some CSS
+ * `RichTextEditor`'s associate, this component will display raw HTML with some CSS
  * resets to ensure we don't mess with the styles. Content can be omitted if you're
  * just willing to take the styles, for example to match the content displayed in the
  * editor with how it's rendered on the page.
@@ -90,15 +90,23 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
   /** Override global styles to match what we have in the editor */
   width: 100%;
   line-height: 1.75em;
-  word-break: break-word;
+  overflow-wrap: break-word;
 
   h1,
   h2,
   h3 {
     margin: 0;
-    margin-bottom: 0.5em;
     font-weight: normal;
     text-align: left;
+  }
+
+  h3 {
+    font-size: 1.25em;
+    margin-bottom: 0.25em;
+  }
+
+  figure {
+    margin: 0;
   }
 
   img {
@@ -122,18 +130,20 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
   blockquote {
     font-size: 1em;
     border-left: 5px solid #e9e9e9;
-    background-color: #f9f9f9;
+    background: white;
+    color: #757677;
     margin: 0;
-    padding: 8px;
+    padding: 16px;
   }
 
   pre {
-    font-size: 1em;
-    background: #f7f8fa;
-    color: #76777a;
+    font-size: 0.85em;
+    background: #f6f8fa;
+    color: #333;
     border: none;
-    padding: 8px 16px;
-    font-familly: Courier;
+    padding: 16px;
+    font-family: monospace;
+    overflow-x: auto;
   }
 
   ${typography}

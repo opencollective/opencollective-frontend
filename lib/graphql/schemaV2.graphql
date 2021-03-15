@@ -28,7 +28,7 @@ interface Account {
   slug: String
 
   """
-  The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+  The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL/VENDOR)
   """
   type: AccountType
   name: String
@@ -81,6 +81,11 @@ interface Account {
     limit: Int = 100
     offset: Int = 0
     role: [MemberRole]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
 
     """
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
@@ -303,6 +308,7 @@ enum AccountType {
   INDIVIDUAL
   ORGANIZATION
   PROJECT
+  VENDOR
 }
 
 input AccountUpdateInput {
@@ -590,6 +596,11 @@ type Bot implements Account {
     accountType: [AccountType]
 
     """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+
+    """
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
@@ -730,6 +741,23 @@ type Bot implements Account {
   features: CollectiveFeatures!
 }
 
+input BraintreePaymentInput {
+  nonce: String!
+  type: BraintreePaymentInputType!
+  details: JSON
+  binData: JSON
+  deviceData: JSON
+  description: String
+  vaulted: Boolean
+}
+
+"""
+Type of account used to pay with Braintree
+"""
+enum BraintreePaymentInputType {
+  PayPalAccount
+}
+
 """
 Input to order results chronologically
 """
@@ -817,6 +845,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int = 0
     role: [MemberRole]
     accountType: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
 
     """
     Order of the results
@@ -1245,6 +1278,8 @@ enum ConnectedAccountService {
   github
   twitter
   transferwise
+  privacy
+  braintree
   meetup @deprecated(reason: "Not using this service anymore")
 }
 
@@ -2986,6 +3021,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     accountType: [AccountType]
 
     """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+
+    """
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
@@ -3480,6 +3520,11 @@ input ExpenseInviteDraftInput {
   The address of the payee
   """
   payeeLocation: LocationInput
+
+  """
+  The payout method that will be used to reimburse the expense
+  """
+  payoutMethod: PayoutMethodInput
 }
 
 input ExpenseInvitee {
@@ -3714,7 +3759,7 @@ enum ExpenseType {
   INVOICE
 
   """
-  Receipt:  Get paid back for a purchase already made.
+  Receipt: Get paid back for a purchase already made.
   """
   RECEIPT
 
@@ -3727,6 +3772,11 @@ enum ExpenseType {
   Unclassified expense
   """
   UNCLASSIFIED
+
+  """
+  Credit Card Charge: Payment done using an issued (virtual) credit card issued by your Fiscal Host.
+  """
+  CHARGE
 }
 
 input ExpenseUpdateInput {
@@ -3860,6 +3910,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     role: [MemberRole]
     accountType: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
 
     """
     Order of the results
@@ -4168,6 +4223,11 @@ type Host implements Account & AccountWithContributions {
     accountType: [AccountType]
 
     """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+
+    """
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
@@ -4369,7 +4429,7 @@ type Host implements Account & AccountWithContributions {
   """
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
   """
-  supportedPaymentMethods: [PaymentMethodType]
+  supportedPaymentMethods: [PaymentMethodLegacyType]
   bankAccount: PayoutMethod
 
   """
@@ -4600,6 +4660,11 @@ type HostPlan {
   Charge on revenues made through Host Fees.
   """
   hostFeeSharePercent: Int
+
+  """
+  Ability to collect Platform Tips.
+  """
+  platformTips: Boolean
 }
 
 enum ImageFormat {
@@ -4673,6 +4738,11 @@ type Individual implements Account {
     offset: Int = 0
     role: [MemberRole]
     accountType: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
 
     """
     Order of the results
@@ -5930,6 +6000,11 @@ type Organization implements Account & AccountWithContributions {
     accountType: [AccountType]
 
     """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+
+    """
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
@@ -6136,13 +6211,13 @@ type PaymentMethod {
   id: String
   legacyId: Int
   name: String
-  service: String @deprecated(reason: "2020-08-18: This field is being deprecated in favor of providerType")
-  type: String @deprecated(reason: "2020-08-18: This field is being deprecated in favor of providerType")
+  service: PaymentMethodService
+  type: PaymentMethodType
 
   """
   Defines the type of the payment method. Meant to be moved to "type" in the future.
   """
-  providerType: PaymentMethodType
+  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
 
   """
   Returns the balance amount and the currency of this paymentMethod
@@ -6172,7 +6247,14 @@ input PaymentMethodInput {
   """
   Type of this payment method
   """
-  type: PaymentMethodType
+  type: PaymentMethodLegacyType
+
+  """
+  Type of this payment method
+  """
+  legacyType: PaymentMethodLegacyType
+  service: PaymentMethodService
+  newType: PaymentMethodType
 
   """
   Name of this payment method
@@ -6193,6 +6275,22 @@ input PaymentMethodInput {
   To pass when type is PAYPAL
   """
   paypalInfo: PaypalPaymentInput
+
+  """
+  To pass when type is BRAINTREE
+  """
+  braintreeInfo: BraintreePaymentInput
+}
+
+enum PaymentMethodLegacyType {
+  CREDIT_CARD
+  GIFT_CARD
+  PREPAID_BUDGET
+  ACCOUNT_BALANCE
+  PAYPAL
+  BRAINTREE_PAYPAL
+  BANK_TRANSFER
+  ADDED_FUNDS
 }
 
 input PaymentMethodReferenceInput {
@@ -6202,14 +6300,24 @@ input PaymentMethodReferenceInput {
   id: String
 }
 
-enum PaymentMethodType {
-  CREDIT_CARD
-  GIFT_CARD
-  PREPAID_BUDGET
-  ACCOUNT_BALANCE
+enum PaymentMethodService {
   PAYPAL
-  BANK_TRANSFER
-  ADDED_FUNDS
+  BRAINTREE
+  STRIPE
+  OPENCOLLECTIVE
+  PREPAID
+}
+
+enum PaymentMethodType {
+  creditcard
+  prepaid
+  payment
+  collective
+  host
+  adaptive
+  paypal
+  giftcard
+  manual
 }
 
 """
@@ -6255,6 +6363,7 @@ enum PayoutMethodType {
   PAYPAL
   BANK_ACCOUNT
   ACCOUNT_BALANCE
+  CREDIT_CARD
 }
 
 input PaypalPaymentInput {
@@ -6397,6 +6506,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     role: [MemberRole]
     accountType: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
 
     """
     Order of the results
@@ -6993,6 +7107,18 @@ type Query {
     """
     account: AccountReferenceInput
   ): Update
+  thirdPartyApiClientToken(
+    """
+    The account that serves as a payment target
+    """
+    account: AccountReferenceInput!
+
+    """
+    The account that is contributing
+    """
+    fromAccount: AccountReferenceInput
+    service: ThirdPartyApiWithClientToken!
+  ): String!
   loggedInAccount: Account
 }
 
@@ -7020,6 +7146,13 @@ type TagStat {
   Number of entries for this tag
   """
   count: Int!
+}
+
+"""
+Third party APIs for which Open Collective API can generate tokens
+"""
+enum ThirdPartyApiWithClientToken {
+  BRAINTREE
 }
 
 """
@@ -7242,6 +7375,11 @@ type Update {
   Indicates whether or not the user is allowed to see the content of this update
   """
   userCanSeeUpdate: Boolean!
+
+  """
+  Indicates whether or not the user is allowed to publish this update
+  """
+  userCanPublishUpdate: Boolean!
   isPrivate: Boolean!
   title: String!
   createdAt: DateTime!
@@ -7327,3 +7465,281 @@ input UpdateUpdateInput {
 A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
 """
 scalar URL
+
+"""
+This represents a Vendor account
+"""
+type Vendor implements Account & AccountWithHost & AccountWithContributions {
+  id: String
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+  name: String
+  description: String
+  longDescription: String
+  tags: [String]
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
+  imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
+
+  """
+  Returns whether it's active: can accept financial contributions and pay expenses.
+  """
+  isActive: Boolean!
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+    account: AccountReferenceInput
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberOfCollection
+  transactions(
+    type: TransactionType
+    limit: Int = 100
+    offset: Int = 0
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    If the account is a user and this field is true, contributions from the
+    incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+  ): TransactionCollection!
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): OrderCollection!
+  settings: JSON!
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
+  categories: [String]!
+  stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    onlyPublishedUpdates: Boolean
+  ): UpdateCollection!
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
+
+  """
+  Returns the Fiscal Host
+  """
+  host: Host
+
+  """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent: Float
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
+  Returns whether it's approved by the Fiscal Host
+  """
+  isApproved: Boolean!
+
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
+  tiers: TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
+}
