@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
-import Router from 'next/router';
 import { injectIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
