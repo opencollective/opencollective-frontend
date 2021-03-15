@@ -56,7 +56,9 @@ const messages = defineMessages({
 const InlineField = ({ name, children, label, isLabelClickable }) => (
   <Flex flexWrap="wrap" alignItems="center" mb="2.5em" className={`field-${name}`}>
     <Box width={[1, 0.3]}>
-      <Strong style={{ cursor: isLabelClickable ? 'pointer' : 'inherit', width: '100%' }}>{label}</Strong>
+      <label htmlFor={`giftcard-${name}`} style={{ cursor: isLabelClickable ? 'pointer' : 'inherit', width: '100%' }}>
+        {label}
+      </label>
     </Box>
     {children}
   </Flex>
@@ -123,7 +125,7 @@ const DeliverTypeRadioSelector = styled(Flex)`
   border-bottom: 1px solid ${themeGet('colors.black.200')};
 `;
 
-const RadioButtonContainer = styled(Strong)`
+const RadioButtonContainer = styled.label`
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -142,7 +144,7 @@ const RadioButtonContainer = styled(Strong)`
 const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   const icon = checked ? <RadioButtonChecked /> : <RadioButtonUnchecked />;
   return (
-    <RadioButtonContainer data-name={name}>
+    <RadioButtonContainer htmlFor="radio-buttons" data-name={name}>
       <div
         role="presentation"
         onClick={onClick}
@@ -156,7 +158,9 @@ const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
         <Box className="radio-btn" textAlign="center">
           {icon}
         </Box>
-        <div style={{ marginTop: 8, cursor: 'pointer' }}>{children}</div>
+        <div id="radio-buttons" style={{ marginTop: 8, cursor: 'pointer' }}>
+          {children}
+        </div>
       </div>
     </RadioButtonContainer>
   );
@@ -402,9 +406,10 @@ class CreateGiftCardsForm extends Component {
     return (
       <Container display="flex" flexDirection="column" width={1} justifyContent="center">
         <Flex justifyContent="center" mt={3} mb={4} alignItems="center">
-          <Strong>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          <label htmlFor="giftcard-numberOfGiftCards">
             <FormattedMessage id="giftCards.create.number" defaultMessage="Number of gift cards" />
-          </Strong>
+          </label>
           <StyledInput
             id="giftcard-numberOfGiftCards"
             name="giftcard-numberOfGiftCards"

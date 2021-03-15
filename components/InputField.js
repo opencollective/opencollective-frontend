@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, isNil } from 'lodash';
+import { get, isNil, uniqueId } from 'lodash';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 
@@ -16,7 +16,6 @@ import StyledInputGroup from './StyledInputGroup';
 import StyledInputTags from './StyledInputTags';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
-import { Strong } from './Text';
 import TimezonePicker from './TimezonePicker';
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
@@ -35,16 +34,17 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
   props.key = props.key || props.name;
 
   const inputProps = { ...props };
+  const id = uniqueId('styled-input-group');
   delete inputProps.children;
 
   if (className && className.match(/horizontal/)) {
     return (
       <Flex flexWrap="wrap" p={1}>
-        <Box width={[1, 2 / 12]} mt={1} mb={1}>
-          <Strong>{label}</Strong>
+        <Box width={[1, 2 / 12]}>
+          <label htmlFor={id}>{label}</label>
         </Box>
         <Box width={[1, 10 / 12]}>
-          <StyledInputGroup prepend={pre} append={post} success={validationState} {...inputProps} />
+          <StyledInputGroup id={id} prepend={pre} append={post} success={validationState} {...inputProps} />
           {after && <div className="after">{after}</div>}
           {button && <StyledButton>{button}</StyledButton>}
           {help && <HelpBlock>{help}</HelpBlock>}
@@ -55,12 +55,12 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
     return (
       <Flex flexWrap="wrap" p={1}>
         {label && (
-          <Box width={1} mt={1} mb={1}>
-            <Strong>{label}</Strong>
+          <Box width={1}>
+            <label htmlFor={id}>{label}</label>
           </Box>
         )}
         <Box width={1}>
-          <StyledInputGroup prepend={pre} append={post} success={validationState} {...inputProps} />
+          <StyledInputGroup id={id} prepend={pre} append={post} success={validationState} {...inputProps} />
           {button && <StyledButton>{button}</StyledButton>}
         </Box>
         {help && <HelpBlock>{help}</HelpBlock>}
@@ -187,6 +187,7 @@ class InputField extends React.Component {
     const context = field.context || {};
     let value = this.state.value;
     const horizontal = field.className && field.className.match(/horizontal/);
+    const id = uniqueId(`styled-${this.props.type}`);
     switch (this.props.type) {
       case 'textarea': {
         value = value || this.props.defaultValue || '';
@@ -202,11 +203,12 @@ class InputField extends React.Component {
           <div>
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
-                <Box width={[1, 2 / 12]} mt={1} mb={1}>
-                  <Strong>{capitalize(field.label)}</Strong>
+                <Box width={[1, 2 / 12]}>
+                  <label htmlFor={id}>{capitalize(field.label)}</label>
                 </Box>
                 <Box width={[1, 10 / 12]}>
                   <StyledTextarea
+                    id={id}
                     width="100%"
                     className={field.className}
                     onChange={event => this.handleChange(event.target.value)}
@@ -222,12 +224,13 @@ class InputField extends React.Component {
             {!horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
-                  <Box width={1} mt={1} mb={1}>
-                    <Strong>{`${capitalize(field.label)}`}</Strong>
+                  <Box width={1}>
+                    <label htmlFor={id}>{`${capitalize(field.label)}`}</label>
                   </Box>
                 )}
                 <Box width={1}>
                   <StyledTextarea
+                    id={id}
                     width="100%"
                     className={field.className}
                     onChange={event => this.handleChange(event.target.value)}
@@ -250,24 +253,24 @@ class InputField extends React.Component {
           <div>
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
-                <Box width={[1, 2 / 12]} mt={1} mb={1}>
-                  <Strong>{capitalize(field.label)}</Strong>
+                <Box width={[1, 2 / 12]}>
+                  <label htmlFor={id}>{capitalize(field.label)}</label>
                 </Box>
                 <Box width={[1, 2 / 12]}>
-                  <StyledInputTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                  <StyledInputTags id={id} {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
                 </Box>
               </Flex>
             )}
             {!horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
-                  <Box width={1} mt={1} mb={1}>
-                    <Strong>{`${capitalize(field.label)}`}</Strong>
+                  <Box width={1}>
+                    <label htmlFor={id}>{`${capitalize(field.label)}`}</label>
                   </Box>
                 )}
                 {field.description && <HelpBlock p={1}>{field.description}</HelpBlock>}
                 <Box width={1}>
-                  <StyledInputTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                  <StyledInputTags id={id} {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
                 </Box>
               </Flex>
             )}
@@ -284,11 +287,12 @@ class InputField extends React.Component {
           <div>
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
-                <Box width={[1, 2 / 12]} mt={1} mb={1}>
-                  <Strong>{capitalize(field.label)}</Strong>
+                <Box width={[1, 2 / 12]}>
+                  <label htmlFor={id}>{capitalize(field.label)}</label>
                 </Box>
                 <Box width={[1, 10 / 12]}>
                   <DateTime
+                    id={id}
                     name={field.name}
                     timeFormat={field.timeFormat || timeFormat}
                     date={this.state.value || field.defaultValue}
@@ -303,12 +307,13 @@ class InputField extends React.Component {
             {!horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
-                  <Box width={1} mt={1} mb={1}>
-                    <Strong>{`${capitalize(field.label)}`}</Strong>
+                  <Box width={1}>
+                    <label htmlFor={id}>{`${capitalize(field.label)}`}</label>
                   </Box>
                 )}
                 <Box width={1}>
                   <DateTime
+                    id={id}
                     name={field.name}
                     timeFormat={field.timeFormat || timeFormat}
                     date={this.state.value || field.defaultValue}
@@ -331,23 +336,23 @@ class InputField extends React.Component {
           <div>
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
-                <Box width={[1, 2 / 12]} mt={1} mb={1}>
-                  <Strong>{capitalize(field.label)}</Strong>
+                <Box width={[1, 2 / 12]}>
+                  <label htmlFor={id}>{capitalize(field.label)}</label>
                 </Box>
                 <Box width={[1, 10 / 12]}>
-                  <field.component onChange={this.handleChange} {...field} {...field.options} />
+                  <field.component id={id} onChange={this.handleChange} {...field} {...field.options} />
                 </Box>
               </Flex>
             )}
             {!horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
-                  <Box width={1} mt={1} mb={1}>
-                    <Strong>{`${capitalize(field.label)}`}</Strong>
+                  <Box width={1}>
+                    <label htmlFor={id}>{`${capitalize(field.label)}`}</label>
                   </Box>
                 )}
                 <Box width={1}>
-                  <field.component onChange={this.handleChange} {...field} {...field.options} />
+                  <field.component id={id} onChange={this.handleChange} {...field} {...field.options} />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </Box>
               </Flex>
@@ -360,12 +365,13 @@ class InputField extends React.Component {
         this.input = (
           <Flex flexWrap="wrap" p={1}>
             {field.label && (
-              <Box width={1} mt={1} mb={1}>
-                <Strong>{`${capitalize(field.label)}`}</Strong>
+              <Box width={1}>
+                <label htmlFor={id}>{`${capitalize(field.label)}`}</label>
               </Box>
             )}
             <Box width={1}>
               <InputTypeLocation
+                id={id}
                 value={this.state.value || field.defaultValue}
                 onChange={event => this.handleChange(event)}
                 placeholder={field.placeholder}
@@ -382,11 +388,12 @@ class InputField extends React.Component {
           <div>
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
-                <Box width={[1, 2 / 12]} mt={1} mb={1}>
-                  <Strong>{capitalize(field.label)}</Strong>
+                <Box width={[1, 2 / 12]}>
+                  <label htmlFor={id}>{capitalize(field.label)}</label>
                 </Box>
                 <Box width={[1, 10 / 12]}>
                   <InputTypeCountry
+                    id={id}
                     name={field.name}
                     value={field.value}
                     defaultValue={field.defaultValue}
@@ -398,12 +405,13 @@ class InputField extends React.Component {
             {!horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
-                  <Box width={1} mt={1} mb={1}>
-                    <Strong>{`${capitalize(field.label)}`}</Strong>
+                  <Box width={1}>
+                    <label htmlFor={id}>{`${capitalize(field.label)}`}</label>
                   </Box>
                 )}
                 <Box width={1}>
                   <InputTypeCountry
+                    id={id}
                     name={field.name}
                     value={field.value}
                     defaultValue={field.defaultValue}
@@ -494,6 +502,7 @@ class InputField extends React.Component {
 
         const StyledSelectComponent = (
           <StyledSelect
+            id={id}
             name={field.name}
             data-cy={field.name}
             type="select"
@@ -521,8 +530,8 @@ class InputField extends React.Component {
             {horizontal && (
               <div>
                 <Flex flexWrap="wrap" p={1}>
-                  <Box width={[1, 2 / 12]} mt={1} mb={1}>
-                    <Strong>{capitalize(field.label)}</Strong>
+                  <Box width={[1, 2 / 12]}>
+                    <label htmlFor={id}>{capitalize(field.label)}</label>
                   </Box>
                   <Box width={[1, 10 / 12]}>{StyledSelectComponent}</Box>
                 </Flex>
@@ -539,8 +548,8 @@ class InputField extends React.Component {
             {!horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
-                  <Box width={1} mt={1} mb={1}>
-                    <Strong>{`${capitalize(field.label)}`}</Strong>
+                  <Box width={1}>
+                    <label htmlFor={id}>{`${capitalize(field.label)}`}</label>
                   </Box>
                 )}
                 <Box width={1}>
@@ -560,11 +569,12 @@ class InputField extends React.Component {
             {horizontal && (
               <div>
                 <Flex flexWrap="wrap" p={1}>
-                  <Box width={[1, 2 / 12]} mt={1} mb={1}>
-                    <Strong>{capitalize(field.label)}</Strong>
+                  <Box width={[1, 2 / 12]}>
+                    <label htmlFor={id}>{capitalize(field.label)}</label>
                   </Box>
                   <Box width={[1, 10 / 12]}>
                     <StyledCheckbox
+                      id={id}
                       name="input-checkbox"
                       defaultChecked={field.defaultValue}
                       onChange={event => this.handleChange(event.target.checked)}
@@ -605,12 +615,13 @@ class InputField extends React.Component {
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
-                  <Box width={[1, 2 / 12]} mt={1} mb={1}>
-                    <Strong>{capitalize(field.label)}</Strong>
+                  <Box width={[1, 2 / 12]}>
+                    <label htmlFor={id}>{capitalize(field.label)}</label>
                   </Box>
                 )}
                 <Box width={[1, 10 / 12]}>
                   <InputSwitch
+                    id={id}
                     name={field.name}
                     defaultChecked={field.defaultValue}
                     onChange={event => this.handleChange(event.target.checked)}
@@ -621,9 +632,10 @@ class InputField extends React.Component {
             )}
             {!horizontal && (
               <React.Fragment>
-                {field.label && <Strong>{capitalize(field.label)}</Strong>}
+                {field.label && <label htmlFor={id}>{capitalize(field.label)}</label>}
                 <div className="switch">
                   <InputSwitch
+                    id={id}
                     name={field.name}
                     defaultChecked={field.defaultValue}
                     onChange={event => this.handleChange(event.target.checked)}
