@@ -28,7 +28,6 @@ import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
-import { Strong } from './Text';
 
 const MIN_AMOUNT = 500;
 const MAX_AMOUNT = 100000000;
@@ -354,7 +353,8 @@ class CreateGiftCardsForm extends Component {
     return (
       <Box>
         <Flex flexDirection="column" mb="2em">
-          <Strong style={{ width: '100%' }}>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          <label style={{ width: '100%' }} htmlFor="gift-cards-recipients">
             <Flex flexDirection="column">
               <FormattedMessage id="giftCards.create.recipients" defaultMessage="Recipients" />
               <FieldLabelDetails>
@@ -364,8 +364,9 @@ class CreateGiftCardsForm extends Component {
                 />
               </FieldLabelDetails>
             </Flex>
-          </Strong>
+          </label>
           <StyledMultiEmailInput
+            id="gift-cards-recipients"
             className="gift-cards-recipients"
             mt="0.25em"
             invalids={errors.emails}
