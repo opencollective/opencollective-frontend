@@ -214,7 +214,7 @@
   "collective.connectedAccounts.reconnect.button": "Ricollega",
   "collective.connectedAccounts.stripe.button": "Collega Stripe",
   "collective.connectedAccounts.stripe.connected": "Account Stripe connesso il {updatedAt, date, short}",
-  "collective.connectedAccounts.transferwise.button": "Connect Wise",
+  "collective.connectedAccounts.transferwise.button": "Collega Wise",
   "collective.connectedAccounts.transferwise.connected": "Wise connected on {updatedAt, date, short}",
   "collective.connectedAccounts.twitter.button": "Collega Twitter",
   "collective.connectedAccounts.twitter.connected": "Account Twitter @{username} connesso il {updatedAt, date, short}",
