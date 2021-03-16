@@ -259,7 +259,9 @@ class StyledUpdate extends Component {
         ) : isReloadingData ? (
           <LoadingPlaceholder height={300} />
         ) : null}
-        {update.userCanPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
+        {update.userCanPublishUpdate && (
+          <PublishUpdateBtnWithData id={update.id} isHost={Boolean(update.account?.isHost)} />
+        )}
       </Container>
     );
   }
