@@ -58,6 +58,7 @@
     "file-saver": "2.0.5",
     "focus-trap-react": "8.4.2",
     "formik": "2.2.6",
+    "get-video-id": "3.2.0",
     "glob": "7.1.6",
     "graphql": "15.5.0",
     "helmet": "4.4.1",

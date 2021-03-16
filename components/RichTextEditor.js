@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import css from '@styled-system/css';
+import getVideoId from 'get-video-id';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
@@ -313,6 +314,7 @@ export default class RichTextEditor extends React.Component {
                   <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-video-embed">
                 </div>
               </div>
+              <strong>Note: Only YouTube and Vimeo links are supported.</strong>
             </div>`;
     const { toolbarElement } = e.target;
     const attachFilesButton = toolbarElement.querySelector('[data-trix-action=attachFiles]');
@@ -334,13 +336,27 @@ export default class RichTextEditor extends React.Component {
       }
     } else if (e.actionName === 'x-video-embed') {
       const videoLink = toolbarElement.querySelector('.trix-input--dialog-video').value;
-      this.embedVideoIFrame(videoLink);
+      if (videoLink) {
+        this.embedVideoIFrame(videoLink);
+      }
+    }
+  };
+
+  constructVideoEmbedURL = videoLink => {
+    const { id, service } = getVideoId(videoLink);
+    if (service === 'youtube') {
+      return `https://www.youtube.com/embed/${id}`;
+    } else if (service === 'vimeo') {
+      return `https://player.vimeo.com/video/${id}`;
+    } else {
+      return null;
     }
   };
 
   embedVideoIFrame = videoLink => {
-    if (videoLink) {
-      const embed = `<iframe src="${videoLink}/?showinfo=0" frameborder="0" allowfullscreen/>`;
+    const embedLink = this.constructVideoEmbedURL(videoLink);
+    if (embedLink) {
+      const embed = `<iframe src="${embedLink}/?showinfo=0" frameborder="0" allowfullscreen/>`;
       const attachment = new this.Trix.Attachment({ content: embed });
       this.getEditor().insertAttachment(attachment);
     }
