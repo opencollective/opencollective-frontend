@@ -132,11 +132,7 @@ const HostInfoCard = ({ host }) => {
             <TransferwiseIcon size={14} color="#9D9FA3" />
           </Box>
           <ColumnTitle>
-            <FormattedMessage
-              id="ServiceBalance"
-              defaultMessage="{service} balance"
-              values={{ service: 'Transferwise' }}
-            />
+            <FormattedMessage id="ServiceBalance" defaultMessage="{service} balance" values={{ service: 'Wise' }} />
           </ColumnTitle>
           <TransferwiseDetailsIcon size={18} balances={host.transferwiseBalances} />
         </Flex>

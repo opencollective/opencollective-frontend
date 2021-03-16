@@ -48,6 +48,7 @@ export const collectivePageQuery = gql`
       stats {
         id
         balance
+        balanceWithBlockedFunds
         yearlyBudget
         updates
         activeRecurringContributions
@@ -96,6 +97,7 @@ export const collectivePageQuery = gql`
           hostFees
           transferwisePayoutsLimit
           transferwisePayouts
+          hostFeeSharePercent
         }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {

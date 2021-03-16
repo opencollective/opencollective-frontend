@@ -31,6 +31,28 @@ import TransactionDetails from './TransactionDetails';
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
 
+const getDisplayedAmount = (transaction, collective) => {
+  const isCredit = transaction.type === TransactionTypes.CREDIT;
+  const hasOrder = transaction.order !== null;
+  const isSelf = transaction.fromAccount.slug === collective.slug;
+
+  if (isCredit && hasOrder) {
+    // Credit from donations should display the full amount donated by the user
+    return transaction.amount;
+  } else if (!isCredit && !hasOrder) {
+    // Expense Debits should display the Amount with Payment Method fees only on collective's profile
+    return isSelf ? transaction.netAmount : transaction.amount;
+  } else if (transaction.isRefunded) {
+    if ((isSelf && !transaction.isRefund) || (transaction.isRefund && isCredit)) {
+      return transaction.netAmount;
+    } else {
+      return transaction.amount;
+    }
+  } else {
+    return transaction.netAmount;
+  }
+};
+
 const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
   const {
     toAccount,
@@ -39,8 +61,6 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
     order,
     expense,
     type,
-    amount,
-    netAmount,
     description,
     createdAt,
     isRefunded,
@@ -62,15 +82,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const isFromCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(fromAccount);
   const isToCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(toAccount);
   const canDownloadInvoice = isRoot || isHostAdmin || isFromCollectiveAdmin || isToCollectiveAdmin;
-  let displayedAmount =
-    (isCredit && hasOrder) || // Credit from donations should display the full amount donated by the user
-    (!isCredit && !hasOrder) // Expense Debits should display the Amount without Payment Method fees
-      ? amount
-      : netAmount;
-  // The refunded transaction logic because it's a bit messy, the conditional was conceived by trial
-  if (isRefunded) {
-    displayedAmount = (fromAccount.slug == collective.slug && !isRefund) || (isRefund && isCredit) ? netAmount : amount;
-  }
+  const displayedAmount = getDisplayedAmount(transaction, collective);
 
   return (
     <Item data-cy="transaction-item">
@@ -141,7 +153,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
                 {INFO_SEPARATOR}
                 <span data-cy="transaction-date">
-                  <time>
+                  <time title={createdAt}>
                     <FormattedDate value={createdAt} year="numeric" month="long" day="2-digit" />
                   </time>
                 </span>

@@ -12,6 +12,7 @@ import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
+import { darken } from 'polished';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { display } from 'styled-system';
@@ -79,14 +80,16 @@ const BackButtonAndAvatar = styled.div`
       width: 48px;
       opacity: 1;
       visibility: visible;
-      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, width 0.075s ease-in-out;
+      margin-right: 8px;
+      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, margin 0.075s, width 0.075s ease-in-out;
     }
 
     &[data-hide-on-desktop='true'] {
       width: 0px;
+      margin-right: 0px;
       visibility: hidden;
       opacity: 0;
-      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, width 0.075s ease-in-out;
+      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, margin 0.075s, width 0.075s ease-in-out;
     }
   }
 `;
@@ -394,10 +397,9 @@ export const MainActionBtn = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
   padding: 5px 10px;
   white-space: nowrap;
   text-transform: uppercase;
-  background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
-    linear-gradient(${themeGet('colors.primary.500')}, ${themeGet('colors.primary.500')});
+  background: ${themeGet('colors.primary.100')};
   border-radius: 8px;
-  color: ${themeGet('colors.primary.600')};
+  color: ${themeGet('colors.primary.700')};
   border: none;
 
   &,
@@ -406,13 +408,12 @@ export const MainActionBtn = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
   }
 
   &:hover {
-    background: linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)),
-      linear-gradient(${themeGet('colors.primary.500')}, ${themeGet('colors.primary.500')});
+    background: ${props => darken(0.025, props.theme.colors.primary[100])};
   }
 
   &:active,
   &:focus {
-    background: ${themeGet('colors.primary.600')};
+    background: ${themeGet('colors.primary.700')};
     color: ${themeGet('colors.white.full')};
     box-shadow: none;
   }
@@ -447,7 +448,7 @@ const CollectiveNavbar = ({
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
-  const isRoot = LoggedInUser?.isRoot;
+  const isRoot = LoggedInUser?.isRoot();
   callsToAction = { ...getDefaultCallsToActions(collective, sections, isAdmin, isHostAdmin, isRoot), ...callsToAction };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
   const mainAction = getMainAction(collective, actionsArray);

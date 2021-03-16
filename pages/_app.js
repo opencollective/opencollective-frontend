@@ -16,7 +16,6 @@ import UserProvider from '../components/UserProvider';
 
 import 'nprogress/nprogress.css';
 import 'react-datetime/css/react-datetime.css';
-import 'react-quill/dist/quill.snow.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import '../public/static/styles/react-tags.css';

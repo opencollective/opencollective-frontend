@@ -37,6 +37,8 @@ const TierCustomFields = ({ fields, data, onChange }) => {
               value={data?.[customField.name] || ''}
               mt={customField.type === 'checkbox' ? '2px !important' : 0}
               css={customField.type === 'checkbox' ? { flex: '0 0 1em' } : undefined}
+              placeholder={customField.placeholder}
+              pattern={customField.pattern}
               onChange={e =>
                 onChange({
                   ...data,
@@ -59,6 +61,8 @@ TierCustomFields.propTypes = {
       label: PropTypes.string,
       type: PropTypes.string,
       required: PropTypes.bool,
+      placeholder: PropTypes.string,
+      pattern: PropTypes.string,
     }),
   ),
 };

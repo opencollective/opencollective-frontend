@@ -115,6 +115,7 @@ describe('Collective page', () => {
       cy.wait(3000);
       cy.get('[data-cy=edit-update-form]').within(() => {
         cy.get('[data-cy=titleInput]').type('Sample Update');
+        cy.get('[data-cy="update-content-editor"] trix-editor').type('Hello World');
         cy.get('[data-cy=edit-update-submit-btn]').click();
       });
       cy.get('[data-cy=PublishUpdateBtn] button').click();

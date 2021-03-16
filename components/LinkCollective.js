@@ -22,7 +22,7 @@ const LinkCollective = ({ target, title, collective, children, ...props }) => {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (collective.isGuest) {
     return children || <FormattedMessage id="profile.guest" defaultMessage="Guest" />;
-  } else if (!collective.slug) {
+  } else if (!collective.slug || collective.type === 'VENDOR') {
     return children || collective.name;
   }
 

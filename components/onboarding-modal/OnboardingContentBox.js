@@ -10,9 +10,9 @@ import Container from '../../components/Container';
 import StyledHr from '../../components/StyledHr';
 import StyledInputField from '../../components/StyledInputField';
 import StyledInputGroup from '../../components/StyledInputGroup';
-import { H1, P } from '../../components/Text';
 
 import { Box, Flex } from '../Grid';
+import { H1, P } from '../Text';
 
 import OnboardingProfileCard from './OnboardingProfileCard';
 import OnboardingSkipButton from './OnboardingSkipButton';

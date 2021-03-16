@@ -100,7 +100,7 @@ const Toast = ({ toast, timeLeft, onClose }) => {
   const [isClosing, setClosing] = React.useState(false);
   const color = getColor(toast);
   return (
-    <StyledToast timeLeft={timeLeft} isClosing={isClosing}>
+    <StyledToast timeLeft={timeLeft} isClosing={isClosing} data-cy="toast-notification">
       <Flex alignItems="center">
         <Container
           bg={color}
@@ -135,6 +135,7 @@ const Toast = ({ toast, timeLeft, onClose }) => {
         </Flex>
       </Flex>
       <StyledButton
+        data-cy="dismiss-toast-btn"
         buttonSize="tiny"
         isBorderless
         onClick={() => {

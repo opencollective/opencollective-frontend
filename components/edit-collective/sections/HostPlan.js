@@ -168,9 +168,14 @@ const editHostPlanMutation = gqlV2/* GraphQL */ `
     editHostPlan(account: $account, plan: $plan) {
       id
       slug
+      hostFeePercent
+      platformFeePercent
       plan {
         id
         name
+      }
+      hostMetrics {
+        hostFeeSharePercent
       }
     }
   }
@@ -224,7 +229,7 @@ const HostPlan = props => {
               <li>
                 <FormattedMessage
                   id="Host.Plan.TransferwisePayouts.limited"
-                  defaultMessage="Up to $1000 payouts with TransferWise"
+                  defaultMessage="Up to $1000 payouts with Wise"
                 />
               </li>
               <li>
@@ -357,12 +362,12 @@ const HostPlan = props => {
           )}
         </li>
         <li>
-          <strong>Payouts with TransferWise Limit</strong>{' '}
+          <strong>Payouts with Wise Limit</strong>{' '}
           <StyledTooltip
             content={() => (
               <FormattedMessage
                 id="collective.hostSettings.help."
-                defaultMessage="You can pay expenses with one-click using TransferWise."
+                defaultMessage="You can pay expenses with one-click using Wise."
               />
             )}
           >

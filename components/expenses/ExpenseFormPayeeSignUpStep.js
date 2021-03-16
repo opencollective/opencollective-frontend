@@ -2,20 +2,18 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
-import { first, get, isEmpty, omit } from 'lodash';
+import { isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective.lib';
-import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex, Grid } from '../Grid';
-import I18nAddressFields, { serializeAddress } from '../I18nAddressFields';
+import I18nAddressFields from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
 import LoginBtn from '../LoginBtn';
 import StyledButton from '../StyledButton';
@@ -29,6 +27,8 @@ import { Span } from '../Text';
 
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
+
+const EMPTY_ARRAY = [];
 
 const msg = defineMessages({
   nameLabel: {
@@ -81,7 +81,6 @@ const msg = defineMessages({
   },
 });
 
-const EMPTY_ARRAY = [];
 const PAYEE_TYPE = {
   USER: 'USER',
   ORG: 'ORG',
@@ -114,42 +113,7 @@ const RadioOptionContainer = styled.label`
   }
 `;
 
-const getPayoutMethodsFromPayee = payee => {
-  const basePms = get(payee, 'payoutMethods') || EMPTY_ARRAY;
-  let filteredPms = basePms.filter(({ isSaved }) => isSaved);
-
-  // If the Payee is active (can manage a budget and has a balance). This is usually:
-  // - a "Collective" family (Collective, Fund, Event, Project) with an host
-  // - an "Host" Organization with budget activated
-  if (payee?.isActive) {
-    if (!filteredPms.find(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)) {
-      filteredPms.unshift({
-        id: 'new',
-        data: {},
-        type: PayoutMethodType.ACCOUNT_BALANCE,
-        isSaved: true,
-      });
-    }
-  }
-
-  // If the Payee is in the "Collective" family (Collective, Fund, Event, Project)
-  // Then the Account Balance should be its only option
-  if (payee && AccountTypesWithHost.includes(payee.type)) {
-    filteredPms = filteredPms.filter(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE);
-  }
-
-  return filteredPms.length > 0 ? filteredPms : EMPTY_ARRAY;
-};
-
-const refreshPayoutProfile = (formik, payoutProfiles) => {
-  const payee = formik.values.payee
-    ? payoutProfiles.find(profile => profile.id === formik.values.payee.id)
-    : first(payoutProfiles);
-
-  formik.setFieldValue('payee', payee);
-};
-
-const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCancel, onNext }) => {
+const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
@@ -158,8 +122,6 @@ const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCanc
     (values.type === expenseTypes.RECEIPT ||
       (values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address));
 
-  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee, collective), [values.payee]);
-  const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const [payeeType, setPayeeType] = React.useState(PAYEE_TYPE.USER);
   const changePayeeType = e => {
@@ -303,84 +265,86 @@ const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCanc
             />
           </Span>
         </Box>
-        <FastField name="payeeLocation.country">
-          {({ field }) => (
-            <StyledInputField
-              name={field.name}
-              label={formatMessage(msg.country)}
-              labelFontSize="13px"
-              error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
-              required
-              mt={3}
-            >
-              {({ id, error }) => (
-                <InputTypeCountry
-                  data-cy="payee-country"
-                  inputId={id}
-                  onChange={value => formik.setFieldValue(field.name, value)}
-                  value={field.value}
-                  error={error}
-                />
-              )}
-            </StyledInputField>
-          )}
-        </FastField>
-        <Field name="payoutMethod">
-          {({ field }) => (
-            <StyledInputField
-              name={field.name}
-              htmlFor="payout-method"
-              flex="1"
-              mt={3}
-              label={formatMessage(msg.payoutOptionLabel)}
-              labelFontSize="13px"
-              error={
-                isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
-                  ? formatFormErrorMessage(intl, errors.payoutMethod)
-                  : null
-              }
-            >
-              {({ id, error }) => (
-                <PayoutMethodSelect
-                  inputId={id}
-                  error={error}
-                  onChange={setPayoutMethod}
-                  onRemove={onPayoutMethodRemove}
-                  payoutMethod={values.payoutMethod}
-                  payoutMethods={allPayoutMethods}
-                  payee={values.payee}
-                  disabled={!values.payee}
-                  collective={collective}
-                />
-              )}
-            </StyledInputField>
-          )}
-        </Field>
         <Box>
-          <Field name="payeeLocation.structured">
+          <FastField name="payeeLocation.country">
             {({ field }) => (
-              <I18nAddressFields
+              <StyledInputField
                 name={field.name}
-                selectedCountry={values.payeeLocation?.country}
-                value={field.value || {}}
-                onChange={({ name, value }) => {
-                  const address = {
-                    ...(formik.values.payeeLocation?.structured || {}),
-                    [name]: value,
-                  };
-
-                  formik.setFieldValue('payeeLocation.structured', address);
-                  formik.setFieldValue('payeeLocation.address', serializeAddress(address));
-                }}
-                onCountryChange={addressObject => {
-                  if (addressObject) {
-                    formik.setFieldValue('payeeLocation.structured', addressObject);
-                  }
-                }}
-              />
+                label={formatMessage(msg.country)}
+                labelFontSize="13px"
+                error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
+                required
+                mt={3}
+              >
+                {({ id, error }) => (
+                  <InputTypeCountry
+                    data-cy="payee-country"
+                    inputId={id}
+                    onChange={value => formik.setFieldValue(field.name, value)}
+                    value={field.value}
+                    error={error}
+                  />
+                )}
+              </StyledInputField>
+            )}
+          </FastField>
+          <I18nAddressFields
+            prefix="payeeLocation.structured"
+            selectedCountry={values.payeeLocation?.country}
+            onCountryChange={addressObject => {
+              if (addressObject) {
+                formik.setFieldValue('payeeLocation.structured', addressObject);
+              }
+            }}
+          />
+        </Box>
+        <Box>
+          <Field name="payoutMethod">
+            {({ field }) => (
+              <StyledInputField
+                name={field.name}
+                htmlFor="payout-method"
+                flex="1"
+                mt={3}
+                label={formatMessage(msg.payoutOptionLabel)}
+                labelFontSize="13px"
+                error={
+                  isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
+                    ? formatFormErrorMessage(intl, errors.payoutMethod)
+                    : null
+                }
+              >
+                {({ id, error }) => (
+                  <PayoutMethodSelect
+                    inputId={id}
+                    error={error}
+                    onChange={setPayoutMethod}
+                    payoutMethod={values.payoutMethod}
+                    payoutMethods={EMPTY_ARRAY}
+                    payee={values.payee}
+                    disabled={!values.payee}
+                    collective={collective}
+                  />
+                )}
+              </StyledInputField>
             )}
           </Field>
+          {values.payoutMethod && (
+            <Field name="payoutMethod">
+              {({ field, meta }) => (
+                <Box mt={3} flex="1">
+                  <PayoutMethodForm
+                    fieldsPrefix="payoutMethod"
+                    payoutMethod={field.value}
+                    host={collective.host}
+                    errors={meta.error}
+                  />
+                </Box>
+              )}
+            </Field>
+          )}
         </Box>
+
         <FastField name="invoiceInfo">
           {({ field }) => (
             <StyledInputField
@@ -403,21 +367,6 @@ const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCanc
             </StyledInputField>
           )}
         </FastField>
-
-        {values.payoutMethod && (
-          <Field name="payoutMethod">
-            {({ field, meta }) => (
-              <Box mt={3} flex="1">
-                <PayoutMethodForm
-                  fieldsPrefix="payoutMethod"
-                  payoutMethod={field.value}
-                  host={collective.host}
-                  errors={meta.error}
-                />
-              </Box>
-            )}
-          </Field>
-        )}
       </Grid>
       {values.payee && (
         <Fragment>
@@ -450,8 +399,18 @@ const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCanc
               data-cy="expense-next"
               buttonStyle="primary"
               disabled={!stepOneCompleted}
-              onClick={() => {
-                onNext?.();
+              onClick={async () => {
+                const allErrors = await formik.validateForm();
+                const errors = omit(pick(allErrors, ['payee', 'payoutMethod', 'payeeLocation']), [
+                  'payoutMethod.data.currency',
+                ]);
+                if (isEmpty(flattenObjectDeep(errors))) {
+                  onNext?.();
+                } else {
+                  // We use set touched here to display errors on fields that are not dirty.
+                  formik.setTouched(errors);
+                  formik.setErrors(errors);
+                }
               }}
             >
               <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
@@ -466,7 +425,6 @@ const ExpenseFormPayeeSignUpStep = ({ formik, payoutProfiles, collective, onCanc
 
 ExpenseFormPayeeSignUpStep.propTypes = {
   formik: PropTypes.object,
-  payoutProfiles: PropTypes.array,
   onCancel: PropTypes.func,
   onNext: PropTypes.func,
   collective: PropTypes.shape({

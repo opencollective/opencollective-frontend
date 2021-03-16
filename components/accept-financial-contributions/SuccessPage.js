@@ -4,8 +4,6 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { confettiFireworks } from '../../lib/confettis';
-
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -32,10 +30,6 @@ class SuccessPage extends React.Component {
     collective: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
   };
-
-  componentDidMount() {
-    confettiFireworks(5000, { zIndex: 3000 });
-  }
 
   render() {
     const { collective, chosenHost, router } = this.props;
@@ -157,7 +151,7 @@ class SuccessPage extends React.Component {
               <StyledButton buttonStyle="standard" mt={[2, 3]} mb={[3, 2]} px={3}>
                 <FormattedMessage
                   id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
-                  defaultMessage="Go to Collective page"
+                  defaultMessage="Go to profile page"
                 />
               </StyledButton>
             </Link>

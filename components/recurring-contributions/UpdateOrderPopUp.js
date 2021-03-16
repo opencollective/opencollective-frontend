@@ -79,6 +79,32 @@ const tiersQuery = gqlV2/* GraphQL */ `
   }
 `;
 
+const getTierOptions = (selectedTier, contribution) => {
+  let optionObject;
+  const objectArray = [];
+  const flexible = selectedTier.flexible || selectedTier.value?.flexible;
+  if (!flexible) {
+    optionObject = {
+      label: formatCurrency(selectedTier.amount || selectedTier.value?.amount, contribution.amount.currency),
+      value: selectedTier.amount || selectedTier.value?.amount,
+    };
+    objectArray.push(optionObject);
+    return objectArray;
+  }
+  // selectedTier.presets if it's the default tier, but selectedTier.value.preset afterwards if it's a radio list selection
+  const presets = selectedTier.presets || selectedTier.value?.presets || [500, 1000, 2000, 5000];
+
+  presets.map(preset => {
+    optionObject = {
+      label: formatCurrency(preset, contribution.amount.currency),
+      value: preset,
+    };
+    objectArray.push(optionObject);
+  });
+  objectArray.push({ label: 'Other', value: 100 });
+  return objectArray;
+};
+
 const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
@@ -155,35 +181,9 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
     }
   }, [mappedTierOptions]);
 
-  const getTierOptions = () => {
-    let optionObject;
-    const objectArray = [];
-    const flexible = selectedTier.flexible || selectedTier.value?.flexible;
-    if (!flexible) {
-      optionObject = {
-        label: formatCurrency(selectedTier.amount || selectedTier.value?.amount, contribution.amount.currency),
-        value: selectedTier.amount || selectedTier.value?.amount,
-      };
-      objectArray.push(optionObject);
-      return objectArray;
-    }
-    // selectedTier.presets if it's the default tier, but selectedTier.value.preset afterwards if it's a radio list selection
-    const presets = selectedTier.presets || selectedTier.value?.presets || [500, 1000, 2000, 5000];
-
-    presets.map(preset => {
-      optionObject = {
-        label: formatCurrency(preset, contribution.amount.currency),
-        value: preset,
-      };
-      objectArray.push(optionObject);
-    });
-    objectArray.push({ label: 'Other', value: 100 });
-    return objectArray;
-  };
-
   useEffect(() => {
     if (selectedTier !== null) {
-      const options = getTierOptions();
+      const options = getTierOptions(selectedTier, contribution);
       setAmountOptions(options);
       setSelectedAmountOption(first(options));
     }

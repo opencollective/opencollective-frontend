@@ -103,8 +103,8 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
 
 ViewAllLink.propTypes = {
   collective: PropTypes.object,
-  hasExpenses: PropTypes.boolean,
-  hasTransactions: PropTypes.boolean,
+  hasExpenses: PropTypes.bool,
+  hasTransactions: PropTypes.bool,
   filter: PropTypes.oneOf(FILTERS),
 };
 

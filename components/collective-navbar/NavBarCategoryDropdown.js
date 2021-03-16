@@ -36,17 +36,22 @@ const IconIllustration = styled.img.attrs({ alt: '' })`
 const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
   display: block;
   width: 100%;
-  font-size: 14px;
-  line-height: 16px;
-  text-decoration: none;
-  white-space: nowrap;
-  color: ${themeGet('colors.black.800')};
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 500;
+
+  span {
+    font-size: 14px;
+    line-height: 16px;
+    text-decoration: none;
+    white-space: nowrap;
+    color: ${themeGet('colors.black.800')};
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
 
   &:focus,
-  &:hover {
+  &:hover,
+  &:focus span,
+  &:hover span {
     text-decoration: none;
     font-weight: 700;
     outline: 0;

@@ -19,6 +19,8 @@ import ExpandableExpensePolicies from './ExpandableExpensePolicies';
  * in a sidebar.
  */
 const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
+  const balanceWithBlockedFunds = collective?.stats.balanceWithBlockedFunds;
+
   return (
     <Box width="100%">
       <Box display={['none', 'block']}>
@@ -39,13 +41,13 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
           color="black.500"
           data-cy="collective-balance"
         >
-          {isLoading && !collective?.balance ? (
+          {isLoading && !balanceWithBlockedFunds ? (
             <LoadingPlaceholder height={28} width={75} />
           ) : (
             <Box>
               <FormattedMoneyAmount
-                currency={collective.currency}
-                amount={collective.balance}
+                currency={balanceWithBlockedFunds.currency}
+                amount={balanceWithBlockedFunds.valueInCents}
                 amountStyles={{ color: 'black.800' }}
                 precision={CurrencyPrecision.DEFAULT}
               />
@@ -99,9 +101,14 @@ ExpenseInfoSidebar.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
-    balance: PropTypes.number.isRequired,
     type: PropTypes.string,
     isApproved: PropTypes.bool,
+    stats: PropTypes.shape({
+      balanceWithBlockedFunds: PropTypes.shape({
+        valueInCents: PropTypes.number.isRequired,
+        currency: PropTypes.string.isRequired,
+      }),
+    }),
   }),
   host: PropTypes.shape({
     id: PropTypes.string.isRequired,

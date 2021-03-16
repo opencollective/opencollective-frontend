@@ -8,7 +8,7 @@ import Toast from './Toast';
 import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 const UPDATE_INTERVAL = 500; // milliseconds
-const DEFAULT_TOAST_DURATION = 8000; // milliseconds
+const DEFAULT_TOAST_DURATION = 15000; // milliseconds
 
 class GlobalToasts extends PureComponent {
   static propTypes = {
