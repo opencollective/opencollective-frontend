@@ -5,6 +5,7 @@ files:
     ignore:
       - '*.test.html'
       - '*.??.html'
+      - '*.??-??.html'
     translation: /%original_path%/%file_name%.%locale%.html
 commit_message: 'i18n(%language%): update %original_file_name%'
 append_commit_message: false
