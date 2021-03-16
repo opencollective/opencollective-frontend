@@ -12,6 +12,7 @@ import StyledTooltip from '../StyledTooltip';
 const getExpenseStatusMsgType = status => {
   switch (status) {
     case expenseStatus.REJECTED:
+    case expenseStatus.SPAM:
       return 'error';
     case expenseStatus.PENDING:
     case expenseStatus.UNVERIFIED:

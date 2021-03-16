@@ -125,6 +125,14 @@ const ProcessExpenseButtons = ({
           </ButtonLabel>
         </StyledButton>
       )}
+      {permissions.canMarkAsSpam && (
+        <StyledButton {...getButtonProps('MARK_AS_SPAM')} buttonStyle="dangerSecondary" data-cy="spam-button">
+          <RejectIcon size={14} />
+          <ButtonLabel>
+            <FormattedMessage id="actions.spam" defaultMessage="Mark as Spam" />
+          </ButtonLabel>
+        </StyledButton>
+      )}
       {permissions.canPay && (
         <PayExpenseButton
           {...getButtonProps('PAY', false)}
@@ -164,6 +172,7 @@ ProcessExpenseButtons.propTypes = {
     canApprove: PropTypes.bool,
     canUnapprove: PropTypes.bool,
     canReject: PropTypes.bool,
+    canMarkAsSpam: PropTypes.bool,
     canPay: PropTypes.bool,
     canMarkAsUnpaid: PropTypes.bool,
   }).isRequired,

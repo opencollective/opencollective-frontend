@@ -3660,6 +3660,11 @@ type ExpensePermissions {
   canReject: Boolean!
 
   """
+  Whether the current user can mark this expense as spam
+  """
+  canMarkAsSpam: Boolean!
+
+  """
   Whether the current user can mark this expense as unpaid
   """
   canMarkAsUnpaid: Boolean!
