@@ -166,6 +166,7 @@ const updateQuery = gqlV2/* GraphQL */ `
         slug
         type
         name
+        isHost
       }
       fromAccount {
         id
