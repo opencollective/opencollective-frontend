@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -11,13 +12,39 @@ import { renderDetailsString, saveInvoice } from '../../lib/transactions';
 import { parseToBoolean } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
+import { I18nBold } from '../I18nFormatters';
 import LinkCollective from '../LinkCollective';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
+import StyledTooltip from '../StyledTooltip';
+import { P } from '../Text';
 
 import TransactionRefundButton from './TransactionRefundButton';
 import TransactionRejectButton from './TransactionRejectButton';
+
+const rejectAndRefundTooltipContent = (showRefundHelp, showRejectHelp) => (
+  <Box>
+    {showRefundHelp && (
+      <P fontSize="12px" lineHeight="18px" mb={showRejectHelp ? 3 : 0}>
+        <FormattedMessage
+          id="transaction.refund.helpText"
+          defaultMessage="<bold>Refund:</bold> This action will reimburse the full amount back to your contributor. They can contribute again in the future."
+          values={{ bold: I18nBold }}
+        />
+      </P>
+    )}
+    {showRejectHelp && (
+      <P fontSize="12px" lineHeight="18px">
+        <FormattedMessage
+          id="transaction.reject.helpText"
+          defaultMessage="<bold>Reject:</bold> This action prevents the contributor from contributing in the future and will reimburse the full amount back to the them."
+          values={{ bold: I18nBold }}
+        />
+      </P>
+    )}
+  </Box>
+);
 
 const DetailTitle = styled.p`
   margin: 8px 8px 4px 8px;
@@ -133,7 +160,14 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           </DetailDescription>
           {displayActions && ( // Let us overide so we can hide buttons in the collective page
             <React.Fragment>
-              <Flex justifyContent="flex-end">
+              <Flex justifyContent="flex-end" alignItems="center">
+                {(showRefundButton || showRejectButton) && (
+                  <StyledTooltip content={rejectAndRefundTooltipContent(showRefundButton, showRejectButton)}>
+                    <Box mx={2}>
+                      <Info color="#1869F5" size={20} />
+                    </Box>
+                  </StyledTooltip>
+                )}
                 {showRefundButton && <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />}
                 {showRejectButton && (
                   <TransactionRejectButton
