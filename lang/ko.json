@@ -214,7 +214,7 @@
   "collective.connectedAccounts.reconnect.button": "재접속",
   "collective.connectedAccounts.stripe.button": "Stripe 연결",
   "collective.connectedAccounts.stripe.connected": "Stripe 계정이 {updatedAt, date, short}에 연결되었습니다.",
-  "collective.connectedAccounts.transferwise.button": "Connect Wise",
+  "collective.connectedAccounts.transferwise.button": "Wise 연결",
   "collective.connectedAccounts.transferwise.connected": "Wise connected on {updatedAt, date, short}",
   "collective.connectedAccounts.twitter.button": "Twitter 연결",
   "collective.connectedAccounts.twitter.connected": "트위터 계정 @{username}이 {updatedAt, date, short}에 연결되었습니다.",
