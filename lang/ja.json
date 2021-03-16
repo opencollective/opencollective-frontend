@@ -214,7 +214,7 @@
   "collective.connectedAccounts.reconnect.button": "再連携",
   "collective.connectedAccounts.stripe.button": "Stripe 連携",
   "collective.connectedAccounts.stripe.connected": "Stripe アカウントは {updatedAt, date, short} に連携されました",
-  "collective.connectedAccounts.transferwise.button": "Connect Wise",
+  "collective.connectedAccounts.transferwise.button": "TransferWiseに接続",
   "collective.connectedAccounts.transferwise.connected": "Wise connected on {updatedAt, date, short}",
   "collective.connectedAccounts.twitter.button": "Twitter 連携",
   "collective.connectedAccounts.twitter.connected": "Twitter アカウント「@{username}」は {updatedAt, date, short} に連携されました",
