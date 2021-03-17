@@ -828,6 +828,7 @@
   "Expense.SubmittedByOnDate": "Enviado por {name} el {date, date, long}",
   "Expense.SuccessPage": "You can edit or review updates on this page.",
   "expense.type": "Tipo",
+  "Expense.Type.Charge": "Charge",
   "Expense.Type.Debit": "Debit",
   "Expense.Type.FundingRequest": "Grant",
   "Expense.Type.Invoice": "Factura",
