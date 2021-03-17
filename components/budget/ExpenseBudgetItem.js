@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
-import { includes, size } from 'lodash';
+import { get, includes, size } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -192,7 +192,11 @@ const ExpenseBudgetItem = ({
                       values={{
                         balance: (
                           <FormattedMoneyAmount
-                            amount={collective.stats?.balance?.valueInCents}
+                            amount={get(
+                              collective,
+                              'stats.balanceWithBlockedFunds.valueInCents',
+                              get(collective, 'stats.balanceWithBlockedFunds', 0),
+                            )}
                             currency={collective.currency}
                             amountStyles={{ color: 'black.700' }}
                           />
@@ -329,9 +333,13 @@ ExpenseBudgetItem.propTypes = {
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string,
     stats: PropTypes.shape({
-      balance: PropTypes.shape({
-        valueInCents: PropTypes.number,
-      }),
+      // Collective / Balance can be v1 or v2 there ...
+      balanceWithBlockedFunds: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.shape({
+          valueInCents: PropTypes.number,
+        }),
+      ]),
     }),
     parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
