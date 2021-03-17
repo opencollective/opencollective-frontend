@@ -27,7 +27,7 @@ export default class CollectiveThemeProvider extends React.PureComponent {
   state = { newPrimaryColor: null };
 
   /**
-   * Ensures that the constrast is at least 7/1, as recommended by the [W3c](https://webaim.org/articles/contrast)
+   * Ensures that the contrast is at least 7/1, as recommended by the [W3c](https://webaim.org/articles/contrast)
    */
   adjustColorContrast = color => {
     const contrast = getContrast(color, '#fff');
@@ -48,9 +48,11 @@ export default class CollectiveThemeProvider extends React.PureComponent {
       return defaultTheme;
     } else {
       const adjustedPrimary = this.adjustColorContrast(primaryColor);
-      // Allow a deviation to up to 20% of the default luminance
-      const luminance = getLuminance(adjustedPrimary) / 5;
-      const adjustLuminance = value => setLightness(clamp(value + luminance, 0, 0.97), adjustedPrimary);
+      const luminance = getLuminance(adjustedPrimary);
+      // Allow a deviation to up to 20% of the default luminance. Don't apply this to really
+      // dark colors (luminance < 0.05)
+      const luminanceAdjustment = luminance < 0.05 ? -0.1 : luminance / 5;
+      const adjustLuminance = value => setLightness(clamp(value + luminanceAdjustment, 0, 0.97), adjustedPrimary);
       return generateTheme({
         colors: {
           ...defaultTheme.colors,
@@ -63,7 +65,7 @@ export default class CollectiveThemeProvider extends React.PureComponent {
             400: adjustLuminance(0.6),
             300: adjustLuminance(0.65),
             200: adjustLuminance(0.72),
-            100: adjustLuminance(0.78),
+            100: adjustLuminance(0.92),
             50: adjustLuminance(0.97),
             base: primaryColor,
           },

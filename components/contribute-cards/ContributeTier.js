@@ -118,7 +118,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
           </P>
           {tier.goal && (
             <Box mb={1} mt={3}>
-              <P fontSize="11px" color="black.500">
+              <P fontSize="11px" color="black.600">
                 <FormattedMessage
                   id="Tier.AmountRaised"
                   defaultMessage="{amount} of {goalWithInterval} raised"
@@ -127,6 +127,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                       <FormattedMoneyAmount
                         amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
                         amount={amountRaised}
+                        currency={currency}
                         precision={getPrecisionFromAmount(amountRaised)}
                       />
                     ),

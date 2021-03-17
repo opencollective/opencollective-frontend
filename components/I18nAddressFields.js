@@ -10,6 +10,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import AddressFormatter from '@shopify/address';
+import { Field } from 'formik';
 import { get, isEmpty, isUndefined, orderBy, pick, truncate } from 'lodash';
 import { useIntl } from 'react-intl';
 
@@ -66,11 +67,6 @@ const wrangleAddressData = addressInfo => {
   return addressFormFields;
 };
 
-/** Checks if the key from labels is also present in optionalLabels */
-const isFieldOptional = (addressInfo, fieldName) => {
-  return !Object.keys(addressInfo.optionalLabels).includes(fieldName);
-};
-
 /** Generates zone/province/state options for select */
 const getZoneLabel = zone => {
   return `${truncate(zone.name, { length: 30 })} - ${zone.code}`;
@@ -112,7 +108,7 @@ const getAddressFieldDifferences = (formAddressValues, addressFields) => {
   }
 };
 
-const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange }) => {
+const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange, required, prefix }) => {
   const intl = useIntl();
   /** If country chosen from InputTypeCountry is one of missingCountries, use 'US' instead */
   const country = missingCountries.includes(selectedCountry) ? 'US' : selectedCountry;
@@ -132,6 +128,7 @@ const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange }
   React.useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await addressFormatter.getCountry(country);
         setData(pick(response, ['formatting', 'labels', 'optionalLabels', 'zones']));
         const countryInfo = pick(response, ['formatting', 'labels', 'optionalLabels', 'zones']);
@@ -160,6 +157,10 @@ const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange }
     return getZoneSelectOptions(zoneFields);
   }, [fields]);
 
+  const isFieldRequired = fieldName => {
+    return isUndefined(required) ? !Object.keys(data?.optionalLabels).includes(fieldName) : required;
+  };
+
   React.useEffect(() => {
     if (zoneOptions) {
       const formValueZone = get(value, 'zone', undefined);
@@ -179,43 +180,37 @@ const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange }
 
   return (
     <Fragment>
-      {fields.map(([name, label]) => (
-        <Fragment key={name}>
-          <StyledInputField
-            name={name}
-            label={label}
-            labelFontSize="13px"
-            mt={3}
-            required={isFieldOptional(data, name)}
-          >
-            {name === 'zone'
-              ? ({ id, name }) => (
-                  <StyledSelect
-                    name={name}
-                    inputId={id}
-                    minWidth={150}
-                    options={zoneOptions}
-                    placeholder={`Please select your ${label}`}
-                    data-cy={`payee-address-${name}`}
-                    onChange={e => {
-                      onChange({ name, value: e.value });
-                    }}
-                    value={zoneOptions.find(option => option?.value == value[name]) || null}
-                  />
-                )
-              : inputProps => (
-                  <StyledInput
-                    {...inputProps}
-                    data-cy={`payee-address-${name}`}
-                    onChange={e => {
-                      onChange(e.target);
-                    }}
-                    value={value[name]}
-                  />
-                )}
-          </StyledInputField>
-        </Fragment>
-      ))}
+      {fields.map(([name, label]) => {
+        const required = isFieldRequired(name);
+        const validate = required ? value => (value ? undefined : `${label} is required`) : undefined;
+        return (
+          <Field key={name} name={`${prefix}.${name}`} validate={validate}>
+            {({ field, meta }) => (
+              <StyledInputField name={field.name} label={label} labelFontSize="13px" mt={3} error={meta.error}>
+                {name === 'zone'
+                  ? ({ id, name, required }) => (
+                      <StyledSelect
+                        {...{ name, required, ...field }}
+                        inputId={id}
+                        minWidth={150}
+                        options={zoneOptions}
+                        error={meta.error}
+                        placeholder={`Please select your ${label}`}
+                        data-cy={`payee-address-${name}`}
+                        onChange={v => {
+                          field.onChange({ target: { name: field.name, value: v.value } });
+                        }}
+                        value={zoneOptions.find(option => option?.value === field.value) || null}
+                      />
+                    )
+                  : inputProps => (
+                      <StyledInput {...inputProps} {...field} error={meta.error} data-cy={`payee-address-${name}`} />
+                    )}
+              </StyledInputField>
+            )}
+          </Field>
+        );
+      })}
     </Fragment>
   );
 };
@@ -224,9 +219,11 @@ I18nAddressFields.propTypes = {
   /** ISO country code passed down from ExpenseFormPayeeStep. */
   selectedCountry: PropTypes.string.isRequired,
   name: PropTypes.string,
+  prefix: PropTypes.string,
+  required: PropTypes.bool,
   /** String if using old address textarea; object if using new address fields. */
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   onCountryChange: PropTypes.func.isRequired,
 };
 

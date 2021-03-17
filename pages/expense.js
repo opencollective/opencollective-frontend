@@ -35,7 +35,7 @@ import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollecti
 import PrivateCommentsMessage from '../components/expenses/PrivateCommentsMessage';
 import { Box, Flex } from '../components/Grid';
 import HTMLContent from '../components/HTMLContent';
-import I18nFormatters, { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
+import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
@@ -44,8 +44,8 @@ import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
 import StyledCheckbox from '../components/StyledCheckbox';
 import StyledLink from '../components/StyledLink';
-import TemporaryNotification from '../components/TemporaryNotification';
 import { H1, H5, Span } from '../components/Text';
+import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
 const messages = defineMessages({
@@ -106,13 +106,12 @@ const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
 const { USER, ORGANIZATION } = CollectiveType;
 
 class ExpensePage extends React.Component {
-  static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, createSuccess, key } }) {
+  static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, key } }) {
     return {
       parentCollectiveSlug,
       collectiveSlug,
       draftKey: key,
       legacyExpenseId: parseInt(ExpenseId),
-      createSuccess: Boolean(createSuccess),
     };
   }
 
@@ -123,8 +122,6 @@ class ExpensePage extends React.Component {
     draftKey: PropTypes.string,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
-    createSuccess: PropTypes.bool,
-    expenseCreated: PropTypes.string, // actually a stringed boolean 'true'
     /** @ignore from withApollo */
     client: PropTypes.object.isRequired,
     /** from withData */
@@ -132,6 +129,7 @@ class ExpensePage extends React.Component {
     /** from addEditExpenseMutation */
     editExpense: PropTypes.func.isRequired,
     verifyExpense: PropTypes.func.isRequired,
+    addToast: PropTypes.func.isRequired,
     /** from injectIntl */
     intl: PropTypes.object,
     expensesTags: PropTypes.arrayOf(
@@ -152,7 +150,6 @@ class ExpensePage extends React.Component {
       status: this.props.draftKey ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
       editedExpense: null,
       isSubmitting: false,
-      successMessageDismissed: false,
       isPoolingEnabled: true,
       tos: false,
       newsletterOptIn: false,
@@ -175,8 +172,14 @@ class ExpensePage extends React.Component {
       }));
     }
 
-    if (this.props.createSuccess) {
-      this.scrollToExpenseTop();
+    const expense = this.props.data?.expense;
+    if (
+      expense?.status == expenseStatus.UNVERIFIED &&
+      expense?.permissions?.canEdit &&
+      this.props.LoggedInUser &&
+      expense?.createdByAccount?.slug == this.props.LoggedInUser?.collective?.slug
+    ) {
+      this.handleExpenseVerification();
     }
 
     this.handlePolling();
@@ -192,16 +195,6 @@ class ExpensePage extends React.Component {
     // Scroll to expense's top when changing status
     if (oldState.status !== this.state.status) {
       this.scrollToExpenseTop();
-    }
-
-    const expense = this.props.data?.expense;
-    if (
-      expense?.status == expenseStatus.UNVERIFIED &&
-      expense?.permissions?.canEdit &&
-      this.props.LoggedInUser &&
-      expense?.createdByAccount?.slug == this.props.LoggedInUser?.collective?.slug
-    ) {
-      this.handleExpenseVerification();
     }
   }
 
@@ -260,9 +253,18 @@ class ExpensePage extends React.Component {
     const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
     const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
     const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-    this.props.router.push(
-      `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}?createSuccess=true`,
+    await this.props.router.push(
+      `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
     );
+    this.props.data.refetch();
+    this.props.addToast({
+      type: TOAST_TYPE.SUCCESS,
+      title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
+      message: (
+        <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
+      ),
+    });
+    window.scrollTo(0, 0);
   }
 
   onSummarySubmit = async () => {
@@ -354,27 +356,7 @@ class ExpensePage extends React.Component {
     return sortBy([...(comments || []), ...activities], 'createdAt');
   });
 
-  onSuccessMsgDismiss = () => {
-    // Replaces the route by the version without `createSuccess=true`
-    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
-    this.setState({ successMessageDismissed: true });
-    const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
-    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.expense?.account) : '';
-    const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-    return this.props.router.replace(
-      `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-      undefined,
-      {
-        shallow: true, // Do not re-fetch data, do not loose state
-      },
-    );
-  };
-
   onEditBtnClick = async () => {
-    if (this.props.createSuccess) {
-      this.onSuccessMsgDismiss();
-    }
-
     return this.setState(() => ({ status: PAGE_STATUS.EDIT, editedExpense: this.props.data.expense }));
   };
 
@@ -387,8 +369,8 @@ class ExpensePage extends React.Component {
   };
 
   render() {
-    const { collectiveSlug, data, loadingLoggedInUser, createSuccess, intl } = this.props;
-    const { isRefetchingDataForUser, error, status, editedExpense, successMessageDismissed } = this.state;
+    const { collectiveSlug, data, loadingLoggedInUser, intl } = this.props;
+    const { isRefetchingDataForUser, error, status, editedExpense } = this.state;
 
     if (!data.loading && !isRefetchingDataForUser) {
       if (!data || data.error) {
@@ -415,15 +397,6 @@ class ExpensePage extends React.Component {
 
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)}>
-        {createSuccess && !successMessageDismissed && (
-          <TemporaryNotification onDismiss={this.onSuccessMsgDismiss}>
-            <FormattedMessage
-              id="expense.createSuccess"
-              defaultMessage="<strong>Expense submitted!</strong> You can edit or review updates on this page."
-              values={I18nFormatters}
-            />
-          </TemporaryNotification>
-        )}
         <CollectiveNavbar
           collective={collective}
           isLoading={!collective}
@@ -718,5 +691,7 @@ const addVerifyExpenseMutation = graphql(verifyExpenseMutation, {
 });
 
 export default injectIntl(
-  addVerifyExpenseMutation(addExpensePageData(withApollo(withUser(withRouter(addEditExpenseMutation(ExpensePage)))))),
+  withToasts(
+    addVerifyExpenseMutation(addExpensePageData(withApollo(withUser(withRouter(addEditExpenseMutation(ExpensePage)))))),
+  ),
 );

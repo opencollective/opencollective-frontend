@@ -13,19 +13,19 @@ import { requireFields } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
+import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
-import StyledInputField from '../StyledInputField';
 import StyledInputTags from '../StyledInputTags';
-import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
+import ExpenseFormPayeeInviteNewStep from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
 import { validateExpenseItem } from './ExpenseItemForm';
@@ -67,10 +67,7 @@ const msg = defineMessages({
     id: 'ExpenseForm.StepExpenseFundingRequest',
     defaultMessage: 'Set grant details',
   },
-  recipientNoteLabel: {
-    id: 'ExpenseForm.RecipientNoteLabel',
-    defaultMessage: 'Add a note for the recipient',
-  },
+
   stepPayee: {
     id: 'ExpenseForm.StepPayeeInvoice',
     defaultMessage: 'Payee information',
@@ -198,15 +195,18 @@ const ExpenseFormBody = ({
   const isInvite = values.payee?.isInvite;
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
+  const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const stepOneCompleted =
     values.payoutMethod &&
     isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
     (isReceipt ? true : values.payeeLocation?.country && values.payeeLocation?.address);
-  const stepTwoCompleted = isInvite ? true : stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
+  const stepTwoCompleted = isInvite
+    ? true
+    : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
 
-  const [step, setStep] = React.useState(stepOneCompleted ? STEPS.EXPENSE : STEPS.PAYEE);
+  const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
-  const isOnBehalf = values.payee?.isInvite;
+  const [isOnBehalf, setOnBehalf] = React.useState(false);
 
   // Scroll to top when step changes
   React.useEffect(() => {
@@ -238,17 +238,28 @@ const ExpenseFormBody = ({
       setLocationFromPayee(formik, values.payee);
     }
     if (!isDraft && values.payee?.isInvite) {
+      setOnBehalf(values.payee.isInvite);
       setStep(STEPS.EXPENSE);
     }
   }, [values.payee]);
 
   // Return to Payee step if type is changed
   React.useEffect(() => {
-    setStep(STEPS.PAYEE);
-    if (!isDraft && values.payee?.isInvite) {
-      formik.setFieldValue('payee', null);
+    if (!isCreditCardCharge) {
+      setStep(STEPS.PAYEE);
+      setOnBehalf(false);
+
+      if (!isDraft && values.payee?.isInvite) {
+        formik.setFieldValue('payee', null);
+      }
     }
   }, [values.type]);
+
+  React.useEffect(() => {
+    if (values.payeeLocation?.structured) {
+      formik.setFieldValue('payeeLocation.address', serializeAddress(values.payeeLocation.structured));
+    }
+  }, [values.payeeLocation]);
 
   // Load values from localstorage
   React.useEffect(() => {
@@ -277,21 +288,79 @@ const ExpenseFormBody = ({
     }
   }, [formPersister, dirty, values]);
 
-  return (
-    <Form>
-      <ExpenseTypeRadioSelect
-        name="type"
-        onChange={e => {
-          handleChange(e);
+  let payeeForm;
+  if (loading) {
+    payeeForm = <LoadingPlaceholder height={32} />;
+  } else if (isDraft && !loggedInAccount) {
+    payeeForm = (
+      <ExpenseFormPayeeSignUpStep
+        collective={collective}
+        formik={formik}
+        onCancel={onCancel}
+        onNext={() => setStep(STEPS.EXPENSE)}
+      />
+    );
+  } else if (isOnBehalf === true) {
+    payeeForm = (
+      <ExpenseFormPayeeInviteNewStep
+        collective={collective}
+        formik={formik}
+        onBack={() => {
+          setStep(STEPS.PAYEE);
+          setOnBehalf(false);
+          formik.setFieldValue('payee', null);
+          formik.setFieldValue('payoutMethod', null);
+          formik.setFieldValue('payeeLocation', null);
         }}
-        value={values.type}
-        options={{
-          fundingRequest:
-            [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
-            collective.settings?.fundingRequest === true ||
-            collective.host?.settings?.fundingRequest === true,
+        onNext={() => {
+          formik.setFieldValue('payee', { ...values.payee, isInvite: true });
+        }}
+        payoutProfiles={payoutProfiles}
+      />
+    );
+  } else {
+    payeeForm = (
+      <ExpenseFormPayeeStep
+        collective={collective}
+        formik={formik}
+        isOnBehalf={isOnBehalf}
+        onCancel={onCancel}
+        payoutProfiles={payoutProfiles}
+        loggedInAccount={loggedInAccount}
+        onNext={() => {
+          const validation = validatePayoutMethod(values.payoutMethod);
+          if (isEmpty(validation)) {
+            setStep(STEPS.EXPENSE);
+          } else {
+            setErrors({ payoutMethod: validation });
+          }
+        }}
+        onInvite={isInvite => {
+          setOnBehalf(isInvite);
+          formik.setFieldValue('payeeLocation', {});
+          formik.setFieldValue('payee', {});
         }}
       />
+    );
+  }
+
+  return (
+    <Form>
+      {!isCreditCardCharge && (
+        <ExpenseTypeRadioSelect
+          name="type"
+          onChange={e => {
+            handleChange(e);
+          }}
+          value={values.type}
+          options={{
+            fundingRequest:
+              [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
+              collective.settings?.fundingRequest === true ||
+              collective.host?.settings?.fundingRequest === true,
+          }}
+        />
+      )}
       {values.type && (
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial" ref={formRef}>
           <HiddenFragment show={step == STEPS.PAYEE}>
@@ -304,34 +373,7 @@ const ExpenseFormBody = ({
               </Box>
               <StyledHr flex="1" borderColor="black.300" mx={2} />
             </Flex>
-            {loading ? (
-              <LoadingPlaceholder height={32} />
-            ) : isDraft && !loggedInAccount ? (
-              <ExpenseFormPayeeSignUpStep
-                collective={collective}
-                formik={formik}
-                onCancel={onCancel}
-                onNext={() => setStep(STEPS.EXPENSE)}
-                payoutProfiles={payoutProfiles}
-              />
-            ) : (
-              <ExpenseFormPayeeStep
-                collective={collective}
-                formik={formik}
-                isOnBehalf={isOnBehalf}
-                onCancel={onCancel}
-                payoutProfiles={payoutProfiles}
-                loggedInAccount={loggedInAccount}
-                onNext={() => {
-                  const validation = validatePayoutMethod(values.payoutMethod);
-                  if (isEmpty(validation)) {
-                    setStep(STEPS.EXPENSE);
-                  } else {
-                    setErrors({ payoutMethod: validation });
-                  }
-                }}
-              />
-            )}
+            {payeeForm}
           </HiddenFragment>
 
           <HiddenFragment show={step == STEPS.EXPENSE}>
@@ -445,6 +487,7 @@ const ExpenseFormBody = ({
                   onClick={() => addNewExpenseItem(formik)}
                   minWidth={135}
                   data-cy="expense-add-item-btn"
+                  disabled={isCreditCardCharge}
                 >
                   +&nbsp;
                   {formatMessage(
@@ -483,9 +526,10 @@ const ExpenseFormBody = ({
                   whiteSpace="nowrap"
                   data-cy="expense-back"
                   onClick={() => {
-                    setStep(STEPS.PAYEE);
-                    if (values.payee?.isInvite) {
-                      formik.setFieldValue('payee', null);
+                    if (isCreditCardCharge) {
+                      onCancel();
+                    } else {
+                      setStep(STEPS.PAYEE);
                     }
                   }}
                 >
@@ -506,6 +550,8 @@ const ExpenseFormBody = ({
                 >
                   {isInvite && !isDraft ? (
                     <FormattedMessage id="Expense.SendInvite" defaultMessage="Send Invite" />
+                  ) : isCreditCardCharge ? (
+                    <FormattedMessage id="Expense.AttachReceipt" defaultMessage="Attach Receipt" />
                   ) : (
                     <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
                   )}
@@ -521,25 +567,6 @@ const ExpenseFormBody = ({
           </HiddenFragment>
         </StyledCard>
       )}
-
-      {isInvite && !isDraft && (
-        <Box>
-          <Field name="recipientNote">
-            {({ field }) => (
-              <StyledInputField
-                name={field.name}
-                label={formatMessage(msg.recipientNoteLabel)}
-                labelFontSize="13px"
-                required={false}
-                mt={3}
-              >
-                {inputProps => <Field as={StyledTextarea} {...inputProps} {...field} minHeight={80} />}
-              </StyledInputField>
-            )}
-          </Field>
-        </Box>
-      )}
-
       {step == STEPS.EXPENSE && (
         <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
           <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless collective={collective} />
@@ -599,6 +626,8 @@ const ExpenseForm = ({
   if (isDraft) {
     initialValues.items = expense.draft.items;
     initialValues.attachedFiles = expense.draft.attachedFiles;
+    initialValues.payoutMethod = expense.draft.payoutMethod;
+    initialValues.payeeLocation = expense.draft.payeeLocation;
   }
 
   return (

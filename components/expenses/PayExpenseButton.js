@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as OtherIcon } from '@styled-icons/fa-solid/University';
-import { includes } from 'lodash';
+import { get, includes } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -16,11 +16,17 @@ import { Span } from '../Text';
 import PayExpenseModal from './PayExpenseModal';
 
 const getDisabledMessage = (expense, collective, host, payoutMethod) => {
+  // Collective can be v1 or v2 there ...
+  const balance = get(
+    collective,
+    'stats.balanceWithBlockedFunds.valueInCents',
+    get(collective, 'stats.balanceWithBlockedFunds', 0),
+  );
   if (!host) {
     return (
       <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a Fiscal Host" />
     );
-  } else if (collective.balance < expense.amount) {
+  } else if (balance < expense.amount) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
   } else if (includes(expense.requiredLegalDocuments, 'US_TAX_FORM')) {
     return (
@@ -41,7 +47,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
       return (
         <FormattedMessage
           id="expense.pay.transferwise.planlimit"
-          defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with TransferWise"
+          defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with Wise"
           values={{
             Link(message) {
               return <Link href={`/${host.slug}/edit/host-plan`}>{message}</Link>;
@@ -141,10 +147,17 @@ PayExpenseButton.propTypes = {
     }),
   }).isRequired,
   collective: PropTypes.shape({
-    balance: PropTypes.number,
-    currency: PropTypes.string,
     host: PropTypes.shape({
       plan: PropTypes.object,
+    }),
+    stats: PropTypes.shape({
+      balanceWithBlockedFunds: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.shape({
+          valueInCents: PropTypes.number.isRequired,
+          currency: PropTypes.string.isRequired,
+        }),
+      ]),
     }),
   }).isRequired,
   host: PropTypes.shape({

@@ -60,6 +60,7 @@ const ExpenseSummary = ({
   ...props
 }) => {
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
+  const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const showProcessButtons = !isEditing && existsInAPI && collective && hasProcessButtons(permissions);
@@ -167,7 +168,7 @@ const ExpenseSummary = ({
           <LoadingPlaceholder height={20} maxWidth={150} />
         ) : (
           <Span fontWeight="bold" fontSize="16px">
-            {isReceipt ? (
+            {isReceipt || isCreditCardCharge ? (
               <FormattedMessage id="Expense.AttachedReceipts" defaultMessage="Attached receipts" />
             ) : isFundingRequest ? (
               <FormattedMessage id="Expense.RequestDetails" defaultMessage="Request Details" />

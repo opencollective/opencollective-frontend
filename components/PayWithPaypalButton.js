@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { getEnvVar } from '../lib/env-utils';
-import { getPaypal } from '../lib/paypal';
+import { getLegacyPaypal } from '../lib/paypal';
 
 /**
  * Encapsulate Paypal button logic so we don't have to deal with refs in parent
@@ -47,7 +47,7 @@ export default class PayWithPaypalButton extends Component {
   }
 
   async componentDidMount() {
-    this.paypal = await getPaypal();
+    this.paypal = await getLegacyPaypal();
     this.paypal.Button.render(this.getOptions(), this.container.current);
   }
 

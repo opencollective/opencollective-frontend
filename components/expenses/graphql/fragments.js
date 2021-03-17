@@ -184,8 +184,11 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         country
       }
 
-      ... on AccountWithContributions {
-        balance
+      stats {
+        balanceWithBlockedFunds {
+          valueInCents
+          currency
+        }
       }
 
       ... on AccountWithHost {
@@ -200,7 +203,6 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       ... on Organization {
         isHost
         isActive
-        balance
         host {
           ...ExpenseHostFields
         }

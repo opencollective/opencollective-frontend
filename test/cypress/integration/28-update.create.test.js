@@ -4,11 +4,12 @@ describe('create an update', () => {
   });
 
   it('edit info', () => {
-    cy.wait(1000);
     cy.get('[data-cy=titleInput]').type('New update');
-    cy.get('.ql-editor').type('This is some bold HTML{selectall}');
-    cy.get('.ql-bold').click();
-    cy.wait(300);
+    cy.get('[data-cy="update-content-editor"] trix-editor').as('editor');
+    cy.get('[data-cy="update-content-editor"] trix-toolbar').as('toolbar');
+    cy.get('@editor').type('This is some bold HTML{selectall}');
+    cy.get('@toolbar').find('.trix-button--icon-bold').click();
+    cy.wait(100);
     cy.getByDataCy('edit-update-submit-btn').click();
     cy.wait(1000);
     cy.get('[data-cy=updateTitle]', { timeout: 10000 }).contains('New update');

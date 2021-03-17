@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isNil } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -41,6 +41,10 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
+  const customFields = [
+    ...(tier?.customFields || []),
+    ...(collective.host?.settings?.contributionFlow?.customFields || []),
+  ];
   const currency = tier?.amount.currency || collective.currency;
 
   return (
@@ -204,13 +208,13 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
           />
         </Box>
       )}
-      {tier?.customFields && (
+      {!isEmpty(customFields) && (
         <Box mt={28}>
           <H5 fontSize="20px" fontWeight="normal" color="black.800">
             <FormattedMessage id="OtherInfo" defaultMessage="Other information" />
           </H5>
           <TierCustomFields
-            fields={tier.customFields}
+            fields={customFields}
             data={data?.customData}
             onChange={customData => dispatchChange('customData', customData)}
           />

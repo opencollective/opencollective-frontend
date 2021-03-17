@@ -9,7 +9,6 @@ import { get, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { createGlobalStyle } from 'styled-components';
 
-import { formatCurrency } from '../lib/currency-utils';
 import { isPastEvent } from '../lib/events';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { capitalize } from '../lib/utils';
@@ -68,14 +67,6 @@ class TopBarProfileMenu extends React.Component {
     super(props);
     this.state = { showProfileMenu: false, loading: true };
     this.messages = defineMessages({
-      'tooltip.balance': {
-        id: 'BalanceAmount',
-        defaultMessage: 'Balance {balance}',
-      },
-      'tooltip.pendingExpenses': {
-        id: 'profilemenu.memberships.tooltip.pendingExpenses',
-        defaultMessage: '{n} pending expenses',
-      },
       'menu.transactions': {
         id: 'menu.transactions',
         defaultMessage: 'transactions',
@@ -129,20 +120,6 @@ class TopBarProfileMenu extends React.Component {
     e.nativeEvent.stopImmediatePropagation();
   };
 
-  tooltip(membership) {
-    const { intl } = this.props;
-    const { collective } = membership;
-    const balance = get(collective, 'stats.balance');
-    let str = intl.formatMessage(this.messages['tooltip.balance'], {
-      balance: formatCurrency(balance, collective.currency),
-    });
-    const pendingExpenses = get(collective, 'stats.expenses.pending');
-    if (pendingExpenses > 0) {
-      str += ` - ${intl.formatMessage(this.messages['tooltip.pendingExpenses'], { n: pendingExpenses })}`;
-    }
-    return str;
-  }
-
   renderMembershipLine = membership => {
     const { intl, LoggedInUser } = this.props;
     const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(membership.collective);
@@ -158,7 +135,6 @@ class TopBarProfileMenu extends React.Component {
         <Link href={`/${get(membership, 'collective.slug')}`}>
           <StyledLink
             as={Span}
-            title={this.tooltip(membership)}
             color="black.700"
             fontSize="1.2rem"
             fontFamily="montserratlight, arial"

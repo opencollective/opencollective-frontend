@@ -87,10 +87,10 @@ describe('New expense flow', () => {
 
       // Submit!
       cy.getByDataCy('submit-expense-btn').click();
-      cy.contains('[data-cy="temporary-notification"]', 'Expense submitted!');
+      cy.contains('[data-cy="toast-notification"]', 'Expense submitted');
       cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
-      cy.getByDataCy('dismiss-temporary-notification-btn').click();
-      cy.getByDataCy('temporary-notification').should('not.exist');
+      cy.getByDataCy('dismiss-toast-btn').click();
+      cy.getByDataCy('toast-notification').should('not.exist');
 
       // Start editing
       cy.getByDataCy('edit-expense-btn').click();
@@ -139,6 +139,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('mini-form-name-field').type('Dummy Expense Org');
       cy.getByDataCy('mini-form-website-field').type('dummy.com');
       cy.getByDataCy('mini-form-save-button').click();
+      cy.wait(250);
 
       // Select Payout Method
       cy.getByDataCy('payout-method-select').click();
@@ -170,10 +171,10 @@ describe('New expense flow', () => {
 
       // Submit!
       cy.getByDataCy('submit-expense-btn').click();
-      cy.contains('[data-cy="temporary-notification"]', 'Expense submitted!');
+      cy.contains('[data-cy="toast-notification"]', 'Expense submitted');
       cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
-      cy.getByDataCy('dismiss-temporary-notification-btn').click();
-      cy.getByDataCy('temporary-notification').should('not.exist');
+      cy.getByDataCy('dismiss-toast-btn').click();
+      cy.getByDataCy('toast-notification').should('not.exist');
     });
 
     // This can happen if you start with an invoice then switch to receipts
@@ -233,9 +234,9 @@ describe('New expense flow', () => {
 
         cy.getByDataCy('select-expense-payee').click();
         cy.getByDataCy('collective-picker-invite-button').click();
-        cy.get('[data-cy="collective-picker-invite-form"] input[name="name"]').type('Nicolas Cage');
-        cy.get('[data-cy="collective-picker-invite-form"] input[name="email"]').type(inviteeEmail);
-        cy.get('[data-cy="collective-picker-invite-form"] [type="submit"]').click();
+        cy.get('input[name="payee.name"]').type('Nicolas Cage');
+        cy.get('input[name="payee.email"]').type(inviteeEmail);
+        cy.get('[data-cy="expense-next"]').click();
 
         cy.get('input[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
@@ -282,7 +283,6 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-status-msg').parent().should('contain', 'Unverified');
         cy.login({ email: inviteeEmail, redirect: `/${collective}/expenses/${expenseId}` });
         cy.visit(`/${collective}/expenses/${expenseId}`);
-        cy.getByDataCy('temporary-notification');
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
         cy.getByDataCy('expense-author').should('contain', 'Requested by');
         cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');

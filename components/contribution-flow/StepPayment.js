@@ -16,9 +16,11 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import NewCreditCardForm from '../NewCreditCardForm';
 import StyledRadioList from '../StyledRadioList';
 import { P } from '../Text';
+import { useUser } from '../UserProvider';
 
 import BlockedContributorMessage from './BlockedContributorMessage';
-import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
+import BraintreePaymentForm from './BraintreePaymentForm';
+import { BRAINTREE_KEY, generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
 
 const PaymentMethodBox = styled.div`
   display: flex;
@@ -30,14 +32,6 @@ const PaymentMethodBox = styled.div`
     props.index &&
     css`
       border-top: 1px solid ${themeGet('colors.black.200')};
-    `}
-
-  ${props =>
-    !props.disabled &&
-    css`
-      &:hover {
-        background: ${themeGet('colors.black.50')};
-      }
     `}
 `;
 
@@ -97,6 +91,7 @@ const StepPayment = ({
   onChange,
   hideCreditCardPostalCode,
   onNewCardFormReady,
+  setBraintree,
 }) => {
   // GraphQL mutations and queries
   const { loading, data, error } = useQuery(paymentMethodsQuery, {
@@ -107,10 +102,12 @@ const StepPayment = ({
   });
 
   // data handling
+  const { LoggedInUser } = useUser();
+  const isRoot = Boolean(LoggedInUser?.isRoot());
   const paymentMethods = get(data, 'account.paymentMethods', null) || [];
   const paymentOptions = React.useMemo(
-    () => generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective),
-    [paymentMethods, stepProfile, stepDetails, collective],
+    () => generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective, isRoot),
+    [paymentMethods, stepProfile, stepDetails, collective, isRoot],
   );
 
   const setNewPaymentMethod = (key, paymentMethod) => {
@@ -191,6 +188,14 @@ const StepPayment = ({
                   {value.instructions}
                 </Box>
               )}
+              {value.key === BRAINTREE_KEY && checked && (
+                <BraintreePaymentForm
+                  collective={collective}
+                  fromCollective={stepProfile}
+                  onReady={setBraintree}
+                  onChange={({ isReady }) => onChange({ stepPayment: { key: 'braintree', isReady } })}
+                />
+              )}
             </PaymentMethodBox>
           )}
         </StyledRadioList>
@@ -207,6 +212,7 @@ StepPayment.propTypes = {
   stepSummary: PropTypes.object,
   onChange: PropTypes.func,
   onNewCardFormReady: PropTypes.func,
+  setBraintree: PropTypes.func,
   hideCreditCardPostalCode: PropTypes.bool,
 };
 

@@ -37,6 +37,7 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import { H1 } from '../components/Text';
+import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
@@ -65,6 +66,8 @@ class CreateExpensePage extends React.Component {
     createExpense: PropTypes.func.isRequired,
     /** from apollo */
     draftExpenseAndInviteUser: PropTypes.func.isRequired,
+    /** from withToast */
+    addToast: PropTypes.func.isRequired,
     /** from apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -161,41 +164,46 @@ class CreateExpensePage extends React.Component {
   }
 
   onFormSubmit = async expense => {
-    if (expense.payee.isInvite) {
-      const expenseDraft = pick(expense, [
-        'description',
-        'longDescription',
-        'tags',
-        'type',
-        'privateMessage',
-        'invoiceInfo',
-        'recipientNote',
-        'items',
-        'attachedFiles',
-        'payee',
-        'payeeLocation',
-      ]);
-      const result = await this.props.draftExpenseAndInviteUser({
-        variables: {
-          account: { id: this.props.data.account.id },
-          expense: expenseDraft,
-        },
-      });
-      if (this.state.formPersister) {
-        this.state.formPersister.clearValues();
-      }
+    try {
+      if (expense.payee.isInvite) {
+        const expenseDraft = pick(expense, [
+          'description',
+          'longDescription',
+          'tags',
+          'type',
+          'privateMessage',
+          'invoiceInfo',
+          'recipientNote',
+          'items',
+          'attachedFiles',
+          'payee',
+          'payeeLocation',
+          'payoutMethod',
+        ]);
+        const result = await this.props.draftExpenseAndInviteUser({
+          variables: {
+            account: { id: this.props.data.account.id },
+            expense: expenseDraft,
+          },
+        });
+        if (this.state.formPersister) {
+          this.state.formPersister.clearValues();
+        }
 
-      // Redirect to the expense page
-      const legacyExpenseId = result.data.draftExpenseAndInviteUser.legacyId;
-      const { collectiveSlug, parentCollectiveSlug, data } = this.props;
-      const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
-      const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
-      const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-      await this.props.router.push(
-        `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-      );
-    } else {
-      this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
+        // Redirect to the expense page
+        const legacyExpenseId = result.data.draftExpenseAndInviteUser.legacyId;
+        const { collectiveSlug, parentCollectiveSlug, data } = this.props;
+        const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
+        const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
+        const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
+        await this.props.router.push(
+          `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
+        );
+      } else {
+        this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
+      }
+    } catch (e) {
+      this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
     }
   };
 
@@ -221,9 +229,17 @@ class CreateExpensePage extends React.Component {
       const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
       const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
       const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-      this.props.router.push(
-        `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}?createSuccess=true`,
+      await this.props.router.push(
+        `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
       );
+      this.props.addToast({
+        type: TOAST_TYPE.SUCCESS,
+        title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
+        message: (
+          <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
+        ),
+      });
+      window.scrollTo(0, 0);
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
     }
@@ -441,8 +457,11 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         tag
       }
 
-      ... on AccountWithContributions {
-        balance
+      stats {
+        balanceWithBlockedFunds {
+          valueInCents
+          currency
+        }
       }
 
       ... on AccountWithHost {
@@ -455,9 +474,9 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       # For Hosts with Budget capabilities
 
       ... on Organization {
-        balance
         isHost
         isActive
+        # NOTE: This will be the account itself in this case
         host {
           ...CreateExpenseHostFields
         }
@@ -514,6 +533,7 @@ const addHoc = compose(
   addCreateExpensePageData,
   addCreateExpenseMutation,
   addDraftExpenseAndInviteUserMutation,
+  withToasts,
   injectIntl,
 );
 

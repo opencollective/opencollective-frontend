@@ -20,7 +20,7 @@ const GoalContainer = styled.div`
   left: 0;
   text-align: right;
   transition: width 3s;
-  height: 15px;
+  height: 25px;
   color: ${props => props.theme.colors.black[700]};
   border-right: 1px solid
     ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme))};
@@ -32,6 +32,7 @@ const GoalContainer = styled.div`
       : 'opacity 2s, height 1s, padding-top 1s, width 2s ease-in-out;'};
 
   .caption {
+    display: inline-block;
     padding: 1rem 0.5rem 1rem 0.5rem;
     font-size: 13px;
     line-height: 15px;

@@ -36,7 +36,7 @@ We do aim having a clean Git history! When submitting a Pull Request, make sure:
 
 Some tips to keep a clean Git history while working on your feature branch:
 
-- always update from master with `git pull --rebase origin master` or similar
+- always update from main with `git pull --rebase origin main` or similar
 - you might have to `git push origin --force`, that's all right if you're the only one working on the feature branch
 - `git commit --amend` to modify your last commit with "fix", "typo", "prettier" or "eslint" modifications
 - `git rebase --interactive` to rewrite the history
