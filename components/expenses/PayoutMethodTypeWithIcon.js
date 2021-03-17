@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
+import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
 import { University as BankIcon } from '@styled-icons/fa-solid/University';
 import { FormattedMessage } from 'react-intl';
@@ -27,6 +28,15 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
           <PaypalIcon size={iconSize} color="#192f86" />
           <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
             PayPal
+          </Span>
+        </Flex>
+      );
+    case PayoutMethodType.CREDIT_CARD:
+      return (
+        <Flex alignItems="center">
+          <CreditCard size={iconSize} color="#9D9FA3" />
+          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
+            <FormattedMessage id="CreditCard" defaultMessage="Credit Card" />
           </Span>
         </Flex>
       );

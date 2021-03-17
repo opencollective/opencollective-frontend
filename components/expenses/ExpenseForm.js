@@ -195,13 +195,16 @@ const ExpenseFormBody = ({
   const isInvite = values.payee?.isInvite;
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
+  const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const stepOneCompleted =
     values.payoutMethod &&
     isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
     (isReceipt ? true : values.payeeLocation?.country && values.payeeLocation?.address);
-  const stepTwoCompleted = isInvite ? true : stepOneCompleted && hasBaseFormFieldsCompleted && values.items.length > 0;
+  const stepTwoCompleted = isInvite
+    ? true
+    : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
 
-  const [step, setStep] = React.useState(stepOneCompleted ? STEPS.EXPENSE : STEPS.PAYEE);
+  const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
 
@@ -242,10 +245,13 @@ const ExpenseFormBody = ({
 
   // Return to Payee step if type is changed
   React.useEffect(() => {
-    setStep(STEPS.PAYEE);
-    setOnBehalf(false);
-    if (!isDraft && values.payee?.isInvite) {
-      formik.setFieldValue('payee', null);
+    if (!isCreditCardCharge) {
+      setStep(STEPS.PAYEE);
+      setOnBehalf(false);
+
+      if (!isDraft && values.payee?.isInvite) {
+        formik.setFieldValue('payee', null);
+      }
     }
   }, [values.type]);
 
@@ -340,19 +346,21 @@ const ExpenseFormBody = ({
 
   return (
     <Form>
-      <ExpenseTypeRadioSelect
-        name="type"
-        onChange={e => {
-          handleChange(e);
-        }}
-        value={values.type}
-        options={{
-          fundingRequest:
-            [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
-            collective.settings?.fundingRequest === true ||
-            collective.host?.settings?.fundingRequest === true,
-        }}
-      />
+      {!isCreditCardCharge && (
+        <ExpenseTypeRadioSelect
+          name="type"
+          onChange={e => {
+            handleChange(e);
+          }}
+          value={values.type}
+          options={{
+            fundingRequest:
+              [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
+              collective.settings?.fundingRequest === true ||
+              collective.host?.settings?.fundingRequest === true,
+          }}
+        />
+      )}
       {values.type && (
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial" ref={formRef}>
           <HiddenFragment show={step == STEPS.PAYEE}>
@@ -479,6 +487,7 @@ const ExpenseFormBody = ({
                   onClick={() => addNewExpenseItem(formik)}
                   minWidth={135}
                   data-cy="expense-add-item-btn"
+                  disabled={isCreditCardCharge}
                 >
                   +&nbsp;
                   {formatMessage(
@@ -517,7 +526,11 @@ const ExpenseFormBody = ({
                   whiteSpace="nowrap"
                   data-cy="expense-back"
                   onClick={() => {
-                    setStep(STEPS.PAYEE);
+                    if (isCreditCardCharge) {
+                      onCancel();
+                    } else {
+                      setStep(STEPS.PAYEE);
+                    }
                   }}
                 >
                   ←&nbsp;
@@ -537,6 +550,8 @@ const ExpenseFormBody = ({
                 >
                   {isInvite && !isDraft ? (
                     <FormattedMessage id="Expense.SendInvite" defaultMessage="Send Invite" />
+                  ) : isCreditCardCharge ? (
+                    <FormattedMessage id="Expense.AttachReceipt" defaultMessage="Attach Receipt" />
                   ) : (
                     <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
                   )}
