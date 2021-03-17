@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import css from '@styled-system/css';
-import getVideoId from 'get-video-id';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
@@ -343,7 +342,7 @@ export default class RichTextEditor extends React.Component {
   };
 
   constructVideoEmbedURL = videoLink => {
-    const { id, service } = getVideoId(videoLink);
+    const { id, service } = this.getVideoId(videoLink);
     if (service === 'youtube') {
       return `https://www.youtube.com/embed/${id}`;
     } else if (service === 'vimeo') {
@@ -351,6 +350,30 @@ export default class RichTextEditor extends React.Component {
     } else {
       return null;
     }
+  };
+
+  getVideoId = videoLink => {
+    let regexExp;
+    const videoId = {};
+    if (videoLink.includes('youtu')) {
+      videoId.service = 'youtube';
+      regexExp = new RegExp(
+        '(?:https?://)?(?:www.)?youtu(?:.be/|be.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
+        'ig',
+      );
+    } else if (videoLink.includes('vimeo')) {
+      videoId.service = 'vimeo';
+      regexExp = new RegExp(
+        '(http|https)?://(www.)?vimeo.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
+      );
+    } else {
+      return videoId;
+    }
+    const matches = regexExp.exec(videoLink);
+    if (matches) {
+      videoId.id = matches[matches.length - 1];
+    }
+    return videoId;
   };
 
   embedVideoIFrame = videoLink => {
