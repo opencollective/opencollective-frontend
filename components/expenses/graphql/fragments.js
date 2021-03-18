@@ -245,6 +245,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       canApprove
       canUnapprove
       canReject
+      canMarkAsSpam
       canPay
       canMarkAsUnpaid
       canComment
@@ -285,6 +286,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       canApprove
       canUnapprove
       canReject
+      canMarkAsSpam
       canPay
       canMarkAsUnpaid
       canSeeInvoiceInfo
