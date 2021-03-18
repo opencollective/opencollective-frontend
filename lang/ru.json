@@ -87,6 +87,8 @@
   "archive.account.confirmation": "Вы действительно хотите заархивировать {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Архивировать {name}",
   "Attachment.Private": "Это вложение приватное",
+  "AttachReceipt": "Attach missing receipt",
+  "AttachReceiptInstructions": "This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information.",
   "authorization.loginRequired": "Вам нужно войти, чтобы продолжить.",
   "Back": "Назад",
   "BalanceAmount": "Баланс {balance}",
