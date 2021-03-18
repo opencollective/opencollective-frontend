@@ -460,6 +460,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM
   COLLECTIVE_EXPENSE_PROCESSING
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -3708,6 +3709,11 @@ enum ExpenseProcessAction {
   To trigger the payment
   """
   PAY
+
+  """
+  To mark the expense as spam
+  """
+  MARK_AS_SPAM
 }
 
 input ExpenseReferenceInput {
@@ -3732,6 +3738,7 @@ enum ExpenseStatus {
   ERROR
   PAID
   SCHEDULED_FOR_PAYMENT
+  SPAM
 }
 
 """
@@ -3747,6 +3754,7 @@ enum ExpenseStatusFilter {
   ERROR
   PAID
   SCHEDULED_FOR_PAYMENT
+  SPAM
 
   """
   Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
@@ -4441,6 +4449,11 @@ type Host implements Account & AccountWithContributions {
   Paypal preapproval info. Returns null if PayPal account is not connected.
   """
   paypalPreApproval: PaymentMethod
+
+  """
+  If the host supports PayPal, this will contain the client ID to use in the frontend
+  """
+  paypalClientId: String
 
   """
   The list of payout methods this Host accepts for its expenses
@@ -6372,8 +6385,19 @@ enum PayoutMethodType {
 }
 
 input PaypalPaymentInput {
-  token: String!
+  token: String
   data: JSON
+  captureId: String
+  orderId: String
+  subscriptionId: String
+  isNewApi: Boolean
+}
+
+"""
+A PayPal plan to associate with a contribution
+"""
+type PaypalPlan {
+  id: String!
 }
 
 """
@@ -7112,6 +7136,23 @@ type Query {
     """
     account: AccountReferenceInput
   ): Update
+  paypalPlan(
+    """
+    The account that serves as a payment target
+    """
+    account: AccountReferenceInput!
+
+    """
+    The contribution amount for 1 quantity, without platform contribution and taxes
+    """
+    amount: AmountInput!
+    frequency: ContributionFrequency!
+
+    """
+    The tier you are contributing to
+    """
+    tier: TierReferenceInput
+  ): PaypalPlan!
   thirdPartyApiClientToken(
     """
     The account that serves as a payment target
