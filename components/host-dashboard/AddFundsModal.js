@@ -12,7 +12,6 @@ import { collectivePageQuery, getCollectivePageQueryVariables } from '../collect
 import { budgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
-import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -52,7 +51,6 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $description: String!
     $hostFeePercent: Int!
     $platformFeePercent: Int
-    $platformTip: AmountInput
   ) {
     addFunds(
       account: $account
@@ -61,7 +59,6 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       description: $description
       hostFeePercent: $hostFeePercent
       platformFeePercent: $platformFeePercent
-      platformTip: $platformTip
     ) {
       id
       toAccount {
@@ -80,7 +77,6 @@ const getInitialValues = values => ({
   amount: null,
   hostFeePercent: null,
   platformFeePercent: 0,
-  platformTip: null,
   description: '',
   fromAccount: null,
   ...values,
@@ -119,24 +115,17 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   // We don't want to use Platform Fees anymore for Hosts that switched to the new model
   const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0;
   const defaultPlatformFeePercent = 0;
-  const defaultPlatformTipPercent = 0;
 
   if (!LoggedInUser) {
     return null;
   }
 
-  function calculateTip(form, field, isAmount) {
-    form.setFieldTouched(field.name, true);
-    if (isAmount) {
-      form.values.platformTipPercent = Math.round((field.value * 100) / form.values.amount);
-    } else {
-      form.values.platformTip = (form.values.amount * field.value) / 100;
-    }
-  }
-
   return (
     <StyledModal width="100%" maxWidth={435} {...props} trapFocus>
       <CollectiveModalHeader collective={collective} />
+      <h3>
+        <FormattedMessage id="AddFundsModal.SubHeading" defaultMessage="Add Funds to the Collective" />
+      </h3>
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
         validate={validate}
@@ -147,7 +136,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
               amount: { valueInCents: values.amount },
               fromAccount: buildAccountReference(values.fromAccount),
               account: buildAccountReference(values.account),
-              platformTip: { valueInCents: values.platformTip || 0 },
             },
           }).then(props.onClose)
         }
@@ -157,9 +145,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           const platformFeePercent = isNaN(values.platformFeePercent)
             ? defaultPlatformFeePercent
             : values.platformFeePercent;
-          const platformTipPercent = isNaN(values.platformTipPercent)
-            ? defaultPlatformTipPercent
-            : values.platformTipPercent;
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
           const platformFee = Math.round(values.amount * (platformFeePercent / 100));
 
@@ -172,11 +157,39 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           return (
             <Form>
               <ModalBody>
+                <StyledInputFormikField
+                  name="fromAccount"
+                  htmlFor="addFunds-fromAccount"
+                  label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
+                  mt={3}
+                >
+                  {({ form, field }) => (
+                    <CollectivePickerAsync
+                      inputId={field.id}
+                      data-cy="add-funds-source"
+                      types={['USER', 'ORGANIZATION']}
+                      creatable
+                      error={field.error}
+                      createCollectiveOptionalFields={['location.address', 'location.country']}
+                      onBlur={() => form.setFieldTouched(field.name, true)}
+                      customOptions={defaultSources}
+                      onChange={({ value }) => form.setFieldValue(field.name, value)}
+                    />
+                  )}
+                </StyledInputFormikField>
+                <StyledInputFormikField
+                  name="description"
+                  htmlFor="addFunds-description"
+                  label={<FormattedMessage id="AddFundsModal.description" defaultMessage="Purpose Description" />}
+                  mt={3}
+                >
+                  {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
+                </StyledInputFormikField>
                 <Flex mt={3} flexWrap="wrap">
                   <StyledInputFormikField
                     name="amount"
                     htmlFor="addFunds-amount"
-                    label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
+                    label={<FormattedMessage id="AddFundsModal.amount" defaultMessage="Amount" />}
                     required
                     flex="1 1"
                   >
@@ -198,7 +211,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     <StyledInputFormikField
                       name="hostFeePercent"
                       htmlFor="addFunds-hostFeePercent"
-                      label={<FormattedMessage id="HostFee" defaultMessage="Host fee" />}
+                      label={<FormattedMessage id="AddFundsModal.hostFee" defaultMessage="Host Fee" />}
                       ml={3}
                     >
                       {({ form, field }) => (
@@ -214,12 +227,12 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     </StyledInputFormikField>
                   )}
                 </Flex>
-                <Flex mt={3} flexWrap="wrap">
-                  {canAddPlatformFee && (
+                {canAddPlatformFee && (
+                  <Flex mt={3} flexWrap="wrap">
                     <StyledInputFormikField
                       name="platformFeePercent"
                       htmlFor="addFunds-platformFeePercent"
-                      label={<FormattedMessage id="PlatformFee" defaultMessage="Platform fee" />}
+                      label={<FormattedMessage id="AddFundsModal.PlatformFee" defaultMessage="Platform fee" />}
                     >
                       {({ form, field }) => (
                         <StyledInputPercentage
@@ -232,80 +245,16 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         />
                       )}
                     </StyledInputFormikField>
-                  )}
-                  {!canAddPlatformFee && (
-                    <Container>
-                      <Flex>
-                        <FormattedMessage id="PlatformTip" defaultMessage="Platform Tips" />
-                      </Flex>
-                      <Flex mt={2}>
-                        <StyledInputFormikField name="platformTip" htmlFor="addFunds-platformTip">
-                          {({ form, field }) => (
-                            <StyledInputAmount
-                              id={field.id}
-                              data-cy="add-funds-platform-tip-amount"
-                              currency={collective.currency}
-                              placeholder="0.00"
-                              error={field.error}
-                              value={field.value}
-                              onChange={value => form.setFieldValue(field.name, value)}
-                              onBlur={() => calculateTip(form, field, true)}
-                            />
-                          )}
-                        </StyledInputFormikField>
-                        <StyledInputFormikField name="platformTipPercent" htmlFor="addFunds-platformTipPercent" ml={3}>
-                          {({ form, field }) => (
-                            <StyledInputPercentage
-                              id={field.id}
-                              data-cy="add-funds-platform-tip-percent"
-                              placeholder="0"
-                              value={field.value}
-                              error={field.error}
-                              onChange={value => form.setFieldValue(field.name, value)}
-                              onBlur={() => calculateTip(form, field, false)}
-                            />
-                          )}
-                        </StyledInputFormikField>
-                      </Flex>
-                    </Container>
-                  )}
-                </Flex>
-                <StyledInputFormikField
-                  name="description"
-                  htmlFor="addFunds-description"
-                  label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-                  mt={3}
-                >
-                  {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
-                </StyledInputFormikField>
-                <StyledInputFormikField
-                  name="fromAccount"
-                  htmlFor="addFunds-fromAccount"
-                  label={<FormattedMessage id="AddFunds.source" defaultMessage="Source" />}
-                  mt={3}
-                >
-                  {({ form, field }) => (
-                    <CollectivePickerAsync
-                      inputId={field.id}
-                      data-cy="add-funds-source"
-                      types={['USER', 'ORGANIZATION']}
-                      creatable
-                      error={field.error}
-                      createCollectiveOptionalFields={['location.address', 'location.country']}
-                      onBlur={() => form.setFieldTouched(field.name, true)}
-                      customOptions={defaultSources}
-                      onChange={({ value }) => form.setFieldValue(field.name, value)}
-                    />
-                  )}
-                </StyledInputFormikField>
+                  </Flex>
+                )}
                 <P fontSize="14px" lineHeight="17px" fontWeight="500" mt={4}>
-                  <FormattedMessage id="Details" defaultMessage="Details" />
+                  <FormattedMessage id="AddFundsModal.Details" defaultMessage="Details" />
                 </P>
                 <StyledHr my={2} borderColor="black.300" />
                 <AmountDetailsLine
                   value={values.amount || 0}
                   currency={collective.currency}
-                  label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
+                  label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
                 />
                 {canAddHostFee && (
                   <AmountDetailsLine
@@ -313,8 +262,8 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     currency={collective.currency}
                     label={
                       <FormattedMessage
-                        id="addfunds.hostFees"
-                        defaultMessage="Host fees ({hostFees})"
+                        id="AddFundsModal.hostFees"
+                        defaultMessage="Host fee charged to collective ({hostFees})"
                         values={{ hostFees: `${hostFeePercent}%` }}
                       />
                     }
@@ -326,38 +275,27 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     currency={collective.currency}
                     label={
                       <FormattedMessage
-                        id="addfunds.platformFees"
+                        id="AddFundsModal.platformFees"
                         defaultMessage="Platform fees ({platformFees})"
                         values={{ platformFees: `${platformFeePercent}%` }}
                       />
                     }
                   />
                 )}
-                {!canAddPlatformFee && (
-                  <AmountDetailsLine
-                    value={values.platformTip || 0}
-                    currency={collective.currency}
-                    label={
-                      <FormattedMessage
-                        id="addfunds.platformTip"
-                        defaultMessage="Platform Tip ({platformTipPercent})"
-                        values={{ platformTipPercent: `${platformTipPercent.toFixed(2)}%` }}
-                      />
-                    }
-                  />
-                )}
                 <StyledHr my={2} borderColor="black.300" />
                 <AmountDetailsLine
-                  value={values.amount - hostFee - platformFee + values.platformTip}
+                  value={values.amount - hostFee - platformFee}
                   currency={collective.currency}
-                  label={<FormattedMessage id="addfunds.netAmount" defaultMessage="Net amount" />}
+                  label={
+                    <FormattedMessage id="AddFundsModal.netAmount" defaultMessage="Net amount received by collective" />
+                  }
                   isLargeAmount
                 />
                 <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
                   <FormattedMessage
-                    id="addfunds.disclaimer"
-                    defaultMessage="You will set aside {amount} in your bank account for this purpose."
-                    values={{ amount: formatCurrency(values.amount + values.platformTip, collective.currency) }}
+                    id="AddFundsModal.disclaimer"
+                    defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
+                    values={{ amount: formatCurrency(values.amount, collective.currency) }}
                   />
                 </P>
                 {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
@@ -374,10 +312,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     disabled={!dirty || !isValid}
                     loading={isSubmitting}
                   >
-                    <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+                    <FormattedMessage id="AddFundsModal.addFunds" defaultMessage="Add Funds" />
                   </StyledButton>
                   <StyledButton mx={2} mb={1} minWidth={100} onClick={props.onClose} type="button">
-                    <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                    <FormattedMessage id="AddFundsModal.cancel" defaultMessage="Cancel" />
                   </StyledButton>
                 </Flex>
               </ModalFooter>
