@@ -87,6 +87,8 @@
   "archive.account.confirmation": "是否要删除{type, select, EVENT {this Event} PROJECT { this Project}FUND {this Fund} COLLECTIVE {this Collective}ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "归档 {name}",
   "Attachment.Private": "此附件是私密的",
+  "AttachReceipt": "Attach missing receipt",
+  "AttachReceiptInstructions": "This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information.",
   "authorization.loginRequired": "你需要登录才能继续。",
   "Back": "返回",
   "BalanceAmount": "余额 {balance}",

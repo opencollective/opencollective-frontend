@@ -87,6 +87,8 @@
   "archive.account.confirmation": "Sei sicuro di voler archiviare {type, select, EVENT {questo evento} PROJECT {questo progetto} FUND {questo finanziamento} COLLECTIVE {questo Collettivo} ORGANIZATION {questa Organizzazione} other {questo account}}?",
   "archive.modal.header": "Archivia {name}",
   "Attachment.Private": "Questo allegato è privato",
+  "AttachReceipt": "Attach missing receipt",
+  "AttachReceiptInstructions": "This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information.",
   "authorization.loginRequired": "Devi essere loggato per continuare.",
   "Back": "Torna indietro",
   "BalanceAmount": "Bilancio {balance}",

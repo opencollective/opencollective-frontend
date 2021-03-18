@@ -87,6 +87,8 @@
   "archive.account.confirmation": "Êtes-vous sûr de vouloir archiver {type, select, EVENT {cet Événement} PROJECT {ce Projet} FUND {ce Fonds} COLLECTIVE {ce Collectif} ORGANIZATION {cette Organization} other {ce compte}} ?",
   "archive.modal.header": "Archiver {name}",
   "Attachment.Private": "Cette pièce jointe est privée",
+  "AttachReceipt": "Attach missing receipt",
+  "AttachReceiptInstructions": "This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information.",
   "authorization.loginRequired": "Veuillez vous authentifier pour pouvoir continuer.",
   "Back": "Retour",
   "BalanceAmount": "Solde {balance}",

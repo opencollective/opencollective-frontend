@@ -87,6 +87,8 @@
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "{name}をアーカイブ",
   "Attachment.Private": "この添付ファイルは非公開です",
+  "AttachReceipt": "Attach missing receipt",
+  "AttachReceiptInstructions": "This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information.",
   "authorization.loginRequired": "続けるにはログインする必要があります",
   "Back": "戻る",
   "BalanceAmount": "残高 {balance}",
