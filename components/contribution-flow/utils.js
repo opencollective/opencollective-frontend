@@ -23,6 +23,7 @@ export const generatePaymentMethodOptions = (
   stepSummary,
   collective,
   isRoot,
+  hasNewPaypal,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
@@ -30,6 +31,7 @@ export const generatePaymentMethodOptions = (
   const hostHasStripe = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
   const hostHasBraintree = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BRAINTREE_PAYPAL);
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
+  const interval = get(stepDetails, 'interval', null);
 
   const paymentMethodsOptions = paymentMethods.map(pm => ({
     id: pm.id,
@@ -97,7 +99,7 @@ export const generatePaymentMethodOptions = (
     }
 
     // Paypal
-    if (hostHasPaypal && !stepDetails.interval) {
+    if (hostHasPaypal && (!interval || hasNewPaypal)) {
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
@@ -107,7 +109,6 @@ export const generatePaymentMethodOptions = (
     }
 
     // Manual (bank transfer)
-    const interval = get(stepDetails, 'interval', null);
     if (hostHasManual && !interval) {
       uniquePMs.push({
         key: 'manual',

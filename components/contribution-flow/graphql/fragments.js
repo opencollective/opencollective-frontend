@@ -11,6 +11,7 @@ const contributionFlowHostFieldsFragment = gqlV2/* GraphQL */ `
     location {
       country
     }
+    paypalClientId
     supportedPaymentMethods
     payoutMethods {
       id
@@ -118,6 +119,11 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
     amount {
       value
       currency
+    }
+    paymentMethod {
+      id
+      service
+      type
     }
     platformContributionAmount {
       value
