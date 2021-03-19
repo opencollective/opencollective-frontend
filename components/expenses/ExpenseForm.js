@@ -363,7 +363,7 @@ const ExpenseFormBody = ({
       )}
       {values.type && (
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial" ref={formRef}>
-          <HiddenFragment show={step == STEPS.PAYEE}>
+          <HiddenFragment show={step === STEPS.PAYEE}>
             <Flex alignItems="center" mb={16}>
               <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
                 {formatMessage(msg.stepPayee)}
@@ -376,7 +376,7 @@ const ExpenseFormBody = ({
             {payeeForm}
           </HiddenFragment>
 
-          <HiddenFragment show={step == STEPS.EXPENSE}>
+          <HiddenFragment show={step === STEPS.EXPENSE}>
             <Flex alignItems="center" mb={10}>
               <P
                 as="label"
@@ -567,7 +567,7 @@ const ExpenseFormBody = ({
           </HiddenFragment>
         </StyledCard>
       )}
-      {step == STEPS.EXPENSE && (
+      {step === STEPS.EXPENSE && (
         <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
           <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless collective={collective} />
         </StyledCard>
