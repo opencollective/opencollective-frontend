@@ -15,6 +15,9 @@ import { withUser } from './UserProvider';
  * If authentication fails, users will be prompted with a form to login that will
  * redirect them to the correct page once they do.
  *
+ * Unless a `noRobots={true}` is provided, pages wrapped with this helper will not be indexed
+ * by default.
+ *
  * ## Usage
  *
  * ```jsx
@@ -66,7 +69,11 @@ class AuthenticatedPage extends React.Component {
   render() {
     const { LoggedInUser, loadingLoggedInUser, ...pageProps } = this.props;
 
-    return <Page {...pageProps}>{this.renderContent(loadingLoggedInUser, LoggedInUser)}</Page>;
+    return (
+      <Page noRobots {...pageProps}>
+        {this.renderContent(loadingLoggedInUser, LoggedInUser)}
+      </Page>
+    );
   }
 }
 
