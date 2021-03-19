@@ -23,6 +23,7 @@ import LinkCollective from '../LinkCollective';
 import LinkExpense from '../LinkExpense';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
@@ -134,9 +135,9 @@ const ExpenseBudgetItem = ({
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
             ) : (
-              <LinkCollective collective={featuredProfile}>
+              <StyledLink as={LinkCollective} collective={featuredProfile}>
                 <Avatar collective={featuredProfile} radius={40} />
-              </LinkCollective>
+              </StyledLink>
             )}
           </Box>
           {isLoading ? (
@@ -173,12 +174,12 @@ const ExpenseBudgetItem = ({
               </ExpenseTitleLink>
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
-                  <LinkCollective collective={collective} />
+                  <StyledLink as={LinkCollective} collective={collective} />
                 ) : (
                   <FormattedMessage
                     id="CreatedBy"
                     defaultMessage="by {name}"
-                    values={{ name: <LinkCollective collective={expense.createdByAccount} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} collective={expense.createdByAccount} /> }}
                   />
                 )}
                 {' • '}
