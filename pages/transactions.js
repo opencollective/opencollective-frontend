@@ -187,7 +187,7 @@ class TransactionsPage extends React.Component {
 
     return (
       <TransactionPageWrapper>
-        <Header collective={collective} LoggedInUser={LoggedInUser} />
+        <Header collective={collective} LoggedInUser={LoggedInUser} noRobots={collective.type === 'INDIVIDUAL'} />
         <Body>
           <CollectiveNavbar
             collective={collective}

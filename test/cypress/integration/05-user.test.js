@@ -12,6 +12,10 @@ describe('New users profiles', () => {
     cy.visit('/xdamman');
   });
 
+  it('Should have no-index meta', () => {
+    cy.get('meta[property="robots"]').should('have.attr', 'content', 'none');
+  });
+
   describe('Contributions section', () => {
     it('Shows contributions with date since and amount contributed', () => {
       cy.get('a[href="#category-CONTRIBUTIONS"]').click();
