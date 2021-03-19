@@ -23,4 +23,7 @@ User-agent: MJ12bot
 Disallow: /
 
 User-agent: AhrefsBot
-Disallow: / 
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
