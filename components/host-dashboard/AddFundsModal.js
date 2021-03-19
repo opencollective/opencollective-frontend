@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
@@ -12,6 +14,7 @@ import { collectivePageQuery, getCollectivePageQueryVariables } from '../collect
 import { budgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -21,16 +24,28 @@ import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputPercentage from '../StyledInputPercentage';
+import StyledLink from '../StyledLink';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../StyledModal';
+import StyledSelect from '../StyledSelect';
+import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import { useUser } from '../UserProvider';
-import StyledSelect from '../StyledSelect';
-import styled from 'styled-components';
+
 import illustration from '../contribution-flow/fees-on-top-illustration.png';
 
 const Illustration = styled.img.attrs({ src: illustration })`
   width: 40px;
   height: 40px;
+`;
+
+const PlatformTipContainer = styled(StyledModal)`
+  ${props =>
+    props.showPlatformTipModal &&
+    css`
+      background-image: url('/static/images/platform-tip-background.svg');
+      background-repeat: no-repeat;
+      background-size: 435px;
+    `}
 `;
 
 const AmountDetailsLine = ({ label, value, currency, isLargeAmount }) => (
@@ -99,8 +114,68 @@ const buildAccountReference = input => {
   return typeof input.id === 'string' ? { id: input.id } : { legacyId: input.id };
 };
 
+const msg = defineMessages({
+  noThankYou: {
+    id: 'NoThankYou',
+    defaultMessage: 'No thank you',
+  },
+  other: {
+    id: 'platformFee.Other',
+    defaultMessage: 'Other',
+  },
+});
+
+const DEFAULT_PLATFORM_TIP_PERCENTAGES = [0.1, 0.15, 0.2];
+
+const getOptionFromPercentage = (amount, currency, percentage) => {
+  const feeAmount = isNaN(amount) ? 0 : Math.round(amount * percentage);
+  return {
+    // Value must be unique, so we set a special key if feeAmount is 0
+    value: feeAmount || `${percentage}%`,
+    feeAmount,
+    percentage,
+    currency,
+    label: `${feeAmount / 100} ${currency} (${percentage * 100}%)`,
+  };
+};
+
+const getOptions = (amount, currency, intl) => {
+  return [
+    ...DEFAULT_PLATFORM_TIP_PERCENTAGES.map(percentage => {
+      return getOptionFromPercentage(amount, currency, percentage);
+    }),
+    {
+      label: intl.formatMessage(msg.noThankYou),
+      value: 0,
+    },
+    {
+      label: intl.formatMessage(msg.other),
+      value: 'CUSTOM',
+    },
+  ];
+};
+
 const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
+  const [fundDetails, setFundDetails] = useState({});
+  const intl = useIntl();
+  const options = React.useMemo(() => getOptions(fundDetails.fundAmount, collective.currency, intl), [
+    fundDetails.fundAmount,
+    collective.currency,
+  ]);
+  const formatOptionLabel = option => {
+    if (option.currency) {
+      return (
+        <span>
+          {formatCurrency(option.feeAmount, option.currency)}{' '}
+          <Span color="black.500">({option.percentage * 100}%)</Span>
+        </span>
+      );
+    } else {
+      return option.label;
+    }
+  };
+  const [selectedOption, setSelectedOption] = useState(options[1]);
 
   const [submitAddFunds, { error }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
@@ -123,24 +198,30 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   // We don't want to use Platform Fees anymore for Hosts that switched to the new model
   const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0;
   const defaultPlatformFeePercent = 0;
-  const [showPlatformTipModal, setShowPlatformTipModal] = useState(false);
 
   if (!LoggedInUser) {
     return null;
   }
 
   const handleClose = () => {
-    setShowPlatformTipModal(false);
+    setFundDetails({ showPlatformTipModal: false });
+    props.onClose();
   };
 
   return (
-    <StyledModal width="100%" maxWidth={435} {...props} trapFocus>
+    <PlatformTipContainer
+      width="100%"
+      maxWidth={435}
+      {...props}
+      trapFocus
+      showPlatformTipModal={fundDetails.showPlatformTipModal}
+    >
       <CollectiveModalHeader collective={collective} onClick={handleClose} />
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
         validate={validate}
         onSubmit={values =>
-          !showPlatformTipModal
+          !fundDetails.showPlatformTipModal
             ? submitAddFunds({
                 variables: {
                   ...values,
@@ -148,7 +229,14 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   fromAccount: buildAccountReference(values.fromAccount),
                   account: buildAccountReference(values.account),
                 },
-              }).then(() => setShowPlatformTipModal(true))
+              }).then(() => {
+                setFundDetails({
+                  showPlatformTipModal: true,
+                  fundAmount: values.amount,
+                  description: values.description,
+                  source: values.fromAccount.name,
+                });
+              })
             : submitAddFunds({
                 variables: {
                   ...values,
@@ -173,7 +261,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
             defaultSources.push({ value: collective, label: <DefaultCollectiveLabel value={collective} /> });
           }
 
-          if (!showPlatformTipModal) {
+          if (!fundDetails.showPlatformTipModal) {
             return (
               <Form>
                 <h3>
@@ -234,7 +322,22 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       <StyledInputFormikField
                         name="hostFeePercent"
                         htmlFor="addFunds-hostFeePercent"
-                        label={<FormattedMessage id="AddFundsModal.hostFee" defaultMessage="Host Fee" />}
+                        label={
+                          <span>
+                            <FormattedMessage id="AddFundsModal.hostFee" defaultMessage="Host Fee" />
+                            {` `}
+                            <StyledTooltip
+                              content={() => (
+                                <FormattedMessage
+                                  id="AddFundsModal.hostFee.tooltip"
+                                  defaultMessage="The default host fee percentage is set up in your host settings. The host fee is charged by the fiscal host to the collectives for the financial services provided."
+                                />
+                              )}
+                            >
+                              <InfoCircle size={16} />
+                            </StyledTooltip>
+                          </span>
+                        }
                         ml={3}
                       >
                         {({ form, field }) => (
@@ -351,6 +454,34 @@ const AddFundsModal = ({ host, collective, ...props }) => {
             return (
               <Form>
                 <ModalBody>
+                  <Container>
+                    <h3>
+                      <FormattedMessage id="AddFundsModal.FundsAdded" defaultMessage="Funds Added ✅" />
+                    </h3>
+                    <Container pb={2}>
+                      <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
+                      <ul>
+                        <li>
+                          <strong>{`${fundDetails.fundAmount / 100} ${collective.currency}`}</strong>
+                        </li>
+                        <li>
+                          <FormattedMessage id="AddFundsModal.FromTheSource" defaultMessage="From the source" />{' '}
+                          <strong>{fundDetails.source}</strong>
+                        </li>
+                        <li>
+                          <FormattedMessage id="AddFundsModal.ForThePurpose" defaultMessage="For the purpose of" />{' '}
+                          <strong>{fundDetails.description}</strong>
+                        </li>
+                      </ul>
+                    </Container>
+                    <Container pb={2}>
+                      <FormattedMessage id="AddFundsModal.NeedHelp" defaultMessage="Need Help?" />{' '}
+                      <StyledLink href="/support" buttonStyle="standard" buttonSize="tiny">
+                        <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
+                      </StyledLink>
+                    </Container>
+                  </Container>
+                  <StyledHr my={3} borderColor="black.300" />
                   <div>
                     <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
                       <FormattedMessage
@@ -368,7 +499,29 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                           />
                         </P>
                       </Flex>
+                      <StyledSelect
+                        aria-label="Donation percentage"
+                        width="100%"
+                        maxWidth={['100%', 190]}
+                        mt={[2, 0]}
+                        isSearchable={false}
+                        fontSize="15px"
+                        options={options}
+                        onChange={setSelectedOption}
+                        formatOptionLabel={formatOptionLabel}
+                        value={selectedOption}
+                      />
                     </Flex>
+                    {selectedOption.value === 'CUSTOM' && (
+                      <Flex justifyContent="flex-end" mt={2}>
+                        <StyledInputAmount
+                          id="platformTip"
+                          currency={collective.currency}
+                          onChange={() => {}}
+                          value={options[1].value}
+                        />
+                      </Flex>
+                    )}
                   </div>
                 </ModalBody>
                 <ModalFooter isFullWidth>
@@ -380,16 +533,15 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       mx={2}
                       mb={1}
                       minWidth={120}
-                      disabled={!dirty || !isValid}
                       loading={isSubmitting}
                     >
-                      {values.amount !== 0 ? (
+                      {selectedOption.value !== 0 ? (
                         <FormattedMessage id="AddFundsModal.tipAndFinish" defaultMessage="Tip and Finish" />
                       ) : (
                         <FormattedMessage id="AddFundsModal.finish" defaultMessage="Finish" />
                       )}
                     </StyledButton>
-                    <StyledButton mx={2} mb={1} minWidth={100} onClick={props.onClose} type="button">
+                    <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
                       <FormattedMessage id="AddFundsModal.cancel" defaultMessage="Cancel" />
                     </StyledButton>
                   </Flex>
@@ -399,7 +551,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           }
         }}
       </Formik>
-    </StyledModal>
+    </PlatformTipContainer>
   );
 };
 
