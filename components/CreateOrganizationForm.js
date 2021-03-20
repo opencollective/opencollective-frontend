@@ -284,7 +284,7 @@ const CreateOrganizationForm = props => {
                             }}
                             as={StyledInputGroup}
                             {...inputProps}
-                            prepend="http://"
+                            prepend="https://"
                             placeholder={intl.formatMessage(placeholders.website)}
                           />
                         )}
