@@ -175,7 +175,8 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       return option.label;
     }
   };
-  const [selectedOption, setSelectedOption] = useState(options[1]);
+  const [selectedOption, setSelectedOption] = useState(options[3]);
+  const [customAmount, setCustomAmount] = useState(0);
 
   const [submitAddFunds, { error }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
@@ -205,6 +206,8 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 
   const handleClose = () => {
     setFundDetails({ showPlatformTipModal: false });
+    setSelectedOption(options[3]);
+    setCustomAmount(0);
     props.onClose();
   };
 
@@ -220,32 +223,38 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
         validate={validate}
-        onSubmit={values =>
-          !fundDetails.showPlatformTipModal
-            ? submitAddFunds({
-                variables: {
-                  ...values,
-                  amount: { valueInCents: values.amount },
-                  fromAccount: buildAccountReference(values.fromAccount),
-                  account: buildAccountReference(values.account),
-                },
-              }).then(() => {
-                setFundDetails({
-                  showPlatformTipModal: true,
-                  fundAmount: values.amount,
-                  description: values.description,
-                  source: values.fromAccount.name,
-                });
-              })
-            : submitAddFunds({
-                variables: {
-                  ...values,
-                  amount: { valueInCents: values.amount },
-                  fromAccount: buildAccountReference(values.fromAccount),
-                  account: buildAccountReference(values.account),
-                },
-              }).then(props.onClose)
-        }
+        onSubmit={(values, actions) => {
+          if (!fundDetails.showPlatformTipModal) {
+            submitAddFunds({
+              variables: {
+                ...values,
+                amount: { valueInCents: values.amount },
+                fromAccount: buildAccountReference(values.fromAccount),
+                account: buildAccountReference(values.account),
+              },
+            }).then(() => {
+              setFundDetails({
+                showPlatformTipModal: true,
+                fundAmount: values.amount,
+                description: values.description,
+                source: values.fromAccount.name,
+              });
+              actions.setSubmitting(false);
+            });
+          } else if (selectedOption.value !== 0) {
+            submitAddFunds({
+              variables: {
+                ...values,
+                hostFeePercent: 0,
+                amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
+                fromAccount: buildAccountReference(host),
+                account: buildAccountReference({ id: 8686 }),
+              },
+            }).then(handleClose);
+          } else {
+            handleClose();
+          }
+        }}
       >
         {({ values, isSubmitting, isValid, dirty }) => {
           const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
@@ -517,7 +526,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         <StyledInputAmount
                           id="platformTip"
                           currency={collective.currency}
-                          onChange={() => {}}
+                          onChange={setCustomAmount}
                           value={options[1].value}
                         />
                       </Flex>
