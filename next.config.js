@@ -5,7 +5,7 @@ const { getCSPHeaderForNextJS } = require('./server/content-security-policy');
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
-  useFileSystemPublicRoutes: false,
+  useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true',
   webpack: (config, { webpack, isServer, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
