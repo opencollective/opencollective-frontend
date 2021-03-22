@@ -185,7 +185,7 @@ describe('Collective page', () => {
       cy.get('[data-cy="funds-added"]').contains('Funds Added ✅');
       cy.contains('[data-cy="donation-percentage"]', 'No thank you').click();
       cy.contains('[data-cy="select-option"]', '$2.00').click();
-      cy.get('[data-cy="tip-and-finish"]').contains('Tip and Finish');
+      cy.get('[data-cy="add-platform-tip-btn"]').contains('Tip and Finish');
       cy.get('[data-cy="add-platform-tip-btn"]').click();
       cy.wait(300);
       scrollToSection(Sections.BUDGET);
