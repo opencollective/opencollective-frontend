@@ -182,9 +182,9 @@ describe('Collective page', () => {
       cy.wait(1000);
       cy.get('[data-cy="add-funds-submit-btn"]').click();
       cy.wait(300);
-      cy.get('#AddFundsModal.FundsAdded').contains('Funds Added ✅');
+      cy.get('[data-cy="funds-added"]').contains('Funds Added ✅');
       cy.contains('[data-cy="donation-percentage"]', '$2.00').click();
-      cy.get('#AddFundsModal.tipAndFinish').contains('Tip and Finish');
+      cy.get('[data-cy="tip-and-finish"]').contains('Tip and Finish');
       cy.get('[data-cy="add-platform-tip-btn"]');
       cy.wait(300);
       scrollToSection(Sections.BUDGET);

@@ -472,7 +472,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       <FormattedMessage id="AddFundsModal.FundsAdded" defaultMessage="Funds Added ✅" />
                     </h3>
                     <Container pb={2}>
-                      <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
+                      <FormattedMessage id="AddFundsModal.YouAdded" data-cy="funds-added" defaultMessage="You added:" />
                       <ul>
                         <li>
                           <strong>{`${fundDetails.fundAmount / 100} ${collective.currency}`}</strong>
@@ -551,7 +551,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       loading={isSubmitting}
                     >
                       {selectedOption.value !== 0 ? (
-                        <FormattedMessage id="AddFundsModal.tipAndFinish" defaultMessage="Tip and Finish" />
+                        <FormattedMessage id="AddFundsModal.tipAndFinish" data-cy="tip-and-finish" defaultMessage="Tip and Finish" />
                       ) : (
                         <FormattedMessage id="AddFundsModal.finish" defaultMessage="Finish" />
                       )}
