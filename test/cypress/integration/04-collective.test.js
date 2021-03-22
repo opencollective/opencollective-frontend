@@ -167,16 +167,12 @@ describe('Collective page', () => {
       cy.get('[data-cy="add-funds-submit-btn"]').should('be.disabled');
     });
 
-    it('Can add funds as collective host', () => {
+    it('Can add funds and platform tip as collective host', () => {
       cy.get('[data-cy="collective-navbar-actions-btn"]').click();
       cy.get('[data-cy="add-funds-btn"]').click();
       cy.wait(300);
       cy.get('[data-cy="add-funds-amount"]').type('20');
-      cy.get('[data-cy="add-funds-platform-tip-percent"]').type('25');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
-      cy.get('[data-cy="add-funds-platform-tip-amount"]')
-        .invoke('val')
-        .then(text => expect(text).to.equal('5'));
       cy.get('[data-cy="add-funds-source"]').click();
       cy.get('[data-cy="collective-type-picker-USER"]').click();
       cy.get('[data-cy="mini-form-email-field"]').type('cypress-test@funds.com');
@@ -185,6 +181,11 @@ describe('Collective page', () => {
       cy.get('[data-cy="mini-form-save-button"]').click();
       cy.wait(1000);
       cy.get('[data-cy="add-funds-submit-btn"]').click();
+      cy.wait(300);
+      cy.get('#AddFundsModal.FundsAdded').contains('Funds Added ✅');
+      cy.contains('[data-cy="donation-percentage"]', '$2.00').click();
+      cy.get('#AddFundsModal.tipAndFinish').contains('Tip and Finish');
+      cy.get('[data-cy="add-platform-tip-btn"]');
       cy.wait(300);
       scrollToSection(Sections.BUDGET);
       cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');

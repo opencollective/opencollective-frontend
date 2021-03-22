@@ -74,6 +74,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $description: String!
     $hostFeePercent: Int!
     $platformFeePercent: Int
+    $platformTip: AmountInput
   ) {
     addFunds(
       account: $account
@@ -82,6 +83,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       description: $description
       hostFeePercent: $hostFeePercent
       platformFeePercent: $platformFeePercent
+      platformTip: $platformTip
     ) {
       id
       toAccount {
@@ -229,6 +231,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
               variables: {
                 ...values,
                 amount: { valueInCents: values.amount },
+                platformTip: { valueInCents: 0 },
                 fromAccount: buildAccountReference(values.fromAccount),
                 account: buildAccountReference(values.account),
               },
@@ -246,9 +249,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
               variables: {
                 ...values,
                 hostFeePercent: 0,
-                amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
-                fromAccount: buildAccountReference(host),
-                account: buildAccountReference({ id: 8686 }),
+                platformTip: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
+                amount: { valueInCents: 0 },
+                fromAccount: buildAccountReference(values.fromAccount),
+                account: buildAccountReference(values.account),
               },
             }).then(handleClose);
           } else {
@@ -510,6 +514,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </Flex>
                       <StyledSelect
                         aria-label="Donation percentage"
+                        data-cy="donation-percentage"
                         width="100%"
                         maxWidth={['100%', 190]}
                         mt={[2, 0]}
@@ -532,12 +537,13 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </Flex>
                     )}
                   </div>
+                  {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
                 </ModalBody>
                 <ModalFooter isFullWidth>
                   <Flex justifyContent="center" flexWrap="wrap">
                     <StyledButton
                       type="submit"
-                      data-cy="add-funds-submit-btn"
+                      data-cy="add-platform-tip-btn"
                       buttonStyle="primary"
                       mx={2}
                       mb={1}
