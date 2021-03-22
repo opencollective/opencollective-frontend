@@ -30,7 +30,6 @@ class Header extends React.Component {
     showSearch: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
-    metas: PropTypes.object,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
     /** @ignore from injectIntl */
@@ -59,39 +58,39 @@ class Header extends React.Component {
     return title;
   }
 
+  getTwitterHandle() {
+    const { collective } = this.props;
+    const parentCollective = collective?.parentCollective;
+    const handle = this.props.twitterHandle || collective?.twitterHandle || get(parentCollective, 'twitterHandle');
+    return handle ? `@${handle}` : '';
+  }
+
   getMetas() {
     const { noRobots, collective } = this.props;
     const title = this.props.title || (collective && collective.name);
     const image = this.props.image || (collective && getCollectiveImage(collective));
-    const description =
-      this.props.description || (collective && (collective.description || collective.longDescription));
-    const twitterHandle =
-      this.props.twitterHandle ||
-      (collective && (collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')));
-
+    const description = this.props.description || collective?.description || collective?.longDescription;
     const metaTitle = title ? `${title} - Open Collective` : 'Open Collective';
     const defaultImage = `https://opencollective.com/static/images/opencollective-og-default.png`;
 
-    const metas = {
-      'twitter:site': '@opencollect',
-      'twitter:creator': twitterHandle ? `@${twitterHandle}` : '',
-      'fb:app_id': '266835577107099',
-      'og:image': image || defaultImage,
-      description: truncate(description, 256),
-      'og:description': truncate(description, 256),
-      'twitter:card': 'summary_large_image',
-      'twitter:title': metaTitle,
-      'twitter:description': truncate(description, 256),
-      'twitter:image': image || defaultImage,
-      'og:title': metaTitle,
-      ...this.props.metas,
-    };
+    const metas = [
+      { property: 'twitter:site', content: '@opencollect' },
+      { property: 'twitter:creator', content: this.getTwitterHandle() },
+      { property: 'fb:app_id', content: '266835577107099' },
+      { property: 'og:image', content: image || defaultImage },
+      { property: 'og:description', name: 'description', content: truncate(description, 256) },
+      { property: 'twitter:card', content: 'summary_large_image' },
+      { property: 'twitter:title', content: metaTitle },
+      { property: 'twitter:description', content: truncate(description, 256) },
+      { property: 'twitter:image', content: image || defaultImage },
+      { property: 'og:title', content: metaTitle },
+    ];
 
     if (noRobots || (collective && collective.isIncognito)) {
-      metas.robots = 'none';
+      metas.push({ name: 'robots', content: 'none' });
     }
 
-    return Object.keys(metas).map(key => ({ key, value: metas[key] }));
+    return metas;
   }
 
   render() {
@@ -106,8 +105,10 @@ class Header extends React.Component {
           <meta property="og:logo" content="/static/images/opencollectivelogo480x80@2x" size="960x160" />
           {css && <link rel="stylesheet" href={css} />}
           <title>{this.getTitle()}</title>
-          {this.getMetas().map(({ key, value }) => (
-            <meta property={key} content={value} key={`meta-${key}`} />
+          {this.getMetas().map((props, idx) => (
+            // We use index in this `key` because their can be multiple meta for the same property (eg. og:image)
+            // eslint-disable-next-line react/no-array-index-key
+            <meta key={`${props.property || props.name}-${idx}`} {...props} />
           ))}
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
