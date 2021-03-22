@@ -551,7 +551,11 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       loading={isSubmitting}
                     >
                       {selectedOption.value !== 0 ? (
-                        <FormattedMessage id="AddFundsModal.tipAndFinish" data-cy="tip-and-finish" defaultMessage="Tip and Finish" />
+                        <FormattedMessage
+                          id="AddFundsModal.tipAndFinish"
+                          data-cy="tip-and-finish"
+                          defaultMessage="Tip and Finish"
+                        />
                       ) : (
                         <FormattedMessage id="AddFundsModal.finish" defaultMessage="Finish" />
                       )}
