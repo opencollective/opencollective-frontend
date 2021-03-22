@@ -87,6 +87,8 @@
   "archive.account.confirmation": "האם אכן ברצונך להעביר את {type, select, EVENT {האירוע הזה} PROJECT {המיזם הזה} FUND {התקציב הזה} COLLECTIVE {קבוצת Collective זו} ORGANIZATION {הארגון הזה} other {החשבון הזה}} לארכיון?",
   "archive.modal.header": "העברת {name} לארכיון",
   "Attachment.Private": "קובץ מצורף זה הוא פרטי",
+  "AttachReceipt": "Attach missing receipt",
+  "AttachReceiptInstructions": "This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information.",
   "authorization.loginRequired": "עליך להיכנס כדי להמשיך.",
   "Back": "חזרה",
   "BalanceAmount": "יתרה {balance}",
