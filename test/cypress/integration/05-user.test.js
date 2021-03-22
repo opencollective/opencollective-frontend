@@ -13,7 +13,7 @@ describe('New users profiles', () => {
   });
 
   it('Should have no-index meta', () => {
-    cy.get('meta[property="robots"]').should('have.attr', 'content', 'none');
+    cy.get('meta[name="robots"]').should('have.attr', 'content', 'none');
   });
 
   describe('Contributions section', () => {

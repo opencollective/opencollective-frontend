@@ -9,7 +9,7 @@ describe('New host page', () => {
   it('Should not have no-index meta', () => {
     // Wait for page to be loaded
     cy.getByDataCy('collective-title');
-    cy.get('meta[property="robots"]').should('not.exist');
+    cy.get('meta[name="robots"]').should('not.exist');
   });
 
   describe('Contributions section', () => {
