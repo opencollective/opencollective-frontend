@@ -466,13 +466,13 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           } else {
             return (
               <Form>
-                <ModalBody>
+                <ModalBody data-cy="funds-added">
                   <Container>
                     <h3>
                       <FormattedMessage id="AddFundsModal.FundsAdded" defaultMessage="Funds Added ✅" />
                     </h3>
                     <Container pb={2}>
-                      <FormattedMessage id="AddFundsModal.YouAdded" data-cy="funds-added" defaultMessage="You added:" />
+                      <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
                       <ul>
                         <li>
                           <strong>{`${fundDetails.fundAmount / 100} ${collective.currency}`}</strong>

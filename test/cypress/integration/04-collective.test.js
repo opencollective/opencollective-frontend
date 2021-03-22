@@ -185,7 +185,7 @@ describe('Collective page', () => {
       cy.get('[data-cy="funds-added"]').contains('Funds Added ✅');
       cy.contains('[data-cy="donation-percentage"]', '$2.00').click();
       cy.get('[data-cy="tip-and-finish"]').contains('Tip and Finish');
-      cy.get('[data-cy="add-platform-tip-btn"]');
+      cy.get('[data-cy="add-platform-tip-btn"]').click();
       cy.wait(300);
       scrollToSection(Sections.BUDGET);
       cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');
