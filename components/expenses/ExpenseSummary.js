@@ -163,6 +163,7 @@ const ExpenseSummary = ({
           <P mt={4}>{expense.longDescription}</P>
         </Fragment>
       )}
+
       <Flex my={4} alignItems="center">
         {isLoading ? (
           <LoadingPlaceholder height={20} maxWidth={150} />

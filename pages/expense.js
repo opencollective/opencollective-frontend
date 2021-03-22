@@ -25,6 +25,7 @@ import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseInviteNotificationBanner from '../components/expenses/ExpenseInviteNotificationBanner';
+import ExpenseMissingReceiptNotificationBanner from '../components/expenses/ExpenseMissingReceiptNotificationBanner';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import {
@@ -460,6 +461,10 @@ class ExpensePage extends React.Component {
               ((expense?.status === expenseStatus.UNVERIFIED && this.state.createdUser) || isDraft) && (
                 <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
               )}
+            {status === PAGE_STATUS.VIEW &&
+              expense?.status === expenseStatus.PAID &&
+              expense?.type === expenseTypes.CHARGE &&
+              expense?.permissions?.canEdit && <ExpenseMissingReceiptNotificationBanner onEdit={this.onEditBtnClick} />}
             {status !== PAGE_STATUS.EDIT && (
               <Box mb={3}>
                 <ExpenseSummary

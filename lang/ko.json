@@ -87,6 +87,8 @@
   "archive.account.confirmation": "정말로 {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} 를 아카이브 하시겠습니까?",
   "archive.modal.header": "{name} 보관",
   "Attachment.Private": "비공개 첨부입니다.",
+  "AttachReceipt": "Attach missing receipt",
+  "AttachReceiptInstructions": "This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information.",
   "authorization.loginRequired": "계속하려면 로그인 해주세요.",
   "Back": "뒤로가기",
   "BalanceAmount": "잔액 {balance}",
