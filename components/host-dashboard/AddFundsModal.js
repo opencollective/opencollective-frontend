@@ -456,7 +456,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     >
                       <FormattedMessage id="AddFundsModal.addFunds" defaultMessage="Add Funds" />
                     </StyledButton>
-                    <StyledButton mx={2} mb={1} minWidth={100} onClick={props.onClose} type="button">
+                    <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
                       <FormattedMessage id="AddFundsModal.cancel" defaultMessage="Cancel" />
                     </StyledButton>
                   </Flex>
@@ -531,8 +531,8 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         <StyledInputAmount
                           id="platformTip"
                           currency={collective.currency}
-                          onChange={setCustomAmount}
-                          value={options[1].value}
+                          onChange={amount => setCustomAmount(amount)}
+                          defaultValue={options[1].value}
                         />
                       </Flex>
                     )}
