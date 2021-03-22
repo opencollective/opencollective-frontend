@@ -87,6 +87,8 @@
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Arşiv {name}",
   "Attachment.Private": "This attachment is private",
+  "AttachReceipt": "Attach missing receipt",
+  "AttachReceiptInstructions": "This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information.",
   "authorization.loginRequired": "Devam etmek için oturum açmalısınız.",
   "Back": "Geri",
   "BalanceAmount": "Balance {balance}",
