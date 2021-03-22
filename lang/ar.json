@@ -87,6 +87,8 @@
   "archive.account.confirmation": "هل أنت متأكد من أنك تريد أرشفة {type, select, EVENT {هذا الحدث} PROJECT {هذا المشروع} FUND {هذا الصندوق! هيكلة} COLLECTIVE {هذه المجموعة} ORGANIZATION {هذه المنظمة} other {هذا الحساب}}?",
   "archive.modal.header": "أرشيف {name}",
   "Attachment.Private": "هذا المرفق خاص",
+  "AttachReceipt": "Attach missing receipt",
+  "AttachReceiptInstructions": "This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information.",
   "authorization.loginRequired": "تحتاج إلى تسجيل الدخول للقيام بذلك",
   "Back": "عودة",
   "BalanceAmount": "الرصيد {balance}",
