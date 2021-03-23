@@ -17,7 +17,6 @@ const LocationSection = styled.section`
 class Location extends React.Component {
   static propTypes = {
     location: PropTypes.object,
-    privateInstructions: PropTypes.string,
     showTitle: PropTypes.bool,
   };
 
@@ -26,24 +25,11 @@ class Location extends React.Component {
   };
 
   render() {
+    if (!this.props.location) {
+      return null;
+    }
+
     const { name, address, lat, long, country } = this.props.location;
-    const { privateInstructions } = this.props;
-
-    const showPrivateInstructions = () => {
-      if (privateInstructions) {
-        return (
-          <Container mt={4}>
-            <P fontWeight="bold" textAlign="center" fontSize="20px">
-              <FormattedMessage id="event.privateInstructions.label" defaultMessage="Private instructions" />
-            </P>
-            <P mt={3} fontSize="16px">
-              {privateInstructions}
-            </P>
-          </Container>
-        );
-      }
-    };
-
     if (name === 'Online') {
       if (address && isURL(address)) {
         return (
@@ -53,11 +39,14 @@ class Location extends React.Component {
                 {address}
               </StyledLink>
             </P>
-            {showPrivateInstructions()}
           </Flex>
         );
       } else {
-        return null;
+        return (
+          <P textAlign="center">
+            <FormattedMessage id="Location.online" defaultMessage="Online" />
+          </P>
+        );
       }
     } else if (!name && !address && !lat && !long && !country) {
       return null;
@@ -85,7 +74,6 @@ class Location extends React.Component {
             <Map lat={lat} long={long} />
           </div>
         )}
-        {showPrivateInstructions()}
       </LocationSection>
     );
   }
