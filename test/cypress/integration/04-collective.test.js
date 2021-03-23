@@ -190,6 +190,9 @@ describe('Collective page', () => {
       cy.wait(300);
       scrollToSection(Sections.BUDGET);
       cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');
+      cy.visit(`/opencollectivehost`);
+      scrollToSection(Sections.BUDGET);
+      cy.get('[data-cy="section-budget"]').contains('Financial contribution (Platform Tip) to Open Collective');
     });
   });
 });
