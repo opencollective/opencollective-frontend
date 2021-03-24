@@ -132,6 +132,7 @@ class CollectivePage extends React.Component {
         title: collective.name,
         description: collective.description,
         twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
+        noRobots: collective.type === 'USER' && !collective.isHost,
         image:
           collective.backgroundImageUrl ||
           get(collective, 'parentCollective.backgroundImageUrl') ||

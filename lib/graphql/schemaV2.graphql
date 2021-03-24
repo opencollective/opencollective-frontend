@@ -3660,6 +3660,11 @@ type ExpensePermissions {
   canReject: Boolean!
 
   """
+  Whether the current user can mark this expense as spam
+  """
+  canMarkAsSpam: Boolean!
+
+  """
   Whether the current user can mark this expense as unpaid
   """
   canMarkAsUnpaid: Boolean!
@@ -5675,7 +5680,7 @@ type Mutation {
   ): Member!
   createUpdate(update: UpdateCreateInput!): Update!
   editUpdate(update: UpdateUpdateInput!): Update!
-  publishUpdate(id: String!, notificationAudience: UpdateAudienceType!): Update!
+  publishUpdate(id: String!, notificationAudience: UpdateAudience!): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
 }
@@ -7385,7 +7390,19 @@ type Update {
   createdAt: DateTime!
   updatedAt: DateTime!
   publishedAt: DateTime
-  notificationAudience: UpdateAudienceType
+  notificationAudience: UpdateAudience
+
+  """
+  Some stats about the target audience. Will be null if the update is already
+  published or if you don't have enough permissions so see this information. Not
+  backed by a loader, avoid using this field in lists.
+  """
+  audienceStats(
+    """
+    To override the default notificationAudience
+    """
+    audience: UpdateAudience
+  ): UpdateAudienceStats
   makePublicOn: DateTime
   summary: String
   html: String
@@ -7402,7 +7419,7 @@ type Update {
 """
 Defines targets for an update
 """
-enum UpdateAudienceType {
+enum UpdateAudience {
   """
   Will be sent to collective admins and financial contributors
   """
@@ -7417,6 +7434,22 @@ enum UpdateAudienceType {
   Will be sent to financial contributors
   """
   FINANCIAL_CONTRIBUTORS
+}
+
+"""
+Stats about the potential audience of an update
+"""
+type UpdateAudienceStats {
+  id: String!
+  individuals: Int!
+  organizations: Int!
+  collectives: Int!
+  hosted: Int!
+
+  """
+  The total number of emails to send
+  """
+  total: Int!
 }
 
 """

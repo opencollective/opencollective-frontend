@@ -102,6 +102,7 @@ const ExpenseItemForm = ({
   isRichText,
   name,
   isOptional,
+  editOnlyDescriptiveInfo,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -178,6 +179,7 @@ const ExpenseItemForm = ({
                 flex={requireFile ? '1 1 44%' : '1 1 50%'}
                 mt={3}
                 mr={[0, '8px']}
+                disabled={editOnlyDescriptiveInfo}
               >
                 {inputProps => (
                   <Field maxHeight={39} {...inputProps}>
@@ -204,6 +206,7 @@ const ExpenseItemForm = ({
               minWidth={150}
               maxWidth={['100%', '40%']}
               mt={3}
+              disabled={editOnlyDescriptiveInfo}
             >
               {inputProps => (
                 <Field name={inputProps.name}>
@@ -226,7 +229,7 @@ const ExpenseItemForm = ({
         </Box>
       </Flex>
       <Flex alignItems="center" mt={3}>
-        {onRemove && (
+        {onRemove && !editOnlyDescriptiveInfo && (
           <StyledButton
             type="button"
             buttonStyle="dangerSecondary"
@@ -271,6 +274,7 @@ ExpenseItemForm.propTypes = {
     incurredAt: PropTypes.string,
     amount: PropTypes.number,
   }).isRequired,
+  editOnlyDescriptiveInfo: PropTypes.bool,
 };
 
 ExpenseItemForm.defaultProps = {

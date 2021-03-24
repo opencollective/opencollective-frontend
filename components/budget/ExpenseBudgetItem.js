@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
-import { includes, size } from 'lodash';
+import { get, includes, size } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -23,6 +23,7 @@ import LinkCollective from '../LinkCollective';
 import LinkExpense from '../LinkExpense';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
@@ -134,9 +135,9 @@ const ExpenseBudgetItem = ({
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
             ) : (
-              <LinkCollective collective={featuredProfile}>
+              <StyledLink as={LinkCollective} collective={featuredProfile}>
                 <Avatar collective={featuredProfile} radius={40} />
-              </LinkCollective>
+              </StyledLink>
             )}
           </Box>
           {isLoading ? (
@@ -173,12 +174,12 @@ const ExpenseBudgetItem = ({
               </ExpenseTitleLink>
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
-                  <LinkCollective collective={collective} />
+                  <StyledLink as={LinkCollective} collective={collective} />
                 ) : (
                   <FormattedMessage
                     id="CreatedBy"
                     defaultMessage="by {name}"
-                    values={{ name: <LinkCollective collective={expense.createdByAccount} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} collective={expense.createdByAccount} /> }}
                   />
                 )}
                 {' • '}
@@ -192,7 +193,11 @@ const ExpenseBudgetItem = ({
                       values={{
                         balance: (
                           <FormattedMoneyAmount
-                            amount={collective.stats?.balance?.valueInCents}
+                            amount={get(
+                              collective,
+                              'stats.balanceWithBlockedFunds.valueInCents',
+                              get(collective, 'stats.balanceWithBlockedFunds', 0),
+                            )}
                             currency={collective.currency}
                             amountStyles={{ color: 'black.700' }}
                           />
@@ -329,9 +334,13 @@ ExpenseBudgetItem.propTypes = {
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string,
     stats: PropTypes.shape({
-      balance: PropTypes.shape({
-        valueInCents: PropTypes.number,
-      }),
+      // Collective / Balance can be v1 or v2 there ...
+      balanceWithBlockedFunds: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.shape({
+          valueInCents: PropTypes.number,
+        }),
+      ]),
     }),
     parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,

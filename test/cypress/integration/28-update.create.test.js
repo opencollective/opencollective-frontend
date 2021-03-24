@@ -15,7 +15,8 @@ describe('create an update', () => {
     cy.get('[data-cy=updateTitle]', { timeout: 10000 }).contains('New update');
     cy.get('[data-cy=meta]').contains('draft');
     cy.get('[data-cy="privateIcon"]').should('not.exist');
-    cy.get('[data-cy=PublishUpdateBtn]').contains('Your Update will be sent to');
+    cy.get('[data-cy=update-audience-breakdown]').contains('Your Update will be sent to a total of 1 emails');
+    cy.get('[data-cy=update-audience-breakdown]').contains('1 individual');
     cy.getByDataCy('btn-publish').click();
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy=meta]').contains('draft').should('not.exist');

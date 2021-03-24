@@ -152,7 +152,12 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
   };
 
   const handleToggleInput = () => {
-    isOpen ? handleClose() : setOpen(true);
+    if (isOpen) {
+      handleClose();
+    } else {
+      setOpen(true);
+      setTimeout(() => inputRef?.current?.focus(), 50);
+    }
   };
 
   const removeTag = (tag, update) => {
