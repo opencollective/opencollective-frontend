@@ -151,7 +151,7 @@ class CollectivePage extends Component {
           <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
         );
       case Sections.LOCATION:
-        return <SectionLocation collective={this.props.collective} />;
+        return <SectionLocation collective={this.props.collective} refetch={this.props.refetch} />;
 
       // all other sections
       case Sections.CONTRIBUTE:

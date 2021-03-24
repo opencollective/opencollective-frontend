@@ -243,6 +243,7 @@ export const collectivePageQuery = gql`
           lat
           long
         }
+        privateInstructions
         orders {
           id
           createdAt
