@@ -31,7 +31,7 @@ class ErrorPage extends React.Component {
       type: PropTypes.oneOf(Object.values(ERROR)),
       payload: PropTypes.object,
     }),
-    /** If true, a loading indicator will be displayed instad of an error */
+    /** If true, a loading indicator will be displayed instead of an error */
     loading: PropTypes.bool,
     /** Define if error should be logged to console. Default: true */
     log: PropTypes.bool,
