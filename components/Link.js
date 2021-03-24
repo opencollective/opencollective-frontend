@@ -60,9 +60,8 @@ class Link extends React.Component {
     } else {
       return (
         <NextLink {...pick(this.props, ['href', 'scroll'])}>
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
           <a
-            role="button"
-            tabIndex={0}
             className={className}
             title={title}
             onClick={onClick}
