@@ -37,7 +37,7 @@ const ChevronsContainer = styled(({ onPrevClick, onNextClick, ...props }) => (
 `;
 
 ChevronsContainer.propTypes = {
-  /** Size of a single chevron. Total width (includin margins) will be 3.5x this value. */
+  /** Size of a single chevron. Total width (including margins) will be 3.5x this value. */
   size: PropTypes.number,
   /** Called when left chevron is clicked. Set to `undefined` to disable */
   onPrevClick: PropTypes.func,
@@ -50,7 +50,7 @@ ChevronsContainer.defaultProps = {
 };
 
 /**
- * Helper to display a list of hoizontally scrollable items, with two little
+ * Helper to display a list of horizontally scrollable items, with two little
  * carets to navigate easily.
  */
 class HorizontalScroller extends React.PureComponent {
@@ -58,7 +58,7 @@ class HorizontalScroller extends React.PureComponent {
     /**
      * A child render function that takes the following arguments:
      *  - `ref`: A ref to pass to you container
-     *  - `Chevrons`: The chevrons to navigate through the list easilly. If the list
+     *  - `Chevrons`: The chevrons to navigate through the list easily. If the list
      *    is not scrollable, nothing will be rendered.
      */
     children: PropTypes.func.isRequired,
