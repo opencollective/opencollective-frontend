@@ -49,7 +49,7 @@ const CarouselSlot = styled(Container)`
   order: ${props => props.order};
 `;
 
-const Indicatior = styled(Box)`
+const Indicator = styled(Box)`
   cursor: pointer;
   width: 8px;
   height: 8px;
@@ -177,7 +177,7 @@ class StyledCarousel extends React.Component {
           )}
           <Flex mx={3} my={3} display={props.display}>
             {Array.from({ length: children.length }, (_, i) => (
-              <Indicatior key={i} active={i === activeIndex} mx={1} onClick={() => this.handleOnClickIndicator(i)} />
+              <Indicator key={i} active={i === activeIndex} mx={1} onClick={() => this.handleOnClickIndicator(i)} />
             ))}
           </Flex>
           {showArrowController && (
