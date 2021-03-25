@@ -7,6 +7,7 @@ import { isTierExpired } from '../../lib/tier-utils';
 
 import { Flex } from '../Grid';
 import Link from '../Link';
+import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 
@@ -50,14 +51,14 @@ const msg = defineMessages({
 /**
  * From received params, see if there's anything preventing the contribution
  */
-const Redirect = ({ to }) => {
+export const Redirect = ({ to }) => {
   const router = useRouter();
 
   useEffect(() => {
     router.push(to);
   }, [to]);
 
-  return null;
+  return <Loading />;
 };
 
 export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier) => {
@@ -94,17 +95,15 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.TIER_MISSING, type: 'warning', showOtherWaysToContribute: true };
   } else if (tier && isTierExpired(tier)) {
     return { reason: CONTRIBUTION_BLOCKER.TIER_EXPIRED, type: 'warning', showOtherWaysToContribute: true };
+  } else if (account.settings.disableCustomContributions && !tier) {
+    return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
   } else {
     return null;
   }
 };
 
-const ContributionBlocker = ({ account, blocker, tier }) => {
+const ContributionBlocker = ({ account, blocker }) => {
   const intl = useIntl();
-
-  if (account.settings.disableCustomContributions && !tier) {
-    return <Redirect to={`${account.slug}/contribute`} />;
-  }
 
   return (
     <Flex flexDirection="column" alignItems="center" py={[5, null, 6]}>
@@ -134,7 +133,6 @@ ContributionBlocker.propTypes = {
     showOtherWaysToContribute: PropTypes.bool,
   }).isRequired,
   account: PropTypes.object,
-  tier: PropTypes.object,
 };
 
 export default ContributionBlocker;
