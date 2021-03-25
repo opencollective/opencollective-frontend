@@ -1,6 +1,9 @@
 name: E2E
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - 'i18n/crowdin'
 
 env:
   CI: true
