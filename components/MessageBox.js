@@ -71,7 +71,7 @@ const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
 MessageBox.propTypes = {
   /** Type of the message */
   type: PropTypes.oneOf(['white', 'dark', 'info', 'success', 'warning', 'error']),
-  /** Weither icon should be hidden. Icons are only set for info, success, warning and error messages. */
+  /** Wether icon should be hidden. Icons are only set for info, success, warning and error messages. */
   withIcon: PropTypes.bool,
   /** If true, a `StyledSpinner` will be displayed instead of the normal icon */
   isLoading: PropTypes.bool,
