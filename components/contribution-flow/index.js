@@ -257,7 +257,7 @@ class ContributionFlow extends React.Component {
   getPaymentMethod = async () => {
     const { stepPayment, stripe } = this.state;
 
-    if (stepPayment.key === BRAINTREE_KEY) {
+    if (stepPayment?.key === BRAINTREE_KEY) {
       return new Promise((resolve, reject) => {
         this.state.braintree.requestPaymentMethod((requestPaymentMethodErr, payload) => {
           if (requestPaymentMethodErr) {
