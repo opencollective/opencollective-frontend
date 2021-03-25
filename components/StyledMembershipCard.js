@@ -74,7 +74,7 @@ StyledMembershipCard.propTypes = {
     role: PropTypes.string,
     since: PropTypes.string,
     stats: PropTypes.shape({
-      totalDonations: PropTypes.numer,
+      totalDonations: PropTypes.number,
     }),
     collective: PropTypes.shape({
       currency: PropTypes.string,
