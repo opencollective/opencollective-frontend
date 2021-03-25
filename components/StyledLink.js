@@ -26,12 +26,12 @@ const StyledLink = styled.a.attrs(props => {
     };
   }
 })`
-  color: ${props => themeGet(`colors.primary.${props.colorShade}`)};
+  color: ${themeGet(`colors.primary.500`)};
   cursor: pointer;
   text-decoration: none;
 
   &:hover {
-    color: ${props => themeGet(`colors.primary.${props.colorShade - 200}`)};
+    color: ${themeGet(`colors.primary.400`)};
   }
 
   ${border}
@@ -115,12 +115,6 @@ StyledLink.propTypes = {
   openInNewTab: PropTypes.bool,
   /** If true, the link will open in a new tab and also adds rel=nofollow */
   openInNewTabNoFollow: PropTypes.bool,
-  /** Color Shade, defaults to 500 */
-  colorShade: PropTypes.number,
-};
-
-StyledLink.defaultProps = {
-  colorShade: 500,
 };
 
 /** @component */

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { set } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import Tickets from './edit-collective/sections/Tickets';
@@ -51,6 +52,14 @@ class EditEventForm extends React.Component {
         id: 'event.location.label',
         defaultMessage: 'location',
       },
+      'privateInstructions.label': {
+        id: 'event.privateInstructions.label',
+        defaultMessage: 'Private instructions',
+      },
+      privateInstructionsDescription: {
+        id: 'event.privateInstructions.description',
+        defaultMessage: 'These instructions will be provided by email to the participants.',
+      },
     });
   }
 
@@ -62,7 +71,7 @@ class EditEventForm extends React.Component {
 
   handleChange(fieldname, value) {
     const event = {};
-    event[fieldname] = value;
+    set(event, fieldname, value);
 
     // Make sure that endsAt is always >= startsAt
     if (fieldname === 'startsAt') {
@@ -81,9 +90,7 @@ class EditEventForm extends React.Component {
         value = newEndDate.toString();
         event['endsAt'] = value;
       }
-    }
-
-    if (fieldname === 'name') {
+    } else if (fieldname === 'name') {
       if (!event['name'].trim()) {
         this.setState({ disabled: true });
       } else {
@@ -160,6 +167,12 @@ class EditEventForm extends React.Component {
         placeholder: '',
         type: 'location',
       },
+      {
+        name: 'privateInstructions',
+        description: intl.formatMessage(this.messages.privateInstructionsDescription),
+        type: 'textarea',
+        maxLength: 10000,
+      },
     ];
 
     this.fields = this.fields.map(field => {
@@ -220,10 +233,10 @@ class EditEventForm extends React.Component {
         </Container>
         <Container margin="5rem auto 1rem" textAlign="center">
           <StyledButton
-            className="save"
             buttonStyle="primary"
             onClick={this.handleSubmit}
-            disabled={this.state.disabled ? true : loading}
+            disabled={this.state.disabled}
+            loading={loading}
           >
             {submitBtnLabel}
           </StyledButton>

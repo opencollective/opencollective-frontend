@@ -222,16 +222,22 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
                   </P>
                   {checked && flexible ? (
                     <Fragment>
-                      <StyledSelect
+                      <div
+                        onClick={e => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <StyledSelect
                         inputId="tier-amount-select"
-                        data-cy="tier-amount-select"
-                        onChange={setSelectedAmountOption}
-                        value={selectedAmountOption}
-                        options={amountOptions}
-                        my={2}
-                        minWidth={150}
-                        isSearchable={false}
-                      />
+                          data-cy="tier-amount-select"
+                          onChange={setSelectedAmountOption}
+                          value={selectedAmountOption}
+                          options={amountOptions}
+                          my={2}
+                          minWidth={150}
+                          isSearchable={false}
+                        />
+                      </div>
                       {selectedAmountOption?.label === 'Other' && (
                         <Flex flexDirection="column">
                           <P fontSize="12px" fontWeight="600" my={2}>

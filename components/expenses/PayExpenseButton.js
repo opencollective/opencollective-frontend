@@ -16,7 +16,7 @@ import { Span } from '../Text';
 import PayExpenseModal from './PayExpenseModal';
 
 const getDisabledMessage = (expense, collective, host, payoutMethod) => {
-  // Collective can be v1 or v2 there ...
+  // Collective / Balance can be v1 or v2 there ...
   const balance = get(
     collective,
     'stats.balanceWithBlockedFunds.valueInCents',
@@ -47,7 +47,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
       return (
         <FormattedMessage
           id="expense.pay.transferwise.planlimit"
-          defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with TransferWise"
+          defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with Wise"
           values={{
             Link(message) {
               return <Link href={`/${host.slug}/edit/host-plan`}>{message}</Link>;
@@ -151,6 +151,7 @@ PayExpenseButton.propTypes = {
       plan: PropTypes.object,
     }),
     stats: PropTypes.shape({
+      // Collective / Balance can be v1 or v2 there ...
       balanceWithBlockedFunds: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.shape({

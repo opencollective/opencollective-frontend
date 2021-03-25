@@ -14,7 +14,7 @@ const ConnectTransferwiseButton = ({ isConnected }) => {
       openInNewTab
       href={
         isConnected
-          ? 'https://transferwise.com/user/account'
+          ? 'https://wise.com/user/account'
           : 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise#connecting-transferwise'
       }
     >
@@ -22,10 +22,7 @@ const ConnectTransferwiseButton = ({ isConnected }) => {
         {isConnected ? (
           <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
         ) : (
-          <FormattedMessage
-            id="collective.connectedAccounts.transferwise.button"
-            defaultMessage="Connect TransferWise"
-          />
+          <FormattedMessage id="collective.connectedAccounts.transferwise.button" defaultMessage="Connect Wise" />
         )}
       </StyledButton>
     </StyledLink>

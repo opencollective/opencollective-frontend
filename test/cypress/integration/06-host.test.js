@@ -6,6 +6,12 @@ describe('New host page', () => {
     cy.visit('/opensourceorg');
   });
 
+  it('Should not have no-index meta', () => {
+    // Wait for page to be loaded
+    cy.getByDataCy('collective-title');
+    cy.get('meta[name="robots"]').should('not.exist');
+  });
+
   describe('Contributions section', () => {
     // The rest of the contributions section is already tested in `05-user.test.js`
     it('Show fiscally hosted collectives', () => {

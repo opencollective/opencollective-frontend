@@ -20,12 +20,10 @@ import TimezonePicker from './TimezonePicker';
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-let HTMLEditor, DateTime;
+let DateTime;
 if (process.env.DYNAMIC_IMPORT) {
-  HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'));
   DateTime = dynamic(() => import(/* webpackChunkName: 'DateTime' */ './DateTime'));
 } else {
-  HTMLEditor = require('./HTMLEditor').default;
   DateTime = require('./DateTime').default;
 }
 
@@ -636,20 +634,6 @@ class InputField extends React.Component {
                 </div>
               </React.Fragment>
             )}
-          </div>
-        );
-        break;
-
-      case 'html':
-        this.input = (
-          <div>
-            {field.label && <label>{capitalize(field.label)}</label>}
-            <HTMLEditor
-              value={this.props.value}
-              defaultValue={field.defaultValue}
-              onChange={this.handleChange}
-              className={field.className}
-            />
           </div>
         );
         break;

@@ -19,7 +19,12 @@ class Link extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = { isIframe: false };
     this.isHash = props.href && this.constructRoutePath(props.href).substr(0, 1) === '#';
+  }
+
+  componentDidMount() {
+    this.setState({ isIframe: window.self !== window.top });
   }
 
   constructRoutePath(href) {
@@ -60,7 +65,7 @@ class Link extends React.Component {
             title={title}
             onClick={onClick}
             data-cy={this.props['data-cy']}
-            {...(!openInNewTab ? null : { target: '_blank', rel: 'noopener noreferrer' })}
+            {...(openInNewTab || this.state.isIframe ? { target: '_blank', rel: 'noopener noreferrer' } : null)}
           >
             {children}
           </a>

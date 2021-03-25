@@ -35,6 +35,12 @@ describe('Collective page', () => {
     cy.wait(900);
   });
 
+  it('Should not have no-index meta', () => {
+    // Wait for page to be loaded
+    cy.getByDataCy('collective-title');
+    cy.get('meta[name="robots"]').should('not.exist');
+  });
+
   describe('Hero', () => {
     it('Must have links to twitter, github and website', () => {
       cy.get('[data-cy=twitterProfileUrl]').should('have.attr', 'href', 'https://twitter.com/testCollective');
@@ -115,6 +121,7 @@ describe('Collective page', () => {
       cy.wait(3000);
       cy.get('[data-cy=edit-update-form]').within(() => {
         cy.get('[data-cy=titleInput]').type('Sample Update');
+        cy.get('[data-cy="update-content-editor"] trix-editor').type('Hello World');
         cy.get('[data-cy=edit-update-submit-btn]').click();
       });
       cy.get('[data-cy=PublishUpdateBtn] button').click();

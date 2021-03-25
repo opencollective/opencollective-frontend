@@ -20,6 +20,9 @@ class SendingMoney extends React.Component {
     if (hasFeature(this.props.collective, FEATURES.PAYPAL_PAYOUTS)) {
       services.push('paypal');
     }
+    if (hasFeature(this.props.collective, FEATURES.PRIVACY_VCC)) {
+      services.push('privacy');
+    }
 
     return (
       <Fragment>

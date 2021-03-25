@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import Currency from '../Currency';
 import { Box, Flex } from '../Grid';
 import PayWithPaypalButton from '../PayWithPaypalButton';
+import PayWithPaypalLegacyButton from '../PayWithPaypalLegacyButton';
 import StyledButton from '../StyledButton';
 
 import { STEPS } from './constants';
@@ -16,11 +17,13 @@ class ContributionFlowButtons extends React.Component {
     step: PropTypes.shape({ name: PropTypes.string }),
     prevStep: PropTypes.shape({ name: PropTypes.string }),
     nextStep: PropTypes.shape({ name: PropTypes.string }),
+    disableNext: PropTypes.bool,
     isValidating: PropTypes.bool,
     /** If provided, the PayPal button will be displayed in place of the regular submit */
     paypalButtonProps: PropTypes.object,
     totalAmount: PropTypes.number,
     currency: PropTypes.string,
+    hasNewPaypal: PropTypes.bool,
   };
 
   state = { isLoadingNext: false };
@@ -75,6 +78,7 @@ class ContributionFlowButtons extends React.Component {
               onClick={this.goNext}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
+              disabled={this.props.disableNext}
               type="submit"
             >
               {nextStep ? (
@@ -98,7 +102,11 @@ class ContributionFlowButtons extends React.Component {
             </StyledButton>
           ) : (
             <Box mx={[1, null, 2]} minWidth={200} mt={2}>
-              <PayWithPaypalButton {...paypalButtonProps} />
+              {this.props.hasNewPaypal ? (
+                <PayWithPaypalButton {...paypalButtonProps} />
+              ) : (
+                <PayWithPaypalLegacyButton {...paypalButtonProps} />
+              )}
             </Box>
           )}
         </Fragment>

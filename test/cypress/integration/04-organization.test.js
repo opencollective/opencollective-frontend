@@ -10,6 +10,12 @@ describe('New organization profile', () => {
     });
   });
 
+  it('Should not have no-index meta', () => {
+    // Wait for page to be loaded
+    cy.getByDataCy('collective-title');
+    cy.get('meta[name="robots"]').should('not.exist');
+  });
+
   it('Has a team section', () => {
     cy.getByDataCy('section-our-team').contains('Our team');
     cy.getByDataCy('section-our-team').contains('Test User Admin');

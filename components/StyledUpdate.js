@@ -15,6 +15,7 @@ import Avatar from './Avatar';
 import Container from './Container';
 import EditUpdateForm from './EditUpdateForm';
 import { Box, Flex } from './Grid';
+import HTMLContent from './HTMLContent';
 import Link from './Link';
 import LinkCollective from './LinkCollective';
 import LoadingPlaceholder from './LoadingPlaceholder';
@@ -64,7 +65,7 @@ class StyledUpdate extends Component {
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
-    isReloadingData: PropTypes.object,
+    isReloadingData: PropTypes.bool,
     editUpdate: PropTypes.func.isRequired,
     deleteUpdate: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
@@ -128,7 +129,7 @@ class StyledUpdate extends Component {
     const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
-      <Container display="flex" alignItems="Baseline" color="#969BA3" data-cy="meta" flexWrap="wrap">
+      <Container display="flex" alignItems="Baseline" color="black.700" data-cy="meta" flexWrap="wrap">
         {update.isPrivate && (
           <Box mr={2}>
             <StyledTooltip
@@ -240,14 +241,13 @@ class StyledUpdate extends Component {
   }
 
   renderFullContent() {
-    const { update, collective, LoggedInUser, isReloadingData } = this.props;
-    const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
+    const { update, collective, isReloadingData } = this.props;
 
     return (
-      <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]} maxWidth={750}>
+      <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]} maxWidth={676}>
         <StyledHr mt={3} mb={4} borderColor="black.100" />
         {update.html ? (
-          <div dangerouslySetInnerHTML={{ __html: update.html }} />
+          <HTMLContent content={update.html} />
         ) : !update.userCanSeeUpdate && !isReloadingData ? (
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
@@ -259,7 +259,9 @@ class StyledUpdate extends Component {
         ) : isReloadingData ? (
           <LoadingPlaceholder height={300} />
         ) : null}
-        {canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
+        {update.userCanPublishUpdate && (
+          <PublishUpdateBtnWithData id={update.id} isHost={Boolean(update.account?.isHost)} />
+        )}
       </Container>
     );
   }
@@ -268,7 +270,7 @@ class StyledUpdate extends Component {
     const { collective, update } = this.props;
 
     return (
-      <Container display="flex" flexDirection="column" flex="1 1" maxWidth={750} flexWrap="wrap">
+      <Container display="flex" flexDirection="column" flex="1 1" maxWidth={665} flexWrap="wrap">
         {this.renderUpdateMeta(update, true)}
         <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
       </Container>
@@ -326,6 +328,7 @@ const editUpdateMutation = gqlV2/* GraphQL */ `
       html
       isPrivate
       makePublicOn
+      userCanPublishUpdate
     }
   }
 `;

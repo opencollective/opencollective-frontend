@@ -179,7 +179,7 @@ const OCUsers = () => {
         </Container>
       </Flex>
       <Box mt={4}>
-        <StyledLink buttonStyle="standard" buttonSize="medium" href="https://blog.opencollective.com/tag/case-studies/">
+        <StyledLink as={Link} buttonStyle="standard" buttonSize="medium" href="/discover">
           <FormattedMessage id="home.discover" defaultMessage="Discover more" />
         </StyledLink>
       </Box>

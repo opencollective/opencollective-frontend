@@ -43,7 +43,7 @@ import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
-import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
+import { BRAINTREE_KEY, getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -84,7 +84,11 @@ class ContributionFlow extends React.Component {
         slug: PropTypes.string,
       }),
     }).isRequired,
-    host: PropTypes.object.isRequired,
+    host: PropTypes.shape({
+      plan: PropTypes.shape({
+        platformTips: PropTypes.bool,
+      }),
+    }).isRequired,
     tier: PropTypes.object,
     intl: PropTypes.object,
     createOrder: PropTypes.func.isRequired,
@@ -94,6 +98,7 @@ class ContributionFlow extends React.Component {
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
+    hasNewPaypal: PropTypes.bool,
     isEmbed: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
@@ -116,6 +121,7 @@ class ContributionFlow extends React.Component {
     this.state = {
       error: null,
       stripe: null,
+      braintree: null,
       isSubmitted: false,
       isSubmitting: false,
       stepProfile: null,
@@ -251,7 +257,21 @@ class ContributionFlow extends React.Component {
 
   getPaymentMethod = async () => {
     const { stepPayment, stripe } = this.state;
-    if (!stepPayment?.paymentMethod) {
+
+    if (stepPayment?.key === BRAINTREE_KEY) {
+      return new Promise((resolve, reject) => {
+        this.state.braintree.requestPaymentMethod((requestPaymentMethodErr, payload) => {
+          if (requestPaymentMethodErr) {
+            reject(requestPaymentMethodErr);
+          } else {
+            return resolve({
+              type: 'BRAINTREE_PAYPAL',
+              braintreeInfo: payload, // TODO(Braintree): Should be sanitized so new keys don't break the mutation
+            });
+          }
+        });
+      });
+    } else if (!stepPayment?.paymentMethod) {
       return null;
     } else if (stepPayment.paymentMethod.id) {
       return pick(stepPayment.paymentMethod, ['id']);
@@ -264,7 +284,14 @@ class ContributionFlow extends React.Component {
         creditCardInfo: { token: pm.token, ...pm.data },
       };
     } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
-      return pick(stepPayment.paymentMethod, ['type', 'paypalInfo.token', 'paypalInfo.data']);
+      return pick(stepPayment.paymentMethod, [
+        'type',
+        'paypalInfo.token',
+        'paypalInfo.data',
+        'paypalInfo.isNewApi',
+        'paypalInfo.orderId',
+        'paypalInfo.subscriptionId',
+      ]);
     } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER) {
       return pick(stepPayment.paymentMethod, ['type']);
     }
@@ -370,6 +397,7 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
+        'hasNewPaypal',
       ]),
       ...queryParams,
     };
@@ -418,7 +446,7 @@ class ContributionFlow extends React.Component {
   getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
   canHaveFeesOnTop() {
-    if (!this.props.collective.platformContributionAvailable) {
+    if (!this.props.collective.platformContributionAvailable || !this.props.host.plan.platformTips) {
       return false;
     } else if (this.props.tier?.type === TierTypes.TICKET) {
       return false;
@@ -497,15 +525,34 @@ class ContributionFlow extends React.Component {
   getPaypalButtonProps({ currency }) {
     const { stepPayment, stepDetails, stepSummary } = this.state;
     if (stepPayment?.paymentMethod?.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
-      const { host } = this.props;
+      const { host, collective, tier } = this.props;
       return {
         host: host,
+        collective,
+        tier,
         currency: currency,
         style: { size: 'responsive', height: 47 },
         totalAmount: getTotalAmount(stepDetails, stepSummary),
+        interval: stepDetails?.interval,
         onClick: () => this.setState({ isSubmitting: true }),
         onCancel: () => this.setState({ isSubmitting: false }),
         onError: e => this.setState({ isSubmitting: false, error: `PayPal error: ${e.message}` }),
+        // New callback, used by `PayWithPaypalButton`
+        onSuccess: paypalInfo => {
+          this.setState(
+            state => ({
+              stepPayment: {
+                ...state.stepPayment,
+                paymentMethod: {
+                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
+                  paypalInfo: { isNewApi: true, ...paypalInfo },
+                },
+              },
+            }),
+            this.submitOrder,
+          );
+        },
+        // Old callback, used by `PayWithPaypalLegacyButton`
         onAuthorize: pm => {
           this.setState(
             state => ({
@@ -550,7 +597,6 @@ class ContributionFlow extends React.Component {
   render() {
     const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails, isEmbed } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
-
     const currency = tier?.amount.currency || collective.currency;
 
     return (
@@ -639,12 +685,14 @@ class ContributionFlow extends React.Component {
                     step={currentStep}
                     showFeesOnTop={this.canHaveFeesOnTop()}
                     onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+                    setBraintree={braintree => this.setState({ braintree })}
                     defaultProfileSlug={this.props.contributeAs}
                     defaultEmail={this.props.defaultEmail}
                     defaultName={this.props.defaultName}
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
+                    hasNewPaypal={this.props.hasNewPaypal}
                   />
 
                   <Box mt={40}>
@@ -658,6 +706,8 @@ class ContributionFlow extends React.Component {
                       paypalButtonProps={this.getPaypalButtonProps({ currency })}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
+                      disableNext={stepPayment?.key === 'braintree' && !stepPayment.isReady}
+                      hasNewPaypal={this.props.hasNewPaypal}
                     />
                   </Box>
                 </Box>

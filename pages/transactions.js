@@ -187,7 +187,11 @@ class TransactionsPage extends React.Component {
 
     return (
       <TransactionPageWrapper>
-        <Header collective={collective} LoggedInUser={LoggedInUser} />
+        <Header
+          collective={collective}
+          LoggedInUser={LoggedInUser}
+          noRobots={collective.type === 'USER' && !collective.isHost}
+        />
         <Body>
           <CollectiveNavbar
             collective={collective}
@@ -195,7 +199,7 @@ class TransactionsPage extends React.Component {
             selectedCategory={NAVBAR_CATEGORIES.BUDGET}
             selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
           />
-          <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]} mt={3}>
+          <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]} mt={3} data-cy="transactions-page-content">
             <Flex justifyContent="space-between">
               <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
                 <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />

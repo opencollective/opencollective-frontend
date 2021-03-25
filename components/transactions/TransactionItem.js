@@ -127,13 +127,13 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   <FormattedMessage
                     id="Transaction.from"
                     defaultMessage="from {name}"
-                    values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} colorShade={600} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} /> }}
                   />
                 ) : (
                   <FormattedMessage
                     id="CreatedBy"
                     defaultMessage="by {name}"
-                    values={{ name: <StyledLink as={LinkCollective} collective={toAccount} colorShade={600} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} collective={toAccount} /> }}
                   />
                 )}
                 {giftCardEmitterAccount && (
@@ -144,16 +144,14 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                       defaultMessage="using a {giftCard} from {collective}"
                       values={{
                         giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
-                        collective: (
-                          <StyledLink as={LinkCollective} collective={giftCardEmitterAccount} colorShade={600} />
-                        ),
+                        collective: <StyledLink as={LinkCollective} collective={giftCardEmitterAccount} />,
                       }}
                     />
                   </React.Fragment>
                 )}
                 {INFO_SEPARATOR}
                 <span data-cy="transaction-date">
-                  <time>
+                  <time title={createdAt}>
                     <FormattedDate value={createdAt} year="numeric" month="long" day="2-digit" />
                   </time>
                 </span>
