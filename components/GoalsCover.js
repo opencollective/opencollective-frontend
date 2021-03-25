@@ -193,7 +193,7 @@ class GoalsCover extends React.Component {
     this.setState({ ...this.populateGoals(), firstMount });
   }
 
-  /** Returns a percentage (0.0-1.0) that reprensent X position */
+  /** Returns a percentage (0.0-1.0) that represent X position */
   getTranslatedPercentage(x) {
     if (this.interpolation === 'logarithm' || (this.interpolation === 'auto' && this.currentProgress <= 0.3)) {
       // See https://www.desmos.com/calculator/30pua5xx7q
