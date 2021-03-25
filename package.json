@@ -154,7 +154,7 @@
     "@babel/core": "^7.13.10",
     "@babel/node": "^7.12.17",
     "@cypress/code-coverage": "^3.9.2",
-    "@wojtekmaj/enzyme-adapter-react-17": "^0.4.1",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "babel-plugin-istanbul": "^6.0.0",
