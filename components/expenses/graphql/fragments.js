@@ -138,8 +138,17 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         data
         isSaved
       }
+
+      # For Collectives, Funds, Events and Projects
       ... on AccountWithHost {
         isApproved
+        host {
+          id
+        }
+      }
+
+      # For Fiscal Hosts
+      ... on Organization {
         host {
           id
         }
