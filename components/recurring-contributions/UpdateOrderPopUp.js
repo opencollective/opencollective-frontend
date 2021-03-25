@@ -228,7 +228,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
                         }}
                       >
                         <StyledSelect
-                        inputId="tier-amount-select"
+                          inputId="tier-amount-select"
                           data-cy="tier-amount-select"
                           onChange={setSelectedAmountOption}
                           value={selectedAmountOption}
