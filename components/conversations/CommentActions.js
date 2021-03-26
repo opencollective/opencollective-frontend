@@ -126,8 +126,8 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
     modifiers: REACT_POPPER_MODIFIERS,
   });
 
-  useGlobalBlur(state?.elements.popper, outsise => {
-    if (outsise && showAdminActions) {
+  useGlobalBlur(state?.elements.popper, outside => {
+    if (outside && showAdminActions) {
       setShowAdminActions(false);
     }
   });
