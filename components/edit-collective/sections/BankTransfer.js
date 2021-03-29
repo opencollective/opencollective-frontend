@@ -78,7 +78,7 @@ const editBankTransferMutation = gqlV2/* GraphQL */ `
 `;
 
 const BankTransfer = props => {
-  const { loading, data, refetch: refetchHostData } = useQuery(hostQuery, {
+  const { loading, data } = useQuery(hostQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collectiveSlug },
   });
@@ -95,8 +95,7 @@ const BankTransfer = props => {
   const existingPayoutMethod = data.host.payoutMethods.find(pm => pm.data.isManualBankTransfer);
   const useStructuredForm =
     !existingManualPaymentMethod || (existingManualPaymentMethod && existingPayoutMethod) ? true : false;
-  const instructions =
-    get(data.host, 'settings.paymentMethods.manual.instructions') || BANK_TRANSFER_DEFAULT_INSTRUCTIONS;
+  const instructions = data.host.settings?.paymentMethods?.manual?.instructions || BANK_TRANSFER_DEFAULT_INSTRUCTIONS;
 
   // Fix currency if the existing payout method already matches the collective currency
   // or if it was already defined by Stripe
@@ -194,7 +193,6 @@ const BankTransfer = props => {
             setSubmitting(false);
             setShowForm(false);
             props.hideTopsection(false);
-            refetchHostData();
           }}
         >
           {({ handleSubmit, isSubmitting, setFieldValue, values }) => (
