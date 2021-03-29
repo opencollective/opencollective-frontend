@@ -123,6 +123,10 @@ const ContributionBlocker = ({ account, blocker }) => {
   );
 };
 
+Redirect.propTypes = {
+  to: PropTypes.string.isRequired,
+};
+
 ContributionBlocker.propTypes = {
   blocker: PropTypes.shape({
     reason: PropTypes.oneOf(Object.values(CONTRIBUTION_BLOCKER)).isRequired,
