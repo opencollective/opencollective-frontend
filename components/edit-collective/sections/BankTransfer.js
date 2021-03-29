@@ -171,7 +171,7 @@ const BankTransfer = props => {
           initialValues={initialValues}
           onSubmit={async (values, { setSubmitting }) => {
             const { data, instructions } = values;
-            if (data?.currency) {
+            if (data?.currency && data?.type) {
               await createPayoutMethod({
                 variables: {
                   payoutMethod: { data: { ...data, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
