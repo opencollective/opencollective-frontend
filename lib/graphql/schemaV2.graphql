@@ -5111,12 +5111,12 @@ type Mutation {
     account: AccountReferenceInput!
     amount: AmountInput!
     description: String!
-    hostFeePercent: Int!
+    hostFeePercent: Float!
 
     """
     Can only be set if root
     """
-    platformFeePercent: Int
+    platformFeePercent: Float
   ): Order!
   createCollective(
     """
@@ -6387,7 +6387,6 @@ enum PayoutMethodType {
 input PaypalPaymentInput {
   token: String
   data: JSON
-  captureId: String
   orderId: String
   subscriptionId: String
   isNewApi: Boolean
