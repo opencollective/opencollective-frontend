@@ -142,7 +142,7 @@ class ContributionFlow extends React.Component {
 
   submitOrder = async () => {
     const { stepDetails, stepProfile, stepSummary } = this.state;
-    this.setState({ error: null });
+    this.setState({ error: null, isSubmitting: true });
 
     let fromAccount, guestInfo;
     if (stepProfile.isGuest) {
@@ -180,6 +180,7 @@ class ContributionFlow extends React.Component {
 
       return this.handleOrderResponse(response.data.createOrder, stepProfile.email);
     } catch (e) {
+      this.setState({ isSubmitting: false });
       this.showError(getErrorFromGraphqlException(e));
     }
   };
@@ -218,7 +219,7 @@ class ContributionFlow extends React.Component {
   };
 
   handleSuccess = async order => {
-    this.setState({ isSubmitted: true });
+    this.setState({ isSubmitted: true, isSubmitting: false });
     this.props.refetchLoggedInUser(); // to update memberships
 
     if (isValidExternalRedirect(this.props.redirect)) {

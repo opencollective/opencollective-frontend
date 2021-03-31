@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { injectIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
 import { getEnvVar } from '../lib/env-utils';
@@ -9,6 +10,17 @@ import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { getPaypal } from '../lib/paypal';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
+import StyledButton from './StyledButton';
+
+const PaypalButtonContainer = styled.div`
+  ${props =>
+    props.isLoading &&
+    css`
+      .paypal-buttons {
+        display: none !important;
+      }
+    `}
+`;
 
 /**
  * Encapsulate Paypal button logic so we don't have to deal with refs in parent
@@ -21,6 +33,7 @@ class PayWithPaypalButton extends Component {
     /** The currency used for this order */
     currency: PropTypes.string.isRequired,
     interval: PropTypes.string,
+    isSubmitting: PropTypes.bool,
     /** Called when user authorize the payment with a payment method generated from PayPal data */
     onSuccess: PropTypes.func.isRequired,
     /** Called when user cancel paypal flow */
@@ -53,11 +66,12 @@ class PayWithPaypalButton extends Component {
     tier: PropTypes.shape({ id: PropTypes.string }),
     data: PropTypes.object,
     intl: PropTypes.object,
+    subscriptionStartDate: PropTypes.string,
   };
 
   constructor(props) {
     super(props);
-    this.container = React.createRef();
+    this.paypalTarget = React.createRef();
     this.state = { isLoading: true };
   }
 
@@ -98,7 +112,7 @@ class PayWithPaypalButton extends Component {
     const intent = this.props.interval ? 'subscription' : 'capture';
     const paypal = await getPaypal({ clientId, currency, intent });
     const options = this.getOptions();
-    paypal.Buttons(options).render(this.container.current);
+    paypal.Buttons(options).render(this.paypalTarget.current);
     this.setState({ isLoading: false });
   }
 
@@ -114,6 +128,7 @@ class PayWithPaypalButton extends Component {
       options.createSubscription = (data, actions) => {
         return actions.subscription.create({
           plan_id: this.props.data.paypalPlan.id,
+          start_time: this.props.subscriptionStartDate,
           application_context: {
             brand_name: `${this.props.collective.name} - Open Collective`,
             locale: this.props.intl.locale,
@@ -157,9 +172,22 @@ class PayWithPaypalButton extends Component {
 
   render() {
     return (
-      <div data-cy="paypal-container" ref={this.container}>
-        {this.state.isLoading && <LoadingPlaceholder height={47} borderRadius={100} />}
-      </div>
+      <PaypalButtonContainer data-cy="paypal-container" isLoading={this.state.isLoading || this.props.isSubmitting}>
+        <div data-cy="paypal-target" ref={this.paypalTarget} />
+        {this.state.isLoading ? (
+          <LoadingPlaceholder height={(this.props.style?.height || 47) + 3} minWidth="70px" borderRadius={100} />
+        ) : this.props.isSubmitting ? (
+          <StyledButton
+            height={this.props.style?.height || 47}
+            p={0}
+            minWidth="70px"
+            width="100%"
+            buttonStyle="primary"
+            background="#0070ba"
+            loading
+          />
+        ) : null}
+      </PaypalButtonContainer>
     );
   }
 }

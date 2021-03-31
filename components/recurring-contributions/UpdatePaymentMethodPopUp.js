@@ -17,7 +17,6 @@ import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { Box, Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import NewCreditCardForm from '../NewCreditCardForm';
 import { withStripeLoader } from '../StripeProvider';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -25,6 +24,8 @@ import StyledRadioList from '../StyledRadioList';
 import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+
+import AddPaymentMethod from './AddPaymentMethod';
 
 const PaymentMethodBox = styled(Flex)`
   border-top: 1px solid ${themeGet('colors.black.300')};
@@ -41,35 +42,63 @@ const messages = defineMessages({
   },
 });
 
-const paymentMethodsQuery = gqlV2/* GraphQL */ `
-  query UpdatePaymentMethodPopUpPaymentMethod($slug: String) {
-    account(slug: $slug) {
+const paymentMethodFragment = gqlV2/* GraphQL */ `
+  fragment UpdatePaymentMethodFragment on PaymentMethod {
+    id
+    name
+    data
+    service
+    type
+    balance {
+      value
+      valueInCents
+      currency
+    }
+    account {
       id
-      paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
-        id
-        name
-        data
-        service
-        type
-        balance {
-          value
-          currency
-        }
-        account {
-          id
-        }
-      }
     }
   }
 `;
 
+const paymentMethodsQuery = gqlV2/* GraphQL */ `
+  query UpdatePaymentMethodPopUpPaymentMethod($slug: String!, $orderId: String!) {
+    account(slug: $slug) {
+      id
+      paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
+        ...UpdatePaymentMethodFragment
+      }
+    }
+    order(order: { id: $orderId }) {
+      id
+      paymentMethod {
+        ...UpdatePaymentMethodFragment
+      }
+    }
+  }
+  ${paymentMethodFragment}
+`;
+
 const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
-  mutation UpdatePaymentMethod($order: OrderReferenceInput!, $paymentMethod: PaymentMethodReferenceInput!) {
-    updateOrder(order: $order, paymentMethod: $paymentMethod) {
+  mutation UpdatePaymentMethod(
+    $order: OrderReferenceInput!
+    $paymentMethod: PaymentMethodReferenceInput
+    $paypalSubscriptionId: String
+  ) {
+    updateOrder(order: $order, paymentMethod: $paymentMethod, paypalSubscriptionId: $paypalSubscriptionId) {
       id
       status
       paymentMethod {
         id
+        service
+        name
+        type
+        data
+        expiryDate
+        balance {
+          value
+          valueInCents
+          currency
+        }
       }
     }
   }
@@ -111,7 +140,100 @@ export const confirmCreditCardMutation = gqlV2/* GraphQL */ `
 
 const mutationOptions = { context: API_V2_CONTEXT };
 
-const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, router, loadStripe, account }) => {
+const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod) => {
+  if (!paymentMethods) {
+    return null;
+  }
+
+  const minBalance = contribution.amount.valueInCents;
+  const uniquePMs = uniqBy(paymentMethods, 'id');
+  const getIsDisabled = pm => pm.balance.valueInCents < minBalance;
+
+  // Make sure we always include the current payment method
+  if (!uniquePMs.some(pm => pm.id === existingPaymentMethod.id)) {
+    uniquePMs.unshift(existingPaymentMethod);
+  }
+
+  uniquePMs.sort((pm1, pm2) => {
+    // Put disabled PMs at the end
+    if (getIsDisabled(pm1) && !getIsDisabled(pm2)) {
+      return 1;
+    } else if (getIsDisabled(pm2) && !getIsDisabled(pm1)) {
+      return -1;
+    }
+
+    // If we've just added a PM, put it at the top of the list
+    if (addedPaymentMethod) {
+      if (addedPaymentMethod.id === pm1.id) {
+        return -1;
+      } else if (addedPaymentMethod.id === pm2.id) {
+        return 1;
+      }
+    }
+
+    // Put the PM that matches this recurring contribution just after the newly added
+    if (existingPaymentMethod.id === pm1.id) {
+      return -1;
+    } else if (existingPaymentMethod.id === pm2.id) {
+      return 1;
+    }
+
+    return 0;
+  });
+
+  return uniquePMs.map(pm => ({
+    key: `pm-${pm.id}`,
+    title: getPaymentMethodName(pm),
+    subtitle: getPaymentMethodMetadata(pm),
+    icon: getPaymentMethodIcon(pm),
+    paymentMethod: pm,
+    disabled: getIsDisabled(pm),
+    id: pm.id,
+    CollectiveId: pm.account?.id,
+  }));
+};
+
+const useUpdatePaymentMethod = contribution => {
+  const { addToast } = useToasts();
+  const [submitUpdatePaymentMethod, { loading: loadingUpdatePaymentMethod }] = useMutation(
+    updatePaymentMethodMutation,
+    mutationOptions,
+  );
+
+  return {
+    loadingUpdatePaymentMethod,
+    updatePaymentMethod: async paymentMethod => {
+      const hasUpdate = paymentMethod.id !== contribution.paymentMethod.id;
+      try {
+        if (hasUpdate) {
+          const variables = { order: { id: contribution.id } };
+          if (paymentMethod.type === 'PAYPAL') {
+            variables.paypalSubscriptionId = paymentMethod.paypalInfo.subscriptionId;
+          } else {
+            variables.paymentMethod = { id: paymentMethod.value ? paymentMethod.value.id : paymentMethod.id };
+          }
+          await submitUpdatePaymentMethod({ variables });
+        }
+        addToast({
+          type: TOAST_TYPE.SUCCESS,
+          message: (
+            <FormattedMessage
+              id="subscription.createSuccessUpdated"
+              defaultMessage="Your recurring contribution has been <strong>updated</strong>."
+              values={I18nFormatters}
+            />
+          ),
+        });
+      } catch (error) {
+        const errorMsg = getErrorFromGraphqlException(error).message;
+        addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+        return false;
+      }
+    },
+  };
+};
+
+const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, router, loadStripe, account }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
 
@@ -119,24 +241,18 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loadingSelectedPaymentMethod, setLoadingSelectedPaymentMethod] = useState(true);
-  const [stripeIsReady, setStripeIsReady] = useState(false);
   const [stripe, setStripe] = useState(null);
   const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
   const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
   const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
+  const { loadingUpdatePaymentMethod, updatePaymentMethod } = useUpdatePaymentMethod(contribution);
 
   // GraphQL mutations and queries
   const { data, refetch } = useQuery(paymentMethodsQuery, {
-    variables: {
-      slug: router.query.slug,
-    },
+    variables: { slug: router.query.slug, orderId: contribution.id },
     context: API_V2_CONTEXT,
     fetchPolicy: 'network-only',
   });
-  const [submitUpdatePaymentMethod, { loading: loadingUpdatePaymentMethod }] = useMutation(
-    updatePaymentMethodMutation,
-    mutationOptions,
-  );
   const [submitAddPaymentMethod] = useMutation(addCreditCardMutation, mutationOptions);
   const [submitConfirmPaymentMethodMutation] = useMutation(confirmCreditCardMutation, mutationOptions);
 
@@ -198,35 +314,16 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
   // load stripe on mount
   useEffect(() => {
     loadStripe();
-    setStripeIsReady(true);
-  }, [stripeIsReady]);
+  }, []);
 
   // data handling
-  const minBalance = 50; // Minimum usable balance for gift card
   const paymentMethods = get(data, 'account.paymentMethods', null);
-  const paymentOptions = React.useMemo(() => {
-    if (!paymentMethods) {
-      return null;
-    }
-    const paymentMethodsOptions = paymentMethods.map(pm => ({
-      key: `${contribution.id}-pm-${pm.id}`,
-      title: getPaymentMethodName(pm),
-      subtitle: getPaymentMethodMetadata(pm),
-      icon: getPaymentMethodIcon(pm),
-      paymentMethod: pm,
-      disabled: pm.balance.amount < minBalance,
-      id: pm.id,
-      CollectiveId: pm.account.id,
-    }));
-    const uniquePMs = uniqBy(paymentMethodsOptions, 'id');
-    // put the PM that matches this recurring contribution on top of the list
-    let sortedPMs = uniquePMs.sort(a => a.id !== contribution.paymentMethod?.id);
-    // if we've just added a PM, put it at the top of the list
-    if (addedPaymentMethod !== null) {
-      sortedPMs = sortedPMs.sort(a => a.id !== addedPaymentMethod.id);
-    }
-    return sortedPMs;
-  }, [paymentMethods]);
+  const existingPaymentMethod = get(data, 'order.paymentMethod', null);
+  const filterPaymentMethodsParams = [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod];
+  const paymentOptions = React.useMemo(
+    () => sortAndFilterPaymentMethods(...filterPaymentMethodsParams),
+    filterPaymentMethodsParams,
+  );
 
   useEffect(() => {
     if (paymentOptions && selectedPaymentMethod === null && contribution.paymentMethod) {
@@ -263,12 +360,15 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
       </Flex>
       {showAddPaymentMethod ? (
         <Box px={1} pt={2} pb={3}>
-          <NewCreditCardForm
-            name="newCreditCardInfo"
-            profileType={'USER'}
-            onChange={setNewPaymentMethodInfo}
-            onReady={({ stripe }) => setStripe(stripe)}
-            hasSaveCheckBox={false}
+          <AddPaymentMethod
+            order={contribution}
+            isSubmitting={loadingUpdatePaymentMethod}
+            setNewPaymentMethodInfo={setNewPaymentMethodInfo}
+            onStripeReady={({ stripe }) => setStripe(stripe)}
+            onPaypalSuccess={async paypalPaymentMethod => {
+              await updatePaymentMethod(paypalPaymentMethod);
+              onCloseEdit();
+            }}
           />
         </Box>
       ) : loadingSelectedPaymentMethod ? (
@@ -283,7 +383,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
           value={selectedPaymentMethod?.key}
         >
           {({ radio, value: { title, subtitle, icon } }) => (
-            <PaymentMethodBox minheight={50} py={2} bg="white.full" data-cy="recurring-contribution-pm-box" px={3}>
+            <PaymentMethodBox minHeight={50} py={2} bg="white.full" data-cy="recurring-contribution-pm-box" px={3}>
               <Flex alignItems="center">
                 <Box as="span" mr={3} flexWrap="wrap">
                   {radio}
@@ -291,12 +391,12 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
                 <Flex mr={2} css={{ flexBasis: '26px' }}>
                   {icon}
                 </Flex>
-                <Flex flexDirection="column">
-                  <P fontSize="12px" fontWeight={subtitle ? 600 : 400} color="black.900">
+                <Flex flexDirection="column" width="100%">
+                  <P fontSize="12px" fontWeight={subtitle ? 600 : 400} color="black.900" overflowWrap="anywhere">
                     {title}
                   </P>
                   {subtitle && (
-                    <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500">
+                    <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500" overflowWrap="anywhere">
                       {subtitle}
                     </P>
                   )}
@@ -329,7 +429,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
               minWidth={75}
               buttonSize="tiny"
               buttonStyle="secondary"
-              disabled={newPaymentMethodInfo ? !newPaymentMethodInfo?.value.complete : true}
+              disabled={newPaymentMethodInfo ? !newPaymentMethodInfo.value?.complete : true}
               type="submit"
               loading={addingPaymentMethod}
               data-cy="recurring-contribution-submit-pm-button"
@@ -351,10 +451,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
                 const { token, error } = await stripe.createToken();
 
                 if (error) {
-                  addToast({
-                    type: TOAST_TYPE.ERROR,
-                    message: error.message,
-                  });
+                  addToast({ type: TOAST_TYPE.ERROR, message: error.message });
                   return false;
                 }
                 const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
@@ -370,10 +467,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
                   return handleAddPaymentMethodResponse(res.data.addCreditCard);
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
-                  addToast({
-                    type: TOAST_TYPE.ERROR,
-                    message: errorMsg,
-                  });
+                  addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
                   setAddingPaymentMethod(false);
                   return false;
                 }
@@ -400,36 +494,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, setShowPopup, ro
               buttonStyle="secondary"
               loading={loadingUpdatePaymentMethod}
               data-cy="recurring-contribution-update-pm-button"
-              onClick={async () => {
-                try {
-                  await submitUpdatePaymentMethod({
-                    variables: {
-                      order: { id: contribution.id },
-                      paymentMethod: {
-                        id: selectedPaymentMethod.value ? selectedPaymentMethod.value.id : selectedPaymentMethod.id,
-                      },
-                    },
-                  });
-                  addToast({
-                    type: TOAST_TYPE.SUCCESS,
-                    message: (
-                      <FormattedMessage
-                        id="subscription.createSuccessUpdated"
-                        defaultMessage="Your recurring contribution has been <strong>updated</strong>."
-                        values={I18nFormatters}
-                      />
-                    ),
-                  });
-                  setShowPopup(false);
-                } catch (error) {
-                  const errorMsg = getErrorFromGraphqlException(error).message;
-                  addToast({
-                    type: TOAST_TYPE.ERROR,
-                    message: errorMsg,
-                  });
-                  return false;
-                }
-              }}
+              onClick={() => updatePaymentMethod(selectedPaymentMethod).then(onCloseEdit)}
             >
               <FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" />
             </StyledButton>
@@ -445,7 +510,7 @@ UpdatePaymentMethodPopUp.propTypes = {
   setMenuState: PropTypes.func,
   router: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
-  setShowPopup: PropTypes.func,
+  onCloseEdit: PropTypes.func,
   loadStripe: PropTypes.func.isRequired,
   account: PropTypes.object.isRequired,
 };

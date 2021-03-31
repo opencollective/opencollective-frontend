@@ -3237,7 +3237,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   """
   The Collective hosting this Event
   """
-  parent: Collective
+  parent: Account
 
   """
   The Collective hosting this Event
@@ -5594,6 +5594,11 @@ type Mutation {
     paymentMethod: PaymentMethodReferenceInput
 
     """
+    To update the order with a PayPal subscription
+    """
+    paypalSubscriptionId: String
+
+    """
     Reference to a Tier to update the order with
     """
     tier: TierReferenceInput
@@ -5737,6 +5742,7 @@ type Order {
   quantity: Int
   status: OrderStatus
   frequency: ContributionFrequency
+  nextChargeDate: DateTime
   tier: Tier
   fromAccount: Account
   toAccount: Account
@@ -6330,6 +6336,7 @@ enum PaymentMethodType {
   creditcard
   prepaid
   payment
+  subscription
   collective
   host
   adaptive
@@ -6751,7 +6758,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   """
   The Fund hosting this Project
   """
-  parent: Fund
+  parent: Account
 }
 
 input ProjectCreateInput {
@@ -7249,6 +7256,7 @@ type TierCollection implements Collection {
 enum TierInterval {
   month
   year
+  flexible
 }
 
 input TierReferenceInput {
@@ -7815,4 +7823,20 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
+}
+
+"""
+VirtualCard related properties.
+"""
+type VirtualCard {
+  id: String
+  CollectiveId: Int
+  HostCollectiveId: Int
+  name: String
+  last4: String
+  data: JSONObject
+  privateData: JSONObject
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }

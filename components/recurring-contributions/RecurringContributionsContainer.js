@@ -37,16 +37,26 @@ const filterContributions = (contributions, filterName) => {
 };
 
 const RecurringContributionsContainer = ({ recurringContributions, filter, account, LoggedInUser }) => {
-  let displayedRecurringContributions = filterContributions(recurringContributions.nodes, filter);
-  const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
-  displayedRecurringContributions = isAdmin
-    ? displayedRecurringContributions
-    : displayedRecurringContributions.filter(contrib => contrib.status !== ORDER_STATUS.ERROR);
+  const isAdmin = Boolean(LoggedInUser?.canEditCollective(account));
+  const [editingContributionId, setEditingContributionId] = React.useState();
+  const displayedRecurringContributions = React.useMemo(() => {
+    const filteredContributions = filterContributions(recurringContributions.nodes, filter);
+    return isAdmin
+      ? filteredContributions
+      : filteredContributions.filter(contrib => contrib.status !== ORDER_STATUS.ERROR);
+  }, [recurringContributions, filter, isAdmin]);
+
+  // Reset edit when changing filters and contribution is not in the list anymore
+  React.useEffect(() => {
+    if (!displayedRecurringContributions.some(c => c.id === editingContributionId)) {
+      setEditingContributionId(null);
+    }
+  }, [displayedRecurringContributions]);
 
   return (
     <Container mt={4}>
       {displayedRecurringContributions.length ? (
-        <Grid gridGap={24} gridTemplateColumns="repeat(auto-fill, minmax(220px, 1fr))" my={2}>
+        <Grid gridGap={24} gridTemplateColumns="repeat(auto-fill, minmax(275px, 1fr))" my={2}>
           {displayedRecurringContributions.map(contribution => (
             <CollectiveCardContainer key={contribution.id}>
               <RecurringContributionsCard
@@ -55,6 +65,11 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, accou
                 contribution={contribution}
                 position="relative"
                 account={account}
+                isAdmin={isAdmin}
+                isEditing={contribution.id === editingContributionId}
+                canEdit={isAdmin && !editingContributionId}
+                onEdit={() => setEditingContributionId(contribution.id)}
+                onCloseEdit={() => setEditingContributionId(null)}
                 data-cy="recurring-contribution-card"
               />
             </CollectiveCardContainer>

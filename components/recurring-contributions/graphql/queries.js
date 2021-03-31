@@ -18,8 +18,19 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
         totalCount
         nodes {
           id
+          nextChargeDate
           paymentMethod {
             id
+            service
+            name
+            type
+            expiryDate
+            data
+            balance {
+              value
+              valueInCents
+              currency
+            }
           }
           amount {
             value
@@ -46,6 +57,22 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
             tags
             imageUrl
             settings
+            ... on AccountWithHost {
+              host {
+                id
+                slug
+                paypalClientId
+                supportedPaymentMethods
+              }
+            }
+            ... on Organization {
+              host {
+                id
+                slug
+                paypalClientId
+                supportedPaymentMethods
+              }
+            }
           }
           platformContributionAmount {
             value
