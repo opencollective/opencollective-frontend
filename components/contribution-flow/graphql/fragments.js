@@ -19,11 +19,6 @@ const contributionFlowHostFieldsFragment = gqlV2/* GraphQL */ `
       data
       type
     }
-    plan {
-      id
-      name
-      platformTips
-    }
   }
 `;
 
