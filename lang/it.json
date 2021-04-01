@@ -1561,7 +1561,6 @@
   "pricing.hostOrganization.note2": "You pay Open Collective for use of our platform on behalf of your Collectives, and can charge them a fee if you wish.",
   "pricing.joinAsFiscalHost": "Join as Fiscal Host",
   "pricing.notes.paymentProcessor": "Payment processor fees apply. See <stripeLink>stripe.com/pricing</stripeLink>, <paypalLink>paypal.com/pricing</paypalLink>, <transferwiseLink>transferwise.com/pricing</transferwiseLink>",
-  "pricing.notes.platformFees": "Some Fiscal Hosts like the Open Source Collective are still applying Platform Fees for a limited time as they switch to the new pricing.",
   "pricing.openFinance": "Transparency and open finances tools",
   "pricing.outsideFunds": "Outside funds",
   "pricing.paymentProcessor": "(1) Payment processor fees apply. See <stripeLink>stripe.com/pricing</stripeLink>, <paypalLink>paypal.com/pricing</paypalLink>, <transferwiseLink>transferwise.com/pricing</transferwiseLink>",
