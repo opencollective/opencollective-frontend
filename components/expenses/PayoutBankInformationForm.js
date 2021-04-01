@@ -340,7 +340,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
     currencies.unshift({ label: 'No selection', value: null });
   }
   const currencyFieldName = getFieldName('data.currency');
-  const selectedCurrency = fixedCurrency || get(formik.values, currencyFieldName);
+  const selectedCurrency = get(formik.values, currencyFieldName);
   const validateCurrencyMinimumAmount = () => {
     // Only validate minimum amount if the form has items
     if (formik?.values?.items?.length > 0) {
@@ -374,7 +374,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
                 }}
                 options={currencies}
                 value={currencies.find(c => c.label === selectedCurrency) || null}
-                disabled={Boolean(fixedCurrency) || !isNew}
+                disabled={Boolean(fixedCurrency && !optional) || !isNew}
               />
             )}
           </StyledInputField>

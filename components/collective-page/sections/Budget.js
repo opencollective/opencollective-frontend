@@ -124,7 +124,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const expenses = get(data, 'expenses.nodes') || EMPTY_ARRAY;
   const budgetItemsParams = [transactions, expenses, filter];
   const allItems = React.useMemo(() => getBudgetItems(...budgetItemsParams), budgetItemsParams);
-  const isLoading = !allItems.length && data?.loading;
+  const isLoading = !allItems.length && budgetQueryResult.loading;
   const hasExpenses = Boolean(expenses.length);
   const hasTransactions = Boolean(transactions.length);
 

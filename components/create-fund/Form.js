@@ -126,11 +126,11 @@ class CreateFundForm extends React.Component {
                 id="createFund.subtitle.introduce"
                 defaultMessage="Apply for Fiscal Sponsorship below. We will review your application shortly. {faqLink}"
                 values={{
-                  faqLink: (
-                    <StyledLink href="https://docs.opencollective.foundation/" openInNewTab>
+                  faqLink: host.faqUrl ? (
+                    <StyledLink href={host.faqUrl} openInNewTab>
                       <FormattedMessage id="createFund.subtitle.faq" defaultMessage="FAQ here." />
                     </StyledLink>
-                  ),
+                  ) : null,
                 }}
               />
             </P>
@@ -244,8 +244,9 @@ class CreateFundForm extends React.Component {
                           -{' '}
                           <FormattedMessage
                             id="createFund.hosttos.label"
-                            defaultMessage="Read the {hosttoslink} of the Open Collective Foundation."
+                            defaultMessage="Read the {hosttoslink} of the {hostName}."
                             values={{
+                              hostName: host.name,
                               hosttoslink: (
                                 <StyledLink href={host.termsUrl} openInNewTab>
                                   <FormattedMessage id="fiscaltos" defaultMessage="terms of fiscal sponsorship" />
