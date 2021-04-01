@@ -204,7 +204,7 @@ class ContributionFlowSuccess extends React.Component {
     const { LoggedInUser, collective, data, intl, isEmbed } = this.props;
     const { order } = data;
     const shareURL = `${process.env.WEBSITE_URL}/${collective.slug}`;
-    const pendingOrder = order && order.status === ORDER_STATUS.PENDING;
+    const isPendingBankTransfer = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
 
     if (!data.loading && !order) {
       return (
@@ -292,7 +292,7 @@ class ContributionFlowSuccess extends React.Component {
               </Flex>
             </ContainerWithImage>
             <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
-              {pendingOrder ? this.renderBankTransferInformation() : this.renderCallsToAction()}
+              {isPendingBankTransfer ? this.renderBankTransferInformation() : this.renderCallsToAction()}
             </Flex>
           </Fragment>
         )}

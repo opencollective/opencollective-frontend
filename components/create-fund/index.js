@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
+import { omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -39,8 +40,18 @@ class CreateFund extends Component {
     if (this.props.router.query.category === 'foundation') {
       return {
         slug: 'foundation',
+        name: 'Open Collective Foundation',
         termsUrl:
           'https://docs.google.com/document/u/2/d/e/2PACX-1vQ_fs7IOojAHaMBKYtaJetlTXJZLnJ7flIWkwxUSQtTkWUMtwFYC2ssb-ooBnT-Ldl6wbVhNQiCkSms/pub',
+        faqUrl: 'https://docs.opencollective.foundation/',
+      };
+    }
+    if (this.props.router.query.category === 'opensource') {
+      return {
+        slug: 'opensource',
+        name: 'Open Source Collective',
+        termsUrl:
+          'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub',
       };
     }
   }
@@ -51,13 +62,11 @@ class CreateFund extends Component {
     // set state to loading
     this.setState({ creating: true });
 
-    delete fund.tos;
-    delete fund.hostTos;
-    delete host.termsUrl;
-
     // try mutation
     try {
-      const res = await this.props.createFund({ variables: { fund, host } });
+      const res = await this.props.createFund({
+        variables: { fund: omit(fund, ['tos', 'hostTos']), host: omit(host, ['termsUrl', 'name']) },
+      });
       await this.props.refetchLoggedInUser();
       this.props.router
         .push({

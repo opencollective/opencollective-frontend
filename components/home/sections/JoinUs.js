@@ -134,7 +134,7 @@ const JoinUs = ({ page }) => (
           </Wrapper>
         </Link>
 
-        <Link href="/hiring">
+        <Link href="https://blog.opencollective.com/tag/case-studies/">
           <Wrapper color="black.900" my={4} width={['288px', '648px', '569px', null, '594px']} className="linkWrapper">
             <Container mb={2} width={['192px', 1]}>
               <H3
