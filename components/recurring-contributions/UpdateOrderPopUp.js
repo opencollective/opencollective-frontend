@@ -222,8 +222,8 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
                   </P>
                   {checked && flexible ? (
                     <Fragment>
+                      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
                       <div
-                        role="presentation"
                         onClick={e => {
                           e.preventDefault();
                         }}
