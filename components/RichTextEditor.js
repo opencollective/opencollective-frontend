@@ -342,7 +342,7 @@ export default class RichTextEditor extends React.Component {
   };
 
   constructVideoEmbedURL = videoLink => {
-    const { id, service } = this.getVideoId(videoLink);
+    const { id, service } = this.parseVideoLink(videoLink);
     if (service === 'youtube') {
       return `https://www.youtube.com/embed/${id}`;
     } else if (service === 'vimeo') {
@@ -352,28 +352,23 @@ export default class RichTextEditor extends React.Component {
     }
   };
 
-  getVideoId = videoLink => {
-    let regexExp;
-    const videoId = {};
-    if (videoLink.includes('youtu')) {
-      videoId.service = 'youtube';
-      regexExp = new RegExp(
+  parseVideoLink = videoLink => {
+    const regexps = {
+      youtube: new RegExp(
         '(?:https?://)?(?:www.)?youtu(?:.be/|be.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
         'ig',
-      );
-    } else if (videoLink.includes('vimeo')) {
-      videoId.service = 'vimeo';
-      regexExp = new RegExp(
+      ),
+      vimeo: new RegExp(
         '(http|https)?://(www.)?vimeo.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
-      );
-    } else {
-      return videoId;
+      ),
+    };
+    for (const service in regexps) {
+      const matches = regexps[service].exec(videoLink);
+      if (matches) {
+        return { service, id: matches[matches.length - 1] };
+      }
     }
-    const matches = regexExp.exec(videoLink);
-    if (matches) {
-      videoId.id = matches[matches.length - 1];
-    }
-    return videoId;
+    return {};
   };
 
   embedVideoIFrame = videoLink => {
