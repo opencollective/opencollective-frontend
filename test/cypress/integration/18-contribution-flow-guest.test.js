@@ -52,9 +52,9 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.contains(`We've sent it to ${email}`);
 
     // Open email
-    const expectedEmailSubject = 'Open Collective: Verify your email address';
+    const expectedEmailSubject = 'Open Collective: Verify your email';
     cy.openEmail(({ subject, html }) => html.includes(email) && subject.includes(expectedEmailSubject));
-    cy.contains('a[href*="/confirm/guest"]', 'Confirm').click();
+    cy.contains('a[href*="/confirm/guest"]', 'Verify').click();
 
     // Redirected from email
     cy.location('pathname').should('include', '/confirm/guest');
@@ -181,9 +181,9 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.contains(`We've sent it to ${firstEmail}`);
 
       // Open email
-      const expectedEmailSubject = 'Open Collective: Verify your email address';
+      const expectedEmailSubject = 'Open Collective: Verify your email';
       cy.openEmail(({ subject, html }) => html.includes(firstEmail) && subject.includes(expectedEmailSubject));
-      cy.contains('a[href*="/confirm/guest"]', 'Confirm').click();
+      cy.contains('a[href*="/confirm/guest"]', 'Verify').click();
 
       // Redirected from email
       cy.location('pathname').should('include', '/confirm/guest');
