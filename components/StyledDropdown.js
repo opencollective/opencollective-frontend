@@ -97,6 +97,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
   }
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <div
       role="button"
       tabIndex={0}
@@ -110,18 +111,6 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
             document.activeElement.blur();
           } else {
             e.target.blur();
-          }
-        }
-      }}
-      onKeyDown={e => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          if (isDisplayed) {
-            if (document.activeElement?.contains(e.target)) {
-              document.activeElement.blur();
-            } else {
-              e.target.blur();
-            }
           }
         }
       }}
