@@ -20,7 +20,7 @@ const StyledToast = styled.div`
   justify-content: space-between;
   align-items: stretch;
   padding: 24px;
-  background: white;
+  background: ${props => (props.variantType ? props.variantType.bg : 'white')};
   border-radius: 8px;
   border: 1px solid #efefef;
   opacity: 1;
@@ -65,6 +65,15 @@ const DEFAULT_TITLES = defineMessages({
   },
 });
 
+const getVariant = variantType => {
+  switch (variantType) {
+    case 'dark':
+      return { bg: 'rgba(49, 50, 51, 0.8)', color: '#ffffff' };
+    default:
+      return { bg: '#ffffff', color: '#313233' };
+  }
+};
+
 const getColor = toast => {
   switch (toast.type) {
     case TOAST_TYPE.SUCCESS:
@@ -95,12 +104,14 @@ const getIcon = toast => {
   }
 };
 
-const Toast = ({ toast, timeLeft, onClose }) => {
+const Toast = ({ toast, timeLeft, onClose, variant }) => {
   const intl = useIntl();
   const [isClosing, setClosing] = React.useState(false);
   const color = getColor(toast);
+  const variantStyle = getVariant(variant);
+  const messageColor = variantStyle.color;
   return (
-    <StyledToast timeLeft={timeLeft} isClosing={isClosing} data-cy="toast-notification">
+    <StyledToast timeLeft={timeLeft} isClosing={isClosing} data-cy="toast-notification" variantType={variantStyle}>
       <Flex alignItems="center">
         <Container
           bg={color}
@@ -128,7 +139,7 @@ const Toast = ({ toast, timeLeft, onClose }) => {
             {toast.title || getDefaultTitle(intl, toast.type)}
           </Span>
           {toast.message && (
-            <Span fontSize="12px" lineHeight="16px" fontWeight="500" letterSpacing="0.06em" color="black.600" mt={2}>
+            <Span fontSize="12px" lineHeight="16px" fontWeight="500" letterSpacing="0.06em" color={messageColor} mt={2}>
               {toast.message}
             </Span>
           )}
@@ -159,6 +170,7 @@ Toast.propTypes = {
   }).isRequired,
   onClose: PropTypes.func,
   timeLeft: PropTypes.number,
+  variant: PropTypes.string,
 };
 
 Toast.defaultProps = {
