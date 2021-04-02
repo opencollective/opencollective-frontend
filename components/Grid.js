@@ -35,6 +35,7 @@ export const Grid = styled('div')(
   {
     boxSizing: 'border-box',
     display: 'grid',
+    '> div': { 'min-width': 0 },
   },
   compose(space, grid, layout),
 );
