@@ -213,6 +213,7 @@ class Webhooks extends React.Component {
           <Box>
             <Span fontSize="14px">{intl.formatMessage(messages['webhooks.types.label'])}</Span>
             <StyledSelect
+              inputId="event-type-select"
               options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(webhook => ({
                 label: webhook,
                 value: webhook,

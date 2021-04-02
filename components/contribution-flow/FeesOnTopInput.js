@@ -119,6 +119,7 @@ const FeesOnTopInput = ({ currency, amount, quantity, fees, onChange }) => {
           </P>
         </Flex>
         <StyledSelect
+          inputId="donation-percentage"
           aria-label="Donation percentage"
           width="100%"
           maxWidth={['100%', 190]}

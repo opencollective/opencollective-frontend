@@ -13,6 +13,7 @@ const TransactionTypeFilter = ({ onChange, value, ...props }) => {
 
   return (
     <StyledSelectFilter
+      inputId="transaction-filter"
       isSearchable={false}
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}

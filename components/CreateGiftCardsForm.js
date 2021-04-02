@@ -485,6 +485,7 @@ class CreateGiftCardsForm extends Component {
             label={<FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />}
           >
             <PaymentMethodSelect
+              inputId="gift-card-payment-method"
               disabled={submitting}
               paymentMethods={paymentMethods}
               defaultPaymentMethod={this.getDefaultPaymentMethod()}
@@ -521,6 +522,7 @@ class CreateGiftCardsForm extends Component {
           >
             <StyledSelectCreatable
               id="giftcard-batch"
+              inputId="giftcard-batch"
               onChange={({ value }) => this.onChange('batch', truncate(value, { length: 200 }))}
               minWidth={300}
               disabled={submitting}
@@ -551,6 +553,7 @@ class CreateGiftCardsForm extends Component {
                   }
                 >
                   <CollectivePicker
+                    inputId="create-gift-card-picker"
                     placeholder={intl.formatMessage(messages.limitToHostsPlaceholder)}
                     disabled={hosts.length === 0}
                     minWidth={300}
