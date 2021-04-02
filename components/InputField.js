@@ -387,6 +387,7 @@ class InputField extends React.Component {
                 <Box width={[1, 10 / 12]}>
                   <InputTypeCountry
                     name={field.name}
+                    inputId={field.name}
                     value={field.value}
                     defaultValue={field.defaultValue}
                     onChange={this.handleChange}
@@ -404,6 +405,7 @@ class InputField extends React.Component {
                 <Box width={1}>
                   <InputTypeCountry
                     name={field.name}
+                    inputId={field.name}
                     value={field.value}
                     defaultValue={field.defaultValue}
                     onChange={this.handleChange}
@@ -493,6 +495,7 @@ class InputField extends React.Component {
 
         const StyledSelectComponent = (
           <StyledSelect
+            inputId={`input-field-${field.name}`}
             name={field.name}
             data-cy={field.name}
             type="select"

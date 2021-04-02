@@ -246,6 +246,7 @@ const PaymentReceipts = ({ collective }) => {
           <FormattedMessage id="paymentReceipts.selectDate.label" defaultMessage="Time period" />
         </P>
         <StyledSelect
+          inputId="active-filter-set"
           options={[defaultFilter, ...yearsFilter]}
           value={activeFilter}
           width="184px"

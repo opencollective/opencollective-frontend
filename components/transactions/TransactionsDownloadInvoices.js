@@ -133,6 +133,7 @@ const TransactionsDownloadInvoices = ({ collective }) => {
           </StyledButtonSet>
           {interval === 'monthly' && (
             <StyledSelect
+              inputId="year-select"
               options={years}
               value={year}
               onChange={setYear}
@@ -145,6 +146,7 @@ const TransactionsDownloadInvoices = ({ collective }) => {
             />
           )}
           <CollectivePicker
+            inputId="transactions-download-invoices"
             customOptions={options}
             onChange={({ value }) =>
               downloadInvoice({

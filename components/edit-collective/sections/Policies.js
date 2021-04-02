@@ -263,6 +263,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               />
             </P>
             <StyledSelect
+              inputId="policy-select"
               isSearchable={false}
               isLoading={loading}
               placeholder={formatMessage(messages['rejectCategories.placeholder'])}
