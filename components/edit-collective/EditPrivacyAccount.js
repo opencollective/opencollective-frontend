@@ -108,7 +108,7 @@ const EditPrivacyAccount = props => {
   } else {
     return (
       <React.Fragment>
-        <P>
+        <P my={1}>
           <FormattedMessage
             id="collective.connectedAccounts.privacy.connected"
             defaultMessage="Privacy connected on {updatedAt, date, short}"
@@ -117,7 +117,7 @@ const EditPrivacyAccount = props => {
             }}
           />
         </P>
-        <P>
+        <P my={1}>
           <StyledButton type="submit" buttonSize="tiny" loading={isDeleting} onClick={handleDelete}>
             <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
           </StyledButton>
