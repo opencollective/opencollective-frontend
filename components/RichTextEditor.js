@@ -351,7 +351,11 @@ export default class RichTextEditor extends React.Component {
       return `https://www.youtube-nocookie.com/embed/${id}`;
     } /* else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
-    }*/ else {
+    } */ else if (
+      service === 'anchor'
+    ) {
+      return `https://anchor.fm${id}`;
+    } else {
       return null;
     }
   };
@@ -362,9 +366,10 @@ export default class RichTextEditor extends React.Component {
         '(?:https?://)?(?:www.)?youtu(?:.be/|be.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
         'ig',
       ),
-      // vimeo: new RegExp(
-      //   '(http|https)?://(www.)?vimeo.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
-      // ),
+      vimeo: new RegExp(
+        '(http|https)?://(www.)?vimeo.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
+      ),
+      anchor: new RegExp('https?://(www.)?anchor.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)'),
     };
     for (const service in regexps) {
       const matches = regexps[service].exec(videoLink);
