@@ -317,7 +317,7 @@ export default class RichTextEditor extends React.Component {
                   <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-video-embed">
                 </div>
               </div>
-              <strong>Note: Only YouTube links are supported</strong>
+              <strong>Note: Only YouTube and Anchor.fm links are supported.</strong>
             </div>`;
     const { toolbarElement } = e.target;
     const attachFilesButton = toolbarElement.querySelector('[data-trix-action=attachFiles]');
@@ -352,7 +352,7 @@ export default class RichTextEditor extends React.Component {
     } /* else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
     } */ else if (
-      service === 'anchor'
+      service === 'anchorFm'
     ) {
       return `https://anchor.fm${id}`;
     } else {
@@ -369,7 +369,7 @@ export default class RichTextEditor extends React.Component {
       vimeo: new RegExp(
         '(http|https)?://(www.)?vimeo.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
       ),
-      anchor: new RegExp('https?://(www.)?anchor.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)'),
+      anchorFm: new RegExp('https?://(www.)?anchor.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)'),
     };
     for (const service in regexps) {
       const matches = regexps[service].exec(videoLink);
