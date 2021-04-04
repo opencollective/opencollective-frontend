@@ -53,13 +53,12 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, des
         <StyledDropzone
           {...attachmentDropzoneParams}
           name="attachedFiles"
-          isMulti={false}
           disabled={disabled}
           minHeight={72}
-          onSuccess={url => {
-            const newFile = { url };
-            setFiles([newFile]);
-            onChange([newFile]);
+          onSuccess={urls => {
+            const uploadedFiles = urls.map(url => ({ url }));
+            setFiles(uploadedFiles);
+            onChange(uploadedFiles);
           }}
         />
       )}
