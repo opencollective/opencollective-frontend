@@ -70,7 +70,7 @@ const getVariant = variantType => {
     case 'dark':
       return { bg: 'rgba(49, 50, 51, 0.8)', titleColor: '#ffffff', messageColor: '#C4C7CC', crossIcon: '#E8E9EB' };
     default:
-      return { bg: '#ffffff', titleColor: '#313233', messageColor: '#76777A', crossIcon: '#E8E9EB' };
+      return { bg: '#ffffff', titleColor: '#313233', messageColor: '#76777A', crossIcon: '#C4C7CC' };
   }
 };
 

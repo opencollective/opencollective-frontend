@@ -54,7 +54,6 @@ const StyledButtonContent = styled.button`
       const baseActiveStyles = props.theme.buttons[props.buttonStyle]?.['&:active'] || {};
 
       return css`
-        color: #e8e9eb;
         background: transparent;
         background-color: transparent;
         border: 1px solid transparent !important;
