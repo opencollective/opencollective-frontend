@@ -68,9 +68,9 @@ const DEFAULT_TITLES = defineMessages({
 const getVariant = variantType => {
   switch (variantType) {
     case 'dark':
-      return { bg: 'rgba(49, 50, 51, 0.8)', color: '#ffffff' };
+      return { bg: 'rgba(49, 50, 51, 0.8)', titleColor: '#ffffff', messageColor: '#C4C7CC' };
     default:
-      return { bg: '#ffffff', color: '#313233' };
+      return { bg: '#ffffff', titleColor: '#313233', messageColor: '#76777A;' };
   }
 };
 
@@ -109,7 +109,8 @@ const Toast = ({ toast, timeLeft, onClose, variant }) => {
   const [isClosing, setClosing] = React.useState(false);
   const color = getColor(toast);
   const variantStyle = getVariant(variant);
-  const messageColor = variantStyle.color;
+  const messageColor = variantStyle.messageColor;
+  const titleColor = variantStyle.titleColor;
   return (
     <StyledToast timeLeft={timeLeft} isClosing={isClosing} data-cy="toast-notification" variantType={variantStyle}>
       <Flex alignItems="center">
@@ -134,7 +135,7 @@ const Toast = ({ toast, timeLeft, onClose, variant }) => {
             fontWeight="500"
             textTransform="uppercase"
             letterSpacing="0.06em"
-            color="black.800"
+            color={titleColor}
           >
             {toast.title || getDefaultTitle(intl, toast.type)}
           </Span>
@@ -154,7 +155,7 @@ const Toast = ({ toast, timeLeft, onClose, variant }) => {
           onClose();
         }}
       >
-        <Close size={12} />
+        <Close size={12} color={titleColor} />
       </StyledButton>
     </StyledToast>
   );
