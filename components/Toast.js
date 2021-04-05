@@ -68,9 +68,9 @@ const DEFAULT_TITLES = defineMessages({
 const getVariant = variantType => {
   switch (variantType) {
     case 'dark':
-      return { bg: 'rgba(49, 50, 51, 0.8)', titleColor: '#ffffff', messageColor: '#C4C7CC' };
+      return { bg: 'rgba(49, 50, 51, 0.8)', titleColor: '#ffffff', messageColor: '#C4C7CC', crossIcon: '#E8E9EB' };
     default:
-      return { bg: '#ffffff', titleColor: '#313233', messageColor: '#76777A;' };
+      return { bg: '#ffffff', titleColor: '#313233', messageColor: '#76777A', crossIcon: '#E8E9EB' };
   }
 };
 
@@ -111,6 +111,7 @@ const Toast = ({ toast, timeLeft, onClose, variant }) => {
   const variantStyle = getVariant(variant);
   const messageColor = variantStyle.messageColor;
   const titleColor = variantStyle.titleColor;
+  const crossIcon = variantStyle.crossIcon;
   return (
     <StyledToast timeLeft={timeLeft} isClosing={isClosing} data-cy="toast-notification" variantType={variantStyle}>
       <Flex alignItems="center">
@@ -155,7 +156,7 @@ const Toast = ({ toast, timeLeft, onClose, variant }) => {
           onClose();
         }}
       >
-        <Close size={12} color={titleColor} />
+        <Close size={12} color={crossIcon} />
       </StyledButton>
     </StyledToast>
   );
