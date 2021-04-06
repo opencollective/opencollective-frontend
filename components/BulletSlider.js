@@ -36,7 +36,19 @@ const BulletSlider = ({ nbItems, selectedIndex, onChange }) => {
   return (
     <Flex flexWrap="wrap" justifyContent="center">
       {[...Array(nbItems).keys()].map(index => (
-        <Bullet key={index} isSelected={index === selectedIndex} onClick={() => onChange(index)} />
+        <Bullet
+          key={index}
+          role="button"
+          tabIndex={0}
+          isSelected={index === selectedIndex}
+          onClick={() => onChange(index)}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              onChange(index);
+            }
+          }}
+        />
       ))}
     </Flex>
   );

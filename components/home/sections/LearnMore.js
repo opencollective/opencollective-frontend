@@ -228,8 +228,8 @@ const LearnMore = () => {
           </P>
         </Box>
         <DonateButtonWrapper width="287px" height="300px" my={3} ml={[null, 4]}>
-          <DonateButtonBG />
-          <DonateButtonBGHover />
+          <DonateButtonBG alt="" />
+          <DonateButtonBGHover alt="" />
           <Link href="/opencollective/donate">
             <DonateButton buttonStyle="dark" minWidth={'97'}>
               <FormattedMessage id="home.donate" defaultMessage="Donate" />

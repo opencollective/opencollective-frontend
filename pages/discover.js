@@ -111,7 +111,7 @@ NavLinkContainer.defaultProps = {
   px: [1, 2, 3],
 };
 
-const NavLink = styled.a`
+const NavLink = styled.div`
   color: #777777;
   font-size: 1.4rem;
 
@@ -222,7 +222,7 @@ const DiscoverPage = () => {
                         <NavLink
                           data-cy="all-collectives-section"
                           className={
-                            query.show == 'all' || query.show == '' || query.show == undefined ? 'selected' : ''
+                            query.show === 'all' || query.show === '' || query.show === undefined ? 'selected' : ''
                           }
                         >
                           <FormattedMessage id="discover.allCollectives" defaultMessage="All collectives" />
@@ -231,7 +231,7 @@ const DiscoverPage = () => {
                     </NavLinkContainer>
                     <NavLinkContainer>
                       <Link href={{ pathname: '/discover', query: { show: 'open source', sort: query.sort } }}>
-                        <NavLink className={query.show == 'open source' ? 'selected' : ''}>
+                        <NavLink className={query.show === 'open source' ? 'selected' : ''}>
                           <FormattedMessage
                             id="discover.openSourceCollectives"
                             defaultMessage="Open Source collectives"
@@ -241,14 +241,14 @@ const DiscoverPage = () => {
                     </NavLinkContainer>
                     <NavLinkContainer>
                       <Link href={{ pathname: '/discover', query: { show: 'covid-19', sort: query.sort } }}>
-                        <NavLink className={query.show == 'covid-19' ? 'selected' : ''}>
+                        <NavLink className={query.show === 'covid-19' ? 'selected' : ''}>
                           <FormattedMessage id="discover.covidCollectives" defaultMessage="COVID-19 collectives" />
                         </NavLink>
                       </Link>
                     </NavLinkContainer>
                     <NavLinkContainer>
                       <Link href={{ pathname: '/discover', query: { show: 'pledged', sort: query.sort } }}>
-                        <NavLink className={query.show == 'pledged' ? 'selected' : ''}>
+                        <NavLink className={query.show === 'pledged' ? 'selected' : ''}>
                           <FormattedMessage id="discover.pledgedCollectives" defaultMessage="Pledged collectives" />
                         </NavLink>
                       </Link>
