@@ -1733,6 +1733,7 @@
   "tier.expiration.label": "Vencimento",
   "tier.goal.description": "Quantidade que você pretende levantar",
   "tier.interval": "por {interval, select, month {mês} year {ano} other {}}",
+  "tier.interval.flexible": "flexible",
   "tier.interval.label": "intervalo",
   "tier.interval.month": "mensal",
   "tier.interval.onetime": "uma vez",

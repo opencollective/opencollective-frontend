@@ -1733,6 +1733,7 @@
   "tier.expiration.label": "Expiration",
   "tier.goal.description": "Amount you aim to raise",
   "tier.interval": "на {interval, select, month {місяць} year {рік} other {}}",
+  "tier.interval.flexible": "flexible",
   "tier.interval.label": "проміжок",
   "tier.interval.month": "щомісячно",
   "tier.interval.onetime": "одноразово",

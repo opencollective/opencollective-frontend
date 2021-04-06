@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
+import INTERVALS from '../../lib/constants/intervals';
 import { isTierExpired } from '../../lib/tier-utils';
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
@@ -292,7 +293,7 @@ class TierPage extends Component {
                           <FormattedMoneyAmount
                             amount={tier.goal}
                             currency={tier.currency}
-                            interval={tier.interval}
+                            interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                             abbreviateAmount={tier.goal > 1000000}
                             abbreviateInterval
                             amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
@@ -320,7 +321,7 @@ class TierPage extends Component {
                             color="black.700"
                             amount={amountRaised}
                             currency={tier.currency}
-                            interval={tier.interval}
+                            interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                             amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
                             abbreviateAmount={amountRaised > 1000000}
                             precision={0}
