@@ -4,6 +4,7 @@ import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CurrencyPrecision } from '../lib/constants/currency-precision';
+import INTERVALS from '../lib/constants/intervals';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
 
 import Currency from './Currency';
@@ -46,7 +47,7 @@ const FormattedMoneyAmount = ({
   }
 
   const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
-  if (!interval) {
+  if (!interval || interval === INTERVALS.flexible) {
     return (
       <FormattedMessage
         id="Amount"
