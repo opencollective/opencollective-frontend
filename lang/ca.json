@@ -1733,6 +1733,7 @@
   "tier.expiration.label": "Expiration",
   "tier.goal.description": "Amount you aim to raise",
   "tier.interval": "per {interval, select, month {month} year {year} other {}}",
+  "tier.interval.flexible": "flexible",
   "tier.interval.label": "interval",
   "tier.interval.month": "mensualment",
   "tier.interval.onetime": "puntual",

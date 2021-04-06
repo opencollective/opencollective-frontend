@@ -1733,6 +1733,7 @@
   "tier.expiration.label": "만료",
   "tier.goal.description": "Amount you aim to raise",
   "tier.interval": "per {interval, select, month {month} year {year} other {}}",
+  "tier.interval.flexible": "flexible",
   "tier.interval.label": "간격",
   "tier.interval.month": "월간",
   "tier.interval.onetime": "일회성",

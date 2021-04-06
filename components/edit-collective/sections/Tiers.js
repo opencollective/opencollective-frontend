@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import intervals from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getCurrencySymbol } from '../../../lib/currency-utils';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
@@ -144,6 +145,7 @@ class Tiers extends React.Component {
       onetime: { id: 'tier.interval.onetime', defaultMessage: 'one time' },
       month: { id: 'tier.interval.month', defaultMessage: 'monthly' },
       year: { id: 'tier.interval.year', defaultMessage: 'yearly' },
+      flexible: { id: 'tier.interval.flexible', defaultMessage: 'flexible' },
       'presets.label': {
         id: 'tier.presets.label',
         defaultMessage: 'suggested amounts',
@@ -211,10 +213,18 @@ class Tiers extends React.Component {
         label: intl.formatMessage(this.messages['description.label']),
       },
       {
+        name: 'interval',
+        type: 'select',
+        options: getOptions(['onetime', 'month', 'year', 'flexible']),
+        label: intl.formatMessage(this.messages['interval.label']),
+        when: tier => !tier || [DONATION, MEMBERSHIP, TIER, SERVICE].includes(tier.type),
+      },
+      {
         name: 'amountType',
         type: 'select',
         options: getOptions([FIXED, FLEXIBLE]),
         label: intl.formatMessage(this.messages['amountType.label']),
+        when: tier => tier.interval !== intervals.flexible,
       },
       {
         name: 'amount',
@@ -244,13 +254,6 @@ class Tiers extends React.Component {
         type: 'currency',
         label: intl.formatMessage(this.messages['minimumAmount.label']),
         when: tier => tier.amountType === FLEXIBLE,
-      },
-      {
-        name: 'interval',
-        type: 'select',
-        options: getOptions(['onetime', 'month', 'year']),
-        label: intl.formatMessage(this.messages['interval.label']),
-        when: tier => !tier || [DONATION, MEMBERSHIP, TIER, SERVICE].includes(tier.type),
       },
       {
         name: 'maxQuantity',
@@ -302,10 +305,22 @@ class Tiers extends React.Component {
   }
 
   editTier(index, fieldname, value) {
-    const tiers = this.state.tiers;
+    const tiers = cloneDeep(this.state.tiers);
 
-    if (fieldname === 'interval' && value === 'onetime') {
-      value = null;
+    if (fieldname === 'interval') {
+      if (value === 'onetime') {
+        value = null;
+      }
+      if (value === intervals.flexible) {
+        tiers[index].amountType = FLEXIBLE;
+      }
+    }
+
+    if (fieldname === 'type') {
+      if (value === TierTypes.PRODUCT) {
+        tiers[index].interval = null;
+        tiers[index].amountType = FIXED;
+      }
     }
 
     tiers[index] = {
@@ -313,6 +328,7 @@ class Tiers extends React.Component {
       type: tiers[index]['type'] || this.defaultType,
       [fieldname]: value,
     };
+
     this.setState({ tiers });
     this.onChange(tiers);
   }
