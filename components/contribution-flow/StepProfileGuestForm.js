@@ -19,7 +19,7 @@ import StepProfileInfoMessage from './StepProfileInfoMessage';
 import { getTotalAmount } from './utils';
 
 const shouldRequireAllInfo = amount => {
-  return amount && amount >= 500000;
+  return Boolean(amount && amount >= 500000);
 };
 
 export const validateGuestProfile = (stepProfile, stepDetails) => {
