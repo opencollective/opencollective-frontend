@@ -159,6 +159,7 @@ class GiftCards extends React.Component {
             {batchesOptions.length > 1 && (
               <Box mb={3}>
                 <StyledSelect
+                  inputId="batches-options"
                   options={batchesOptions}
                   onChange={({ value }) =>
                     this.props.router.push({

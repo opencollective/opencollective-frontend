@@ -126,6 +126,7 @@ const Input = props => {
             >
               {() => (
                 <StyledSelect
+                  inputId={field.name}
                   disabled={disabled}
                   error={(meta.touched || disabled) && meta.error}
                   isLoading={loading && !options.length}

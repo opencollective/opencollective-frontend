@@ -128,9 +128,11 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const hasExpenses = Boolean(expenses.length);
   const hasTransactions = Boolean(transactions.length);
 
-  // Refetch data when used logs in to refresh permissions
+  // Refetch data when user logs in to refresh permissions
   React.useEffect(() => {
-    refetch();
+    if (LoggedInUser) {
+      refetch();
+    }
   }, [LoggedInUser]);
 
   return (
