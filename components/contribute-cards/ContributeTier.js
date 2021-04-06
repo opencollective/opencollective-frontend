@@ -52,10 +52,12 @@ const getContributionTypeFromTier = (tier, isPassed) => {
 };
 
 const ContributeTier = ({ intl, collective, tier, ...props }) => {
+  const { stats } = tier;
   const currency = tier.currency || collective.currency;
   const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
+  const isFlexibleInterval = tier.interval === INTERVALS.flexible;
   const minAmount = isFlexibleAmount ? tier.minimumAmount : tier.amount;
-  const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
+  const amountRaised = stats[tier.interval && !isFlexibleInterval ? 'totalRecurringDonations' : 'totalDonated'] || 0;
   const tierIsExpired = isTierExpired(tier);
   const tierType = getContributionTypeFromTier(tier, tierIsExpired);
   const hasNoneLeft = tier.stats.availableQuantity === 0;
