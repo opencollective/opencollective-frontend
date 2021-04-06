@@ -304,7 +304,7 @@ class Tiers extends React.Component {
   }
 
   editTier(index, fieldname, value) {
-    const tiers = this.state.tiers;
+    const tiers = cloneDeep(this.state.tiers);
 
     if (fieldname === 'interval') {
       if (value === 'onetime') {
@@ -315,11 +315,19 @@ class Tiers extends React.Component {
       }
     }
 
+    if (fieldname === 'type') {
+      if (value === TierTypes.PRODUCT) {
+        tiers[index].interval = null;
+        tiers[index].amountType = FIXED;
+      }
+    }
+
     tiers[index] = {
       ...tiers[index],
       type: tiers[index]['type'] || this.defaultType,
       [fieldname]: value,
     };
+
     this.setState({ tiers });
     this.onChange(tiers);
   }
