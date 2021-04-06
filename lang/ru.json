@@ -1733,6 +1733,7 @@
   "tier.expiration.label": "Срок окончания",
   "tier.goal.description": "Amount you aim to raise",
   "tier.interval": "в {interval, select, month {месяц} year {год} other {}}",
+  "tier.interval.flexible": "flexible",
   "tier.interval.label": "интервал",
   "tier.interval.month": "каждый месяц",
   "tier.interval.onetime": "один раз",
