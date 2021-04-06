@@ -504,6 +504,7 @@ class InputField extends React.Component {
             className={field.className}
             defaultValue={defaultValue}
             disabled={field.disabled}
+            isSearchable={field.options?.length > 15}
             options={
               field.options &&
               field.options.map(option => {
