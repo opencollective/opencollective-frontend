@@ -1733,6 +1733,7 @@
   "tier.expiration.label": "过期",
   "tier.goal.description": "Amount you aim to raise",
   "tier.interval": "per {interval, select, month {month} year {year} other {}}",
+  "tier.interval.flexible": "flexible",
   "tier.interval.label": "间隔",
   "tier.interval.month": "每月",
   "tier.interval.onetime": "一次性",
