@@ -22,10 +22,11 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
 import StyledLink from '../../StyledLink';
+import StyledLinkButton from '../../StyledLinkButton';
 import { P, Span } from '../../Text';
+import { editCollectiveSettingsMutation } from '../mutations';
 import SettingsTitle from '../SettingsTitle';
 
-import { editCollectiveSettingsMutation } from './../mutations';
 import SettingsSectionTitle from './SettingsSectionTitle';
 
 const { FUND, PROJECT, EVENT } = CollectiveType;
@@ -371,9 +372,9 @@ class Tiers extends React.Component {
     return (
       <Container margin="3rem 0" className={`tier ${tier.slug}`} key={key}>
         <Container textAlign="right" fontSize="1.3rem" pr={1}>
-          <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>
+          <StyledLinkButton className="removeTier" onClick={() => this.removeTier(index)}>
             {intl.formatMessage(this.messages[`${this.defaultType}.remove`])}
-          </a>
+          </StyledLinkButton>
         </Container>
         <form>
           {this.fields.map(

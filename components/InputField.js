@@ -18,6 +18,8 @@ import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
 import TimezonePicker from './TimezonePicker';
 
+/* eslint-disable jsx-a11y/label-has-associated-control */
+
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
 let DateTime;

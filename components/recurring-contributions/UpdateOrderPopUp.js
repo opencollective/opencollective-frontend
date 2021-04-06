@@ -160,7 +160,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
       .map(tier => ({
         key: `${contribution.id}-tier-${tier.id}`,
         title: tier.name,
-        flexible: tier.amountType === 'FLEXIBLE' ? true : false,
+        flexible: tier.amountType === 'FLEXIBLE',
         amount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.value * 100 : tier.amount.value * 100,
         id: tier.id,
         currency: tier.amount.currency,
@@ -222,6 +222,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
                   </P>
                   {checked && flexible ? (
                     <Fragment>
+                      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
                       <div
                         onClick={e => {
                           e.preventDefault();
