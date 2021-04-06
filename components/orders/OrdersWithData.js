@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { mapValues, omitBy, pick } from 'lodash';
+import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -192,16 +192,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
               values={{
                 ResetLink(text) {
                   return (
-                    <Link
-                      data-cy="reset-orders-filters"
-                      href={{
-                        pathname: router.route.slice(1),
-                        query: {
-                          ...mapValues(router.query, () => null),
-                          ...pick(router.query, ['slug', 'collectiveSlug', 'hostCollectiveSlug', 'view']),
-                        },
-                      }}
-                    >
+                    <Link data-cy="reset-orders-filters" href={{ pathname: router.asPath.split('?')[0], query: {} }}>
                       {text}
                     </Link>
                   );
