@@ -15,11 +15,7 @@ import { compose, parseToBoolean } from '../../lib/utils';
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
 import Container from '../../components/Container';
 import { STEPS } from '../../components/contribution-flow/constants';
-import ContributionBlocker, {
-  CONTRIBUTION_BLOCKER,
-  getContributionBlocker,
-  Redirect,
-} from '../../components/contribution-flow/ContributionBlocker';
+import ContributionBlocker, { getContributionBlocker } from '../../components/contribution-flow/ContributionBlocker';
 import ContributionFlowSuccess from '../../components/contribution-flow/ContributionFlowSuccess';
 import {
   contributionFlowAccountQuery,
@@ -152,9 +148,6 @@ class NewContributionFlowPage extends React.Component {
     }
 
     const contributionBLocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
-    if (contributionBLocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
-      return <Redirect to={`${account.slug}/contribute`} />;
-    }
     if (contributionBLocker) {
       return <ContributionBlocker blocker={contributionBLocker} account={account} />;
     } else if (step === 'success') {

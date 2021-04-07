@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isTierExpired } from '../../lib/tier-utils';
 
 import { Flex } from '../Grid';
 import Link from '../Link';
-import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 
@@ -51,15 +49,6 @@ const msg = defineMessages({
 /**
  * From received params, see if there's anything preventing the contribution
  */
-export const Redirect = ({ to }) => {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.push(to);
-  }, [to]);
-
-  return <Loading />;
-};
 
 export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier) => {
   if (!account.host) {
@@ -121,10 +110,6 @@ const ContributionBlocker = ({ account, blocker }) => {
       )}
     </Flex>
   );
-};
-
-Redirect.propTypes = {
-  to: PropTypes.string.isRequired,
 };
 
 ContributionBlocker.propTypes = {
