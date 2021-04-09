@@ -274,7 +274,7 @@ const VirtualCard = props => {
     navigator.clipboard.writeText(value);
     addToast({
       type: TOAST_TYPE.SUCCESS,
-      message: <FormattedMessage id="VirtualCards.InfoCopied" defaultMessage="Copied!" />,
+      message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
     });
   };
 
@@ -360,7 +360,7 @@ const VirtualCard = props => {
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
           {displayDetails ? (
             <React.Fragment>
-              <FormattedMessage id="VirtualCards.CloseDetails" defaultMessage="Close Details" />
+              <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
               <DismissIcon height="12px" width="12px" ml={2} mb="2px" />
             </React.Fragment>
           ) : (

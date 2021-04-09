@@ -150,11 +150,11 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Two-factor authentication',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS]: {
-    id: 'editCollective.menu.virtualCards',
+    id: 'VirtualCards.Title',
     defaultMessage: 'Virtual Cards',
   },
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: {
-    id: 'editCollective.menu.virtualCards',
+    id: 'VirtualCards.Title',
     defaultMessage: 'Virtual Cards',
   },
 });
