@@ -37,6 +37,7 @@ import Host from './sections/Host';
 import HostMetrics from './sections/HostMetrics';
 import HostPlan from './sections/HostPlan';
 import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
+import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
@@ -47,6 +48,7 @@ import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
+import VirtualCards from './sections/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
@@ -529,6 +531,12 @@ class EditCollectiveForm extends React.Component {
       // Policies and moderation
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
         return <Policies collective={collective} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS:
+        return <HostVirtualCards collective={collective} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
+        return <VirtualCards collective={collective} />;
 
       default:
         return null;
