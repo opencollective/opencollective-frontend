@@ -140,7 +140,7 @@ class NewContributionFlowPage extends React.Component {
     const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
     if (contributionBlocker) {
       if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
-        return <Redirect to={`${account.slug}/contribute`} />;
+        return <Redirect to={`/${account.slug}/contribute`} />;
       }
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
