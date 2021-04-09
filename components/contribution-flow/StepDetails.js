@@ -46,6 +46,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
     ...(collective.host?.settings?.contributionFlow?.customFields || []),
   ];
   const currency = tier?.amount.currency || collective.currency;
+  const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;
 
   return (
     <Box width={1}>
@@ -56,12 +57,12 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
           mt={[4, 0]}
           mb="30px"
           items={[null, INTERVALS.month, INTERVALS.year]}
-          selected={data?.interval || null}
+          selected={selectedInterval || null}
           buttonProps={{ px: 2, py: '5px' }}
           role="group"
           aria-label="Amount types"
           onChange={interval => {
-            if (tier) {
+            if (tier && tier.interval !== INTERVALS.flexible) {
               setTemporaryInterval(interval);
             } else {
               dispatchChange('interval', interval);

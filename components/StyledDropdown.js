@@ -97,7 +97,9 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
   }
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <div
+      role="button"
       tabIndex={0}
       trigger={trigger}
       {...props}

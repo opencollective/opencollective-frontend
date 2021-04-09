@@ -163,6 +163,7 @@ const VATInputs = ({ currency, taxInfo, dispatchChange, setFormState, formState 
               {vatShortLabel}
             </Span>
             <InputTypeCountry
+              inputId="step-summary-location"
               minWidth={250}
               maxMenuHeight={100}
               onChange={code => dispatchChange({ countryISO: code, number: null })}

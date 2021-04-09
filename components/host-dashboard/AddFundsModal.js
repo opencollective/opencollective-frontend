@@ -72,8 +72,8 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $account: AccountReferenceInput!
     $amount: AmountInput!
     $description: String!
-    $hostFeePercent: Int!
-    $platformFeePercent: Int
+    $hostFeePercent: Float!
+    $platformFeePercent: Float
     $platformTip: AmountInput
   ) {
     addFunds(

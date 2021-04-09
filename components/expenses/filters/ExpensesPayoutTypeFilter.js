@@ -13,6 +13,7 @@ const ExpensesPayoutTypeFilter = ({ onChange, value, ...props }) => {
 
   return (
     <StyledSelectFilter
+      inputId="expenses-payout-type-filter"
       options={[getOption('ALL'), ...Object.values(PayoutMethodType).map(getOption)]}
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}

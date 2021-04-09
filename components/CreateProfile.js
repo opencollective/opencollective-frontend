@@ -114,7 +114,7 @@ const useForm = ({ onEmailChange, errors, formatMessage }) => {
       type: 'text',
       width: 1,
       onChange: ({ target }) => {
-        // Email state is not local so any changes should be handled seprately
+        // Email state is not local so any changes should be handled separately
         let value = target.value,
           error = null;
         if (target.name === 'email') {

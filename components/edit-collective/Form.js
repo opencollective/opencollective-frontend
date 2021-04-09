@@ -193,8 +193,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: `If your Host fee is 10% and your Collectives bring in $1,000, your Platform fee will be $15. If you host fee is 0%, your Platform fee will be 0.`,
       },
       'location.label': {
-        id: 'collective.location.label',
-        defaultMessage: 'City',
+        id: 'SectionLocation.Title',
+        defaultMessage: 'Location',
       },
       'country.label': {
         id: 'collective.country.label',
@@ -247,6 +247,14 @@ class EditCollectiveForm extends React.Component {
       'GST-number.label': {
         id: 'EditCollective.GSTNumber',
         defaultMessage: 'GST number',
+      },
+      'privateInstructions.label': {
+        id: 'event.privateInstructions.label',
+        defaultMessage: 'Private instructions',
+      },
+      privateInstructionsDescription: {
+        id: 'event.privateInstructions.description',
+        defaultMessage: 'These instructions will be provided by email to the participants.',
       },
     });
 
@@ -310,7 +318,7 @@ class EditCollectiveForm extends React.Component {
           collective['endsAt'] = endsAtValue;
         }
       } else {
-        collective[fieldname] = value;
+        set(collective, fieldname, value);
       }
 
       return { collective, modified: true };
@@ -701,6 +709,14 @@ class EditCollectiveForm extends React.Component {
           name: 'location',
           placeholder: '',
           type: 'location',
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'privateInstructions',
+          description: intl.formatMessage(this.messages.privateInstructionsDescription),
+          type: 'textarea',
+          maxLength: 10000,
+          defaultValue: collective.privateInstructions,
           when: () => collective.type === CollectiveType.EVENT,
         },
         {

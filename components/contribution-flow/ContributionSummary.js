@@ -5,6 +5,7 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { color, typography } from 'styled-system';
 
+import INTERVALS from '../../lib/constants/intervals';
 import { getNextChargeDate } from '../../lib/date-utils';
 import getPaymentMethodFees from '../../lib/fees';
 import { i18nTaxType } from '../../lib/i18n/taxes';
@@ -193,7 +194,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         </AmountLine>
       )}
       <StyledHr borderColor="black.500" my={1} />
-      {stepDetails?.interval && (
+      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.flexible && (
         <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
           <FormattedMessage
             id="ContributionSummary.NextCharge"

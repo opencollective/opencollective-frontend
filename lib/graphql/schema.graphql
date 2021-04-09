@@ -114,6 +114,11 @@ type Collective implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -406,6 +411,11 @@ input CollectiveInputType {
   tiers: [TierInputType]
   settings: JSON
   data: JSON
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   members: [MemberInputType]
   notifications: [NotificationInputType]
   HostCollectiveId: Int
@@ -462,6 +472,11 @@ interface CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -1084,6 +1099,11 @@ type Event implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -1451,6 +1471,11 @@ type Fund implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -2478,6 +2503,11 @@ type Organization implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -2857,6 +2887,11 @@ type Project implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -3706,6 +3741,11 @@ type User implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -3989,6 +4029,11 @@ type Vendor implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String

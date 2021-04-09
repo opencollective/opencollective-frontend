@@ -8,7 +8,7 @@ import Container from './Container';
 import { Box } from './Grid';
 import InputField from './InputField';
 import StyledLink from './StyledLink';
-import { Label } from './Text';
+import { Label, Strong } from './Text';
 
 const ParameterColumnHeader = styled.th`
   font-size: 12px;
@@ -137,9 +137,9 @@ class ExportImages extends React.Component {
                   {image.code}
                 </Container>
                 <Container fontSize="14px" mt={3}>
-                  <label>
+                  <Strong>
                     <FormattedMessage id="export.json.parameters.title" defaultMessage="Parameters" />
-                  </label>
+                  </Strong>
                   <Container as="table" width="100%" css={{ borderSpacing: 16 }}>
                     <tbody>
                       <tr>

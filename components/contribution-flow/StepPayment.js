@@ -92,6 +92,7 @@ const StepPayment = ({
   hideCreditCardPostalCode,
   onNewCardFormReady,
   setBraintree,
+  hasNewPaypal,
 }) => {
   // GraphQL mutations and queries
   const { loading, data, error } = useQuery(paymentMethodsQuery, {
@@ -106,8 +107,17 @@ const StepPayment = ({
   const isRoot = Boolean(LoggedInUser?.isRoot());
   const paymentMethods = get(data, 'account.paymentMethods', null) || [];
   const paymentOptions = React.useMemo(
-    () => generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective, isRoot),
-    [paymentMethods, stepProfile, stepDetails, collective, isRoot],
+    () =>
+      generatePaymentMethodOptions(
+        paymentMethods,
+        stepProfile,
+        stepDetails,
+        stepSummary,
+        collective,
+        isRoot,
+        hasNewPaypal,
+      ),
+    [paymentMethods, stepProfile, stepDetails, collective, isRoot, hasNewPaypal],
   );
 
   const setNewPaymentMethod = (key, paymentMethod) => {
@@ -214,6 +224,7 @@ StepPayment.propTypes = {
   onNewCardFormReady: PropTypes.func,
   setBraintree: PropTypes.func,
   hideCreditCardPostalCode: PropTypes.bool,
+  hasNewPaypal: PropTypes.bool,
 };
 
 StepPayment.defaultProps = {

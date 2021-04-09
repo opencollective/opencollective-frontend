@@ -84,11 +84,7 @@ class ContributionFlow extends React.Component {
         slug: PropTypes.string,
       }),
     }).isRequired,
-    host: PropTypes.shape({
-      plan: PropTypes.shape({
-        platformTips: PropTypes.bool,
-      }),
-    }).isRequired,
+    host: PropTypes.object.isRequired,
     tier: PropTypes.object,
     intl: PropTypes.object,
     createOrder: PropTypes.func.isRequired,
@@ -98,6 +94,7 @@ class ContributionFlow extends React.Component {
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
+    hasNewPaypal: PropTypes.bool,
     isEmbed: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
@@ -257,7 +254,7 @@ class ContributionFlow extends React.Component {
   getPaymentMethod = async () => {
     const { stepPayment, stripe } = this.state;
 
-    if (stepPayment.key === BRAINTREE_KEY) {
+    if (stepPayment?.key === BRAINTREE_KEY) {
       return new Promise((resolve, reject) => {
         this.state.braintree.requestPaymentMethod((requestPaymentMethodErr, payload) => {
           if (requestPaymentMethodErr) {
@@ -283,7 +280,14 @@ class ContributionFlow extends React.Component {
         creditCardInfo: { token: pm.token, ...pm.data },
       };
     } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
-      return pick(stepPayment.paymentMethod, ['type', 'paypalInfo.token', 'paypalInfo.data']);
+      return pick(stepPayment.paymentMethod, [
+        'type',
+        'paypalInfo.token',
+        'paypalInfo.data',
+        'paypalInfo.isNewApi',
+        'paypalInfo.orderId',
+        'paypalInfo.subscriptionId',
+      ]);
     } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER) {
       return pick(stepPayment.paymentMethod, ['type']);
     }
@@ -389,6 +393,7 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
+        'hasNewPaypal',
       ]),
       ...queryParams,
     };
@@ -437,7 +442,7 @@ class ContributionFlow extends React.Component {
   getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
   canHaveFeesOnTop() {
-    if (!this.props.collective.platformContributionAvailable || !this.props.host.plan.platformTips) {
+    if (!this.props.collective.platformContributionAvailable) {
       return false;
     } else if (this.props.tier?.type === TierTypes.TICKET) {
       return false;
@@ -516,15 +521,34 @@ class ContributionFlow extends React.Component {
   getPaypalButtonProps({ currency }) {
     const { stepPayment, stepDetails, stepSummary } = this.state;
     if (stepPayment?.paymentMethod?.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
-      const { host } = this.props;
+      const { host, collective, tier } = this.props;
       return {
         host: host,
+        collective,
+        tier,
         currency: currency,
         style: { size: 'responsive', height: 47 },
         totalAmount: getTotalAmount(stepDetails, stepSummary),
+        interval: stepDetails?.interval,
         onClick: () => this.setState({ isSubmitting: true }),
         onCancel: () => this.setState({ isSubmitting: false }),
         onError: e => this.setState({ isSubmitting: false, error: `PayPal error: ${e.message}` }),
+        // New callback, used by `PayWithPaypalButton`
+        onSuccess: paypalInfo => {
+          this.setState(
+            state => ({
+              stepPayment: {
+                ...state.stepPayment,
+                paymentMethod: {
+                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
+                  paypalInfo: { isNewApi: true, ...paypalInfo },
+                },
+              },
+            }),
+            this.submitOrder,
+          );
+        },
+        // Old callback, used by `PayWithPaypalLegacyButton`
         onAuthorize: pm => {
           this.setState(
             state => ({
@@ -664,6 +688,7 @@ class ContributionFlow extends React.Component {
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
+                    hasNewPaypal={this.props.hasNewPaypal}
                   />
 
                   <Box mt={40}>
@@ -678,6 +703,7 @@ class ContributionFlow extends React.Component {
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
                       disableNext={stepPayment?.key === 'braintree' && !stepPayment.isReady}
+                      hasNewPaypal={this.props.hasNewPaypal}
                     />
                   </Box>
                 </Box>
