@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
+import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
@@ -20,6 +21,7 @@ import { getSettingsRoute } from '../../lib/url_helpers';
 import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
+import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
@@ -324,6 +326,23 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         />
                       </MenuItem>
                     )}
+                    {callsToAction.assignVirtualCard && (
+                      <AssignVirtualCardBtn collective={collective} host={collective.host}>
+                        {btnProps => (
+                          <MenuItem
+                            py={1}
+                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
+                          >
+                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                              <CreditCard size="20px" />
+                              <Span>
+                                <FormattedMessage id="menu.assignCard" defaultMessage="Assign a Card" />
+                              </Span>
+                            </StyledButton>
+                          </MenuItem>
+                        )}
+                      </AssignVirtualCardBtn>
+                    )}
                   </Box>
                 </DropdownContent>
               </div>
@@ -367,6 +386,8 @@ CollectiveNavbarActionsMenu.propTypes = {
     addFunds: PropTypes.bool,
     /** Add prepaid budget to an organization */
     addPrepaidBudget: PropTypes.bool,
+    /** Add new card to Collective */
+    assignVirtualCard: PropTypes.bool,
     /** Button to Edit the Collective */
     hasSettings: PropTypes.bool,
   }).isRequired,

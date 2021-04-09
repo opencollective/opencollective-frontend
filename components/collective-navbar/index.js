@@ -230,6 +230,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, is
     hasRequestGrant: isFund || get(settings, 'fundingRequest') === true,
     addPrepaidBudget: isRoot && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
+    assignVirtualCard: isHostAdmin,
     hasSettings: isAdmin,
   };
 };
