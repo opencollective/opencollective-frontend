@@ -221,6 +221,7 @@ interface Account {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
 }
 
 """
@@ -740,6 +741,7 @@ type Bot implements Account {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
 }
 
 input BraintreePaymentInput {
@@ -991,6 +993,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
 
   """
   Returns the Fiscal Host
@@ -3165,6 +3168,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
 
   """
   Returns the Fiscal Host
@@ -3235,7 +3239,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   contributionPolicy: String
 
   """
-  The Collective hosting this Event
+  The Account hosting this Event
   """
   parent: Account
 
@@ -4068,6 +4072,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
 
   """
   Returns the Fiscal Host
@@ -4379,6 +4384,7 @@ type Host implements Account & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
 
   """
   Number of unique financial contributors.
@@ -4489,6 +4495,7 @@ type Host implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): HostApplicationCollection!
+  hostedVirtualCards: [VirtualCard]
 }
 
 type HostApplication {
@@ -4903,6 +4910,7 @@ type Individual implements Account {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
   firstName: String @deprecated(reason: "2020-10-12: Use the name field")
   lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
@@ -5701,6 +5709,51 @@ type Mutation {
   publishUpdate(id: String!, notificationAudience: UpdateAudience!): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
+
+  """
+  Assign new Virtual Card information to existing hosted collective
+  """
+  assignNewVirtualCard(
+    """
+    Virtual Card data
+    """
+    virtualCard: VirtualCardInput!
+
+    """
+    Account where the virtual card will be associated
+    """
+    account: AccountReferenceInput!
+  ): VirtualCard!
+
+  """
+  Pause active Virtual Card
+  """
+  pauseVirtualCard(
+    """
+    Virtual Card reference
+    """
+    virtualCard: VirtualCardReferenceInput!
+  ): VirtualCard!
+
+  """
+  Resume paused Virtual Card
+  """
+  resumeVirtualCard(
+    """
+    Virtual Card reference
+    """
+    virtualCard: VirtualCardReferenceInput!
+  ): VirtualCard!
+
+  """
+  Delete Virtual Card
+  """
+  deleteVirtualCard(
+    """
+    Virtual Card reference
+    """
+    virtualCard: VirtualCardReferenceInput!
+  ): Boolean
 }
 
 input NewAccountOrganizationInput {
@@ -6169,6 +6222,7 @@ type Organization implements Account & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
 
   """
   Number of unique financial contributors.
@@ -6686,6 +6740,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
 
   """
   Returns the Fiscal Host
@@ -6756,7 +6811,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   contributionPolicy: String
 
   """
-  The Fund hosting this Project
+  The Account hosting this Project
   """
   parent: Account
 }
@@ -7755,6 +7810,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
+  virtualCards: [VirtualCard]
 
   """
   Returns the Fiscal Host
@@ -7830,13 +7886,24 @@ VirtualCard related properties.
 """
 type VirtualCard {
   id: String
-  CollectiveId: Int
-  HostCollectiveId: Int
+  account: Account
+  host: Account
   name: String
   last4: String
   data: JSONObject
   privateData: JSONObject
   createdAt: DateTime
   updatedAt: DateTime
-  deletedAt: DateTime
+}
+
+input VirtualCardInput {
+  id: String
+  name: String
+  last4: String
+  data: JSONObject
+  privateData: JSONObject
+}
+
+input VirtualCardReferenceInput {
+  id: String
 }
