@@ -88,7 +88,7 @@ const WhatCanYouDo = () => {
           <NextIllustration
             width={558}
             height={418}
-            src="/static/images/home/collectmoney-illustration-md.png"
+            src="/static/images/home/original/collectmoney-illustration-lg.png"
             display={['block', null, null, 'none']}
             alt="Collect money"
           />
@@ -119,7 +119,7 @@ const WhatCanYouDo = () => {
           <NextIllustration
             width={558}
             height={429}
-            src="/static/images/home/spendmoney-illustration-md.png"
+            src="/static/images/home/original/spendmoney-illustration-lg.png"
             display={['block', null, null, 'none']}
             alt="Spend money"
           />
@@ -150,7 +150,7 @@ const WhatCanYouDo = () => {
           <NextIllustration
             width={558}
             height={350}
-            src="/static/images/home/managemoney-illustration-md.png"
+            src="/static/images/home/original/managemoney-illustration-lg.png"
             alt="Manage money"
             display={['block', null, null, 'none']}
           />

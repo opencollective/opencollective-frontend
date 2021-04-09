@@ -242,22 +242,12 @@ const Feature = ({ id, learnMoreLink, intl }) => (
       <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', 'block']} />
     </Container>
     <Container width={[null, '392px', '466px', null, '756px']}>
-      <Box display={['none', 'block']}>
-        <NextIllustration
-          width={756}
-          height={575}
-          src={`/static/images/home/${id}-screenshot.png`}
-          alt={intl.formatMessage(messages[`home.feature.${id}`])}
-        />
-      </Box>
-      <Box display={['block', 'none']}>
-        <NextIllustration
-          width={756}
-          height={575}
-          src={`/static/images/home/${id}-screenshot-sm.png`}
-          alt={intl.formatMessage(messages[`home.feature.${id}`])}
-        />
-      </Box>
+      <NextIllustration
+        width={756}
+        height={575}
+        src={`/static/images/home/${id}-screenshot.png`}
+        alt={intl.formatMessage(messages[`home.feature.${id}`])}
+      />
     </Container>
     <FeatureDescription intl={intl} id={id} learnMoreLink={learnMoreLink} display={['block', 'none']} mt={2} />
   </Container>
