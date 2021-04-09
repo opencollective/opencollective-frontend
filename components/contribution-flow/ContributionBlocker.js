@@ -49,7 +49,6 @@ const msg = defineMessages({
 /**
  * From received params, see if there's anything preventing the contribution
  */
-
 export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier) => {
   if (!account.host) {
     return { reason: CONTRIBUTION_BLOCKER.NO_HOST };
