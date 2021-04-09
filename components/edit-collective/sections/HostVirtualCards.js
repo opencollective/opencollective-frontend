@@ -22,6 +22,8 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
       legacyId
       slug
       supportedPayoutMethods
+      name
+      imageUrl
       hostedVirtualCards {
         id
         name

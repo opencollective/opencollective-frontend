@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
+import { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import { Box, Grid } from '../Grid';
@@ -113,6 +114,13 @@ const AssignVirtualCardModal = props => {
                   id="collective"
                   collective={formik.values.collective}
                   isDisabled={!!props.collective}
+                  customOptions={[
+                    {
+                      value: props.host,
+                      label: props.host.name,
+                      [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
+                    },
+                  ]}
                   onChange={option => formik.setFieldValue('collective', option.value)}
                 />
               )}
@@ -241,6 +249,11 @@ AssignVirtualCardModal.propTypes = {
   onSuccess: PropTypes.func,
   host: PropTypes.shape({
     legacyId: PropTypes.number,
+    slug: PropTypes.string,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    type: PropTypes.string,
+    name: PropTypes.string,
+    imageUrl: PropTypes.string,
   }).isRequired,
   collective: PropTypes.shape({
     slug: PropTypes.string,
