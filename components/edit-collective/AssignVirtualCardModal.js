@@ -88,17 +88,17 @@ const AssignVirtualCardModal = props => {
     <Modal width="382px" onClose={handleClose} trapFocus {...props}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={props.onClose}>
-          <FormattedMessage id="Host.VirtualCards.AddNewCard" defaultMessage="Add New Card" />
+          <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
         </ModalHeader>
         <ModalBody pt={2}>
           <P>
             <FormattedMessage
-              id="Host.VirtualCards.AddNewCard.Description"
-              defaultMessage="Create a new card using Privacy.com and fill up the information below."
+              id="Host.VirtualCards.AssignCard.Description"
+              defaultMessage="Assign existing card to a collective sharing the private information below."
             />
           </P>
           <StyledHr borderColor="black.300" mt={3} />
-          <Grid mt={3} gridTemplateColumns={['100%', 'repeat(2, 1fr)']} gridGap={[null, '26px 8px']}>
+          <Grid mt={3} gridTemplateColumns="repeat(2, 1fr)" gridGap="26px 8px">
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"

@@ -56,7 +56,9 @@ const HostVirtualCards = props => {
   const handleSucess = () => {
     addToast({
       type: TOAST_TYPE.SUCCESS,
-      message: <FormattedMessage id="Host.VirtualCards.AddNewCard.Success" defaultMessage="Card successfully added" />,
+      message: (
+        <FormattedMessage id="Host.VirtualCards.AssignCard.Success" defaultMessage="Card successfully assigned" />
+      ),
     });
     setAssignCardModalDisplay(false);
     refetch();
@@ -98,7 +100,7 @@ const HostVirtualCards = props => {
             +
           </StyledButton>
           <Box mt="10px">
-            <FormattedMessage id="Host.VirtualCards.AddNewCard" defaultMessage="Add New Card" />
+            <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
           </Box>
         </AddCardPlaceholder>
         {data.host.hostedVirtualCards.map(vc => (

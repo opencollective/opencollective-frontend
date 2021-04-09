@@ -17,6 +17,7 @@ import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const CardContainer = styled(Flex)`
   border: 1px solid #dcdee0;
@@ -265,10 +266,16 @@ ActionsButton.propTypes = {
 const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
 
+  const { addToast } = useToasts();
+
   const name = props.name || '';
   const cardNumber = `****  ****  ****  ${props.last4}`;
   const handleCopy = value => () => {
     navigator.clipboard.writeText(value);
+    addToast({
+      type: TOAST_TYPE.SUCCESS,
+      message: <FormattedMessage id="VirtualCards.InfoCopied" defaultMessage="Copied!" />,
+    });
   };
 
   return (
