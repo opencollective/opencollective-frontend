@@ -220,6 +220,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       {...props}
       trapFocus
       showPlatformTipModal={fundDetails.showPlatformTipModal}
+      onClose={handleClose}
     >
       <CollectiveModalHeader collective={collective} onClick={handleClose} />
       <Formik
