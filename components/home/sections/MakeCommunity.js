@@ -114,8 +114,7 @@ const MakeCommunity = () => {
             width={558}
             height={448}
             alt="Make your community sustainable"
-            src="/static/images/home/makecommunity-section-illustration.png"
-            display={['none', null, 'block']}
+            src="/static/images/home/original/makecommunity-section-illustration.png"
           />
         </Flex>
       </Flex>
@@ -144,8 +143,7 @@ const MakeCommunity = () => {
             width={696}
             height={396}
             alt="Make your community sustainable"
-            src="/static/images/home/whatisgreataboutOC-Illustration-sm.png"
-            display={[null, 'none']}
+            src="/static/images/home/whatisgreataboutOC-Illustration-2x.png"
           />
         </Box>
         <Box width={['288px', '224px', '396px']}>
