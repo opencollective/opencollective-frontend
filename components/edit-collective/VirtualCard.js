@@ -94,6 +94,17 @@ const Arrow = styled.div`
   }
 `;
 
+const StateLabel = styled(Box)`
+  align-self: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: ${props => (props.isActive ? props.theme.colors.green[500] : props.theme.colors.black[500])};
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 12px;
+`;
+
 const pauseCardMutation = gqlV2/* GraphQL */ `
   mutation PauseVirtualCard($virtualCard: VirtualCardReferenceInput!) {
     pauseVirtualCard(virtualCard: $virtualCard) {
@@ -266,9 +277,7 @@ const VirtualCard = props => {
       <Box flexGrow={1} m="24px 24px 0 24px">
         <Flex fontSize="16px" lineHeight="24px" fontWeight="500" justifyContent="space-between">
           <Box>{name}</Box>
-          <Box fontSize="13px" lineHeight="24px" verticalAlign="middle">
-            {props.data.state}
-          </Box>
+          <StateLabel isActive={props.data.state === 'OPEN'}>{props.data.state}</StateLabel>
         </Flex>
         {displayDetails ? (
           <React.Fragment>
