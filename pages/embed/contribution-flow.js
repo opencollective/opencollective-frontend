@@ -147,9 +147,9 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBLocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
-    if (contributionBLocker) {
-      return <ContributionBlocker blocker={contributionBLocker} account={account} />;
+    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    if (contributionBlocker) {
+      return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
       return <ContributionFlowSuccess collective={account} isEmbed />;
     } else {
