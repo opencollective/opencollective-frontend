@@ -504,7 +504,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     </P>
                     <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
                       <Flex alignItems="center">
-                        <Illustration />
+                        <Illustration alt="" />
                         <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
                           <FormattedMessage
                             id="AddFundsModal.thankYou"

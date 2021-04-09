@@ -3540,7 +3540,9 @@ type TierStatsType {
   totalDonated: Int
 
   """
-  How much money is given for this tier for each tier.interval (monthly/yearly)
+  How much money is given for this tier for each tier.interval (monthly/yearly).
+  For flexible tiers, this amount is a monthly average of contributions amount,
+  taking into account both yearly and monthly subscriptions.
   """
   totalRecurringDonations: Int
 
