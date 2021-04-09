@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { alignSelf, height, width } from 'styled-system';
+import { alignSelf, height, margin, verticalAlign, width } from 'styled-system';
 
 import { cursor } from '../../lib/styled-system-custom-properties';
 
@@ -14,6 +14,8 @@ const StyledSVG = styled.svg`
   ${height};
   ${width};
   ${cursor};
+  ${verticalAlign};
+  ${margin};
 `;
 
 /**
