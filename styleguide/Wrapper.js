@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
+import {Elements} from "@stripe/react-stripe-js";
+import {loadStripe} from "@stripe/stripe-js";
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
 import { initClient } from '../lib/apollo-client';
 import theme from '../lib/theme';
 
-import StripeProvider from '../components/StripeProvider';
 import UserProvider from '../components/UserProvider';
 
 import 'trix/dist/trix.css';
@@ -31,11 +32,11 @@ export default class ThemeWrapper extends Component {
     return (
       <ThemeProvider theme={theme}>
         <IntlProvider locale="en">
-          <StripeProvider token={STRIPE_KEY} loadOnMount>
+          <Elements stripe={loadStripe(STRIPE_KEY)}>
             <ApolloProvider client={initClient({ graphqlUrl: this.getGraphqlUrl() })}>
               <UserProvider skipRouteCheck>{this.props.children}</UserProvider>
             </ApolloProvider>
-          </StripeProvider>
+          </Elements>
         </IntlProvider>
       </ThemeProvider>
     );

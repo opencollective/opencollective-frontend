@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -9,7 +10,7 @@ import { maxWidth } from 'styled-system';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { subscriptionsQuery } from '../lib/graphql/queries';
-import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
+import { stripeTokenToPaymentMethod } from '../lib/stripe';
 import { compose } from '../lib/utils';
 
 import Container from '../components/Container';
@@ -21,7 +22,6 @@ import Loading from '../components/Loading';
 import NewCreditCardForm from '../components/NewCreditCardForm';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import { withStripeLoader } from '../components/StripeProvider';
 import StyledButton from '../components/StyledButton';
 import { H1, H5 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -43,277 +43,257 @@ const AlignedBullets = styled.ul`
   width: max-content;
 `;
 
-class UpdatePaymentPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, id } }) {
-    return { slug: collectiveSlug, id: Number(id) };
-  }
+function UpdatePaymentPage(props) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [showCreditCardForm, setShowCreditCardForm] = useState(true);
+  const [newCreditCardInfo, setNewCreditCardInfo] = useState({});
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  static propTypes = {
-    collective: PropTypes.object,
-    slug: PropTypes.string,
-    id: PropTypes.number,
-    LoggedInUser: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
-    data: PropTypes.object,
-    subscriptions: PropTypes.array,
-    intl: PropTypes.object.isRequired,
-    replaceCreditCard: PropTypes.func.isRequired,
-    loadStripe: PropTypes.func.isRequired,
-  };
+  const replaceCreditCard = async () => {
+    const data = newCreditCardInfo.value;
 
-  state = {
-    showCreditCardForm: true,
-    newCreditCardInfo: {},
-    error: null,
-    stripe: null,
-    submitting: false,
-    success: false,
-  };
-
-  componentDidMount() {
-    this.props.loadStripe();
-  }
-
-  replaceCreditCard = async () => {
-    const data = get(this.state, 'newCreditCardInfo.value');
-
-    if (!data || !this.state.stripe) {
-      this.setState({
-        error: 'There was a problem initializing the payment form',
-        submitting: false,
-        showCreditCardForm: false,
-      });
+    if (!data || !stripe) {
+      setError('There was a problem initializing the payment form');
+      setSubmitting(false);
+      setShowCreditCardForm(false);
     } else if (data.error) {
-      this.setState({ error: data.error.message, submitting: false, showCreditCardForm: false });
+      setError(data.error.message);
+      setSubmitting(false);
+      setShowCreditCardForm(false);
     } else {
       try {
-        this.setState({ submitting: true });
-        const { token, error } = await this.state.stripe.createToken();
+        setSubmitting(true);
+        const cardElement = elements.getElement(CardElement);
+        const { token, error } = await elements.createToken(cardElement);
         if (error) {
-          this.setState({ error: 'There was a problem with Stripe.', submitting: false, showCreditCardForm: false });
+          setError('There was a problem with Stripe.');
+          setSubmitting(false);
+          setShowCreditCardForm(false);
           throw error;
         }
         const paymentMethod = stripeTokenToPaymentMethod(token);
-        const res = await this.props.replaceCreditCard({
+        const res = await props.replaceCreditCard({
           variables: {
-            CollectiveId: this.props.LoggedInUser.collective.id,
+            CollectiveId: props.LoggedInUser.collective.id,
             ...paymentMethod,
-            id: parseInt(this.props.id),
+            id: parseInt(props.id),
           },
         });
         const updatedCreditCard = res.data.replaceCreditCard;
 
         if (updatedCreditCard.stripeError) {
-          this.handleStripeError(updatedCreditCard.stripeError);
+          handleStripeError(updatedCreditCard.stripeError);
         } else {
-          this.handleSuccess();
+          handleSuccess();
         }
       } catch (e) {
         const message = e.message;
-        this.setState({ error: message, submitting: false, showCreditCardForm: false });
+        setError(message);
+        setSubmitting(false);
+        setShowCreditCardForm(false);
       }
     }
   };
 
-  handleSuccess = () => {
-    this.setState({
-      showCreditCardForm: false,
-      showManualPaymentMethodForm: false,
-      error: null,
-      newCreditCardInfo: {},
-      submitting: false,
-      success: true,
-    });
+  const handleSuccess = () => {
+    setShowCreditCardForm(false);
+    setError(null);
+    setNewCreditCardInfo({});
+    setSubmitting(false);
+    setSuccess(true);
   };
 
-  handleReload = () => {
-    this.props.data.refetch();
-    this.setState({
-      showCreditCardForm: true,
-      showManualPaymentMethodForm: false,
-      error: null,
-      newCreditCardInfo: null,
-      submitting: false,
-    });
+  const handleReload = () => {
+    props.data.refetch();
+    setShowCreditCardForm(true);
+    setError(null);
+    setNewCreditCardInfo(null);
+    setSubmitting(false);
   };
 
-  handleStripeError = async ({ message, response }) => {
+  const handleStripeError = async ({ message, response }) => {
     if (!response) {
-      this.setState({ error: message, submitting: false, showCreditCardForm: false });
+      setError(message);
+      setSubmitting(false);
+      setShowCreditCardForm(false);
       return;
     }
-
-    if (response.setupIntent) {
-      const stripe = await getStripe();
-      const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
-      if (result.error) {
-        this.setState({ submitting: false, error: result.error.message, showCreditCardForm: false });
-      }
-      if (result.setupIntent && result.setupIntent.status === 'succeeded') {
-        this.handleSuccess();
-      }
-    }
   };
 
-  render() {
-    const { showCreditCardForm, submitting, error, success } = this.state;
-    const { LoggedInUser, loadingLoggedInUser, data } = this.props;
+  const { LoggedInUser, loadingLoggedInUser, data } = props;
 
-    if (!LoggedInUser && !loadingLoggedInUser) {
-      return (
-        <Page>
-          <Flex justifyContent="center" p={5}>
-            <SignInOrJoinFree />
-          </Flex>
-        </Page>
-      );
-    } else if (loadingLoggedInUser || (data && data.loading)) {
-      return (
-        <Page>
-          <Flex justifyContent="center" py={6}>
-            <Loading />
-          </Flex>
-        </Page>
-      );
-    } else if (!data) {
-      return <ErrorPage />;
-    } else if (data && data.error) {
-      return <ErrorPage data={data} />;
-    }
-
-    const filteredSubscriptions = this.props.subscriptions.filter(
-      sub => sub.paymentMethod && sub.paymentMethod.id === this.props.id,
-    );
-
+  if (!LoggedInUser && !loadingLoggedInUser) {
     return (
-      <div className="UpdatedPaymentMethodPage">
-        <Page>
-          <Flex alignItems="center" flexDirection="column">
-            <HappyBackground>
-              <Box mt={5}>
-                <H1 color="white.full" fontSize={['3rem', null, '4rem']} textAlign="center">
-                  <FormattedMessage id="updatePaymentMethod.title" defaultMessage="Update Payment Method" />
-                </H1>
-              </Box>
+      <Page>
+        <Flex justifyContent="center" p={5}>
+          <SignInOrJoinFree />
+        </Flex>
+      </Page>
+    );
+  } else if (loadingLoggedInUser || (data && data.loading)) {
+    return (
+      <Page>
+        <Flex justifyContent="center" py={6}>
+          <Loading />
+        </Flex>
+      </Page>
+    );
+  } else if (!data) {
+    return <ErrorPage />;
+  } else if (data && data.error) {
+    return <ErrorPage data={data} />;
+  }
 
-              <Box mt={3}>
-                <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
-                  <Box>
-                    <FormattedMessage
-                      id="updatePaymentMethod.subtitle.line"
-                      defaultMessage="Please add a new payment method for the following subscriptions before your current one expires."
-                    />
-                  </Box>
-                </Subtitle>
-              </Box>
+  const filteredSubscriptions = props.subscriptions.filter(
+    sub => sub.paymentMethod && sub.paymentMethod.id === props.id,
+  );
 
-              <Box mt={3}>
-                <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
-                  <Box alignItems="left">
-                    <AlignedBullets>
-                      {filteredSubscriptions.map(sub => {
-                        return (
-                          <li key={sub.id}>
-                            {sub.collective.name}:{' '}
-                            {formatCurrency(sub.totalAmount, sub.currency, {
-                              precision: 2,
-                            })}{' '}
-                            ({sub.interval}ly)
-                          </li>
-                        );
-                      })}
-                    </AlignedBullets>
-                  </Box>
-                </Subtitle>
-              </Box>
-            </HappyBackground>
-            <Flex alignItems="center" flexDirection="column" mt={-175} mb={4}>
-              <Container mt={54} zIndex={2}>
-                <Flex justifyContent="center" alignItems="center" flexDirection="column">
-                  <Container background="white" borderRadius="16px" maxWidth="600px">
-                    <ShadowBox py="24px" px="32px" minWidth="500px">
-                      {showCreditCardForm && (
-                        <Box mr={2} css={{ flexGrow: 1 }}>
-                          <NewCreditCardForm
-                            name="newCreditCardInfo"
-                            profileType={get(this.props.collective, 'type')}
-                            hasSaveCheckBox={false}
-                            onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
-                            onReady={({ stripe }) => this.setState({ stripe })}
-                          />
-                        </Box>
-                      )}
-                      {!showCreditCardForm && error}
-                      {!showCreditCardForm && success && (
-                        <FormattedMessage
-                          id="updatePaymentMethod.form.success"
-                          defaultMessage="Your new card info has been added"
-                        />
-                      )}
-                    </ShadowBox>
-                  </Container>
-                  <Flex mt={5} mb={4} px={2} flexDirection="column" alignItems="center">
+  return (
+    <div className="UpdatedPaymentMethodPage">
+      <Page>
+        <Flex alignItems="center" flexDirection="column">
+          <HappyBackground>
+            <Box mt={5}>
+              <H1 color="white.full" fontSize={['3rem', null, '4rem']} textAlign="center">
+                <FormattedMessage id="updatePaymentMethod.title" defaultMessage="Update Payment Method" />
+              </H1>
+            </Box>
+
+            <Box mt={3}>
+              <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                <Box>
+                  <FormattedMessage
+                    id="updatePaymentMethod.subtitle.line"
+                    defaultMessage="Please add a new payment method for the following subscriptions before your current one expires."
+                  />
+                </Box>
+              </Subtitle>
+            </Box>
+
+            <Box mt={3}>
+              <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                <Box alignItems="left">
+                  <AlignedBullets>
+                    {filteredSubscriptions.map(sub => {
+                      return (
+                        <li key={sub.id}>
+                          {sub.collective.name}:{' '}
+                          {formatCurrency(sub.totalAmount, sub.currency, {
+                            precision: 2,
+                          })}{' '}
+                          ({sub.interval}ly)
+                        </li>
+                      );
+                    })}
+                  </AlignedBullets>
+                </Box>
+              </Subtitle>
+            </Box>
+          </HappyBackground>
+          <Flex alignItems="center" flexDirection="column" mt={-175} mb={4}>
+            <Container mt={54} zIndex={2}>
+              <Flex justifyContent="center" alignItems="center" flexDirection="column">
+                <Container background="white" borderRadius="16px" maxWidth="600px">
+                  <ShadowBox py="24px" px="32px" minWidth="500px">
                     {showCreditCardForm && (
+                      <Box mr={2} css={{ flexGrow: 1 }}>
+                        <NewCreditCardForm
+                          name="newCreditCardInfo"
+                          profileType={get(props.collective, 'type')}
+                          hasSaveCheckBox={false}
+                          onChange={newCreditCardInfo => {
+                            setNewCreditCardInfo(newCreditCardInfo);
+                            setError(null);
+                          }}
+                        />
+                      </Box>
+                    )}
+                    {!showCreditCardForm && error}
+                    {!showCreditCardForm && success && (
+                      <FormattedMessage
+                        id="updatePaymentMethod.form.success"
+                        defaultMessage="Your new card info has been added"
+                      />
+                    )}
+                  </ShadowBox>
+                </Container>
+                <Flex mt={5} mb={4} px={2} flexDirection="column" alignItems="center">
+                  {showCreditCardForm && (
+                    <StyledButton
+                      buttonStyle="primary"
+                      buttonSize="large"
+                      mb={2}
+                      maxWidth={335}
+                      width={1}
+                      type="submit"
+                      onClick={replaceCreditCard}
+                      disabled={submitting}
+                      loading={submitting}
+                      textTransform="capitalize"
+                    >
+                      <FormattedMessage id="updatePaymentMethod.form.updatePaymentMethod.btn" defaultMessage="update" />
+                    </StyledButton>
+                  )}
+                  {!showCreditCardForm && error && (
+                    <StyledButton
+                      buttonStyle="primary"
+                      buttonSize="large"
+                      mb={2}
+                      maxWidth={335}
+                      width={1}
+                      onClick={handleReload}
+                    >
+                      <FormattedMessage
+                        id="updatePaymentMethod.form.updatePaymentMethodError.btn"
+                        defaultMessage="Try again"
+                      />
+                    </StyledButton>
+                  )}
+                  {!showCreditCardForm && success && (
+                    <Link href={`/${props.slug}`}>
                       <StyledButton
                         buttonStyle="primary"
                         buttonSize="large"
                         mb={2}
                         maxWidth={335}
                         width={1}
-                        type="submit"
-                        onClick={this.replaceCreditCard}
-                        disabled={submitting}
-                        loading={submitting}
                         textTransform="capitalize"
                       >
                         <FormattedMessage
-                          id="updatePaymentMethod.form.updatePaymentMethod.btn"
-                          defaultMessage="update"
+                          id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
+                          defaultMessage="Go to profile page"
                         />
                       </StyledButton>
-                    )}
-                    {!showCreditCardForm && error && (
-                      <StyledButton
-                        buttonStyle="primary"
-                        buttonSize="large"
-                        mb={2}
-                        maxWidth={335}
-                        width={1}
-                        onClick={this.handleReload}
-                      >
-                        <FormattedMessage
-                          id="updatePaymentMethod.form.updatePaymentMethodError.btn"
-                          defaultMessage="Try again"
-                        />
-                      </StyledButton>
-                    )}
-                    {!showCreditCardForm && success && (
-                      <Link href={`/${this.props.slug}`}>
-                        <StyledButton
-                          buttonStyle="primary"
-                          buttonSize="large"
-                          mb={2}
-                          maxWidth={335}
-                          width={1}
-                          textTransform="capitalize"
-                        >
-                          <FormattedMessage
-                            id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
-                            defaultMessage="Go to profile page"
-                          />
-                        </StyledButton>
-                      </Link>
-                    )}
-                  </Flex>
+                    </Link>
+                  )}
                 </Flex>
-              </Container>
-            </Flex>
+              </Flex>
+            </Container>
           </Flex>
-        </Page>
-      </div>
-    );
-  }
+        </Flex>
+      </Page>
+    </div>
+  );
 }
+
+UpdatePaymentPage.getInitialProps = async ({ query: { collectiveSlug, id } }) => {
+  return { slug: collectiveSlug, id: Number(id) };
+};
+
+UpdatePaymentPage.propTypes = {
+  collective: PropTypes.object,
+  slug: PropTypes.string,
+  id: PropTypes.number,
+  LoggedInUser: PropTypes.object,
+  loadingLoggedInUser: PropTypes.bool,
+  data: PropTypes.object,
+  subscriptions: PropTypes.array,
+  intl: PropTypes.object.isRequired,
+  replaceCreditCard: PropTypes.func.isRequired,
+};
 
 const replaceCreditCardMutation = gql`
   mutation ReplaceCreditCard(
@@ -362,4 +342,4 @@ const addSubscriptionsData = graphql(subscriptionsQuery, {
 
 const addGraphql = compose(addSubscriptionsData, addReplaceCreditCardMutation);
 
-export default injectIntl(withUser(addGraphql(withStripeLoader(UpdatePaymentPage))));
+export default injectIntl(withUser(addGraphql(UpdatePaymentPage)));

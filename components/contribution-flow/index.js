@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
+import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { find, get, intersection, isEmpty, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
@@ -17,7 +18,7 @@ import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/erro
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
-import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
@@ -74,75 +75,41 @@ const STEP_LABELS = defineMessages({
   },
 });
 
-class ContributionFlow extends React.Component {
-  static propTypes = {
-    collective: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-      currency: PropTypes.string.isRequired,
-      platformContributionAvailable: PropTypes.bool,
-      parent: PropTypes.shape({
-        slug: PropTypes.string,
-      }),
-    }).isRequired,
-    host: PropTypes.object.isRequired,
-    tier: PropTypes.object,
-    intl: PropTypes.object,
-    createOrder: PropTypes.func.isRequired,
-    confirmOrder: PropTypes.func.isRequired,
-    fixedInterval: PropTypes.string,
-    fixedAmount: PropTypes.number,
-    platformContribution: PropTypes.number,
-    skipStepDetails: PropTypes.bool,
-    loadingLoggedInUser: PropTypes.bool,
-    hasNewPaypal: PropTypes.bool,
-    isEmbed: PropTypes.bool,
-    step: PropTypes.string,
-    redirect: PropTypes.string,
-    verb: PropTypes.string,
-    contributeAs: PropTypes.string,
-    defaultEmail: PropTypes.string,
-    defaultName: PropTypes.string,
-    /** @ignore from withUser */
-    refetchLoggedInUser: PropTypes.func,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-    createCollective: PropTypes.func.isRequired, // from mutation
-    router: PropTypes.object,
-  };
+function ContributionFlow(props) {
+  const mainContainerRef = useRef(null);
+  const formRef = useRef(null);
+  const isFirstRender = useRef(true);
+  const [error, setError] = useState(null);
+  const stripe = useStripe();
+  const elements = useElements();
+  const [braintree, setBraintree] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [stepProfile, setStepProfile] = useState(null);
+  const [stepPayment, setStepPayment] = useState(null);
+  const [stepSummary, setStepSummary] = useState(null);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [stepDetails, setStepDetails] = useState({
+    quantity: 1,
+    interval: props.fixedInterval || props.tier?.interval,
+    amount: props.fixedAmount || getDefaultTierAmount(props.tier),
+    platformContribution: props.platformContribution,
+  });
 
-  constructor(props) {
-    super(props);
-    this.mainContainerRef = React.createRef();
-    this.formRef = React.createRef();
-    this.state = {
-      error: null,
-      stripe: null,
-      braintree: null,
-      isSubmitted: false,
-      isSubmitting: false,
-      stepProfile: null,
-      stepPayment: null,
-      stepSummary: null,
-      showSignIn: false,
-      stepDetails: {
-        quantity: 1,
-        interval: props.fixedInterval || props.tier?.interval,
-        amount: props.fixedAmount || getDefaultTierAmount(props.tier),
-        platformContribution: props.platformContribution,
-      },
-    };
-  }
-
-  componentDidUpdate(oldProps) {
-    if (oldProps.LoggedInUser && !this.props.LoggedInUser) {
-      this.setState({ stepProfile: null, stepSummary: null, stepPayment: null });
-      this.pushStepRoute(STEPS.PROFILE);
+  useEffect(prevProps => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+    } else if (prevProps?.LoggedInUser && !props.LoggedInUser) {
+      setStepProfile(null);
+      setStepSummary(null);
+      setStepPayment(null);
+      pushStepRoute(STEPS.PROFILE);
     }
-  }
+  });
 
-  submitOrder = async () => {
-    const { stepDetails, stepProfile, stepSummary } = this.state;
-    this.setState({ error: null, isSubmitting: true });
+  const submitOrder = async () => {
+    setError(null);
+    setIsSubmitting(true);
 
     let fromAccount, guestInfo;
     if (stepProfile.isGuest) {
@@ -152,7 +119,7 @@ class ContributionFlow extends React.Component {
     }
 
     try {
-      const response = await this.props.createOrder({
+      const response = await props.createOrder({
         variables: {
           order: {
             quantity: stepDetails.quantity,
@@ -160,12 +127,12 @@ class ContributionFlow extends React.Component {
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
             guestInfo,
             fromAccount,
-            toAccount: pick(this.props.collective, ['id']),
+            toAccount: pick(props.collective, ['id']),
             customData: stepDetails.customData,
-            paymentMethod: await this.getPaymentMethod(),
+            paymentMethod: await getPaymentMethod(),
             platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
-            tier: this.props.tier && { legacyId: this.props.tier.legacyId },
-            context: { isEmbed: this.props.isEmbed || false },
+            tier: props.tier && { legacyId: props.tier.legacyId },
+            context: { isEmbed: props.isEmbed || false },
             taxes: stepSummary && [
               {
                 type: stepSummary.taxType,
@@ -178,52 +145,42 @@ class ContributionFlow extends React.Component {
         },
       });
 
-      return this.handleOrderResponse(response.data.createOrder, stepProfile.email);
+      return handleOrderResponse(response.data.createOrder, stepProfile.email);
     } catch (e) {
-      this.setState({ isSubmitting: false });
-      this.showError(getErrorFromGraphqlException(e));
+      setIsSubmitting(false);
+      showError(getErrorFromGraphqlException(e));
     }
   };
 
-  handleOrderResponse = async ({ order, stripeError, guestToken }, email) => {
+  const handleOrderResponse = async ({ order, stripeError, guestToken }, email) => {
     if (guestToken && order) {
       setGuestToken(email, order.id, guestToken);
     }
 
     if (stripeError) {
-      return this.handleStripeError(order, stripeError, email, guestToken);
+      return handleStripeError(order, stripeError, email, guestToken);
     } else {
-      return this.handleSuccess(order);
+      return handleSuccess(order);
     }
   };
 
-  handleStripeError = async (order, stripeError, email, guestToken) => {
-    const { message, account, response } = stripeError;
+  const handleStripeError = async (order, stripeError) => {
+    const { message, response } = stripeError;
     if (!response) {
-      this.setState({ isSubmitting: false, error: message });
-    } else if (response.paymentIntent) {
-      const stripe = await getStripe(null, account);
-      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
-      if (result.error) {
-        this.setState({ isSubmitting: false, error: result.error.message });
-      } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
-        this.setState({ isSubmitting: true, error: null });
-        try {
-          const response = await this.props.confirmOrder({ variables: { order: { id: order.id }, guestToken } });
-          return this.handleOrderResponse(response.data.confirmOrder, email);
-        } catch (e) {
-          this.setState({ isSubmitting: false, error: e.message });
-        }
-      }
+      setIsSubmitting(false);
+      setError(message);
     }
   };
 
-  handleSuccess = async order => {
-    this.setState({ isSubmitted: true, isSubmitting: false });
-    this.props.refetchLoggedInUser(); // to update memberships
+  const handleSuccess = async order => {
+    setIsSubmitted(true);
+    setIsSubmitting(false);
+    props.refetchLoggedInUser(); // to update memberships
 
-    if (isValidExternalRedirect(this.props.redirect)) {
-      const url = new URL(this.props.redirect);
+    props.refetchLoggedInUser(); // to update memberships
+
+    if (isValidExternalRedirect(props.redirect)) {
+      const url = new URL(props.redirect);
       url.searchParams.set('orderId', order.legacyId);
       url.searchParams.set('orderIdV2', order.id);
       url.searchParams.set('status', order.status);
@@ -234,30 +191,28 @@ class ContributionFlow extends React.Component {
       }
 
       const verb = 'donate';
-      const fallback = `/${this.props.collective.slug}/${verb}/success?OrderId=${order.id}`;
+      const fallback = `/${props.collective.slug}/${verb}/success?OrderId=${order.id}`;
       if (isAllowedRedirect(url.host)) {
         window.location.href = url.href;
       } else {
-        await this.props.router.push({ pathname: '/external-redirect', query: { url: url.href, fallback } });
-        return this.scrollToTop();
+        await props.router.push({ pathname: '/external-redirect', query: { url: url.href, fallback } });
+        return scrollToTop();
       }
     } else {
-      const email = this.state.stepProfile?.email;
-      return this.pushStepRoute('success', { OrderId: order.id, email });
+      const email = stepProfile?.email;
+      return pushStepRoute('success', { OrderId: order.id, email });
     }
   };
 
-  showError = error => {
-    this.setState({ error });
-    this.scrollToTop();
+  const showError = error => {
+    setError(error);
+    scrollToTop();
   };
 
-  getPaymentMethod = async () => {
-    const { stepPayment, stripe } = this.state;
-
+  const getPaymentMethod = async () => {
     if (stepPayment?.key === BRAINTREE_KEY) {
       return new Promise((resolve, reject) => {
-        this.state.braintree.requestPaymentMethod((requestPaymentMethodErr, payload) => {
+        braintree.requestPaymentMethod((requestPaymentMethodErr, payload) => {
           if (requestPaymentMethodErr) {
             reject(requestPaymentMethodErr);
           } else {
@@ -273,7 +228,8 @@ class ContributionFlow extends React.Component {
     } else if (stepPayment.paymentMethod.id) {
       return pick(stepPayment.paymentMethod, ['id']);
     } else if (stepPayment.key === NEW_CREDIT_CARD_KEY) {
-      const { token } = await stripe.createToken();
+      const cardElement = elements.getElement(CardElement);
+      const { token } = await stripe.createToken(cardElement);
       const pm = stripeTokenToPaymentMethod(token);
       return {
         name: pm.name,
@@ -294,22 +250,9 @@ class ContributionFlow extends React.Component {
     }
   };
 
-  getEmailRedirectURL() {
-    let currentPath = window.location.pathname;
-    if (window.location.search) {
-      currentPath = currentPath + window.location.search;
-    } else {
-      currentPath = `${currentPath}?`;
-    }
-
-    return encodeURIComponent(currentPath);
-  }
-
   /** Validate step profile, create new incognito/org if necessary */
-  validateStepProfile = async action => {
-    const { stepProfile, stepDetails } = this.state;
-
-    if (!this.checkFormValidity()) {
+  const validateStepProfile = async action => {
+    if (!checkFormValidity()) {
       return false;
     }
 
@@ -326,33 +269,33 @@ class ContributionFlow extends React.Component {
         return false;
       }
 
-      this.setState({ isSubmitting: true });
+      setIsSubmitting(true);
 
       try {
-        const { data: result } = await this.props.createCollective(stepProfile);
+        const { data: result } = await props.createCollective(stepProfile);
         const createdProfile = result.createCollective;
-        await this.props.refetchLoggedInUser();
-        this.setState({ stepProfile: createdProfile, isSubmitting: false });
+        await props.refetchLoggedInUser();
+        setStepProfile(createdProfile);
+        setIsSubmitting(false);
       } catch (error) {
-        this.setState({ error: error.message, isSubmitting: false });
+        setError(error.message);
+        setIsSubmitting(false);
         window.scrollTo(0, 0);
         return false;
       }
     }
 
     // Check that the contributor is not blocked from contributing to the collective
-    const containsRejectedCategories = this.getContributorRejectedCategories(stepProfile);
+    const containsRejectedCategories = getContributorRejectedCategories(stepProfile);
     if (!isEmpty(containsRejectedCategories)) {
-      this.setState({
-        stepProfile: { ...this.state.stepProfile, contributorRejectedCategories: containsRejectedCategories },
-      });
+      setStepProfile({ ...stepProfile, contributorRejectedCategories: containsRejectedCategories });
     }
 
     return true;
   };
 
-  getContributorRejectedCategories = account => {
-    const rejectedCategories = get(this.props.collective, 'settings.moderation.rejectedCategories', []);
+  const getContributorRejectedCategories = account => {
+    const rejectedCategories = get(props.collective, 'settings.moderation.rejectedCategories', []);
     const contributorCategories = get(account, 'categories', []);
 
     if (rejectedCategories.length === 0 || contributorCategories.length === 0) {
@@ -374,19 +317,19 @@ class ContributionFlow extends React.Component {
   };
 
   /** Steps component callback  */
-  onStepChange = async step => {
-    this.setState({ showSignIn: false });
-    this.pushStepRoute(step.name);
+  const onStepChange = async step => {
+    setShowSignIn(false);
+    pushStepRoute(step.name);
   };
 
   /** Navigate to another step, ensuring all route params are preserved */
-  pushStepRoute = async (stepName, queryParams = {}) => {
-    const { collective, tier, isEmbed } = this.props;
-    const verb = this.props.verb || 'donate';
+  const pushStepRoute = async (stepName, queryParams = {}) => {
+    const { collective, tier, isEmbed } = props;
+    const verb = props.verb || 'donate';
     const step = stepName === 'details' ? '' : stepName;
     const allQueryParams = {
-      interval: this.props.fixedInterval,
-      ...pick(this.props, [
+      interval: props.fixedInterval,
+      ...pick(props, [
         'interval',
         'description',
         'redirect',
@@ -419,48 +362,47 @@ class ContributionFlow extends React.Component {
     }
 
     // Reset errors if any
-    if (this.state.error) {
-      this.setState({ error: null });
+    if (error) {
+      setError(null);
     }
 
     // Navigate to the new route
-    await this.props.router.push({ pathname: route, query: omitBy(allQueryParams, value => !value) });
-    this.scrollToTop();
+    await props.router.push({ pathname: route, query: omitBy(allQueryParams, value => !value) });
+    scrollToTop();
   };
 
-  scrollToTop = () => {
-    if (this.mainContainerRef.current) {
-      this.mainContainerRef.current.scrollIntoView({ behavior: 'smooth' });
+  const scrollToTop = () => {
+    if (mainContainerRef.current) {
+      mainContainerRef.current.scrollIntoView({ behavior: 'smooth' });
     } else {
       window.scrollTo(0, 0);
     }
   };
 
   // Memoized helpers
-  isFixedContribution = memoizeOne(isFixedContribution);
-  getTierMinAmount = memoizeOne(getTierMinAmount);
-  getApplicableTaxes = memoizeOne(getApplicableTaxes);
+  const memoizedIsFixedContribution = memoizeOne(isFixedContribution);
+  const memoizedGetTierMinAmount = memoizeOne(getTierMinAmount);
+  const memoizedGetApplicableTaxes = memoizeOne(getApplicableTaxes);
 
-  canHaveFeesOnTop() {
-    if (!this.props.collective.platformContributionAvailable) {
+  const canHaveFeesOnTop = () => {
+    if (!props.collective.platformContributionAvailable) {
       return false;
-    } else if (this.props.tier?.type === TierTypes.TICKET) {
+    } else if (props.tier?.type === TierTypes.TICKET) {
       return false;
     } else {
       return true;
     }
-  }
+  };
 
-  checkFormValidity = () => {
-    return reportValidityHTML5(this.formRef.current);
+  const checkFormValidity = () => {
+    return reportValidityHTML5(formRef.current);
   };
 
   /** Returns the steps list */
-  getSteps() {
-    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser } = this.props;
-    const { stepDetails, stepProfile, stepPayment, stepSummary } = this.state;
-    const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
-    const minAmount = this.getTierMinAmount(tier);
+  const getSteps = () => {
+    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser } = props;
+    const isFixedContribution = memoizedIsFixedContribution(tier, fixedAmount, fixedInterval);
+    const minAmount = memoizedGetTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || stepProfile?.isGuest);
 
@@ -470,7 +412,7 @@ class ContributionFlow extends React.Component {
         label: intl.formatMessage(STEP_LABELS.details),
         isCompleted: Boolean(stepDetails),
         validate: () => {
-          if (!this.checkFormValidity() || !stepDetails || stepDetails.amount < minAmount || !stepDetails.quantity) {
+          if (!checkFormValidity() || !stepDetails || stepDetails.amount < minAmount || !stepDetails.quantity) {
             return false;
           } else {
             return isNil(tier?.availableQuantity) || stepDetails.quantity <= tier.availableQuantity;
@@ -481,12 +423,12 @@ class ContributionFlow extends React.Component {
         name: 'profile',
         label: intl.formatMessage(STEP_LABELS.profile),
         isCompleted: isStepProfileCompleted,
-        validate: this.validateStepProfile,
+        validate: validateStepProfile,
       },
     ];
 
     // Show the summary step only if the order has tax
-    if (!noPaymentRequired && this.getApplicableTaxes(collective, host, tier?.type).length) {
+    if (!noPaymentRequired && memoizedGetApplicableTaxes(collective, host, tier?.type).length) {
       steps.push({
         name: 'summary',
         label: intl.formatMessage(STEP_LABELS.summary),
@@ -516,12 +458,11 @@ class ContributionFlow extends React.Component {
     }
 
     return steps;
-  }
+  };
 
-  getPaypalButtonProps({ currency }) {
-    const { stepPayment, stepDetails, stepSummary } = this.state;
+  const getPaypalButtonProps = ({ currency }) => {
     if (stepPayment?.paymentMethod?.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
-      const { host, collective, tier } = this.props;
+      const { host, collective, tier } = props;
       return {
         host: host,
         collective,
@@ -530,49 +471,47 @@ class ContributionFlow extends React.Component {
         style: { size: 'responsive', height: 47 },
         totalAmount: getTotalAmount(stepDetails, stepSummary),
         interval: stepDetails?.interval,
-        onClick: () => this.setState({ isSubmitting: true }),
-        onCancel: () => this.setState({ isSubmitting: false }),
-        onError: e => this.setState({ isSubmitting: false, error: `PayPal error: ${e.message}` }),
+        onClick: () => setIsSubmitting(true),
+        onCancel: () => setIsSubmitting(false),
+        onError: e => {
+          setIsSubmitting(false);
+          setError(`PayPal error: ${e.message}`);
+        },
         // New callback, used by `PayWithPaypalButton`
         onSuccess: paypalInfo => {
-          this.setState(
-            state => ({
-              stepPayment: {
-                ...state.stepPayment,
-                paymentMethod: {
-                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
-                  paypalInfo: { isNewApi: true, ...paypalInfo },
-                },
+          setStepPayment(stepPayment => {
+            return {
+              ...stepPayment,
+              paymentMethod: {
+                type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
+                paypalInfo: { isNewApi: true, ...paypalInfo },
               },
-            }),
-            this.submitOrder,
-          );
+            };
+          });
+          submitOrder();
         },
         // Old callback, used by `PayWithPaypalLegacyButton`
         onAuthorize: pm => {
-          this.setState(
-            state => ({
-              stepPayment: {
-                ...state.stepPayment,
-                paymentMethod: {
-                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
-                  paypalInfo: pm,
-                },
+          setStepPayment(stepPayment => {
+            return {
+              ...stepPayment,
+              paymentMethod: {
+                type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
+                paypalInfo: pm,
               },
-            }),
-            this.submitOrder,
-          );
+            };
+          });
+          submitOrder();
         },
       };
     }
-  }
+  };
 
-  getRedirectUrlForSignIn = () => {
+  const getRedirectUrlForSignIn = () => {
     if (typeof window === 'undefined') {
       return undefined;
     }
 
-    const { stepDetails } = this.state;
     const stepDetailsParams = objectToQueryString({
       amount: stepDetails.amount / 100,
       interval: stepDetails.interval || undefined,
@@ -590,146 +529,193 @@ class ContributionFlow extends React.Component {
     }
   };
 
-  render() {
-    const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails, isEmbed } = this.props;
-    const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
-    const currency = tier?.amount.currency || collective.currency;
+  const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails, isEmbed } = props;
+  const currency = tier?.amount.currency || collective.currency;
 
-    return (
-      <Steps
-        steps={this.getSteps()}
-        currentStepName={this.props.step}
-        onStepChange={this.onStepChange}
-        onComplete={this.submitOrder}
-        skip={skipStepDetails ? ['details'] : null}
-      >
-        {({
-          steps,
-          currentStep,
-          lastVisitedStep,
-          goNext,
-          goBack,
-          goToStep,
-          prevStep,
-          nextStep,
-          isValidating,
-          isValidStep,
-        }) => (
-          <Container
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            py={[3, 4, 5]}
-            mb={4}
-            data-cy="cf-content"
-            ref={this.mainContainerRef}
-          >
-            <Box px={[2, 3]} mb={4}>
-              <ContributionFlowHeader collective={collective} />
+  const setContributionFlowStepDetails = data => {
+    const { stepDetails, stepProfile, stepSummary, stepPayment } = data;
+    if (stepDetails) {
+      setStepDetails(stepDetails);
+    }
+    if (stepProfile) {
+      setStepProfile(stepProfile);
+    }
+    if (stepPayment) {
+      setStepPayment(stepPayment);
+    }
+    if (stepSummary) {
+      setStepSummary(stepSummary);
+    }
+  };
+
+  return (
+    <Steps
+      steps={getSteps()}
+      currentStepName={props.step}
+      onStepChange={onStepChange}
+      onComplete={submitOrder}
+      skip={skipStepDetails ? ['details'] : null}
+    >
+      {({
+        steps,
+        currentStep,
+        lastVisitedStep,
+        goNext,
+        goBack,
+        goToStep,
+        prevStep,
+        nextStep,
+        isValidating,
+        isValidStep,
+      }) => (
+        <Container
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          py={[3, 4, 5]}
+          mb={4}
+          data-cy="cf-content"
+          ref={mainContainerRef}
+        >
+          <Box px={[2, 3]} mb={4}>
+            <ContributionFlowHeader collective={collective} />
+          </Box>
+          <StepsProgressBox mb={3} width={[1.0, 0.8]}>
+            <ContributionFlowStepsProgress
+              steps={steps}
+              currentStep={currentStep}
+              lastVisitedStep={lastVisitedStep}
+              goToStep={goToStep}
+              stepProfile={stepProfile}
+              stepDetails={stepDetails}
+              stepPayment={stepPayment}
+              stepSummary={stepSummary}
+              isSubmitted={isSubmitted}
+              loading={isValidating || isSubmitted || isSubmitting}
+              currency={currency}
+              isFreeTier={memoizedGetTierMinAmount(tier) === 0}
+            />
+          </StepsProgressBox>
+          {/* main container */}
+          {(currentStep.name !== STEPS.DETAILS && loadingLoggedInUser) || !isValidStep ? (
+            <Box py={[4, 5]}>
+              <Loading />
             </Box>
-            <StepsProgressBox mb={3} width={[1.0, 0.8]}>
-              <ContributionFlowStepsProgress
-                steps={steps}
-                currentStep={currentStep}
-                lastVisitedStep={lastVisitedStep}
-                goToStep={goToStep}
-                stepProfile={stepProfile}
-                stepDetails={stepDetails}
-                stepPayment={stepPayment}
-                stepSummary={stepSummary}
-                isSubmitted={this.state.isSubmitted}
-                loading={isValidating || isSubmitted || isSubmitting}
-                currency={currency}
-                isFreeTier={this.getTierMinAmount(tier) === 0}
-              />
-            </StepsProgressBox>
-            {/* main container */}
-            {(currentStep.name !== STEPS.DETAILS && loadingLoggedInUser) || !isValidStep ? (
-              <Box py={[4, 5]}>
-                <Loading />
-              </Box>
-            ) : currentStep.name === STEPS.PROFILE && !LoggedInUser && this.state.showSignIn ? (
-              <SignInToContributeAsAnOrganization
-                defaultEmail={stepProfile?.email}
-                redirect={this.getRedirectUrlForSignIn()}
-                onCancel={() => this.setState({ showSignIn: false })}
-              />
-            ) : (
-              <Grid
-                px={[2, 3]}
-                gridTemplateColumns={[
-                  'minmax(200px, 600px)',
-                  null,
-                  '0fr minmax(300px, 600px) 1fr',
-                  '1fr minmax(300px, 600px) 1fr',
-                ]}
-              >
-                <Box />
-                <Box as="form" ref={this.formRef} onSubmit={e => e.preventDefault()} maxWidth="100%">
-                  {error && (
-                    <MessageBox type="error" withIcon mb={3}>
-                      {formatErrorMessage(this.props.intl, error)}
-                    </MessageBox>
-                  )}
+          ) : currentStep.name === STEPS.PROFILE && !LoggedInUser && showSignIn ? (
+            <SignInToContributeAsAnOrganization
+              defaultEmail={stepProfile?.email}
+              redirect={getRedirectUrlForSignIn()}
+              onCancel={() => setShowSignIn(false)}
+            />
+          ) : (
+            <Grid
+              px={[2, 3]}
+              gridTemplateColumns={[
+                'minmax(200px, 600px)',
+                null,
+                '0fr minmax(300px, 600px) 1fr',
+                '1fr minmax(300px, 600px) 1fr',
+              ]}
+            >
+              <Box />
+              <Box as="form" ref={formRef} onSubmit={e => e.preventDefault()} maxWidth="100%">
+                {error && (
+                  <MessageBox type="error" withIcon mb={3}>
+                    {formatErrorMessage(props.intl, error)}
+                  </MessageBox>
+                )}
 
-                  <ContributionFlowStepContainer
-                    collective={collective}
-                    tier={tier}
-                    mainState={this.state}
-                    onChange={data => this.setState(data)}
+                <ContributionFlowStepContainer
+                  collective={collective}
+                  tier={tier}
+                  mainState={{ stepDetails, stepProfile, stepSummary, stepPayment }}
+                  onChange={data => setContributionFlowStepDetails(data)}
+                  step={currentStep}
+                  showFeesOnTop={canHaveFeesOnTop()}
+                  setBraintree={braintree => setBraintree(braintree)}
+                  defaultProfileSlug={props.contributeAs}
+                  defaultEmail={props.defaultEmail}
+                  defaultName={props.defaultName}
+                  taxes={memoizedGetApplicableTaxes(collective, host, tier?.type)}
+                  onSignInClick={() => setShowSignIn(true)}
+                  isEmbed={isEmbed}
+                  hasNewPaypal={props.hasNewPaypal}
+                />
+
+                <Box mt={40}>
+                  <ContributionFlowButtons
+                    goNext={goNext}
+                    goBack={goBack}
                     step={currentStep}
-                    showFeesOnTop={this.canHaveFeesOnTop()}
-                    onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
-                    setBraintree={braintree => this.setState({ braintree })}
-                    defaultProfileSlug={this.props.contributeAs}
-                    defaultEmail={this.props.defaultEmail}
-                    defaultName={this.props.defaultName}
-                    taxes={this.getApplicableTaxes(collective, host, tier?.type)}
-                    onSignInClick={() => this.setState({ showSignIn: true })}
-                    isEmbed={isEmbed}
-                    hasNewPaypal={this.props.hasNewPaypal}
+                    prevStep={prevStep}
+                    nextStep={nextStep}
+                    isValidating={isValidating || isSubmitted || isSubmitting}
+                    paypalButtonProps={!nextStep && getPaypalButtonProps({ currency })}
+                    totalAmount={getTotalAmount(stepDetails, stepSummary)}
+                    currency={currency}
+                    disableNext={stepPayment?.key === 'braintree' && !stepPayment.isReady}
+                    hasNewPaypal={props.hasNewPaypal}
                   />
-
-                  <Box mt={40}>
-                    <ContributionFlowButtons
-                      goNext={goNext}
-                      goBack={goBack}
-                      step={currentStep}
-                      prevStep={prevStep}
-                      nextStep={nextStep}
-                      isValidating={isValidating || isSubmitted || isSubmitting}
-                      paypalButtonProps={!nextStep && this.getPaypalButtonProps({ currency })}
-                      totalAmount={getTotalAmount(stepDetails, stepSummary)}
+                </Box>
+              </Box>
+              <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
+                <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
+                  <SafeTransactionMessage />
+                  <Box mt={4}>
+                    <ContributionSummary
+                      collective={collective}
+                      stepDetails={stepDetails}
+                      stepSummary={stepSummary}
+                      stepPayment={stepPayment}
                       currency={currency}
-                      disableNext={stepPayment?.key === 'braintree' && !stepPayment.isReady}
-                      hasNewPaypal={this.props.hasNewPaypal}
                     />
                   </Box>
+                  <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />
                 </Box>
-                <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
-                  <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
-                    <SafeTransactionMessage />
-                    <Box mt={4}>
-                      <ContributionSummary
-                        collective={collective}
-                        stepDetails={stepDetails}
-                        stepSummary={stepSummary}
-                        stepPayment={stepPayment}
-                        currency={currency}
-                      />
-                    </Box>
-                    <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />
-                  </Box>
-                </Box>
-              </Grid>
-            )}
-          </Container>
-        )}
-      </Steps>
-    );
-  }
+              </Box>
+            </Grid>
+          )}
+        </Container>
+      )}
+    </Steps>
+  );
 }
+
+ContributionFlow.propTypes = {
+  collective: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    currency: PropTypes.string.isRequired,
+    platformContributionAvailable: PropTypes.bool,
+    parent: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
+  }).isRequired,
+  host: PropTypes.object.isRequired,
+  tier: PropTypes.object,
+  intl: PropTypes.object,
+  createOrder: PropTypes.func.isRequired,
+  confirmOrder: PropTypes.func.isRequired,
+  fixedInterval: PropTypes.string,
+  fixedAmount: PropTypes.number,
+  platformContribution: PropTypes.number,
+  skipStepDetails: PropTypes.bool,
+  loadingLoggedInUser: PropTypes.bool,
+  hasNewPaypal: PropTypes.bool,
+  isEmbed: PropTypes.bool,
+  step: PropTypes.string,
+  redirect: PropTypes.string,
+  verb: PropTypes.string,
+  contributeAs: PropTypes.string,
+  defaultEmail: PropTypes.string,
+  defaultName: PropTypes.string,
+  /** @ignore from withUser */
+  refetchLoggedInUser: PropTypes.func,
+  /** @ignore from withUser */
+  LoggedInUser: PropTypes.object,
+  createCollective: PropTypes.func.isRequired, // from mutation
+  router: PropTypes.object,
+};
 
 const addCreateOrderMutation = graphql(
   gqlV2/* GraphQL */ `

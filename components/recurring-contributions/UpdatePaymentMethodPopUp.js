@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
+import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import themeGet from '@styled-system/theme-get';
 import { first, get, merge, pick, uniqBy } from 'lodash';
@@ -11,12 +12,11 @@ import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
-import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { stripeTokenToPaymentMethod } from '../../lib/stripe';
 
 import { Box, Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import { withStripeLoader } from '../StripeProvider';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledRadioList from '../StyledRadioList';
@@ -229,7 +229,7 @@ const useUpdatePaymentMethod = contribution => {
   };
 };
 
-const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loadStripe, account }) => {
+const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, account }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
 
@@ -237,7 +237,8 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loadingSelectedPaymentMethod, setLoadingSelectedPaymentMethod] = useState(true);
-  const [stripe, setStripe] = useState(null);
+  const stripe = useStripe();
+  const elements = useElements();
   const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
   const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
   const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
@@ -273,29 +274,18 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
       return false;
     }
 
-    const stripe = await getStripe();
-    const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
-    if (result.error) {
+    try {
+      const response = await submitConfirmPaymentMethodMutation({
+        variables: { paymentMethod: { id: paymentMethod.id } },
+      });
+      return handleSuccess(response.data.confirmCreditCard.paymentMethod);
+    } catch (error) {
       addToast({
         type: TOAST_TYPE.ERROR,
-        message: result.error.message,
+        message: error.message,
       });
       setAddingPaymentMethod(false);
       return false;
-    } else {
-      try {
-        const response = await submitConfirmPaymentMethodMutation({
-          variables: { paymentMethod: { id: paymentMethod.id } },
-        });
-        return handleSuccess(response.data.confirmCreditCard.paymentMethod);
-      } catch (error) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
-          message: error.message,
-        });
-        setAddingPaymentMethod(false);
-        return false;
-      }
     }
   };
 
@@ -306,11 +296,6 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
     setShowAddPaymentMethod(false);
     setLoadingSelectedPaymentMethod(true);
   };
-
-  // load stripe on mount
-  useEffect(() => {
-    loadStripe();
-  }, []);
 
   // data handling
   const paymentMethods = get(data, 'account.paymentMethods', null);
@@ -360,7 +345,6 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
             order={contribution}
             isSubmitting={isSubmitting}
             setNewPaymentMethodInfo={setNewPaymentMethodInfo}
-            onStripeReady={({ stripe }) => setStripe(stripe)}
             onPaypalSuccess={async paypalPaymentMethod => {
               await updatePaymentMethod(paypalPaymentMethod);
               onCloseEdit();
@@ -425,7 +409,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
               minWidth={75}
               buttonSize="tiny"
               buttonStyle="secondary"
-              disabled={newPaymentMethodInfo ? !newPaymentMethodInfo.value?.complete : true}
+              disabled={newPaymentMethodInfo ? !newPaymentMethodInfo?.stripeData?.complete : true}
               type="submit"
               loading={addingPaymentMethod}
               data-cy="recurring-contribution-submit-pm-button"
@@ -444,7 +428,8 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
                   setAddingPaymentMethod(false);
                   return false;
                 }
-                const { token, error } = await stripe.createToken();
+                const cardElement = elements.getElement(CardElement);
+                const { token, error } = await stripe.createToken(cardElement);
 
                 if (error) {
                   addToast({ type: TOAST_TYPE.ERROR, message: error.message });
@@ -507,8 +492,7 @@ UpdatePaymentMethodPopUp.propTypes = {
   router: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
   onCloseEdit: PropTypes.func,
-  loadStripe: PropTypes.func.isRequired,
   account: PropTypes.object.isRequired,
 };
 
-export default withStripeLoader(UpdatePaymentMethodPopUp);
+export default UpdatePaymentMethodPopUp;

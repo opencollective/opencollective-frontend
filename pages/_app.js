@@ -11,7 +11,6 @@ import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import theme from '../lib/theme';
 import withData from '../lib/withData';
 
-import StripeProviderSSR from '../components/StripeProvider';
 import UserProvider from '../components/UserProvider';
 
 import 'nprogress/nprogress.css';
@@ -26,6 +25,10 @@ Router.onRouteChangeComplete = () => NProgress.done();
 
 Router.onRouteChangeError = () => NProgress.done();
 
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+
+import { getEnvVar } from '../lib/env-utils';
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 import sentryLib from '../server/sentry';
 
@@ -123,12 +126,13 @@ class OpenCollectiveFrontendApp extends App {
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
 
     const intl = createIntl({ locale: locale || 'en', messages }, cache);
+    const stripePromise = loadStripe(getEnvVar('STRIPE_KEY'));
 
     return (
       <Fragment>
         <ApolloProvider client={client}>
           <ThemeProvider theme={theme}>
-            <StripeProviderSSR>
+            <Elements stripe={stripePromise}>
               <RawIntlProvider value={intl}>
                 <UserProvider>
                   <ToastProvider>
@@ -137,7 +141,7 @@ class OpenCollectiveFrontendApp extends App {
                   </ToastProvider>
                 </UserProvider>
               </RawIntlProvider>
-            </StripeProviderSSR>
+            </Elements>
           </ThemeProvider>
         </ApolloProvider>
         {Object.keys(scripts).map(key => (

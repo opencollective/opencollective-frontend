@@ -28,7 +28,6 @@ import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import Redirect from '../components/Redirect';
-import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
 
 class NewContributionFlowPage extends React.Component {
@@ -91,7 +90,6 @@ class NewContributionFlowPage extends React.Component {
       tier: PropTypes.object,
     }), // from withData
     intl: PropTypes.object,
-    loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     hasNewPaypal: PropTypes.bool,
@@ -111,9 +109,6 @@ class NewContributionFlowPage extends React.Component {
 
   loadExternalScripts() {
     const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
-    if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
-      this.props.loadStripe();
-    }
     if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BRAINTREE_PAYPAL)) {
       getBraintree();
     }
@@ -199,4 +194,4 @@ const addAccountWithTierData = graphql(contributionFlowAccountWithTierQuery, {
 
 const addGraphql = compose(addAccountData, addAccountWithTierData);
 
-export default addGraphql(withUser(injectIntl(withStripeLoader(NewContributionFlowPage))));
+export default addGraphql(withUser(injectIntl(NewContributionFlowPage)));
