@@ -122,7 +122,7 @@ class OpenCollectiveFrontendApp extends App {
   render() {
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
 
-    const intl = createIntl({ locale, messages }, cache);
+    const intl = createIntl({ locale: locale || 'en', messages }, cache);
 
     return (
       <Fragment>
