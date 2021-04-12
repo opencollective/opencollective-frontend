@@ -16,22 +16,23 @@ import { formatManualInstructions } from '../../lib/payment-method-utils';
 import { facebookShareURL, tweetURL } from '../../lib/url_helpers';
 
 import Container from '../../components/Container';
-import { formatAccountDetails } from '../../components/edit-collective/utils';
-import { Box, Flex } from '../../components/Grid';
 import I18nFormatters, { getI18nLink } from '../../components/I18nFormatters';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
-import { H3, P } from '../../components/Text';
-import { withUser } from '../../components/UserProvider';
 
+import { formatAccountDetails } from '../edit-collective/utils';
+import { Box, Flex } from '../Grid';
 import Link from '../Link';
+import { H3, P } from '../Text';
+import { withUser } from '../UserProvider';
 
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
-import successIllustrationUrl from './success-illustration.jpg';
 import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
+
+import successIllustrationUrl from '../../public/static/images/contribution-flow/success-illustration.jpg';
 
 // Styled components
 const ContainerWithImage = styled(Container)`

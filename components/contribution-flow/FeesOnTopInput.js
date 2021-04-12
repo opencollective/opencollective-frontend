@@ -12,7 +12,7 @@ import StyledInputAmount from '../StyledInputAmount';
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
 
-import illustration from './fees-on-top-illustration.png';
+import illustration from '../../public/static/images/contribution-flow/fees-on-top-illustration.png';
 
 const msg = defineMessages({
   noThankYou: {
