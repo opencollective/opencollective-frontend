@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Add } from '@styled-icons/material/Add';
 import { Close } from '@styled-icons/material/Close';
-import { difference, get, pick } from 'lodash';
+import { cloneDeep, difference, get, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
@@ -63,7 +63,7 @@ class Webhooks extends React.Component {
     super(props);
     this.state = {
       modified: false,
-      webhooks: [...this.getWebhooksFromProps(props)],
+      webhooks: cloneDeep(this.getWebhooksFromProps(props)),
       isLoaded: false,
       status: null,
       error: '',
@@ -72,7 +72,7 @@ class Webhooks extends React.Component {
 
   componentDidUpdate(oldProps) {
     if (this.getWebhooksFromProps(oldProps) !== this.getWebhooksFromProps(this.props)) {
-      this.setState({ webhooks: [...this.getWebhooksFromProps(this.props)] });
+      this.setState({ webhooks: cloneDeep(this.getWebhooksFromProps(this.props)) });
     }
   }
 
@@ -156,8 +156,8 @@ class Webhooks extends React.Component {
     const notifications = webhooks.map(webhook => pick(webhook, ['type', 'webhookUrl', 'id']));
 
     try {
-      await this.props.editWebhooks({ collectiveId: this.props.data.Collective.id, notifications });
-      this.setState({ modified: false, status: 'saved' });
+      const result = await this.props.editWebhooks({ collectiveId: this.props.data.Collective.id, notifications });
+      this.setState({ modified: false, status: 'saved', webhooks: cloneDeep(result.data.editWebhooks) });
       setTimeout(() => {
         this.setState({ status: null });
       }, 3000);
