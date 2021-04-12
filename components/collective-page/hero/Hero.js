@@ -264,35 +264,38 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                   )}
                 </Fragment>
               )}
-              {collective.canApply && (
+              {collective.isHost && (
                 <Fragment>
-                  {collective.settings.tos && (
-                    <StyledLink
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={collective.settings.tos}
-                      borderBottom="2px dotted #969ba3"
-                      color="black.700"
-                      textDecoration="none"
-                      fontSize="12px"
-                      mr={2}
-                    >
-                      <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
-                    </StyledLink>
+                  {collective.type !== CollectiveType.COLLECTIVE && (
+                    <Fragment>
+                      {collective.settings?.tos && (
+                        <StyledLink
+                          openInNewTab
+                          href={collective.settings.tos}
+                          borderBottom="2px dotted #969ba3"
+                          color="black.700"
+                          textDecoration="none"
+                          fontSize="12px"
+                          mr={2}
+                        >
+                          <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
+                        </StyledLink>
+                      )}
+                      <Container ml={2} mr={3} color="black.700" fontSize="12px">
+                        <FormattedMessage
+                          id="Hero.HostFee"
+                          defaultMessage="Host fee: {fee}"
+                          values={{
+                            fee: (
+                              <DefinedTerm term={Terms.HOST_FEE} color="black.700">
+                                {collective.hostFeePercent || 0}%
+                              </DefinedTerm>
+                            ),
+                          }}
+                        />
+                      </Container>
+                    </Fragment>
                   )}
-                  <Container ml={2} mr={3} color="black.700" fontSize="12px">
-                    <FormattedMessage
-                      id="Hero.HostFee"
-                      defaultMessage="Host fee: {fee}"
-                      values={{
-                        fee: (
-                          <DefinedTerm term={Terms.HOST_FEE} color="black.700">
-                            {collective.hostFeePercent || 0}%
-                          </DefinedTerm>
-                        ),
-                      }}
-                    />
-                  </Container>
                   {collective.platformFeePercent > 0 && (
                     <Container ml={2} mr={3} color="black.700" fontSize="12px">
                       <FormattedMessage
@@ -333,7 +336,6 @@ Hero.propTypes = {
     slug: PropTypes.string.isRequired,
     company: PropTypes.string,
     isApproved: PropTypes.bool,
-    canApply: PropTypes.bool,
     backgroundImage: PropTypes.string,
     backgroundImageUrl: PropTypes.string,
     twitterHandle: PropTypes.string,
