@@ -17,7 +17,7 @@ class GlobalToasts extends PureComponent {
       PropTypes.shape({
         id: PropTypes.string.isRequired,
         type: PropTypes.oneOf(Object.values(TOAST_TYPE)).isRequired,
-        title: PropTypes.string.isRequired,
+        title: PropTypes.string,
         message: PropTypes.string,
         createdAt: PropTypes.number,
       }),

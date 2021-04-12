@@ -11,6 +11,7 @@ import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
+import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 
 const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, description }) => {
@@ -35,6 +36,16 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, des
           <PrivateInfoIcon color="#969BA3" size={12} />
         </Span>
         <StyledHr flex="1" borderColor="black.300" mx={2} />
+        {files?.length > 0 && (
+          <AddNewAttachedFilesButton
+            disabled={disabled}
+            onSuccess={urls => {
+              const uploadedFiles = [...files, ...urls.map(url => ({ url }))];
+              setFiles(uploadedFiles);
+              onChange(uploadedFiles);
+            }}
+          />
+        )}
       </Flex>
       <P fontSize="13px" color="black.600" mb={16}>
         {description}
@@ -53,13 +64,12 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, des
         <StyledDropzone
           {...attachmentDropzoneParams}
           name="attachedFiles"
-          isMulti={false}
           disabled={disabled}
           minHeight={72}
-          onSuccess={url => {
-            const newFile = { url };
-            setFiles([newFile]);
-            onChange([newFile]);
+          onSuccess={urls => {
+            const uploadedFiles = urls.map(url => ({ url }));
+            setFiles(uploadedFiles);
+            onChange(uploadedFiles);
           }}
         />
       )}
