@@ -1541,7 +1541,6 @@
   "pricing.hostFee.note": "(1) If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform.",
   "pricing.joinAsFiscalHost": "Join as Fiscal Host",
   "pricing.notes.paymentProcessor": "Payment processor fees apply. See <stripeLink>stripe.com/pricing</stripeLink>, <paypalLink>paypal.com/pricing</paypalLink>, <transferwiseLink>transferwise.com/pricing</transferwiseLink>",
-  "pricing.notes.platformFees": "Some Fiscal Hosts like the Open Source Collective are still applying Platform Fees for a limited time as they switch to the new pricing.",
   "pricing.openFinance": "Transparency and open finances tools",
   "pricing.outsideFunds": "Outside funds",
   "pricing.paymentProcessor": "(1) Payment processor fees apply. See <stripeLink>stripe.com/pricing</stripeLink>, <paypalLink>paypal.com/pricing</paypalLink>, <transferwiseLink>transferwise.com/pricing</transferwiseLink>",

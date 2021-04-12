@@ -159,7 +159,7 @@ const ForCollectiveCard = () => {
                     fee: <FeeData>0$</FeeData>,
                   }}
                 />{' '}
-                ¹ ²
+                ¹
               </FeeDescription>
             </Flex>
             <Flex my={3}>
@@ -201,13 +201,6 @@ const ForCollectiveCard = () => {
                   openInNewTab: true,
                 }),
               }}
-            />
-          </P>
-          <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
-            (2){' '}
-            <FormattedMessage
-              id="pricing.notes.platformFees"
-              defaultMessage="Some Fiscal Hosts like the Open Source Collective are still applying Platform Fees for a limited time as they switch to the new pricing."
             />
           </P>
           {displayPlatformTipBox && (
