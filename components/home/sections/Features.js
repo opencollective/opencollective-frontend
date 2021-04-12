@@ -243,6 +243,7 @@ const Feature = ({ id, learnMoreLink, intl }) => (
     </Container>
     <Container width={[null, '392px', '466px', null, '756px']}>
       <NextIllustration
+        loading="eager"
         width={756}
         height={575}
         src={`/static/images/home/${id}-screenshot.png`}
