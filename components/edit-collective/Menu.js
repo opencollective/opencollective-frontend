@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { Flex } from '../Grid';
@@ -195,7 +196,8 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c => isOneOfTypes(c, COLLECTIVE, FUND, ORGANIZATION, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, ORGANIZATION, USER),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: c => isOneOfTypes(c, ORGANIZATION, USER),
-  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isOneOfTypes(c, COLLECTIVE, FUND),
+  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c =>
+    isOneOfTypes(c, COLLECTIVE, FUND) && hasFeature(c.host, FEATURES.PRIVACY_VCC),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
     isOneOfTypes(c, COLLECTIVE, FUND, EVENT, PROJECT) || (c.type === ORGANIZATION && c.isActive),
@@ -273,7 +275,8 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
           {collective.type === COLLECTIVE && renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH))}
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS))}
+          {hasFeature(collective, FEATURES.PRIVACY_VCC) &&
+            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS))}
         </Fragment>
       )}
     </Flex>
