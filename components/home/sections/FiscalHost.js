@@ -11,7 +11,7 @@ import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
 import { H2, H3, H5, P, Span } from '../../Text';
-import NextIllustration from '../HomeNextIllustration';
+import Illustration from '../HomeIllustration';
 import SectionTitle from '../SectionTitle';
 
 const Wrapper = styled(Container)`
@@ -312,12 +312,7 @@ const FiscalHost = () => {
             ml={[null, null, null, null, 5]}
             mr={[3, null, null, 4]}
           >
-            <NextIllustration
-              width={81}
-              height={54}
-              src="/static/images/home/umbrella-Illustration.png"
-              alt="Umbrella"
-            />
+            <Illustration src="/static/images/home/umbrella-Illustration.png" alt="Umbrella" />
           </Box>
           <Container display={['block', 'flex']} alignItems={[null, 'center']}>
             <Container display={[null, null, 'flex']} mr={[null, 3]} alignItems={[null, null, 'center']}>
