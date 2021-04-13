@@ -15,7 +15,7 @@
   "acceptContributions.organization.myOrgs": "Meine Organisationen",
   "acceptContributions.organization.subtitle": "Unsere Organisation",
   "acceptContributions.picker.header": "Finanzbeiträge akzeptieren",
-  "acceptContributions.picker.host": "A Fiscal Host",
+  "acceptContributions.picker.host": "Ein Finanzverwalter",
   "acceptContributions.picker.hostInfo": "Apply to join a Fiscal Host, who will hold money on behalf of your Collective. Choose this option if you want someone else to take care of banking, accounting, taxes, payments, and liability. {moreInfo}",
   "acceptContributions.picker.organizationInfo": "Create a Fiscal Host to hold funds for multiple Collectives, or select a one that you already manage. Choose this option if you have a legal entity set up to handle accounting, taxes, payments, and liability for multiple Collectives.",
   "acceptContributions.picker.ourselves": "Wir selbst",
