@@ -15,6 +15,7 @@ import { Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
+import { slideInUp } from '../StyledKeyframes';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { withUser } from '../UserProvider';
@@ -41,10 +42,16 @@ const MenuItem = styled(Flex).attrs({
 const PopUpMenu = styled(Flex)`
   position: absolute;
   bottom: 0;
-  z-index: 1000;
+  z-index: 998;
   background: white;
   border-radius: 8px;
   box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.5);
+  min-height: 180px;
+  max-height: 360px;
+  width: 100%;
+  overflow-y: auto;
+  padding: 4px 0;
+  animation: ${slideInUp} 0.2s;
 `;
 
 const MenuSection = styled(Flex).attrs({
@@ -62,12 +69,12 @@ const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, account }) => {
+const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account }) => {
+  const { addToast } = useToasts();
   const [menuState, setMenuState] = useState('mainMenu');
-  const [submitCancellation, { loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
+  const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
   });
-  const { addToast } = useToasts();
 
   const mainMenu = menuState === 'mainMenu' && (status === 'ACTIVE' || status === 'ERROR');
   const cancelMenu = menuState === 'cancelMenu';
@@ -75,14 +82,7 @@ const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, accou
   const paymentMethodMenu = menuState === 'paymentMethodMenu';
 
   return (
-    <PopUpMenu
-      minHeight={180}
-      maxHeight={360}
-      width={'100%'}
-      overflowY={'auto'}
-      py={1}
-      data-cy="recurring-contribution-menu"
-    >
+    <PopUpMenu data-cy="recurring-contribution-menu">
       {mainMenu && (
         <MenuSection>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" px={3}>
@@ -92,12 +92,7 @@ const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, accou
             <Flex flexGrow={1} alignItems="center">
               <StyledHr width="100%" mx={2} />
             </Flex>
-            <GrayXCircle
-              size={26}
-              onClick={() => {
-                setShowPopup(false);
-              }}
-            />
+            <GrayXCircle size={26} onClick={onCloseEdit} />
           </Flex>
           {account.type !== 'COLLECTIVE' && (
             <MenuItem
@@ -170,12 +165,7 @@ const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, accou
             <Flex flexGrow={1} alignItems="center">
               <StyledHr width="100%" mx={2} />
             </Flex>
-            <GrayXCircle
-              size={26}
-              onClick={() => {
-                setShowPopup(false);
-              }}
-            />
+            <GrayXCircle size={26} onClick={onCloseEdit} />
           </Flex>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
             <P fontSize="14px" fontWeight="400">
@@ -195,9 +185,8 @@ const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, accou
               data-cy="recurring-contribution-cancel-yes"
               onClick={async () => {
                 try {
-                  await submitCancellation({
-                    variables: { order: { id: contribution.id } },
-                  });
+                  await submitCancellation({ variables: { order: { id: contribution.id } } });
+                  onCloseEdit();
                   addToast({
                     type: TOAST_TYPE.INFO,
                     message: (
@@ -210,10 +199,7 @@ const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, accou
                   });
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
-                  addToast({
-                    type: TOAST_TYPE.ERROR,
-                    message: errorMsg,
-                  });
+                  addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
                 }
               }}
             >
@@ -224,9 +210,8 @@ const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, accou
               minWidth={95}
               buttonSize="tiny"
               buttonStyle="secondary"
-              onClick={() => {
-                setMenuState('mainMenu');
-              }}
+              disabled={loadingCancellation}
+              onClick={() => setMenuState('mainMenu')}
               data-cy="recurring-contribution-cancel-no"
             >
               <FormattedMessage id="subscription.menu.cancel.no" defaultMessage="No, wait" />
@@ -240,7 +225,7 @@ const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, accou
           <UpdatePaymentMethodPopUp
             setMenuState={setMenuState}
             contribution={contribution}
-            setShowPopup={setShowPopup}
+            onCloseEdit={onCloseEdit}
             account={account}
           />
         </MenuSection>
@@ -248,7 +233,7 @@ const RecurringContributionsPopUp = ({ contribution, status, setShowPopup, accou
 
       {updateTierMenu && (
         <MenuSection data-cy="recurring-contribution-order-menu">
-          <UpdateOrderPopUp setMenuState={setMenuState} contribution={contribution} setShowPopup={setShowPopup} />
+          <UpdateOrderPopUp setMenuState={setMenuState} contribution={contribution} onCloseEdit={onCloseEdit} />
         </MenuSection>
       )}
     </PopUpMenu>
@@ -259,7 +244,7 @@ RecurringContributionsPopUp.propTypes = {
   contribution: PropTypes.object.isRequired,
   LoggedInUser: PropTypes.object.isRequired,
   status: PropTypes.string.isRequired,
-  setShowPopup: PropTypes.func,
+  onCloseEdit: PropTypes.func,
   account: PropTypes.object.isRequired,
 };
 

@@ -18,6 +18,7 @@ import Loading from '../components/Loading';
 import { recurringContributionsQuery } from '../components/recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../components/recurring-contributions/RecurringContributionsContainer';
 import StyledFilters from '../components/StyledFilters';
+import { withUser } from '../components/UserProvider';
 
 const MainContainer = styled(Container)`
   max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
@@ -56,6 +57,7 @@ class recurringContributionsPage extends React.Component {
 
   static propTypes = {
     slug: PropTypes.string.isRequired,
+    loadingLoggedInUser: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -70,11 +72,11 @@ class recurringContributionsPage extends React.Component {
   }
 
   render() {
-    const { slug, data, intl } = this.props;
+    const { slug, data, intl, loadingLoggedInUser } = this.props;
 
     const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
 
-    if (!data.loading) {
+    if (!data?.loading && !loadingLoggedInUser) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
@@ -84,17 +86,16 @@ class recurringContributionsPage extends React.Component {
 
     const collective = data && data.account;
     const recurringContributions = collective && collective.orders;
-
     return (
       <AuthenticatedPage>
-        {data.loading ? (
+        {data?.loading || loadingLoggedInUser ? (
           <Container py={[5, 6]}>
             <Loading />
           </Container>
         ) : (
           <Fragment>
             <CollectiveNavbar collective={collective} />
-            <MainContainer py={[3, 4]} px={[2, 3]}>
+            <MainContainer py={[3, 4]} px={[2, 3, 4]}>
               <SectionTitle textAlign="left" mb={1}>
                 <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
               </SectionTitle>
@@ -122,9 +123,10 @@ class recurringContributionsPage extends React.Component {
 }
 
 const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
+  skip: props => !props.LoggedInUser,
   options: {
     context: API_V2_CONTEXT,
   },
 });
 
-export default injectIntl(addRecurringContributionsPageData(recurringContributionsPage));
+export default withUser(injectIntl(addRecurringContributionsPageData(recurringContributionsPage)));

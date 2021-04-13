@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 import { color, display, space, typography } from 'styled-system';
 
-import { cursor, textTransform, whiteSpace, wordBreak } from '../lib/styled-system-custom-properties';
+import { cursor, overflowWrap, textTransform, whiteSpace, wordBreak } from '../lib/styled-system-custom-properties';
 
 export const P = styled.p.attrs(props => ({
   // Overrides default margin Y to avoid global styles
@@ -14,6 +14,7 @@ export const P = styled.p.attrs(props => ({
   ${typography}
   ${textTransform}
   ${whiteSpace}
+  ${overflowWrap}
   ${wordBreak}
   ${cursor}
   ${props =>
