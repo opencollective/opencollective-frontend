@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
+import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -114,7 +115,7 @@ class TopBar extends React.Component {
             <Logo width="24" height="24" />
             <Hide xs>
               <Box mx={2}>
-                <img height="16px" src="/static/images/logotype.svg" alt="Open collective" />
+                <Image height={16} width={100} src="/static/images/logotype.svg" alt="Open collective" />
               </Box>
             </Hide>
           </Flex>
