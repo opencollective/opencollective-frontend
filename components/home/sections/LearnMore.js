@@ -9,7 +9,7 @@ import StyledButton from '../../StyledButton';
 import { flicker } from '../../StyledKeyframes';
 import StyledLink from '../../StyledLink';
 import { H3, P } from '../../Text';
-import Illustration from '../HomeIllustration';
+import NextIllustration from '../HomeNextIllustration';
 
 const IconWrapper = styled(Box)`
   display: flex;
@@ -182,7 +182,9 @@ const LearnMore = () => {
               order={[null, channel.desktopItemOrder]}
             >
               <IconWrapper my={2}>
-                <Illustration
+                <NextIllustration
+                  width={60}
+                  height={60}
                   src={`/static/images/home/${channel.id}-illustration.png`}
                   alt={`${channel.id} illustration`}
                 />
@@ -228,8 +230,8 @@ const LearnMore = () => {
           </P>
         </Box>
         <DonateButtonWrapper width="287px" height="300px" my={3} ml={[null, 4]}>
-          <DonateButtonBG />
-          <DonateButtonBGHover />
+          <DonateButtonBG alt="" />
+          <DonateButtonBGHover alt="" />
           <Link href="/opencollective/donate">
             <DonateButton buttonStyle="dark" minWidth={'97'}>
               <FormattedMessage id="home.donate" defaultMessage="Donate" />

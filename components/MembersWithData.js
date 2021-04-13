@@ -34,7 +34,7 @@ class MembersWithData extends React.Component {
     fetchMore: PropTypes.func.isRequired,
     className: PropTypes.string,
     data: PropTypes.object,
-    role: PropTypes.string,
+    memberRole: PropTypes.string,
     type: PropTypes.string,
   };
 
@@ -191,7 +191,7 @@ export const addMembersData = graphql(membersQuery, {
       TierId: props.tier && props.tier.id,
       offset: 0,
       type: props.type,
-      role: props.role,
+      role: props.memberRole,
       orderBy: props.orderBy,
       limit: props.limit || MEMBERS_PER_PAGE * 2,
     },

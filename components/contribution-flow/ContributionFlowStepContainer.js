@@ -24,6 +24,7 @@ class ContributionFlowStepContainer extends React.Component {
     tier: PropTypes.object,
     onChange: PropTypes.func,
     showFeesOnTop: PropTypes.bool,
+    hasNewPaypal: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
     setBraintree: PropTypes.func,
     onSignInClick: PropTypes.func,
@@ -165,6 +166,7 @@ class ContributionFlowStepContainer extends React.Component {
             stepPayment={stepPayment}
             onNewCardFormReady={this.props.onNewCardFormReady}
             setBraintree={this.props.setBraintree}
+            hasNewPaypal={this.props.hasNewPaypal}
           />
         );
       case 'summary':

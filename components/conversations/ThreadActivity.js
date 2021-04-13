@@ -58,6 +58,10 @@ const ACTIVITIES_INFO = {
     type: 'error',
     icon: ErrorIcon,
   },
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
+    type: 'error',
+    icon: RejectedIcon,
+  },
 };
 
 const MESSAGES = defineMessages({
@@ -96,6 +100,10 @@ const MESSAGES = defineMessages({
   COLLECTIVE_EXPENSE_ERROR: {
     id: 'Expense.Activity.Error',
     defaultMessage: 'Expense error',
+  },
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
+    id: 'Expense.Activity.MarkedAsSpam',
+    defaultMessage: 'Expense marked as spam',
   },
 });
 

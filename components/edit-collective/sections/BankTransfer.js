@@ -78,7 +78,7 @@ const editBankTransferMutation = gqlV2/* GraphQL */ `
 `;
 
 const BankTransfer = props => {
-  const { loading, data, refetch: refetchHostData } = useQuery(hostQuery, {
+  const { loading, data } = useQuery(hostQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collectiveSlug },
   });
@@ -95,8 +95,7 @@ const BankTransfer = props => {
   const existingPayoutMethod = data.host.payoutMethods.find(pm => pm.data.isManualBankTransfer);
   const useStructuredForm =
     !existingManualPaymentMethod || (existingManualPaymentMethod && existingPayoutMethod) ? true : false;
-  const instructions =
-    get(data.host, 'settings.paymentMethods.manual.instructions') || BANK_TRANSFER_DEFAULT_INSTRUCTIONS;
+  const instructions = data.host.settings?.paymentMethods?.manual?.instructions || BANK_TRANSFER_DEFAULT_INSTRUCTIONS;
 
   // Fix currency if the existing payout method already matches the collective currency
   // or if it was already defined by Stripe
@@ -172,7 +171,7 @@ const BankTransfer = props => {
           initialValues={initialValues}
           onSubmit={async (values, { setSubmitting }) => {
             const { data, instructions } = values;
-            if (data?.currency) {
+            if (data?.currency && data?.type) {
               await createPayoutMethod({
                 variables: {
                   payoutMethod: { data: { ...data, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
@@ -194,7 +193,6 @@ const BankTransfer = props => {
             setSubmitting(false);
             setShowForm(false);
             props.hideTopsection(false);
-            refetchHostData();
           }}
         >
           {({ handleSubmit, isSubmitting, setFieldValue, values }) => (
@@ -209,7 +207,7 @@ const BankTransfer = props => {
                     defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout and instructions will be autmatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on Open Collective.'
                   />
                 </P>
-                <img src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} />
+                <img alt="" src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} />
               </Flex>
               {useStructuredForm && (
                 <React.Fragment>

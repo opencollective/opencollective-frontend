@@ -35,6 +35,12 @@ describe('Collective page', () => {
     cy.wait(900);
   });
 
+  it('Should not have no-index meta', () => {
+    // Wait for page to be loaded
+    cy.getByDataCy('collective-title');
+    cy.get('meta[name="robots"]').should('not.exist');
+  });
+
   describe('Hero', () => {
     it('Must have links to twitter, github and website', () => {
       cy.get('[data-cy=twitterProfileUrl]').should('have.attr', 'href', 'https://twitter.com/testCollective');

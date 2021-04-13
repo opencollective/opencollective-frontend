@@ -6,7 +6,9 @@ import { first, get, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import INTERVALS from '../../lib/constants/intervals';
 import { formatCurrency } from '../../lib/currency-utils';
+import { getIntervalFromContributionFrequency } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
@@ -38,6 +40,7 @@ const updateOrderMutation = gqlV2/* GraphQL */ `
     updateOrder(order: $order, amount: $amount, tier: $tier) {
       id
       status
+      frequency
       amount {
         value
         currency
@@ -105,6 +108,34 @@ const getTierOptions = (selectedTier, contribution) => {
   return objectArray;
 };
 
+const ContributionInterval = ({ tier, contribution }) => {
+  const isActiveTier = contribution.tier?.id && contribution.tier.id === tier.id;
+  let interval = null;
+
+  if (isActiveTier) {
+    interval = getIntervalFromContributionFrequency(contribution.frequency);
+  } else if (tier?.interval === INTERVALS.flexible) {
+    // TODO: We should ideally have a select for that
+    interval = getIntervalFromContributionFrequency(contribution.frequency) || INTERVALS.month;
+  } else if (tier?.interval && tier.interval !== INTERVALS.flexible) {
+    interval = tier.interval;
+  }
+
+  // Show message only if there's an active interval
+  if (interval) {
+    return (
+      <P fontSize="12px" fontWeight="500">
+        <FormattedMessage
+          id="tier.interval"
+          defaultMessage="per {interval, select, month {month} year {year} other {}}"
+          values={{ interval }}
+        />
+      </P>
+    );
+  } else {
+    return null;
+  }
+};
 const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
@@ -160,7 +191,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
       .map(tier => ({
         key: `${contribution.id}-tier-${tier.id}`,
         title: tier.name,
-        flexible: tier.amountType === 'FLEXIBLE' ? true : false,
+        flexible: tier.amountType === 'FLEXIBLE',
         amount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.value * 100 : tier.amount.value * 100,
         id: tier.id,
         currency: tier.amount.currency,
@@ -210,7 +241,11 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
           onChange={setSelectedTier}
           value={selectedTier?.key}
         >
-          {({ radio, checked, value: { title, subtitle, amount, flexible, currency, interval, minimumAmount } }) => (
+          {({
+            radio,
+            checked,
+            value: { id, title, subtitle, amount, flexible, currency, interval, minimumAmount },
+          }) => (
             <TierBox minheight={50} py={2} px={3} bg="white.full" data-cy="recurring-contribution-tier-box">
               <Flex alignItems="center">
                 <Box as="span" mr={3} flexWrap="wrap">
@@ -222,15 +257,24 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, setShowPopup }) => {
                   </P>
                   {checked && flexible ? (
                     <Fragment>
-                      <StyledSelect
-                        data-cy="tier-amount-select"
-                        onChange={setSelectedAmountOption}
-                        value={selectedAmountOption}
-                        options={amountOptions}
-                        my={2}
-                        minWidth={150}
-                        isSearchable={false}
-                      />
+                      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
+                      <div
+                        onClick={e => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <StyledSelect
+                          inputId={`tier-amount-select-${contribution.id}`}
+                          data-cy="tier-amount-select"
+                          onChange={setSelectedAmountOption}
+                          value={selectedAmountOption}
+                          options={amountOptions}
+                          my={2}
+                          minWidth={150}
+                          isSearchable={false}
+                        />
+                      </div>
+                      <ContributionInterval contribution={contribution} tier={{ id, interval }} />
                       {selectedAmountOption?.label === 'Other' && (
                         <Flex flexDirection="column">
                           <P fontSize="12px" fontWeight="600" my={2}>
