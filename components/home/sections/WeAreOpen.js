@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import NextIllustration from '../HomeNextIllustration';
+import Illustration from '../HomeIllustration';
 import SectionSubtitle from '../SectionSubtitle';
 import SectionTitle from '../SectionTitle';
 
@@ -21,13 +21,8 @@ const WeAreOpen = () => (
           <FormattedMessage id="home.weAreOpenSection.title" defaultMessage="We are open in every way" />
         </SectionTitle>
       </Box>
-      <Box display={['block', 'none']} my={3}>
-        <NextIllustration
-          width={224}
-          height={144}
-          src="/static/images/home/original/weareopen-illustration-md.png"
-          alt="We are open in every way"
-        />
+      <Box display={['block', 'none']} my={3} width="224px" height="144px">
+        <Illustration src="/static/images/home/weareopen-illustration-sm.png" alt="We are open in every way" />
       </Box>
       <Box my={2} width={['288px', 1]} textAlign={['center', 'left']}>
         <SectionSubtitle
@@ -50,12 +45,7 @@ const WeAreOpen = () => (
       my={5}
       ml={[null, null, 5]}
     >
-      <NextIllustration
-        width={336}
-        height={216}
-        src="/static/images/home/original/weareopen-illustration-md.png"
-        alt="We are open in every way"
-      />
+      <Illustration src="/static/images/home/weareopen-illustration-md.png" alt="We are open in every way" />
     </Box>
   </Flex>
 );
