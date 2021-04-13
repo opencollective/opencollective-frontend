@@ -185,7 +185,7 @@ const getDefaultContributeOption = (contribution, tiersOptions) => {
 
 const useContributeOptions = (order, tiers, disableCustomContributions) => {
   const intl = useIntl();
-  const [loadingDefaultTier, setLoadingDefaultTier] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [selectedContributeOption, setSelectedContributeOption] = useState(null);
   const [amountOptions, setAmountOptions] = useState(null);
   const [selectedAmountOption, setSelectedAmountOption] = useState(null);
@@ -196,7 +196,7 @@ const useContributeOptions = (order, tiers, disableCustomContributions) => {
   useEffect(() => {
     if (contributeOptions && !selectedContributeOption) {
       setSelectedContributeOption(getDefaultContributeOption(order, contributeOptions));
-      setLoadingDefaultTier(false);
+      setLoading(false);
     }
   }, [contributeOptions]);
 
@@ -209,7 +209,7 @@ const useContributeOptions = (order, tiers, disableCustomContributions) => {
   }, [selectedContributeOption]);
 
   return {
-    loadingDefaultTier,
+    loading,
     contributeOptions,
     amountOptions,
     selectedContributeOption,
@@ -274,7 +274,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, onCloseEdit }) => {
           <StyledHr width="100%" mx={2} />
         </Flex>
       </Flex>
-      {contributeOptionsState.loadingDefaultTier ? (
+      {contributeOptionsState.loading ? (
         <LoadingPlaceholder height={100} />
       ) : (
         <StyledRadioList

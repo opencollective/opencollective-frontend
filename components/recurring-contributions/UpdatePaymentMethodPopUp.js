@@ -195,13 +195,10 @@ const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentM
 
 const useUpdatePaymentMethod = contribution => {
   const { addToast } = useToasts();
-  const [submitUpdatePaymentMethod, { loading: loadingUpdatePaymentMethod }] = useMutation(
-    updatePaymentMethodMutation,
-    mutationOptions,
-  );
+  const [submitUpdatePaymentMethod, { loading }] = useMutation(updatePaymentMethodMutation, mutationOptions);
 
   return {
-    loadingUpdatePaymentMethod,
+    isSubmitting: loading,
     updatePaymentMethod: async paymentMethod => {
       const hasUpdate = paymentMethod.id !== contribution.paymentMethod.id;
       try {
@@ -245,7 +242,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
   const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
   const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
   const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
-  const { loadingUpdatePaymentMethod, updatePaymentMethod } = useUpdatePaymentMethod(contribution);
+  const { isSubmitting, updatePaymentMethod } = useUpdatePaymentMethod(contribution);
 
   // GraphQL mutations and queries
   const { data, refetch } = useQuery(paymentMethodsQuery, {
@@ -362,7 +359,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
         <Box px={1} pt={2} pb={3}>
           <AddPaymentMethod
             order={contribution}
-            isSubmitting={loadingUpdatePaymentMethod}
+            isSubmitting={isSubmitting}
             setNewPaymentMethodInfo={setNewPaymentMethodInfo}
             onStripeReady={({ stripe }) => setStripe(stripe)}
             onPaypalSuccess={async paypalPaymentMethod => {
@@ -492,7 +489,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
               minWidth={75}
               buttonSize="tiny"
               buttonStyle="secondary"
-              loading={loadingUpdatePaymentMethod}
+              loading={isSubmitting}
               data-cy="recurring-contribution-update-pm-button"
               onClick={() => updatePaymentMethod(selectedPaymentMethod).then(onCloseEdit)}
             >
