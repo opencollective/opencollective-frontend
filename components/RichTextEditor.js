@@ -197,6 +197,7 @@ export default class RichTextEditor extends React.Component {
     /** If truthy, will display a red outline */
     error: PropTypes.any,
     'data-cy': PropTypes.string,
+    videoEmbedEnabled: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -207,6 +208,7 @@ export default class RichTextEditor extends React.Component {
     toolbarBackgroundColor: 'white',
     version: 'default',
     'data-cy': 'RichTextEditor',
+    videoEmbedEnabled: false,
   };
 
   constructor(props) {
@@ -260,8 +262,10 @@ export default class RichTextEditor extends React.Component {
       this.editorRef.current.addEventListener('trix-file-accept', this.handleFileAccept);
       this.editorRef.current.addEventListener('trix-action-invoke', this.trixActionInvoke);
       this.editorRef.current.addEventListener('trix-initialize', event => {
-        this.replaceEmbeddedIFrames(this.props.value || this.props.defaultValue);
-        this.trixVideoEmbed(event);
+        if (this.props.videoEmbedEnabled) {
+          this.replaceEmbeddedIFrames(this.props.value || this.props.defaultValue);
+          this.trixVideoEmbed(event);
+        }
         // Some special handling for links
         if (this.mainContainerRef.current) {
           // We must listen when the user presses the 'Enter' key and when the user clicks the 'Link' button as well
@@ -374,7 +378,7 @@ export default class RichTextEditor extends React.Component {
   embedVideoIFrame = videoLink => {
     const embedLink = this.constructVideoEmbedURL(videoLink);
     if (embedLink) {
-      const embed = `<iframe src="${embedLink}/?showinfo=0" frameborder="0" allowfullscreen/>`;
+      const embed = `<iframe src="${embedLink}/?showinfo=0" width="100%" height="400" frameborder="0" allowfullscreen/>`;
       const attachment = new this.Trix.Attachment({ content: embed });
       this.getEditor().insertAttachment(attachment);
     }
