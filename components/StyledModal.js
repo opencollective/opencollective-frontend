@@ -257,7 +257,7 @@ StyledModal.propTypes = {
   minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
-  /** wether to render the modal at the root with a potal */
+  /** whether to render the modal at the root with a potal */
   usePortal: PropTypes.bool,
   /** set this to true if the modal contains a form or buttons */
   trapFocus: PropTypes.bool,
