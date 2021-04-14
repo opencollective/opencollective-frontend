@@ -5,6 +5,9 @@
     "type": "git",
     "url": "https://github.com/opencollective/opencollective-frontend.git"
   },
+  "cacheDirectories": [
+    ".next/cache"
+  ],
   "private": true,
   "engines": {
     "node": "14.x",
