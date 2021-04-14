@@ -762,7 +762,6 @@
   "event.privateInstructions.description": "These instructions will be provided by email to the participants.",
   "event.privateInstructions.label": "Private instructions",
   "event.responses.title.going": "{n} {n, plural, one {person going} other {people going}}",
-  "Event.SendEmail": "Invia email",
   "event.sponsors.title": "Sponsors",
   "event.type.label": "Tipo",
   "EventCover.LocalTime": "Il Tuo Tempo",

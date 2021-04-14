@@ -762,7 +762,6 @@
   "event.privateInstructions.description": "These instructions will be provided by email to the participants.",
   "event.privateInstructions.label": "Private instructions",
   "event.responses.title.going": "{n} {n, plural, one {person going} other {people going}}",
-  "Event.SendEmail": "Poslat e-mail",
   "event.sponsors.title": "Sponzoři",
   "event.type.label": "Typ",
   "EventCover.LocalTime": "Váš čas",

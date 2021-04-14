@@ -762,7 +762,6 @@
   "event.privateInstructions.description": "Estas instruções serão fornecidas por e-mail aos participantes.",
   "event.privateInstructions.label": "Instruções privadas",
   "event.responses.title.going": "{n}{n, plural, one {pessoa indo} other {pessoas indo}}",
-  "Event.SendEmail": "Enviar e-mail",
   "event.sponsors.title": "Patrocinadores",
   "event.type.label": "Tipo",
   "EventCover.LocalTime": "Seu Tempo",

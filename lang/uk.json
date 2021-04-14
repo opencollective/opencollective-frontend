@@ -762,7 +762,6 @@
   "event.privateInstructions.description": "These instructions will be provided by email to the participants.",
   "event.privateInstructions.label": "Private instructions",
   "event.responses.title.going": "{n} {n, plural, one {person going} other {people going}}",
-  "Event.SendEmail": "Надіслати електронного листа",
   "event.sponsors.title": "Спонсори",
   "event.type.label": "Тип",
   "EventCover.LocalTime": "Ваш час",
