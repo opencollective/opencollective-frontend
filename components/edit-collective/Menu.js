@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { Flex } from '../Grid';
@@ -32,6 +33,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   PENDING_ORDERS: 'pending-orders',
   TWO_FACTOR_AUTH: 'two-factor-auth',
   ADVANCED: 'advanced', // Last on purpose
+  VIRTUAL_CARDS: 'virtual-cards',
   // Host Specific
   FISCAL_HOSTING: 'fiscal-hosting',
   HOST_PLAN: 'host-plan',
@@ -40,6 +42,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
   HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
+  HOST_VIRTUAL_CARDS: 'host-virtual-cards',
 };
 
 const SECTION_LABELS = defineMessages({
@@ -147,6 +150,14 @@ const SECTION_LABELS = defineMessages({
     id: 'TwoFactorAuth',
     defaultMessage: 'Two-factor authentication',
   },
+  [EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS]: {
+    id: 'VirtualCards.Title',
+    defaultMessage: 'Virtual Cards',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: {
+    id: 'VirtualCards.Title',
+    defaultMessage: 'Virtual Cards',
+  },
 });
 
 const MenuItem = styled(Link)`
@@ -185,6 +196,8 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c => isOneOfTypes(c, COLLECTIVE, FUND, ORGANIZATION, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, ORGANIZATION, USER),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: c => isOneOfTypes(c, ORGANIZATION, USER),
+  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c =>
+    isOneOfTypes(c, COLLECTIVE, FUND) && hasFeature(c.host, FEATURES.PRIVACY_VCC),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
     isOneOfTypes(c, COLLECTIVE, FUND, EVENT, PROJECT) || (c.type === ORGANIZATION && c.isActive),
@@ -201,6 +214,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS]: () => false,
 };
 
 const shouldDisplaySection = (collective, section) => {
@@ -261,6 +275,8 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
           {collective.type === COLLECTIVE && renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH))}
+          {hasFeature(collective, FEATURES.PRIVACY_VCC) &&
+            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS))}
         </Fragment>
       )}
     </Flex>

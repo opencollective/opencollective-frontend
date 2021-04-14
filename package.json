@@ -88,6 +88,7 @@
     "react-select": "3.2.0",
     "react-stripe-elements": "6.1.2",
     "react-swipeable": "5.5.1",
+    "react-text-mask": "^5.4.3",
     "react-window": "1.8.6",
     "redis": "3.0.2",
     "sanitize-html": "1.27.4",
