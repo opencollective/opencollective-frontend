@@ -145,6 +145,11 @@ interface Account {
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput
   ): OrderCollection!
   settings: JSON!
@@ -672,6 +677,11 @@ type Bot implements Account {
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
@@ -924,6 +934,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
@@ -3099,6 +3114,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
@@ -4003,6 +4023,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
@@ -4315,6 +4340,11 @@ type Host implements Account & AccountWithContributions {
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
@@ -4839,6 +4869,11 @@ type Individual implements Account {
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
@@ -6151,6 +6186,11 @@ type Organization implements Account & AccountWithContributions {
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
@@ -6671,6 +6711,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
@@ -7741,6 +7786,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     Only returns orders that have an subscription (monthly/yearly)
     """
     onlySubscriptions: Boolean
+
+    """
+    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    """
+    includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
