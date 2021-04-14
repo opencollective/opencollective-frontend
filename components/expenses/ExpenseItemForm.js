@@ -256,9 +256,9 @@ ExpenseItemForm.propTypes = {
   onRemove: PropTypes.func,
   /** A map of errors for this object */
   errors: PropTypes.object,
-  /** Wether a file is required for this attachment type */
+  /** Whether a file is required for this attachment type */
   requireFile: PropTypes.bool,
-  /** Wether a date is required for this expense type */
+  /** Whether a date is required for this expense type */
   requireDate: PropTypes.bool,
   /** Wheter this whole item is optional */
   isOptional: PropTypes.bool,

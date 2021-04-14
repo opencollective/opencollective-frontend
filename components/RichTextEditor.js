@@ -173,13 +173,13 @@ export default class RichTextEditor extends React.Component {
     showCount: PropTypes.bool,
     /** max length which is allowed */
     maxLength: PropTypes.number,
-    /** Wether the toolbar should stick to the top */
+    /** Whether the toolbar should stick to the top */
     withStickyToolbar: PropTypes.bool,
     /** This component is borderless by default. Set this to `true` to change that. */
     withBorders: PropTypes.bool,
     /** This component is borderless by default. Set this to `true` to change that. */
     version: PropTypes.oneOf(['default', 'simplified']),
-    /** Wether the field should be disabled */
+    /** Whether the field should be disabled */
     disabled: PropTypes.bool,
     /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
     toolbarTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),

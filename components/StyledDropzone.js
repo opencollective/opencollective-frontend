@@ -215,7 +215,7 @@ StyledDropzone.propTypes = {
   size: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** A function to generate mock images */
   mockImageGenerator: PropTypes.func,
-  /** Wether the dropzone should accept multiple files */
+  /** Whether the dropzone should accept multiple files */
   isMulti: PropTypes.bool,
   /** Filetypes to accept */
   accept: PropTypes.string,

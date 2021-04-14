@@ -143,10 +143,10 @@ SectionTransactions.propTypes = {
     platformFeePercent: PropTypes.number,
   }).isRequired,
 
-  /** Wether user is admin of `collective` */
+  /** Whether user is admin of `collective` */
   isAdmin: PropTypes.bool,
 
-  /** Wether user is root user */
+  /** Whether user is root user */
   isRoot: PropTypes.bool,
 
   /** @ignore from withData */

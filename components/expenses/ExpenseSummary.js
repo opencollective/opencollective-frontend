@@ -386,7 +386,7 @@ ExpenseSummary.propTypes = {
       canDelete: PropTypes.bool,
     }),
   }),
-  /** Wether or not this is being displayed for an edited Expense */
+  /** Whether or not this is being displayed for an edited Expense */
   isEditing: PropTypes.bool,
   /** The account where the expense has been submitted, required to display the process actions */
   collective: PropTypes.object,
