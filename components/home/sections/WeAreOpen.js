@@ -25,7 +25,7 @@ const WeAreOpen = () => (
         <NextIllustration
           width={224}
           height={144}
-          src="/static/images/home/original/weareopen-illustration-md.png"
+          src="/static/images/home/weareopen-illustration-md.png"
           alt="We are open in every way"
         />
       </Box>
@@ -53,7 +53,7 @@ const WeAreOpen = () => (
       <NextIllustration
         width={336}
         height={216}
-        src="/static/images/home/original/weareopen-illustration-md.png"
+        src="/static/images/home/weareopen-illustration-md.png"
         alt="We are open in every way"
       />
     </Box>
