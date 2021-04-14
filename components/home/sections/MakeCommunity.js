@@ -114,7 +114,7 @@ const MakeCommunity = () => {
             width={558}
             height={448}
             alt="Make your community sustainable"
-            src="/static/images/home/original/makecommunity-section-illustration.png"
+            src="/static/images/home/makecommunity-section-illustration.png"
           />
         </Flex>
       </Flex>
