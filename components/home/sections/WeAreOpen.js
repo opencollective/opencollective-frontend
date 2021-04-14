@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import NextIllustration from '../HomeNextIllustration';
+import Illustration from '../HomeIllustration';
 import SectionSubtitle from '../SectionSubtitle';
 import SectionTitle from '../SectionTitle';
 

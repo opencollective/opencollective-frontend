@@ -10,7 +10,7 @@ import { Box, Flex } from '../../Grid';
 import StyledCarousel from '../../StyledCarousel';
 import StyledLink from '../../StyledLink';
 import { H4, P, Span } from '../../Text';
-import NextIllustration from '../HomeNextIllustration';
+import Illustration from '../HomeIllustration';
 import SectionSubtitle from '../SectionSubtitle';
 import SectionTitle from '../SectionTitle';
 
@@ -175,7 +175,7 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
     <Flex alignItems="center" justifyContent={['center', 'space-between']} width={1} {...props}>
       <Container display="flex" alignItems="center">
         <Box display={['none', 'block']} width={[null, '48px']} height={[null, '48px']} mr={[3, 2]}>
-          <NextIllustration width={50} height={50} src={iconUrl} alt={`${id} icon`} />
+          <Illustration src={iconUrl} alt={`${id} icon`} />
         </Box>
         <Span
           color={['black.800', 'black.900']}
@@ -242,13 +242,18 @@ const Feature = ({ id, learnMoreLink, intl }) => (
       <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', 'block']} />
     </Container>
     <Container width={[null, '392px', '466px', null, '756px']}>
-      <NextIllustration
-        loading="eager"
-        width={756}
-        height={575}
-        src={`/static/images/home/${id}-screenshot.png`}
-        alt={intl.formatMessage(messages[`home.feature.${id}`])}
-      />
+      <Box display={['none', 'block']}>
+        <Illustration
+          src={`/static/images/home/${id}-screenshot.png`}
+          alt={intl.formatMessage(messages[`home.feature.${id}`])}
+        />
+      </Box>
+      <Box display={['block', 'none']}>
+        <Illustration
+          src={`/static/images/home/${id}-screenshot-sm.png`}
+          alt={intl.formatMessage(messages[`home.feature.${id}`])}
+        />
+      </Box>
     </Container>
     <FeatureDescription intl={intl} id={id} learnMoreLink={learnMoreLink} display={['block', 'none']} mt={2} />
   </Container>

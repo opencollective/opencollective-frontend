@@ -6,7 +6,7 @@ import { display } from 'styled-system';
 
 import { Box, Flex } from '../../Grid';
 import { H3, P } from '../../Text';
-import NextIllustration from '../HomeNextIllustration';
+import Illustration from '../HomeIllustration';
 import SectionSubTitle from '../SectionSubtitle';
 import SectionTitle from '../SectionTitle';
 
