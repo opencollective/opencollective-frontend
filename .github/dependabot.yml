@@ -61,3 +61,8 @@ updates:
     versions:
     - ">= 1.0.a"
     - "< 1.1"
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: daily
+    timezone: Europe/Berlin
