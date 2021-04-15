@@ -116,9 +116,9 @@ describe('Contribution Flow: Donate', () => {
   });
 
   it('Forces params if given in URL', () => {
+    const date = Cypress.moment().add(1, 'years').format('MMMM 1, Y');
     cy.signup({ redirect: `${donateRoute}/42/year`, visitParams }).then(() => {
-      cy.clock(Date.parse('2042/05/25'));
-      cy.contains('The next charge will be on May 1, 2043');
+      cy.contains(`The next charge will be on ${date}`);
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.checkStepsProgress({ enabled: ['details', 'profile'] });
       cy.get('button[data-cy="cf-next-step"]').click();
@@ -149,7 +149,7 @@ describe('Contribution Flow: Donate', () => {
 
     // Rejecting the validation should produce an error
     cy.complete3dSecure(false);
-    cy.wait(3000);
+    cy.wait(5000);
     cy.contains('We are unable to authenticate your payment method.');
 
     // Refill stripe input to avoid using the same token twice
@@ -161,7 +161,7 @@ describe('Contribution Flow: Donate', () => {
     // Approving the validation should create the order
     cy.wait(8000); // Wait for order to be submitted and popup to appear
     cy.complete3dSecure(true);
-    cy.wait(8000);
+    cy.wait(5000);
     cy.getByDataCy('order-success', { timeout: 20000 });
     cy.contains('You are now supporting APEX.');
   });

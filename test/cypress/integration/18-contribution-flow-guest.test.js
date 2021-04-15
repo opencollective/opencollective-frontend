@@ -56,10 +56,6 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.openEmail(({ subject, html }) => html.includes(email) && subject.includes(expectedEmailSubject));
     cy.contains('a[href*="/confirm/guest"]', 'Verify').click();
 
-    // Redirected from email
-    cy.location('pathname').should('include', '/confirm/guest');
-    cy.contains('Your email has been confirmed');
-
     // Redirected to profile, contains all transactions
     cy.location('pathname').should('include', '/user-');
     cy.contains('Incognito'); // Default user name
@@ -184,10 +180,6 @@ describe('Contribution Flow: Guest contributions', () => {
       const expectedEmailSubject = 'Open Collective: Verify your email';
       cy.openEmail(({ subject, html }) => html.includes(firstEmail) && subject.includes(expectedEmailSubject));
       cy.contains('a[href*="/confirm/guest"]', 'Verify').click();
-
-      // Redirected from email
-      cy.location('pathname').should('include', '/confirm/guest');
-      cy.contains('Your email has been confirmed');
 
       // Redirected to profile, contains all transactions
       cy.location('pathname').should('include', '/rick-astley'); // Used name to generate the profile
