@@ -763,7 +763,6 @@
   "event.privateInstructions.description": "These instructions will be provided by email to the participants.",
   "event.privateInstructions.label": "Private instructions",
   "event.responses.title.going": "{n} {n, plural, one {person going} other {people going}}",
-  "Event.SendEmail": "Send email",
   "event.sponsors.title": "Sponsors",
   "event.type.label": "Type",
   "EventCover.LocalTime": "Your Time",

@@ -763,7 +763,6 @@
   "event.privateInstructions.description": "These instructions will be provided by email to the participants.",
   "event.privateInstructions.label": "Private instructions",
   "event.responses.title.going": "{n} {n, plural, one {人が参加} other {人が参加}}",
-  "Event.SendEmail": "メールを送信",
   "event.sponsors.title": "スポンサー",
   "event.type.label": "タイプ",
   "EventCover.LocalTime": "Your Time",

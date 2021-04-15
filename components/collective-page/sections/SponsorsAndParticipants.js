@@ -105,11 +105,6 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
             <StyledAdminActions>
               <ul>
                 <li>
-                  <a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>
-                    <FormattedMessage id="Event.SendEmail" defaultMessage="Send email" />
-                  </a>
-                </li>
-                <li>
                   <StyledLinkButton onClick={() => exportRSVPs(event)}>
                     <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
                   </StyledLinkButton>
