@@ -121,6 +121,18 @@ function UpdatePaymentPage(props) {
       setShowCreditCardForm(false);
       return;
     }
+
+    if (response.setupIntent) {
+      const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
+      if (result.error) {
+        setSubmitting(false);
+        setError(result.error.message);
+        setShowCreditCardForm(false);
+      }
+      if (result.setupIntent && result.setupIntent.status === 'succeeded') {
+        handleSuccess();
+      }
+    }
   };
 
   const { LoggedInUser, loadingLoggedInUser, data } = props;

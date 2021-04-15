@@ -99,6 +99,24 @@ function EditPaymentMethods(props) {
       setSubmitting(false);
       return;
     }
+
+    if (response.setupIntent) {
+      const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
+      if (result.error) {
+        setSubmitting(false);
+        setError(result.error.message);
+      } else {
+        try {
+          await props.confirmCreditCardEditCollective({
+            variables: { paymentMethod: { id: paymentMethod.id } },
+          });
+          handleSuccess();
+        } catch (error) {
+          setSubmitting(false);
+          setError(result.error.message);
+        }
+      }
+    }
   };
 
   const updatePaymentMethod = async paymentMethod => {

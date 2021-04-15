@@ -274,18 +274,28 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, acc
       return false;
     }
 
-    try {
-      const response = await submitConfirmPaymentMethodMutation({
-        variables: { paymentMethod: { id: paymentMethod.id } },
-      });
-      return handleSuccess(response.data.confirmCreditCard.paymentMethod);
-    } catch (error) {
+    const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
+    if (result.error) {
       addToast({
         type: TOAST_TYPE.ERROR,
-        message: error.message,
+        message: result.error.message,
       });
       setAddingPaymentMethod(false);
       return false;
+    } else {
+      try {
+        const response = await submitConfirmPaymentMethodMutation({
+          variables: { paymentMethod: { id: paymentMethod.id } },
+        });
+        return handleSuccess(response.data.confirmCreditCard.paymentMethod);
+      } catch (error) {
+        addToast({
+          type: TOAST_TYPE.ERROR,
+          message: error.message,
+        });
+        setAddingPaymentMethod(false);
+        return false;
+      }
     }
   };
 

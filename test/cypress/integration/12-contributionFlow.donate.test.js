@@ -149,6 +149,7 @@ describe('Contribution Flow: Donate', () => {
 
     // Rejecting the validation should produce an error
     cy.complete3dSecure(false);
+    cy.wait(3000);
     cy.contains('We are unable to authenticate your payment method.');
 
     // Refill stripe input to avoid using the same token twice
@@ -160,6 +161,7 @@ describe('Contribution Flow: Donate', () => {
     // Approving the validation should create the order
     cy.wait(8000); // Wait for order to be submitted and popup to appear
     cy.complete3dSecure(true);
+    cy.wait(8000);
     cy.getByDataCy('order-success', { timeout: 20000 });
     cy.contains('You are now supporting APEX.');
   });

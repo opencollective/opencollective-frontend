@@ -18,7 +18,7 @@ import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/erro
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
-import { stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
@@ -164,11 +164,28 @@ function ContributionFlow(props) {
     }
   };
 
-  const handleStripeError = async (order, stripeError) => {
-    const { message, response } = stripeError;
+  const handleStripeError = async (order, stripeError, email, guestToken) => {
+    const { message, account, response } = stripeError;
     if (!response) {
       setIsSubmitting(false);
       setError(message);
+    } else if (response.paymentIntent) {
+      const stripe = await getStripe(null, account);
+      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
+      if (result.error) {
+        setIsSubmitting(false);
+        setError(result.error.message);
+      } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
+        setIsSubmitting(true);
+        setError(null);
+        try {
+          const response = await props.confirmOrder({ variables: { order: { id: order.id }, guestToken } });
+          return handleOrderResponse(response.data.confirmOrder, email);
+        } catch (e) {
+          setIsSubmitting(false);
+          setError(e.message);
+        }
+      }
     }
   };
 
