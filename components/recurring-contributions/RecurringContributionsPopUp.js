@@ -226,7 +226,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             setMenuState={setMenuState}
             contribution={contribution}
             onCloseEdit={onCloseEdit}
-            account={account}
+            account={contribution.fromAccount || account}
           />
         </MenuSection>
       )}

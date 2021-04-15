@@ -4,7 +4,6 @@ import { useMutation, useQuery } from '@apollo/client';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import themeGet from '@styled-system/theme-get';
 import { first, get, merge, pick, uniqBy } from 'lodash';
-import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -61,8 +60,8 @@ const paymentMethodFragment = gqlV2/* GraphQL */ `
 `;
 
 const paymentMethodsQuery = gqlV2/* GraphQL */ `
-  query UpdatePaymentMethodPopUpPaymentMethod($slug: String!, $orderId: String!) {
-    account(slug: $slug) {
+  query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
+    account(id: $accountId) {
       id
       paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
         ...UpdatePaymentMethodFragment
@@ -230,7 +229,7 @@ const useUpdatePaymentMethod = contribution => {
   };
 };
 
-const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, router, loadStripe, account }) => {
+const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loadStripe, account }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
 
@@ -246,7 +245,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
 
   // GraphQL mutations and queries
   const { data, refetch } = useQuery(paymentMethodsQuery, {
-    variables: { slug: router.query.slug, orderId: contribution.id },
+    variables: { accountId: account.id, orderId: contribution.id },
     context: API_V2_CONTEXT,
     fetchPolicy: 'network-only',
   });
@@ -512,4 +511,4 @@ UpdatePaymentMethodPopUp.propTypes = {
   account: PropTypes.object.isRequired,
 };
 
-export default withStripeLoader(withRouter(UpdatePaymentMethodPopUp));
+export default withStripeLoader(UpdatePaymentMethodPopUp);

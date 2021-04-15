@@ -14,7 +14,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
       features {
         ...NavbarFields
       }
-      orders(filter: OUTGOING, onlySubscriptions: true) {
+      orders(filter: OUTGOING, onlySubscriptions: true, includeIncognito: true) {
         totalCount
         nodes {
           id
@@ -47,6 +47,12 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
             value
             valueInCents
             currency
+          }
+          fromAccount {
+            id
+            name
+            slug
+            isIncognito
           }
           toAccount {
             id
