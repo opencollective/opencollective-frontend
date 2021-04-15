@@ -39,7 +39,7 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
           </MessageBox>
         )}
 
-        <StyledButton mt={10} type="submit" buttonSize="tiny" onClick={handleConnect}>
+        <StyledButton mt={2} type="submit" onClick={handleConnect}>
           <FormattedMessage id="collective.connectedAccounts.transferwise.button" defaultMessage="Connect Wise" />
         </StyledButton>
       </React.Fragment>
@@ -47,7 +47,7 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
   } else {
     return (
       <React.Fragment>
-        <P my={1}>
+        <P>
           <FormattedMessage
             id="collective.connectedAccounts.transferwise.connected"
             defaultMessage="Wise connected on {updatedAt, date, short}"
@@ -56,8 +56,8 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
             }}
           />
         </P>
-        <P my={1}>
-          <StyledButton type="submit" buttonSize="tiny" onClick={handleDisconnect}>
+        <P>
+          <StyledButton type="submit" mt={2} onClick={handleDisconnect}>
             <FormattedMessage
               id="collective.connectedAccounts.disconnect.button"
               defaultMessage="Disconnect"
