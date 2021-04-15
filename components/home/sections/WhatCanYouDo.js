@@ -6,7 +6,7 @@ import { display } from 'styled-system';
 
 import { Box, Flex } from '../../Grid';
 import { H3, P } from '../../Text';
-import Illustration from '../HomeIllustration';
+import NextIllustration from '../HomeNextIllustration';
 import SectionSubTitle from '../SectionSubtitle';
 import SectionTitle from '../SectionTitle';
 
@@ -85,14 +85,11 @@ const WhatCanYouDo = () => {
           <FormattedMessage id="home.whatCanYouDoSection.collectMoney" defaultMessage="Collect Money" />
         </Title>
         <Box width={[null, '390px', '488px', null, '558px']} mr={[null, null, 3, null, 5]}>
-          <Illustration
-            src="/static/images/home/collectmoney-illustration-md.png"
-            display={['block', null, null, 'none']}
-            alt="Collect money"
-          />
-          <Illustration
+          <NextIllustration
+            width={558}
+            height={418}
             src="/static/images/home/collectmoney-illustration-lg.png"
-            display={['none', null, null, 'block']}
+            display={['block', null, null, 'none']}
             alt="Collect money"
           />
         </Box>
@@ -119,14 +116,11 @@ const WhatCanYouDo = () => {
           <FormattedMessage id="home.whatCanYouDoSection.spendMoney" defaultMessage="Spend Money" />
         </Title>
         <Box width={[null, '390px', '488px', null, '558px']} ml={[null, null, 3, null, 5]}>
-          <Illustration
-            src="/static/images/home/spendmoney-illustration-md.png"
-            display={['block', null, null, 'none']}
-            alt="Spend money"
-          />
-          <Illustration
+          <NextIllustration
+            width={558}
+            height={429}
             src="/static/images/home/spendmoney-illustration-lg.png"
-            display={['none', null, null, 'block']}
+            display={['block', null, null, 'none']}
             alt="Spend money"
           />
         </Box>
@@ -153,15 +147,12 @@ const WhatCanYouDo = () => {
           <FormattedMessage id="home.whatCanYouDoSection.manageMoney" defaultMessage="Manage Money" />
         </Title>
         <Box width={[null, '390px', '488px', null, '558px']} mr={[null, null, 3, null, 5]}>
-          <Illustration
-            src="/static/images/home/managemoney-illustration-md.png"
-            alt="Manage money"
-            display={['block', null, null, 'none']}
-          />
-          <Illustration
+          <NextIllustration
+            width={558}
+            height={350}
             src="/static/images/home/managemoney-illustration-lg.png"
             alt="Manage money"
-            display={['none', null, null, 'block']}
+            display={['block', null, null, 'none']}
           />
         </Box>
         <Box width={[null, '224px', '274px', null, '408px']} textAlign="left" ml={[null, 4, 0, 5]}>
