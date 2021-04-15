@@ -394,7 +394,6 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
-        'hasNewPaypal',
       ]),
       ...queryParams,
     };
@@ -700,7 +699,7 @@ class ContributionFlow extends React.Component {
                       prevStep={prevStep}
                       nextStep={nextStep}
                       isValidating={isValidating || isSubmitted || isSubmitting}
-                      paypalButtonProps={this.getPaypalButtonProps({ currency })}
+                      paypalButtonProps={!nextStep && this.getPaypalButtonProps({ currency })}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
                       disableNext={stepPayment?.key === 'braintree' && !stepPayment.isReady}
