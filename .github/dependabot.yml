@@ -1,0 +1,64 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    timezone: Europe/Berlin
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: "@babel/cli"
+    versions:
+    - ">= 7.10.a"
+    - "< 7.11"
+  - dependency-name: "@babel/cli"
+    versions:
+    - ">= 7.5.a"
+    - "< 7.6"
+  - dependency-name: "@babel/core"
+    versions:
+    - ">= 7.5.a"
+    - "< 7.6"
+  - dependency-name: "@babel/node"
+    versions:
+    - ">= 7.5.a"
+    - "< 7.6"
+  - dependency-name: "@babel/runtime"
+    versions:
+    - ">= 7.5.a"
+    - "< 7.6"
+  - dependency-name: bootstrap
+    versions:
+    - ">= 4.a"
+    - "< 5"
+  - dependency-name: clean-tag
+    versions:
+    - "> 3.1.0"
+  - dependency-name: next
+    versions:
+    - ">= 9.0.0.a"
+    - "< 9.0.1"
+  - dependency-name: react-mde
+    versions:
+    - ">= 10.a"
+    - "< 11"
+  - dependency-name: react-mde
+    versions:
+    - ">= 7.a"
+    - "< 8"
+  - dependency-name: react-styleguidist
+    versions:
+    - ">= 9.1.a"
+    - "< 9.2"
+  - dependency-name: react-styleguidist
+    versions:
+    - ">= 9.2.a"
+    - "< 9.3"
+  - dependency-name: styled-icons
+    versions:
+    - ">= 8.4.a"
+    - "< 8.5"
+  - dependency-name: "@zeit/next-css"
+    versions:
+    - ">= 1.0.a"
+    - "< 1.1"
