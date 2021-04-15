@@ -7589,6 +7589,7 @@ Stats about the potential audience of an update
 """
 type UpdateAudienceStats {
   id: String!
+  coreContributors: Int!
   individuals: Int!
   organizations: Int!
   collectives: Int!
