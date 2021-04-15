@@ -68,7 +68,6 @@ class NewContributionFlowPage extends React.Component {
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
-      hasNewPaypal: parseToBoolean(query.hasNewPaypal),
     };
   }
 
@@ -162,7 +161,7 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
-          hasNewPaypal={this.props.hasNewPaypal && LoggedInUser?.isRoot()}
+          hasNewPaypal={LoggedInUser?.isRoot()}
         />
       );
     }
