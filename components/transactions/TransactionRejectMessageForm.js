@@ -4,7 +4,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
-import { P } from '../Text';
 
 const MESSAGE_MAX_LENGTH = 500;
 
@@ -27,13 +26,13 @@ const TransactionRejectMessageForm = ({ message, onChange }) => {
         name="rejectionMessage"
         htmlFor="rejectionMessage"
         label={<FormattedMessage id="Contact.Message" defaultMessage="Message" />}
+        required={false}
         my={3}
       >
         {inputProps => (
           <StyledTextarea
             {...inputProps}
             resize="none"
-            withOutline
             maxLength={MESSAGE_MAX_LENGTH}
             minWidth={[290, 500]}
             minHeight={100}
@@ -45,9 +44,6 @@ const TransactionRejectMessageForm = ({ message, onChange }) => {
           />
         )}
       </StyledInputField>
-      <P fontSize="11px">
-        <FormattedMessage id="forms.optional" defaultMessage="Optional" />
-      </P>
     </div>
   );
 };

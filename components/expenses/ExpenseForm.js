@@ -129,13 +129,14 @@ export const prepareExpenseForSubmit = expenseData => {
  * Validate the expense
  */
 const validate = expense => {
+  const isCardCharge = expense.type === expenseTypes.CHARGE;
   if (expense.payee?.isInvite) {
     return expense.payee.id
       ? requireFields(expense, ['description', 'payee', 'payee.id'])
       : requireFields(expense, ['description', 'payee', 'payee.name', 'payee.email']);
   }
 
-  const errors = requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
+  const errors = isCardCharge ? {} : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.items.length > 0) {
     const itemsErrors = expense.items.map(item => validateExpenseItem(expense, item));
@@ -145,7 +146,11 @@ const validate = expense => {
     }
   }
 
-  if (expense.payoutMethod) {
+  if (
+    expense.payoutMethod &&
+    // CHARGE expenses have VirtualCard and do not have PayoutMethod
+    isCardCharge
+  ) {
     const payoutMethodErrors = validatePayoutMethod(expense.payoutMethod);
     if (!isEmpty(payoutMethodErrors)) {
       errors.payoutMethod = payoutMethodErrors;

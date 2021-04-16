@@ -8,7 +8,6 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
-import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 
@@ -63,17 +62,15 @@ const TransactionRefundButton = props => {
           onClose={closeModal}
           header={<FormattedMessage id="Refund" defaultMessage="Refund" />}
           body={
-            <React.Fragment>
-              <Flex alignItems="center" justifyContent="center">
-                <MessageBox type="info" mx={2}>
-                  <FormattedMessage
-                    id="transaction.refund.info"
-                    defaultMessage="The contributor will be refunded the full amount."
-                  />
-                </MessageBox>
-                {error && <MessageBoxGraphqlError mt="12px" error={error} />}
-              </Flex>
-            </React.Fragment>
+            <div>
+              <div>
+                <FormattedMessage
+                  id="transaction.refund.info"
+                  defaultMessage="The contributor will be refunded the full amount."
+                />
+              </div>
+              {error && <MessageBoxGraphqlError mt="12px" error={error} />}
+            </div>
           }
           continueLabel={
             <Flex alignItems="center" justifyContent="space-evenly">

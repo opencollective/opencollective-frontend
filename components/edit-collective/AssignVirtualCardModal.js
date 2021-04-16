@@ -53,7 +53,7 @@ const AssignVirtualCardModal = props => {
           virtualCard: {
             privateData,
           },
-          account: { legacyId: collective.id },
+          account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
         },
       });
       props.onSuccess?.();
