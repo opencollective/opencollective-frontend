@@ -111,7 +111,13 @@ const EditPayPalAccount = props => {
           disabled={isCreating}
         >
           {inputProps => (
-            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.clientId} />
+            <StyledInput
+              type="text"
+              {...inputProps}
+              onChange={formik.handleChange}
+              value={formik.values.clientId}
+              autoComplete="off"
+            />
           )}
         </StyledInputField>
         <StyledInputField
@@ -122,7 +128,13 @@ const EditPayPalAccount = props => {
           disabled={isCreating}
         >
           {inputProps => (
-            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.token} />
+            <StyledInput
+              type="text"
+              {...inputProps}
+              onChange={formik.handleChange}
+              value={formik.values.token}
+              autoComplete="off"
+            />
           )}
         </StyledInputField>
 
