@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StripeProvider as StripeProviderLib } from 'react-stripe-elements';
+import { Elements } from '@stripe/react-stripe-js';
 
 import { getStripe } from '../lib/stripe';
 
@@ -52,7 +52,7 @@ class StripeProvider extends React.Component {
           isStripeLoaded: this.state.isStripeLoaded,
         }}
       >
-        <StripeProviderLib stripe={this.state.stripe} {...this.props} />
+        <Elements stripe={this.state.stripe} {...this.props} />
       </StripeLoaderContext.Provider>
     );
   }
