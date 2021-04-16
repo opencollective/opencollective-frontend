@@ -147,7 +147,7 @@ interface Account {
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput
@@ -679,7 +679,7 @@ type Bot implements Account {
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
@@ -936,7 +936,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
@@ -3116,7 +3116,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
@@ -4025,7 +4025,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
@@ -4342,7 +4342,7 @@ type Host implements Account & AccountWithContributions {
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
@@ -4871,7 +4871,7 @@ type Individual implements Account {
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
@@ -6188,7 +6188,7 @@ type Organization implements Account & AccountWithContributions {
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
@@ -6713,7 +6713,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
@@ -7789,7 +7789,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     onlySubscriptions: Boolean
 
     """
-    Wether outgoing incognito contributions should be included. Only works when user is an admin.
+    Whether outgoing incognito contributions should be included. Only works when user is an admin.
     """
     includeIncognito: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
