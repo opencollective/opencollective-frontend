@@ -5,8 +5,3 @@ updates:
   schedule:
     interval: daily
     timezone: Europe/Berlin
-  ignore:
-  - dependency-name: "@zeit/next-css"
-    versions:
-    - ">= 1.0.a"
-    - "< 1.1"
