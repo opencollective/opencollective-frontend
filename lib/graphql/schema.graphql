@@ -303,6 +303,7 @@ type Collective implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -488,6 +489,7 @@ interface CollectiveInterface {
   isArchived: Boolean
   isApproved: Boolean
   isDeletable: Boolean
+  hasVirtualCards: Boolean
   host: CollectiveInterface
   hostCollective: CollectiveInterface
 
@@ -1288,6 +1290,7 @@ type Event implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -1660,6 +1663,7 @@ type Fund implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -2692,6 +2696,7 @@ type Organization implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
   email: String
 }
 
@@ -3076,6 +3081,7 @@ type Project implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -3932,6 +3938,7 @@ type User implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
   firstName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   lastName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   email: String
@@ -4220,4 +4227,5 @@ type Vendor implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
