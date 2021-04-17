@@ -1,53 +1,39 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ChevronLeft } from '@styled-icons/fa-solid/ChevronLeft';
-import { ChevronRight } from '@styled-icons/fa-solid/ChevronRight';
-import themeGet from '@styled-system/theme-get';
+import { ArrowBack } from '@styled-icons/material/ArrowBack';
+import { ArrowForward } from '@styled-icons/material/ArrowForward';
 import styled from 'styled-components';
 
 import { debounceScroll } from '../lib/ui-utils';
 import withViewport from '../lib/withViewport';
 
-/** Main chevrons container, spacing the items properly */
-const ChevronsContainer = styled(({ onPrevClick, onNextClick, ...props }) => (
-  <div {...props}>
-    <ChevronLeft onMouseDown={onPrevClick} disabled={!onPrevClick} />
-    <ChevronRight onMouseDown={onNextClick} disabled={!onNextClick} />
-  </div>
-))`
+import { Box, Flex } from './Grid';
+import StyledRoundButton from './StyledRoundButton';
+
+const RefContainer = styled(Box)`
   display: flex;
-  justify-content: space-between;
-  color: #dadada;
-  user-select: none;
-  width: ${props => props.size * 3.5}px;
-
-  svg {
-    width: ${props => props.size}px;
-    height: ${props => props.size}px;
-
-    &:not([disabled]) {
-      color: ${themeGet('colors.primary.500')};
-
-      &:hover {
-        cursor: pointer;
-        color: ${themeGet('colors.primary.400')};
-      }
-    }
-  }
+  overflow-x: auto;
+  scroll-behavior: smooth;
 `;
 
-ChevronsContainer.propTypes = {
-  /** Size of a single chevron. Total width (including margins) will be 3.5x this value. */
-  size: PropTypes.number,
-  /** Called when left chevron is clicked. Set to `undefined` to disable */
-  onPrevClick: PropTypes.func,
-  /** Called when right chevron is clicked. Set to `undefined` to disable */
-  onNextClick: PropTypes.func,
-};
+const ControlsContainer = styled(Flex)`
+  z-index: 10;
+  position: relative;
+  top: 30rem;
+  pointer-events: none;
+`;
 
-ChevronsContainer.defaultProps = {
-  size: 14,
-};
+const ArrowContainer = styled(StyledRoundButton)`
+  transition: opacity 0.25s ease-in, visibility 0.25s;
+  visibility: ${props => (props.isVisible ? 'hidden' : 'visible')};
+  opacity: ${props => (props.isVisible ? '0' : '1')};
+  pointer-events: auto;
+
+  svg {
+    height: 40px;
+    padding 7px;
+  }
+`;
 
 /**
  * Helper to display a list of horizontally scrollable items, with two little
@@ -55,14 +41,9 @@ ChevronsContainer.defaultProps = {
  */
 class HorizontalScroller extends React.PureComponent {
   static propTypes = {
-    /**
-     * A child render function that takes the following arguments:
-     *  - `ref`: A ref to pass to you container
-     *  - `Chevrons`: The chevrons to navigate through the list easily. If the list
-     *    is not scrollable, nothing will be rendered.
-     */
-    children: PropTypes.func.isRequired,
-    /** Callback to get the scrolled distance when we click on prev/next chevrons */
+    /* Children component */
+    children: PropTypes.node.isRequired,
+    /** Callback to get the scrolled distance when we click on prev/next controllers */
     getScrollDistance: PropTypes.func,
     /** @ignore from withViewport */
     width: PropTypes.number,
@@ -138,14 +119,18 @@ class HorizontalScroller extends React.PureComponent {
   render() {
     const { canGoPrev, canGoNext } = this.state;
 
-    return this.props.children(this.ref, props =>
-      !canGoPrev && !canGoNext ? null : (
-        <ChevronsContainer
-          onPrevClick={canGoPrev ? this.onPrevClick : undefined}
-          onNextClick={canGoNext ? this.onNextClick : undefined}
-          {...props}
-        />
-      ),
+    return (
+      <Box>
+        <ControlsContainer mx={[2, 2, 5]} justifyContent="space-between">
+          <ArrowContainer isVisible={!canGoPrev}>
+            <ArrowBack onMouseDown={canGoPrev ? this.onPrevClick : undefined} />
+          </ArrowContainer>
+          <ArrowContainer isVisible={!canGoNext}>
+            <ArrowForward onMouseDown={canGoNext ? this.onNextClick : undefined} />
+          </ArrowContainer>
+        </ControlsContainer>
+        <RefContainer ref={this.ref}>{this.props.children}</RefContainer>
+      </Box>
     );
   }
 }
