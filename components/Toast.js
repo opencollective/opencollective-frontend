@@ -6,13 +6,13 @@ import { Times } from '@styled-icons/fa-solid/Times';
 import { Close } from '@styled-icons/material/Close';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
+import { variant } from 'styled-system';
 
 import Container from './Container';
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 import { TOAST_TYPE } from './ToastProvider';
-import { variant } from 'styled-system';
 
 const variants = {
   light: {
