@@ -12,6 +12,22 @@ import { Flex } from './Grid';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 import { TOAST_TYPE } from './ToastProvider';
+import { variant } from 'styled-system';
+
+const variants = {
+  light: {
+    bg: '#ffffff',
+    titleColor: '#313233',
+    messageColor: '#76777A',
+    crossIcon: '#C4C7CC',
+  },
+  dark: {
+    bg: 'rgba(49, 50, 51, 0.8)',
+    titleColor: '#ffffff',
+    messageColor: '#C4C7CC',
+    crossIcon: '#E8E9EB',
+  },
+};
 
 const StyledToast = styled.div`
   position: relative;
@@ -20,7 +36,7 @@ const StyledToast = styled.div`
   justify-content: space-between;
   align-items: stretch;
   padding: 24px;
-  background: ${props => (props.variantType ? props.variantType.bg : 'white')};
+  background: ${props => props.variantType.bg};
   border-radius: 8px;
   border: 1px solid #efefef;
   opacity: 1;
@@ -52,6 +68,7 @@ const StyledToast = styled.div`
       }
     }}
   }
+  ${variant({ variants })}
 `;
 
 const DEFAULT_TITLES = defineMessages({
@@ -67,10 +84,10 @@ const DEFAULT_TITLES = defineMessages({
 
 const getVariant = variantType => {
   switch (variantType) {
-    case 'dark':
-      return { bg: 'rgba(49, 50, 51, 0.8)', titleColor: '#ffffff', messageColor: '#C4C7CC', crossIcon: '#E8E9EB' };
-    default:
+    case 'light':
       return { bg: '#ffffff', titleColor: '#313233', messageColor: '#76777A', crossIcon: '#C4C7CC' };
+    default:
+      return { bg: 'rgba(49, 50, 51, 0.8)', titleColor: '#ffffff', messageColor: '#C4C7CC', crossIcon: '#E8E9EB' };
   }
 };
 
@@ -112,6 +129,7 @@ const Toast = ({ toast, timeLeft, onClose, variant }) => {
   const messageColor = variantStyle.messageColor;
   const titleColor = variantStyle.titleColor;
   const crossIcon = variantStyle.crossIcon;
+
   return (
     <StyledToast timeLeft={timeLeft} isClosing={isClosing} data-cy="toast-notification" variantType={variantStyle}>
       <Flex alignItems="center">
@@ -172,11 +190,12 @@ Toast.propTypes = {
   }).isRequired,
   onClose: PropTypes.func,
   timeLeft: PropTypes.number,
-  variant: PropTypes.string,
+  variant: PropTypes.oneOf(['light', 'dark']),
 };
 
 Toast.defaultProps = {
   timeLeft: 6000,
+  variant: 'dark',
 };
 
 export default Toast;
