@@ -35,6 +35,7 @@ export const invoicesQuery = gql`
         slug
       }
       host {
+        id
         slug
         name
       }
