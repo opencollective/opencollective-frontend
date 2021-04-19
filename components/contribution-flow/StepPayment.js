@@ -89,6 +89,7 @@ const StepPayment = ({
   stepSummary,
   collective,
   onChange,
+  isSubmitting,
   hideCreditCardPostalCode,
   onNewCardFormReady,
   setBraintree,
@@ -157,6 +158,7 @@ const StepPayment = ({
           options={paymentOptions}
           onChange={option => setNewPaymentMethod(option.key, option.value.paymentMethod)}
           value={stepPayment?.key || null}
+          disabled={isSubmitting}
         >
           {({ radio, checked, index, value }) => (
             <PaymentMethodBox index={index} disabled={value.disabled}>
@@ -225,6 +227,7 @@ StepPayment.propTypes = {
   setBraintree: PropTypes.func,
   hideCreditCardPostalCode: PropTypes.bool,
   hasNewPaypal: PropTypes.bool,
+  isSubmitting: PropTypes.bool,
 };
 
 StepPayment.defaultProps = {

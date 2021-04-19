@@ -689,6 +689,7 @@ class ContributionFlow extends React.Component {
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
                     hasNewPaypal={this.props.hasNewPaypal}
+                    isSubmitting={isValidating || isSubmitted || isSubmitting}
                   />
 
                   <Box mt={40}>
