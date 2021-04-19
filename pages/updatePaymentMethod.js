@@ -67,7 +67,7 @@ class UpdatePaymentPage extends React.Component {
     newCreditCardInfo: {},
     error: null,
     stripe: null,
-    elements: null,
+    stripeElements: null,
     submitting: false,
     success: false,
   };
@@ -90,7 +90,7 @@ class UpdatePaymentPage extends React.Component {
     } else {
       try {
         this.setState({ submitting: true });
-        const cardElement = this.state.elements.getElement(CardElement);
+        const cardElement = this.state.stripeElements.getElement(CardElement);
         const { token, error } = await this.state.stripe.createToken(cardElement);
         if (error) {
           this.setState({ error: 'There was a problem with Stripe.', submitting: false, showCreditCardForm: false });
@@ -242,7 +242,7 @@ class UpdatePaymentPage extends React.Component {
                             profileType={get(this.props.collective, 'type')}
                             hasSaveCheckBox={false}
                             onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
-                            onReady={({ stripe, elements }) => this.setState({ stripe, elements })}
+                            onReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                           />
                         </Box>
                       )}

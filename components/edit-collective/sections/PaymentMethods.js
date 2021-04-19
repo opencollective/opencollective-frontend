@@ -67,7 +67,7 @@ class EditPaymentMethods extends React.Component {
     bankDetails: null,
     error: null,
     stripe: null,
-    elements: null,
+    stripeElements: null,
     submitting: false,
     removedId: null,
     savingId: null,
@@ -86,7 +86,7 @@ class EditPaymentMethods extends React.Component {
     } else {
       try {
         this.setState({ submitting: true });
-        const cardElement = this.state.elements.getElement(CardElement);
+        const cardElement = this.state.stripeElements.getElement(CardElement);
         const { token, error } = await this.state.stripe.createToken(cardElement);
         if (error) {
           throw error;
@@ -295,7 +295,7 @@ class EditPaymentMethods extends React.Component {
               <NewCreditCardForm
                 hasSaveCheckBox={false}
                 onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
-                onReady={({ stripe, elements }) => this.setState({ stripe, elements })}
+                onReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
               />
             </Box>
             <Box my={2}>

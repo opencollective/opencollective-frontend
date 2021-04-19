@@ -239,7 +239,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loadingSelectedPaymentMethod, setLoadingSelectedPaymentMethod] = useState(true);
   const [stripe, setStripe] = useState(null);
-  const [elements, setElements] = useState(null);
+  const [stripeElements, setStripeElements] = useState(null);
   const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
   const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
   const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
@@ -362,9 +362,9 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
             order={contribution}
             isSubmitting={isSubmitting}
             setNewPaymentMethodInfo={setNewPaymentMethodInfo}
-            onStripeReady={({ stripe, elements }) => {
+            onStripeReady={({ stripe, stripeElements }) => {
               setStripe(stripe);
-              setElements(elements);
+              setStripeElements(stripeElements);
             }}
             onPaypalSuccess={async paypalPaymentMethod => {
               await updatePaymentMethod(paypalPaymentMethod);
@@ -449,7 +449,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
                   setAddingPaymentMethod(false);
                   return false;
                 }
-                const cardElement = elements.getElement(CardElement);
+                const cardElement = stripeElements.getElement(CardElement);
                 const { token, error } = await stripe.createToken(cardElement);
 
                 if (error) {

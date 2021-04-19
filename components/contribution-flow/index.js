@@ -118,7 +118,7 @@ class ContributionFlow extends React.Component {
     this.state = {
       error: null,
       stripe: null,
-      elements: null,
+      stripeElements: null,
       braintree: null,
       isSubmitted: false,
       isSubmitting: false,
@@ -255,7 +255,7 @@ class ContributionFlow extends React.Component {
   };
 
   getPaymentMethod = async () => {
-    const { stepPayment, stripe, elements } = this.state;
+    const { stepPayment, stripe, stripeElements } = this.state;
 
     if (stepPayment?.key === BRAINTREE_KEY) {
       return new Promise((resolve, reject) => {
@@ -275,7 +275,7 @@ class ContributionFlow extends React.Component {
     } else if (stepPayment.paymentMethod.id) {
       return pick(stepPayment.paymentMethod, ['id']);
     } else if (stepPayment.key === NEW_CREDIT_CARD_KEY) {
-      const cardElement = elements.getElement(CardElement);
+      const cardElement = stripeElements.getElement(CardElement);
       const { token } = await stripe.createToken(cardElement);
       const pm = stripeTokenToPaymentMethod(token);
       return {
@@ -683,7 +683,7 @@ class ContributionFlow extends React.Component {
                     onChange={data => this.setState(data)}
                     step={currentStep}
                     showFeesOnTop={this.canHaveFeesOnTop()}
-                    onNewCardFormReady={({ stripe, elements }) => this.setState({ stripe, elements })}
+                    onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     setBraintree={braintree => this.setState({ braintree })}
                     defaultProfileSlug={this.props.contributeAs}
                     defaultEmail={this.props.defaultEmail}

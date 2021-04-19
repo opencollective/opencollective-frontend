@@ -42,7 +42,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     onChange: PropTypes.func,
     onReady: PropTypes.func,
     stripe: PropTypes.object,
-    elements: PropTypes.object,
+    stripeElements: PropTypes.object,
     useLegacyCallback: PropTypes.bool,
     defaultIsSaved: PropTypes.bool,
   };
@@ -57,13 +57,13 @@ class NewCreditCardFormWithoutStripe extends React.Component {
 
   componentDidMount() {
     if (this.props.onReady && this.props.stripe) {
-      this.props.onReady({ stripe: this.props.stripe, elements: this.props.elements });
+      this.props.onReady({ stripe: this.props.stripe, stripeElements: this.props.stripeElements });
     }
   }
 
   componentDidUpdate(oldProps) {
     if (this.props.onReady && !oldProps.stripe && this.props.stripe) {
-      this.props.onReady({ stripe: this.props.stripe, elements: this.props.elements });
+      this.props.onReady({ stripe: this.props.stripe, stripeElements: this.props.stripeElements });
     }
   }
 
@@ -179,7 +179,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
 
 const NewCreditCardForm = props => (
   <ElementsConsumer>
-    {({ stripe, elements }) => <NewCreditCardFormWithoutStripe stripe={stripe} elements={elements} {...props} />}
+    {({ stripe, elements }) => <NewCreditCardFormWithoutStripe stripe={stripe} stripeElements={elements} {...props} />}
   </ElementsConsumer>
 );
 
