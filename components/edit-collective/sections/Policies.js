@@ -16,6 +16,7 @@ import { Flex } from '../../Grid';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
+import StyledCheckbox from '../../StyledCheckbox';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
@@ -78,6 +79,10 @@ const messages = defineMessages({
     id: 'collective.expensePolicy.error',
     defaultMessage: 'Expense policy must contain less than {maxLength} characters',
   },
+  'expensePolicy.allowExpense': {
+    id: 'collective.expensePolicy.allowExpense',
+    defaultMessage: 'Allow expense submission only for Admins, Members and Contributors of the collective',
+  },
 });
 
 const Policies = ({ collective, showOnlyExpensePolicy }) => {
@@ -104,6 +109,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const collectiveContributionFilteringCategories = get(data, 'account.settings.moderation.rejectedCategories', null);
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
   const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
+  const collectiveDisableExpenseSubmission = get(collective, 'settings.disableExpenseSubmission', false);
 
   const selectOptions = React.useMemo(() => {
     const optionsArray = Object.entries(MODERATION_CATEGORIES).map(([key, value], index) => ({
@@ -128,15 +134,17 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     initialValues: {
       contributionPolicy: collectiveContributionPolicy || '',
       expensePolicy: collectiveExpensePolicy || '',
+      disableExpenseSubmission: collectiveDisableExpenseSubmission || false,
     },
     async onSubmit(values) {
-      const { contributionPolicy, expensePolicy } = values;
+      const { contributionPolicy, expensePolicy, disableExpenseSubmission } = values;
       await updatePolicies({
         variables: {
           collective: {
             id: collective.id,
             contributionPolicy,
             expensePolicy,
+            settings: { ...collective.settings, disableExpenseSubmission },
           },
         },
       });
@@ -276,6 +284,14 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             />
           </Container>
         )}
+        <Container mt={4}>
+          <StyledCheckbox
+            name="allow-expense-submission"
+            label={formatMessage(messages['expensePolicy.allowExpense'])}
+            onChange={() => (formik.values.disableExpenseSubmission = !formik.values.disableExpenseSubmission)}
+            defaultChecked={Boolean(formik.values.disableExpenseSubmission)}
+          />
+        </Container>
         <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
           <StyledButton
             buttonStyle="primary"

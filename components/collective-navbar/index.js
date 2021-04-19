@@ -17,7 +17,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { display } from 'styled-system';
 
-import { getContributeRoute } from '../../lib/collective.lib';
+import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
@@ -213,7 +213,7 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, isRoot) => {
+const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, isRoot, LoggedInUser) => {
   if (!collective) {
     return {};
   }
@@ -224,10 +224,12 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, is
     hasContribute: getHasContribute(collective, sections, isAdmin),
     hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
-    hasSubmitExpense: isFeatureAvailable(collective, 'RECEIVE_EXPENSES'),
+    hasSubmitExpense:
+      isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
     hasManageSubscriptions: isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
-    hasRequestGrant: isFund || get(settings, 'fundingRequest') === true,
+    hasRequestGrant:
+      (isFund || get(settings, 'fundingRequest') === true) && expenseSubmissionAllowed(collective, LoggedInUser),
     addPrepaidBudget: isRoot && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
     assignVirtualCard: false,
@@ -450,7 +452,10 @@ const CollectiveNavbar = ({
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   const isRoot = LoggedInUser?.isRoot();
-  callsToAction = { ...getDefaultCallsToActions(collective, sections, isAdmin, isHostAdmin, isRoot), ...callsToAction };
+  callsToAction = {
+    ...getDefaultCallsToActions(collective, sections, isAdmin, isHostAdmin, isRoot, LoggedInUser),
+    ...callsToAction,
+  };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
   const mainAction = getMainAction(collective, actionsArray);
   const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));
