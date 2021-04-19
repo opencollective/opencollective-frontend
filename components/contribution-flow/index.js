@@ -699,7 +699,7 @@ class ContributionFlow extends React.Component {
                       prevStep={prevStep}
                       nextStep={nextStep}
                       isValidating={isValidating || isSubmitted || isSubmitting}
-                      paypalButtonProps={!nextStep && this.getPaypalButtonProps({ currency })}
+                      paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
                       disableNext={stepPayment?.key === 'braintree' && !stepPayment.isReady}
