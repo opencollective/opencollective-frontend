@@ -203,7 +203,7 @@
     "shx": "^0.3.3",
     "style-loader": "^2.0.0",
     "url-loader": "^4.1.1",
-    "webpack-bundle-analyzer": "^4.4.0"
+    "webpack-bundle-analyzer": "^4.4.1"
   },
   "jest": {
     "moduleNameMapper": {
