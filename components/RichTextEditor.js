@@ -489,7 +489,7 @@ export default class RichTextEditor extends React.Component {
               />
               <Container position="absolute" bottom="1em" right="1em">
                 <StyledTag textTransform="uppercase">
-                  <span>{stripHTML(defaultValue).length}</span>
+                  <span>{stripHTML(value || defaultValue).length}</span>
                   {maxLength && <span> / {maxLength}</span>}
                 </StyledTag>
               </Container>
