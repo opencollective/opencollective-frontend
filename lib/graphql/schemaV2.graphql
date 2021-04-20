@@ -7231,11 +7231,6 @@ type Query {
     """
     The update slug identifying the update
     """
-    updateSlug: String
-
-    """
-    The update slug identifying the update
-    """
     slug: String
 
     """
