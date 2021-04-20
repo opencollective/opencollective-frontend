@@ -70,6 +70,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, accou
                 canEdit={isAdmin && !editingContributionId}
                 onEdit={() => setEditingContributionId(contribution.id)}
                 onCloseEdit={() => setEditingContributionId(null)}
+                showPaymentMethod={isAdmin}
                 data-cy="recurring-contribution-card"
               />
             </CollectiveCardContainer>
