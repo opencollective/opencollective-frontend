@@ -24,6 +24,8 @@ export default class SignIn extends React.Component {
     loading: PropTypes.bool,
     /** To display a box shadow below the card */
     withShadow: PropTypes.bool,
+    /** Whether user can click on "Join Free" */
+    showSecondaryAction: PropTypes.bool,
     /** Set this to true to display the unknown email message */
     unknownEmail: PropTypes.bool,
     /** Label, defaults to "Sign in using your email address:" */
@@ -134,14 +136,16 @@ export default class SignIn extends React.Component {
           )}
         </Box>
 
-        <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="center">
-          <Span color="black.700" mr={1} fontSize="14px">
-            <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
-          </Span>{' '}
-          <Span fontSize="14px">
-            {this.renderSecondaryAction(<FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />)}
-          </Span>
-        </Container>
+        {this.props.showSecondaryAction && (
+          <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="center">
+            <Span color="black.700" mr={1} fontSize="14px">
+              <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
+            </Span>{' '}
+            <Span fontSize="14px">
+              {this.renderSecondaryAction(<FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />)}
+            </Span>
+          </Container>
+        )}
       </StyledCard>
     );
   }
