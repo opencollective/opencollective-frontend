@@ -128,9 +128,6 @@ const nextConfig = {
   async rewrites() {
     return REWRITES;
   },
-  images: {
-    domains: ['opencollective.com', 'images-staging.opencollective.com'],
-  },
 };
 
 module.exports = withSourceMaps(nextConfig);

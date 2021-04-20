@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
 import { endsWith, max } from 'lodash';
-import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -124,7 +123,7 @@ const UploadedFilePreview = ({ isPrivate, isLoading, isDownloading, url, size, a
     );
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
-    const img = <Image src={imagePreview(url, null, { width: resizeWidth })} alt={alt} layout="fill" />;
+    const img = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt} />;
     content = !hasLink ? (
       img
     ) : (

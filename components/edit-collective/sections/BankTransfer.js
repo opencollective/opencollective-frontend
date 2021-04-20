@@ -208,12 +208,7 @@ const BankTransfer = props => {
                     defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout and instructions will be autmatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on Open Collective.'
                   />
                 </P>
-                <Image
-                  alt=""
-                  src="/static/images/ManualPaymentMethod-BankTransfer.png"
-                  width={350}
-                  height={168}
-                />
+                <Image alt="" src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} height={168} />
               </Flex>
               {useStructuredForm && (
                 <React.Fragment>

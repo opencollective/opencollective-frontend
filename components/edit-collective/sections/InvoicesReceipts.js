@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
-import Image from 'next/image';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
@@ -113,7 +112,7 @@ const InvoicesReceipts = ({ collective }) => {
           </StyledButton>
         </Flex>
         <Box mt={3} maxWidth={400}>
-          <Image src={imgInvoiceTitlePreview} alt="" style={{ maxWidth: 400 }} width={400} height={285} />
+          <img src={imgInvoiceTitlePreview} alt="" style={{ maxWidth: 400 }} />
         </Box>
       </Flex>
     </Container>
