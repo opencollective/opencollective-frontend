@@ -1208,7 +1208,7 @@
   "Member.Role.FUNDRAISER": "Patrocinador",
   "Member.Role.HOST": "Organizador",
   "Member.Role.MEMBER": "Colaborador Central",
-  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins of this Collective.",
+  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins.",
   "MemberInvitations.none": "Nenhum convite pendente",
   "MemberInvitations.title": "Convites pendentes",
   "members.add": "Add Team Member",

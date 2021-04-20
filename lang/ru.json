@@ -1208,7 +1208,7 @@
   "Member.Role.FUNDRAISER": "Сборщик средств",
   "Member.Role.HOST": "Представитель",
   "Member.Role.MEMBER": "Основной Участник",
-  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins of this Collective.",
+  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins.",
   "MemberInvitations.none": "No pending invitations",
   "MemberInvitations.title": "Ожидающие приглашений",
   "members.add": "Добавить члена команды",

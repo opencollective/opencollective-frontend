@@ -1208,7 +1208,7 @@
   "Member.Role.FUNDRAISER": "資金調達者",
   "Member.Role.HOST": "ホスト",
   "Member.Role.MEMBER": "コアコントリビュータ",
-  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins of this Collective.",
+  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins.",
   "MemberInvitations.none": "No pending invitations",
   "MemberInvitations.title": "保留中の招待状",
   "members.add": "Add Team Member",
