@@ -8,20 +8,95 @@ import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { variant } from 'styled-system';
 
-import Container from './Container';
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
-import { Span } from './Text';
 import { TOAST_TYPE } from './ToastProvider';
+
+const CloseButton = styled(StyledButton).attrs({
+  'data-cy': 'dismiss-toast-btn',
+  buttonSize: 'tiny',
+  isBorderless: true,
+})``;
+
+const ToastTitle = styled.span`
+  font-size: 11px;
+  line-height: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+`;
+
+const ToastMessage = styled.span`
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  margin-top: 8px;
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  min-width: 28px;
+  width: 28px;
+  height: 28px;
+  color: #ffffff;
+`;
+
+const Separator = styled.div`
+  width: 4px;
+  height: 100%;
+  min-height: 40px;
+  margin: 0 12px;
+`;
 
 const variantType = variant({
   variants: {
     light: {
       bg: '#ffffff',
+      borderColor: '#FFFFFF',
+
+      [ToastTitle]: { color: 'black.800' },
+      [ToastMessage]: { color: 'black.600' },
+      [CloseButton]: { color: 'black.500' },
+
+      '&[data-type="INFO"]': {
+        [IconContainer]: { bg: 'blue.500' },
+        [Separator]: { bg: 'blue.500' },
+      },
+      '&[data-type="ERROR"]': {
+        [IconContainer]: { bg: 'red.500' },
+        [Separator]: { bg: 'red.500' },
+      },
+      '&[data-type="SUCCESS"]': {
+        [IconContainer]: { bg: 'green.500' },
+        [Separator]: { bg: 'green.500' },
+      },
     },
 
     dark: {
-      bg: 'rgba(49, 50, 51, 0.8)',
+      bg: '#5a5b5c',
+      borderColor: 'black.700',
+
+      [ToastTitle]: { color: '#FFFFFF' },
+      [ToastMessage]: { color: 'black.300' },
+      [CloseButton]: { color: 'black.200', '&:hover': { color: 'black.800' } },
+      [IconContainer]: { border: '2px solid' },
+
+      '&[data-type="INFO"]': {
+        [IconContainer]: { color: 'blue.200' },
+        [Separator]: { bg: 'blue.200' },
+      },
+      '&[data-type="ERROR"]': {
+        [IconContainer]: { color: 'red.500' },
+        [Separator]: { bg: 'red.500' },
+      },
+      '&[data-type="SUCCESS"]': {
+        [IconContainer]: { color: 'green.500' },
+        [Separator]: { bg: 'green.500' },
+      },
     },
   },
 });
@@ -33,7 +108,6 @@ const StyledToast = styled.div`
   justify-content: space-between;
   align-items: stretch;
   padding: 24px;
-
   border-radius: 8px;
   border: 1px solid #efefef;
   opacity: 1;
@@ -65,6 +139,7 @@ const StyledToast = styled.div`
       }
     }}
   }
+
   ${variantType}
 `;
 
@@ -78,26 +153,6 @@ const DEFAULT_TITLES = defineMessages({
     defaultMessage: 'Error',
   },
 });
-
-const getVariant = variantType => {
-  switch (variantType) {
-    case 'light':
-      return { titleColor: '#313233', messageColor: '#76777A', crossIcon: '#C4C7CC' };
-    default:
-      return { titleColor: '#ffffff', messageColor: '#C4C7CC', crossIcon: '#E8E9EB' };
-  }
-};
-
-const getColor = toast => {
-  switch (toast.type) {
-    case TOAST_TYPE.SUCCESS:
-      return 'green.500';
-    case TOAST_TYPE.ERROR:
-      return 'red.500';
-    default:
-      return 'blue.500';
-  }
-};
 
 const getDefaultTitle = (intl, toastType) => {
   return DEFAULT_TITLES[toastType] ? intl.formatMessage(DEFAULT_TITLES[toastType]) : null;
@@ -121,58 +176,31 @@ const getIcon = toast => {
 const Toast = ({ toast, timeLeft, onClose, variant }) => {
   const intl = useIntl();
   const [isClosing, setClosing] = React.useState(false);
-  const color = getColor(toast);
-  const variantStyle = getVariant(variant);
-  const messageColor = variantStyle.messageColor;
-  const titleColor = variantStyle.titleColor;
-  const crossIcon = variantStyle.crossIcon;
 
   return (
-    <StyledToast timeLeft={timeLeft} isClosing={isClosing} data-cy="toast-notification" variant={variant}>
+    <StyledToast
+      timeLeft={timeLeft}
+      isClosing={isClosing}
+      data-type={toast.type}
+      variant={variant}
+      data-cy="toast-notification"
+    >
       <Flex alignItems="center">
-        <Container
-          bg={color}
-          height={28}
-          width={28}
-          minWidth={28}
-          borderRadius="50%"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          color="#ffffff"
-        >
-          {getIcon(toast)}
-        </Container>
-        <Container width="4px" height="100%" minHeight="40px" mx="12px" bg={color} />
+        <IconContainer>{getIcon(toast)}</IconContainer>
+        <Separator />
         <Flex flexDirection="column" justifyContent="center">
-          <Span
-            fontSize="11px"
-            lineHeight="12px"
-            fontWeight="500"
-            textTransform="uppercase"
-            letterSpacing="0.06em"
-            color={titleColor}
-          >
-            {toast.title || getDefaultTitle(intl, toast.type)}
-          </Span>
-          {toast.message && (
-            <Span fontSize="12px" lineHeight="16px" fontWeight="500" letterSpacing="0.06em" color={messageColor} mt={2}>
-              {toast.message}
-            </Span>
-          )}
+          <ToastTitle>{toast.title || getDefaultTitle(intl, toast.type)}</ToastTitle>
+          {toast.message && <ToastMessage>{toast.message}</ToastMessage>}
         </Flex>
       </Flex>
-      <StyledButton
-        data-cy="dismiss-toast-btn"
-        buttonSize="tiny"
-        isBorderless
+      <CloseButton
         onClick={() => {
           setClosing(true);
           onClose();
         }}
       >
-        <Close size={12} color={crossIcon} />
-      </StyledButton>
+        <Close size={12} />
+      </CloseButton>
     </StyledToast>
   );
 };
