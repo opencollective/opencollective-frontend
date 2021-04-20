@@ -1988,13 +1988,6 @@ type Mutation {
   createOrder(order: OrderInputType!): OrderType
     @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
   confirmOrder(order: ConfirmOrderInputType!): OrderType
-  createUpdate(update: UpdateInputType!): UpdateType
-    @deprecated(reason: "2021-01-29: This endpoint has been moved to GQLV2")
-  editUpdate(update: UpdateAttributesInputType!): UpdateType @deprecated(reason: "2021-01-29: Not used anymore")
-  publishUpdate(id: Int!, notificationAudience: UpdateAudienceTypeEnum!): UpdateType
-    @deprecated(reason: "2021-01-29: Not used anymore")
-  unpublishUpdate(id: Int!): UpdateType @deprecated(reason: "2021-01-29: Not used anymore")
-  deleteUpdate(id: Int!): UpdateType @deprecated(reason: "2021-01-29: Not used anymore")
   createComment(comment: CommentInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   editComment(comment: CommentAttributesInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   deleteComment(id: Int!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
@@ -3137,8 +3130,6 @@ type Query {
     fetchDataFromLedger: Boolean
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
-  Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
-    @deprecated(reason: "2021-01-29: Not used anymore")
   Application(id: Int): Application
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
   allOrders(
@@ -3623,23 +3614,6 @@ enum TypeOfCollective {
 }
 
 """
-Input type for UpdateType
-"""
-input UpdateAttributesInputType {
-  id: Int
-  views: Int
-  slug: String
-  title: String
-  image: String
-  isPrivate: Boolean
-  makePublicOn: IsoDateString
-  markdown: String
-  html: String
-  fromCollective: CollectiveAttributesInputType
-  tier: TierInputType
-}
-
-"""
 Defines targets for an update
 """
 enum UpdateAudienceTypeEnum {
@@ -3657,24 +3631,6 @@ enum UpdateAudienceTypeEnum {
   Will be sent to financial contributors
   """
   FINANCIAL_CONTRIBUTORS
-}
-
-"""
-Input type for UpdateType
-"""
-input UpdateInputType {
-  id: Int
-  views: Int
-  slug: String
-  title: String
-  image: String
-  isPrivate: Boolean
-  makePublicOn: IsoDateString
-  markdown: String
-  html: String
-  fromCollective: CollectiveAttributesInputType
-  collective: CollectiveAttributesInputType!
-  tier: TierInputType
 }
 
 """
