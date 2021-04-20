@@ -16,9 +16,9 @@
     "@hyperwatch/hyperwatch": "3.8.1",
     "@material-ui/core": "4.11.3",
     "@opencollective/taxes": "3.1.0",
-    "@popperjs/core": "2.9.1",
+    "@popperjs/core": "2.9.2",
     "@sentry/browser": "6.2.3",
-    "@sentry/node": "6.2.4",
+    "@sentry/node": "6.2.5",
     "@shopify/address": "2.10.4",
     "@styled-icons/boxicons-regular": "10.23.0",
     "@styled-icons/boxicons-solid": "10.23.0",
@@ -28,7 +28,7 @@
     "@styled-icons/icomoon": "10.18.0",
     "@styled-icons/ionicons-solid": "10.28.0",
     "@styled-icons/material": "10.28.0",
-    "@styled-icons/octicons": "10.28.0",
+    "@styled-icons/octicons": "10.33.0",
     "@styled-icons/remix-line": "10.18.0",
     "@styled-system/css": "5.1.5",
     "@styled-system/prop-types": "5.1.5",
@@ -151,10 +151,10 @@
     "test:update": "npm run test:jest -- --updateSnapshot"
   },
   "devDependencies": {
-    "@babel/cli": "^7.12.17",
+    "@babel/cli": "^7.13.14",
     "@babel/core": "^7.13.10",
     "@babel/node": "^7.12.17",
-    "@cypress/code-coverage": "^3.9.3",
+    "@cypress/code-coverage": "^3.9.4",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
@@ -203,7 +203,7 @@
     "shx": "^0.3.3",
     "style-loader": "^2.0.0",
     "url-loader": "^4.1.1",
-    "webpack-bundle-analyzer": "^4.4.0"
+    "webpack-bundle-analyzer": "^4.4.1"
   },
   "jest": {
     "moduleNameMapper": {
