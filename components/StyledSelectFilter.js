@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import StyledSelect from './StyledSelect';
 
@@ -24,4 +25,11 @@ export const StyledSelectFilter = props => {
       {...props}
     />
   );
+};
+
+StyledSelectFilter.propTypes = {
+  /** The id of the search input */
+  inputId: PropTypes.string.isRequired,
+  /** Define an id prefix for the select components e.g. {your-id}-value */
+  instanceId: PropTypes.string,
 };

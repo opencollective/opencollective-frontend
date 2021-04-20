@@ -19,7 +19,7 @@ import StepProfileInfoMessage from './StepProfileInfoMessage';
 import { getTotalAmount } from './utils';
 
 const shouldRequireAllInfo = amount => {
-  return amount && amount >= 500000;
+  return Boolean(amount && amount >= 500000);
 };
 
 export const validateGuestProfile = (stepProfile, stepDetails) => {
@@ -125,6 +125,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
               {inputProps => (
                 <InputTypeCountry
                   {...inputProps}
+                  inputId="step-profile-location"
                   autoDetect
                   onChange={value => dispatchChange('location.country', value)}
                   value={data?.location?.country}

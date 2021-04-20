@@ -84,11 +84,7 @@ class ContributionFlow extends React.Component {
         slug: PropTypes.string,
       }),
     }).isRequired,
-    host: PropTypes.shape({
-      plan: PropTypes.shape({
-        platformTips: PropTypes.bool,
-      }),
-    }).isRequired,
+    host: PropTypes.object.isRequired,
     tier: PropTypes.object,
     intl: PropTypes.object,
     createOrder: PropTypes.func.isRequired,
@@ -146,7 +142,7 @@ class ContributionFlow extends React.Component {
 
   submitOrder = async () => {
     const { stepDetails, stepProfile, stepSummary } = this.state;
-    this.setState({ error: null });
+    this.setState({ error: null, isSubmitting: true });
 
     let fromAccount, guestInfo;
     if (stepProfile.isGuest) {
@@ -184,6 +180,7 @@ class ContributionFlow extends React.Component {
 
       return this.handleOrderResponse(response.data.createOrder, stepProfile.email);
     } catch (e) {
+      this.setState({ isSubmitting: false });
       this.showError(getErrorFromGraphqlException(e));
     }
   };
@@ -222,7 +219,7 @@ class ContributionFlow extends React.Component {
   };
 
   handleSuccess = async order => {
-    this.setState({ isSubmitted: true });
+    this.setState({ isSubmitted: true, isSubmitting: false });
     this.props.refetchLoggedInUser(); // to update memberships
 
     if (isValidExternalRedirect(this.props.redirect)) {
@@ -397,7 +394,6 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
-        'hasNewPaypal',
       ]),
       ...queryParams,
     };
@@ -446,7 +442,7 @@ class ContributionFlow extends React.Component {
   getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
   canHaveFeesOnTop() {
-    if (!this.props.collective.platformContributionAvailable || !this.props.host.plan.platformTips) {
+    if (!this.props.collective.platformContributionAvailable) {
       return false;
     } else if (this.props.tier?.type === TierTypes.TICKET) {
       return false;
@@ -693,6 +689,7 @@ class ContributionFlow extends React.Component {
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
                     hasNewPaypal={this.props.hasNewPaypal}
+                    isSubmitting={isValidating || isSubmitted || isSubmitting}
                   />
 
                   <Box mt={40}>
@@ -703,7 +700,7 @@ class ContributionFlow extends React.Component {
                       prevStep={prevStep}
                       nextStep={nextStep}
                       isValidating={isValidating || isSubmitted || isSubmitting}
-                      paypalButtonProps={this.getPaypalButtonProps({ currency })}
+                      paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
                       disableNext={stepPayment?.key === 'braintree' && !stepPayment.isReady}

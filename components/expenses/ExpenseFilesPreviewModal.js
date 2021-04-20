@@ -80,7 +80,7 @@ const ExpenseInvoicePreview = ({ isLoading, fileURL }) => {
   if (isLoading) {
     return <UploadedFilePreview isDownloading width="100%" minHeight={350} />;
   } else {
-    return <iframe width="100%" height={350} src={fileURL} />;
+    return <iframe title="Expense Invoice File URL" width="100%" height={350} src={fileURL} />;
   }
 };
 

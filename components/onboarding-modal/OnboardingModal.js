@@ -345,10 +345,10 @@ class OnboardingModal extends React.Component {
                     <ResponsiveModalBody>
                       <Flex flexDirection="column" alignItems="center">
                         <Image
+                          alt="OnBoarding"
                           width={160}
                           height={this.getStepParams(step, 'height')}
                           src={this.getStepParams(step, 'src')}
-                          alt=""
                         />
                         <OnboardingContentBox
                           slug={collective.slug}

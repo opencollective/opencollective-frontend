@@ -103,7 +103,7 @@ class ContributionFlowButtons extends React.Component {
           ) : (
             <Box mx={[1, null, 2]} minWidth={200} mt={2}>
               {this.props.hasNewPaypal ? (
-                <PayWithPaypalButton {...paypalButtonProps} />
+                <PayWithPaypalButton {...paypalButtonProps} isSubmitting={isValidating || this.state.isLoadingNext} />
               ) : (
                 <PayWithPaypalLegacyButton {...paypalButtonProps} />
               )}

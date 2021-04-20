@@ -27,7 +27,6 @@ import EmbeddedPage from '../../components/EmbeddedPage';
 import ErrorPage from '../../components/ErrorPage';
 import { Box } from '../../components/Grid';
 import Loading from '../../components/Loading';
-import MessageBox from '../../components/MessageBox';
 import { withStripeLoader } from '../../components/StripeProvider';
 import { withUser } from '../../components/UserProvider';
 
@@ -148,17 +147,11 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBLocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
-    if (contributionBLocker) {
-      return <ContributionBlocker blocker={contributionBLocker} account={account} />;
+    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    if (contributionBlocker) {
+      return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
       return <ContributionFlowSuccess collective={account} isEmbed />;
-    } else if (!get(data.account, 'settings.beta.embedContributionFlow')) {
-      return (
-        <MessageBox type="info" withIcon m={4}>
-          Embedded contribution flow feature is not enabled for this account
-        </MessageBox>
-      );
     } else {
       return (
         <Box height="100%" pt={3}>

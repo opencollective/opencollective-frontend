@@ -308,6 +308,7 @@ const Footer = () => {
             </P>
             <Container width="230px" my={2}>
               <StyledSelect
+                inputId="language-options"
                 options={languageOptions}
                 onChange={({ value }) => switchLanguage(value)}
                 defaultValue={defaultLanguage}
@@ -430,6 +431,7 @@ const Footer = () => {
           </P>
           <Container width={['230px']} my={2}>
             <StyledSelect
+              inputId="language-switcher"
               data-cy="language-switcher"
               options={languageOptions}
               onChange={({ value }) => switchLanguage(value)}

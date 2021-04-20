@@ -328,6 +328,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                               />
                             </P>
                             <CollectivePicker
+                              inputId="host-apply-collective-picker"
                               data-cy="host-apply-collective-picker"
                               collective={field.value}
                               collectives={collectives}

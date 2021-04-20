@@ -35,6 +35,7 @@ class AddFundsSourcePicker extends React.Component {
     return (
       <CollectivePickerAsync
         id="sourcePicker"
+        inputId="sourcePicker"
         onChange={this.onChange}
         maxMenuHeight={200}
         customOptions={customOptions}
@@ -72,6 +73,7 @@ class AddFundsSourcePickerForUser extends React.Component {
       <div>
         <StyledSelect
           id="sourcePicker"
+          inputId="sourcePicker"
           placeholder="Select"
           options={hostOptions}
           isSearchable={false}

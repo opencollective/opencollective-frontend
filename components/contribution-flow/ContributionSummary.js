@@ -5,6 +5,7 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { color, typography } from 'styled-system';
 
+import INTERVALS from '../../lib/constants/intervals';
 import { getNextChargeDate } from '../../lib/date-utils';
 import getPaymentMethodFees from '../../lib/fees';
 import { i18nTaxType } from '../../lib/i18n/taxes';
@@ -193,11 +194,11 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         </AmountLine>
       )}
       <StyledHr borderColor="black.500" my={1} />
-      {stepDetails?.interval && (
+      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.flexible && (
         <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
           <FormattedMessage
             id="ContributionSummary.NextCharge"
-            defaultMessage="The next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year}}. You can cancel or edit this contribution go to 'Manage Contributions'."
+            defaultMessage="If you select PayPal, you will be charged on the same day each month. Otherwise the next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year}}. You can cancel or edit this contribution by going to 'Manage Contributions'."
             values={{
               date: (
                 <FormattedDate

@@ -1,22 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
-import { get, isNil, omit, partition } from 'lodash';
+import { isNil, omit } from 'lodash';
 import { useDropzone } from 'react-dropzone';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
-import { uploadImageWithXHR } from '../lib/api';
-import { getErrorFromXhrUpload } from '../lib/errors';
-import { allSettled } from '../lib/utils';
+import { useImageUploader } from '../lib/hooks/useImageUploader';
 
 import Container from './Container';
 import { Box } from './Grid';
 import { getI18nLink } from './I18nFormatters';
 import StyledSpinner from './StyledSpinner';
 import { P } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 import UploadedFilePreview from './UploadedFilePreview';
 
 const Dropzone = styled(Container)`
@@ -78,16 +75,6 @@ const ReplaceContainer = styled.div`
   }
 `;
 
-/** Fets the average progress from a list of upload progress */
-const getUploadProgress = uploadProgressList => {
-  if (!uploadProgressList || uploadProgressList.length === 0) {
-    return 0;
-  } else {
-    const totalUploadProgress = uploadProgressList.reduce((total, current) => total + current, 0);
-    return Math.trunc(totalUploadProgress / uploadProgressList.length);
-  }
-};
-
 /**
  * A dropzone to upload one or multiple files
  */
@@ -110,68 +97,10 @@ const StyledDropzone = ({
   isMulti,
   ...props
 }) => {
-  const [isUploading, setUploading] = React.useState(false);
-  const [uploadProgressList, setUploadProgressList] = React.useState([]);
-  const uploadProgress = getUploadProgress(uploadProgressList);
-  const { addToast } = useToasts();
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept,
-    minSize,
-    maxSize,
-    multiple: isMulti,
-    onDrop: React.useCallback(
-      async (acceptedFiles, rejectedFiles) => {
-        setUploading(true);
-        const filesToUpload = isMulti ? acceptedFiles : [acceptedFiles[0]];
-        const results = await allSettled(
-          filesToUpload.map((file, index) =>
-            uploadImageWithXHR(file, {
-              mockImage: mockImageGenerator && mockImageGenerator(index),
-              onProgress: progress => {
-                const newProgressList = [...uploadProgressList];
-                newProgressList.splice(index, 0, progress);
-                setUploadProgressList(newProgressList);
-              },
-            }),
-          ),
-        );
-
-        setUploading(false);
-
-        const [successes, failures] = partition(results, r => r.status === 'fulfilled');
-        const getResultValue = r => r.value;
-        const getRejectReason = r => getErrorFromXhrUpload(r.reason);
-
-        if (onSuccess && successes.length > 0) {
-          await onSuccess(isMulti ? successes.map(getResultValue) : getResultValue(successes[0]));
-        }
-
-        if (onReject && failures.length > 0) {
-          onReject(isMulti ? failures.map(getRejectReason) : getRejectReason(failures[0]));
-        }
-
-        if (rejectedFiles?.length) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
-            message: (
-              <React.Fragment>
-                <FormattedMessage
-                  id="StyledDropzone."
-                  defaultMessage="The following {count, plural, one {file is} other {files are}} not valid: {files}"
-                  values={{
-                    count: rejectedFiles.length,
-                    files: <i>{rejectedFiles.map(({ file }) => file.name).join(', ')}</i>,
-                  }}
-                />
-                . {get(rejectedFiles[0], 'errors.0.message') || null}
-              </React.Fragment>
-            ),
-          });
-        }
-      },
-      [isMulti, onSuccess, onReject, mockImageGenerator, uploadProgressList],
-    ),
-  });
+  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject };
+  const { uploadFiles, isUploading, uploadProgress } = useImageUploader(imgUploaderParams);
+  const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop: uploadFiles };
+  const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
 
   minHeight = size || minHeight;
   const innerMinHeight = minHeight - 2; // -2 To account for the borders
@@ -241,7 +170,17 @@ const StyledDropzone = ({
               ) : (
                 <React.Fragment>
                   <UploadedFilePreview size={size} url={value} hasLink border="none" />
-                  <ReplaceContainer onClick={dropProps.onClick}>
+                  <ReplaceContainer
+                    onClick={dropProps.onClick}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                        dropProps.onClick();
+                      }
+                    }}
+                  >
                     <FormattedMessage id="Image.Replace" defaultMessage="Replace" />
                   </ReplaceContainer>
                 </React.Fragment>
@@ -276,7 +215,7 @@ StyledDropzone.propTypes = {
   size: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** A function to generate mock images */
   mockImageGenerator: PropTypes.func,
-  /** Wether the dropzone should accept multiple files */
+  /** Whether the dropzone should accept multiple files */
   isMulti: PropTypes.bool,
   /** Filetypes to accept */
   accept: PropTypes.string,

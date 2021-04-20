@@ -22,6 +22,7 @@ const CollectiveSortByFilter = ({ value, onChange, ...props }) => {
 
   return (
     <StyledSelectFilter
+      inputId="collective-sort-filter"
       value={labels[value] ? getOption(value) : options[0]}
       onChange={({ value }) => onChange(value)}
       options={options}
