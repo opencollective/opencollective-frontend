@@ -1208,7 +1208,7 @@
   "Member.Role.FUNDRAISER": "Leveur de fonds",
   "Member.Role.HOST": "Hôte",
   "Member.Role.MEMBER": "Membre de l'équipe",
-  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins of this Collective.",
+  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins.",
   "MemberInvitations.none": "Aucune invitation en attente",
   "MemberInvitations.title": "Invitations en attente",
   "members.add": "Ajouter un membre de l'équipe",

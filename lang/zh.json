@@ -1208,7 +1208,7 @@
   "Member.Role.FUNDRAISER": "筹款人",
   "Member.Role.HOST": "Host",
   "Member.Role.MEMBER": "核心贡献者",
-  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins of this Collective.",
+  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins.",
   "MemberInvitations.none": "没有待处理的邀请",
   "MemberInvitations.title": "待处理的邀请",
   "members.add": "添加团队成员",

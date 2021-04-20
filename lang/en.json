@@ -1208,7 +1208,7 @@
   "Member.Role.FUNDRAISER": "Fundraiser",
   "Member.Role.HOST": "Host",
   "Member.Role.MEMBER": "Core Contributor",
-  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins of this Collective.",
+  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins.",
   "MemberInvitations.none": "No pending invitations",
   "MemberInvitations.title": "Pending invitations",
   "members.add": "Add Team Member",

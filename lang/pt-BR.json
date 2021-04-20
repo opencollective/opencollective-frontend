@@ -1208,7 +1208,7 @@
   "Member.Role.FUNDRAISER": "Arrecadação de fundos",
   "Member.Role.HOST": "Administrador",
   "Member.Role.MEMBER": "Colaborador principal",
-  "MemberInvitation.detailsEmail": "Se você aceitar, seu endereço de e-mail ficará visível para outros administradores deste Coletivo.",
+  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins.",
   "MemberInvitations.none": "Nenhum convite pendente",
   "MemberInvitations.title": "Convites pendentes",
   "members.add": "Adicionar membro na equipe",

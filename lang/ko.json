@@ -1208,7 +1208,7 @@
   "Member.Role.FUNDRAISER": "Fundraiser",
   "Member.Role.HOST": "호스트",
   "Member.Role.MEMBER": "주요 기여자",
-  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins of this Collective.",
+  "MemberInvitation.detailsEmail": "If you accept, your email address will be visible to other admins.",
   "MemberInvitations.none": "No pending invitations",
   "MemberInvitations.title": "Pending invitations",
   "members.add": "팀 멤버 추가",
