@@ -14,7 +14,7 @@ import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -370,7 +370,7 @@ class CreateCollectiveForm extends React.Component {
                 }}
               </Formik>
               <Container justifyContent="center" mb={4} display={['flex', 'none']}>
-                <Illustration src="/static/images/create-collective/mobileForm.png" width="320px" height="200px" />
+                <NextIllustration src="/static/images/create-collective/mobileForm.png" width="320px" height="200px" />
               </Container>
             </ContainerWithImage>
           </Flex>

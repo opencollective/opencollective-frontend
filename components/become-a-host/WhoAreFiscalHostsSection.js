@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { H2, H3, P } from '../Text';
 
 const IconWrapper = styled(Box)`
@@ -119,9 +119,11 @@ const WhoAreFiscalHosts = () => {
           width={['222.74px', null, null, null, '330px']}
           height={['142.48px']}
         >
-          <Illustration
+          <NextIllustration
             src="/static/images/become-a-host/whoAreFiscalHost-illustration.png"
             alt="Who are Fiscal Hosts illustration"
+            width={330}
+            height={142.48}
           />
         </Box>
       </Container>
@@ -154,9 +156,11 @@ const WhoAreFiscalHosts = () => {
             ]}
           >
             <IconWrapper my={2}>
-              <Illustration
+              <NextIllustration
                 src={`/static/images/become-a-host/${feature.id}-illustration.png`}
                 alt={`${feature.id} illustration`}
+                width={1150}
+                height={1150}
               />
             </IconWrapper>
             <Box width={['288px', '306px', null, null, '297px']}>

@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { H2, P } from '../Text';
 
 const SupportCommunities = () => (
@@ -26,9 +26,11 @@ const SupportCommunities = () => (
             defaultMessage="Support communities and help them grow."
           />
         </H2>
-        <Illustration
+        <NextIllustration
           display={[null, 'none']}
-          src="/static/images/become-a-sponsor/supportCommunities-illustration-xs.png"
+          src="/static/images/become-a-sponsor/supportCommunities-illustration.png"
+          width={576}
+          height={405}
         />
       </Box>
       <Box width={['304px', '306px', '437px', null, '536px']}>
@@ -51,17 +53,11 @@ const SupportCommunities = () => (
       width={['324px', null, '478px', null, '576px']}
       height={['220px', null, '355px', null, '405px']}
     >
-      <Illustration
-        display={[null, null, 'none']}
-        src="/static/images/become-a-sponsor/supportCommunities-illustration-sm.png"
-      />
-      <Illustration
-        display={[null, 'none', 'block', null, 'none']}
-        src="/static/images/become-a-sponsor/supportCommunities-illustration-md.png"
-      />
-      <Illustration
-        display={[null, 'none', null, null, 'block']}
-        src="/static/images/become-a-sponsor/supportCommunities-illustration-lg.png"
+      <NextIllustration
+        display={[null, 'block']}
+        src="/static/images/become-a-sponsor/supportCommunities-illustration.png"
+        width={576}
+        height={405}
       />
     </Box>
   </Flex>

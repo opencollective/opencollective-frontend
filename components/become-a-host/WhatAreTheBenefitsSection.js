@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { H2, H3, P } from '../Text';
 
 const ScreenShotWrapper = styled(Illustration)`
@@ -65,7 +66,12 @@ const WhatAreTheBenefits = () => {
             mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
-            <Illustration src="/static/images/become-a-host/reduceOverhead-icon.png" alt="Reduce Overhead Icon" />
+            <NextIllustration
+              src="/static/images/become-a-host/reduceOverhead-icon.png"
+              alt="Reduce Overhead Icon"
+              width={208}
+              height={208}
+            />
           </Box>
           <Box width={['288px', '472px', '250px', null, '289px']}>
             <H3
@@ -98,7 +104,12 @@ const WhatAreTheBenefits = () => {
             mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
-            <Illustration src="/static/images/become-a-host/increaseCapacity-icon.png" alt="Increase Capacity Icon" />
+            <NextIllustration
+              src="/static/images/become-a-host/increaseCapacity-icon.png"
+              alt="Increase Capacity Icon"
+              width={208}
+              height={208}
+            />
           </Box>
           <Box width={['288px', '472px', '250px', null, '289px']}>
             <H3
@@ -130,9 +141,11 @@ const WhatAreTheBenefits = () => {
             mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
-            <Illustration
+            <NextIllustration
               src="/static/images/become-a-host/ABetterExperience-icon.png"
               alt="A Better Experience Icon"
+              width={208}
+              height={208}
             />
           </Box>
           <Box width={['288px', '472px', '250px', null, '289px']}>
@@ -169,7 +182,12 @@ const WhatAreTheBenefits = () => {
             top={[null, 0, '265px', null, '290px']}
             left={['0', '215px', '330px', null, '350px']}
           >
-            <Illustration src="/static/images/become-a-host/keepTrackBird.png" alt="Bird illustration" />
+            <NextIllustration
+              src="/static/images/become-a-host/keepTrackBird.png"
+              alt="Bird illustration"
+              width={147}
+              height={120}
+            />
           </Container>
           <Box width="304px" mb="24px" display={[null, 'none']} mt="27px">
             <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
@@ -253,7 +271,12 @@ const WhatAreTheBenefits = () => {
             right={['0', null, '124px', null, '28px']}
             top={[null, null, '65px']}
           >
-            <Illustration src="/static/images/become-a-host/easyExpenseBird.png" alt="Bird illustration" />
+            <NextIllustration
+              src="/static/images/become-a-host/easyExpenseBird.png"
+              alt="Bird illustration"
+              width={126}
+              height={78}
+            />
           </Container>
           <Box width="304px" mb="24px" display={[null, 'none']} mr={['10px', 0]}>
             <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
@@ -338,7 +361,12 @@ const WhatAreTheBenefits = () => {
             left={['0', '150px', '200px']}
             top={[null, '-10px', '35px']}
           >
-            <Illustration src="/static/images/become-a-host/combineFundingBird.png" alt="Bird illustration" />
+            <NextIllustration
+              src="/static/images/become-a-host/combineFundingBird.png"
+              alt="Bird illustration"
+              width={156}
+              height={78}
+            />
           </Container>
           <Box width="304px" mb="24px" display={[null, 'none']} mt={['27px', 0]}>
             <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
@@ -422,7 +450,12 @@ const WhatAreTheBenefits = () => {
             left={['49px', '380px', '550px', null, '660px']}
             bottom="0"
           >
-            <Illustration src="/static/images/become-a-host/indepthReportBird1.png" alt="Bird illustration" />
+            <NextIllustration
+              src="/static/images/become-a-host/indepthReportBird1.png"
+              alt="Bird illustration"
+              width={136}
+              height={55}
+            />
           </Container>
           <Container
             width={['78px', '93px', '108px', null, '138px']}
@@ -431,7 +464,12 @@ const WhatAreTheBenefits = () => {
             right={['42px', 0, '98px', null, 0]}
             bottom="0"
           >
-            <Illustration src="/static/images/become-a-host/indepthReportBird2.png" alt="Bird illustration" />
+            <NextIllustration
+              src="/static/images/become-a-host/indepthReportBird2.png"
+              alt="Bird illustration"
+              width={138}
+              height={68}
+            />
           </Container>
           <Box width="304px" mb="24px" display={[null, 'none']}>
             <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">

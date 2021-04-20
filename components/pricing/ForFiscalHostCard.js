@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -181,7 +181,12 @@ const ForFiscalHosts = () => {
     <Card padding={['24px', null, '32px']} width={['288px', '636px']} borderRadius="8px" border="1px solid #DCDEE0">
       <Flex justifyContent="center" alignItems="center" mb="32px">
         <Box width="72px" height="72px" mr="16px">
-          <Illustration src="/static/images/pricing/for-fiscalHost-illustration.png" alt="FiscalHost Illustration" />
+          <NextIllustration
+            src="/static/images/pricing/for-fiscalHost-illustration.png"
+            alt="FiscalHost Illustration"
+            width={72}
+            height={72}
+          />
         </Box>
         <Box width={[null, '500px', '672px', null, '702px']}>
           <H3
@@ -294,9 +299,11 @@ const ForFiscalHosts = () => {
             maxWidth={['180px', '185px', null, '246px', '257px']}
           >
             <Box width="112px" height="112px" mb={3}>
-              <Illustration
+              <NextIllustration
                 alt={`${plan.id} illustration`}
                 src={`/static/images/pricing/${plan.id}-plan-illustration.svg`}
+                width={112}
+                height={112}
               />
             </Box>
             <Container mb={4} minHeight="230px">
@@ -403,7 +410,7 @@ const ForFiscalHosts = () => {
           <React.Fragment key={access}>
             <AccessToWrapper display="flex" flexDirection={['column', 'row', 'column']}>
               <Box mb="12px" mr={[null, '13px']} size={['32px', null, '40px']}>
-                <Illustration src={`/static/images/pricing/${access}-icon.svg`} alt="Icon" />
+                <NextIllustration src={`/static/images/pricing/${access}-icon.svg`} alt="Icon" width={40} height={40} />
               </Box>
               <Box width={['112px', '230px', '176px']}>
                 <H4 fontSize="15px" lineHeight="22px" color="black.900" fontWeight="500" mb="8px">

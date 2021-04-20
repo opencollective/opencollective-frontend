@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';
@@ -12,25 +12,11 @@ const FiscalSponsorship = () => {
   return (
     <Flex flexDirection={['column', 'row-reverse']} justifyContent="center" alignItems="center" px="16px" mt={4}>
       <Box ml={[null, '6px', '40px', null, '84px']} width={['288px', '324px', '478px', null, '558px']}>
-        <Illustration
+        <NextIllustration
           alt="Fiscal sponsorship illustration"
-          src="/static/images/become-a-host/fiscalSponsorship-illustration-xs.png"
-          display={[null, 'none']}
-        />
-        <Illustration
-          alt="Fiscal sponsorship illustration"
-          src="/static/images/become-a-host/fiscalSponsorship-illustration-sm.png"
-          display={['none', 'block', 'none']}
-        />
-        <Illustration
-          alt="Fiscal sponsorship illustration"
-          src="/static/images/become-a-host/fiscalSponsorship-illustration-md.png"
-          display={['none', null, 'block', null, 'none']}
-        />
-        <Illustration
-          alt="Fiscal sponsorship illustration"
-          src="/static/images/become-a-host/fiscalSponsorship-illustration-lg.png"
-          display={['none', null, null, null, 'block']}
+          src="/static/images/become-a-host/fiscalSponsorship-illustration.png"
+          width={558}
+          height={414}
         />
       </Box>
       <Container display="flex" flexDirection="column" alignItems={['center', 'flex-start']}>
