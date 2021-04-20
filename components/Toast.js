@@ -14,20 +14,17 @@ import StyledButton from './StyledButton';
 import { Span } from './Text';
 import { TOAST_TYPE } from './ToastProvider';
 
-const variants = {
-  light: {
-    bg: '#ffffff',
-    titleColor: '#313233',
-    messageColor: '#76777A',
-    crossIcon: '#C4C7CC',
+const variantType = variant({
+  variants: {
+    light: {
+      bg: '#ffffff',
+    },
+
+    dark: {
+      bg: 'rgba(49, 50, 51, 0.8)',
+    },
   },
-  dark: {
-    bg: 'rgba(49, 50, 51, 0.8)',
-    titleColor: '#ffffff',
-    messageColor: '#C4C7CC',
-    crossIcon: '#E8E9EB',
-  },
-};
+});
 
 const StyledToast = styled.div`
   position: relative;
@@ -36,7 +33,7 @@ const StyledToast = styled.div`
   justify-content: space-between;
   align-items: stretch;
   padding: 24px;
-  background: ${props => props.variantType.bg};
+
   border-radius: 8px;
   border: 1px solid #efefef;
   opacity: 1;
@@ -68,7 +65,7 @@ const StyledToast = styled.div`
       }
     }}
   }
-  ${variant({ variants })}
+  ${variantType}
 `;
 
 const DEFAULT_TITLES = defineMessages({
@@ -85,9 +82,9 @@ const DEFAULT_TITLES = defineMessages({
 const getVariant = variantType => {
   switch (variantType) {
     case 'light':
-      return { bg: '#ffffff', titleColor: '#313233', messageColor: '#76777A', crossIcon: '#C4C7CC' };
+      return { titleColor: '#313233', messageColor: '#76777A', crossIcon: '#C4C7CC' };
     default:
-      return { bg: 'rgba(49, 50, 51, 0.8)', titleColor: '#ffffff', messageColor: '#C4C7CC', crossIcon: '#E8E9EB' };
+      return { titleColor: '#ffffff', messageColor: '#C4C7CC', crossIcon: '#E8E9EB' };
   }
 };
 
@@ -131,7 +128,7 @@ const Toast = ({ toast, timeLeft, onClose, variant }) => {
   const crossIcon = variantStyle.crossIcon;
 
   return (
-    <StyledToast timeLeft={timeLeft} isClosing={isClosing} data-cy="toast-notification" variantType={variantStyle}>
+    <StyledToast timeLeft={timeLeft} isClosing={isClosing} data-cy="toast-notification" variant={variant}>
       <Flex alignItems="center">
         <Container
           bg={color}
