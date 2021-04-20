@@ -6,7 +6,10 @@ on:
       - 'i18n/crowdin'
       - 'dependabot/**'
   pull_request_target:
-
+    types:
+      - opened
+      - synchronize
+      - reopened
 env:
   CI: true
   TZ: UTC
