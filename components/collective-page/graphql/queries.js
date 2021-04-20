@@ -13,12 +13,6 @@ export const collectivePageQuery = gql`
       name
       description
       longDescription
-      expenses {
-        fromCollective {
-          slug
-        }
-        status
-      }
       backgroundImage
       backgroundImageUrl
       twitterHandle
