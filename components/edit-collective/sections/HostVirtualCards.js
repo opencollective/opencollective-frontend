@@ -75,21 +75,34 @@ const AddCardPlaceholder = styled(Flex)`
 
 const HostVirtualCards = props => {
   const { formatMessage } = useIntl();
+  const { addToast } = useToasts();
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collective.slug },
   });
-  const [
-    updateAccountSetting,
-    { loading: updateLoading, error: updateError },
-  ] = useMutation(updateAccountSettingsMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
+    context: API_V2_CONTEXT,
+    onError: e => {
+      addToast({
+        type: TOAST_TYPE.ERROR,
+        message: (
+          <FormattedMessage
+            id="Host.VirtualCards.Settings.Error"
+            defaultMessage="Error updating setting: {error}"
+            values={{
+              error: e.message,
+            }}
+          />
+        ),
+      });
+    },
+  });
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
   );
 
-  const handleSucess = () => {
+  const handleAssignCardSucess = () => {
     addToast({
       type: TOAST_TYPE.SUCCESS,
       message: (
@@ -100,7 +113,6 @@ const HostVirtualCards = props => {
     refetch();
   };
   const handleSettingsUpdate = key => async value => {
-    console.log({ key, value });
     await updateAccountSetting({
       variables: {
         account: { legacyId: props.collective.id },
@@ -109,6 +121,10 @@ const HostVirtualCards = props => {
       },
     });
     await refetch();
+    addToast({
+      type: TOAST_TYPE.SUCCESS,
+      message: <FormattedMessage id="Host.VirtualCards.Settings.Success" defaultMessage="Setting updated" />,
+    });
   };
 
   if (loading) {
@@ -264,7 +280,7 @@ const HostVirtualCards = props => {
       {displayAssignCardModal && (
         <AssignVirtualCardModal
           host={data.host}
-          onSuccess={handleSucess}
+          onSuccess={handleAssignCardSucess}
           onClose={() => setAssignCardModalDisplay(false)}
           show
         />
@@ -275,7 +291,15 @@ const HostVirtualCards = props => {
 
 HostVirtualCards.propTypes = {
   collective: PropTypes.shape({
+    id: PropTypes.number,
     slug: PropTypes.string,
+    settings: PropTypes.shape({
+      virtualcards: PropTypes.shape({
+        autopause: PropTypes.bool,
+        requestcard: PropTypes.bool,
+        policy: PropTypes.string,
+      }),
+    }),
   }),
   hideTopsection: PropTypes.func,
 };
