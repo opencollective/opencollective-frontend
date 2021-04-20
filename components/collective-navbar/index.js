@@ -213,7 +213,7 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, isRoot, LoggedInUser) => {
+const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, LoggedInUser) => {
   if (!collective) {
     return {};
   }
@@ -230,7 +230,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, is
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
       (isFund || get(settings, 'fundingRequest') === true) && expenseSubmissionAllowed(collective, LoggedInUser),
-    addPrepaidBudget: isRoot && type === CollectiveType.ORGANIZATION,
+    addPrepaidBudget: LoggedInUser?.isRoot() && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
     assignVirtualCard: false,
     hasSettings: isAdmin,
@@ -451,9 +451,8 @@ const CollectiveNavbar = ({
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
-  const isRoot = LoggedInUser?.isRoot();
   callsToAction = {
-    ...getDefaultCallsToActions(collective, sections, isAdmin, isHostAdmin, isRoot, LoggedInUser),
+    ...getDefaultCallsToActions(collective, sections, isAdmin, isHostAdmin, LoggedInUser),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
