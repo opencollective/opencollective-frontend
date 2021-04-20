@@ -109,7 +109,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const collectiveContributionFilteringCategories = get(data, 'account.settings.moderation.rejectedCategories', null);
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
   const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
-  const collectiveDisableExpenseSubmission = get(collective, 'settings.disableExpenseSubmission', false);
+  const collectiveDisableExpenseSubmission = get(collective, 'settings.disablePublicExpenseSubmission', false);
 
   const selectOptions = React.useMemo(() => {
     const optionsArray = Object.entries(MODERATION_CATEGORIES).map(([key, value], index) => ({
@@ -134,17 +134,17 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     initialValues: {
       contributionPolicy: collectiveContributionPolicy || '',
       expensePolicy: collectiveExpensePolicy || '',
-      disableExpenseSubmission: collectiveDisableExpenseSubmission || false,
+      disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
     },
     async onSubmit(values) {
-      const { contributionPolicy, expensePolicy, disableExpenseSubmission } = values;
+      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission } = values;
       await updatePolicies({
         variables: {
           collective: {
             id: collective.id,
             contributionPolicy,
             expensePolicy,
-            settings: { ...collective.settings, disableExpenseSubmission },
+            settings: { ...collective.settings, disablePublicExpenseSubmission },
           },
         },
       });
@@ -288,8 +288,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           <StyledCheckbox
             name="allow-expense-submission"
             label={formatMessage(messages['expensePolicy.allowExpense'])}
-            onChange={() => (formik.values.disableExpenseSubmission = !formik.values.disableExpenseSubmission)}
-            defaultChecked={Boolean(formik.values.disableExpenseSubmission)}
+            onChange={() => (formik.values.disablePublicExpenseSubmission = !formik.values.disablePublicExpenseSubmission)}
+            defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
         </Container>
         <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
