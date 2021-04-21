@@ -179,7 +179,7 @@ const HostVirtualCards = props => {
           <Box lineHeight="20px" fontSize="14px" fontWeight="500">
             <FormattedMessage
               id="Host.VirtualCards.RequestCard.Title"
-              defaultMessage="Allow collectives to reqest a card"
+              defaultMessage="Allow collectives to request a card"
             />
             <P fontSize="11px" fontWeight="400" color="black.600">
               <FormattedMessage
