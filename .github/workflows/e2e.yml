@@ -4,6 +4,8 @@ on:
   push:
     branches-ignore:
       - 'i18n/crowdin'
+      - 'dependabot/**'
+  pull_request_target:
 
 env:
   CI: true
@@ -31,6 +33,8 @@ env:
 
 jobs:
   e2e:
+    if: >-
+      github.event_name == 'push' || github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
 
     timeout-minutes: 30

@@ -34,6 +34,8 @@ class AuthenticatedPage extends React.Component {
   static propTypes = {
     /** A child renderer to call when user is properly authenticated */
     children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+    /** Whether user can signup on this page */
+    disableSignup: PropTypes.bool,
     /** @ignore from withUser */
     loadingLoggedInUser: PropTypes.bool,
     /** @ignore from withUser */
@@ -54,7 +56,7 @@ class AuthenticatedPage extends React.Component {
                   defaultMessage="You need to be logged in to continue."
                 />
               </MessageBox>
-              <SignInOrJoinFree />
+              <SignInOrJoinFree form="signin" disableSignup={this.props.disableSignup} />
             </Flex>
           )}
         </Container>

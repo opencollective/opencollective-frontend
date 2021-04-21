@@ -28,6 +28,7 @@ export const StyledHeroBackground = styled.div`
 
   img {
     margin: 0;
+    user-select: none;
   }
 
   .reactEasyCrop_Image,

@@ -197,7 +197,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, ORGANIZATION, USER),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: c => isOneOfTypes(c, ORGANIZATION, USER),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c =>
-    isOneOfTypes(c, COLLECTIVE, FUND) && hasFeature(c.host, FEATURES.PRIVACY_VCC),
+    isOneOfTypes(c, COLLECTIVE, FUND) && hasFeature(c.host, FEATURES.PRIVACY_VCC) && c.hasVirtualCards,
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
     isOneOfTypes(c, COLLECTIVE, FUND, EVENT, PROJECT) || (c.type === ORGANIZATION && c.isActive),
