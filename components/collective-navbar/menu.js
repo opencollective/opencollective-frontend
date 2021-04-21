@@ -14,6 +14,7 @@ export const NAVBAR_ACTION_TYPE = {
   ADD_PREPAID_BUDGET: 'addPrepaidBudget',
   ADD_FUNDS: 'addFunds',
   ASSIGN_CARD: 'assignCard',
+  REQUEST_CARD: 'requestCard',
   CONTRIBUTE: 'hasContribute',
   MANAGE_SUBSCRIPTIONS: 'hasManageSubscriptions',
   REQUEST_GRANT: 'hasRequestGrant',

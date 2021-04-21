@@ -491,6 +491,7 @@ enum ActivityType {
   ADDED_FUND_TO_ORG
   ACTIVATED_COLLECTIVE_AS_HOST
   DEACTIVATED_COLLECTIVE_AS_HOST
+  VIRTUAL_CARD_REQUESTED
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
 }
@@ -5760,6 +5761,21 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): VirtualCard!
+
+  """
+  Request Virtual Card to host
+  """
+  requestVirtualCard(
+    """
+    Request notes
+    """
+    notes: String
+
+    """
+    Account where the virtual card will be associated
+    """
+    account: AccountReferenceInput!
+  ): Boolean
 
   """
   Pause active Virtual Card

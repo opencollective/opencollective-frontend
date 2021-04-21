@@ -92,7 +92,7 @@ const EditPrivacyAccount = props => {
         <StyledInputField
           mt={2}
           name="token"
-          label="Token"
+          label="API Key"
           error={(formik.touched.token && formik.errors.token) || createError?.message}
           disabled={isCreating}
         >

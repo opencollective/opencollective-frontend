@@ -219,7 +219,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, is
   }
 
   const isFund = collective.type === CollectiveType.FUND;
-  const { type, features, settings } = collective;
+  const { type, features, settings, host } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
     hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
@@ -230,7 +230,8 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, is
     hasRequestGrant: isFund || get(settings, 'fundingRequest') === true,
     addPrepaidBudget: isRoot && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
-    assignVirtualCard: false,
+    assignVirtualCard: isHostAdmin && get(host, 'settings.features.privacyVcc'),
+    requestVirtualCard: isAdmin && get(host, 'settings.virtualcards.requestcard'),
     hasSettings: isAdmin,
   };
 };
