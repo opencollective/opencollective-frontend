@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import formatMemberRole from '../lib/i18n/member-role';
-import { Router } from '../server/pages';
 
 import Avatar from './Avatar';
 import { Flex } from './Grid';
@@ -55,6 +55,7 @@ const replyToMemberInvitationMutation = gql`
 const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUser, redirectOnAccept }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
+  const router = useRouter();
   const [accepted, setAccepted] = React.useState();
   const [isSubmitting, setSubmitting] = React.useState(false);
   const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation);
@@ -67,7 +68,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
     await sendReplyToInvitation({ variables: { id: invitation.id, accept } });
     await refetchLoggedInUser();
     if (accept && redirectOnAccept) {
-      await Router.pushRoute(`/${invitation.collective.slug}`);
+      await router.push(`/${invitation.collective.slug}`);
     }
     setSubmitting(false);
   };
