@@ -1,43 +1,55 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import { Box, Grid } from '../../Grid';
+import { Box, Flex, Grid } from '../../Grid';
 import Loading from '../../Loading';
+import Pagination from '../../Pagination';
 import { P } from '../../Text';
 import SettingsTitle from '../SettingsTitle';
 import VirtualCard from '../VirtualCard';
 
 const virtualCardsQuery = gqlV2/* GraphQL */ `
-  query CollectiveVirtualCards($slug: String) {
+  query CollectiveVirtualCards($slug: String, $limit: Int!, $offset: Int!) {
     collective(slug: $slug) {
       id
       legacyId
       slug
-      virtualCards {
-        id
-        name
-        last4
-        data
-        privateData
-        createdAt
-        account {
+      virtualCards(limit: $limit, offset: $offset) {
+        totalCount
+        limit
+        offset
+        nodes {
           id
           name
-          imageUrl
+          last4
+          data
+          privateData
+          createdAt
+          account {
+            id
+            name
+            imageUrl
+          }
         }
       }
     }
   }
 `;
 
+const VIRTUAL_CARDS_PER_PAGE = 6;
+
 const VirtualCards = props => {
+  const router = useRouter();
+  const offset = parseInt(router.query.offset) || 0;
+
   const { loading, data } = useQuery(virtualCardsQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: props.collective.slug },
+    variables: { slug: props.collective.slug, limit: VIRTUAL_CARDS_PER_PAGE, offset },
   });
 
   if (loading) {
@@ -59,10 +71,20 @@ const VirtualCards = props => {
         </P>
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
-        {data.collective.virtualCards.map(vc => (
+        {data.collective.virtualCards.nodes.map(vc => (
           <VirtualCard key={vc.id} {...vc} />
         ))}
       </Grid>
+      <Flex mt={5} justifyContent="center">
+        <Pagination
+          route={`/${props.collective.slug}/edit/virtual-cards`}
+          total={data.collective.virtualCards.totalCount}
+          limit={VIRTUAL_CARDS_PER_PAGE}
+          offset={offset}
+          ignoredQueryParams={['slug', 'section']}
+          scrollToTopOnChange
+        />
+      </Flex>
     </Fragment>
   );
 };
@@ -70,6 +92,7 @@ const VirtualCards = props => {
 VirtualCards.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
+    virtualCards: PropTypes.object,
   }),
   hideTopsection: PropTypes.func,
 };
