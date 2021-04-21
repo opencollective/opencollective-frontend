@@ -50,7 +50,7 @@ const transformResultInCSV = json => {
   const lines = json.map(i => {
     const profile = `http://opencollective.com/${i.fromCollective.slug}`;
     const subscriptionInterval = i.subscription ? i.subscription.interval : 'one time';
-    const expenseTags = i.expense && i.expense.tags ? i.expense.tags.join(', ') : '';
+    const expenseTags = i.expense?.tags ? i.expense.tags.join(', ') : '';
 
     return [
       q(i.description) /* Transaction Description */,
