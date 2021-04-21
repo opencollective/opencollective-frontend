@@ -288,7 +288,9 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           <StyledCheckbox
             name="allow-expense-submission"
             label={formatMessage(messages['expensePolicy.allowExpense'])}
-            onChange={() => setFieldValue('disablePublicExpenseSubmission', !formik.values.disablePublicExpenseSubmission)}
+            onChange={() =>
+              formik.setFieldValue('disablePublicExpenseSubmission', !formik.values.disablePublicExpenseSubmission)
+            }
             defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
         </Container>
