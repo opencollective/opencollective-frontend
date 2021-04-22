@@ -229,6 +229,28 @@ describe('New expense flow', () => {
       let collective, expenseId;
       const inviteeEmail = randomEmail();
 
+      it('can invite an existing user to submit an expense', () => {
+        cy.getByDataCy('radio-expense-type-INVOICE').click();
+
+        cy.getByDataCy('select-expense-payee').click();
+        cy.get('input#input-payee').type('Xa');
+        cy.wait(2000);
+        cy.get('#react-select-input-payee-option-0-0').click();
+
+        cy.get('input[name="description"]').type('Service Invoice');
+        cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+
+        cy.getByDataCy('expense-summary-btn').click();
+        cy.wait(500);
+
+        cy.getByDataCy('expense-status-msg').should('contain', 'DRAFT');
+        cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
+        cy.getByDataCy('expense-draft-banner').should(
+          'contain',
+          `An invitation to submit this expense has been sent to`,
+        );
+      });
+
       it('can invite a third-party user to submit an expense', () => {
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
