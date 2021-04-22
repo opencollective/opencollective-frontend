@@ -48,7 +48,7 @@ import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
-import VirtualCards from './sections/VirtualCards';
+import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';

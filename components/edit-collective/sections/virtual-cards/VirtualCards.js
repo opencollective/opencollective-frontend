@@ -1,25 +1,28 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 
-import { Box, Flex, Grid } from '../../Grid';
-import Loading from '../../Loading';
-import Pagination from '../../Pagination';
-import { P } from '../../Text';
-import SettingsTitle from '../SettingsTitle';
-import VirtualCard from '../VirtualCard';
+import { Box, Flex, Grid } from '../../../Grid';
+import Loading from '../../../Loading';
+import Pagination from '../../../Pagination';
+import { P } from '../../../Text';
+import SettingsTitle from '../../SettingsTitle';
+import VirtualCard from '../../VirtualCard';
+
+import VirtualCardFilters from './VirtualCardFilters';
 
 const virtualCardsQuery = gqlV2/* GraphQL */ `
-  query CollectiveVirtualCards($slug: String, $limit: Int!, $offset: Int!) {
+  query CollectiveVirtualCards($slug: String, $limit: Int!, $offset: Int!, $state: String) {
     collective(slug: $slug) {
       id
       legacyId
       slug
-      virtualCards(limit: $limit, offset: $offset) {
+      virtualCards(limit: $limit, offset: $offset, state: $state) {
         totalCount
         limit
         offset
@@ -45,19 +48,28 @@ const VIRTUAL_CARDS_PER_PAGE = 6;
 
 const VirtualCards = props => {
   const router = useRouter();
-  const offset = parseInt(router.query.offset) || 0;
+  const routerQuery = omit(router.query, ['slug', 'section']);
+  const offset = parseInt(routerQuery.offset) || 0;
+  const state = routerQuery.state;
 
   const { loading, data } = useQuery(virtualCardsQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: props.collective.slug, limit: VIRTUAL_CARDS_PER_PAGE, offset },
+    variables: { slug: props.collective.slug, limit: VIRTUAL_CARDS_PER_PAGE, offset, state },
   });
 
   if (loading) {
     return <Loading />;
   }
 
+  function updateFilters(queryParams) {
+    return router.push({
+      pathname: `/${props.collective.slug}/edit/virtual-cards`,
+      query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
+    });
+  }
+
   return (
-    <Fragment>
+    <Box width={['366px', '764px']}>
       <SettingsTitle>
         <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
       </SettingsTitle>
@@ -69,6 +81,13 @@ const VirtualCards = props => {
             defaultMessage="Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them."
           />
         </P>
+        <Flex mt={3} flexDirection={['row', 'column']}>
+          <VirtualCardFilters
+            filters={routerQuery}
+            collective={props.collective}
+            onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
+          />
+        </Flex>
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
         {data.collective.virtualCards.nodes.map(vc => (
@@ -85,7 +104,7 @@ const VirtualCards = props => {
           scrollToTopOnChange
         />
       </Flex>
-    </Fragment>
+    </Box>
   );
 };
 
