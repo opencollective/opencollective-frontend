@@ -317,7 +317,7 @@ export default class RichTextEditor extends React.Component {
                   <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-video-embed">
                 </div>
               </div>
-              <strong>Note: Only YouTube and Vimeo links are supported.</strong>
+              <strong>Note: Only YouTube links are supported</strong>
             </div>`;
     const { toolbarElement } = e.target;
     const attachFilesButton = toolbarElement.querySelector('[data-trix-action=attachFiles]');
@@ -349,9 +349,9 @@ export default class RichTextEditor extends React.Component {
     const { id, service } = this.parseVideoLink(videoLink);
     if (service === 'youtube') {
       return `https://www.youtube-nocookie.com/embed/${id}`;
-    } else if (service === 'vimeo') {
+    } /* else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
-    } else {
+    }*/ else {
       return null;
     }
   };
@@ -362,9 +362,9 @@ export default class RichTextEditor extends React.Component {
         '(?:https?://)?(?:www.)?youtu(?:.be/|be.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
         'ig',
       ),
-      vimeo: new RegExp(
-        '(http|https)?://(www.)?vimeo.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
-      ),
+      // vimeo: new RegExp(
+      //   '(http|https)?://(www.)?vimeo.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
+      // ),
     };
     for (const service in regexps) {
       const matches = regexps[service].exec(videoLink);
