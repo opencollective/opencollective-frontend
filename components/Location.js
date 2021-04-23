@@ -2,10 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-<<<<<<< HEAD
-=======
 import { isURL } from 'validator';
->>>>>>> 2a6d2bbb97b2b5eddfc8374f1882a995938a0daf
 
 import Container from './Container';
 import { Flex } from './Grid';
