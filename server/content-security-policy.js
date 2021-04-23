@@ -50,6 +50,7 @@ const COMMON_DIRECTIVES = {
   ],
   frameSrc: [
     'www.youtube.com',
+    'www.youtube-nocookie.com',
     'opencollective.com',
     'js.stripe.com',
     '*.paypal.com',
