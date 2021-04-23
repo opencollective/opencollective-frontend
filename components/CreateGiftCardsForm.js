@@ -127,7 +127,6 @@ const DeliverTypeRadioSelector = styled(Flex)`
 const RadioButtonContainer = styled.label`
   display: flex;
   flex-direction: column;
-  align-items: center;
   cursor: pointer;
   width: auto;
   svg {
@@ -144,11 +143,24 @@ const RadioButtonContainer = styled.label`
 const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   const icon = checked ? <RadioButtonChecked /> : <RadioButtonUnchecked />;
   return (
-    <RadioButtonContainer data-name={name} onClick={onClick}>
-      <Box className="radio-btn">{icon}</Box>
-      <label textAlign="center" px={2} style={{ marginTop: 8, cursor: 'pointer' }}>
-        {children}
-      </label>
+    <RadioButtonContainer htmlFor="radio-buttons" data-name={name}>
+      <div
+        role="presentation"
+        onClick={onClick}
+        onKeyDown={event => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            onClick();
+          }
+        }}
+      >
+        <Box className="radio-btn" textAlign="center">
+          {icon}
+        </Box>
+        <div id="radio-buttons" style={{ marginTop: 8, cursor: 'pointer' }}>
+          {children}
+        </div>
+      </div>
     </RadioButtonContainer>
   );
 };
@@ -341,7 +353,8 @@ class CreateGiftCardsForm extends Component {
     return (
       <Box>
         <Flex flexDirection="column" mb="2em">
-          <label style={{ width: '100%' }}>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          <label style={{ width: '100%' }} htmlFor="gift-cards-recipients">
             <Flex flexDirection="column">
               <FormattedMessage id="giftCards.create.recipients" defaultMessage="Recipients" />
               <FieldLabelDetails>
@@ -353,6 +366,7 @@ class CreateGiftCardsForm extends Component {
             </Flex>
           </label>
           <StyledMultiEmailInput
+            id="gift-cards-recipients"
             className="gift-cards-recipients"
             mt="0.25em"
             invalids={errors.emails}
@@ -393,6 +407,7 @@ class CreateGiftCardsForm extends Component {
     return (
       <Container display="flex" flexDirection="column" width={1} justifyContent="center">
         <Flex justifyContent="center" mt={3} mb={4} alignItems="center">
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label htmlFor="giftcard-numberOfGiftCards">
             <FormattedMessage id="giftCards.create.number" defaultMessage="Number of gift cards" />
           </label>
@@ -485,6 +500,7 @@ class CreateGiftCardsForm extends Component {
             label={<FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />}
           >
             <PaymentMethodSelect
+              inputId="gift-card-payment-method"
               disabled={submitting}
               paymentMethods={paymentMethods}
               defaultPaymentMethod={this.getDefaultPaymentMethod()}
@@ -521,6 +537,7 @@ class CreateGiftCardsForm extends Component {
           >
             <StyledSelectCreatable
               id="giftcard-batch"
+              inputId="giftcard-batch"
               onChange={({ value }) => this.onChange('batch', truncate(value, { length: 200 }))}
               minWidth={300}
               disabled={submitting}
@@ -551,6 +568,7 @@ class CreateGiftCardsForm extends Component {
                   }
                 >
                   <CollectivePicker
+                    inputId="create-gift-card-picker"
                     placeholder={intl.formatMessage(messages.limitToHostsPlaceholder)}
                     disabled={hosts.length === 0}
                     minWidth={300}

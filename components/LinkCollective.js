@@ -21,7 +21,13 @@ const LinkCollective = ({ target, title, collective, children, ...props }) => {
   if (!collective || collective.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (collective.isGuest) {
-    return children || <FormattedMessage id="profile.guest" defaultMessage="Guest" />;
+    if (children) {
+      return children;
+    } else if (collective.name === 'Guest') {
+      return <FormattedMessage id="profile.guest" defaultMessage="Guest" />;
+    } else {
+      return collective.name;
+    }
   } else if (!collective.slug || collective.type === 'VENDOR') {
     return children || collective.name;
   }

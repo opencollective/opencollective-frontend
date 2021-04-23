@@ -13,7 +13,10 @@ import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
 import { STEPS } from '../components/contribution-flow/constants';
-import ContributionBlocker, { getContributionBlocker } from '../components/contribution-flow/ContributionBlocker';
+import ContributionBlocker, {
+  CONTRIBUTION_BLOCKER,
+  getContributionBlocker,
+} from '../components/contribution-flow/ContributionBlocker';
 import ContributionFlowSuccess from '../components/contribution-flow/ContributionFlowSuccess';
 import {
   contributionFlowAccountQuery,
@@ -24,6 +27,7 @@ import { getContributionFlowMetadata } from '../components/contribution-flow/uti
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import Redirect from '../components/Redirect';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
 
@@ -90,6 +94,7 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    hasNewPaypal: PropTypes.bool,
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -131,9 +136,12 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBLocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
-    if (contributionBLocker) {
-      return <ContributionBlocker blocker={contributionBLocker} account={account} />;
+    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    if (contributionBlocker) {
+      if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
+        return <Redirect to={`/${account.slug}/contribute`} />;
+      }
+      return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
       return <ContributionFlowSuccess collective={account} />;
     } else {
@@ -153,6 +161,11 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
+          hasNewPaypal={
+            LoggedInUser?.isRoot() ||
+            get(account, 'settings.forceNewPaypalPayments', false) ||
+            get(account, 'host.settings.forceNewPaypalPayments', false)
+          }
         />
       );
     }

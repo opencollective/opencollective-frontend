@@ -16,7 +16,7 @@ import { Span } from '../Text';
 import PayExpenseModal from './PayExpenseModal';
 
 const getDisabledMessage = (expense, collective, host, payoutMethod) => {
-  // Collective can be v1 or v2 there ...
+  // Collective / Balance can be v1 or v2 there ...
   const balance = get(
     collective,
     'stats.balanceWithBlockedFunds.valueInCents',
@@ -151,6 +151,7 @@ PayExpenseButton.propTypes = {
       plan: PropTypes.object,
     }),
     stats: PropTypes.shape({
+      // Collective / Balance can be v1 or v2 there ...
       balanceWithBlockedFunds: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.shape({

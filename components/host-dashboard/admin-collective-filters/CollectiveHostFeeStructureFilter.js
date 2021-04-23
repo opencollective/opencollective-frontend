@@ -15,6 +15,7 @@ const CollectiveHostFeeStructureFilter = ({ value, onChange, ...props }) => {
 
   return (
     <StyledSelectFilter
+      inputId="fee-structure-filter"
       value={value ? getOption(value) : optionAll}
       onChange={({ value }) => onChange(value)}
       options={options}

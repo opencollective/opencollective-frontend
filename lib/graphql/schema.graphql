@@ -114,6 +114,11 @@ type Collective implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -193,7 +198,7 @@ type Collective implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -284,7 +289,7 @@ type Collective implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -298,6 +303,7 @@ type Collective implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -406,6 +412,11 @@ input CollectiveInputType {
   tiers: [TierInputType]
   settings: JSON
   data: JSON
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   members: [MemberInputType]
   notifications: [NotificationInputType]
   HostCollectiveId: Int
@@ -462,6 +473,11 @@ interface CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -473,6 +489,7 @@ interface CollectiveInterface {
   isArchived: Boolean
   isApproved: Boolean
   isDeletable: Boolean
+  hasVirtualCards: Boolean
   host: CollectiveInterface
   hostCollective: CollectiveInterface
 
@@ -517,7 +534,7 @@ interface CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -617,7 +634,7 @@ interface CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -924,7 +941,7 @@ type Contributor {
   totalAmountDonated: Int!
 
   """
-  Wether the contributor is an individual, an organization...
+  Whether the contributor is an individual, an organization...
   """
   type: String!
 
@@ -1084,6 +1101,11 @@ type Event implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -1163,7 +1185,7 @@ type Event implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -1254,7 +1276,7 @@ type Event implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -1268,6 +1290,7 @@ type Event implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -1451,6 +1474,11 @@ type Fund implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -1530,7 +1558,7 @@ type Fund implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -1621,7 +1649,7 @@ type Fund implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -1635,6 +1663,7 @@ type Fund implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -1959,13 +1988,6 @@ type Mutation {
   createOrder(order: OrderInputType!): OrderType
     @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
   confirmOrder(order: ConfirmOrderInputType!): OrderType
-  createUpdate(update: UpdateInputType!): UpdateType
-    @deprecated(reason: "2021-01-29: This endpoint has been moved to GQLV2")
-  editUpdate(update: UpdateAttributesInputType!): UpdateType @deprecated(reason: "2021-01-29: Not used anymore")
-  publishUpdate(id: Int!, notificationAudience: UpdateAudienceTypeEnum!): UpdateType
-    @deprecated(reason: "2021-01-29: Not used anymore")
-  unpublishUpdate(id: Int!): UpdateType @deprecated(reason: "2021-01-29: Not used anymore")
-  deleteUpdate(id: Int!): UpdateType @deprecated(reason: "2021-01-29: Not used anymore")
   createComment(comment: CommentInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   editComment(comment: CommentAttributesInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   deleteComment(id: Int!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
@@ -2123,7 +2145,7 @@ type Mutation {
     invitationId: Int!
 
     """
-    Wether this invitation should be accepted or declined
+    Whether this invitation should be accepted or declined
     """
     accept: Boolean!
   ): Boolean
@@ -2478,6 +2500,11 @@ type Organization implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -2557,7 +2584,7 @@ type Organization implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -2648,7 +2675,7 @@ type Organization implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -2662,6 +2689,7 @@ type Organization implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
   email: String
 }
 
@@ -2857,6 +2885,11 @@ type Project implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -2936,7 +2969,7 @@ type Project implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -3027,7 +3060,7 @@ type Project implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -3041,6 +3074,7 @@ type Project implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -3096,8 +3130,6 @@ type Query {
     fetchDataFromLedger: Boolean
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
-  Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
-    @deprecated(reason: "2021-01-29: Not used anymore")
   Application(id: Int): Application
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
   allOrders(
@@ -3254,7 +3286,7 @@ type Query {
     types: [TypeOfCollective]
 
     """
-    Filter on wether account is a host
+    Filter on whether account is a host
     """
     isHost: Boolean
 
@@ -3505,7 +3537,9 @@ type TierStatsType {
   totalDonated: Int
 
   """
-  How much money is given for this tier for each tier.interval (monthly/yearly)
+  How much money is given for this tier for each tier.interval (monthly/yearly).
+  For flexible tiers, this amount is a monthly average of contributions amount,
+  taking into account both yearly and monthly subscriptions.
   """
   totalRecurringDonations: Int
 
@@ -3580,23 +3614,6 @@ enum TypeOfCollective {
 }
 
 """
-Input type for UpdateType
-"""
-input UpdateAttributesInputType {
-  id: Int
-  views: Int
-  slug: String
-  title: String
-  image: String
-  isPrivate: Boolean
-  makePublicOn: IsoDateString
-  markdown: String
-  html: String
-  fromCollective: CollectiveAttributesInputType
-  tier: TierInputType
-}
-
-"""
 Defines targets for an update
 """
 enum UpdateAudienceTypeEnum {
@@ -3614,24 +3631,6 @@ enum UpdateAudienceTypeEnum {
   Will be sent to financial contributors
   """
   FINANCIAL_CONTRIBUTORS
-}
-
-"""
-Input type for UpdateType
-"""
-input UpdateInputType {
-  id: Int
-  views: Int
-  slug: String
-  title: String
-  image: String
-  isPrivate: Boolean
-  makePublicOn: IsoDateString
-  markdown: String
-  html: String
-  fromCollective: CollectiveAttributesInputType
-  collective: CollectiveAttributesInputType!
-  tier: TierInputType
 }
 
 """
@@ -3706,6 +3705,11 @@ type User implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -3785,7 +3789,7 @@ type User implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -3876,7 +3880,7 @@ type User implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -3890,6 +3894,7 @@ type User implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
   firstName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   lastName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   email: String
@@ -3914,7 +3919,7 @@ type UserDetails {
     roles: [String]
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -3989,6 +3994,11 @@ type Vendor implements CollectiveInterface {
   """
   isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
   githubContributors: JSON!
   slug: String
   path: String
@@ -4068,7 +4078,7 @@ type Vendor implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -4159,7 +4169,7 @@ type Vendor implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -4173,4 +4183,5 @@ type Vendor implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }

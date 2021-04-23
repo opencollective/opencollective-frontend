@@ -10,5 +10,5 @@ export const attachmentDropzoneParams = {
  * Returns true if the attachment require adding a file
  */
 export const attachmentRequiresFile = expenseType => {
-  return expenseType === expenseTypes.RECEIPT;
+  return expenseType === expenseTypes.RECEIPT || expenseType === expenseTypes.CHARGE;
 };

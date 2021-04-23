@@ -92,7 +92,7 @@ class EditTwitterAccount extends React.Component {
       },
       'oneThousandBackers.toggle.label': {
         id: 'connectedAccounts.twitter.oneThousandBackers.toggle.label',
-        defaultMessage: '1,000 contributos',
+        defaultMessage: '1,000 contributors',
       },
       'oneThousandBackers.toggle.description': {
         id: 'connectedAccounts.twitter.oneThousandBackers.toggle.description',

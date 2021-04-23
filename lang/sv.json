@@ -637,7 +637,7 @@
   "CreateUpdateFAQ.whatfor.content": "Updates are great to keep your community of contributors up to date with what you do. They should preferably be low volume (at least once a month, ideally no more than once a week). If your contributors hear regularly from you, they will more likely engage, help you and continue to support you. Updates are also great for your fiscal sponsor and for writing reports for grants that you may have.",
   "CreateVirtualCardsSuccess.Download": "Download cards",
   "CreateVirtualCardsSuccess.RedeemLinks": "Copy the links",
-  "creditcard.label": "Credit Card",
+  "CreditCard": "Credit Card",
   "Currency": "Currency",
   "currency": "currency",
   "DateRange.All": "All",

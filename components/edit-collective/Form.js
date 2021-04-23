@@ -37,6 +37,7 @@ import Host from './sections/Host';
 import HostMetrics from './sections/HostMetrics';
 import HostPlan from './sections/HostPlan';
 import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
+import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
@@ -47,6 +48,7 @@ import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
+import VirtualCards from './sections/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
@@ -193,8 +195,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: `If your Host fee is 10% and your Collectives bring in $1,000, your Platform fee will be $15. If you host fee is 0%, your Platform fee will be 0.`,
       },
       'location.label': {
-        id: 'collective.location.label',
-        defaultMessage: 'City',
+        id: 'SectionLocation.Title',
+        defaultMessage: 'Location',
       },
       'country.label': {
         id: 'collective.country.label',
@@ -247,6 +249,14 @@ class EditCollectiveForm extends React.Component {
       'GST-number.label': {
         id: 'EditCollective.GSTNumber',
         defaultMessage: 'GST number',
+      },
+      'privateInstructions.label': {
+        id: 'event.privateInstructions.label',
+        defaultMessage: 'Private instructions',
+      },
+      privateInstructionsDescription: {
+        id: 'event.privateInstructions.description',
+        defaultMessage: 'These instructions will be provided by email to the participants.',
       },
     });
 
@@ -310,7 +320,7 @@ class EditCollectiveForm extends React.Component {
           collective['endsAt'] = endsAtValue;
         }
       } else {
-        collective[fieldname] = value;
+        set(collective, fieldname, value);
       }
 
       return { collective, modified: true };
@@ -522,6 +532,12 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
         return <Policies collective={collective} />;
 
+      case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS:
+        return <HostVirtualCards collective={collective} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
+        return <VirtualCards collective={collective} />;
+
       default:
         return null;
     }
@@ -701,6 +717,14 @@ class EditCollectiveForm extends React.Component {
           name: 'location',
           placeholder: '',
           type: 'location',
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'privateInstructions',
+          description: intl.formatMessage(this.messages.privateInstructionsDescription),
+          type: 'textarea',
+          maxLength: 10000,
+          defaultValue: collective.privateInstructions,
           when: () => collective.type === CollectiveType.EVENT,
         },
         {

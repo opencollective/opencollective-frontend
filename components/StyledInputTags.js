@@ -152,7 +152,12 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
   };
 
   const handleToggleInput = () => {
-    isOpen ? handleClose() : setOpen(true);
+    if (isOpen) {
+      handleClose();
+    } else {
+      setOpen(true);
+      setTimeout(() => inputRef?.current?.focus(), 50);
+    }
   };
 
   const removeTag = (tag, update) => {
@@ -238,7 +243,6 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                       data-cy="styled-input-tags-input"
                       placeholder={formatMessage(messages.placeholder)}
                       ref={inputRef}
-                      autoFocus
                       value={inputValue}
                       onChange={e => setInputValue(e.target.value)}
                       onBlur={() => {

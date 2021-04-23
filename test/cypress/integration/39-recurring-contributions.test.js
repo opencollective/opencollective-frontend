@@ -1,5 +1,4 @@
-// TODO: This tests are failing too often. We need to improve their reliability before enabling them
-describe.skip('Recurring contributions', () => {
+describe('Recurring contributions', () => {
   let user;
 
   before(() => {
@@ -29,7 +28,7 @@ describe.skip('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-menu-payment-option').click();
       cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
       cy.getByDataCy('recurring-contribution-add-pm-button').click();
-      cy.wait(2000);
+      cy.wait(3000);
       cy.fillStripeInput();
       cy.getByDataCy('recurring-contribution-submit-pm-button').click();
       cy.contains('[data-cy="recurring-contribution-pm-box"]', 'VISA **** 4242').within(() => {
@@ -50,7 +49,7 @@ describe.skip('Recurring contributions', () => {
       });
       cy.getByDataCy('recurring-contribution-update-order-button').click();
       cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
-      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$2.00 USD / month');
+      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$5.00 USD / month');
     });
   });
 

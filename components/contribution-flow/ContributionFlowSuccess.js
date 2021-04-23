@@ -137,7 +137,7 @@ class ContributionFlowSuccess extends React.Component {
 
     return (
       <Flex flexDirection="column" justifyContent="center" p={2}>
-        {callsToAction.length <= 2 && <SuccessIllustration />}
+        {callsToAction.length <= 2 && <SuccessIllustration alt="" />}
         {callsToAction.map(type => (
           <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} email={email} />
         ))}
@@ -204,7 +204,7 @@ class ContributionFlowSuccess extends React.Component {
     const { LoggedInUser, collective, data, intl, isEmbed } = this.props;
     const { order } = data;
     const shareURL = `${process.env.WEBSITE_URL}/${collective.slug}`;
-    const pendingOrder = order && order.status === ORDER_STATUS.PENDING;
+    const isPendingBankTransfer = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
 
     if (!data.loading && !order) {
       return (
@@ -292,7 +292,7 @@ class ContributionFlowSuccess extends React.Component {
               </Flex>
             </ContainerWithImage>
             <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
-              {pendingOrder ? this.renderBankTransferInformation() : this.renderCallsToAction()}
+              {isPendingBankTransfer ? this.renderBankTransferInformation() : this.renderCallsToAction()}
             </Flex>
           </Fragment>
         )}

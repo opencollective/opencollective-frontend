@@ -1,0 +1,19 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import CustomStyledIcon from './CustomStyledIcon';
+
+const DismissIcon = props => (
+  <CustomStyledIcon width="14" height="14" viewBox="0 0 14 14" fill="none" {...props}>
+    <path
+      d="M0.586873 0.814096L0.678557 0.706658C1.01473 0.366575 1.54079 0.335658 1.91149 0.613908L2.01769 0.706658L6.99998 5.64487L12.0502 0.613882C12.42 0.23979 13.0195 0.23979 13.3893 0.613882C13.7591 0.987973 13.7591 1.5945 13.3893 1.96859L8.33954 7.00001L13.2831 11.9386C13.6193 12.2787 13.6499 12.8109 13.3748 13.1859L13.2831 13.2933C12.9469 13.6334 12.4209 13.6643 12.0502 13.3861L11.944 13.2933L6.99998 8.35515L1.94977 13.3861C1.57998 13.7602 0.98043 13.7602 0.610638 13.3861C0.240847 13.012 0.240847 12.4055 0.610638 12.0314L5.66042 7.00001L0.678557 2.06136C0.342382 1.72128 0.311821 1.18911 0.586873 0.814096Z"
+      fill="#141414"
+    />
+  </CustomStyledIcon>
+);
+
+DismissIcon.propTypes = {
+  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+export default DismissIcon;

@@ -45,8 +45,8 @@ SLACK_CHANNEL="CEZUS9WH3"
 LOCAL_ORIGIN="origin"
 PRE_DEPLOY_ORIGIN="predeploy-${1}"
 
-LOCAL_BRANCH="master"
-PRE_DEPLOY_BRANCH="master"
+LOCAL_BRANCH="main"
+PRE_DEPLOY_BRANCH="main"
 
 GIT_LOG_FORMAT_SHELL='short'
 GIT_LOG_FORMAT_SLACK='format:<https://github.com/opencollective/opencollective-frontend/commit/%H|[%ci]> *%an* %n_%<(80,trunc)%s_%n'
@@ -94,7 +94,7 @@ echo ""
 
 # ---- Ask for confirmation ----
 
-echo "ℹ️  You're about to deploy the preceding commits from master branch to $1 server."
+echo "ℹ️  You're about to deploy the preceding commits from main branch to $1 server."
 confirm "❔ Are you sure (yes/no) > " || exit 1
 
 # ---- Slack notification ----

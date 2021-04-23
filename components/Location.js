@@ -1,10 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+<<<<<<< HEAD
+=======
+import { isURL } from 'validator';
+>>>>>>> 2a6d2bbb97b2b5eddfc8374f1882a995938a0daf
 
 import Container from './Container';
+import { Flex } from './Grid';
 import Map from './Map';
 import StyledLink from './StyledLink';
+import { P } from './Text';
 
 const LocationSection = styled.section`
   text-align: center;
@@ -21,7 +28,32 @@ class Location extends React.Component {
   };
 
   render() {
+    if (!this.props.location) {
+      return null;
+    }
+
     const { name, address, lat, long, country } = this.props.location;
+    if (name === 'Online') {
+      if (address && isURL(address)) {
+        return (
+          <Flex flexDirection="Column" alignItems="center">
+            <P textAlign="center">
+              <StyledLink openInNewTabNoFollow href={address}>
+                {address}
+              </StyledLink>
+            </P>
+          </Flex>
+        );
+      } else {
+        return (
+          <P textAlign="center">
+            <FormattedMessage id="Location.online" defaultMessage="Online" />
+          </P>
+        );
+      }
+    } else if (!name && !address && !lat && !long && !country) {
+      return null;
+    }
 
     return (
       <LocationSection id="location">

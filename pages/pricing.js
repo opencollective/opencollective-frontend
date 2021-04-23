@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import Page from '../components/Page';
-import Pricing from '../components/pricing-new';
+import Pricing from '../components/pricing';
 
 export default class PricingPage extends Component {
   static getInitialProps({ query }) {

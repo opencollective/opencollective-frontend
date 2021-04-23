@@ -55,11 +55,13 @@ class CollectiveContact extends React.Component {
         description: collective.description,
         twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
         image: collective.image || get(collective, 'parentCollective.image'),
+        noRobots: false,
       };
     } else {
       return {
         title: 'Contact collective',
         image: '/static/images/defaultBackgroundImage.png',
+        noRobots: false,
       };
     }
   }

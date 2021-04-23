@@ -92,7 +92,7 @@ const EditPrivacyAccount = props => {
         <StyledInputField
           mt={2}
           name="token"
-          label="Token"
+          label="API Key"
           error={(formik.touched.token && formik.errors.token) || createError?.message}
           disabled={isCreating}
         >
@@ -100,7 +100,7 @@ const EditPrivacyAccount = props => {
             <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.token} />
           )}
         </StyledInputField>
-        <StyledButton mt={10} type="submit" buttonSize="tiny" loading={isCreating}>
+        <StyledButton mt={2} type="submit" loading={isCreating}>
           <FormattedMessage id="collective.connectedAccounts.privacy.button" defaultMessage="Connect Privacy" />
         </StyledButton>
       </form>
@@ -118,7 +118,7 @@ const EditPrivacyAccount = props => {
           />
         </P>
         <P>
-          <StyledButton type="submit" buttonSize="tiny" loading={isDeleting} onClick={handleDelete}>
+          <StyledButton type="submit" mt={2} loading={isDeleting} onClick={handleDelete}>
             <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
           </StyledButton>
         </P>

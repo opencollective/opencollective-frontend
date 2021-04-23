@@ -89,9 +89,11 @@ const StepPayment = ({
   stepSummary,
   collective,
   onChange,
+  isSubmitting,
   hideCreditCardPostalCode,
   onNewCardFormReady,
   setBraintree,
+  hasNewPaypal,
 }) => {
   // GraphQL mutations and queries
   const { loading, data, error } = useQuery(paymentMethodsQuery, {
@@ -106,8 +108,17 @@ const StepPayment = ({
   const isRoot = Boolean(LoggedInUser?.isRoot());
   const paymentMethods = get(data, 'account.paymentMethods', null) || [];
   const paymentOptions = React.useMemo(
-    () => generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective, isRoot),
-    [paymentMethods, stepProfile, stepDetails, collective, isRoot],
+    () =>
+      generatePaymentMethodOptions(
+        paymentMethods,
+        stepProfile,
+        stepDetails,
+        stepSummary,
+        collective,
+        isRoot,
+        hasNewPaypal,
+      ),
+    [paymentMethods, stepProfile, stepDetails, collective, isRoot, hasNewPaypal],
   );
 
   const setNewPaymentMethod = (key, paymentMethod) => {
@@ -147,6 +158,7 @@ const StepPayment = ({
           options={paymentOptions}
           onChange={option => setNewPaymentMethod(option.key, option.value.paymentMethod)}
           value={stepPayment?.key || null}
+          disabled={isSubmitting}
         >
           {({ radio, checked, index, value }) => (
             <PaymentMethodBox index={index} disabled={value.disabled}>
@@ -214,6 +226,8 @@ StepPayment.propTypes = {
   onNewCardFormReady: PropTypes.func,
   setBraintree: PropTypes.func,
   hideCreditCardPostalCode: PropTypes.bool,
+  hasNewPaypal: PropTypes.bool,
+  isSubmitting: PropTypes.bool,
 };
 
 StepPayment.defaultProps = {

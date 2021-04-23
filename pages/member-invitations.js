@@ -49,7 +49,7 @@ class MemberInvitationsPage extends React.Component {
 
   render() {
     return (
-      <AuthenticatedPage noRobots title="Pending invitations">
+      <AuthenticatedPage title="Pending invitations" disableSignup>
         {LoggedInUser => (
           <Query
             query={memberInvitationsPageQuery}

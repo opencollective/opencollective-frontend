@@ -51,6 +51,7 @@ const AmountFilter = ({ currency, onChange, value, steps, ...props }) => {
 
   return (
     <StyledSelectFilter
+      inputId="expenses-amount-filter"
       data-cy="expenses-filter-amount"
       value={value ? getOption(intl, currency, ...parseAmountRange(value)) : allExpensesOption}
       onChange={({ value }) => onChange(value)}
