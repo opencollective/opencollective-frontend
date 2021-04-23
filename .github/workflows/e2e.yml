@@ -90,8 +90,17 @@ jobs:
 
       # Checkouts
 
-      - name: Checkout (frontend)
+      - name: Checkout (Push)
+        if: github.event_name == 'push'
         uses: actions/checkout@v2
+
+      - name: Checkout (Pull Request Target)
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v2
+        with:
+          # We are in a pull_request_target event - we need to explicitly checkout the PR's head.
+          # Otherwise we would be running against main branch
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set REF in env, removing the `refs/` part
         run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV
