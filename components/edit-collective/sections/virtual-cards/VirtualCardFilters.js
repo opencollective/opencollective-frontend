@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import AmountFilter from '../../../budget/filters/AmountFilter';
 import { Box, Flex } from '../../../Grid';
 
+import MerchantFilter from './filters/MerchantFilter';
 import StatusFilter from './filters/StatusFilter';
 
 const FilterContainer = styled(Box)`
@@ -21,7 +21,7 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const VirtualCardFilters = ({ collective, filters, onChange }) => {
+const VirtualCardFilters = ({ filters, onChange }) => {
   const getFilterProps = name => {
     return {
       inputId: `virtual-cards-filter-${name}`,
@@ -44,7 +44,7 @@ const VirtualCardFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="virtual-card-filter-amount">
           <FormattedMessage id="VirtualCard.Merchant" defaultMessage="Merchant" />
         </FilterLabel>
-        <AmountFilter currency={collective.currency} {...getFilterProps('merchant')} />
+        <MerchantFilter {...getFilterProps('merchant')} />
       </FilterContainer>
     </Flex>
   );

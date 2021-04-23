@@ -226,7 +226,7 @@ interface Account {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
 }
 
 """
@@ -491,6 +491,7 @@ enum ActivityType {
   ADDED_FUND_TO_ORG
   ACTIVATED_COLLECTIVE_AS_HOST
   DEACTIVATED_COLLECTIVE_AS_HOST
+  VIRTUAL_CARD_REQUESTED
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
 }
@@ -752,7 +753,7 @@ type Bot implements Account {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
 }
 
 input BraintreePaymentInput {
@@ -1009,7 +1010,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
 
   """
   Returns the Fiscal Host
@@ -3189,7 +3190,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
 
   """
   Returns the Fiscal Host
@@ -4098,7 +4099,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
 
   """
   Returns the Fiscal Host
@@ -4415,7 +4416,7 @@ type Host implements Account & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
 
   """
   Number of unique financial contributors.
@@ -4946,7 +4947,7 @@ type Individual implements Account {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
   firstName: String @deprecated(reason: "2020-10-12: Use the name field")
   lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
@@ -5762,6 +5763,21 @@ type Mutation {
   ): VirtualCard!
 
   """
+  Request Virtual Card to host
+  """
+  requestVirtualCard(
+    """
+    Request notes
+    """
+    notes: String
+
+    """
+    Account where the virtual card will be associated
+    """
+    account: AccountReferenceInput!
+  ): Boolean
+
+  """
   Pause active Virtual Card
   """
   pauseVirtualCard(
@@ -6263,7 +6279,7 @@ type Organization implements Account & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
 
   """
   Number of unique financial contributors.
@@ -6786,7 +6802,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
 
   """
   Returns the Fiscal Host
@@ -7857,7 +7873,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null): VirtualCardCollection!
+  virtualCards(limit: Int = 100, offset: Int = 0, state: String = null, merchant: String = null): VirtualCardCollection!
 
   """
   Returns the Fiscal Host
