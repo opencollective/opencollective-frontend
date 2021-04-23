@@ -9,11 +9,29 @@ import withViewport from '../lib/withViewport';
 
 import { Box, Flex } from './Grid';
 import StyledRoundButton from './StyledRoundButton';
+import { Dimensions } from './collective-page/_constants';
 
 const RefContainer = styled(Box)`
   display: flex;
   overflow-x: auto;
   scroll-behavior: smooth;
+
+  /** Respect left margin / center cards on widescreens */
+
+  @supports (width: fit-content) {
+    @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
+      margin: 0 auto;
+      min-width: ${Dimensions.MAX_SECTION_WIDTH}px;
+      width: fit-content;
+      max-width: 100%;
+    }
+  }
+
+  @supports not (width: fit-content) {
+    @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
+      padding-left: calc((100% - ${Dimensions.MAX_SECTION_WIDTH + 10}px) / 2);
+    }
+  }
 `;
 
 const ControlsContainer = styled(Flex)`
