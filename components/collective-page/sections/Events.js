@@ -15,7 +15,6 @@ import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import { H3 } from '../../Text';
-import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 
@@ -61,34 +60,33 @@ class SectionEvents extends React.PureComponent {
     }
 
     return (
-      <Box pb={4}>
-        <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-          <div>
-            <Box pb={3} px={Dimensions.PADDING_X}>
-              <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
-                <FormattedMessage id="Events" defaultMessage="Events" />
-              </H3>
+      <Box pb={4} mt={2}>
+        <ContainerSectionContent>
+          <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700" mb={2}>
+            <FormattedMessage id="Events" defaultMessage="Events" />
+          </H3>
+        </ContainerSectionContent>
+        <HorizontalScroller
+          container={ContributeCardsContainer}
+          getScrollDistance={this.getContributeCardsScrollDistance}
+        >
+          {[...upcomingEvents, ...pastEvents].map(event => (
+            <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+              <ContributeEvent
+                collective={collective}
+                event={event}
+                hideContributors={hasNoContributorForEvents}
+                disableCTA={!collective.isActive || !event.isActive}
+              />
             </Box>
-            <ContributeCardsContainer>
-              {isAdmin && (
-                <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
-                  <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
-                    <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
-                  </CreateNew>
-                </Box>
-              )}
-              {[...upcomingEvents, ...pastEvents].map(event => (
-                <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                  <ContributeEvent
-                    collective={collective}
-                    event={event}
-                    hideContributors={hasNoContributorForEvents}
-                    disableCTA={!collective.isActive || !event.isActive}
-                  />
-                </Box>
-              ))}
-            </ContributeCardsContainer>
-          </div>
+          ))}
+          {isAdmin && (
+            <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
+              <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
+                <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+              </CreateNew>
+            </Box>
+          )}
         </HorizontalScroller>
         {Boolean(events?.length) && (
           <ContainerSectionContent>
