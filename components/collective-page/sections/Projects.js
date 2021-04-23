@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import ContributeProject from '../../contribute-cards/ContributeProject';
 import CreateNew from '../../contribute-cards/CreateNew';
-import { Box, Flex } from '../../Grid';
+import { Box } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
@@ -61,39 +61,27 @@ class SectionProjects extends React.PureComponent {
 
         <Box mb={4}>
           <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-            {(ref, Chevrons) => (
-              <div>
-                {projects.length > 1 && (
-                  <ContainerSectionContent>
-                    <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                      <Box m={2} flex="0 0 50px">
-                        <Chevrons />
-                      </Box>
-                    </Flex>
-                  </ContainerSectionContent>
+            <div>
+              <ContributeCardsContainer>
+                {projects.map(project => (
+                  <Box key={project.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                    <ContributeProject
+                      collective={collective}
+                      project={project}
+                      disableCTA={!project.isActive}
+                      hideContributors={!projects.some(project => project.contributors.length)}
+                    />
+                  </Box>
+                ))}
+                {isAdmin && (
+                  <ContributeCardContainer minHeight={150}>
+                    <CreateNew route={`/${collective.slug}/projects/create`}>
+                      <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
+                    </CreateNew>
+                  </ContributeCardContainer>
                 )}
-
-                <ContributeCardsContainer ref={ref}>
-                  {projects.map(project => (
-                    <Box key={project.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeProject
-                        collective={collective}
-                        project={project}
-                        disableCTA={!project.isActive}
-                        hideContributors={!projects.some(project => project.contributors.length)}
-                      />
-                    </Box>
-                  ))}
-                  {isAdmin && (
-                    <ContributeCardContainer minHeight={150}>
-                      <CreateNew route={`/${collective.slug}/projects/create`}>
-                        <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
-                      </CreateNew>
-                    </ContributeCardContainer>
-                  )}
-                </ContributeCardsContainer>
-              </div>
-            )}
+              </ContributeCardsContainer>
+            </div>
           </HorizontalScroller>
         </Box>
       </Box>
