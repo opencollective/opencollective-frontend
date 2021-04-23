@@ -378,8 +378,8 @@ export default class RichTextEditor extends React.Component {
   embedVideoIFrame = videoLink => {
     const embedLink = this.constructVideoEmbedURL(videoLink);
     if (embedLink) {
-      const embed = `<iframe src="${embedLink}/?showinfo=0" width="100%" height="400" frameborder="0" allowfullscreen/>`;
-      const attachment = new this.Trix.Attachment({ content: embed });
+      const embed = `<iframe src="${embedLink}/?showinfo=0" width="100%" height="394" frameborder="0" allowfullscreen/>`;
+      const attachment = new this.Trix.Attachment({ content: embed, contentType: '--embed-iframe-video' });
       this.getEditor().insertAttachment(attachment);
     }
   };
