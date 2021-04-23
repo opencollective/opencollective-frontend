@@ -7,9 +7,9 @@ import styled from 'styled-components';
 import { debounceScroll } from '../lib/ui-utils';
 import withViewport from '../lib/withViewport';
 
+import { Dimensions } from './collective-page/_constants';
 import { Box, Flex } from './Grid';
 import StyledRoundButton from './StyledRoundButton';
-import { Dimensions } from './collective-page/_constants';
 
 const RefContainer = styled(Box)`
   display: flex;
