@@ -348,7 +348,7 @@ export default class RichTextEditor extends React.Component {
   constructVideoEmbedURL = videoLink => {
     const { id, service } = this.parseVideoLink(videoLink);
     if (service === 'youtube') {
-      return `https://www.youtube.com/embed/${id}`;
+      return `https://www.youtube-nocookie.com/embed/${id}`;
     } else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
     } else {
