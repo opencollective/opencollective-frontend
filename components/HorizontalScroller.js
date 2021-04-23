@@ -7,44 +7,30 @@ import styled from 'styled-components';
 import { debounceScroll } from '../lib/ui-utils';
 import withViewport from '../lib/withViewport';
 
-import { Dimensions } from './collective-page/_constants';
-import { Box, Flex } from './Grid';
+import Container from './Container';
+import { Flex } from './Grid';
 import StyledRoundButton from './StyledRoundButton';
 
-const RefContainer = styled(Box)`
+const RefContainer = styled.div`
   display: flex;
   overflow-x: auto;
   scroll-behavior: smooth;
-
-  /** Respect left margin / center cards on widescreens */
-
-  @supports (width: fit-content) {
-    @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
-      margin: 0 auto;
-      min-width: ${Dimensions.MAX_SECTION_WIDTH}px;
-      width: fit-content;
-      max-width: 100%;
-    }
-  }
-
-  @supports not (width: fit-content) {
-    @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
-      padding-left: calc((100% - ${Dimensions.MAX_SECTION_WIDTH + 10}px) / 2);
-    }
-  }
+  max-width: 100%;
 `;
 
 const ControlsContainer = styled(Flex)`
   z-index: 10;
-  position: relative;
-  top: 30rem;
+  position: absolute;
+  top: 50%;
   pointer-events: none;
+  justify-content: space-between;
+  width: 100%;
 `;
 
 const ArrowContainer = styled(StyledRoundButton)`
   transition: opacity 0.25s ease-in, visibility 0.25s;
-  visibility: ${props => (props.isVisible ? 'hidden' : 'visible')};
-  opacity: ${props => (props.isVisible ? '0' : '1')};
+  visibility: ${props => (props.isVisible ? 'visible' : 'hidden')};
+  opacity: ${props => (props.isVisible ? '1' : '0')};
   pointer-events: auto;
 
   svg {
@@ -61,6 +47,10 @@ class HorizontalScroller extends React.PureComponent {
   static propTypes = {
     /* Children component */
     children: PropTypes.node.isRequired,
+    /** Container component where the list (children) will be inserted */
+    container: PropTypes.elementType,
+    /** Passed to `container` */
+    containerProps: PropTypes.object,
     /** Callback to get the scrolled distance when we click on prev/next controllers */
     getScrollDistance: PropTypes.func,
     /** @ignore from withViewport */
@@ -138,17 +128,19 @@ class HorizontalScroller extends React.PureComponent {
     const { canGoPrev, canGoNext } = this.state;
 
     return (
-      <Box>
-        <ControlsContainer mx={[2, 2, 5]} justifyContent="space-between">
-          <ArrowContainer isVisible={!canGoPrev}>
+      <Container position="relative">
+        <ControlsContainer px={[2, null, 5]}>
+          <ArrowContainer isVisible={canGoPrev}>
             <ArrowBack onMouseDown={canGoPrev ? this.onPrevClick : undefined} />
           </ArrowContainer>
-          <ArrowContainer isVisible={!canGoNext}>
+          <ArrowContainer isVisible={canGoNext}>
             <ArrowForward onMouseDown={canGoNext ? this.onNextClick : undefined} />
           </ArrowContainer>
         </ControlsContainer>
-        <RefContainer ref={this.ref}>{this.props.children}</RefContainer>
-      </Box>
+        <RefContainer {...this.props.containerProps} as={this.props.container} ref={this.ref}>
+          {this.props.children}
+        </RefContainer>
+      </Container>
     );
   }
 }

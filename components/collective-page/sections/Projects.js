@@ -60,28 +60,27 @@ class SectionProjects extends React.PureComponent {
         </ContainerSectionContent>
 
         <Box mb={4}>
-          <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-            <div>
-              <ContributeCardsContainer>
-                {projects.map(project => (
-                  <Box key={project.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                    <ContributeProject
-                      collective={collective}
-                      project={project}
-                      disableCTA={!project.isActive}
-                      hideContributors={!projects.some(project => project.contributors.length)}
-                    />
-                  </Box>
-                ))}
-                {isAdmin && (
-                  <ContributeCardContainer minHeight={150}>
-                    <CreateNew route={`/${collective.slug}/projects/create`}>
-                      <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
-                    </CreateNew>
-                  </ContributeCardContainer>
-                )}
-              </ContributeCardsContainer>
-            </div>
+          <HorizontalScroller
+            container={ContributeCardsContainer}
+            getScrollDistance={this.getContributeCardsScrollDistance}
+          >
+            {projects.map(project => (
+              <Box key={project.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                <ContributeProject
+                  collective={collective}
+                  project={project}
+                  disableCTA={!project.isActive}
+                  hideContributors={!projects.some(project => project.contributors.length)}
+                />
+              </Box>
+            ))}
+            {isAdmin && (
+              <ContributeCardContainer minHeight={150}>
+                <CreateNew route={`/${collective.slug}/projects/create`}>
+                  <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
+                </CreateNew>
+              </ContributeCardContainer>
+            )}
           </HorizontalScroller>
         </Box>
       </Box>
