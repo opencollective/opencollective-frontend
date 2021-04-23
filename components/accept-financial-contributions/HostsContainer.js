@@ -72,22 +72,24 @@ class HostsContainer extends React.Component {
       <Flex flexDirection="column" flexGrow={1}>
         <Hide md lg>
           <HorizontalScroller>
-            <AllCardsContainerMobile>
-              {hosts.map(host => (
-                <HostCollectiveCard
-                  key={host.legacyId}
-                  host={host}
-                  collective={this.props.collective}
-                  onChange={onChange}
-                  style={{
-                    flexBasis: 250,
-                    height: 360,
-                    marginRight: 20,
-                    flexShrink: 0,
-                  }}
-                />
-              ))}
-            </AllCardsContainerMobile>
+            {ref => (
+              <AllCardsContainerMobile ref={ref}>
+                {hosts.map(host => (
+                  <HostCollectiveCard
+                    key={host.legacyId}
+                    host={host}
+                    collective={this.props.collective}
+                    onChange={onChange}
+                    style={{
+                      flexBasis: 250,
+                      height: 360,
+                      marginRight: 20,
+                      flexShrink: 0,
+                    }}
+                  />
+                ))}
+              </AllCardsContainerMobile>
+            )}
           </HorizontalScroller>
         </Hide>
         <Hide xs sm>
