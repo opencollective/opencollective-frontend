@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useRouter } from 'next/router';
 
 import { CollectiveType } from '../../../../../lib/constants/collectives';
 
@@ -7,6 +8,8 @@ import { CUSTOM_OPTIONS_POSITION } from '../../../../CollectivePicker';
 import CollectivePickerAsync from '../../../../CollectivePickerAsync';
 
 function MerchantFilter({ inputId, onChange }) {
+  const router = useRouter();
+
   return (
     <CollectivePickerAsync
       id={inputId}
@@ -17,7 +20,12 @@ function MerchantFilter({ inputId, onChange }) {
       preload={true}
       limit={10}
       onChange={({ value }) => onChange(value.slug)}
-      emptyCustomOptions={[{ value: 'ALL', label: 'All Merchants' }]}
+      value={
+        router.query.merchant
+          ? { label: router.query.merchant, value: router.query.merchant }
+          : { label: 'All Merchants', value: 'ALL' }
+      }
+      emptyCustomOptions={[{ label: 'All Merchants', value: 'ALL' }]}
       customOptionsPosition={CUSTOM_OPTIONS_POSITION.TOP}
     />
   );
