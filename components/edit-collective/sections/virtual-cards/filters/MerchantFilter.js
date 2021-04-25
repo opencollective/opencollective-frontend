@@ -7,7 +7,7 @@ import { CollectiveType } from '../../../../../lib/constants/collectives';
 import { CUSTOM_OPTIONS_POSITION } from '../../../../CollectivePicker';
 import CollectivePickerAsync from '../../../../CollectivePickerAsync';
 
-function MerchantFilter({ inputId, onChange }) {
+function MerchantFilter({ inputId, onChange, virtualCardMerchants }) {
   const router = useRouter();
 
   return (
@@ -27,12 +27,14 @@ function MerchantFilter({ inputId, onChange }) {
       }
       emptyCustomOptions={[{ label: 'All Merchants', value: 'ALL' }]}
       customOptionsPosition={CUSTOM_OPTIONS_POSITION.TOP}
+      collectives={virtualCardMerchants}
     />
   );
 }
 
 MerchantFilter.propTypes = {
   inputId: PropTypes.string,
+  virtualCardMerchants: PropTypes.object,
   onChange: PropTypes.func,
 };
 

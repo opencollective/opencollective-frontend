@@ -21,7 +21,7 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const VirtualCardFilters = ({ filters, onChange }) => {
+const VirtualCardFilters = ({ filters, onChange, virtualCardMerchants }) => {
   const getFilterProps = name => {
     return {
       inputId: `virtual-cards-filter-${name}`,
@@ -44,7 +44,7 @@ const VirtualCardFilters = ({ filters, onChange }) => {
         <FilterLabel htmlFor="virtual-card-filter-amount">
           <FormattedMessage id="VirtualCard.Merchant" defaultMessage="Merchant" />
         </FilterLabel>
-        <MerchantFilter {...getFilterProps('merchant')} />
+        <MerchantFilter {...getFilterProps('merchant')} virtualCardMerchants={virtualCardMerchants} />
       </FilterContainer>
     </Flex>
   );
@@ -53,6 +53,7 @@ const VirtualCardFilters = ({ filters, onChange }) => {
 VirtualCardFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
+  virtualCardMerchants: PropTypes.object,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
   }).isRequired,

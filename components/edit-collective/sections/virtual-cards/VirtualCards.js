@@ -40,6 +40,19 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
           }
         }
       }
+      virtualCardMerchants(slug: $slug) {
+        id
+        type
+        slug
+        name
+        currency
+        location {
+          address
+          country
+        }
+        imageUrl(height: 64)
+        hostFeePercent
+      }
     }
   }
 `;
@@ -85,6 +98,7 @@ const VirtualCards = props => {
           <VirtualCardFilters
             filters={routerQuery}
             collective={props.collective}
+            virtualCardMerchants={data.collective.virtualCardMerchants}
             onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
           />
         </Flex>
@@ -112,6 +126,7 @@ VirtualCards.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
     virtualCards: PropTypes.object,
+    virtualCardMerchants: PropTypes.object,
   }),
   hideTopsection: PropTypes.func,
 };
