@@ -270,7 +270,7 @@
   "collective.emptyBalance.body": "Êtes-vous sûr de vouloir {action} ce {collective} ?",
   "collective.emptyBalance.header": "{action} Balance",
   "collective.event.delete.isNotDeletable-message": "{type, select, EVENT {Les Événements} PROJECT {Les Projets}} avec des transactions, des commandes ou des dépenses payées ne peuvent pas être supprimés. Veuillez les archiver à la place.",
-  "collective.expensePolicy.allowExpense": "Allow expense submission only for Admins, Members and Contributors of the collective",
+  "collective.expensePolicy.allowExpense": "Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees).",
   "collective.expensePolicy.description": "Ajouter une dépense peut être intimidant si vous ne savez pas ce qui est attendu. Ajoutez des consignes claires pour guider les personnes qui ajoutent ces dépenses.",
   "collective.expensePolicy.error": "La politique de dépenses doit contenir moins de {maxLength} caractères",
   "collective.expensePolicy.placeholder": "E.g. approval criteria, limitations, or required documentation.",

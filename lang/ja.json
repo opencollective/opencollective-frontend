@@ -270,7 +270,7 @@
   "collective.emptyBalance.body": "本当に {action} から {collective} にしますか？",
   "collective.emptyBalance.header": "{action} 残高",
   "collective.event.delete.isNotDeletable-message": "{type, select, EVENT {Events} PROJECT {Projects}} with transactions, orders or paid expenses cannot be deleted. Please archive it instead.",
-  "collective.expensePolicy.allowExpense": "Allow expense submission only for Admins, Members and Contributors of the collective",
+  "collective.expensePolicy.allowExpense": "Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees).",
   "collective.expensePolicy.description": "It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters.",
   "collective.expensePolicy.error": "支出ポリシーは {maxLength} 文字未満でなければなりません",
   "collective.expensePolicy.placeholder": "E.g. approval criteria, limitations, or required documentation.",

@@ -270,7 +270,7 @@
   "collective.emptyBalance.body": "¿Estás seguro que quieres {action} este {collective}?",
   "collective.emptyBalance.header": "{action} Saldo",
   "collective.event.delete.isNotDeletable-message": "{type, select, EVENTOS {Events} PROYECTOS {Projects}} con transacciones, pedidos o gastos de expensas no se pueden eliminar. Por favor archivalos.",
-  "collective.expensePolicy.allowExpense": "Allow expense submission only for Admins, Members and Contributors of the collective",
+  "collective.expensePolicy.allowExpense": "Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees).",
   "collective.expensePolicy.description": "Puede ser abrumador presentar un gasto si no está seguro de lo que está permitido. Proporcione una política clara para guiar a los remitentes de gastos.",
   "collective.expensePolicy.error": "La política de gastos debe tener menos de {maxLength} caracteres",
   "collective.expensePolicy.placeholder": "E.g. approval criteria, limitations, or required documentation.",
