@@ -21,23 +21,37 @@ import ContributeEvent from '../components/contribute-cards/ContributeEvent';
 import ContributeTier from '../components/contribute-cards/ContributeTier';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
+import { Grid } from '../components/Grid';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import { H2, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-const ContributeCardContainer = styled.div`
-  margin: 0 20px 20px 0;
+const CardsContainer = styled(Grid).attrs({
+  gridGap: '30px',
+  justifyContent: ['center', 'space-between'],
+  gridTemplateColumns: [
+    'minmax(280px, 400px)',
+    'repeat(2, minmax(280px, 350px))',
+    'repeat(3, minmax(240px, 350px))',
+    'repeat(3, minmax(280px, 350px))',
+    'repeat(4, 280px)',
+  ],
+})`
+  & > * {
+    width: 100%;
+  }
 `;
 
 class TiersPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug } }) {
-    return { slug: collectiveSlug };
+  static getInitialProps({ query: { collectiveSlug, verb } }) {
+    return { slug: collectiveSlug, verb };
   }
 
   static propTypes = {
     slug: PropTypes.string, // from getInitialProps, for addContributePageData
+    verb: PropTypes.string, // from getInitialProps
     query: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
@@ -65,7 +79,7 @@ class TiersPage extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, data = {} } = this.props;
+    const { LoggedInUser, data = {}, verb } = this.props;
 
     if (!data || !data.Collective) {
       return <ErrorPage data={data} />;
@@ -75,7 +89,7 @@ class TiersPage extends React.Component {
     const canContribute = collective.isActive && collective.host;
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(collective.contributors);
     const hasContributors = this.hasContributors(collective.contributors, collective.events);
-
+    const showAll = verb === 'contribute';
     return (
       <div>
         <Header LoggedInUser={LoggedInUser} {...this.getPageMetadata(collective)} />
@@ -101,39 +115,40 @@ class TiersPage extends React.Component {
                     />
                   </P>
                   {canContribute ? (
-                    <Container display="flex" flexWrap="wrap">
+                    <CardsContainer>
                       {!collective.settings.disableCustomContributions && (
-                        <ContributeCardContainer>
-                          <ContributeCustom
-                            hideContributors={!hasContributors}
-                            collective={collective}
-                            contributors={financialContributorsWithoutTier}
-                            stats={collective.stats.backers}
-                          />
-                        </ContributeCardContainer>
+                        <ContributeCustom
+                          hideContributors={!hasContributors}
+                          collective={collective}
+                          contributors={financialContributorsWithoutTier}
+                          stats={collective.stats.backers}
+                        />
                       )}
 
                       {collective.tiers.map(tier => (
-                        <ContributeCardContainer key={`tier-${tier.id}`} data-cy="contribute-tier">
-                          <ContributeTier collective={collective} tier={tier} hideContributors={!hasContributors} />
-                        </ContributeCardContainer>
+                        <ContributeTier
+                          collective={collective}
+                          tier={tier}
+                          hideContributors={!hasContributors}
+                          key={`tier-${tier.id}`}
+                          data-cy="contribute-tier"
+                        />
                       ))}
 
                       {collective.connectedCollectives.map(member => {
                         const childCollective = member.collective;
-                        return (
-                          <ContributeCardContainer key={member.id}>
-                            <ContributeCollective collective={childCollective} />
-                          </ContributeCardContainer>
-                        );
+                        return <ContributeCollective collective={childCollective} key={`member-${member.id}`} />;
                       })}
 
                       {collective.events.map(event => (
-                        <ContributeCardContainer key={`event-${event.id}`}>
-                          <ContributeEvent collective={collective} event={event} hideContributors={!hasContributors} />
-                        </ContributeCardContainer>
+                        <ContributeEvent
+                          collective={collective}
+                          event={event}
+                          hideContributors={!hasContributors}
+                          key={`event-${event.id}`}
+                        />
                       ))}
-                    </Container>
+                    </CardsContainer>
                   ) : (
                     <MessageBox type="info" withIcon>
                       <FormattedMessage
