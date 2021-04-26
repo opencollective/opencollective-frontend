@@ -4,7 +4,6 @@ on:
   push:
     branches-ignore:
       - 'i18n/crowdin'
-      - 'dependabot/**'
   pull_request_target:
 
 env:
