@@ -5,7 +5,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeCollective from '../../contribute-cards/ContributeCollective';
-import { Box, Flex } from '../../Grid';
+import { Box } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
@@ -47,29 +47,20 @@ class ConnectedCollectives extends React.PureComponent {
 
     return (
       <Box pb={4}>
-        <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-          {(ref, Chevrons) => (
-            <div>
-              <ContainerSectionContent pb={3}>
-                <Flex justifyContent="space-between" alignItems="center">
-                  <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
-                    <FormattedMessage id="ConnectedCollectives" defaultMessage="Connected Collectives" />
-                  </H3>
-                  <Box m={2} flex="0 0 50px">
-                    <Chevrons />
-                  </Box>
-                </Flex>
-              </ContainerSectionContent>
-
-              <ContributeCardsContainer ref={ref}>
-                {connectedCollectives.map(({ id, collective }) => (
-                  <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
-                    <ContributeCollective collective={collective} />
-                  </Box>
-                ))}
-              </ContributeCardsContainer>
-            </div>
-          )}
+        <ContainerSectionContent>
+          <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
+            <FormattedMessage id="ConnectedCollectives" defaultMessage="Connected Collectives" />
+          </H3>
+        </ContainerSectionContent>
+        <HorizontalScroller
+          container={ContributeCardsContainer}
+          getScrollDistance={this.getContributeCardsScrollDistance}
+        >
+          {connectedCollectives.map(({ id, collective }) => (
+            <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
+              <ContributeCollective collective={collective} />
+            </Box>
+          ))}
         </HorizontalScroller>
       </Box>
     );

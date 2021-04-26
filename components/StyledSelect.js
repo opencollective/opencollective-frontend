@@ -218,7 +218,7 @@ StyledSelect.propTypes = {
   instanceId: PropTypes.string,
   /** Placeholder for the select value */
   placeholder: PropTypes.node,
-  /** Wether the component is disabled */
+  /** Whether the component is disabled */
   disabled: PropTypes.bool,
   /** Alias for `disabled` */
   isDisabled: PropTypes.bool,

@@ -199,13 +199,13 @@ StyledCheckbox.propTypes = {
   name: PropTypes.string.isRequired,
   /** Called when state change with an object like { name, checked, type, target: { value } }*/
   onChange: PropTypes.func,
-  /** Wether the checkbox is checked. Use it to control the component. If not provided, component will maintain its own state. */
+  /** Whether the checkbox is checked. Use it to control the component. If not provided, component will maintain its own state. */
   checked: PropTypes.bool,
-  /** Wether the checkbox should be checked by default. Ignored if `checked` is provided. */
+  /** Whether the checkbox should be checked by default. Ignored if `checked` is provided. */
   defaultChecked: PropTypes.bool,
   /** And optional ID for the `<input/>` */
   inputId: PropTypes.string,
-  /** Wether checkbox should be disabled */
+  /** Whether checkbox should be disabled */
   disabled: PropTypes.bool,
   /** An optional label to display next to checkbox */
   label: PropTypes.node,

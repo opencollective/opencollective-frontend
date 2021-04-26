@@ -17,9 +17,10 @@ class GlobalToasts extends PureComponent {
       PropTypes.shape({
         id: PropTypes.string.isRequired,
         type: PropTypes.oneOf(Object.values(TOAST_TYPE)).isRequired,
-        title: PropTypes.string.isRequired,
+        title: PropTypes.string,
         message: PropTypes.string,
         createdAt: PropTypes.number,
+        variant: PropTypes.string,
       }),
     ),
   };
@@ -115,6 +116,7 @@ class GlobalToasts extends PureComponent {
           {this.props.toasts.map(toast => (
             <Box key={toast.id} mt={24}>
               <Toast
+                variant={toast.variant}
                 toast={toast}
                 timeLeft={this.getTimeLeft(toast)}
                 onClose={() => this.props.removeToasts(t => t.id === toast.id)}

@@ -37,9 +37,11 @@ export const invoicesQuery = gql`
       totalTransactions
       currency
       fromCollective {
+        id
         slug
       }
       host {
+        id
         slug
         name
         imageUrl

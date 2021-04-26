@@ -22,6 +22,15 @@ export const fadeIn = keyframes`
   }
 `;
 
+export const slideInUp = keyframes`
+  from {
+    transform: translate3d(0,40px,0);
+  }
+  to {
+    transform: translate3d(0,0,0);
+  }
+`;
+
 export const fadeInUp = keyframes`
   from {
     opacity: 0;

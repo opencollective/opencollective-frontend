@@ -8,6 +8,8 @@ export const ToastContext = React.createContext({
    * - {TOAST_TYPE} type (default: INFO)
    * - {string} title
    * - {string} message (optional)
+   * - {light|dark} variant (default: dark)
+   * - {number} duration (default: 15000)
    */
   addToast: () => {},
 });
@@ -35,7 +37,11 @@ const ToastProvider = ({ children }) => {
 
   const context = {
     toasts,
+    /** Use this helper to add multiple toasts at once */
+    addToasts: useCallback(toastsParams => setToasts([...toasts, ...toastsParams.map(createToast)]), [toasts]),
+    /** To add a single toast */
     addToast: useCallback(params => setToasts([...toasts, createToast(params)]), [toasts]),
+    /** To remove displayed toasts */
     removeToasts: useCallback(
       filterFunc => {
         const newToasts = toasts.filter(toast => !filterFunc(toast));

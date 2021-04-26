@@ -47,6 +47,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         }
         ... on Collective {
           host {
+            id
             name
             slug
             type

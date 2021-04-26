@@ -23,10 +23,8 @@ const AllCardsContainer = styled(Flex).attrs({
   justifyContent: 'space-evenly',
 })``;
 
-const AllCardsContainerMobile = styled(Flex)`
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  width: 95vw;
+const AllCardsContainerMobile = styled.div`
+  display: flex;
   padding: 16px;
 `;
 
@@ -69,27 +67,23 @@ class HostsContainer extends React.Component {
     const hosts = [...data.hosts.nodes];
 
     return (
-      <Flex flexDirection="column" flexGrow={1}>
+      <Flex flexDirection="column" flexGrow={1} css={{ maxWidth: '100%' }}>
         <Hide md lg>
-          <HorizontalScroller>
-            {ref => (
-              <AllCardsContainerMobile ref={ref}>
-                {hosts.map(host => (
-                  <HostCollectiveCard
-                    key={host.legacyId}
-                    host={host}
-                    collective={this.props.collective}
-                    onChange={onChange}
-                    style={{
-                      flexBasis: 250,
-                      height: 360,
-                      marginRight: 20,
-                      flexShrink: 0,
-                    }}
-                  />
-                ))}
-              </AllCardsContainerMobile>
-            )}
+          <HorizontalScroller container={AllCardsContainerMobile}>
+            {hosts.map(host => (
+              <HostCollectiveCard
+                key={host.legacyId}
+                host={host}
+                collective={this.props.collective}
+                onChange={onChange}
+                style={{
+                  flexBasis: 250,
+                  height: 360,
+                  marginRight: 20,
+                  flexShrink: 0,
+                }}
+              />
+            ))}
           </HorizontalScroller>
         </Hide>
         <Hide xs sm>

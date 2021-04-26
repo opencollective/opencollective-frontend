@@ -83,9 +83,14 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             ) : (
               <Avatar collective={payee} radius={24} />
             )}
-            <Span ml={2} color="black.900" fontWeight="bold" truncateOverflow>
-              {payee.organization?.name || payee.name}
-            </Span>
+            <Flex flexDirection="column" ml={2}>
+              <Span color="black.900" fontWeight="bold" truncateOverflow>
+                {payee.organization?.name || payee.name}
+              </Span>
+              <Span color="black.900" fontSize="11px" truncateOverflow>
+                @{payee.organization?.slug || payee.slug}
+              </Span>
+            </Flex>
           </Flex>
         </LinkCollective>
         {payeeLocation && isInvoice && (

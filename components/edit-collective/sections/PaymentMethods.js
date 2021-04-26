@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { CardElement } from '@stripe/react-stripe-js';
 import { Add } from '@styled-icons/material/Add';
 import { get, merge, pick, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -66,6 +67,7 @@ class EditPaymentMethods extends React.Component {
     bankDetails: null,
     error: null,
     stripe: null,
+    stripeElements: null,
     submitting: false,
     removedId: null,
     savingId: null,
@@ -84,7 +86,8 @@ class EditPaymentMethods extends React.Component {
     } else {
       try {
         this.setState({ submitting: true });
-        const { token, error } = await this.state.stripe.createToken();
+        const cardElement = this.state.stripeElements.getElement(CardElement);
+        const { token, error } = await this.state.stripe.createToken(cardElement);
         if (error) {
           throw error;
         }
@@ -292,7 +295,7 @@ class EditPaymentMethods extends React.Component {
               <NewCreditCardForm
                 hasSaveCheckBox={false}
                 onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
-                onReady={({ stripe }) => this.setState({ stripe })}
+                onReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
               />
             </Box>
             <Box my={2}>
