@@ -4533,7 +4533,13 @@ type Host implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): HostApplicationCollection!
-  hostedVirtualCards: [VirtualCard]
+  hostedVirtualCards(
+    limit: Int = 100
+    offset: Int = 0
+    state: String = null
+    merchant: String = null
+  ): VirtualCardCollection!
+  hostedVirtualCardMerchants(slug: String): [Account]
 }
 
 type HostApplication {

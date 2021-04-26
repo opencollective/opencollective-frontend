@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
-import { get } from 'lodash';
+import { get, omit, omitBy } from 'lodash';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -10,6 +11,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { Box, Flex, Grid } from '../../Grid';
 import InputField from '../../InputField';
 import Loading from '../../Loading';
+import Pagination from '../../Pagination';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledInputField from '../../StyledInputField';
@@ -19,12 +21,13 @@ import AssignVirtualCardModal from '../AssignVirtualCardModal';
 import SettingsTitle from '../SettingsTitle';
 import VirtualCard from '../VirtualCard';
 
+import VirtualCardFilters from './virtual-cards/VirtualCardFilters';
 import SettingsSectionTitle from './SettingsSectionTitle';
 
 const VIRTUAL_CARDS_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
 const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
-  query HostedVirtualCards($slug: String) {
+  query HostedVirtualCards($slug: String, $limit: Int!, $offset: Int!, $state: String, $merchant: String) {
     host(slug: $slug) {
       id
       legacyId
@@ -32,18 +35,35 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
       supportedPayoutMethods
       name
       imageUrl
-      hostedVirtualCards {
-        id
-        name
-        last4
-        data
-        privateData
-        createdAt
-        account {
+      hostedVirtualCards(limit: $limit, offset: $offset, state: $state, merchant: $merchant) {
+        totalCount
+        limit
+        offset
+        nodes {
           id
           name
-          imageUrl
+          last4
+          data
+          privateData
+          createdAt
+          account {
+            id
+            name
+            imageUrl
+          }
         }
+      }
+      hostedVirtualCardMerchants(slug: $slug) {
+        id
+        type
+        slug
+        name
+        currency
+        location {
+          address
+          country
+        }
+        imageUrl(height: 64)
       }
     }
   }
@@ -73,13 +93,27 @@ const AddCardPlaceholder = styled(Flex)`
   ${props => `border: 1px dashed ${props.theme.colors.primary[500]};`}
 `;
 
+const VIRTUAL_CARDS_PER_PAGE = 5;
+
 const HostVirtualCards = props => {
+  const router = useRouter();
+  const routerQuery = omit(router.query, ['slug', 'section']);
+  const offset = parseInt(routerQuery.offset) || 0;
+  const { state, merchant } = routerQuery;
   const { formatMessage } = useIntl();
   const { addToast } = useToasts();
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: props.collective.slug },
+    variables: { slug: props.collective.slug, limit: VIRTUAL_CARDS_PER_PAGE, offset, state, merchant },
   });
+
+  function updateFilters(queryParams) {
+    return router.push({
+      pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
+      query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
+    });
+  }
+
   const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
     context: API_V2_CONTEXT,
     onError: e => {
@@ -251,6 +285,14 @@ const HostVirtualCards = props => {
             defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier! Learn more"
           />
         </P>
+        <Flex mt={3} flexDirection={['row', 'column']}>
+          <VirtualCardFilters
+            filters={routerQuery}
+            collective={props.collective}
+            virtualCardMerchants={data.host.hostedVirtualCardMerchants}
+            onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
+          />
+        </Flex>
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
         <AddCardPlaceholder
@@ -273,10 +315,20 @@ const HostVirtualCards = props => {
             <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
           </Box>
         </AddCardPlaceholder>
-        {data.host.hostedVirtualCards.map(vc => (
+        {data.host.hostedVirtualCards.nodes.map(vc => (
           <VirtualCard key={vc.id} {...vc} onUpdate={refetch} hasActions />
         ))}
       </Grid>
+      <Flex mt={5} justifyContent="center">
+        <Pagination
+          route={`/${props.collective.slug}/edit/host-virtual-cards`}
+          total={data.host.hostedVirtualCards.totalCount}
+          limit={VIRTUAL_CARDS_PER_PAGE}
+          offset={offset}
+          ignoredQueryParams={['slug', 'section']}
+          scrollToTopOnChange
+        />
+      </Flex>
       {displayAssignCardModal && (
         <AssignVirtualCardModal
           host={data.host}
