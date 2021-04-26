@@ -25,6 +25,7 @@ import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
+import RequestVirtualCardBtn from '../RequestVirtualCardBtn';
 import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
@@ -343,6 +344,26 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         )}
                       </AssignVirtualCardBtn>
                     )}
+                    {callsToAction.requestVirtualCard && (
+                      <RequestVirtualCardBtn collective={collective} host={collective.host}>
+                        {btnProps => (
+                          <MenuItem
+                            py={1}
+                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
+                          >
+                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                              <CreditCard size="20px" />
+                              <Span>
+                                <FormattedMessage
+                                  id="Collective.VirtualCards.RequestCard"
+                                  defaultMessage="Request a Card"
+                                />
+                              </Span>
+                            </StyledButton>
+                          </MenuItem>
+                        )}
+                      </RequestVirtualCardBtn>
+                    )}
                   </Box>
                 </DropdownContent>
               </div>
@@ -388,6 +409,8 @@ CollectiveNavbarActionsMenu.propTypes = {
     addPrepaidBudget: PropTypes.bool,
     /** Add new card to Collective */
     assignVirtualCard: PropTypes.bool,
+    /** Request card to Collective */
+    requestVirtualCard: PropTypes.bool,
     /** Button to Edit the Collective */
     hasSettings: PropTypes.bool,
   }).isRequired,
