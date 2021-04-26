@@ -21,6 +21,7 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-c
 import ContributeCollective from '../components/contribute-cards/ContributeCollective';
 import ContributeCustom from '../components/contribute-cards/ContributeCustom';
 import ContributeEvent from '../components/contribute-cards/ContributeEvent';
+import ContributeProject from '../components/contribute-cards/ContributeProject';
 import ContributeTier from '../components/contribute-cards/ContributeTier';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
@@ -134,6 +135,22 @@ class TiersPage extends React.Component {
             tier: ticket,
             hideContributors: !hasContributors,
             'data-cy': 'contribute-ticket',
+          },
+        });
+      });
+    }
+
+    // Projects
+    if (showAll || verb === 'projects') {
+      collective.projects?.forEach(project => {
+        waysToContribute.push({
+          ContributeCardComponent: ContributeProject,
+          key: `project-${project.id}`,
+          props: {
+            collective: collective,
+            project: project,
+            disableCTA: !project.isActive,
+            hideContributors: !hasContributors,
           },
         });
       });
@@ -400,6 +417,31 @@ const contributePageQuery = gql`
           image
           collectiveSlug
           name
+          type
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
+      }
+      projects {
+        id
+        slug
+        name
+        description
+        image
+        isActive
+        backgroundImageUrl(height: 208)
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
+          id
+          name
+          image
+          collectiveSlug
           type
         }
         stats {
