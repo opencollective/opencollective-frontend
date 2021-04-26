@@ -100,7 +100,7 @@ jobs:
         with:
           # We are in a pull_request_target event - we need to explicitly checkout the PR's head.
           # Otherwise we would be running against main branch
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Set REF in env, removing the `refs/` part (Push)
         if: github.event_name == 'push'
@@ -109,7 +109,7 @@ jobs:
       - name: Set REF in env, removing the `refs/` part (Pull Request Target)
         if: github.event_name == 'pull_request_target'
         run: |
-          BRANCH_REF=${{ github.event.pull_request.head.sha }}
+          BRANCH_REF=${{ github.event.pull_request.head.ref }}
           echo "MATCHING_BRANCH_REF=$(echo $BRANCH_REF | sed 's|refs/||')" >> $GITHUB_ENV
 
       - name: Check matching branch (api)
