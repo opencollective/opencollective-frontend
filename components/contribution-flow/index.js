@@ -19,7 +19,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
+import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
 
@@ -128,7 +128,7 @@ class ContributionFlow extends React.Component {
       showSignIn: false,
       stepDetails: {
         quantity: 1,
-        interval: props.fixedInterval || props.tier?.interval,
+        interval: props.fixedInterval || getDefaultInterval(props.tier),
         amount: props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
       },

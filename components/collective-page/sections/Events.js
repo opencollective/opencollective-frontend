@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { partition } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { isPastEvent } from '../../../lib/events';
+import { sortEvents } from '../../../lib/events';
 
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
@@ -35,9 +34,7 @@ class SectionEvents extends React.PureComponent {
     isAdmin: PropTypes.bool.isRequired,
   };
 
-  triageEvents = memoizeOne(events => {
-    return partition(events, isPastEvent);
-  });
+  sortEvents = memoizeOne(sortEvents);
 
   getContributeCardsScrollDistance = width => {
     const oneCardScrollDistance = CONTRIBUTE_CARD_WIDTH + CONTRIBUTE_CARD_PADDING_X[0] * 2;
@@ -53,7 +50,6 @@ class SectionEvents extends React.PureComponent {
   render() {
     const { collective, events, isAdmin } = this.props;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
-    const [pastEvents, upcomingEvents] = this.triageEvents(events);
 
     if (!events?.length && !isAdmin) {
       return null;
@@ -70,7 +66,7 @@ class SectionEvents extends React.PureComponent {
           container={ContributeCardsContainer}
           getScrollDistance={this.getContributeCardsScrollDistance}
         >
-          {[...upcomingEvents, ...pastEvents].map(event => (
+          {this.sortEvents(events).map(event => (
             <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
               <ContributeEvent
                 collective={collective}
@@ -90,7 +86,7 @@ class SectionEvents extends React.PureComponent {
         </HorizontalScroller>
         {Boolean(events?.length) && (
           <ContainerSectionContent>
-            <Link href={`/${collective.slug}/contribute`}>
+            <Link href={`/${collective.slug}/events`}>
               <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
                 <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
               </StyledButton>
