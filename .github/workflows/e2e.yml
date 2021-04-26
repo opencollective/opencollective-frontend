@@ -49,10 +49,11 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: mdillon/postgis:9.6
+        image: postgis/postgis:9.6-2.5
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck

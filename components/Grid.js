@@ -37,5 +37,5 @@ export const Grid = styled('div')(
     display: 'grid',
     '> div': { 'min-width': 0 },
   },
-  compose(space, grid, layout),
+  compose(space, grid, layout, flexbox),
 );
