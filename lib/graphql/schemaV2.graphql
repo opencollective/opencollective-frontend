@@ -5162,6 +5162,7 @@ type Mutation {
     Can only be set if root
     """
     platformFeePercent: Float
+    platformTip: AmountInput
   ): Order!
   createCollective(
     """
