@@ -102,8 +102,15 @@ jobs:
           # Otherwise we would be running against main branch
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Set REF in env, removing the `refs/` part
+      - name: Set REF in env, removing the `refs/` part (Push)
+        if: github.event_name == 'push'
         run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV
+
+      - name: Set REF in env, removing the `refs/` part (Pull Request Target)
+        if: github.event_name == 'pull_request_target'
+        run: |
+          BRANCH_REF=${{ github.event.pull_request.head.sha }}
+          echo "MATCHING_BRANCH_REF=$(echo $BRANCH_REF | sed 's|refs/||')" >> $GITHUB_ENV
 
       - name: Check matching branch (api)
         id: check-matching-branch
