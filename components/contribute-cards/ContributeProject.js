@@ -4,6 +4,9 @@ import { truncate } from 'lodash';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 
+import Link from '../Link';
+import StyledLink from '../StyledLink';
+
 import Contribute from './Contribute';
 
 /**
@@ -15,10 +18,14 @@ const ContributeProject = ({ collective, project, ...props }) => {
     <Contribute
       route={`/${collective.slug}/projects/${project.slug}`}
       type={ContributionTypes.PROJECT}
-      title={project.name}
       contributors={project.contributors}
       stats={project.stats.backers}
       image={project.backgroundImageUrl}
+      title={
+        <StyledLink as={Link} color="black.800" href={`/${collective.slug}/projects/${project.slug}`}>
+          {project.name}
+        </StyledLink>
+      }
       {...props}
     >
       {description}
