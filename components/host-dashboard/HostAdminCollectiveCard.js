@@ -112,6 +112,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
         </P>
         <Container display="flex" alignItems="center" position="relative" mt={20}>
           <StyledRoundButton
+            data-cy="hosted-collective-add-funds-btn"
             buttonStyle="successSecondary"
             size={32}
             fontSize="16px"

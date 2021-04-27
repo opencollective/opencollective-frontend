@@ -164,43 +164,6 @@ describe('Collective page', () => {
       cy.get('[data-cy="longDescription"]').should('have.html', '<div><strong>Hello world!</strong></div>');
     });
   });
-
-  describe('Add funds modal', () => {
-    it('Cannot submit incomplete form', () => {
-      cy.get('[data-cy="collective-navbar-actions-btn"]').click();
-      cy.get('[data-cy="add-funds-btn"]').click();
-      cy.wait(300);
-      cy.get('[data-cy="add-funds-submit-btn"]').should('be.disabled');
-    });
-
-    it('Can add funds and platform tip as collective host', () => {
-      cy.get('[data-cy="collective-navbar-actions-btn"]').click();
-      cy.get('[data-cy="add-funds-btn"]').click();
-      cy.wait(300);
-      cy.get('[data-cy="add-funds-amount"]').type('20');
-      cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
-      cy.get('[data-cy="add-funds-source"]').click();
-      cy.get('[data-cy="collective-type-picker-USER"]').click();
-      cy.get('[data-cy="mini-form-email-field"]').type('cypress-test@funds.com');
-      cy.get('[data-cy="mini-form-name-field"]').type('cypress user');
-      cy.get('[data-cy="collective-mini-form-scroll"]').scrollTo('bottom', { duration: 5000 });
-      cy.get('[data-cy="mini-form-save-button"]').click();
-      cy.wait(1000);
-      cy.get('[data-cy="add-funds-submit-btn"]').click();
-      cy.wait(300);
-      cy.get('[data-cy="funds-added"]').contains('Funds Added ✅');
-      cy.contains('[data-cy="donation-percentage"]', 'No thank you').click();
-      cy.contains('[data-cy="select-option"]', '$2.00').click();
-      cy.get('[data-cy="add-platform-tip-btn"]').contains('Tip and Finish');
-      cy.get('[data-cy="add-platform-tip-btn"]').click();
-      cy.wait(300);
-      scrollToSection(Sections.BUDGET);
-      cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');
-      cy.visit(`/opencollectivehost`);
-      scrollToSection(Sections.TRANSACTIONS);
-      cy.get('[data-cy="section-transactions"]').contains('Financial contribution (Platform Tip) to Open Collective');
-    });
-  });
 });
 
 describe('Collective page with euro currency', () => {
