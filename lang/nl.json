@@ -270,7 +270,7 @@
   "collective.emptyBalance.body": "Ben je zeker dat je {collective} wilt {action}?",
   "collective.emptyBalance.header": "{action} Balans",
   "collective.event.delete.isNotDeletable-message": "{type, select, EVENT {Events} PROJECT {Projects}} with transactions, orders or paid expenses cannot be deleted. Please archive it instead.",
-  "collective.expensePolicy.allowExpense": "Allow expense submission only for Admins, Members and Contributors of the collective",
+  "collective.expensePolicy.allowExpense": "Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees).",
   "collective.expensePolicy.description": "Het kan intimiderend zijn om een onkostennota in te dienen als je niet zeker bent wat is toegestaan. Voorzie duidelijke richtlijnen om indieners van onkosten te helpen.",
   "collective.expensePolicy.error": "Expense policy must contain less than {maxLength} characters",
   "collective.expensePolicy.placeholder": "E.g. approval criteria, limitations, or required documentation.",

@@ -270,7 +270,7 @@
   "collective.emptyBalance.body": "你确定要 {action} 此 {collective} 吗？",
   "collective.emptyBalance.header": "{action} 余额",
   "collective.event.delete.isNotDeletable-message": "{type, select, EVENT {Events} PROJECT {Projects}} with transactions, orders or paid expenses cannot be deleted. Please archive it instead.",
-  "collective.expensePolicy.allowExpense": "Allow expense submission only for Admins, Members and Contributors of the collective",
+  "collective.expensePolicy.allowExpense": "Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees).",
   "collective.expensePolicy.description": "It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters.",
   "collective.expensePolicy.error": "开销策略必须小于 {maxLength} 个字符",
   "collective.expensePolicy.placeholder": "E.g. approval criteria, limitations, or required documentation.",

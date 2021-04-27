@@ -81,7 +81,8 @@ const messages = defineMessages({
   },
   'expensePolicy.allowExpense': {
     id: 'collective.expensePolicy.allowExpense',
-    defaultMessage: 'Allow expense submission only for Admins, Members and Contributors of the collective',
+    defaultMessage:
+      'Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees).',
   },
 });
 
