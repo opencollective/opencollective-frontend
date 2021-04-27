@@ -42,6 +42,7 @@ const COMMON_DIRECTIVES = {
   scriptSrc: [
     SELF,
     UNSAFE_INLINE, // Required by current PayPal integration. https://developer.paypal.com/docs/checkout/troubleshoot/support/#browser-features-and-polyfills provides a way to deal with that through nonces.
+    "'nonce-__OC_REQUEST_NONCE__'",
     'maps.googleapis.com',
     'js.stripe.com',
     '*.paypal.com',
@@ -79,7 +80,7 @@ const generateDirectives = customValues => {
 
 /**
  * A adapter inspired by  https://github.com/helmetjs/helmet/blob/master/middlewares/content-security-policy/index.ts
- * to generate the header string. Usefull for plugging to Zeit.
+ * to generate the header string. Useful for plugging to Vercel.
  */
 const getHeaderValueFromDirectives = directives => {
   return Object.entries(directives)
@@ -90,10 +91,7 @@ const getHeaderValueFromDirectives = directives => {
       if (typeof rawDirectiveValue === 'string') {
         directiveValue = ` ${rawDirectiveValue}`;
       } else if (Array.isArray(rawDirectiveValue)) {
-        directiveValue = '';
-        for (const element of rawDirectiveValue) {
-          directiveValue = `${directiveValue} ${element}`;
-        }
+        directiveValue = rawDirectiveValue.join(' ');
       } else if (typeof rawDirectiveValue === 'boolean' && !rawDirectiveValue) {
         return '';
       }
@@ -102,12 +100,15 @@ const getHeaderValueFromDirectives = directives => {
         return directiveName;
       }
 
-      return `${directiveName}${directiveValue}`;
+      return `${directiveName} ${directiveValue}`;
     })
     .filter(Boolean)
-    .join(';');
+    .join('; ');
 };
 
+/**
+ * Get a config compatible with Helmet's format
+ */
 const getContentSecurityPolicyConfig = () => {
   if (env === 'development' || env === 'e2e') {
     return {
@@ -155,7 +156,7 @@ const getContentSecurityPolicyConfig = () => {
 
 module.exports = {
   getContentSecurityPolicyConfig,
-  getCSPHeaderForNextJS: () => {
+  getCSPHeader: () => {
     const config = getContentSecurityPolicyConfig();
     if (config) {
       return {
