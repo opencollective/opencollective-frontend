@@ -5162,7 +5162,6 @@ type Mutation {
     Can only be set if root
     """
     platformFeePercent: Float
-    platformTip: AmountInput
   ): Order!
   createCollective(
     """
@@ -5697,6 +5696,21 @@ type Mutation {
   Confirm a credit card is ready for use after strong customer authentication
   """
   confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
+
+  """
+  Add platform tips to a transaction
+  """
+  addPlatformTipToTransaction(
+    """
+    Reference to the transaction in the platform tip
+    """
+    transaction: TransactionReferenceInput!
+
+    """
+    Reference to the amount of input for the platform tip
+    """
+    amount: AmountInput!
+  ): Transaction!
 
   """
   Refunds transaction

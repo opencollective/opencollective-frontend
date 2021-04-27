@@ -74,7 +74,6 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $description: String!
     $hostFeePercent: Float!
     $platformFeePercent: Float
-    $platformTip: AmountInput
   ) {
     addFunds(
       account: $account
@@ -83,9 +82,11 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       description: $description
       hostFeePercent: $hostFeePercent
       platformFeePercent: $platformFeePercent
-      platformTip: $platformTip
     ) {
       id
+      transactions {
+        id
+      }
       toAccount {
         id
         stats {
@@ -94,6 +95,14 @@ const addFundsMutation = gqlV2/* GraphQL */ `
           }
         }
       }
+    }
+  }
+`;
+
+const addPlatformTipMutation = gqlV2/* GraphQL */ `
+  mutation AddPlatformTip($amount: AmountInput!, $transaction: TransactionReferenceInput!) {
+    addPlatformTipToTransaction(amount: $amount, transaction: $transaction) {
+      id
     }
   }
 `;
@@ -180,7 +189,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(options[3]);
   const [customAmount, setCustomAmount] = useState(0);
 
-  const [submitAddFunds, { error }] = useMutation(addFundsMutation, {
+  const [submitAddFunds, { data, error }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
@@ -191,6 +200,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
     awaitRefetchQueries: true,
+  });
+
+  const [addPlatformTip, { platformTipError }] = useMutation(addPlatformTipMutation, {
+    context: API_V2_CONTEXT,
   });
 
   // From the Collective page we pass host and collective as API v1 objects
@@ -246,14 +259,14 @@ const AddFundsModal = ({ host, collective, ...props }) => {
               actions.setSubmitting(false);
             });
           } else if (selectedOption.value !== 0) {
-            submitAddFunds({
+            const creditTransaction = data.addFunds.transactions.filter(
+              transaction => transaction.__typename === 'Credit',
+            )[0];
+            addPlatformTip({
               variables: {
                 ...values,
-                hostFeePercent: 0,
-                platformTip: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
-                amount: { valueInCents: 0 },
-                fromAccount: buildAccountReference(values.fromAccount),
-                account: buildAccountReference(values.account),
+                amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
+                transaction: { id: creditTransaction.id },
               },
             }).then(handleClose);
           } else {
@@ -538,7 +551,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </Flex>
                     )}
                   </div>
-                  {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
+                  {platformTipError && <MessageBoxGraphqlError error={platformTipError} mt={3} fontSize="13px" />}
                 </ModalBody>
                 <ModalFooter isFullWidth>
                   <Flex justifyContent="center" flexWrap="wrap">
