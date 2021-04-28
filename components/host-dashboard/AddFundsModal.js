@@ -86,6 +86,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       id
       transactions {
         id
+        type
       }
       toAccount {
         id
