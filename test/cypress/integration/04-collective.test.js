@@ -1,7 +1,6 @@
 import { Sections } from '../../../components/collective-page/_constants';
 
 import mockRecaptcha from '../mocks/recaptcha';
-import { hostAdminTestUserEmail } from '../support/data';
 import { disableSmoothScroll } from '../support/helpers';
 
 const scrollToSection = section => {
@@ -23,7 +22,6 @@ describe('Collective page', () => {
   let collectiveSlug = null;
   before(() => {
     cy.createHostedCollective({
-      userEmail: hostAdminTestUserEmail,
       twitterHandle: 'testCollective',
       githubHandle: 'testCollective',
       website: 'opencollective.com/testCollective',
@@ -33,7 +31,7 @@ describe('Collective page', () => {
   });
 
   beforeEach(() => {
-    cy.login({ redirect: `/${collectiveSlug}`, email: hostAdminTestUserEmail });
+    cy.login({ redirect: `/${collectiveSlug}` });
     cy.wait(900);
   });
 

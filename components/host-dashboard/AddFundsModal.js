@@ -260,7 +260,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
             });
           } else if (selectedOption.value !== 0) {
             const creditTransaction = data.addFunds.transactions.filter(
-              transaction => transaction.__typename === 'Credit',
+              transaction => transaction.type === 'CREDIT',
             )[0];
             addPlatformTip({
               variables: {
