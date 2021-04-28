@@ -53,7 +53,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           }
         }
       }
-      hostedVirtualCardMerchants(slug: $slug) {
+      hostedVirtualCardMerchants {
         id
         type
         slug

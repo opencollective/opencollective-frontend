@@ -40,7 +40,7 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
           }
         }
       }
-      virtualCardMerchants(slug: $slug) {
+      virtualCardMerchants {
         id
         type
         slug

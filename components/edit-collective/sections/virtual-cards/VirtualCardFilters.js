@@ -54,9 +54,6 @@ VirtualCardFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   virtualCardMerchants: PropTypes.object,
-  collective: PropTypes.shape({
-    currency: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default React.memo(VirtualCardFilters);

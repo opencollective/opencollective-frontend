@@ -4,20 +4,18 @@ import { useRouter } from 'next/router';
 
 import { CollectiveType } from '../../../../../lib/constants/collectives';
 
-import { CUSTOM_OPTIONS_POSITION } from '../../../../CollectivePicker';
-import CollectivePickerAsync from '../../../../CollectivePickerAsync';
+import CollectivePicker, { CUSTOM_OPTIONS_POSITION } from '../../../../CollectivePicker';
 
 function MerchantFilter({ inputId, onChange, virtualCardMerchants }) {
   const router = useRouter();
 
   return (
-    <CollectivePickerAsync
+    <CollectivePicker
       id={inputId}
       inputId={inputId}
       types={[CollectiveType.COLLECTIVE]}
       maxMenuHeight={200}
       placeholder="Search for Merchants"
-      preload={true}
       limit={10}
       onChange={({ value }) => onChange(value.slug)}
       value={
@@ -25,7 +23,7 @@ function MerchantFilter({ inputId, onChange, virtualCardMerchants }) {
           ? { label: router.query.merchant, value: router.query.merchant }
           : { label: 'All Merchants', value: 'ALL' }
       }
-      emptyCustomOptions={[{ label: 'All Merchants', value: 'ALL' }]}
+      customOptions={[{ label: 'All Merchants', value: 'ALL' }]}
       customOptionsPosition={CUSTOM_OPTIONS_POSITION.TOP}
       collectives={virtualCardMerchants}
     />

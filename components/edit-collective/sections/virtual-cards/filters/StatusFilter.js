@@ -17,14 +17,7 @@ const StatusFilter = ({ onChange, value, ...props }) => {
       isSearchable={false}
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}
-      options={[
-        getOption('ALL'),
-        getOption(VIRTUAL_CARD_STATUS.OPEN),
-        getOption(VIRTUAL_CARD_STATUS.CLOSED),
-        getOption(VIRTUAL_CARD_STATUS.PAUSED),
-        getOption(VIRTUAL_CARD_STATUS.PENDING_ACTIVATION),
-        getOption(VIRTUAL_CARD_STATUS.PENDING_FULFILLMENT),
-      ]}
+      options={[getOption('ALL'), ...Object.values(VIRTUAL_CARD_STATUS).map(getOption)]}
       {...props}
     />
   );
