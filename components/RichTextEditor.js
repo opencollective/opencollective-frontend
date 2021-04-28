@@ -264,7 +264,7 @@ export default class RichTextEditor extends React.Component {
       this.editorRef.current.addEventListener('trix-initialize', event => {
         if (this.props.videoEmbedEnabled) {
           this.replaceEmbeddedIFrames(this.props.value || this.props.defaultValue);
-          this.trixVideoEmbed(event);
+          this.trixEmbed(event);
         }
         // Some special handling for links
         if (this.mainContainerRef.current) {
@@ -307,17 +307,17 @@ export default class RichTextEditor extends React.Component {
     }
   };
 
-  trixVideoEmbed = e => {
+  trixEmbed = e => {
     const videoEmbedButton = `<button type="button" tabindex="-1" data-trix-action="x-video-dialog-open" title="Attach Video" class="trix-button trix-button--icon trix-button--video-attach">Attach Video</button>`;
     const videoEmbedDialog = `
             <div class="trix-dialog" data-trix-dialog="video-url" data-trix-dialog-attribute="video">
               <div class="trix-dialog__link-fields">
-                <input type="url" name="video-url" class="trix-input trix-input--dialog trix-input--dialog-video" placeholder="Enter Video URL…" aria-label="Video URL" data-trix-input="">
+                <input type="url" name="video-url" class="trix-input trix-input--dialog trix-input--dialog-embed" placeholder="Enter Video URL…" aria-label="Video URL" data-trix-input="">
                 <div class="trix-button-group">
-                  <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-video-embed">
+                  <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
                 </div>
               </div>
-              <strong>Note: Only YouTube links are supported</strong>
+              <strong>Note: Only YouTube and Anchor.fm links are supported.</strong>
             </div>`;
     const { toolbarElement } = e.target;
     const attachFilesButton = toolbarElement.querySelector('[data-trix-action=attachFiles]');
@@ -330,58 +330,82 @@ export default class RichTextEditor extends React.Component {
     const { toolbarElement } = e.target;
     if (e.actionName === 'x-video-dialog-open') {
       const attachVideoDialog = toolbarElement.querySelector('[data-trix-dialog=video-url]');
-      const attachVideoDialogInput = toolbarElement.querySelector('.trix-input--dialog-video');
+      const attachVideoDialogInput = toolbarElement.querySelector('.trix-input--dialog-embed');
       if (attachVideoDialog.getAttribute('data-trix-active') === '') {
         attachVideoDialog.removeAttribute('data-trix-active');
       } else {
         attachVideoDialog.setAttribute('data-trix-active', '');
         attachVideoDialogInput.removeAttribute('disabled');
       }
-    } else if (e.actionName === 'x-video-embed') {
-      const videoLink = toolbarElement.querySelector('.trix-input--dialog-video').value;
-      if (videoLink) {
-        this.embedVideoIFrame(videoLink);
+    } else if (e.actionName === 'x-add-embed') {
+      const embedLink = toolbarElement.querySelector('.trix-input--dialog-embed').value?.trim();
+      if (embedLink) {
+        this.embedIframe(embedLink);
       }
     }
   };
 
-  constructVideoEmbedURL = videoLink => {
-    const { id, service } = this.parseVideoLink(videoLink);
+  constructVideoEmbedURL = (service, id) => {
     if (service === 'youtube') {
       return `https://www.youtube-nocookie.com/embed/${id}`;
     } /* else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
-    }*/ else {
+    } */ else if (
+      service === 'anchorFm'
+    ) {
+      return `https://anchor.fm/${id}`;
+    } else {
       return null;
     }
   };
 
-  parseVideoLink = videoLink => {
+  parseServiceLink = videoLink => {
     const regexps = {
       youtube: new RegExp(
-        '(?:https?://)?(?:www.)?youtu(?:.be/|be.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
-        'ig',
+        '(?:https?://)?(?:www\\.)?youtu(?:\\.be/|be\\.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
+        'i',
       ),
-      // vimeo: new RegExp(
-      //   '(http|https)?://(www.)?vimeo.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
-      // ),
+      vimeo: new RegExp(
+        '(http|https)?://(www\\.)?vimeo\\.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
+      ),
+      anchorFm: /^(http|https)?:\/\/(www\.)?anchor\.fm\/([^/]+)(\/embed)?(\/episodes\/)?([^/]+)?\/?$/,
     };
     for (const service in regexps) {
       const matches = regexps[service].exec(videoLink);
       if (matches) {
-        return { service, id: matches[matches.length - 1] };
+        if (service === 'anchorFm') {
+          const podcastName = matches[3];
+          const episodeId = matches[6];
+          const podcastUrl = `${podcastName}/embed`;
+          return { service, id: episodeId ? `${podcastUrl}/episodes/${episodeId}` : podcastUrl };
+        } else {
+          return { service, id: matches[matches.length - 1] };
+        }
       }
     }
     return {};
   };
 
-  embedVideoIFrame = videoLink => {
-    const embedLink = this.constructVideoEmbedURL(videoLink);
+  embedIframe = videoLink => {
+    const { id, service } = this.parseServiceLink(videoLink);
+    const embedLink = this.constructVideoEmbedURL(service, id);
     if (embedLink) {
-      const sanitizedLink = embedLink.replace('"', ''); // Small security enhancement, prevents going out of `src`
-      const embed = `<iframe src="${sanitizedLink}/?showinfo=0" width="100%" height="394" frameborder="0" allowfullscreen/>`;
-      const attachment = new this.Trix.Attachment({ content: embed, contentType: '--embed-iframe-video' });
-      this.getEditor().insertAttachment(attachment);
+      const sanitizedLink = embedLink.replace(/["\\]/g, ''); // Small security enhancement, prevents going out of `src`
+      const videoServices = ['youtube', 'vimeo'];
+      let attachmentData;
+      if (videoServices.includes(service)) {
+        attachmentData = {
+          contentType: '--embed-iframe-video',
+          content: `<iframe src="${sanitizedLink}/?showinfo=0" width="100%" height="394" frameborder="0" allowfullscreen/>`,
+        };
+      } else {
+        attachmentData = {
+          contentType: `--embed-iframe-${service}`,
+          content: `<iframe src="${sanitizedLink}" width="100%" frameborder="0"/>`,
+        };
+      }
+
+      this.getEditor().insertAttachment(new this.Trix.Attachment(attachmentData));
     }
   };
 
