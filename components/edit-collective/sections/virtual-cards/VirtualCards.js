@@ -17,12 +17,18 @@ import VirtualCard from '../../VirtualCard';
 import VirtualCardFilters from './VirtualCardFilters';
 
 const virtualCardsQuery = gqlV2/* GraphQL */ `
-  query CollectiveVirtualCards($slug: String, $limit: Int!, $offset: Int!, $state: String, $merchant: String) {
+  query CollectiveVirtualCards(
+    $slug: String
+    $limit: Int!
+    $offset: Int!
+    $state: String
+    $merchantAccount: AccountReferenceInput
+  ) {
     collective(slug: $slug) {
       id
       legacyId
       slug
-      virtualCards(limit: $limit, offset: $offset, state: $state, merchant: $merchant) {
+      virtualCards(limit: $limit, offset: $offset, state: $state, merchantAccount: $merchantAccount) {
         totalCount
         limit
         offset
@@ -67,7 +73,13 @@ const VirtualCards = props => {
 
   const { loading, data } = useQuery(virtualCardsQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: props.collective.slug, limit: VIRTUAL_CARDS_PER_PAGE, offset, state, merchant },
+    variables: {
+      slug: props.collective.slug,
+      limit: VIRTUAL_CARDS_PER_PAGE,
+      offset,
+      state,
+      merchantAccount: { slug: merchant },
+    },
   });
 
   if (loading) {

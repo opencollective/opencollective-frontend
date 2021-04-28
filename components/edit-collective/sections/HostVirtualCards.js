@@ -27,7 +27,13 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 const VIRTUAL_CARDS_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
 const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
-  query HostedVirtualCards($slug: String, $limit: Int!, $offset: Int!, $state: String, $merchant: String) {
+  query HostedVirtualCards(
+    $slug: String
+    $limit: Int!
+    $offset: Int!
+    $state: String
+    $merchantAccount: AccountReferenceInput
+  ) {
     host(slug: $slug) {
       id
       legacyId
@@ -35,7 +41,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
       supportedPayoutMethods
       name
       imageUrl
-      hostedVirtualCards(limit: $limit, offset: $offset, state: $state, merchant: $merchant) {
+      hostedVirtualCards(limit: $limit, offset: $offset, state: $state, merchantAccount: $merchantAccount) {
         totalCount
         limit
         offset
@@ -104,7 +110,13 @@ const HostVirtualCards = props => {
   const { addToast } = useToasts();
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: props.collective.slug, limit: VIRTUAL_CARDS_PER_PAGE, offset, state, merchant },
+    variables: {
+      slug: props.collective.slug,
+      limit: VIRTUAL_CARDS_PER_PAGE,
+      offset,
+      state,
+      merchantAccount: { slug: merchant },
+    },
   });
 
   function updateFilters(queryParams) {
