@@ -17,7 +17,9 @@ const GoalsCover = dynamic(() => import('../../GoalsCover'), {
 const SectionGoals = ({ collective }) => {
   return (
     <Container background="rgb(245, 247, 250)" pt={5} pb={40}>
-      <GoalsCover collective={collective} />
+      <Container maxWidth="80%" m="0 auto">
+        <GoalsCover collective={collective} />
+      </Container>
     </Container>
   );
 };
