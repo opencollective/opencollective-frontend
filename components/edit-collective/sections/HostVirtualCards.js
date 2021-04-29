@@ -102,7 +102,7 @@ const HostVirtualCards = props => {
     props.collective.settings?.virtualcards?.policy || '',
   );
 
-  const handleAssignCardSucess = () => {
+  const handleAssignCardSuccess = () => {
     addToast({
       type: TOAST_TYPE.SUCCESS,
       message: (
@@ -280,7 +280,7 @@ const HostVirtualCards = props => {
       {displayAssignCardModal && (
         <AssignVirtualCardModal
           host={data.host}
-          onSuccess={handleAssignCardSucess}
+          onSuccess={handleAssignCardSuccess}
           onClose={() => setAssignCardModalDisplay(false)}
           show
         />
