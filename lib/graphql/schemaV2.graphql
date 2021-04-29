@@ -232,7 +232,7 @@ interface Account {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
 
 """
@@ -765,7 +765,7 @@ type Bot implements Account {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
 
 input BraintreePaymentInput {
@@ -1028,7 +1028,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
   """
   Returns the Fiscal Host
@@ -3214,7 +3214,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
   """
   Returns the Fiscal Host
@@ -4129,7 +4129,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
   """
   Returns the Fiscal Host
@@ -4452,7 +4452,7 @@ type Host implements Account & AccountWithContributions {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
   """
   Number of unique financial contributors.
@@ -4569,7 +4569,7 @@ type Host implements Account & AccountWithContributions {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  hostedVirtualCardMerchants: [Account]
+  hostedVirtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
 
 type HostApplication {
@@ -4995,7 +4995,7 @@ type Individual implements Account {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
   firstName: String @deprecated(reason: "2020-10-12: Use the name field")
   lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
@@ -6333,7 +6333,7 @@ type Organization implements Account & AccountWithContributions {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
   """
   Number of unique financial contributors.
@@ -6862,7 +6862,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
   """
   Returns the Fiscal Host
@@ -7939,7 +7939,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     state: String = null
     merchantAccount: AccountReferenceInput = null
   ): VirtualCardCollection!
-  virtualCardMerchants: [Collective]!
+  virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
   """
   Returns the Fiscal Host

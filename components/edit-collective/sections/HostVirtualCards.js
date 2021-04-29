@@ -60,16 +60,18 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
         }
       }
       hostedVirtualCardMerchants {
-        id
-        type
-        slug
-        name
-        currency
-        location {
-          address
-          country
+        nodes {
+          id
+          type
+          slug
+          name
+          currency
+          location {
+            address
+            country
+          }
+          imageUrl(height: 64)
         }
-        imageUrl(height: 64)
       }
     }
   }
@@ -301,7 +303,7 @@ const HostVirtualCards = props => {
           <VirtualCardFilters
             filters={routerQuery}
             collective={props.collective}
-            virtualCardMerchants={data.host.hostedVirtualCardMerchants}
+            virtualCardMerchants={data.host.hostedVirtualCardMerchants.nodes}
             onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
           />
         </Flex>
