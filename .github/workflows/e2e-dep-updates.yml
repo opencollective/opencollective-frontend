@@ -1,9 +1,6 @@
 name: E2E
 
-on:
-  push:
-    branches-ignore:
-      - 'i18n/crowdin'
+on: [pull_request_target]
 
 env:
   CI: true
@@ -31,7 +28,7 @@ env:
 
 jobs:
   e2e:
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
 
     timeout-minutes: 30
@@ -88,34 +85,14 @@ jobs:
 
       # Checkouts
 
-      - name: Checkout (frontend)
-        uses: actions/checkout@v2
-
-      - name: Set REF in env, removing the `refs/` part
-        run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV
-
-      - name: Check matching branch (api)
-        id: check-matching-branch
-        uses: octokit/request-action@v2.x
-        with:
-          route: GET /repos/{owner}/{repo}/git/ref/{ref}
-          owner: opencollective
-          repo: opencollective-api
-          ref: ${{ env.MATCHING_BRANCH_REF }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
-
-      - name: Checkout (api - matching branch)
-        if: steps.check-matching-branch.outputs.status == 200
+      - name: Checkout
         uses: actions/checkout@v2
         with:
-          repository: opencollective/opencollective-api
-          path: opencollective-api
-          ref: ${{ github.ref }}
+          # We are in a pull_request_target event - we need to explicitly checkout the PR's head.
+          # Otherwise we would be running against main branch
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Checkout (api - main)
-        if: steps.check-matching-branch.outputs.status != 200
         uses: actions/checkout@v2
         with:
           repository: opencollective/opencollective-api
