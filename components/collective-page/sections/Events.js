@@ -13,7 +13,7 @@ import { Box } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
-import { H3 } from '../../Text';
+import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 
@@ -61,6 +61,20 @@ class SectionEvents extends React.PureComponent {
           <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700" mb={2}>
             <FormattedMessage id="Events" defaultMessage="Events" />
           </H3>
+          <P color="black.700" mb={4}>
+            {isAdmin ? (
+              <FormattedMessage
+                id="CollectivePage.SectionEvents.AdminDescription"
+                defaultMessage="Set up events for your community and sell tickets that go straight to your budget."
+              />
+            ) : (
+              <FormattedMessage
+                id="CollectivePage.SectionEvents.Description"
+                defaultMessage="{collectiveName} is hosting the following events."
+                values={{ collectiveName: collective.name }}
+              />
+            )}
+          </P>
         </ContainerSectionContent>
         <HorizontalScroller
           container={ContributeCardsContainer}
