@@ -290,16 +290,9 @@ const getMainAction = (collective, callsToAction) => {
       ),
     };
   } else if (callsToAction.includes('hasApply')) {
-    const plan = collective.plan || {};
     return {
       type: NAVBAR_ACTION_TYPE.APPLY,
-      component: (
-        <ApplyToHostBtn
-          hostSlug={collective.slug}
-          buttonRenderer={props => <MainActionBtn {...props} />}
-          hostWithinLimit={!plan.hostedCollectivesLimit || plan.hostedCollectives < plan.hostedCollectivesLimit}
-        />
-      ),
+      component: <ApplyToHostBtn hostSlug={collective.slug} buttonRenderer={props => <MainActionBtn {...props} />} />,
     };
   } else if (callsToAction.includes('hasRequestGrant')) {
     return {

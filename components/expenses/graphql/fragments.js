@@ -88,8 +88,6 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     supportedPayoutMethods
     plan {
       id
-      transferwisePayouts
-      transferwisePayoutsLimit
     }
   }
 `;
