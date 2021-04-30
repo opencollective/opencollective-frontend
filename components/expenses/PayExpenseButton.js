@@ -8,7 +8,6 @@ import { FormattedMessage } from 'react-intl';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 
 import TransferwiseIcon from '../icons/TransferwiseIcon';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
@@ -38,24 +37,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   } else if (!payoutMethod) {
     return null;
   } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
-    // In some cases, host.plan might not be available (Host Organization account)
-    if (
-      host.plan &&
-      host.plan.transferwisePayoutsLimit !== null &&
-      host.plan.transferwisePayouts >= host.plan.transferwisePayoutsLimit
-    ) {
-      return (
-        <FormattedMessage
-          id="expense.pay.transferwise.planlimit"
-          defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with Wise"
-          values={{
-            Link(message) {
-              return <Link href={`/${host.slug}/edit/host-plan`}>{message}</Link>;
-            },
-          }}
-        />
-      );
-    }
+    return null;
   } else if (payoutMethod.type === PayoutMethodType.ACCOUNT_BALANCE) {
     if (!expense.payee.host) {
       return (

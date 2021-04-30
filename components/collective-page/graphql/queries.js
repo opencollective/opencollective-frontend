@@ -95,8 +95,6 @@ export const collectivePageQuery = gql`
         plan {
           id
           hostFees
-          transferwisePayoutsLimit
-          transferwisePayouts
           hostFeeSharePercent
         }
       }
@@ -229,7 +227,6 @@ export const collectivePageQuery = gql`
       plan {
         id
         hostedCollectives
-        hostedCollectivesLimit
       }
 
       ... on Event {
