@@ -313,6 +313,21 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       name
       imageUrl(height: 80)
       isAdmin
+
+      # For Collectives, Funds, Events and Projects
+      ... on AccountWithHost {
+        isApproved
+        host {
+          id
+        }
+      }
+
+      # For Fiscal Hosts
+      ... on Organization {
+        host {
+          id
+        }
+      }
     }
     createdByAccount {
       id
