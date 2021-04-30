@@ -127,6 +127,11 @@ PayExpenseButton.propTypes = {
     payoutMethod: PropTypes.shape({
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     }),
+    payee: PropTypes.shape({
+      host: PropTypes.shape({
+        id: PropTypes.string,
+      }),
+    }),
   }).isRequired,
   collective: PropTypes.shape({
     host: PropTypes.shape({
