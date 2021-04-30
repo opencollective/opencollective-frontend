@@ -29,6 +29,7 @@ import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../S
 import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { useUser } from '../UserProvider';
 
 import illustration from '../contribution-flow/fees-on-top-illustration.png';
@@ -170,6 +171,7 @@ const getOptions = (amount, currency, intl) => {
 const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
   const [fundDetails, setFundDetails] = useState({});
+  const { addToast } = useToasts();
   const intl = useIntl();
   const options = React.useMemo(() => getOptions(fundDetails.fundAmount, collective.currency, intl), [
     fundDetails.fundAmount,
@@ -269,7 +271,15 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
                 transaction: { id: creditTransaction.id },
               },
-            }).then(handleClose);
+            }).then(() => {
+              handleClose();
+              addToast({
+                type: TOAST_TYPE.SUCCESS,
+                message: (
+                  <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />
+                ),
+              });
+            });
           } else {
             handleClose();
           }
@@ -319,7 +329,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   <StyledInputFormikField
                     name="description"
                     htmlFor="addFunds-description"
-                    label={<FormattedMessage id="AddFundsModal.description" defaultMessage="Purpose Description" />}
+                    label={<FormattedMessage id="AddFundsModal.description" defaultMessage="Description" />}
                     mt={3}
                   >
                     {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
@@ -571,9 +581,11 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         <FormattedMessage id="AddFundsModal.finish" defaultMessage="Finish" />
                       )}
                     </StyledButton>
-                    <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
-                      <FormattedMessage id="AddFundsModal.cancel" defaultMessage="Cancel" />
-                    </StyledButton>
+                    {!fundDetails.showPlatformTipModal && (
+                      <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
+                        <FormattedMessage id="AddFundsModal.cancel" defaultMessage="Cancel" />
+                      </StyledButton>
+                    )}
                   </Flex>
                 </ModalFooter>
               </Form>
