@@ -48,7 +48,7 @@ import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
-import VirtualCards from './sections/VirtualCards';
+import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
@@ -212,7 +212,7 @@ class EditCollectiveForm extends React.Component {
       },
       'currency.warning': {
         id: 'collective.currency.warning',
-        defaultMessage: `Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if this is an issue.`,
+        defaultMessage: `Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if this is an issue.`,
       },
       'address.label': {
         id: 'collective.address.label',
@@ -733,8 +733,12 @@ class EditCollectiveForm extends React.Component {
           defaultValue: get(this.state.collective, 'currency'),
           options: currencyOptions,
           description: collective.isHost ? intl.formatMessage(this.messages['currency.warning']) : null,
+          when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective.type),
           disabled:
-            (collective.type === CollectiveType.COLLECTIVE && collective.isActive) || collective.isHost ? true : false,
+            ([CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type) && collective.isActive) ||
+            collective.isHost
+              ? true
+              : false,
         },
         ...this.getApplicableTaxesFields(),
         {

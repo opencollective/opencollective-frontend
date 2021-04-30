@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
+import { CardElement } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import themeGet from '@styled-system/theme-get';
 import { first, get, merge, pick, uniqBy } from 'lodash';
@@ -238,6 +239,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loadingSelectedPaymentMethod, setLoadingSelectedPaymentMethod] = useState(true);
   const [stripe, setStripe] = useState(null);
+  const [stripeElements, setStripeElements] = useState(null);
   const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
   const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
   const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
@@ -360,7 +362,10 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
             order={contribution}
             isSubmitting={isSubmitting}
             setNewPaymentMethodInfo={setNewPaymentMethodInfo}
-            onStripeReady={({ stripe }) => setStripe(stripe)}
+            onStripeReady={({ stripe, stripeElements }) => {
+              setStripe(stripe);
+              setStripeElements(stripeElements);
+            }}
             onPaypalSuccess={async paypalPaymentMethod => {
               await updatePaymentMethod(paypalPaymentMethod);
               onCloseEdit();
@@ -444,7 +449,8 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
                   setAddingPaymentMethod(false);
                   return false;
                 }
-                const { token, error } = await stripe.createToken();
+                const cardElement = stripeElements.getElement(CardElement);
+                const { token, error } = await stripe.createToken(cardElement);
 
                 if (error) {
                   addToast({ type: TOAST_TYPE.ERROR, message: error.message });

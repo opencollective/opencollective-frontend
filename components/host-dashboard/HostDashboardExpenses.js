@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 
 import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
@@ -90,7 +91,27 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   ${hostInfoCardFields}
 `;
 
-const EXPENSES_PER_PAGE = 15;
+const onExpenseUpdate = (updatedExpense, cache, filteredStatus) => {
+  if (updatedExpense.status !== filteredStatus) {
+    cache.modify({
+      fields: {
+        expenses(existingExpenses, { readField }) {
+          if (!existingExpenses?.nodes) {
+            return existingExpenses;
+          } else {
+            return {
+              ...existingExpenses,
+              totalCount: existingExpenses.totalCount - 1,
+              nodes: existingExpenses.nodes.filter(expense => updatedExpense.id !== readField('id', expense)),
+            };
+          }
+        },
+      },
+    });
+  }
+};
+
+const NB_EXPENSES_DISPLAYED = 10;
 
 const isValidStatus = status => {
   return Boolean(status === 'READY_TO_PAY' || EXPENSE_STATUS[status]);
@@ -101,7 +122,7 @@ const getVariablesFromQuery = query => {
   const [dateFrom] = getDateRangeFromPeriod(query.period);
   return {
     offset: parseInt(query.offset) || 0,
-    limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
+    limit: (parseInt(query.limit) || NB_EXPENSES_DISPLAYED) * 2,
     status: isValidStatus(query.status) ? query.status : null,
     type: query.type,
     tags: query.tag ? [query.tag] : undefined,
@@ -115,25 +136,25 @@ const getVariablesFromQuery = query => {
 
 const ROUTE_PARAMS = ['hostCollectiveSlug', 'view'];
 
+const hasParams = query => {
+  return Object.entries(query).some(([key, value]) => {
+    return ![...ROUTE_PARAMS, 'offset', 'limit', 'paypalApprovalError'].includes(key) && value;
+  });
+};
+
 const HostDashboardExpenses = ({ hostSlug }) => {
   const router = useRouter() || {};
   const query = router.query;
+  const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
+  const hasFilters = React.useMemo(() => hasParams(query), [query]);
+  const variables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
+  const context = API_V2_CONTEXT;
+  const gqlQuery = useQuery(hostDashboardExpensesQuery, { variables, context });
+  const paginatedExpenses = useLazyGraphQLPaginatedResults(gqlQuery, 'expenses');
+  const { data, error, loading } = gqlQuery;
   const getQueryParams = newParams => {
     return omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
-
-  const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
-  const { data, error, loading, variables, refetch } = useQuery(hostDashboardExpensesQuery, {
-    variables: { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) },
-    context: API_V2_CONTEXT,
-  });
-  const hasFilters = React.useMemo(
-    () =>
-      Object.entries(query).some(([key, value]) => {
-        return ![...ROUTE_PARAMS, 'offset', 'limit', 'paypalApprovalError'].includes(key) && value;
-      }),
-    [query],
-  );
 
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
@@ -236,20 +257,19 @@ const HostDashboardExpenses = ({ hostSlug }) => {
         <React.Fragment>
           <ExpensesList
             isLoading={loading}
-            nbPlaceholders={variables.limit}
             host={data?.host}
-            expenses={data?.expenses?.nodes}
+            nbPlaceholders={paginatedExpenses.limit}
+            expenses={paginatedExpenses.nodes}
             view="admin"
             usePreviewModal
-            onDelete={() => refetch()}
-            onProcess={() => hasFilters && refetch()}
+            onProcess={(expense, cache) => hasFilters && onExpenseUpdate(expense, cache, query.status)}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
               route={`/${hostSlug}/dashboard/expenses`}
-              total={data?.expenses?.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
+              total={paginatedExpenses.totalCount}
+              limit={paginatedExpenses.limit}
+              offset={paginatedExpenses.offset}
               ignoredQueryParams={ROUTE_PARAMS}
               scrollToTopOnChange
             />

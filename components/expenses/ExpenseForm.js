@@ -198,6 +198,7 @@ const ExpenseFormBody = ({
   const { values, handleChange, errors, setValues, dirty, touched, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const isInvite = values.payee?.isInvite;
+  const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
@@ -305,7 +306,7 @@ const ExpenseFormBody = ({
         onNext={() => setStep(STEPS.EXPENSE)}
       />
     );
-  } else if (isOnBehalf === true) {
+  } else if (isOnBehalf === true && isNewUser) {
     payeeForm = (
       <ExpenseFormPayeeInviteNewStep
         collective={collective}

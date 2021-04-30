@@ -127,7 +127,7 @@ class ApplyToHost extends React.Component {
             my={3}
           >
             <Image alt="" src={umbrellaIllustration} width={160} height={160} />
-            <Box maxWidth={'480px'} ml={[0, 4]}>
+            <Box maxWidth={'480px'} minWidth={'240px'} ml={[0, 4]}>
               <H2 fontSize="20px" color="black.900" textAlign={['center', 'left']} my={[3, 0]}>
                 {intl.formatMessage(this.messages.applyToHost)}
               </H2>

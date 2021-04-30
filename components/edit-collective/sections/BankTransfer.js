@@ -36,12 +36,7 @@ const hostQuery = gqlV2/* GraphQL */ `
       }
       plan {
         id
-        addedFunds
-        addedFundsLimit
-        bankTransfers
-        bankTransfersLimit
         hostedCollectives
-        hostedCollectivesLimit
         manualPayments
         name
       }
@@ -130,17 +125,6 @@ const BankTransfer = props => {
                   id="paymentMethods.manual.upgradePlan"
                   defaultMessage="Subscribe to our special plans for hosts"
                 />
-              )}
-              {data.host.plan.bankTransfersLimit && (
-                <Box mt={1}>
-                  <FormattedMessage
-                    id="paymentMethods.manual.add.trial"
-                    defaultMessage="Free for the first $1,000 received, "
-                  />
-                  <a href="/pricing">
-                    <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
-                  </a>
-                </Box>
               )}
             </Container>
           </Box>

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { pick } from 'lodash';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatErrorMessage } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -46,15 +46,21 @@ const ExpenseModal = ({ expense, onDelete, onProcess, onClose, show }) => {
       trapFocus={!loading}
     >
       <ModalBody maxHeight="calc(80vh - 80px)" overflowY="auto" mb={80} p={20}>
-        <ExpenseSummary
-          isLoading={loading || !data}
-          expense={!loading ? data?.expense : null}
-          host={!loading ? data?.expense?.account?.host : null}
-          collective={!loading ? data?.expense?.account : null}
-          onDelete={onDelete}
-          onClose={onClose}
-          borderless
-        />
+        {loading || data?.expense ? (
+          <ExpenseSummary
+            isLoading={loading || !data}
+            expense={!loading ? data?.expense : null}
+            host={!loading ? data?.expense?.account?.host : null}
+            collective={!loading ? data?.expense?.account : null}
+            onDelete={onDelete}
+            onClose={onClose}
+            borderless
+          />
+        ) : (
+          <MessageBox type="warning" withIcon>
+            <FormattedMessage id="Expense.NotFound" defaultMessage="This expense doesn't exist or has been removed" />
+          </MessageBox>
+        )}
       </ModalBody>
       <ModalFooter
         position="absolute"

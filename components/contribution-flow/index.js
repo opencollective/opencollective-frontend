@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
+import { CardElement } from '@stripe/react-stripe-js';
 import { find, get, intersection, isEmpty, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
@@ -18,7 +19,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
+import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
 
@@ -117,6 +118,7 @@ class ContributionFlow extends React.Component {
     this.state = {
       error: null,
       stripe: null,
+      stripeElements: null,
       braintree: null,
       isSubmitted: false,
       isSubmitting: false,
@@ -126,7 +128,7 @@ class ContributionFlow extends React.Component {
       showSignIn: false,
       stepDetails: {
         quantity: 1,
-        interval: props.fixedInterval || props.tier?.interval,
+        interval: props.fixedInterval || getDefaultInterval(props.tier),
         amount: props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
       },
@@ -253,7 +255,7 @@ class ContributionFlow extends React.Component {
   };
 
   getPaymentMethod = async () => {
-    const { stepPayment, stripe } = this.state;
+    const { stepPayment, stripe, stripeElements } = this.state;
 
     if (stepPayment?.key === BRAINTREE_KEY) {
       return new Promise((resolve, reject) => {
@@ -273,7 +275,8 @@ class ContributionFlow extends React.Component {
     } else if (stepPayment.paymentMethod.id) {
       return pick(stepPayment.paymentMethod, ['id']);
     } else if (stepPayment.key === NEW_CREDIT_CARD_KEY) {
-      const { token } = await stripe.createToken();
+      const cardElement = stripeElements.getElement(CardElement);
+      const { token } = await stripe.createToken(cardElement);
       const pm = stripeTokenToPaymentMethod(token);
       return {
         name: pm.name,
@@ -680,7 +683,7 @@ class ContributionFlow extends React.Component {
                     onChange={data => this.setState(data)}
                     step={currentStep}
                     showFeesOnTop={this.canHaveFeesOnTop()}
-                    onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+                    onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     setBraintree={braintree => this.setState({ braintree })}
                     defaultProfileSlug={this.props.contributeAs}
                     defaultEmail={this.props.defaultEmail}

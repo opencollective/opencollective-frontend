@@ -393,6 +393,12 @@ class ExpensePage extends React.Component {
     const hasAttachedFiles = (isInvoice && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
+    const isMissingReceipt =
+      status === PAGE_STATUS.VIEW &&
+      expense?.status === expenseStatus.PAID &&
+      expense?.type === expenseTypes.CHARGE &&
+      expense?.permissions?.canEdit &&
+      expense?.items?.every(item => !item.url);
 
     const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
 
@@ -461,10 +467,7 @@ class ExpensePage extends React.Component {
               ((expense?.status === expenseStatus.UNVERIFIED && this.state.createdUser) || isDraft) && (
                 <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
               )}
-            {status === PAGE_STATUS.VIEW &&
-              expense?.status === expenseStatus.PAID &&
-              expense?.type === expenseTypes.CHARGE &&
-              expense?.permissions?.canEdit && <ExpenseMissingReceiptNotificationBanner onEdit={this.onEditBtnClick} />}
+            {isMissingReceipt && <ExpenseMissingReceiptNotificationBanner onEdit={this.onEditBtnClick} />}
             {status !== PAGE_STATUS.EDIT && (
               <Box mb={3}>
                 <ExpenseSummary
