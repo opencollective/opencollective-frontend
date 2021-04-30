@@ -815,6 +815,7 @@
   "expense.markAsUnpaid.btn": "Marcar como não paga",
   "Expense.markAsUnpaid.details": "O valor será creditado de volta ao saldo do coletivo.",
   "expense.notes": "Anotações",
+  "Expense.NotFound": "This expense doesn't exist or has been removed",
   "expense.page.description": "Tarifas do processador de pagamento podem ser aplicadas.",
   "expense.page.total": "Total de páginas",
   "expense.paid": "Paga",

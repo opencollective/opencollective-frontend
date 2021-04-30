@@ -815,6 +815,7 @@
   "expense.markAsUnpaid.btn": "未支払いにする",
   "Expense.markAsUnpaid.details": "The amount will be credited back to the Collective balance.",
   "expense.notes": "注",
+  "Expense.NotFound": "This expense doesn't exist or has been removed",
   "expense.page.description": "Payment processor fees may apply.",
   "expense.page.total": "Page Total",
   "expense.paid": "Paid",

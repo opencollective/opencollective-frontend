@@ -66,7 +66,8 @@ const ProcessExpenseButtons = ({
   onSuccess,
 }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const mutationOptions = { context: API_V2_CONTEXT };
+  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache);
+  const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
   const [processExpense, { loading }] = useMutation(processExpenseMutation, mutationOptions);
   const [error, setError] = React.useState(null);
 
@@ -80,12 +81,7 @@ const ProcessExpenseButtons = ({
 
     try {
       const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
-      const processedExpense = await processExpense({ variables });
-      if (onSuccess) {
-        await onSuccess(processedExpense, action, paymentParams);
-      }
-
-      return processedExpense;
+      return processExpense({ variables });
     } catch (e) {
       setError(e);
       if (onError && selectedAction !== 'PAY') {

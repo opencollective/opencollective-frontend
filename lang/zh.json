@@ -815,6 +815,7 @@
   "expense.markAsUnpaid.btn": "标记为未支付",
   "Expense.markAsUnpaid.details": "The amount will be credited back to the Collective balance.",
   "expense.notes": "笔记",
+  "Expense.NotFound": "This expense doesn't exist or has been removed",
   "expense.page.description": "Payment processor fees may apply.",
   "expense.page.total": "Page Total",
   "expense.paid": "已支付",
