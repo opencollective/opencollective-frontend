@@ -161,11 +161,7 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
-          hasNewPaypal={
-            LoggedInUser?.isRoot() ||
-            get(account, 'settings.forceNewPaypalPayments', false) ||
-            get(account, 'host.settings.forceNewPaypalPayments', false)
-          }
+          hasNewPaypal={!get(account, 'host.settings.useLegacyPayPalPayments', false)}
         />
       );
     }

@@ -4,23 +4,15 @@ import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
 import { FormattedMessage } from 'react-intl';
 
 import ApplyToHostModal from './ApplyToHostModal';
-import { getI18nLink } from './I18nFormatters';
-import Link from './Link';
 import StyledButton from './StyledButton';
-import StyledTooltip from './StyledTooltip';
 
 class ApplyToHostBtn extends React.Component {
   static propTypes = {
     hostSlug: PropTypes.string.isRequired,
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    hostWithinLimit: PropTypes.bool,
     withoutIcon: PropTypes.bool,
     buttonProps: PropTypes.object,
     buttonRenderer: PropTypes.func,
-  };
-
-  static defaultProps = {
-    hostWithinLimit: true,
   };
 
   constructor(props) {
@@ -29,11 +21,10 @@ class ApplyToHostBtn extends React.Component {
   }
 
   renderButton() {
-    const { buttonRenderer, hostWithinLimit, withoutIcon, buttonProps, minWidth } = this.props;
+    const { buttonRenderer, withoutIcon, buttonProps, minWidth } = this.props;
 
     if (buttonRenderer) {
       return buttonRenderer({
-        disabled: !hostWithinLimit,
         onClick: () => this.setState({ showModal: true }),
         'data-cy': 'host-apply-btn',
         ...buttonProps,
@@ -53,7 +44,6 @@ class ApplyToHostBtn extends React.Component {
       <StyledButton
         buttonStyle="secondary"
         buttonSize="small"
-        disabled={!hostWithinLimit}
         onClick={() => this.setState({ showModal: true })}
         minWidth={minWidth}
         data-cy="host-apply-btn"
@@ -66,29 +56,12 @@ class ApplyToHostBtn extends React.Component {
   }
 
   render() {
-    const { hostSlug, hostWithinLimit } = this.props;
+    const { hostSlug } = this.props;
 
     return (
       <Fragment>
-        {hostWithinLimit ? (
-          this.renderButton()
-        ) : (
-          <StyledTooltip
-            place="left"
-            content={
-              <FormattedMessage
-                id="host.hostLimit.warning"
-                defaultMessage="This Fiscal Host has reached its Collective limit. <a>Contact {collectiveName}</a> to request they upgrade, and let them know you want to apply."
-                values={{
-                  collectiveName: hostSlug,
-                  a: getI18nLink({ as: Link, href: `${hostSlug}/contact` }),
-                }}
-              />
-            }
-          >
-            {this.renderButton()}
-          </StyledTooltip>
-        )}
+        {this.renderButton()}
+
         {this.state.showModal && (
           <ApplyToHostModal hostSlug={hostSlug} onClose={() => this.setState({ showModal: false })} />
         )}

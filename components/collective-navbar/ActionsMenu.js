@@ -11,7 +11,7 @@ import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
-import { get, pickBy } from 'lodash';
+import { pickBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -178,10 +178,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
-  const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
-  const hostWithinLimit = hostedCollectivesLimit
-    ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
-    : true;
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -322,7 +318,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
                         <ApplyToHostBtn
                           hostSlug={collective.slug}
-                          hostWithinLimit={hostWithinLimit}
                           buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
                         />
                       </MenuItem>

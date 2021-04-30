@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { sumBy } from 'lodash';
+import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -41,32 +42,39 @@ const ExpensesList = ({
   onDelete,
   onProcess,
 }) => {
-  expenses = !isLoading ? expenses : [...new Array(nbPlaceholders)];
-
-  if (!expenses?.length) {
+  if (!expenses?.length && !isLoading) {
     return null;
   }
 
   const totalAmount = sumBy(expenses, 'amount');
-
   return (
     <StyledCard>
-      {expenses.map((expense, idx) => (
-        <ExpenseContainer key={expense?.id || idx} isFirst={!idx} data-cy={`expense-${expense?.status}`}>
-          <ExpenseBudgetItem
-            isLoading={isLoading}
-            isInverted={isInverted}
-            collective={collective || expense?.account}
-            expense={expense}
-            host={host}
-            showProcessActions
-            view={view}
-            usePreviewModal={usePreviewModal}
-            onDelete={onDelete}
-            onProcess={onProcess}
-          />
-        </ExpenseContainer>
-      ))}
+      {isLoading ? (
+        [...new Array(nbPlaceholders)].map((_, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <ExpenseContainer key={idx} isFirst={!idx}>
+            <ExpenseBudgetItem isLoading />
+          </ExpenseContainer>
+        ))
+      ) : (
+        <FlipMove enterAnimation="fade" leaveAnimation="fade">
+          {expenses.map((expense, idx) => (
+            <ExpenseContainer key={expense.id} isFirst={!idx} data-cy={`expense-${expense.status}`}>
+              <ExpenseBudgetItem
+                isInverted={isInverted}
+                collective={collective || expense.account}
+                expense={expense}
+                host={host}
+                showProcessActions
+                view={view}
+                usePreviewModal={usePreviewModal}
+                onDelete={onDelete}
+                onProcess={onProcess}
+              />
+            </ExpenseContainer>
+          ))}
+        </FlipMove>
+      )}
       {!isLoading && (
         <FooterContainer>
           <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>

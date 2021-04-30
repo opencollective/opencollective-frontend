@@ -338,12 +338,7 @@ const paymentMethodsQuery = gql`
       settings
       plan {
         id
-        addedFunds
-        addedFundsLimit
-        bankTransfers
-        bankTransfersLimit
         hostedCollectives
-        hostedCollectivesLimit
         manualPayments
         name
       }

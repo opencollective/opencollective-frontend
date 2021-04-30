@@ -9,6 +9,9 @@ import ContributeProject from '../../contribute-cards/ContributeProject';
 import CreateNew from '../../contribute-cards/CreateNew';
 import { Box } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
+import Link from '../../Link';
+import StyledButton from '../../StyledButton';
+import { P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import SectionTitle from '../SectionTitle';
@@ -26,6 +29,7 @@ class SectionProjects extends React.PureComponent {
     projects: PropTypes.arrayOf(PropTypes.object),
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
       currency: PropTypes.string,
       isActive: PropTypes.bool,
     }),
@@ -57,6 +61,20 @@ class SectionProjects extends React.PureComponent {
           <SectionTitle>
             <FormattedMessage id="CollectivePage.SectionProjects.Title" defaultMessage="Projects" />
           </SectionTitle>
+          <P color="black.700" mb={4}>
+            {isAdmin ? (
+              <FormattedMessage
+                id="CollectivePage.SectionProjects.AdminDescription"
+                defaultMessage="Manage finances for a project or initiative separate from your collective budget."
+              />
+            ) : (
+              <FormattedMessage
+                id="CollectivePage.SectionProjects.Description"
+                defaultMessage="Support the following initiatives from {collectiveName}."
+                values={{ collectiveName: collective.name }}
+              />
+            )}
+          </P>
         </ContainerSectionContent>
 
         <Box mb={4}>
@@ -82,6 +100,15 @@ class SectionProjects extends React.PureComponent {
               </ContributeCardContainer>
             )}
           </HorizontalScroller>
+          {Boolean(projects?.length) && (
+            <ContainerSectionContent>
+              <Link href={`/${collective.slug}/projects`}>
+                <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
+                  <FormattedMessage id="CollectivePage.SectionProjects.ViewAll" defaultMessage="View all projects" /> →
+                </StyledButton>
+              </Link>
+            </ContainerSectionContent>
+          )}
         </Box>
       </Box>
     );

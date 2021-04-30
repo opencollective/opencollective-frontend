@@ -120,6 +120,11 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
         height: 100%;
       }
     }
+    &[data-trix-content-type='--embed-iframe-anchorFm'] {
+      iframe {
+        min-height: 300px;
+      }
+    }
   }
 
   img {
