@@ -1470,6 +1470,8 @@
   "Payout": "지불",
   "Payout.Automatic": "자동",
   "Payout.Manual": "수동",
+  "PayoutBankInformationForm.Error.AvailableCurrencies": "There was an error loading available currencies for this host",
+  "PayoutBankInformationForm.Error.RequiredFields": "There was an error fetching the required fields",
   "PayoutMethod.AccountBalance": "Open Collective (계정 잔고)",
   "PayoutMethod.New.BankAccount": "New bank account",
   "PayoutMethod.New.default": "신규 {pmType}",

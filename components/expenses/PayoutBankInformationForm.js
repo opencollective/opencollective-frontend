@@ -4,12 +4,13 @@ import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, useFormikContext } from 'formik';
 import { get, kebabCase, partition, set } from 'lodash';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
+import MessageBox from '../MessageBox';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledSelect from '../StyledSelect';
@@ -201,7 +202,15 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     return <StyledSpinner />;
   }
   if (error) {
-    return <P>{error.message}</P>;
+    return (
+      <MessageBox fontSize="12px" type="error">
+        <FormattedMessage
+          id="PayoutBankInformationForm.Error.RequiredFields"
+          defaultMessage="There was an error fetching the required fields"
+        />
+        {error.message && `: ${error.message}`}
+      </MessageBox>
+    );
   }
 
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({ label: rf.title, value: rf.type }));
@@ -389,6 +398,15 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
           getFieldName={getFieldName}
           host={host}
         />
+      )}
+      {!selectedCurrency && !currencies?.length && (
+        <MessageBox fontSize="12px" type="error">
+          <FormattedMessage
+            id="PayoutBankInformationForm.Error.AvailableCurrencies"
+            defaultMessage="There was an error loading available currencies for this host"
+          />
+          .
+        </MessageBox>
       )}
     </React.Fragment>
   );

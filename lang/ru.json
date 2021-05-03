@@ -1470,6 +1470,8 @@
   "Payout": "Выплата",
   "Payout.Automatic": "Автоматически",
   "Payout.Manual": "Вручную",
+  "PayoutBankInformationForm.Error.AvailableCurrencies": "There was an error loading available currencies for this host",
+  "PayoutBankInformationForm.Error.RequiredFields": "There was an error fetching the required fields",
   "PayoutMethod.AccountBalance": "Open Collective (Баланс аккаунта)",
   "PayoutMethod.New.BankAccount": "Новый банковский счет",
   "PayoutMethod.New.default": "Новый {pmType}",

@@ -1470,6 +1470,8 @@
   "Payout": "赔付",
   "Payout.Automatic": "自动 ",
   "Payout.Manual": "指南",
+  "PayoutBankInformationForm.Error.AvailableCurrencies": "There was an error loading available currencies for this host",
+  "PayoutBankInformationForm.Error.RequiredFields": "There was an error fetching the required fields",
   "PayoutMethod.AccountBalance": "Open Collective (账户余额)",
   "PayoutMethod.New.BankAccount": "New bank account",
   "PayoutMethod.New.default": "New {pmType}",

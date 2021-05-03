@@ -1470,6 +1470,8 @@
   "Payout": "Pagamento",
   "Payout.Automatic": "Automático",
   "Payout.Manual": "Manualmente",
+  "PayoutBankInformationForm.Error.AvailableCurrencies": "There was an error loading available currencies for this host",
+  "PayoutBankInformationForm.Error.RequiredFields": "There was an error fetching the required fields",
   "PayoutMethod.AccountBalance": "Open Collective (Saldo da Conta)",
   "PayoutMethod.New.BankAccount": "Nova conta bancária",
   "PayoutMethod.New.default": "Novo {pmType}",
