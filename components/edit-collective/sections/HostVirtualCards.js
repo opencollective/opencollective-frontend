@@ -121,13 +121,6 @@ const HostVirtualCards = props => {
     },
   });
 
-  function updateFilters(queryParams) {
-    return router.push({
-      pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
-      query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
-    });
-  }
-
   const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
     context: API_V2_CONTEXT,
     onError: e => {
@@ -149,6 +142,13 @@ const HostVirtualCards = props => {
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
   );
+
+  const handleUpdateFilters = queryParams => {
+    return router.push({
+      pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
+      query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
+    });
+  };
 
   const handleAssignCardSuccess = () => {
     addToast({
@@ -304,7 +304,7 @@ const HostVirtualCards = props => {
             filters={routerQuery}
             collective={props.collective}
             virtualCardMerchants={data.host.hostedVirtualCardMerchants.nodes}
-            onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
+            onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
           />
         </Flex>
       </Box>
