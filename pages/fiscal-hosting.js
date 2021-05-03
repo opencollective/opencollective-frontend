@@ -2,6 +2,7 @@ import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
 import APlaceToGrowAndThrive from '../components/fiscal-hosting/APlaceToGrowAndThriveSection';
+import ApplyToFiscalHosts from '../components/fiscal-hosting/ApplyToFiscalHostSection';
 import FindTheRightFiscalHost from '../components/fiscal-hosting/FindTheRightFiscalHostSection';
 import HowToUseOpenCollective from '../components/fiscal-hosting/HowToUseOpenCollective';
 import WhatAreTheBenefits from '../components/fiscal-hosting/WhatAreTheBenefitsSection';
@@ -28,6 +29,7 @@ const BecomeAHost = () => {
       <WhatAreTheBenefits />
       <HowToUseOpenCollective />
       <WhoIsFiscalHosting />
+      <ApplyToFiscalHosts />
       <FindTheRightFiscalHost />
       {/* <WhoAreFiscalHosts />
       <WhatAreTheBenefits />

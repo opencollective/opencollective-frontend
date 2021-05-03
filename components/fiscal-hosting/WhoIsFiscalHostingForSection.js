@@ -7,7 +7,6 @@ import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
 import SectionSubtitle from '../home/SectionSubtitle';
 import SectionTitle from '../home/SectionTitle';
-import StyledLink from '../StyledLink';
 import { H3, P } from '../Text';
 
 const IconWrapper = styled(Box)`
@@ -23,92 +22,83 @@ const IconWrapper = styled(Box)`
   }
 `;
 
-const learningChannels = [
+const OCPotentialUsers = [
   {
-    id: 'slack',
-    name: 'Slack',
+    id: 'community',
     desktopItemOrder: 2,
   },
   {
-    id: 'documentation',
-    name: 'Documentation',
-    link: 'https://docs.opencollective.com',
+    id: 'grantRecipients',
     desktopItemOrder: 1,
   },
   {
-    id: 'openSourceCode',
-    name: 'Open Source code',
-    link: 'https://github.com/opencollective/opencollective',
+    id: 'timeLimited',
     desktopItemOrder: 4,
   },
   {
-    id: 'blog',
-    name: 'Blog',
-    link: 'https://blog.opencollective.com',
+    id: 'unincorporatedGroup',
     desktopItemOrder: 3,
   },
   {
-    id: 'openFinances',
-    name: 'Open Finances',
-    link: 'https://opencollective.com/opencollective',
+    id: 'crowdFunding',
     desktopItemOrder: 5,
   },
   {
-    id: 'openCompany',
-    name: 'Open Company',
-    link: 'https://drive.opencollective.com',
+    id: 'youngActivists',
     desktopItemOrder: 6,
   },
 ];
 
 const messages = defineMessages({
-  'home.learnMore.documentation': {
-    id: 'home.learnMore.documentation',
-    defaultMessage: 'Support your community with fundholding and fiscal sponsorship services.',
+  'fiscalHosting.community': {
+    id: 'fiscalHosting.community',
+    defaultMessage: 'Emergent community responses',
   },
-  'home.learnMore.documentation.buttonText': {
-    id: 'home.learnMore.buttonText',
-    defaultMessage: 'View our documentation',
+  'fiscalHosting.community.description': {
+    id: 'fiscalHosting.community.description',
+    defaultMessage: 'To current events, like a pandemic, who need to get operational immediately.',
   },
-  'home.learnMore.blog': {
-    id: 'home.learnMore.blog',
-    defaultMessage: 'Case studies, news, and how groups around the world use Open Collective.',
+  'fiscalHosting.grantRecipients': {
+    id: 'fiscalHosting.grantRecipients',
+    defaultMessage: 'Grant recipients or applicants',
   },
-  'home.learnMore.blog.buttonText': {
-    id: 'home.learnMore.blog.buttonText',
-    defaultMessage: 'Visit our blog',
+  'fiscalHosting.grantRecipients.description': {
+    id: 'fiscalHosting.grantRecipients.description',
+    defaultMessage: 'Who need a place to receive the funds and hold them as they are spent down.',
   },
-  'home.learnMore.slack': {
-    id: 'home.learnMore.slack',
-    defaultMessage: 'Come meet the team, chat with the community, and share your questions and stories.',
+  'fiscalHosting.timeLimited': {
+    id: 'fiscalHosting.timeLimited',
+    defaultMessage: 'Time-limited projects',
   },
-  'home.learnMore.slack.buttonText': {
-    id: 'home.learnMore.slack.buttonText',
-    defaultMessage: 'Join our slack',
+  'fiscalHosting.timeLimited.description': {
+    id: 'fiscalHosting.timeLimited.description',
+    defaultMessage:
+      "Where it doesn't make sense to set up a whole new organization only to wind it up six months later.",
   },
-  'home.learnMore.openSourceCode': {
-    id: 'home.learnMore.OpenSourceCode',
-    defaultMessage: 'Our code is open source. You can contribute! Check it out on GitHub.',
+  'fiscalHosting.unincorporatedGroup': {
+    id: 'fiscalHosting.unincorporatedGroup',
+    defaultMessage: 'An unincorporated group',
   },
-  'home.learnMore.openSourceCode.buttonText': {
-    id: 'home.learnMore.openSourceCode.buttonText',
-    defaultMessage: 'See our code base',
+  'fiscalHosting.unincorporatedGroup.description': {
+    id: 'fiscalHosting.unincorporatedGroup.description',
+    defaultMessage:
+      'Like a meetup, needing to fundraise, collect membership dues, or sign a contract with a venue or sponsor.',
   },
-  'home.learnMore.openFinances': {
-    id: 'home.learnMore.openFinances',
-    defaultMessage: 'We operate as an Open Collective ourselves, with transparent budgets.',
+  'fiscalHosting.crowdFunding': {
+    id: 'fiscalHosting.crowdFunding',
+    defaultMessage: 'A crowdfunding campaign',
   },
-  'home.learnMore.openFinances.buttonText': {
-    id: 'home.learnMore.openFinances.buttonText',
-    defaultMessage: 'See our Collectives',
+  'fiscalHosting.crowdFunding.description': {
+    id: 'fiscalHosting.crowdFunding.description',
+    defaultMessage: 'Seeking a place to hold the money and a way to offer accountability to their backers.',
   },
-  'home.learnMore.openCompany': {
-    id: 'home.learnMore.openCompany',
-    defaultMessage: 'Our metrics, financials, and other documents are public.',
+  'fiscalHosting.youngActivists': {
+    id: 'fiscalHosting.youngActivists',
+    defaultMessage: 'Young activists and change-makers',
   },
-  'home.learnMore.openCompany.buttonText': {
-    id: 'home.learnMore.openCompany.buttonText',
-    defaultMessage: 'See our public company',
+  'fiscalHosting.youngActivists.description': {
+    id: 'fiscalHosting.youngActivists.description',
+    defaultMessage: 'Who may lack the experience to manage their own legal entity.',
   },
 });
 
@@ -195,26 +185,26 @@ const WhoIsFiscalHosting = () => {
           flexWrap={[null, 'wrap']}
           justifyContent="space-between"
         >
-          {learningChannels.map(channel => (
-            <React.Fragment key={channel.id}>
+          {OCPotentialUsers.map(user => (
+            <React.Fragment key={user.id}>
               <Container
                 display="flex"
                 flexDirection="column"
                 alignItems="flex-start"
                 my={[2, null, null, null, 4]}
-                order={[null, channel.desktopItemOrder]}
+                order={[null, user.desktopItemOrder]}
               >
-                <IconWrapper my={2}>
+                {/* <IconWrapper my={2}>
                   <NextIllustration
                     width={60}
                     height={60}
                     src={`/static/images/home/${channel.id}-illustration.png`}
                     alt={`${channel.id} illustration`}
                   />
-                </IconWrapper>
+                </IconWrapper> */}
                 <Box width={['288px', '306px', null, null, '289px']}>
                   <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px" mb={2} color="black.800">
-                    {channel.name}
+                    {intl.formatMessage(messages[`fiscalHosting.${user.id}`])}
                   </H3>
                   <P
                     color={['black.700', 'black.600', 'black.700']}
@@ -223,7 +213,7 @@ const WhoIsFiscalHosting = () => {
                     letterSpacing={['-0.12px', '-0.16px']}
                     mb={3}
                   >
-                    {intl.formatMessage(messages[`home.learnMore.${channel.id}`])}
+                    {intl.formatMessage(messages[`fiscalHosting.${user.id}.description`])}
                   </P>
                 </Box>
               </Container>

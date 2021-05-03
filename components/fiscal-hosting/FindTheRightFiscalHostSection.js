@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
-import { Box, Flex } from '../Grid';
+import { Box, Flex, Grid } from '../Grid';
 import Illustration from '../home/HomeIllustration';
 import { H2, H3, P } from '../Text';
 
@@ -19,8 +19,8 @@ const FindTheRightFiscalHost = () => {
             textAlign="center"
           >
             <FormattedMessage
-              id="becomeAHost.whatAreTheBenefits"
-              defaultMessage="What are the benefits to host with us?"
+              id="fiscalHosting.findingRightFiscalHost"
+              defaultMessage="Finding the right fiscal host for you"
             />
           </H2>
         </Box>
@@ -34,25 +34,26 @@ const FindTheRightFiscalHost = () => {
             fontWeight="500"
           >
             <FormattedMessage
-              id="becomeAHost.whatAreTheBenefits.description"
-              defaultMessage="Accept donations and sponsorship, celebrate your supporters, pay expenses, and keep everyone up to date — all in one place."
+              id="fiscalHosting.findingRightFiscalHost.description"
+              defaultMessage="Some key things to consider when looking for the right fit"
             />
           </P>
         </Box>
       </Container>
-      <Flex
+      <Grid
         mx={3}
-        flexDirection={['column', null, 'row']}
-        justifyContent="center"
-        alignItems={['center', null, 'baseline']}
+        gridTemplateColumns={[null, null, 'repeat(3, 1fr)']}
+        columnGap="48px"
+        placeSelf="center"
+        alignItems="center"
         mt={['24px', '48px', null, null, '80px']}
       >
         <Container
           display="flex"
           flexDirection={['column', 'row', 'column']}
-          alignItems={['flex-start', 'center', 'flex-start']}
+          alignItems="center"
           mb={4}
-          mr={[null, null, '40px', null, '103px']}
+          textAlign={['center', 'left', 'center']}
         >
           <Box
             width={['132px', null, null, null, '208px']}
@@ -60,7 +61,7 @@ const FindTheRightFiscalHost = () => {
             mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
-            <Illustration src="/static/images/become-a-host/reduceOverhead-icon.png" alt="Reduce Overhead Icon" />
+            <Illustration src="/static/images/become-a-host/increaseCapacity-icon.png" alt="Mission alignment Icon" />
           </Box>
           <Box width={['288px', '472px', '250px', null, '289px']}>
             <H3
@@ -70,12 +71,12 @@ const FindTheRightFiscalHost = () => {
               color="black.800"
               mb={[2, 3]}
             >
-              <FormattedMessage id="becomeAHost.reduceOverhead" defaultMessage="Reduce overhead" />
+              <FormattedMessage id="fiscalHosting.missionAlignment" defaultMessage="Mission alignment" />
             </H3>
             <P fontSize={['15px', '18px']} lineHeight={['22px', '26px']} color="black.700" fontWeight="400">
               <FormattedMessage
-                id="becomeAHost.reduceOverhead.description"
-                defaultMessage="When you’re managing funds for multiple projects or groups, it's easy to get overwhelmed by complex spreadsheets and countless email threads. Open Collective automates budget tracking, reporting, expense processing, and payments, making your job a lot easier."
+                id="fiscalHosting.missionAlignment.description"
+                defaultMessage="Fiscal hosts usually have specific topics or areas they are designed to serve. When it comes to the application process, their acceptance criteria will fit in that scope."
               />
             </P>
           </Box>
@@ -83,9 +84,9 @@ const FindTheRightFiscalHost = () => {
         <Container
           display="flex"
           flexDirection={['column', 'row', 'column']}
-          alignItems={['flex-start', 'center', 'flex-start']}
+          alignItems="center"
           mb={4}
-          mr={[null, null, '40px', null, '103px']}
+          textAlign={['center', 'left', 'center']}
         >
           <Box
             width={['132px', null, null, null, '208px']}
@@ -93,7 +94,7 @@ const FindTheRightFiscalHost = () => {
             mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
-            <Illustration src="/static/images/become-a-host/increaseCapacity-icon.png" alt="Increase Capacity Icon" />
+            <Illustration src="/static/images/become-a-host/reduceOverhead-icon.png" alt="Location Icon" />
           </Box>
           <Box width={['288px', '472px', '250px', null, '289px']}>
             <H3
@@ -103,12 +104,46 @@ const FindTheRightFiscalHost = () => {
               color="black.800"
               mb={[2, 3]}
             >
-              <FormattedMessage id="becomeAHost.increaseCapacity" defaultMessage="Increase capacity" />
+              <FormattedMessage id="fiscalHosting.location" defaultMessage="Location" />
             </H3>
             <P fontSize={['15px', '18px']} lineHeight={['22px', '26px']} color="black.700" fontWeight="400">
               <FormattedMessage
-                id="becomeAHost.increaseCapacity.description"
-                defaultMessage="Open Collective makes it possible for you to offer more services to more projects in less time. Large numbers of transactions won’t overwhelm you, because the platform automates most of the work, and also collects any fund holding fees you set."
+                id="fiscalHosting.location.description"
+                defaultMessage="Which country a fiscal host is based in will determine the currency you your money will be accounted in, and where you are located in a legal sense, e.g. if you are applying for an EU grant, you might need a fiscal host based in the EU."
+              />
+            </P>
+          </Box>
+        </Container>
+
+        <Container
+          display="flex"
+          flexDirection={['column', 'row', 'column']}
+          alignItems="center"
+          mb={4}
+          textAlign={['center', 'left', 'center']}
+        >
+          <Box
+            width={['132px', null, null, null, '208px']}
+            height={['132px', null, null, null, '208px']}
+            mb={[2, null, '17px', null, '51px']}
+            mr={[null, 4, 0]}
+          >
+            <Illustration src="/static/images/become-a-host/ABetterExperience-icon.png" alt="Legal structure Icon" />
+          </Box>
+          <Box width={['288px', '472px', '250px', null, '289px']}>
+            <H3
+              fontSize={['20px', null, null, null, '24px']}
+              lineHeight={['28px', null, null, null, '32px']}
+              letterSpacing="-0.008em"
+              color="black.800"
+              mb={[2, 3]}
+            >
+              <FormattedMessage id="fiscalHosting.legalStructure" defaultMessage="Legal Structure" />
+            </H3>
+            <P fontSize={['15px', '18px']} lineHeight={['22px', '26px']} color="black.700" fontWeight="400">
+              <FormattedMessage
+                id="fiscalHosting.legalStructure.description"
+                defaultMessage="Do you want your host to be a charity, a company, a cooperative, or something else? E.g. a charity structure can enable tax-deductible donations, but may also have more restrictions on allowed activities."
               />
             </P>
           </Box>
@@ -116,8 +151,9 @@ const FindTheRightFiscalHost = () => {
         <Container
           display="flex"
           flexDirection={['column', 'row', 'column']}
-          alignItems={['flex-start', 'center', 'flex-start']}
+          alignItems="center"
           mb={4}
+          textAlign={['center', 'left', 'center']}
         >
           <Box
             width={['132px', null, null, null, '208px']}
@@ -125,10 +161,7 @@ const FindTheRightFiscalHost = () => {
             mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
-            <Illustration
-              src="/static/images/become-a-host/ABetterExperience-icon.png"
-              alt="A Better Experience Icon"
-            />
+            <Illustration src="/static/images/become-a-host/ABetterExperience-icon.png" alt="Services offered Icon" />
           </Box>
           <Box width={['288px', '472px', '250px', null, '289px']}>
             <H3
@@ -138,17 +171,83 @@ const FindTheRightFiscalHost = () => {
               color="black.800"
               mb={[2, 3]}
             >
-              <FormattedMessage id="becomeAHost.aBetterExperience" defaultMessage="A better experience" />
+              <FormattedMessage id="fiscalHosting.servicesOffered" defaultMessage="Services offered" />
             </H3>
             <P fontSize={['15px', '18px']} lineHeight={['22px', '26px']} color="black.700" fontWeight="400">
               <FormattedMessage
-                id="becomeAHost.aBetterExperience.description"
-                defaultMessage="Reporting is automatic and real-time, so everyone can see the up to date budget at any time. Projects can have more direct control over their funds, while fiscal sponsors can ensure everything is done according to their policies. "
+                id="fiscalHosting.servicesOffered.description"
+                defaultMessage="Some hosts also have other offerings, such as HR and payroll, accepting donations in bitcoin or public stock, access to advice from lawyers and accountants, mentorship and capacity building, industry initiatives and expertise, partnerships with funders, etc."
               />
             </P>
           </Box>
         </Container>
-      </Flex>
+        <Container
+          display="flex"
+          flexDirection={['column', 'row', 'column']}
+          alignItems="center"
+          mb={4}
+          textAlign={['center', 'left', 'center']}
+        >
+          <Box
+            width={['132px', null, null, null, '208px']}
+            height={['132px', null, null, null, '208px']}
+            mb={[2, null, '17px', null, '51px']}
+            mr={[null, 4, 0]}
+          >
+            <Illustration src="/static/images/become-a-host/ABetterExperience-icon.png" alt="Fees Icon" />
+          </Box>
+          <Box width={['288px', '472px', '250px', null, '289px']}>
+            <H3
+              fontSize={['20px', null, null, null, '24px']}
+              lineHeight={['28px', null, null, null, '32px']}
+              letterSpacing="-0.008em"
+              color="black.800"
+              mb={[2, 3]}
+            >
+              <FormattedMessage id="fiscalHosting.fees" defaultMessage="Fees" />
+            </H3>
+            <P fontSize={['15px', '18px']} lineHeight={['22px', '26px']} color="black.700" fontWeight="400">
+              <FormattedMessage
+                id="fiscalHosting.fees.description"
+                defaultMessage="Fiscal hosts often charge a fee for the service they provide. Some hosts keep fees low and offer a lightweight service, while others have higher fees and provide more support. Some fiscal hosts don’t charge fees at all."
+              />
+            </P>
+          </Box>
+        </Container>
+        <Container
+          display="flex"
+          flexDirection={['column', 'row', 'column']}
+          alignItems="center"
+          mb={4}
+          textAlign={['center', 'left', 'center']}
+        >
+          <Box
+            width={['132px', null, null, null, '208px']}
+            height={['132px', null, null, null, '208px']}
+            mb={[2, null, '17px', null, '51px']}
+            mr={[null, 4, 0]}
+          >
+            <Illustration src="/static/images/become-a-host/ABetterExperience-icon.png" alt="Operation Icon" />
+          </Box>
+          <Box width={['288px', '472px', '250px', null, '289px']}>
+            <H3
+              fontSize={['20px', null, null, null, '24px']}
+              lineHeight={['28px', null, null, null, '32px']}
+              letterSpacing="-0.008em"
+              color="black.800"
+              mb={[2, 3]}
+            >
+              <FormattedMessage id="fiscalHosting.operations" defaultMessage="Operations" />
+            </H3>
+            <P fontSize={['15px', '18px']} lineHeight={['22px', '26px']} color="black.700" fontWeight="400">
+              <FormattedMessage
+                id="fiscalHosting.operations.description"
+                defaultMessage="There are a few different models of fiscal sponsorship (depending on country as well). Check to see that you are using the one that is best for your project. Also look into the sponsor’s company culture & history of expertise in the field to ensure your fiscal sponsorship relationship aligns with your needs. "
+              />
+            </P>
+          </Box>
+        </Container>
+      </Grid>
     </Flex>
   );
 };
