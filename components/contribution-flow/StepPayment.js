@@ -19,8 +19,7 @@ import { P } from '../Text';
 import { useUser } from '../UserProvider';
 
 import BlockedContributorMessage from './BlockedContributorMessage';
-import BraintreePaymentForm from './BraintreePaymentForm';
-import { BRAINTREE_KEY, generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
+import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
 
 const PaymentMethodBox = styled.div`
   display: flex;
@@ -92,7 +91,6 @@ const StepPayment = ({
   isSubmitting,
   hideCreditCardPostalCode,
   onNewCardFormReady,
-  setBraintree,
   hasNewPaypal,
 }) => {
   // GraphQL mutations and queries
@@ -200,14 +198,6 @@ const StepPayment = ({
                   {value.instructions}
                 </Box>
               )}
-              {value.key === BRAINTREE_KEY && checked && (
-                <BraintreePaymentForm
-                  collective={collective}
-                  fromCollective={stepProfile}
-                  onReady={setBraintree}
-                  onChange={({ isReady }) => onChange({ stepPayment: { key: 'braintree', isReady } })}
-                />
-              )}
             </PaymentMethodBox>
           )}
         </StyledRadioList>
@@ -224,7 +214,6 @@ StepPayment.propTypes = {
   stepSummary: PropTypes.object,
   onChange: PropTypes.func,
   onNewCardFormReady: PropTypes.func,
-  setBraintree: PropTypes.func,
   hideCreditCardPostalCode: PropTypes.bool,
   hasNewPaypal: PropTypes.bool,
   isSubmitting: PropTypes.bool,
