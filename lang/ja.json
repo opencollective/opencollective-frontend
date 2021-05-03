@@ -1163,7 +1163,7 @@
   "Host.VirtualCards.AssignCard.Success": "Card successfully assigned",
   "Host.VirtualCards.AutoPause.Description": "Automatically pause cards that have incomplete charge expenses and resume after all pending expenses are up-to-date.",
   "Host.VirtualCards.AutoPause.Title": "Automatically pause and resume cards",
-  "Host.VirtualCards.List.Description": "You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier! Learn more",
+  "Host.VirtualCards.List.Description": "You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier!",
   "Host.VirtualCards.List.Title": "Assigned Cards",
   "Host.VirtualCards.Policy.Placeholder": "Provide specific rules for your Collectives to follow while using the Virtual Cards regarding terms of use, transactions etc.",
   "Host.VirtualCards.Policy.Save": "Save Policy",
