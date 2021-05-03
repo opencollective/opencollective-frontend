@@ -33,6 +33,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
     $offset: Int!
     $state: String
     $merchantAccount: AccountReferenceInput
+    $collectiveAccounts: [AccountReferenceInput]
   ) {
     host(slug: $slug) {
       id
@@ -41,7 +42,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
       supportedPayoutMethods
       name
       imageUrl
-      hostedVirtualCards(limit: $limit, offset: $offset, state: $state, merchantAccount: $merchantAccount) {
+      hostedVirtualCards(limit: $limit, offset: $offset, state: $state, merchantAccount: $merchantAccount, collectiveAccounts: $collectiveAccounts) {
         totalCount
         limit
         offset
@@ -70,6 +71,17 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
             address
             country
           }
+          imageUrl(height: 64)
+        }
+      }
+      hostedVirtualCardCollectives {
+        totalCount
+        limit
+        offset
+        nodes {
+          id
+          slug
+          name
           imageUrl(height: 64)
         }
       }
@@ -107,9 +119,10 @@ const HostVirtualCards = props => {
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { state, merchant } = routerQuery;
+  const { state, merchant, collectiveAccounts } = routerQuery;
   const { formatMessage } = useIntl();
   const { addToast } = useToasts();
+  console.log(collectiveAccounts)
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
@@ -118,6 +131,7 @@ const HostVirtualCards = props => {
       offset,
       state,
       merchantAccount: { slug: merchant },
+      collectiveAccounts: collectiveAccounts ? collectiveAccounts.split(",").map(collectiveAccount => ( { slug: collectiveAccount })): undefined,
     },
   });
 
@@ -291,7 +305,7 @@ const HostVirtualCards = props => {
 
       <Box mt={4}>
         <SettingsSectionTitle>
-          <FormattedMessage id="Host.VirtualCards.List.Title" defaultMessage="Assigned Cards" />
+          <FormattedMessage id="Host.VirtualCards.List.Title" defaultMessage="Virtual Cards" />
         </SettingsSectionTitle>
         <P>
           <FormattedMessage
@@ -301,9 +315,11 @@ const HostVirtualCards = props => {
         </P>
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
+            isCollectiveFilter={true}
             filters={routerQuery}
             collective={props.collective}
             virtualCardMerchants={data.host.hostedVirtualCardMerchants.nodes}
+            virtualCardCollectives={data.host.hostedVirtualCardCollectives.nodes}
             onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
           />
         </Flex>

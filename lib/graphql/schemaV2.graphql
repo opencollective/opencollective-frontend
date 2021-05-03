@@ -4568,8 +4568,10 @@ type Host implements Account & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    collectiveAccounts: AccountReferenceInput = null
   ): VirtualCardCollection!
   hostedVirtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  hostedVirtualCardCollectives(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
 
 type HostApplication {
