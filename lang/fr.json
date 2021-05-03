@@ -1470,6 +1470,8 @@
   "Payout": "Remboursement",
   "Payout.Automatic": "Automatique",
   "Payout.Manual": "Manuel",
+  "PayoutBankInformationForm.Error.AvailableCurrencies": "There was an error loading available currencies for this host",
+  "PayoutBankInformationForm.Error.RequiredFields": "There was an error fetching the required fields",
   "PayoutMethod.AccountBalance": "Open Collective (balance du compte)",
   "PayoutMethod.New.BankAccount": "Nouveau compte bancaire",
   "PayoutMethod.New.default": "Nouveau {pmType}",
