@@ -8,7 +8,7 @@ import Container from '../../../../Container';
 import StyledRadioList from '../../../../StyledRadioList';
 import StyledSelect from '../../../../StyledSelect';
 
-const CollectiveFilter = ({ onChange, value, virtualCardCollectives }) => {
+const CollectiveFilter = ({ onChange, virtualCardCollectives }) => {
   const intl = useIntl();
   const router = useRouter();
   const { collectiveAccounts } = router.query;
@@ -48,7 +48,12 @@ const CollectiveFilter = ({ onChange, value, virtualCardCollectives }) => {
         defaultValue={isAllCollectives ? collectiveFilters[0] : collectiveFilters[1]}
         labelProps={{ width: null, mr: 2, mt: 2 }}
         onChange={({ value }) => {
-          setIsAllCollectives(value === 'All hosted collectives');
+          if (value === 'All hosted collectives') {
+            onChange(undefined);
+            setIsAllCollectives(true);
+          } else {
+            setIsAllCollectives(false);
+          }
         }}
       />
       {!isAllCollectives && (
@@ -71,7 +76,7 @@ const CollectiveFilter = ({ onChange, value, virtualCardCollectives }) => {
 
 CollectiveFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
+  virtualCardCollectives: PropTypes.array,
 };
 
 export default CollectiveFilter;

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../../../Container';
@@ -31,8 +31,6 @@ const VirtualCardFilters = ({
   virtualCardCollectives,
 }) => {
   const getFilterProps = name => {
-    if (name === 'collective') {
-    }
     return {
       inputId: `virtual-cards-filter-${name}`,
       value: filters?.[name],
@@ -74,6 +72,8 @@ VirtualCardFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   virtualCardMerchants: PropTypes.object,
+  virtualCardCollectives: PropTypes.array,
+  isCollectiveFilter: PropTypes.bool,
 };
 
 export default React.memo(VirtualCardFilters);

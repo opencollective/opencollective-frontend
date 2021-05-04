@@ -143,10 +143,14 @@ const HostVirtualCards = props => {
   });
 
   function updateFilters(queryParams) {
-    return router.push({
-      pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
-      query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
-    });
+    return router.push(
+      {
+        pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
+        query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
+      },
+      null,
+      { scroll: false },
+    );
   }
 
   const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
