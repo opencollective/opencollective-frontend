@@ -42,7 +42,13 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
       supportedPayoutMethods
       name
       imageUrl
-      hostedVirtualCards(limit: $limit, offset: $offset, state: $state, merchantAccount: $merchantAccount, collectiveAccounts: $collectiveAccounts) {
+      hostedVirtualCards(
+        limit: $limit
+        offset: $offset
+        state: $state
+        merchantAccount: $merchantAccount
+        collectiveAccounts: $collectiveAccounts
+      ) {
         totalCount
         limit
         offset
@@ -122,7 +128,6 @@ const HostVirtualCards = props => {
   const { state, merchant, collectiveAccounts } = routerQuery;
   const { formatMessage } = useIntl();
   const { addToast } = useToasts();
-  console.log(collectiveAccounts)
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
@@ -131,7 +136,9 @@ const HostVirtualCards = props => {
       offset,
       state,
       merchantAccount: { slug: merchant },
-      collectiveAccounts: collectiveAccounts ? collectiveAccounts.split(",").map(collectiveAccount => ( { slug: collectiveAccount })): undefined,
+      collectiveAccounts: collectiveAccounts
+        ? collectiveAccounts.split(',').map(collectiveAccount => ({ slug: collectiveAccount }))
+        : undefined,
     },
   });
 
