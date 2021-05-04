@@ -28,6 +28,18 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
       id
       legacyId
       slug
+      type
+      name
+      imageUrl
+      host {
+        legacyId
+        slug
+        id
+        type
+        name
+        imageUrl
+        settings
+      }
       virtualCards(limit: $limit, offset: $offset, state: $state, merchantAccount: $merchantAccount) {
         totalCount
         limit
@@ -111,6 +123,7 @@ const VirtualCards = props => {
           <VirtualCardFilters
             filters={routerQuery}
             collective={props.collective}
+            host={props.collective.host}
             virtualCardMerchants={data.collective.virtualCardMerchants.nodes}
             onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
           />
@@ -140,6 +153,7 @@ VirtualCards.propTypes = {
     slug: PropTypes.string,
     virtualCards: PropTypes.object,
     virtualCardMerchants: PropTypes.array,
+    host: PropTypes.object,
   }),
   hideTopsection: PropTypes.func,
 };
