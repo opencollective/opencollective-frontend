@@ -32,7 +32,7 @@ function MerchantFilter({ inputId, onChange, virtualCardMerchants }) {
 
 MerchantFilter.propTypes = {
   inputId: PropTypes.string,
-  virtualCardMerchants: PropTypes.object,
+  virtualCardMerchants: PropTypes.array,
   onChange: PropTypes.func,
 };
 

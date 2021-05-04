@@ -139,7 +139,7 @@ VirtualCards.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
     virtualCards: PropTypes.object,
-    virtualCardMerchants: PropTypes.object,
+    virtualCardMerchants: PropTypes.array,
   }),
   hideTopsection: PropTypes.func,
 };

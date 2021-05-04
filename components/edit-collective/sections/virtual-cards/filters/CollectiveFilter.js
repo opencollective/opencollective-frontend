@@ -11,8 +11,8 @@ import StyledSelect from '../../../../StyledSelect';
 const CollectiveFilter = ({ onChange, virtualCardCollectives }) => {
   const intl = useIntl();
   const router = useRouter();
-  const { collectiveAccounts } = router.query;
-  const [isAllCollectives, setIsAllCollectives] = useState(!collectiveAccounts);
+  const { collectiveAccountIds } = router.query;
+  const [isAllCollectives, setIsAllCollectives] = useState(!collectiveAccountIds);
   const collectiveFilters = [
     intl.formatMessage({
       id: 'VirtualCards.CollectiveFilter.AllCollectives',
@@ -25,18 +25,18 @@ const CollectiveFilter = ({ onChange, virtualCardCollectives }) => {
   ];
 
   const getAllCollectives = () => {
-    return uniqBy(virtualCardCollectives, 'slug').map(collective => {
+    return uniqBy(virtualCardCollectives, 'legacyId').map(collective => {
       return {
         label: collective.name,
-        value: collective.slug,
+        value: String(collective.legacyId),
       };
     });
   };
 
   const findCollectiveFilters = () => {
-    return collectiveAccounts
+    return collectiveAccountIds
       ?.split(',')
-      .map(collectiveAccount => find(getAllCollectives(), { value: collectiveAccount }));
+      .map(collectiveAccountId => find(getAllCollectives(), { value: collectiveAccountId }));
   };
 
   return (
@@ -58,6 +58,7 @@ const CollectiveFilter = ({ onChange, virtualCardCollectives }) => {
       />
       {!isAllCollectives && (
         <StyledSelect
+          inputId="virtual-card-collective-picker"
           isMulti={true}
           options={getAllCollectives()}
           value={findCollectiveFilters()}

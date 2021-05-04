@@ -47,7 +47,10 @@ const VirtualCardFilters = ({
           <FilterLabel htmlFor="virtual-card-filter-collective">
             <FormattedMessage id="VirtualCard.Collective" defaultMessage="Collective" />
           </FilterLabel>
-          <CollectiveFilter {...getFilterProps('collectiveAccounts')} virtualCardCollectives={virtualCardCollectives} />
+          <CollectiveFilter
+            {...getFilterProps('collectiveAccountIds')}
+            virtualCardCollectives={virtualCardCollectives}
+          />
         </FilterContainer>
       )}
       <Flex flexDirection={['column', 'row']} flexGrow={[1, 0.5]}>
@@ -71,7 +74,7 @@ const VirtualCardFilters = ({
 VirtualCardFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
-  virtualCardMerchants: PropTypes.object,
+  virtualCardMerchants: PropTypes.array,
   virtualCardCollectives: PropTypes.array,
   isCollectiveFilter: PropTypes.bool,
 };

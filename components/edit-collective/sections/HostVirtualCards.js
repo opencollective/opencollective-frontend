@@ -33,7 +33,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
     $offset: Int!
     $state: String
     $merchantAccount: AccountReferenceInput
-    $collectiveAccounts: [AccountReferenceInput]
+    $collectiveAccountIds: [AccountReferenceInput]
   ) {
     host(slug: $slug) {
       id
@@ -47,7 +47,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
         offset: $offset
         state: $state
         merchantAccount: $merchantAccount
-        collectiveAccounts: $collectiveAccounts
+        collectiveAccountIds: $collectiveAccountIds
       ) {
         totalCount
         limit
@@ -88,6 +88,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           id
           slug
           name
+          legacyId
           imageUrl(height: 64)
         }
       }
@@ -125,7 +126,7 @@ const HostVirtualCards = props => {
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { state, merchant, collectiveAccounts } = routerQuery;
+  const { state, merchant, collectiveAccountIds } = routerQuery;
   const { formatMessage } = useIntl();
   const { addToast } = useToasts();
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
@@ -136,8 +137,8 @@ const HostVirtualCards = props => {
       offset,
       state,
       merchantAccount: { slug: merchant },
-      collectiveAccounts: collectiveAccounts
-        ? collectiveAccounts.split(',').map(collectiveAccount => ({ slug: collectiveAccount }))
+      collectiveAccountIds: collectiveAccountIds
+        ? collectiveAccountIds.split(',').map(collectiveAccountId => ({ legacyId: parseInt(collectiveAccountId) }))
         : undefined,
     },
   });
