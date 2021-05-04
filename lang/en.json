@@ -1,4 +1,5 @@
 {
+  "2FA.PleaseEnterCode": "Two-factor authentication enabled: please enter your code.",
   "Accept": "Accept",
   "acceptContributions.addBankAccount": "Add bank account",
   "acceptContributions.bankAccount.info": "Accept contributions via bank transfer. The budget will update when you confirm receipt of funds.",

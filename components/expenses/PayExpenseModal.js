@@ -11,18 +11,14 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
-import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
-import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
-import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import { H4, P, Span } from '../Text';
 import { withUser } from '../UserProvider';
@@ -110,7 +106,7 @@ const SectionLabel = styled.p`
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
-const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedInUser, error, resetError }) => {
+const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const initialValues = { ...DEFAULT_VALUES, ...getPayoutOptionValue(payoutMethodType, true, host) };
@@ -154,9 +150,6 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
                 ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                 paymentProcessorFee: null,
               });
-              if (resetError) {
-                resetError();
-              }
             }}
           >
             {({ item }) =>
@@ -244,35 +237,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, LoggedI
             </Amount>
           </AmountLine>
         </Box>
-        {error && (
-          <MessageBox type="error" withIcon my={3}>
-            {error}
-            <br />
-            {/** TODO: Add a proper ID/Type to detect this error */}
-            {error.startsWith('Insufficient Paypal balance') && (
-              <StyledLink as={Link} href={`/${host.slug}/dashboard`}>
-                <FormattedMessage
-                  id="PayExpenseModal.RefillBalanceError"
-                  defaultMessage="Refill your balance from the Host dashboard"
-                />
-              </StyledLink>
-            )}
-            {error.startsWith('Host has two-factor authentication enabled for large payouts.') && (
-              <FormattedMessage
-                id="PayExpenseModal.HostTwoFactorAuthEnabled"
-                defaultMessage="Please go to your <SettingsLink>settings</SettingsLink> to enable two-factor authentication for your account."
-                values={{
-                  SettingsLink: getI18nLink({
-                    as: Link,
-                    href: `${LoggedInUser.collective.slug}/edit/${EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH}`,
-                    openInNewTab: true,
-                  }),
-                }}
-              />
-            )}
-          </MessageBox>
-        )}
-        {error && error.startsWith('Two-factor authentication') && (
+        {Boolean(error?.message?.startsWith('Two-factor authentication')) && (
           <StyledInputField
             name="twoFactorAuthenticatorCode"
             htmlFor="twoFactorAuthenticatorCode"
@@ -369,8 +334,7 @@ PayExpenseModal.propTypes = {
   /** Function called when users click on one of the "Pay" buttons */
   onSubmit: PropTypes.func.isRequired,
   /** If set, will be displayed in the pay modal */
-  error: PropTypes.string,
-  resetError: PropTypes.func,
+  error: PropTypes.object,
   /** From withUser */
   LoggedInUser: PropTypes.object,
 };
