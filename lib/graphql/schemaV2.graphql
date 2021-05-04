@@ -5728,6 +5728,21 @@ type Mutation {
   confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
 
   """
+  Add platform tips to a transaction
+  """
+  addPlatformTipToTransaction(
+    """
+    Reference to the transaction in the platform tip
+    """
+    transaction: TransactionReferenceInput!
+
+    """
+    Reference to the amount of input for the platform tip
+    """
+    amount: AmountInput!
+  ): Transaction!
+
+  """
   Refunds transaction
   """
   refundTransaction(
