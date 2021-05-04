@@ -155,7 +155,7 @@ const StyledCollectiveCard = ({
         <Container height={74} px={3} pt={26}>
           <Container borderRadius={borderRadius} background="white" width={48} border="3px solid white">
             <CollectiveContainer useLink={useLink} collective={collective}>
-              <Avatar collective={collective} radius={48} />
+              <Avatar data-cy="collective-avatar" collective={collective} radius={48} />
             </CollectiveContainer>
           </Container>
         </Container>

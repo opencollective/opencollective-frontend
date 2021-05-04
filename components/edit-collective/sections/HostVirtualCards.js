@@ -142,17 +142,6 @@ const HostVirtualCards = props => {
     },
   });
 
-  function updateFilters(queryParams) {
-    return router.push(
-      {
-        pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
-        query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
-      },
-      null,
-      { scroll: false },
-    );
-  }
-
   const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
     context: API_V2_CONTEXT,
     onError: e => {
@@ -174,6 +163,17 @@ const HostVirtualCards = props => {
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
   );
+
+  const handleUpdateFilters = queryParams => {
+    return router.push(
+      {
+        pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
+        query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
+      },
+      null,
+      { scroll: false },
+    );
+  };
 
   const handleAssignCardSuccess = () => {
     addToast({
@@ -321,7 +321,7 @@ const HostVirtualCards = props => {
         <P>
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
-            defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier! Learn more"
+            defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier!"
           />
         </P>
         <Flex mt={3} flexDirection={['row', 'column']}>
@@ -331,7 +331,7 @@ const HostVirtualCards = props => {
             collective={props.collective}
             virtualCardMerchants={data.host.hostedVirtualCardMerchants.nodes}
             virtualCardCollectives={data.host.hostedVirtualCardCollectives.nodes}
-            onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
+            onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
           />
         </Flex>
       </Box>

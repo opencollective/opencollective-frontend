@@ -1,4 +1,14 @@
+import { Sections } from '../../../components/collective-page/_constants';
+
 import { randomSlug } from '../support/faker';
+import { disableSmoothScroll } from '../support/helpers';
+
+const scrollToSection = section => {
+  // Wait for collective page to load before disabling smooth scroll
+  cy.get('[data-cy=collective-page-main]');
+  disableSmoothScroll();
+  cy.get(`#section-${section}`).scrollIntoView();
+};
 
 describe('host dashboard', () => {
   let user;
@@ -85,6 +95,44 @@ describe('host dashboard', () => {
       // Reject
       cy.get('@currentExpense').find('[data-cy="reject-button"]').click();
       cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Rejected');
+    });
+  });
+
+  describe('Add funds modal', () => {
+    it('Cannot submit incomplete form', () => {
+      cy.login({ redirect: '/brusselstogetherasbl/dashboard/hosted-collectives' });
+      cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
+      cy.wait(300);
+      cy.get('[data-cy="add-funds-submit-btn"]').should('be.disabled');
+    });
+
+    it('Can add funds and platform tip as collective host', () => {
+      cy.login({ redirect: '/brusselstogetherasbl/dashboard/hosted-collectives' });
+      cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
+      cy.wait(300);
+      cy.get('[data-cy="add-funds-amount"]').type('20');
+      cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
+      cy.get('[data-cy="add-funds-source"]').click();
+      cy.get('[data-cy="collective-type-picker-USER"]').click();
+      cy.get('[data-cy="mini-form-email-field"]').type('cypress-test@funds.com');
+      cy.get('[data-cy="mini-form-name-field"]').type('cypress user');
+      cy.get('[data-cy="collective-mini-form-scroll"]').scrollTo('bottom', { duration: 5000 });
+      cy.get('[data-cy="mini-form-save-button"]').click();
+      cy.wait(1000);
+      cy.get('[data-cy="add-funds-submit-btn"]').click();
+      cy.wait(300);
+      cy.get('[data-cy="funds-added"]').contains('Funds Added ✅');
+      cy.contains('[data-cy="donation-percentage"]', 'No thank you').click();
+      cy.contains('[data-cy="select-option"]', '€2.00').click();
+      cy.get('[data-cy="add-platform-tip-btn"]').contains('Tip and Finish');
+      cy.get('[data-cy="add-platform-tip-btn"]').click();
+      cy.wait(300);
+      cy.get('[data-cy="collective-avatar"]').first().click();
+      scrollToSection(Sections.BUDGET);
+      cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');
+      cy.visit('opencollectivehost');
+      scrollToSection(Sections.TRANSACTIONS);
+      cy.get('[data-cy="section-transactions"]').contains('Financial contribution to Open Collective');
     });
   });
 });

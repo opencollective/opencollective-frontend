@@ -5,7 +5,6 @@ import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
-import { getBraintree } from '../../lib/braintree';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -121,9 +120,6 @@ class NewContributionFlowPage extends React.Component {
     const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
     if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
       this.props.loadStripe();
-    }
-    if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BRAINTREE_PAYPAL)) {
-      getBraintree();
     }
   }
 
