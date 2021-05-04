@@ -87,12 +87,12 @@ const VirtualCards = props => {
     return <Loading />;
   }
 
-  function updateFilters(queryParams) {
+  const handleUpdateFilters = queryParams => {
     return router.push({
       pathname: `/${props.collective.slug}/edit/virtual-cards`,
       query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
     });
-  }
+  };
 
   return (
     <Box width={['366px', '764px']}>
@@ -112,7 +112,7 @@ const VirtualCards = props => {
             filters={routerQuery}
             collective={props.collective}
             virtualCardMerchants={data.collective.virtualCardMerchants.nodes}
-            onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
+            onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
           />
         </Flex>
       </Box>
