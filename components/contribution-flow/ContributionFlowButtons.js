@@ -17,7 +17,6 @@ class ContributionFlowButtons extends React.Component {
     step: PropTypes.shape({ name: PropTypes.string }),
     prevStep: PropTypes.shape({ name: PropTypes.string }),
     nextStep: PropTypes.shape({ name: PropTypes.string }),
-    disableNext: PropTypes.bool,
     isValidating: PropTypes.bool,
     /** If provided, the PayPal button will be displayed in place of the regular submit */
     paypalButtonProps: PropTypes.object,
@@ -78,7 +77,6 @@ class ContributionFlowButtons extends React.Component {
               onClick={this.goNext}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
-              disabled={this.props.disableNext}
               type="submit"
             >
               {nextStep ? (
