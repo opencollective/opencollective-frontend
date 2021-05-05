@@ -6,8 +6,6 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { getEnvVar } from '../../../lib/env-utils';
 import { exportHosts, exportMembers } from '../../../lib/export_file';
 
-import { P } from '../../../components/Text';
-
 import Container from '../../Container';
 import ExportImages from '../../ExportImages';
 import { Box } from '../../Grid';
@@ -165,9 +163,9 @@ class Export extends React.Component {
           />
         </P>
         <div className="actions">
-          <Button onClick={async () => await exportHosts(collective.slug, 'csv')}>
+          <StyledButton onClick={async () => await exportHosts(collective.slug, 'csv')}>
             <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-          </Button>
+          </StyledButton>
         </div>
 
         <hr />
@@ -183,9 +181,9 @@ class Export extends React.Component {
           />
         </P>
         <div className="actions">
-          <Button onClick={async () => await exportHosts(collective.slug, 'json')}>
+          <StyledButton onClick={async () => await exportHosts(collective.slug, 'json')}>
             <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'JSON' }} />
-          </Button>
+          </StyledButton>
         </div>
       </Fragment>
     );
