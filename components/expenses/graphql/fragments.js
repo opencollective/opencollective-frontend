@@ -240,6 +240,11 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       data
       isSaved
     }
+    virtualCard {
+      id
+      name
+      last4
+    }
     comments(limit: 300) {
       nodes {
         ...CommentFields
