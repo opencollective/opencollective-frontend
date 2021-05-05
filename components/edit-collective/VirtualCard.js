@@ -249,7 +249,7 @@ const ActionsButton = props => {
         <P fontSize="14px" lineHeight="18px" mt={2}>
           <FormattedMessage
             id="VirtualCards.DeleteCard.Description"
-            defaultMessage="Deleting a card is permament both in the platform and in your provider, you won't be able to restore it later."
+            defaultMessage="Deleting a card is permanent both in the platform and in your provider, you won't be able to restore it later."
           />
         </P>
       </ConfirmationModal>

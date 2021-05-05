@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
 
+import CollectiveFilter from './filters/CollectiveFilter';
 import MerchantFilter from './filters/MerchantFilter';
 import StatusFilter from './filters/StatusFilter';
 
@@ -21,7 +23,13 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const VirtualCardFilters = ({ filters, onChange, virtualCardMerchants }) => {
+const VirtualCardFilters = ({
+  filters,
+  onChange,
+  virtualCardMerchants,
+  isCollectiveFilter,
+  virtualCardCollectives,
+}) => {
   const getFilterProps = name => {
     return {
       inputId: `virtual-cards-filter-${name}`,
@@ -33,27 +41,42 @@ const VirtualCardFilters = ({ filters, onChange, virtualCardMerchants }) => {
   };
 
   return (
-    <Flex flexDirection={['column', 'row']} flexGrow={[1, 0.5]}>
-      <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
-        <FilterLabel htmlFor="virtual-card-filter-status">
-          <FormattedMessage id="VirtualCard.Status" defaultMessage="Status" />
-        </FilterLabel>
-        <StatusFilter {...getFilterProps('state')} />
-      </FilterContainer>
-      <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
-        <FilterLabel htmlFor="virtual-card-filter-amount">
-          <FormattedMessage id="VirtualCard.Merchant" defaultMessage="Merchant" />
-        </FilterLabel>
-        <MerchantFilter {...getFilterProps('merchant')} virtualCardMerchants={virtualCardMerchants} />
-      </FilterContainer>
-    </Flex>
+    <Container>
+      {isCollectiveFilter && (
+        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+          <FilterLabel htmlFor="virtual-card-filter-collective">
+            <FormattedMessage id="VirtualCard.Collective" defaultMessage="Collective" />
+          </FilterLabel>
+          <CollectiveFilter
+            {...getFilterProps('collectiveAccountIds')}
+            virtualCardCollectives={virtualCardCollectives}
+          />
+        </FilterContainer>
+      )}
+      <Flex flexDirection={['column', 'row']} flexGrow={[1, 0.5]}>
+        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+          <FilterLabel htmlFor="virtual-card-filter-status">
+            <FormattedMessage id="VirtualCard.Status" defaultMessage="Status" />
+          </FilterLabel>
+          <StatusFilter {...getFilterProps('state')} />
+        </FilterContainer>
+        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+          <FilterLabel htmlFor="virtual-card-filter-amount">
+            <FormattedMessage id="VirtualCard.Merchant" defaultMessage="Merchant" />
+          </FilterLabel>
+          <MerchantFilter {...getFilterProps('merchant')} virtualCardMerchants={virtualCardMerchants} />
+        </FilterContainer>
+      </Flex>
+    </Container>
   );
 };
 
 VirtualCardFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
-  virtualCardMerchants: PropTypes.object,
+  virtualCardMerchants: PropTypes.array,
+  virtualCardCollectives: PropTypes.array,
+  isCollectiveFilter: PropTypes.bool,
 };
 
 export default React.memo(VirtualCardFilters);
