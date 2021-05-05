@@ -1961,6 +1961,7 @@
   "VirtualCards.DisplayDetails": "View Card Details →",
   "VirtualCards.ExpireDate": "MM/YYYY",
   "VirtualCards.PauseCard": "Pause Card",
+  "VirtualCards.RequestCardButton": "Request card",
   "VirtualCards.ResumeCard": "Resume Card",
   "VirtualCards.Title": "Virtual Cards",
   "warning.discardUnsavedChanges": "Are you sure you want to discard your unsaved changes?",

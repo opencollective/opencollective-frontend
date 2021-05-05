@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
+import RequestVirtualCardBtn from '../../../RequestVirtualCardBtn';
+import StyledButton from '../../../StyledButton';
 
 import CollectiveFilter from './filters/CollectiveFilter';
 import MerchantFilter from './filters/MerchantFilter';
@@ -29,7 +32,11 @@ const VirtualCardFilters = ({
   virtualCardMerchants,
   isCollectiveFilter,
   virtualCardCollectives,
+  collective,
+  host,
 }) => {
+  const allowRequestVirtualCard = get(host, 'settings.virtualcards.requestcard');
+
   const getFilterProps = name => {
     return {
       inputId: `virtual-cards-filter-${name}`,
@@ -66,6 +73,15 @@ const VirtualCardFilters = ({
           </FilterLabel>
           <MerchantFilter {...getFilterProps('merchant')} virtualCardMerchants={virtualCardMerchants} />
         </FilterContainer>
+        {allowRequestVirtualCard && (
+          <RequestVirtualCardBtn collective={collective} host={host}>
+            {btnProps => (
+              <StyledButton m={3} {...btnProps}>
+                <FormattedMessage id="VirtualCards.RequestCardButton" defaultMessage="Request card" />
+              </StyledButton>
+            )}
+          </RequestVirtualCardBtn>
+        )}
       </Flex>
     </Container>
   );
@@ -77,6 +93,8 @@ VirtualCardFilters.propTypes = {
   virtualCardMerchants: PropTypes.array,
   virtualCardCollectives: PropTypes.array,
   isCollectiveFilter: PropTypes.bool,
+  host: PropTypes.object,
+  collective: PropTypes.object,
 };
 
 export default React.memo(VirtualCardFilters);
