@@ -14,7 +14,7 @@ import { Box, Flex } from './Grid';
 import LinkContributor from './LinkContributor';
 import StyledCard from './StyledCard';
 import StyledTag from './StyledTag';
-import { H5, P } from './Text';
+import { P } from './Text';
 
 /** Main card */
 const MainContainer = styled(StyledCard)`
@@ -40,11 +40,12 @@ const publicMessageStyle = css`
   font-size: 10px;
   line-height: 13px;
   letter-spacing: -0.5px;
-  color: #76777a;
+  color: #4e5052;
   text-align: center;
   word-break: break-word;
   font-style: italic;
 `;
+
 /** User-submitted public message */
 const PublicMessage = styled.p`
   ${publicMessageStyle}
@@ -100,7 +101,17 @@ const ContributorTag = styled(StyledTag)`
  * A single contributor card, exported as a PureComponent to improve performances.
  * Accept all the props from [StyledCard](/#/Atoms?id=styledcard).
  */
-const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedUser, collectiveId, ...props }) => {
+const ContributorCard = ({
+  intl,
+  width,
+  height,
+  contributor,
+  currency,
+  isLoggedUser,
+  collectiveId,
+  hideTotalAmountDonated,
+  ...props
+}) => {
   const { collectiveId: fromCollectiveId, publicMessage, description } = contributor;
   const truncatedPublicMessage = publicMessage && truncate(publicMessage, { length: 140 });
   const truncatedDescription = description && truncate(description, { length: 140 });
@@ -117,18 +128,25 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
       </CollectiveLogoContainer>
       <Flex flexDirection="column" alignItems="center" p={2} pt={1}>
         <LinkContributor contributor={contributor}>
-          <H5 fontSize="Paragraph" fontWeight="bold" textAlign="center" lineHeight="Caption" title={contributor.name}>
+          <P
+            color="black.900"
+            fontSize="14px"
+            fontWeight="bold"
+            textAlign="center"
+            lineHeight="18px"
+            title={contributor.name}
+          >
             {truncate(contributor.name, { length: 16 })}
-          </H5>
+          </P>
         </LinkContributor>
         <ContributorTag>{formatMemberRole(intl, getMainContributorRole(contributor))}</ContributorTag>
-        {contributor.totalAmountDonated > 0 && (
+        {contributor.totalAmountDonated > 0 && !hideTotalAmountDonated && (
           <React.Fragment>
-            <P fontSize="Tiny" lineHeight="Caption" color="black.500">
+            <P fontSize="10px" lineHeight="18px" color="black.700">
               <FormattedMessage id="ContributorCard.Total" defaultMessage="Total contributions" />
             </P>
-            <P fontSize="Caption" fontWeight="bold">
-              <FormattedMoneyAmount amount={contributor.totalAmountDonated} currency={currency} />
+            <P fontSize="12px" fontWeight="bold">
+              <FormattedMoneyAmount amount={contributor.totalAmountDonated} currency={currency} precision={0} />
             </P>
           </React.Fragment>
         )}
@@ -143,7 +161,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
             }}
           >
             {truncatedPublicMessage || (
-              <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (Optional)" />
+              <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (optional)" />
             )}
           </PublicMessageEditButton>
         ) : (
@@ -173,7 +191,7 @@ ContributorCard.propTypes = {
     description: PropTypes.string,
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
-    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'FUND', 'CHAPTER', 'ANONYMOUS']),
     totalAmountDonated: PropTypes.number,
     image: PropTypes.string,
     publicMessage: PropTypes.string,
@@ -193,12 +211,15 @@ ContributorCard.propTypes = {
   isLoggedUser: PropTypes.bool,
   /** Collective id */
   collectiveId: PropTypes.number,
+  /** True if you want to hide the total amount donated */
+  hideTotalAmountDonated: PropTypes.bool,
 };
 
 ContributorCard.defaultProps = {
   width: 144,
   height: 272,
   currency: 'USD',
+  hideTotalAmountDonated: false,
 };
 
 export default React.memo(injectIntl(ContributorCard));

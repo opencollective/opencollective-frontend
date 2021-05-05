@@ -4,11 +4,11 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import Avatar from '../Avatar';
 import Currency from '../Currency';
 import { Box } from '../Grid';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
-import Logo from '../Logo';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 
@@ -116,7 +116,7 @@ const StatsItemValue = styled(StatsItem)`
   text-align: center;
   color: #303233;
   font-size: 1rem;
-  margin: 3px 2px 0px;
+  margin: 12px 2px 0px;
 `;
 
 const StatsItemLabel = styled(StatsItem)`
@@ -153,18 +153,12 @@ class PledgedCollectiveCard extends React.Component {
     }
 
     return (
-      <StyledCard width={250} height={380} borderRadius={8} bg="#ffffff">
+      <StyledCard height={380} borderRadius={8} bg="#ffffff">
         <CardHeader>
           <LogoBorder />
           <LogoContainer>
             <LinkCollective collective={collective}>
-              <Logo
-                src={defaultPledgedLogo}
-                type={collective.type}
-                website={collective.website}
-                height={70}
-                width={213}
-              />
+              <Avatar src={defaultPledgedLogo} type={collective.type} radius={70} />
             </LinkCollective>
           </LogoContainer>
         </CardHeader>
@@ -177,7 +171,7 @@ class PledgedCollectiveCard extends React.Component {
           </CollectiveDescriptionText>
           <CollectiveWebsiteText className="website">{website}</CollectiveWebsiteText>
 
-          <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
+          <Link href={`/${collective.slug}/pledges/new`}>
             <StyledButton mt={4} width={1} buttonStyle="primary" buttonSize="small" minWidth={150}>
               <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
             </StyledButton>

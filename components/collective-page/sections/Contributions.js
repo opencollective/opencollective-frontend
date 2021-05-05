@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -9,21 +9,18 @@ import styled from 'styled-components';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 
-import { Dimensions } from '../_constants';
 import Container from '../../Container';
-import { Box, Flex } from '../../Grid';
+import { Box, Flex, Grid } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
 import { fadeIn } from '../../StyledKeyframes';
 import StyledMembershipCard from '../../StyledMembershipCard';
-import { H3, P } from '../../Text';
+import { H3 } from '../../Text';
+import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
-// Local imports
 import SectionTitle from '../SectionTitle';
-
-import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
 
 const FILTERS = {
   ALL: 'ALL',
@@ -33,6 +30,7 @@ const FILTERS = {
   FINANCIAL: 'FINANCIAL',
   EVENTS: 'EVENTS',
 };
+
 const FILTERS_LIST = Object.values(FILTERS);
 const I18nFilters = defineMessages({
   [FILTERS.ALL]: {
@@ -79,24 +77,11 @@ const filterFuncs = {
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
 
+const GRID_TEMPLATE_COLUMNS = 'repeat(auto-fill, minmax(220px, 1fr))';
+
 /** A container for membership cards to ensure we have a smooth transition */
 const MembershipCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
-  margin-bottom: 40px;
-  margin-right: 4px;
-
-  @media screen and (min-width: 40em) {
-    margin-right: 5%;
-  }
-
-  @media screen and (min-width: 64em) {
-    margin-right: 2%;
-  }
-
-  @media screen and (min-width: 1250px) {
-    margin-right: 57px;
-    margin-bottom: 50px;
-  }
 `;
 
 class SectionContributions extends React.PureComponent {
@@ -105,6 +90,7 @@ class SectionContributions extends React.PureComponent {
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
+      slug: PropTypes.string,
       type: PropTypes.string.isRequired,
       stats: PropTypes.shape({
         backers: PropTypes.shape({
@@ -154,7 +140,7 @@ class SectionContributions extends React.PureComponent {
     selectedFilter: FILTERS.ALL,
   };
 
-  static NB_MEMBERSHIPS_PER_PAGE = 16;
+  static NB_MEMBERSHIPS_PER_PAGE = 20;
 
   /** There's no point to show all filters if not required */
   getFilters = memoizeOne(memberships => {
@@ -241,213 +227,200 @@ class SectionContributions extends React.PureComponent {
       );
     }
 
+    const { memberOf, connectedCollectives } = data.Collective;
+    if (!memberOf.length && !connectedCollectives.length) {
+      return null;
+    }
+
     const filters = this.getFilters(data.Collective.memberOf);
     const memberships = this.getUniqueMemberships(data.Collective.memberOf, selectedFilter);
     const sortedMemberships = this.sortMemberships(memberships);
-    const connectedCollectives = data.Collective.connectedCollectives;
-    const memberOf = data.Collective.memberOf;
-    const hasContributions = memberOf.length || connectedCollectives.length;
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     return (
-      <Box pt={5} pb={3}>
-        {!hasContributions ? (
-          <Flex flexDirection="column" alignItems="center">
-            <img src={EmptyCollectivesSectionImageSVG} alt="" />
-            <P color="black.600" fontSize="LeadParagraph" mt={5}>
-              <FormattedMessage
-                id="CollectivePage.SectionContributions.Empty"
-                defaultMessage="{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!"
-                values={{ collectiveName: collective.name }}
-              />
-            </P>
-          </Flex>
-        ) : (
+      <Box pb={4}>
+        {memberOf.length > 0 && (
           <React.Fragment>
-            {memberOf.length > 0 && (
-              <React.Fragment>
-                <ContainerSectionContent>
-                  <SectionTitle data-cy="section-contributions-title" textAlign="left" mb={1}>
-                    <FormattedMessage id="Contributions" defaultMessage="Contributions" />
-                  </SectionTitle>
-                  {data.Collective.stats.collectives.hosted > 0 && (
-                    <H3 fontSize="H5" fontWeight="500" color="black.600">
-                      <FormattedMessage
-                        id="organization.collective.memberOf.collective.host.title"
-                        values={{ n: data.Collective.stats.collectives.hosted }}
-                        defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
-                      />
-                    </H3>
-                  )}
-                </ContainerSectionContent>
-                {filters.length > 1 && (
-                  <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
-                    <StyledFilters
-                      filters={filters}
-                      getLabel={key => intl.formatMessage(I18nFilters[key])}
-                      onChange={filter => this.setState({ selectedFilter: filter })}
-                      selected={selectedFilter}
-                      justifyContent="left"
-                      minButtonWidth={175}
-                      px={Dimensions.PADDING_X}
-                    />
-                  </Box>
-                )}
-                <Container
-                  data-cy="Contributions"
-                  maxWidth={Dimensions.MAX_SECTION_WIDTH}
-                  pl={Dimensions.PADDING_X}
-                  mt={4}
-                  mx="auto"
-                >
-                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
-                    {sortedMemberships.slice(0, nbMemberships).map(membership => (
-                      <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
-                        <StyledMembershipCard membership={membership} />
-                      </MembershipCardContainer>
-                    ))}
-                  </Flex>
-                </Container>
-                {nbMemberships < sortedMemberships.length && (
-                  <Flex mt={3} justifyContent="center">
-                    <StyledButton
-                      data-cy="load-more"
-                      textTransform="capitalize"
-                      minWidth={170}
-                      onClick={this.showMoreMemberships}
-                    >
-                      <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
-                    </StyledButton>
-                  </Flex>
-                )}
-              </React.Fragment>
-            )}
-
-            {connectedCollectives.length > 0 && (
-              <Box mt={5}>
-                <ContainerSectionContent>
-                  <SectionTitle textAlign="left" mb={4}>
-                    {isOrganization ? (
-                      <FormattedMessage
-                        id="CP.Contributions.PartOfOrg"
-                        defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
-                        values={{ n: connectedCollectives.length }}
-                      />
-                    ) : (
-                      <FormattedMessage
-                        id="CP.Contributions.ConnectedCollective"
-                        defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of what we do"
-                        values={{ n: connectedCollectives.length }}
-                      />
-                    )}
-                  </SectionTitle>
-                </ContainerSectionContent>
-                <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
-                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
-                    {connectedCollectives.map(({ id, collective }) => (
-                      <MembershipCardContainer key={id}>
-                        <StyledMembershipCard membership={{ collective }} />
-                      </MembershipCardContainer>
-                    ))}
-                  </Flex>
-                </Container>
+            <ContainerSectionContent>
+              {data.Collective.stats.collectives.hosted > 0 && (
+                <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
+                  <FormattedMessage
+                    id="organization.collective.memberOf.collective.host.title"
+                    values={{ n: data.Collective.stats.collectives.hosted }}
+                    defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
+                  />
+                </H3>
+              )}
+            </ContainerSectionContent>
+            {filters.length > 1 && (
+              <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+                <StyledFilters
+                  filters={filters}
+                  getLabel={key => intl.formatMessage(I18nFilters[key])}
+                  onChange={filter => this.setState({ selectedFilter: filter })}
+                  selected={selectedFilter}
+                  justifyContent="left"
+                  minButtonWidth={175}
+                  px={Dimensions.PADDING_X}
+                />
               </Box>
             )}
+            <Container
+              data-cy="Contributions"
+              maxWidth={Dimensions.MAX_SECTION_WIDTH}
+              px={Dimensions.PADDING_X}
+              mt={4}
+              mx="auto"
+            >
+              <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
+                {sortedMemberships.slice(0, nbMemberships).map(membership => (
+                  <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
+                    <StyledMembershipCard membership={membership} />
+                  </MembershipCardContainer>
+                ))}
+              </Grid>
+            </Container>
+            {nbMemberships < sortedMemberships.length && (
+              <Flex mt={3} justifyContent="center">
+                <StyledButton
+                  data-cy="load-more"
+                  textTransform="capitalize"
+                  minWidth={170}
+                  onClick={this.showMoreMemberships}
+                >
+                  <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+                </StyledButton>
+              </Flex>
+            )}
           </React.Fragment>
+        )}
+
+        {connectedCollectives.length > 0 && (
+          <Box mt={5}>
+            <ContainerSectionContent>
+              <SectionTitle textAlign="left" mb={4} fontSize={['20px', '24px', '32px']} color="black.700">
+                {isOrganization ? (
+                  <FormattedMessage
+                    id="CP.Contributions.PartOfOrg"
+                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
+                    values={{ n: connectedCollectives.length }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="CP.Contributions.ConnectedCollective"
+                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} connected to us"
+                    values={{ n: connectedCollectives.length }}
+                  />
+                )}
+              </SectionTitle>
+            </ContainerSectionContent>
+            <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
+              <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
+                {connectedCollectives.map(({ id, collective }) => (
+                  <MembershipCardContainer key={id}>
+                    <StyledMembershipCard membership={{ collective }} />
+                  </MembershipCardContainer>
+                ))}
+              </Grid>
+            </Container>
+          </Box>
         )}
       </Box>
     );
   }
 }
 
-const withData = graphql(
-  gql`
-    query SectionContributions($id: Int!) {
-      Collective(id: $id) {
+export const contributionsSectionQuery = gql`
+  query ContributionsSection($slug: String!) {
+    Collective(slug: $slug) {
+      id
+      settings
+      stats {
         id
-        settings
-        stats {
+        collectives {
           id
-          collectives {
-            id
-            hosted
-          }
+          hosted
         }
-        connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+      }
+      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+        id
+        collective: member {
           id
-          collective: member {
+          name
+          slug
+          type
+          currency
+          isIncognito
+          description
+          imageUrl(height: 128)
+          backgroundImageUrl(height: 200)
+          tags
+          settings
+          parentCollective {
             id
+            backgroundImageUrl
             name
             slug
-            type
-            currency
-            isIncognito
-            description
-            imageUrl(height: 128)
-            backgroundImageUrl(height: 200)
-            tags
-            settings
-            parentCollective {
-              id
-              backgroundImageUrl
-              name
-              slug
-            }
-            host {
-              id
-            }
-            stats {
-              id
-              backers {
-                id
-                all
-              }
-            }
           }
-        }
-        memberOf(onlyActiveCollectives: true, limit: 1500) {
-          id
-          role
-          since
-          description
+          host {
+            id
+          }
           stats {
             id
-            totalDonations
+            backers {
+              id
+              all
+            }
           }
-          collective {
+        }
+      }
+      memberOf(onlyActiveCollectives: true, limit: 1500) {
+        id
+        role
+        since
+        description
+        stats {
+          id
+          totalDonations
+        }
+        collective {
+          id
+          name
+          slug
+          type
+          currency
+          isIncognito
+          description
+          imageUrl(height: 128)
+          backgroundImageUrl(height: 200)
+          tags
+          parentCollective {
             id
-            name
-            slug
-            type
-            currency
-            isIncognito
-            description
-            imageUrl(height: 128)
             backgroundImageUrl(height: 200)
-            tags
-            parentCollective {
+          }
+          host {
+            id
+          }
+          stats {
+            id
+            backers {
               id
-              backgroundImageUrl(height: 200)
-            }
-            host {
-              id
-            }
-            stats {
-              id
-              backers {
-                id
-                all
-              }
+              all
             }
           }
         }
       }
     }
-  `,
-  {
-    options: props => ({
-      variables: { id: props.collective.id },
-    }),
-  },
-);
+  }
+`;
 
-export default React.memo(injectIntl(withData(SectionContributions)));
+export const getContributionsSectionQueryVariables = slug => {
+  return { slug };
+};
+
+const addContributionsSectionData = graphql(contributionsSectionQuery, {
+  options: props => ({
+    variables: getContributionsSectionQueryVariables(props.collective.slug),
+  }),
+});
+
+export default React.memo(injectIntl(addContributionsSectionData(SectionContributions)));

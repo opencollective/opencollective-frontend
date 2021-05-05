@@ -19,7 +19,7 @@ const Translations = defineMessages({
   },
   [CONTRIBUTOR_FILTERS.CORE]: {
     id: 'ContributorsFilter.Core',
-    defaultMessage: 'Core contributors',
+    defaultMessage: 'Team',
   },
   [CONTRIBUTOR_FILTERS.FINANCIAL]: {
     id: 'ContributorsFilter.Financial',

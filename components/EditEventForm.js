@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { set } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import EditTiers from './edit-collective/sections/Tiers';
-import Button from './Button';
+import Tickets from './edit-collective/sections/Tickets';
+import Container from './Container';
 import InputField from './InputField';
+import StyledButton from './StyledButton';
 import TimezonePicker from './TimezonePicker';
 
 class EditEventForm extends React.Component {
@@ -50,6 +52,14 @@ class EditEventForm extends React.Component {
         id: 'event.location.label',
         defaultMessage: 'location',
       },
+      'privateInstructions.label': {
+        id: 'event.privateInstructions.label',
+        defaultMessage: 'Private instructions',
+      },
+      privateInstructionsDescription: {
+        id: 'event.privateInstructions.description',
+        defaultMessage: 'These instructions will be provided by email to the participants.',
+      },
     });
   }
 
@@ -61,7 +71,7 @@ class EditEventForm extends React.Component {
 
   handleChange(fieldname, value) {
     const event = {};
-    event[fieldname] = value;
+    set(event, fieldname, value);
 
     // Make sure that endsAt is always >= startsAt
     if (fieldname === 'startsAt') {
@@ -80,9 +90,7 @@ class EditEventForm extends React.Component {
         value = newEndDate.toString();
         event['endsAt'] = value;
       }
-    }
-
-    if (fieldname === 'name') {
+    } else if (fieldname === 'name') {
       if (!event['name'].trim()) {
         this.setState({ disabled: true });
       } else {
@@ -159,6 +167,12 @@ class EditEventForm extends React.Component {
         placeholder: '',
         type: 'location',
       },
+      {
+        name: 'privateInstructions',
+        description: intl.formatMessage(this.messages.privateInstructionsDescription),
+        type: 'textarea',
+        maxLength: 10000,
+      },
     ];
 
     this.fields = this.fields.map(field => {
@@ -173,44 +187,7 @@ class EditEventForm extends React.Component {
 
     return (
       <div className="EditEventForm">
-        <style jsx>
-          {`
-            :global(.field) {
-              margin: 1rem;
-            }
-            :global(label) {
-              width: 150px;
-              display: inline-block;
-              vertical-align: top;
-            }
-            :global(input),
-            select,
-            :global(textarea) {
-              width: 300px;
-              font-size: 1.5rem;
-            }
-
-            .FormInputs {
-              max-width: 700px;
-              margin: 0 auto;
-            }
-
-            :global(textarea[name='longDescription']) {
-              height: 50rem;
-            }
-
-            .actions {
-              margin: 5rem auto 1rem;
-              text-align: center;
-            }
-
-            :global(section#location) {
-              margin-top: 0;
-            }
-          `}
-        </style>
-
-        <div className="FormInputs">
+        <Container maxWidth="700px" margin="0 auto">
           <div className="inputs">
             {this.fields.map(field =>
               field.name === 'timezone' ? (
@@ -219,6 +196,8 @@ class EditEventForm extends React.Component {
                   label="Timezone"
                   selectedTimezone={this.state.event.timezone}
                   onChange={this.handleTimezoneChange}
+                  mx="2px"
+                  my={2}
                 />
               ) : (
                 <InputField
@@ -240,23 +219,28 @@ class EditEventForm extends React.Component {
               ),
             )}
           </div>
-          <EditTiers
-            title="Tickets"
-            types={['TIER', 'TICKET', 'DONATION']}
-            tiers={this.state.tiers}
-            collective={{ ...event, type: 'EVENT' }}
-            currency={event.parentCollective.currency}
-            onChange={tiers => this.setState({ tiers })}
-          />
-        </div>
-        <div className="actions">
-          <Button
-            className="blue save"
-            label={submitBtnLabel}
+          {['e2e', 'ci'].includes(process.env.OC_ENV) && (
+            <Tickets
+              title="Tickets"
+              types={['TICKET']}
+              tiers={this.state.tiers}
+              collective={{ ...event, type: 'EVENT' }}
+              currency={event.parentCollective.currency}
+              onChange={tiers => this.setState({ tiers })}
+              defaultType="TICKET"
+            />
+          )}
+        </Container>
+        <Container margin="5rem auto 1rem" textAlign="center">
+          <StyledButton
+            buttonStyle="primary"
             onClick={this.handleSubmit}
-            disabled={this.state.disabled ? true : loading}
-          />
-        </div>
+            disabled={this.state.disabled}
+            loading={loading}
+          >
+            {submitBtnLabel}
+          </StyledButton>
+        </Container>
       </div>
     );
   }

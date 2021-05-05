@@ -4,6 +4,7 @@ describe('Create collective from Github', () => {
     cy.route({
       method: 'GET',
       url: '/api/github-repositories?*',
+      /* eslint-disable camelcase */
       response: [
         {
           description: 'Adblock Plus browser extension',
@@ -23,6 +24,7 @@ describe('Create collective from Github', () => {
           stargazers_count: 103,
         },
       ],
+      /* eslint-enable camelcase */
     });
     cy.login({ email: 'testuser@opencollective.com', redirect: '/create/opensource?token=foofoo' });
     cy.contains('[data-cy=connect-github-header]', 'Pick a repository');
@@ -31,8 +33,8 @@ describe('Create collective from Github', () => {
     cy.get('[data-cy=connect-github-continue]').click();
     cy.get('[data-cy=ccf-form-description]').type('Blocks some ads');
     cy.get('[data-cy=ccf-form-submit]').click();
-    cy.get('[data-cy=ccf-error-message]').contains('Please accept the terms of service');
-    cy.get('[data-cy=custom-checkbox').click();
+    cy.contains('[data-cy=ccf-form]', 'This must be checked');
+    cy.get('[data-cy=checkbox-tos]').click();
     cy.get('[data-cy=ccf-form-submit]').click();
     cy.url().should('include', '/adblockpluschrome/onboarding');
   });

@@ -1,10 +1,18 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import CustomStyledIcon from './CustomStyledIcon';
 
-const PayPal = props => {
+const PayPal = ({ width, height, size, ...props }) => {
   return (
-    <CustomStyledIcon width={21} height={24} viewBox="0 0 21 24" fill="none" {...props} color="blue">
+    <CustomStyledIcon
+      width={size || width || 21}
+      height={height || size || 24}
+      viewBox="0 0 21 24"
+      fill="none"
+      {...props}
+      color="blue"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -25,6 +33,12 @@ const PayPal = props => {
       />
     </CustomStyledIcon>
   );
+};
+
+PayPal.propTypes = {
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default PayPal;

@@ -18,12 +18,12 @@ import StyledTextarea from '../StyledTextarea';
 import PayoutBankInformationForm from './PayoutBankInformationForm';
 
 const msg = defineMessages({
-  email: {
-    id: 'Email',
-    defaultMessage: 'Email',
+  paypalEmail: {
+    id: 'Paypal.Email',
+    defaultMessage: 'PayPal email',
   },
   content: {
-    id: 'PayoutMethod.Other.content',
+    id: 'editCollective.menu.info',
     defaultMessage: 'Info',
   },
   savePayout: {
@@ -36,7 +36,9 @@ const msg = defineMessages({
 export const validatePayoutMethod = payoutMethod => {
   const errors = {};
 
-  if (payoutMethod.type === PayoutMethodType.PAYPAL) {
+  if (!payoutMethod || !payoutMethod.type) {
+    set(errors, 'type', createError(ERROR.FORM_FIELD_REQUIRED));
+  } else if (payoutMethod.type === PayoutMethodType.PAYPAL) {
     const email = get(payoutMethod, 'data.email');
     if (!email) {
       set(errors, 'data.email', createError(ERROR.FORM_FIELD_REQUIRED));
@@ -82,11 +84,12 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
               name={field.name}
               type="email"
               error={formatFormErrorMessage(intl, meta.error)}
-              label={formatMessage(msg.email)}
+              label={formatMessage(msg.paypalEmail)}
+              labelFontSize="13px"
               disabled={!isNew}
               required
             >
-              {inputProps => <StyledInput placeholder="i.e. yourname@yourhost.com" {...inputProps} {...field} />}
+              {inputProps => <StyledInput placeholder="e.g. yourname@yourhost.com" {...inputProps} {...field} />}
             </StyledInputField>
           )}
         </Field>
@@ -96,10 +99,11 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
           {({ field, meta }) => (
             <StyledInputField
               name={field.name}
-              type="email"
               error={formatFormErrorMessage(intl, meta.error)}
               label={formatMessage(msg.content)}
+              labelFontSize="13px"
               disabled={!isNew}
+              data-cy="payout-other-info"
               required
             >
               {inputProps => <StyledTextarea minHeight={100} {...inputProps} {...field} />}
@@ -107,13 +111,15 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
           )}
         </Field>
       )}
-      {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
+      {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && host && (
         <PayoutBankInformationForm isNew={isNew} getFieldName={getFieldName} host={host} />
       )}
       {isNew && (
         <Box mt={3}>
           <Field name={getFieldName('isSaved')}>
-            {({ field }) => <StyledCheckbox label={formatMessage(msg.savePayout)} checked={field.value} {...field} />}
+            {({ field }) => (
+              <StyledCheckbox label={formatMessage(msg.savePayout)} fontSize="13px" checked={field.value} {...field} />
+            )}
           </Field>
         </Box>
       )}
@@ -124,10 +130,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
 PayoutMethodForm.propTypes = {
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    transferwise: PropTypes.shape({
-      availableCurrencies: PropTypes.arrayOf(PropTypes.string),
-    }),
-  }).isRequired,
+  }),
   /** Set this to nil to create a new one */
   payoutMethod: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

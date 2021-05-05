@@ -17,7 +17,7 @@ const content = () => (
     <P fontWeight="bold" mb={2}>
       Example heading
     </P>
-    <P fontSize="Caption" lineHeight="Caption">
+    <P fontSize="12px" lineHeight="18px">
       Example text. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
       et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
       commodo consequat.

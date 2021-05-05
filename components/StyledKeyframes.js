@@ -22,6 +22,15 @@ export const fadeIn = keyframes`
   }
 `;
 
+export const slideInUp = keyframes`
+  from {
+    transform: translate3d(0,40px,0);
+  }
+  to {
+    transform: translate3d(0,0,0);
+  }
+`;
+
 export const fadeInUp = keyframes`
   from {
     opacity: 0;
@@ -31,7 +40,17 @@ export const fadeInUp = keyframes`
     opacity: 1;
     transform: translate3d(0,0,0);
   }
+`;
 
+export const fadeInDown = keyframes`
+  from {
+    opacity: 0;
+    transform: translate3d(0,-40px,0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0,0,0);
+  }
 `;
 
 export const flicker = ({ minOpacity = 0 }) => keyframes`

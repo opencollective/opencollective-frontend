@@ -152,7 +152,7 @@ const ContributorsGrid = ({
               contributor={contributor}
               currency={currency}
               collectiveId={collectiveId}
-              isLoggedUser={loggedUserCollectiveId === contributor.collectiveId}
+              isLoggedUser={contributor.collectiveId && loggedUserCollectiveId === contributor.collectiveId}
             />
           </ContributorCardContainer>
         );
@@ -166,7 +166,7 @@ ContributorsGrid.propTypes = {
   contributors: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      collectiveId: PropTypes.number.isRequired,
+      collectiveId: PropTypes.number,
     }),
   ),
 

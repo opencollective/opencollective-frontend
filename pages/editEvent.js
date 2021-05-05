@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 
 import { addEditCollectiveMutation } from '../lib/graphql/mutations';
-import { addEventCollectiveData } from '../lib/graphql/queries';
+import { editCollectivePageFieldsFragment } from '../lib/graphql/queries';
 import { compose } from '../lib/utils';
 
 import EditCollective from '../components/edit-collective';
@@ -29,17 +31,65 @@ class EditEventPage extends React.Component {
   }
 
   render() {
-    const { data, loadingLoggedInUser, LoggedInUser, editCollective } = this.props;
+    const { data, loadingLoggedInUser, editCollective } = this.props;
 
-    if (loadingLoggedInUser || !data.Collective) {
-      return <ErrorPage loading={loadingLoggedInUser} data={data} />;
+    if (loadingLoggedInUser || !data?.Collective) {
+      return <ErrorPage loading={loadingLoggedInUser || data?.loading} data={data} />;
     }
 
     const event = data.Collective;
-    return <EditCollective editCollective={editCollective} collective={event} LoggedInUser={LoggedInUser} />;
+    return <EditCollective editCollective={editCollective} collective={event} />;
   }
 }
 
-const addGraphQL = compose(addEventCollectiveData, addEditCollectiveMutation);
+const editEventPageQuery = gql`
+  query EditEventPage($eventSlug: String) {
+    Collective(slug: $eventSlug) {
+      ...EditCollectivePageFields
+      path
+      startsAt
+      endsAt
+      timezone
+      tiers {
+        stats {
+          id
+          availableQuantity
+        }
+      }
+      parentCollective {
+        id
+        slug
+        name
+        currency
+        imageUrl
+        backgroundImage
+        settings
+      }
+      stats {
+        id
+        balance
+        expenses {
+          id
+          all
+        }
+        transactions {
+          id
+          all
+        }
+      }
+    }
+  }
+  ${editCollectivePageFieldsFragment}
+`;
 
-export default withUser(addGraphQL(EditEventPage));
+const addEditEventPageData = graphql(editEventPageQuery, {
+  skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
+  // The fetchPolicy is important for an edge case.
+  // Same component, different collective (moving from edit to another edit through the menu)
+  // Reloading data make sure we get the loading state and we re-initialize Form and sub-components
+  options: { fetchPolicy: 'network-only' },
+});
+
+const addGraphql = compose(addEditEventPageData, addEditCollectiveMutation);
+
+export default withUser(addGraphql(EditEventPage));

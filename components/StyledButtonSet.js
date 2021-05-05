@@ -6,15 +6,12 @@ import styled from 'styled-components';
 import Container from './Container';
 import StyledButton from './StyledButton';
 
-const borderRadius = '4px';
-
-const comboStyle = ({ combo }) => (combo ? '0' : `0 ${borderRadius} ${borderRadius} 0`);
-
 const StyledButtonItem = styled(StyledButton)`
   border-radius: 0;
   line-height: 1.5;
   flex-grow: 1;
-  border-color: ${themeGet('colors.black.400')};
+  border-color: ${themeGet('colors.black.300')};
+  transition: color 0.2s, background 0.1s, font-size 30ms;
 
   &:active p {
     color: white;
@@ -29,13 +26,14 @@ const StyledButtonItem = styled(StyledButton)`
     border: 0;
   }
   &:first-child {
-    border-radius: ${borderRadius} 0 0 ${borderRadius};
+    border-radius: ${({ customBorderRadius }) => `${customBorderRadius} 0 0 ${customBorderRadius}`};
   }
   &:not(:first-child) {
     margin-left: -1px;
   }
   &:last-child {
-    border-radius: ${comboStyle};
+    border-radius: ${({ combo, customBorderRadius }) =>
+      combo ? '0' : `0 ${customBorderRadius} ${customBorderRadius} 0`};
   }
 `;
 
@@ -53,10 +51,11 @@ const StyledButtonSet = ({
   onChange,
   combo,
   disabled,
+  customBorderRadius,
   ...props
 }) => (
   <Container display="flex" {...props}>
-    {items.map(item => (
+    {items.map((item, index) => (
       <StyledButtonItem
         combo={combo || undefined}
         color={item === selected ? 'white' : 'black.400'}
@@ -66,10 +65,12 @@ const StyledButtonSet = ({
         onClick={onChange && (() => onChange(item))}
         className={item === selected ? 'selected' : undefined}
         disabled={disabled}
+        aria-pressed={item === selected}
         type="button"
         py="8px"
+        customBorderRadius={customBorderRadius}
         {...buttonProps}
-        {...(buttonPropsBuilder ? buttonPropsBuilder({ item }) : {})}
+        {...(buttonPropsBuilder ? buttonPropsBuilder({ item, index, isSelected: item === selected }) : {})}
       >
         {children({ item, isSelected: item === selected })}
       </StyledButtonItem>
@@ -83,7 +84,7 @@ StyledButtonSet.propTypes = {
   /** Button child content renderer. Get passed an object like { item, isSelected } */
   children: PropTypes.func.isRequired,
   /** Based on the design system theme */
-  size: PropTypes.oneOf(['small', 'medium', 'large']),
+  size: PropTypes.oneOf(['small', 'medium', 'large', 'tiny']),
   /** Currently selected item */
   selected: PropTypes.any,
   /** An optional func called with the new item when option changes */
@@ -95,14 +96,15 @@ StyledButtonSet.propTypes = {
   /** Similar to `buttonProps` but allow props to be added dynamically based on item */
   buttonPropsBuilder: PropTypes.func,
   /** Button Props */
-
   buttonProps: PropTypes.object,
+  customBorderRadius: PropTypes.string,
 };
 
 StyledButtonSet.defaultProps = {
   combo: false,
   size: 'medium',
-  fontSize: 'Paragraph',
+  fontSize: '14px',
+  customBorderRadius: '4px',
 };
 
 export default StyledButtonSet;

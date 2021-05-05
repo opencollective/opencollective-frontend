@@ -15,6 +15,9 @@ import { withUser } from './UserProvider';
  * If authentication fails, users will be prompted with a form to login that will
  * redirect them to the correct page once they do.
  *
+ * Unless a `noRobots={true}` is provided, pages wrapped with this helper will not be indexed
+ * by default.
+ *
  * ## Usage
  *
  * ```jsx
@@ -31,6 +34,8 @@ class AuthenticatedPage extends React.Component {
   static propTypes = {
     /** A child renderer to call when user is properly authenticated */
     children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+    /** Whether user can signup on this page */
+    disableSignup: PropTypes.bool,
     /** @ignore from withUser */
     loadingLoggedInUser: PropTypes.bool,
     /** @ignore from withUser */
@@ -51,7 +56,7 @@ class AuthenticatedPage extends React.Component {
                   defaultMessage="You need to be logged in to continue."
                 />
               </MessageBox>
-              <SignInOrJoinFree />
+              <SignInOrJoinFree form="signin" disableSignup={this.props.disableSignup} />
             </Flex>
           )}
         </Container>
@@ -66,7 +71,11 @@ class AuthenticatedPage extends React.Component {
   render() {
     const { LoggedInUser, loadingLoggedInUser, ...pageProps } = this.props;
 
-    return <Page {...pageProps}>{this.renderContent(loadingLoggedInUser, LoggedInUser)}</Page>;
+    return (
+      <Page noRobots {...pageProps}>
+        {this.renderContent(loadingLoggedInUser, LoggedInUser)}
+      </Page>
+    );
   }
 }
 

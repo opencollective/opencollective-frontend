@@ -33,16 +33,22 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
     >
       <Flex justifyContent="space-between" alignItems="center">
         <Box minWidth={135} flex="1 1 45%">
-          <P fontSize="Caption" fontWeight="bold" color="black.900" mb={1}>
-            <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
+          <P fontSize="12px" fontWeight="bold" color="black.900" mb={1}>
+            <FormattedMessage
+              id="CollectiveBalance"
+              defaultMessage="{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}"
+              values={{
+                type: collective?.type, // collective can be null when it's loading
+              }}
+            />
           </P>
           {isLoading ? (
             <LoadingPlaceholder height={16} width={75} />
           ) : (
-            <Span color="black.500" fontSize="LeadParagraph">
+            <Span color="black.500" fontSize="16px">
               <FormattedMoneyAmount
-                currency={collective.currency}
-                amount={collective.balance}
+                currency={collective.stats.balanceWithBlockedFunds.currency}
+                amount={collective.stats.balanceWithBlockedFunds.valueInCents}
                 precision={CurrencyPrecision.DEFAULT}
               />
             </Span>
@@ -51,7 +57,7 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
         <Box flex="0 0 5%" />
         {host && (
           <Box flex="1 1 45%" maxWidth="45%">
-            <P color="black.600" fontSize="SmallCaption" lineHeight="SmallCaption">
+            <P color="black.600" fontSize="11px" lineHeight="17px">
               <FormattedMessage
                 id="withColon"
                 defaultMessage="{item}:"
@@ -59,8 +65,18 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
               />
             </P>
             <LinkCollective collective={host}>
-              <P color="black.600" fontSize="SmallCaption" fontWeight="bold" truncateOverflow maxWidth={135}>
-                {host.name}
+              <P color="black.600" fontSize="11px" fontWeight="bold" truncateOverflow maxWidth={135}>
+                {collective && collective.isApproved ? (
+                  host.name
+                ) : (
+                  <FormattedMessage
+                    id="Fiscalhost.pending"
+                    defaultMessage="{host} (pending)"
+                    values={{
+                      host: host.name,
+                    }}
+                  />
+                )}
               </P>
             </LinkCollective>
           </Box>
@@ -74,8 +90,16 @@ MobileCollectiveInfoStickyBar.propTypes = {
   isLoading: PropTypes.bool,
   /** Must be provided if `isLoading` is false */
   collective: PropTypes.shape({
-    currency: PropTypes.string.isRequried,
-    balance: PropTypes.number.isRequried,
+    currency: PropTypes.string.isRequired,
+    balance: PropTypes.number.isRequired,
+    type: PropTypes.string,
+    isApproved: PropTypes.bool,
+    stats: PropTypes.shape({
+      balanceWithBlockedFunds: PropTypes.shape({
+        valueInCents: PropTypes.number.isRequired,
+        currency: PropTypes.string.isRequired,
+      }),
+    }),
   }),
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,

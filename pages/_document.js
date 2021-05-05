@@ -2,11 +2,14 @@ import '../env';
 
 import React from 'react';
 import { pick } from 'lodash';
-import Document, { Head, Main, NextScript } from 'next/document';
+import Document, { Head, Html, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
-import flush from 'styled-jsx/server';
+import { v4 as uuid } from 'uuid';
 
 import { parseToBoolean } from '../lib/utils';
+import { getCSPHeader } from '../server/content-security-policy';
+
+const cspHeader = getCSPHeader();
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
@@ -31,33 +34,31 @@ export default class IntlDocument extends Document {
       clientAnalytics.customUrl = '/signin/token';
     }
 
+    // On server-side, add a CSP header
+    let requestNonce;
+    if (ctx.res && cspHeader) {
+      requestNonce = uuid();
+      ctx.res.setHeader(cspHeader.key, cspHeader.value.replace('__OC_REQUEST_NONCE__', requestNonce));
+    }
+
     try {
-      // The new recommended way to process Styled Components
-      // unfortunately not compatible with styled-jsx as is
-      // ctx.renderPage = () =>
-      //   originalRenderPage({
-      //     enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
-      //   })
-
-      // The old recommended way to process Styled Components
-      const page = originalRenderPage(App => props => sheet.collectStyles(<App {...props} />));
-
-      const styledJsxStyles = flush();
-      const styledComponentsStyles = sheet.getStyleElement();
+      ctx.renderPage = () =>
+        originalRenderPage({
+          enhanceApp: App => props => sheet.collectStyles(<App {...props} />),
+        });
 
       const initialProps = await Document.getInitialProps(ctx);
 
       return {
         ...initialProps,
-        ...page,
         locale,
         localeDataScript,
         clientAnalytics,
+        cspNonce: requestNonce,
         styles: (
           <React.Fragment>
             {initialProps.styles}
-            {styledJsxStyles}
-            {styledComponentsStyles}
+            {sheet.getStyleElement()}
           </React.Fragment>
         ),
       };
@@ -68,12 +69,17 @@ export default class IntlDocument extends Document {
 
   constructor(props) {
     super(props);
+    if (props.cspNonce) {
+      props.__NEXT_DATA__.cspNonce = props.cspNonce;
+    }
     // We pick the environment variables that we want to access from the client
     // They can later be read with getEnvVar()
     // Please, NEVER SECRETS!
     props.__NEXT_DATA__.env = pick(process.env, [
       'REST_URL',
       'IMAGES_URL',
+      'REJECT_CONTRIBUTION',
+      'REJECTED_CATEGORIES',
       'PAYPAL_ENVIRONMENT',
       'STRIPE_KEY',
       'SENTRY_DSN',
@@ -105,21 +111,22 @@ export default class IntlDocument extends Document {
 
   render() {
     return (
-      <html>
-        <Head />
+      <Html>
+        <Head nonce={this.props.cspNonce} />
         <body>
-          <Main />
+          <Main nonce={this.props.cspNonce} />
           <script
+            nonce={this.props.cspNonce}
             dangerouslySetInnerHTML={{
               __html: this.props.localeDataScript,
             }}
           />
-          <NextScript />
+          <NextScript nonce={this.props.cspNonce} />
           {this.props.clientAnalytics.enabled && (
-            <script dangerouslySetInnerHTML={{ __html: this.clientAnalyticsCode() }} />
+            <script nonce={this.props.cspNonce} dangerouslySetInnerHTML={{ __html: this.clientAnalyticsCode() }} />
           )}
         </body>
-      </html>
+      </Html>
     );
   }
 }

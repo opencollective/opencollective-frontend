@@ -1,8 +1,8 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 import { gqlV2 } from '../../lib/graphql/helpers';
 
-export const updateSettingsMutation = gql`
+export const editCollectiveSettingsMutation = gql`
   mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
     editCollective(collective: { id: $id, settings: $settings }) {
       id

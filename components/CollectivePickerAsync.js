@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useLazyQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { gql, useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -10,9 +9,14 @@ import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
 
-const DEFAULT_SEARCH_QUERY = gql`
-  query SearchCollective($term: String!, $types: [TypeOfCollective], $limit: Int, $hostCollectiveIds: [Int]) {
-    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds, useAlgolia: false) {
+const collectivePickerSearchQuery = gql`
+  query CollectivePickerSearchQuery(
+    $term: String!
+    $types: [TypeOfCollective]
+    $limit: Int
+    $hostCollectiveIds: [Int]
+  ) {
+    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds) {
       id
       collectives {
         id
@@ -20,6 +24,10 @@ const DEFAULT_SEARCH_QUERY = gql`
         slug
         name
         currency
+        location {
+          address
+          country
+        }
         imageUrl(height: 64)
         hostFeePercent
       }
@@ -37,10 +45,12 @@ const Messages = defineMessages({
     id: 'SearchFor',
     defaultMessage: 'Search for {entity}',
   },
+  // eslint-disable-next-line camelcase
   searchForType_2: {
     id: 'SearchFor2',
     defaultMessage: 'Search for {entity1} or {entity2}',
   },
+  // eslint-disable-next-line camelcase
   searchForType_3: {
     id: 'SearchFor3',
     defaultMessage: 'Search for {entity1}, {entity2} or {entity3}',
@@ -76,7 +86,18 @@ const getPlaceholder = (intl, types) => {
 /**
  * A specialization of `CollectivePicker` that fetches the data based on user search.
  */
-const CollectivePickerAsync = ({ types, limit, hostCollectiveIds, preload, filterResults, searchQuery, ...props }) => {
+const CollectivePickerAsync = ({
+  inputId,
+  types,
+  limit,
+  hostCollectiveIds,
+  preload,
+  filterResults,
+  searchQuery,
+  invitable,
+  emptyCustomOptions,
+  ...props
+}) => {
   const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery);
   const [term, setTerm] = React.useState(null);
   const intl = useIntl();
@@ -93,6 +114,7 @@ const CollectivePickerAsync = ({ types, limit, hostCollectiveIds, preload, filte
 
   return (
     <CollectivePicker
+      inputId={inputId}
       isLoading={loading}
       collectives={filteredCollectives}
       groupByType={!types || types.length > 1}
@@ -101,15 +123,20 @@ const CollectivePickerAsync = ({ types, limit, hostCollectiveIds, preload, filte
       placeholder={placeholder}
       types={types}
       useSearchIcon={true}
+      // Only displays the invite option if no results were found:
+      invitable={invitable}
       onInputChange={newTerm => {
         setTerm(newTerm.trim());
       }}
+      customOptions={!term ? emptyCustomOptions : []}
       {...props}
     />
   );
 };
 
 CollectivePickerAsync.propTypes = {
+  /** The id of the search input */
+  inputId: PropTypes.string.isRequired,
   /** The types of collectives to retrieve */
   types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))),
   /** Whether we should group collectives by type. By default, this is true when there's more than one type */
@@ -122,16 +149,21 @@ CollectivePickerAsync.propTypes = {
   preload: PropTypes.bool,
   /** Query to use for the search. Override to add custom fields */
   searchQuery: PropTypes.any.isRequired,
+  /** Custom options that are displayed when the field is empty */
+  emptyCustomOptions: PropTypes.any,
   /** Function to filter results returned by the API */
   filterResults: PropTypes.func,
   /** If true, a permanent option to create a collective will be displayed in the select */
   creatable: PropTypes.bool,
+  /** If true, a permanent option to invite a new user will be displayed in the select */
+  invitable: PropTypes.bool,
+  onInvite: PropTypes.func,
 };
 
 CollectivePickerAsync.defaultProps = {
   preload: false,
   limit: 20,
-  searchQuery: DEFAULT_SEARCH_QUERY,
+  searchQuery: collectivePickerSearchQuery,
 };
 
 export default CollectivePickerAsync;

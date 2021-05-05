@@ -9,6 +9,7 @@ import { exportRSVPs } from '../../../lib/export_file';
 import { Box } from '../../Grid';
 import Responses from '../../Responses';
 import Sponsors from '../../Sponsors';
+import StyledLinkButton from '../../StyledLinkButton';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
@@ -34,14 +35,16 @@ const StyledAdminActions = styled.div`
   }
 `;
 
-const Participants = ({ collective: event, LoggedInUser }) => {
+const Participants = ({ collective: event, LoggedInUser, refetch }) => {
+  const [isRefetched, setIsRefetched] = React.useState(false);
+
   // const ticketOrders = event.orders
   //   .filter(order => (order.tier && order.tier.type === TierTypes.TICKET))
   //   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // Logic from old Event component, (filter away tiers with 'sponsor in the name')
   // to handle orders where there is no tier to check for TICKET:
-  const orders = event.orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const orders = [...event.orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const guestOrders = [];
   const sponsorOrders = [];
@@ -68,8 +71,19 @@ const Participants = ({ collective: event, LoggedInUser }) => {
 
   const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
 
+  React.useEffect(() => {
+    const refreshData = async () => {
+      if (canEditEvent) {
+        await refetch();
+        setIsRefetched(true);
+      }
+    };
+
+    refreshData();
+  }, [LoggedInUser]);
+
   return (
-    <Box pt={[4, 5]}>
+    <Box pb={4}>
       {sponsors.length > 0 && (
         <ContainerSectionContent pt={[4, 5]}>
           <SectionTitle textAlign="center">
@@ -87,18 +101,13 @@ const Participants = ({ collective: event, LoggedInUser }) => {
               defaultMessage="{n} {n, plural, one {person going} other {people going}}"
             />
           </SectionTitle>
-          {canEditEvent && (
+          {canEditEvent && isRefetched && (
             <StyledAdminActions>
               <ul>
                 <li>
-                  <a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>
-                    <FormattedMessage id="Event.SendEmail" defaultMessage="Send email" />
-                  </a>
-                </li>
-                <li>
-                  <a onClick={() => exportRSVPs(event)}>
+                  <StyledLinkButton onClick={() => exportRSVPs(event)}>
                     <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-                  </a>
+                  </StyledLinkButton>
                 </li>
               </ul>
             </StyledAdminActions>
@@ -115,6 +124,7 @@ Participants.propTypes = {
     orders: PropTypes.array,
   }).isRequired,
   LoggedInUser: PropTypes.object,
+  refetch: PropTypes.func,
 };
 
 export default Participants;

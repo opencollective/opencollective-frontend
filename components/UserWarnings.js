@@ -11,7 +11,7 @@ import { withUser } from './UserProvider';
 const UserWarnings = ({ LoggedInUser }) => {
   if (LoggedInUser && LoggedInUser.isLimited) {
     return (
-      <MessageBox type="warning" fontSize="LeadParagraph" textAlign="center" withIcon borderRadius={0}>
+      <MessageBox type="warning" fontSize="16px" textAlign="center" withIcon borderRadius={0}>
         <FormattedMessage
           id="warning.limitedAccount"
           defaultMessage="Your account is currently limited. If you think this is a mistake, please contact support@opencollective.com."

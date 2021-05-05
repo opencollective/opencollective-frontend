@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
@@ -19,21 +19,21 @@ import StyledButton from '../StyledButton';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
-import { CommentFieldsFragment } from './graphql';
+import { commentFieldsFragment } from './graphql';
 
-const createCommentMutation = gqlV2`
+const createCommentMutation = gqlV2/* GraphQL */ `
   mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       ...CommentFields
     }
   }
-  ${CommentFieldsFragment}
+  ${commentFieldsFragment}
 `;
 
 const messages = defineMessages({
   placeholder: {
     id: 'CommentForm.placeholder',
-    defaultMessage: 'Type in your message...',
+    defaultMessage: 'Type your message...',
   },
   postReply: {
     id: 'CommentForm.PostReply',
@@ -57,7 +57,7 @@ const isAutoFocused = id => {
 const mutationOptions = { context: API_V2_CONTEXT };
 
 /** A small helper to make the form work with params from both API V1 & V2 */
-const prepareCommentParams = (html, conversationId, expenseId) => {
+const prepareCommentParams = (html, conversationId, expenseId, updateId) => {
   const comment = { html };
   if (conversationId) {
     comment.ConversationId = conversationId;
@@ -67,6 +67,13 @@ const prepareCommentParams = (html, conversationId, expenseId) => {
       comment.expense.id = expenseId;
     } else {
       comment.expense.legacyId = expenseId;
+    }
+  } else if (updateId) {
+    comment.update = {};
+    if (typeof updateId === 'string') {
+      comment.update.id = updateId;
+    } else {
+      comment.update.legacyId = updateId;
     }
   }
   return comment;
@@ -80,6 +87,7 @@ const CommentForm = ({
   id,
   ConversationId,
   ExpenseId,
+  UpdateId,
   onSuccess,
   router,
   loadingLoggedInUser,
@@ -93,13 +101,13 @@ const CommentForm = ({
   const [validationError, setValidationError] = useState();
   const { formatMessage } = intl;
 
-  const submitForm = async () => {
+  const submitForm = async event => {
     event.preventDefault();
     event.stopPropagation();
     if (!html) {
       setValidationError(createError(ERROR.FORM_FIELD_REQUIRED));
     } else {
-      const comment = prepareCommentParams(html, ConversationId, ExpenseId);
+      const comment = prepareCommentParams(html, ConversationId, ExpenseId, UpdateId);
       const response = await createComment({ variables: { comment } });
       setResetValue(response.data.createComment.id);
       if (onSuccess) {
@@ -171,6 +179,8 @@ CommentForm.propTypes = {
   ConversationId: PropTypes.string,
   /** If commenting on an expense */
   ExpenseId: PropTypes.string,
+  /** If commenting on an update */
+  UpdateId: PropTypes.string,
   /** Called when the comment is created successfully */
   onSuccess: PropTypes.func,
   /** disable the inputs */

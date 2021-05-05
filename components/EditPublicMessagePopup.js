@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
+import { gql } from '@apollo/client';
+import { Mutation } from '@apollo/client/react/components';
 import { Times } from '@styled-icons/fa-solid/Times';
-import gql from 'graphql-tag';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { Popper } from 'react-popper';
 import styled from 'styled-components';
 
+import { formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
 import withViewport from '../lib/withViewport';
 
-import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
-import { getTierPageQuery } from '../components/tier-page/graphql/queries';
+import { collectivePageQuery } from '../components/collective-page/graphql/queries';
+import { tierPageQuery } from '../components/tier-page/graphql/queries';
 
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from './contribute-cards/Contribute';
 import { Box, Flex } from './Grid';
@@ -93,8 +94,8 @@ const Arrow = styled('div')`
   }
 `;
 
-const EditPublicMessageMutation = gql`
-  mutation EditPublicMessageMutation($FromCollectiveId: Int!, $CollectiveId: Int!, $message: String) {
+const editPublicMessageMutation = gql`
+  mutation EditPublicMessage($FromCollectiveId: Int!, $CollectiveId: Int!, $message: String) {
     editPublicMessage(FromCollectiveId: $FromCollectiveId, CollectiveId: $CollectiveId, message: $message) {
       id
       publicMessage
@@ -136,7 +137,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
   }
 
   return createPortal(
-    <Mutation mutation={EditPublicMessageMutation}>
+    <Mutation mutation={editPublicMessageMutation}>
       {(submitMessage, { loading, error }) => (
         <Popper
           referenceElement={cardRef.current}
@@ -154,8 +155,8 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                 <Times size="1em" color="#a2a2a2" cursor="pointer" onClick={onClose} />
               </Flex>
               <Flex flexDirection="column" p={2}>
-                <Span fontSize="Paragraph" color="black.600" mb={2}>
-                  <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (Optional)" />
+                <Span fontSize="14px" color="black.600" mb={2}>
+                  <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (optional)" />
                 </Span>
 
                 <StyledInput
@@ -165,7 +166,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                   py={10}
                   width="100%"
                   height={112}
-                  fontSize="Paragraph"
+                  fontSize="14px"
                   style={{ resize: 'none' }}
                   placeholder={intl.formatMessage(messages.publicMessagePlaceholder)}
                   value={messageDraft}
@@ -174,8 +175,8 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                   disabled={loading}
                 />
                 {error && (
-                  <Span color="red.500" fontSize="Caption" mt={2}>
-                    {error}
+                  <Span color="red.500" fontSize="12px" mt={2}>
+                    {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
                   </Span>
                 )}
                 <Box m="0 auto">
@@ -200,7 +201,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           const tier = member.tier;
                           const queries = [
                             {
-                              query: getCollectivePageQuery,
+                              query: collectivePageQuery,
                               variables: {
                                 slug: collectiveSlug,
                                 nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
@@ -209,7 +210,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           ];
                           if (tier) {
                             queries.push({
-                              query: getTierPageQuery,
+                              query: tierPageQuery,
                               variables: { tierId: tier.id },
                             });
                           }

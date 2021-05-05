@@ -16,11 +16,11 @@ import { Span } from './Text';
 
 const Message = styled.div`
   border: 1px solid;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: ${themeGet('space.3')}px;
 
   a {
-    text-decoration: underline;
+    text-decoration: underline !important;
   }
 
   ${borders}
@@ -33,13 +33,17 @@ const Message = styled.div`
   ${flexbox}
 
   ${messageType}
+
+  svg[data-type="message-icon"] {
+    vertical-align: text-bottom;
+  }
 `;
 
 const icons = {
-  info: <InfoCircle size="1em" />,
-  success: <CheckCircle size="1em" />,
-  warning: <ExclamationTriangle size="1em" />,
-  error: <ExclamationCircle size="1em" />,
+  info: <InfoCircle data-type="message-icon" size="1em" color="#5CA3FF" />,
+  success: <CheckCircle data-type="message-icon" size="1em" color="#25B869" />,
+  warning: <ExclamationTriangle data-type="message-icon" size="1em" color="#CCCC18" />,
+  error: <ExclamationCircle data-type="message-icon" size="1em" color="#E03F6A" />,
 };
 
 /**
@@ -55,7 +59,7 @@ const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
         </Span>
       )}
       {icon && !isLoading && (
-        <Span mr={2} css={{ display: 'inline-block' }}>
+        <Span mr={2} css={{ display: 'inline-block', verticalAlign: 'text-bottom' }}>
           {icon}
         </Span>
       )}
@@ -67,7 +71,7 @@ const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
 MessageBox.propTypes = {
   /** Type of the message */
   type: PropTypes.oneOf(['white', 'dark', 'info', 'success', 'warning', 'error']),
-  /** Weither icon should be hidden. Icons are only set for info, success, warning and error messages. */
+  /** Whether icon should be hidden. Icons are only set for info, success, warning and error messages. */
   withIcon: PropTypes.bool,
   /** If true, a `StyledSpinner` will be displayed instead of the normal icon */
   isLoading: PropTypes.bool,

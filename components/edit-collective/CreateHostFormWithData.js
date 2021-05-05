@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { get } from 'lodash';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
+import { cloneDeep, get } from 'lodash';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { compose } from '../../lib/utils';
@@ -69,8 +69,8 @@ class CreateHostFormWithData extends React.Component {
   }
 }
 
-const getConnectedAccountsQuery = gql`
-  query Collective($slug: String!) {
+const editCollectiveConnectedAccountsQuery = gql`
+  query EditCollectiveConnectedAccounts($slug: String!) {
     Collective(slug: $slug) {
       id
       isHost
@@ -102,7 +102,7 @@ const getConnectedAccountsQuery = gql`
   }
 `;
 
-export const addConnectedAccountsQuery = graphql(getConnectedAccountsQuery, {
+export const addEditCollectiveConnectedAccountsData = graphql(editCollectiveConnectedAccountsQuery, {
   options: props => ({
     variables: {
       slug: get(props, 'LoggedInUser.collective.slug'),
@@ -110,8 +110,8 @@ export const addConnectedAccountsQuery = graphql(getConnectedAccountsQuery, {
   }),
 });
 
-const createCollectiveQuery = gql`
-  mutation createCollective($collective: CollectiveInputType!) {
+const editCollectiveCreateHostMutation = gql`
+  mutation EditCollectiveCreateHost($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
       slug
@@ -122,7 +122,7 @@ const createCollectiveQuery = gql`
   }
 `;
 
-const addMutation = graphql(createCollectiveQuery, {
+const addEditCollectiveCreateHostMutation = graphql(editCollectiveCreateHostMutation, {
   props: ({ ownProps, mutate }) => ({
     createCollective: async CollectiveInputType =>
       await mutate({
@@ -133,10 +133,12 @@ const addMutation = graphql(createCollectiveQuery, {
           };
 
           // Retrieve the query from the cache
-          const data = proxy.readQuery({
-            query: getConnectedAccountsQuery,
-            variables,
-          });
+          const data = cloneDeep(
+            proxy.readQuery({
+              query: editCollectiveConnectedAccountsQuery,
+              variables,
+            }),
+          );
 
           // Insert new Collective at the beginning
           const membership = {
@@ -153,7 +155,7 @@ const addMutation = graphql(createCollectiveQuery, {
 
           // write data back for the query
           proxy.writeQuery({
-            query: getConnectedAccountsQuery,
+            query: editCollectiveConnectedAccountsQuery,
             variables,
             data,
           });
@@ -162,6 +164,6 @@ const addMutation = graphql(createCollectiveQuery, {
   }),
 });
 
-const addGraphQL = compose(addConnectedAccountsQuery, addMutation);
+const addGraphql = compose(addEditCollectiveConnectedAccountsData, addEditCollectiveCreateHostMutation);
 
-export default addGraphQL(CreateHostFormWithData);
+export default addGraphql(CreateHostFormWithData);

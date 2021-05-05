@@ -41,7 +41,7 @@ const FollowersAvatars = ({ followers, totalCount, avatarRadius, maxNbDisplayed 
   const nbNotFetched = totalCount - followers.length;
   const usersNotDisplayedNames = getFollwersNotDisplayedNames(followers, maxNbDisplayed);
   return (
-    <Container display="flex" alignItems="center" fontSize="Caption">
+    <Container display="flex" alignItems="center" fontSize="12px">
       {followers.slice(0, maxNbDisplayed).map(collective => (
         <Box key={collective.id} mr={[-2, 2]}>
           <LinkCollective collective={collective}>

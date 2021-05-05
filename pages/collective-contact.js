@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
+import CollectiveNavbar from '../components/collective-navbar';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveContactForm from '../components/CollectiveContactForm';
-import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -54,11 +55,13 @@ class CollectiveContact extends React.Component {
         description: collective.description,
         twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
         image: collective.image || get(collective, 'parentCollective.image'),
+        noRobots: false,
       };
     } else {
       return {
         title: 'Contact collective',
         image: '/static/images/defaultBackgroundImage.png',
+        noRobots: false,
       };
     }
   }
@@ -95,21 +98,20 @@ class CollectiveContact extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       }
     }
 
     const collective = data && data.Collective;
     return (
-      <AuthenticatedPage {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <AuthenticatedPage {...this.getPageMetaData(collective)}>
         {() =>
           data.loading ? (
             <Loading />
           ) : (
             <CollectiveThemeProvider collective={data.Collective}>
               <Container>
-                <CollectiveNavbar collective={data.Collective} />
+                <CollectiveNavbar collective={data.Collective} selectedCategory={NAVBAR_CATEGORIES.CONNECT} />
                 <Container py={[4, 5]} px={[2, 3, 4]}>
                   {this.renderContent()}
                 </Container>
@@ -122,24 +124,27 @@ class CollectiveContact extends React.Component {
   }
 }
 
-// eslint-disable graphql/template-strings
-const getCollective = graphql(
-  gql`
-    query ContactPage($collectiveSlug: String!) {
-      Collective(slug: $collectiveSlug, throwIfMissing: false) {
-        id
-        slug
-        path
-        name
-        type
-        canContact
-        description
-        settings
-        imageUrl
-        twitterHandle
+const collectiveContactPageQuery = gql`
+  query CollectiveContactPage($collectiveSlug: String!) {
+    Collective(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      path
+      name
+      type
+      canContact
+      description
+      settings
+      imageUrl
+      twitterHandle
+      features {
+        ...NavbarFields
       }
     }
-  `,
-);
+  }
+  ${collectiveNavbarFieldsFragment}
+`;
 
-export default withUser(getCollective(CollectiveContact));
+const addCollectiveContactPageData = graphql(collectiveContactPageQuery);
+
+export default withUser(addCollectiveContactPageData(CollectiveContact));

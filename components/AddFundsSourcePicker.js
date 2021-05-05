@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormControl } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import CollectivePickerAsync from './CollectivePickerAsync';
+import StyledSelect from './StyledSelect';
 
 const messages = defineMessages({
   addFundsFromHost: {
@@ -26,12 +26,16 @@ class AddFundsSourcePicker extends React.Component {
   render() {
     const { intl, host } = this.props;
     const customOptions = [
-      { value: { id: host.id }, label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }) },
+      {
+        value: { id: host.legacyId || host.id },
+        label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }),
+      },
     ];
 
     return (
       <CollectivePickerAsync
         id="sourcePicker"
+        inputId="sourcePicker"
         onChange={this.onChange}
         maxMenuHeight={200}
         customOptions={customOptions}
@@ -54,27 +58,27 @@ class AddFundsSourcePickerForUser extends React.Component {
   }
 
   onChange = async e => {
-    this.props.onChange(e.target.value);
+    this.props.onChange(e.value);
   };
 
   render() {
     const hosts = this.props.LoggedInUser.hostsUserIsAdminOf();
+    const hostOptions = [
+      ...hosts.map(h => {
+        const value = h.legacyId || h.id;
+        return { key: `addfsph-${h.id}`, value: value, label: h.name };
+      }),
+    ];
     return (
       <div>
-        <FormControl
+        <StyledSelect
           id="sourcePicker"
-          name="template"
-          componentClass="select"
-          placeholder="select"
+          inputId="sourcePicker"
+          placeholder="Select"
+          options={hostOptions}
+          isSearchable={false}
           onChange={this.onChange}
-        >
-          <option value="" key="addfsph-00" />
-          {hosts.map(h => (
-            <option value={h.id} key={`addfsph-${h.id}`}>
-              {h.name}
-            </option>
-          ))}
-        </FormControl>
+        />
       </div>
     );
   }

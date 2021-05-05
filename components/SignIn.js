@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { Link } from '../server/pages';
-
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledInput from './StyledInput';
@@ -25,6 +24,8 @@ export default class SignIn extends React.Component {
     loading: PropTypes.bool,
     /** To display a box shadow below the card */
     withShadow: PropTypes.bool,
+    /** Whether user can click on "Join Free" */
+    showSecondaryAction: PropTypes.bool,
     /** Set this to true to display the unknown email message */
     unknownEmail: PropTypes.bool,
     /** Label, defaults to "Sign in using your email address:" */
@@ -40,13 +41,23 @@ export default class SignIn extends React.Component {
   renderSecondaryAction(message) {
     const { loading, onSecondaryAction } = this.props;
     return typeof onSecondaryAction === 'string' ? (
-      <Link route={onSecondaryAction} passHref>
-        <StyledLink disabled={loading} fontSize="Paragraph">
-          {message}&nbsp;→
-        </StyledLink>
-      </Link>
+      <StyledLink
+        as={Link}
+        href={onSecondaryAction}
+        disabled={loading}
+        fontSize="14px"
+        data-cy="signin-secondary-action-btn"
+      >
+        {message}&nbsp;→
+      </StyledLink>
     ) : (
-      <StyledButton asLink fontSize="Paragraph" onClick={onSecondaryAction} disabled={loading}>
+      <StyledButton
+        asLink
+        fontSize="14px"
+        onClick={onSecondaryAction}
+        disabled={loading}
+        data-cy="signin-secondary-action-btn"
+      >
         {message}&nbsp;→
       </StyledButton>
     );
@@ -73,7 +84,7 @@ export default class SignIn extends React.Component {
           >
             <StyledInput
               error={!!error}
-              fontSize="Paragraph"
+              fontSize="14px"
               id="email"
               name="email"
               minWidth={120}
@@ -96,7 +107,7 @@ export default class SignIn extends React.Component {
                 event.preventDefault();
                 this.setState({ error: event.target.validationMessage });
               }}
-              placeholder="i.e. yourname@yourhost.com"
+              placeholder="e.g. yourname@yourhost.com"
               required
               value={email}
               type="email"
@@ -111,31 +122,34 @@ export default class SignIn extends React.Component {
               minWidth={100}
               ml={3}
               type="submit"
+              whiteSpace="nowrap"
             >
-              Sign In
+              <FormattedMessage id="signIn" defaultMessage="Sign In" />
             </StyledButton>
           </Flex>
           {error && showError && (
-            <Span display="block" color="red.500" pt={2} fontSize="Tiny" lineHeight="Tiny" aria-live="assertive">
+            <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
               {error}
             </Span>
           )}
           {unknownEmail && (
-            <Span display="block" color="black.600" pt={2} fontSize="Tiny" lineHeight="Tiny" aria-live="assertive">
+            <Span display="block" color="black.600" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
               <FormattedMessage id="signin.unknownEmail" defaultMessage="There is no user with this email address." />{' '}
               {this.renderSecondaryAction(<FormattedMessage id="signin.joinForFree" defaultMessage="Join for free!" />)}
             </Span>
           )}
         </Box>
 
-        <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="center">
-          <Span color="black.700" mr={1} fontSize="Paragraph">
-            <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
-          </Span>{' '}
-          <Span fontSize="Paragraph">
-            {this.renderSecondaryAction(<FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />)}
-          </Span>
-        </Container>
+        {this.props.showSecondaryAction && (
+          <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="center">
+            <Span color="black.700" mr={1} fontSize="14px">
+              <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
+            </Span>{' '}
+            <Span fontSize="14px">
+              {this.renderSecondaryAction(<FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />)}
+            </Span>
+          </Container>
+        )}
       </StyledCard>
     );
   }

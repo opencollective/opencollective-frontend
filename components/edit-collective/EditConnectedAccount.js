@@ -4,12 +4,14 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import { connectAccount, disconnectAccount } from '../../lib/api';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 
 import EditPayPalAccount from './EditPayPalAccount';
+import EditPrivacyAccount from './EditPrivacyAccount';
 import EditTransferWiseAccount from './EditTransferWiseAccount';
 import EditTwitterAccount from './EditTwitterAccount';
 
@@ -22,6 +24,7 @@ class EditConnectedAccount extends React.Component {
     intl: PropTypes.object.isRequired,
     service: PropTypes.string,
     connectedAccount: PropTypes.object,
+    variation: PropTypes.bool,
   };
 
   constructor(props) {
@@ -80,19 +83,24 @@ class EditConnectedAccount extends React.Component {
         defaultMessage: 'GitHub account {username} connected on {updatedAt, date, short}',
       },
     });
-    this.services = ['stripe', 'paypal', 'twitter', 'github', 'transferwise'];
+    this.services = ['stripe', 'paypal', 'twitter', 'github', 'transferwise', 'privacy'];
   }
 
   connect(service) {
     const { collective, options } = this.props;
 
     if (service === 'github' || service === 'twitter') {
-      const redirect = `${window.location.protocol}//${window.location.host}/${collective.slug}/edit/connected-accounts`;
-      return window.location.replace(
-        `/api/connected-accounts/${service}/oauthUrl?CollectiveId=${collective.id}&redirect=${encodeURIComponent(
-          redirect,
-        )}&access_token=${getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)}`,
-      );
+      const redirectUrl = `${getWebsiteUrl()}/api/connected-accounts/${service}/oauthUrl`;
+      const redirectUrlParams = new URLSearchParams({ CollectiveId: collective.id });
+
+      const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+      if (accessToken) {
+        redirectUrlParams.set('access_token', accessToken); // eslint-disable-line camelcase
+      }
+
+      window.location.href = `${redirectUrl}?${redirectUrlParams.toString()}`;
+
+      return;
     }
 
     connectAccount(collective.id, service, options)
@@ -100,6 +108,8 @@ class EditConnectedAccount extends React.Component {
         return (window.location.href = json.redirectUrl);
       })
       .catch(err => {
+        // TODO: this should be reported to the user
+        // eslint-disable-next-line no-console
         console.error(`>>> /api/connected-accounts/${service} error`, err);
       });
   }
@@ -116,12 +126,14 @@ class EditConnectedAccount extends React.Component {
         }
       })
       .catch(err => {
+        // TODO: this should be reported to the user
+        // eslint-disable-next-line no-console
         console.error(`>>> /api/connected-accounts/${service}/disconnect error`, err);
       });
   }
 
   render() {
-    const { intl, service, collective } = this.props;
+    const { intl, service, collective, variation } = this.props;
     const { connectedAccount } = this.state;
 
     let vars = {};
@@ -140,20 +152,30 @@ class EditConnectedAccount extends React.Component {
         <EditTransferWiseAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />
       );
     } else if (service === 'paypal') {
-      return <EditPayPalAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />;
+      return (
+        <EditPayPalAccount
+          collective={collective}
+          connectedAccount={this.props.connectedAccount}
+          variation={variation}
+          intl={intl}
+        />
+      );
+    } else if (service === 'privacy') {
+      return <EditPrivacyAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />;
     }
 
     return (
       <Flex className="EditConnectedAccount">
         {!connectedAccount && (
           <Box>
-            <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
+            <P fontSize="12px" color="black.600" fontWeight="normal" mb={2}>
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
             </P>
             <StyledButton
               data-cy={`connect-${service}-button`}
               buttonSize="small"
               onClick={() => this.connect(service)}
+              mb={2}
             >
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.button`])}
             </StyledButton>
@@ -162,6 +184,11 @@ class EditConnectedAccount extends React.Component {
         {connectedAccount && (
           <Flex flexDirection="column">
             <Box>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</Box>
+            {connectedAccount.service === 'twitter' && (
+              <Box my={2}>
+                <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
+              </Box>
+            )}
             <Box mt={1}>
               <StyledButton buttonSize="small" onClick={() => this.connect(service)}>
                 {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
@@ -171,9 +198,6 @@ class EditConnectedAccount extends React.Component {
               </StyledButton>
             </Box>
           </Flex>
-        )}
-        {connectedAccount && connectedAccount.service === 'twitter' && collective.type === 'ORGANIZATION' && (
-          <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
         )}
       </Flex>
     );

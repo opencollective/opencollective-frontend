@@ -1,32 +1,100 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { formatCurrency } from '../../lib/currency-utils';
+import INTERVALS from '../../lib/constants/intervals';
+import { getPaymentMethodName } from '../../lib/payment_method_label';
 
+import Container from '../Container';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
 import StepsProgress from '../StepsProgress';
-import { Span } from '../Text';
+import { P, Span } from '../Text';
+
+import { STEPS } from './constants';
+import { getTotalAmount } from './utils';
 
 // Styles for the steps label rendered in StepsProgress
 const StepLabel = styled(Span)`
   text-transform: uppercase;
   text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  letter-spacing: 0.06em;
+  margin-top: 8px;
+  margin-bottom: 4px;
 `;
 
-StepLabel.defaultProps = {
-  color: 'black.400',
-  fontSize: 'Tiny',
-  mt: 1,
+const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
+  if (stepDetails.amount) {
+    const totalAmount = stepDetails.amount + (stepDetails.platformContribution || 0);
+    return (
+      <FormattedMoneyAmount
+        interval={stepDetails.interval !== INTERVALS.flexible ? stepDetails.interval : null}
+        currency={currency}
+        amount={totalAmount}
+        abbreviateInterval
+        amountStyles={null}
+      />
+    );
+  } else if (stepDetails.amount === 0 && isFreeTier) {
+    return <FormattedMessage id="Amount.Free" defaultMessage="Free" />;
+  } else {
+    return null;
+  }
+};
+
+const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency }) => {
+  if (step.name === STEPS.PROFILE) {
+    if (stepProfile) {
+      const mainInfo = (stepProfile.id && stepProfile.name) || (stepProfile.email ?? stepProfile.name);
+      const fullDescription = [stepProfile.name, stepProfile.email].filter(Boolean).join(' · ');
+      return (
+        <P title={fullDescription} fontSize="inherit" lineHeight="inherit" truncateOverflow css={{ maxWidth: 150 }}>
+          {mainInfo}
+        </P>
+      );
+    }
+  } else if (step.name === STEPS.DETAILS) {
+    if (stepDetails) {
+      return (
+        <React.Fragment>
+          <PrettyAmountFromStepDetails stepDetails={stepDetails} currency={currency} isFreeTier={isFreeTier} />
+          {!isNaN(stepDetails.quantity) && stepDetails.quantity > 1 && ` x ${stepDetails.quantity}`}
+        </React.Fragment>
+      );
+    }
+  } else if (step.name === STEPS.PAYMENT) {
+    if (isFreeTier && getTotalAmount(stepDetails, stepSummary) === 0) {
+      return <FormattedMessage id="noPaymentRequired" defaultMessage="No payment required" />;
+    } else {
+      return (stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
+    }
+  } else if (step.name === STEPS.SUMMARY) {
+    return stepSummary?.countryISO || null;
+  }
+
+  return null;
+};
+
+StepInfo.propTypes = {
+  step: PropTypes.object,
+  stepProfile: PropTypes.object,
+  stepDetails: PropTypes.object,
+  stepPayment: PropTypes.object,
+  stepSummary: PropTypes.object,
+  isFreeTier: PropTypes.bool,
+  currency: PropTypes.string,
 };
 
 const ContributionFlowStepsProgress = ({
   stepProfile,
   stepDetails,
   stepPayment,
-  submitted,
+  stepSummary,
+  isSubmitted,
   loading,
   steps,
   currentStep,
@@ -34,67 +102,36 @@ const ContributionFlowStepsProgress = ({
   goToStep,
   currency,
   isFreeTier,
-  showFeesOnTop,
 }) => {
   return (
     <StepsProgress
       steps={steps}
       focus={currentStep}
-      allCompleted={submitted}
-      onStepSelect={!loading && !submitted ? goToStep : undefined}
+      allCompleted={isSubmitted}
+      onStepSelect={!loading && !isSubmitted ? goToStep : undefined}
       loadingStep={loading ? currentStep : undefined}
       disabledStepNames={steps.slice(lastVisitedStep.index + 1, steps.length).map(s => s.name)}
     >
-      {({ step }) => {
-        let label = null;
-        let details = null;
-        if (step.name === 'contributeAs') {
-          label = <FormattedMessage id="contribute.step.contributeAs" defaultMessage="Contribute as" />;
-          details = get(stepProfile, 'name', null);
-        } else if (step.name === 'details') {
-          label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
-          if (stepDetails && stepDetails.totalAmount) {
-            const formattedAmount = showFeesOnTop
-              ? formatCurrency(stepDetails.amount + stepDetails.platformFee?.value, currency)
-              : formatCurrency(stepDetails.amount, currency);
-
-            const formattedTotalAmount =
-              stepDetails.quantity > 1 ? `${formattedAmount} x ${stepDetails.quantity}` : formattedAmount;
-            details = !stepDetails.interval ? (
-              formattedTotalAmount
-            ) : (
-              <Span>
-                {formattedTotalAmount}{' '}
-                <FormattedMessage
-                  id="tier.interval"
-                  defaultMessage="per {interval, select, month {month} year {year} other {}}"
-                  values={{ interval: stepDetails.interval }}
-                />
-              </Span>
-            );
-          } else if (stepDetails && stepDetails.totalAmount === 0 && isFreeTier) {
-            details = 'Free';
-          }
-        } else if (step.name === 'payment') {
-          label = <FormattedMessage id="contribute.step.payment" defaultMessage="Payment info" />;
-          if (isFreeTier && get(stepDetails, 'totalAmount') === 0) {
-            details = 'No payment required';
-          } else {
-            details = get(stepPayment, 'title', null);
-          }
-        } else if (step.name === 'summary') {
-          label = <FormattedMessage id="contribute.step.summary" defaultMessage="Summary" />;
-        }
-
-        return (
-          <Flex flexDirection="column" alignItems="center">
-            <StepLabel>{label}</StepLabel>
-            <Span fontSize="Caption" textAlign="center">
-              {step.isVisited && details}
-            </Span>
-          </Flex>
-        );
-      }}
+      {({ step }) => (
+        <Flex flexDirection="column" alignItems="center">
+          <StepLabel color={currentStep.name === step.name ? 'primary.600' : 'black.700'}>
+            {step.label || step.name}
+          </StepLabel>
+          <Container fontSize="13px" lineHeight="20px" textAlign="center" wordBreak="break-word">
+            {step.isVisited && (
+              <StepInfo
+                step={step}
+                stepProfile={stepProfile}
+                stepDetails={stepDetails}
+                stepPayment={stepPayment}
+                stepSummary={stepSummary}
+                isFreeTier={isFreeTier}
+                currency={currency}
+              />
+            )}
+          </Container>
+        </Flex>
+      )}
     </StepsProgress>
   );
 };
@@ -106,12 +143,12 @@ ContributionFlowStepsProgress.propTypes = {
   stepProfile: PropTypes.object,
   stepDetails: PropTypes.object,
   stepPayment: PropTypes.object,
-  submitted: PropTypes.bool,
+  stepSummary: PropTypes.object,
+  isSubmitted: PropTypes.bool,
   loading: PropTypes.bool,
   lastVisitedStep: PropTypes.object,
   currency: PropTypes.string,
   isFreeTier: PropTypes.bool,
-  showFeesOnTop: PropTypes.bool,
 };
 
 export default ContributionFlowStepsProgress;

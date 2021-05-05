@@ -1,68 +1,47 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FastField, Field, FieldArray, Form, Formik } from 'formik';
-import { first, get, isEmpty, pick } from 'lodash';
+import { Field, FieldArray, Form, Formik } from 'formik';
+import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { ERROR, isErrorType } from '../../lib/errors';
-import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
+import { requireFields } from '../../lib/form-utils';
+import { flattenObjectDeep } from '../../lib/utils';
 
-import CollectivePicker from '../CollectivePicker';
 import { Box, Flex } from '../Grid';
+import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
-import InputTypeCountry from '../InputTypeCountry';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
-import StyledInputField from '../StyledInputField';
 import StyledInputTags from '../StyledInputTags';
-import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
+import ExpenseFormPayeeInviteNewStep from './ExpenseFormPayeeInviteNewStep';
+import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
+import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
 import { validateExpenseItem } from './ExpenseItemForm';
+import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import ExpenseTypeTag from './ExpenseTypeTag';
-import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
-import PayoutMethodSelect from './PayoutMethodSelect';
+import { validatePayoutMethod } from './PayoutMethodForm';
 
 const msg = defineMessages({
   descriptionPlaceholder: {
     id: `ExpenseForm.DescriptionPlaceholder`,
     defaultMessage: 'Enter expense title here...',
   },
-  payeeLabel: {
-    id: `ExpenseForm.payeeLabel`,
-    defaultMessage: 'Who is being paid for this expense?',
-  },
-  payoutOptionLabel: {
-    id: `ExpenseForm.PayoutOptionLabel`,
-    defaultMessage: 'Payout method',
-  },
-  invoiceInfo: {
-    id: 'ExpenseForm.InvoiceInfo',
-    defaultMessage: 'Additional invoice information',
-  },
-  invoiceInfoPlaceholder: {
-    id: 'ExpenseForm.InvoiceInfoPlaceholder',
-    defaultMessage: 'Tax ID, VAT number, etc. This information will be printed on your invoice.',
-  },
-  country: {
-    id: 'ExpenseForm.ChooseCountry',
-    defaultMessage: 'Choose country',
-  },
-  address: {
-    id: 'ExpenseForm.AddressLabel',
-    defaultMessage: 'Physical address',
-  },
-  leaveWithUnsavedChanges: {
-    id: 'ExpenseForm.UnsavedChangesWarning',
-    defaultMessage: 'If you cancel now you will loose any changes made to this expense. Are you sure?',
+  grantSubjectPlaceholder: {
+    id: `ExpenseForm.GrantSubjectPlaceholder`,
+    defaultMessage: 'e.g. research, software development, etc...',
   },
   addNewReceipt: {
     id: 'ExpenseForm.AddReceipt',
@@ -72,29 +51,35 @@ const msg = defineMessages({
     id: 'ExpenseForm.AddLineItem',
     defaultMessage: 'Add new item',
   },
-  step1: {
-    id: 'ExpenseForm.Step1',
+  addNewGrantItem: {
+    id: 'ExpenseForm.AddGrantItem',
+    defaultMessage: 'Add grant item',
+  },
+  stepReceipt: {
+    id: 'ExpenseForm.StepExpense',
     defaultMessage: 'Upload one or multiple receipt',
   },
-  step1Invoice: {
-    id: 'ExpenseForm.Step1Invoice',
+  stepInvoice: {
+    id: 'ExpenseForm.StepExpenseInvoice',
     defaultMessage: 'Set invoice details',
   },
-  step2: {
-    id: 'ExpenseForm.Step2',
-    defaultMessage: 'Reimbursements details',
+  stepFundingRequest: {
+    id: 'ExpenseForm.StepExpenseFundingRequest',
+    defaultMessage: 'Set grant details',
   },
-  step2Invoice: {
-    id: 'ExpenseForm.Step2Invoice',
+
+  stepPayee: {
+    id: 'ExpenseForm.StepPayeeInvoice',
     defaultMessage: 'Payee information',
   },
 });
 
-const getDefaultExpense = (collective, payoutProfiles) => ({
+const getDefaultExpense = collective => ({
   description: '',
+  longDescription: '',
   items: [],
   attachedFiles: [],
-  payee: first(payoutProfiles),
+  payee: null,
   payoutMethod: undefined,
   privateMessage: '',
   invoiceInfo: '',
@@ -113,17 +98,25 @@ export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const payeeIdField = typeof expenseData.payee?.id === 'string' ? 'id' : 'legacyId';
   const isInvoice = expenseData.type === expenseTypes.INVOICE;
+  const isFundingRequest = expenseData.type === expenseTypes.FUNDING_REQUEST;
+  const payee =
+    expenseData.payee?.isNewUser || expenseData.payee?.isInvite
+      ? pick(expenseData.payee, ['name', 'email', 'organization', 'newsletterOptIn'])
+      : { [payeeIdField]: expenseData.payee.id };
+
+  const payeeLocation = isInvoice ? pick(expenseData.payeeLocation, ['address', 'country', 'structured']) : null;
+
   return {
-    ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
-    payee: expenseData.payee && { [payeeIdField]: expenseData.payee.id },
+    ...pick(expenseData, ['id', 'description', 'longDescription', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
+    payee,
+    payeeLocation,
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-    payeeLocation: isInvoice ? pick(expenseData.payeeLocation, ['address', 'country']) : null,
     attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
     // Omit item's ids that were created for keying purposes
     items: expenseData.items.map(item => {
       return pick(item, [
         ...(item.__isNew ? [] : ['id']),
-        ...(isInvoice ? [] : ['url']), // never submit URLs for invoices
+        ...(isInvoice || isFundingRequest ? [] : ['url']), // never submit URLs for invoices or requests
         'description',
         'incurredAt',
         'amount',
@@ -136,7 +129,14 @@ export const prepareExpenseForSubmit = expenseData => {
  * Validate the expense
  */
 const validate = expense => {
-  const errors = requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
+  const isCardCharge = expense.type === expenseTypes.CHARGE;
+  if (expense.payee?.isInvite) {
+    return expense.payee.id
+      ? requireFields(expense, ['description', 'payee', 'payee.id'])
+      : requireFields(expense, ['description', 'payee', 'payee.name', 'payee.email']);
+  }
+
+  const errors = isCardCharge ? {} : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.items.length > 0) {
     const itemsErrors = expense.items.map(item => validateExpenseItem(expense, item));
@@ -146,7 +146,11 @@ const validate = expense => {
     }
   }
 
-  if (expense.payoutMethod) {
+  if (
+    expense.payoutMethod &&
+    // CHARGE expenses have VirtualCard and do not have PayoutMethod
+    isCardCharge
+  ) {
     const payoutMethodErrors = validatePayoutMethod(expense.payoutMethod);
     if (!isEmpty(payoutMethodErrors)) {
       errors.payoutMethod = payoutMethodErrors;
@@ -160,14 +164,19 @@ const validate = expense => {
   return errors;
 };
 
-const EMPTY_ARRAY = [];
-
-// Margin x between inline fields, not displayed on mobile
-const fieldsMarginRight = [2, 3, 4];
-
 const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.country', payee.location.country || null);
   formik.setFieldValue('payeeLocation.address', payee.location.address || '');
+  formik.setFieldValue('payeeLocation.structured', payee.location.structured);
+};
+
+const HiddenFragment = styled.div`
+  display: ${({ show }) => (show ? 'block' : 'none')};
+`;
+
+const STEPS = {
+  PAYEE: 'PAYEE',
+  EXPENSE: 'EXPENSE',
 };
 
 const ExpenseFormBody = ({
@@ -177,31 +186,86 @@ const ExpenseFormBody = ({
   autoFocusTitle,
   onCancel,
   formPersister,
+  loggedInAccount,
+  loading,
   expensesTags,
   shouldLoadValuesFromPersister,
+  isDraft,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, handleChange, errors, setValues, dirty } = formik;
+  const formRef = React.useRef();
+  const { values, handleChange, errors, setValues, dirty, touched, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const stepOneCompleted = hasBaseFormFieldsCompleted && values.items.length > 0;
-  const stepTwoCompleted = stepOneCompleted && values.payoutMethod;
+  const isInvite = values.payee?.isInvite;
+  const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
-  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
+  const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
+  const isCreditCardCharge = values.type === expenseTypes.CHARGE;
+  const stepOneCompleted =
+    values.payoutMethod &&
+    isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
+    (isReceipt ? true : values.payeeLocation?.country && values.payeeLocation?.address);
+  const stepTwoCompleted = isInvite
+    ? true
+    : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
+
+  const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
+  // Only true when logged in and drafting the expense
+  const [isOnBehalf, setOnBehalf] = React.useState(false);
+
+  // Scroll to top when step changes
+  React.useEffect(() => {
+    const boundingRect = formRef.current?.getBoundingClientRect();
+    if (boundingRect) {
+      const elemTop = boundingRect.top + window.scrollY;
+      window.scroll({ top: elemTop - 75 });
+    }
+  }, [step]);
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
-    if (!values.payee && !isEmpty(payoutProfiles)) {
+    if (values?.draft?.payee && !loggedInAccount) {
+      formik.setFieldValue('payee', {
+        ...values.draft.payee,
+        isInvite: false,
+        isNewUser: true,
+      });
+    }
+    // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
+    else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
       formik.setFieldValue('payee', first(payoutProfiles));
     }
-  }, [payoutProfiles]);
+  }, [payoutProfiles, loggedInAccount]);
 
   // Pre-fill address based on the payout profile
   React.useEffect(() => {
     if (!values.payeeLocation?.address && values.payee?.location) {
       setLocationFromPayee(formik, values.payee);
     }
+    if (!isDraft && values.payee?.isInvite) {
+      setOnBehalf(values.payee.isInvite);
+      setStep(STEPS.EXPENSE);
+    }
   }, [values.payee]);
+
+  // Return to Payee step if type is changed
+  React.useEffect(() => {
+    if (!isCreditCardCharge) {
+      setStep(STEPS.PAYEE);
+      setOnBehalf(false);
+
+      if (!isDraft && values.payee?.isInvite) {
+        formik.setFieldValue('payee', null);
+      }
+    }
+  }, [values.type]);
+
+  React.useEffect(() => {
+    if (values.payeeLocation?.structured) {
+      formik.setFieldValue('payeeLocation.address', serializeAddress(values.payeeLocation.structured));
+    }
+  }, [values.payeeLocation]);
 
   // Load values from localstorage
   React.useEffect(() => {
@@ -209,10 +273,16 @@ const ExpenseFormBody = ({
       const formValues = formPersister.loadValues();
       if (formValues) {
         // Reset payoutMethod if host is no longer connected to TransferWise
-        if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host.transferwise) {
+        if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host?.transferwise) {
           formValues.payoutMethod = undefined;
         }
-        setValues(formValues);
+        setValues(
+          omit(
+            formValues,
+            // Omit deprecated fields, otherwise it will prevent expense submission
+            ['location', 'privateInfo'],
+          ),
+        );
       }
     }
   }, [formPersister, dirty]);
@@ -224,12 +294,95 @@ const ExpenseFormBody = ({
     }
   }, [formPersister, dirty, values]);
 
+  let payeeForm;
+  if (loading) {
+    payeeForm = <LoadingPlaceholder height={32} />;
+  } else if (isDraft && !loggedInAccount) {
+    payeeForm = (
+      <ExpenseFormPayeeSignUpStep
+        collective={collective}
+        formik={formik}
+        onCancel={onCancel}
+        onNext={() => setStep(STEPS.EXPENSE)}
+      />
+    );
+  } else if (isOnBehalf === true && isNewUser) {
+    payeeForm = (
+      <ExpenseFormPayeeInviteNewStep
+        collective={collective}
+        formik={formik}
+        onBack={() => {
+          setStep(STEPS.PAYEE);
+          setOnBehalf(false);
+          formik.setFieldValue('payee', null);
+          formik.setFieldValue('payoutMethod', null);
+          formik.setFieldValue('payeeLocation', null);
+        }}
+        onNext={() => {
+          formik.setFieldValue('payee', { ...values.payee, isInvite: true });
+        }}
+        payoutProfiles={payoutProfiles}
+      />
+    );
+  } else {
+    payeeForm = (
+      <ExpenseFormPayeeStep
+        collective={collective}
+        formik={formik}
+        isOnBehalf={isOnBehalf}
+        onCancel={onCancel}
+        payoutProfiles={payoutProfiles}
+        loggedInAccount={loggedInAccount}
+        onNext={() => {
+          const validation = validatePayoutMethod(values.payoutMethod);
+          if (isEmpty(validation)) {
+            setStep(STEPS.EXPENSE);
+          } else {
+            setErrors({ payoutMethod: validation });
+          }
+        }}
+        onInvite={isInvite => {
+          setOnBehalf(isInvite);
+          formik.setFieldValue('payeeLocation', {});
+          formik.setFieldValue('payee', {});
+        }}
+      />
+    );
+  }
+
   return (
     <Form>
-      <ExpenseTypeRadioSelect name="type" onChange={handleChange} value={values.type} />
+      {!isCreditCardCharge && (
+        <ExpenseTypeRadioSelect
+          name="type"
+          onChange={e => {
+            handleChange(e);
+          }}
+          value={values.type}
+          options={{
+            fundingRequest:
+              [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
+              collective.settings?.fundingRequest === true ||
+              collective.host?.settings?.fundingRequest === true,
+          }}
+        />
+      )}
       {values.type && (
-        <Box width="100%">
-          <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
+        <StyledCard mt={4} p={[16, 16, 32]} overflow="initial" ref={formRef}>
+          <HiddenFragment show={step === STEPS.PAYEE}>
+            <Flex alignItems="center" mb={16}>
+              <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
+                {formatMessage(msg.stepPayee)}
+              </Span>
+              <Box ml={2}>
+                <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
+              </Box>
+              <StyledHr flex="1" borderColor="black.300" mx={2} />
+            </Flex>
+            {payeeForm}
+          </HiddenFragment>
+
+          <HiddenFragment show={step === STEPS.EXPENSE}>
             <Flex alignItems="center" mb={10}>
               <P
                 as="label"
@@ -239,293 +392,191 @@ const ExpenseFormBody = ({
                 lineHeight="24px"
                 fontWeight="bold"
               >
-                <FormattedMessage
-                  id="Expense.EnterExpenseTitle"
-                  defaultMessage="Enter expense title <small>(Public)</small>"
-                  values={{
-                    small(msg) {
-                      return (
-                        <Span fontWeight="normal" color="black.600">
-                          {msg}
-                        </Span>
-                      );
-                    },
-                  }}
-                />
+                {values.type === expenseTypes.FUNDING_REQUEST ? (
+                  <FormattedMessage
+                    id="Expense.EnterRequestSubject"
+                    defaultMessage="Enter grant subject <small>(Public)</small>"
+                    values={{
+                      small(msg) {
+                        return (
+                          <Span fontWeight="normal" color="black.600">
+                            {msg}
+                          </Span>
+                        );
+                      },
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="Expense.EnterExpenseTitle"
+                    defaultMessage="Enter expense title <small>(Public)</small>"
+                    values={{
+                      small(msg) {
+                        return (
+                          <Span fontWeight="normal" color="black.600">
+                            {msg}
+                          </Span>
+                        );
+                      },
+                    }}
+                  />
+                )}
               </P>
               <StyledHr flex="1" borderColor="black.300" ml={2} />
             </Flex>
             <P fontSize="12px" color="black.600">
               <FormattedMessage
                 id="Expense.PrivacyWarning"
-                defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
+                defaultMessage="This information is public. Do not put any private details in this field."
               />
             </P>
             <Field
               as={StyledInput}
               autoFocus={autoFocusTitle}
-              id="expense-description"
-              name="description"
-              placeholder={formatMessage(msg.descriptionPlaceholder)}
-              width="100%"
-              fontSize="H4"
               border="0"
               error={errors.description}
+              fontSize="24px"
+              id="expense-description"
+              maxLength={255}
               mt={3}
+              name="description"
               px={2}
               py={1}
-              maxLength={255}
+              width="100%"
               withOutline
+              placeholder={
+                values.type === expenseTypes.FUNDING_REQUEST
+                  ? formatMessage(msg.grantSubjectPlaceholder)
+                  : formatMessage(msg.descriptionPlaceholder)
+              }
             />
-            {hasBaseFormFieldsCompleted && (
-              <React.Fragment>
-                <Flex alignItems="flex-start" mt={3}>
-                  <ExpenseTypeTag type={values.type} mr="4px" />
-                  <StyledInputTags
-                    renderUpdatedTags
-                    suggestedTags={expensesTags}
-                    onChange={tags =>
-                      formik.setFieldValue(
-                        'tags',
-                        tags.map(t => t.value.toLowerCase()),
-                      )
+            <HiddenFragment show={hasBaseFormFieldsCompleted}>
+              <Flex alignItems="flex-start" mt={3}>
+                <ExpenseTypeTag type={values.type} mr="4px" />
+                <StyledInputTags
+                  suggestedTags={expensesTags}
+                  onChange={tags => {
+                    formik.setFieldValue(
+                      'tags',
+                      tags.map(t => t.value.toLowerCase()),
+                    );
+                  }}
+                  value={values.tags}
+                />
+              </Flex>
+              {values.type === expenseTypes.INVOICE && (
+                <Box my={40}>
+                  <ExpenseAttachedFilesForm
+                    title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
+                    description={
+                      <FormattedMessage
+                        id="UploadInvoiceDescription"
+                        defaultMessage="If you already have an invoice document, you can upload it here."
+                      />
                     }
-                    value={values.tags}
+                    onChange={files => formik.setFieldValue('attachedFiles', files)}
+                    defaultValue={values.attachedFiles}
                   />
-                </Flex>
-                {values.type === expenseTypes.INVOICE && (
-                  <Box my={40}>
-                    <ExpenseAttachedFilesForm
-                      onChange={files => formik.setFieldValue('attachedFiles', files)}
-                      defaultValue={values.attachedFiles}
-                    />
+                </Box>
+              )}
+
+              <Flex alignItems="center" my={24}>
+                <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
+                  {formatMessage(
+                    isReceipt ? msg.stepReceipt : isFundingRequest ? msg.stepFundingRequest : msg.stepInvoice,
+                  )}
+                </Span>
+                <StyledHr flex="1" borderColor="black.300" mx={2} />
+                <StyledButton
+                  buttonSize="tiny"
+                  type="button"
+                  onClick={() => addNewExpenseItem(formik)}
+                  minWidth={135}
+                  data-cy="expense-add-item-btn"
+                  disabled={isCreditCardCharge}
+                >
+                  +&nbsp;
+                  {formatMessage(
+                    isReceipt ? msg.addNewReceipt : isFundingRequest ? msg.addNewGrantItem : msg.addNewItem,
+                  )}
+                </StyledButton>
+              </Flex>
+              <Box>
+                <FieldArray name="items" component={ExpenseFormItems} />
+              </Box>
+
+              {values.type === expenseTypes.FUNDING_REQUEST && (
+                <Box my={40}>
+                  <ExpenseAttachedFilesForm
+                    title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
+                    description={
+                      <FormattedMessage
+                        id="UploadDocumentationDescription"
+                        defaultMessage="If you want to include any documentation, you can upload it here."
+                      />
+                    }
+                    onChange={files => formik.setFieldValue('attachedFiles', files)}
+                    defaultValue={values.attachedFiles}
+                  />
+                </Box>
+              )}
+
+              <StyledHr flex="1" mt={4} borderColor="black.300" />
+              <Flex mt={3} flexWrap="wrap" alignItems="center">
+                <StyledButton
+                  type="button"
+                  width={['100%', 'auto']}
+                  mx={[2, 0]}
+                  mr={[null, 3]}
+                  mt={2}
+                  whiteSpace="nowrap"
+                  data-cy="expense-back"
+                  onClick={() => {
+                    if (isCreditCardCharge) {
+                      onCancel();
+                    } else {
+                      setStep(STEPS.PAYEE);
+                    }
+                  }}
+                >
+                  ←&nbsp;
+                  <FormattedMessage id="Back" defaultMessage="Back" />
+                </StyledButton>
+                <StyledButton
+                  type="submit"
+                  width={['100%', 'auto']}
+                  mx={[2, 0]}
+                  mr={[null, 3]}
+                  mt={2}
+                  whiteSpace="nowrap"
+                  data-cy="expense-summary-btn"
+                  buttonStyle="primary"
+                  disabled={!stepTwoCompleted || !formik.isValid}
+                  loading={formik.isSubmitting}
+                >
+                  {isInvite && !isDraft ? (
+                    <FormattedMessage id="Expense.SendInvite" defaultMessage="Send Invite" />
+                  ) : isCreditCardCharge ? (
+                    <FormattedMessage id="Expense.AttachReceipt" defaultMessage="Attach Receipt" />
+                  ) : (
+                    <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+                  )}
+                  &nbsp;→
+                </StyledButton>
+                {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
+                  <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
+                    {errors.payoutMethod.data.currency.toString()}
                   </Box>
                 )}
-                <Flex alignItems="center" my={24}>
-                  <Span color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
-                    {formatMessage(isReceipt ? msg.step1 : msg.step1Invoice)}
-                  </Span>
-                  <StyledHr flex="1" borderColor="black.300" mx={2} />
-                  <StyledButton
-                    buttonSize="tiny"
-                    type="button"
-                    onClick={() => addNewExpenseItem(formik)}
-                    minWidth={135}
-                    data-cy="expense-add-item-btn"
-                  >
-                    +&nbsp;{formatMessage(isReceipt ? msg.addNewReceipt : msg.addNewItem)}
-                  </StyledButton>
-                </Flex>
-                <Box>
-                  <FieldArray name="items" component={ExpenseFormItems} />
-                </Box>
-              </React.Fragment>
-            )}
-            {stepOneCompleted && (
-              <React.Fragment>
-                <Flex alignItems="center" mt={24} mb={16}>
-                  <Span color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
-                    {formatMessage(isReceipt ? msg.step2 : msg.step2Invoice)}
-                  </Span>
-                  <Box ml={2}>
-                    <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
-                  </Box>
-                  <StyledHr flex="1" borderColor="black.300" mx={2} />
-                </Flex>
-
-                <Box>
-                  <Flex justifyContent="space-between" flexWrap="wrap">
-                    <Box minWidth={250} flex="1 1 50%">
-                      <Field name="payee">
-                        {({ field }) => (
-                          <StyledInputField
-                            name={field.name}
-                            label={formatMessage(msg.payeeLabel)}
-                            flex="1"
-                            mr={fieldsMarginRight}
-                            mt={3}
-                          >
-                            {({ id }) => (
-                              <CollectivePicker
-                                types={[CollectiveType.ORGANIZATION]}
-                                inputId={id}
-                                collectives={payoutProfiles}
-                                getDefaultOptions={build => values.payee && build(values.payee)}
-                                data-cy="select-expense-payee"
-                                onChange={({ value }) => {
-                                  formik.setFieldValue('payee', value);
-                                  formik.setFieldValue('payoutMethod', null);
-                                  setLocationFromPayee(formik, value);
-                                }}
-                              />
-                            )}
-                          </StyledInputField>
-                        )}
-                      </Field>
-                      {values.type === expenseTypes.INVOICE && (
-                        <React.Fragment>
-                          <FastField name="payeeLocation.country">
-                            {({ field }) => (
-                              <StyledInputField
-                                name={field.name}
-                                label={formatMessage(msg.country)}
-                                error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
-                                required
-                                minWidth={250}
-                                mr={fieldsMarginRight}
-                                mt={3}
-                              >
-                                {({ id, error }) => (
-                                  <InputTypeCountry
-                                    inputId={id}
-                                    onChange={value => formik.setFieldValue(field.name, value)}
-                                    value={field.value}
-                                    error={error}
-                                  />
-                                )}
-                              </StyledInputField>
-                            )}
-                          </FastField>
-                          <FastField name="payeeLocation.address">
-                            {({ field }) => (
-                              <StyledInputField
-                                name={field.name}
-                                label={formatMessage(msg.address)}
-                                error={formatFormErrorMessage(intl, errors.payeeLocation?.address)}
-                                required
-                                minWidth={250}
-                                mr={fieldsMarginRight}
-                                mt={3}
-                              >
-                                {inputProps => (
-                                  <StyledTextarea
-                                    {...inputProps}
-                                    {...field}
-                                    minHeight={100}
-                                    placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
-                                  />
-                                )}
-                              </StyledInputField>
-                            )}
-                          </FastField>
-                          <FastField name="invoiceInfo">
-                            {({ field }) => (
-                              <StyledInputField
-                                name={field.name}
-                                label={formatMessage(msg.invoiceInfo)}
-                                required={false}
-                                minWidth={250}
-                                mr={fieldsMarginRight}
-                                mt={3}
-                              >
-                                {inputProps => (
-                                  <Field
-                                    as={StyledTextarea}
-                                    {...inputProps}
-                                    {...field}
-                                    minHeight={80}
-                                    placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
-                                  />
-                                )}
-                              </StyledInputField>
-                            )}
-                          </FastField>
-                        </React.Fragment>
-                      )}
-                    </Box>
-                    <Box minWidth={250} flex="1 1 50%">
-                      <Field name="payoutMethod">
-                        {({ field }) => (
-                          <StyledInputField
-                            name={field.name}
-                            htmlFor="payout-method"
-                            flex="1"
-                            mr={fieldsMarginRight}
-                            mt={3}
-                            minWidth={250}
-                            label={formatMessage(msg.payoutOptionLabel)}
-                            error={
-                              isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
-                                ? formatFormErrorMessage(intl, errors.payoutMethod)
-                                : null
-                            }
-                          >
-                            {({ id, error }) => (
-                              <PayoutMethodSelect
-                                inputId={id}
-                                error={error}
-                                onChange={setPayoutMethod}
-                                payoutMethod={values.payoutMethod}
-                                payoutMethods={get(values.payee, 'payoutMethods', EMPTY_ARRAY)}
-                                disabled={!values.payee}
-                                collective={collective}
-                              />
-                            )}
-                          </StyledInputField>
-                        )}
-                      </Field>
-
-                      {values.payoutMethod && (
-                        <Field name="payoutMethod">
-                          {({ field, meta }) => (
-                            <Box mr={fieldsMarginRight} mt={3} flex="1" minWidth={258}>
-                              <PayoutMethodForm
-                                fieldsPrefix="payoutMethod"
-                                payoutMethod={field.value}
-                                host={collective.host}
-                                errors={meta.error}
-                              />
-                            </Box>
-                          )}
-                        </Field>
-                      )}
-                    </Box>
-                  </Flex>
-                </Box>
-              </React.Fragment>
-            )}
-          </StyledCard>
-        </Box>
+              </Flex>
+            </HiddenFragment>
+          </HiddenFragment>
+        </StyledCard>
       )}
-      {stepOneCompleted && (
-        <Flex mt={4} flexWrap="wrap">
-          {onCancel && (
-            <StyledButton
-              type="button"
-              data-cy="expense-cancel-btn"
-              disabled={formik.isSubmitting}
-              mt={2}
-              minWidth={175}
-              width={['100%', 'auto']}
-              mx={[2, 0]}
-              mr={[null, 3]}
-              whiteSpace="nowrap"
-              onClick={() => {
-                if (!formik.dirty || confirm(formatMessage(msg.leaveWithUnsavedChanges))) {
-                  onCancel();
-                }
-              }}
-            >
-              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
-          )}
-          <StyledButton
-            type="submit"
-            minWidth={175}
-            width={['100%', 'auto']}
-            mx={[2, 0]}
-            mr={[null, 3]}
-            mt={2}
-            whiteSpace="nowrap"
-            data-cy="expense-summary-btn"
-            buttonStyle="primary"
-            disabled={!stepTwoCompleted || !formik.isValid}
-            loading={formik.isSubmitting}
-          >
-            <FormattedMessage id="Expense.ReviewSummary" defaultMessage="Review expense summary" />
-            &nbsp;→
-          </StyledButton>
-        </Flex>
+      {step === STEPS.EXPENSE && (
+        <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
+          <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless collective={collective} />
+        </StyledCard>
       )}
     </Form>
   );
@@ -538,14 +589,23 @@ ExpenseFormBody.propTypes = {
   shouldLoadValuesFromPersister: PropTypes.bool,
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
+  loggedInAccount: PropTypes.object,
+  loading: PropTypes.bool,
+  isDraft: PropTypes.bool,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
+      }),
+      settings: PropTypes.shape({
+        fundingRequest: PropTypes.bool,
       }),
     }),
+    settings: PropTypes.object,
+    isApproved: PropTypes.bool,
   }).isRequired,
 };
 
@@ -561,14 +621,24 @@ const ExpenseForm = ({
   onCancel,
   validateOnChange,
   formPersister,
+  loggedInAccount,
+  loading,
   expensesTags,
   shouldLoadValuesFromPersister,
 }) => {
-  const [hasValidate, setValidate] = React.useState(validateOnChange);
+  const isDraft = expense?.status === expenseStatus.DRAFT;
+  const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
+  const initialValues = { ...getDefaultExpense(collective), ...expense };
+  if (isDraft) {
+    initialValues.items = expense.draft.items;
+    initialValues.attachedFiles = expense.draft.attachedFiles;
+    initialValues.payoutMethod = expense.draft.payoutMethod;
+    initialValues.payeeLocation = expense.draft.payeeLocation;
+  }
 
   return (
     <Formik
-      initialValues={{ ...getDefaultExpense(collective, payoutProfiles), ...expense }}
+      initialValues={initialValues}
       validate={hasValidate && validate}
       onSubmit={async (values, formik) => {
         // We initially let the browser do the validation. Then once users try to submit the
@@ -590,8 +660,11 @@ const ExpenseForm = ({
           autoFocusTitle={autoFocusTitle}
           onCancel={onCancel}
           formPersister={formPersister}
+          loggedInAccount={loggedInAccount}
           expensesTags={expensesTags}
+          loading={loading}
           shouldLoadValuesFromPersister={shouldLoadValuesFromPersister}
+          isDraft={isDraft}
         />
       )}
     </Formik>
@@ -606,6 +679,8 @@ ExpenseForm.propTypes = {
   onCancel: PropTypes.func,
   /** To save draft of form values */
   formPersister: PropTypes.object,
+  loggedInAccount: PropTypes.object,
+  loading: PropTypes.bool,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
@@ -613,14 +688,19 @@ ExpenseForm.propTypes = {
     host: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
     }),
+    settings: PropTypes.object,
+    isApproved: PropTypes.bool,
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
     description: PropTypes.string,
+    status: PropTypes.string,
+    payee: PropTypes.object,
+    draft: PropTypes.object,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string,

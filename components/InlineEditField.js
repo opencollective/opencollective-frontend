@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
+import { Mutation } from '@apollo/client/react/components';
 import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { get, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -167,7 +167,7 @@ class InlineEditField extends Component {
     const { draft, isEditing } = this.state;
     const { buttonsMinWidth } = this.props;
     const value = get(values, field);
-    const touched = draft !== value;
+    const isValid = draft !== value && draft != '';
 
     if (!isEditing) {
       return (
@@ -182,7 +182,7 @@ class InlineEditField extends Component {
       );
     } else {
       return (
-        <WarnIfUnsavedChanges hasUnsavedChanges={warnIfUnsavedChanges && touched}>
+        <WarnIfUnsavedChanges hasUnsavedChanges={warnIfUnsavedChanges && isValid}>
           <Mutation mutation={mutation} {...mutationOptions}>
             {(updateField, { loading, error }) => (
               <React.Fragment>
@@ -216,15 +216,8 @@ class InlineEditField extends Component {
                 )}
                 <Box width={1}>
                   {error && (
-                    <MessageBox
-                      type="error"
-                      my={2}
-                      fontSize="Paragraph"
-                      lineHeight="Paragraph"
-                      fontWeight="normal"
-                      withIcon
-                    >
-                      {error.message.replace('GraphQL error: ', '')}
+                    <MessageBox type="error" my={2} fontSize="14px" lineHeight="20px" fontWeight="normal" withIcon>
+                      {error.message}
                     </MessageBox>
                   )}
                   <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
@@ -239,7 +232,7 @@ class InlineEditField extends Component {
                     <FormButton
                       buttonStyle="primary"
                       loading={loading}
-                      disabled={!touched}
+                      disabled={!isValid}
                       data-cy="InlineEditField-Btn-Save"
                       minWidth={buttonsMinWidth}
                       onClick={() => {

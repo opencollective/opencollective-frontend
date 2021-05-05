@@ -1,229 +1,120 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { graphql } from '@apollo/client/react/hoc';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
+import CollectiveNavbar from '../components/collective-navbar';
+import { Dimensions } from '../components/collective-page/_constants';
+import SectionTitle from '../components/collective-page/SectionTitle';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import { Flex } from '../components/Grid';
-import I18nFormatters from '../components/I18nFormatters';
+import { Box } from '../components/Grid';
 import Loading from '../components/Loading';
+import { recurringContributionsQuery } from '../components/recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../components/recurring-contributions/RecurringContributionsContainer';
-import StyledTag from '../components/StyledTag';
-import TemporaryNotification from '../components/TemporaryNotification';
-import { H2, P } from '../components/Text';
+import StyledFilters from '../components/StyledFilters';
 import { withUser } from '../components/UserProvider';
 
-const FilterTag = styled(StyledTag)`
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  cursor: pointer;
-  min-width: 180px;
+const MainContainer = styled(Container)`
+  max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
+  margin: 0 auto;
 `;
 
-export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
-  query RecurringContributions($collectiveSlug: String) {
-    account(slug: $collectiveSlug) {
-      id
-      slug
-      name
-      type
-      description
-      settings
-      imageUrl
-      twitterHandle
-      orders {
-        totalCount
-        nodes {
-          id
-          paymentMethod {
-            id
-          }
-          amount {
-            value
-            currency
-          }
-          status
-          frequency
-          tier {
-            id
-            name
-          }
-          totalDonations {
-            value
-            currency
-          }
-          toAccount {
-            id
-            slug
-            name
-            description
-            tags
-            imageUrl
-            settings
-          }
-        }
-      }
-    }
-  }
-`;
+const FILTERS = {
+  ACTIVE: 'ACTIVE',
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY',
+  CANCELLED: 'CANCELLED',
+};
+const I18nFilters = defineMessages({
+  [FILTERS.ACTIVE]: {
+    id: 'Subscriptions.Active',
+    defaultMessage: 'Active',
+  },
+  [FILTERS.MONTHLY]: {
+    id: 'Frequency.Monthly',
+    defaultMessage: 'Monthly',
+  },
+  [FILTERS.YEARLY]: {
+    id: 'Frequency.Yearly',
+    defaultMessage: 'Yearly',
+  },
+  [FILTERS.CANCELLED]: {
+    id: 'Subscriptions.Cancelled',
+    defaultMessage: 'Cancelled',
+  },
+});
 
 class recurringContributionsPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug } }) {
-    return { collectiveSlug };
+  static getInitialProps({ query: { slug } }) {
+    return { slug };
   }
 
   static propTypes = {
-    collectiveSlug: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object,
+    slug: PropTypes.string.isRequired,
+    loadingLoggedInUser: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      account: PropTypes.object.isRequired,
+      account: PropTypes.object,
     }), // from withData
+    intl: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
-    this.state = { filter: 'active', notification: false, notificationType: null, notificationText: null };
+    this.state = { filter: 'ACTIVE' };
   }
 
-  createNotification = (type, error) => {
-    this.setState({ notification: true });
-    if (type === 'error') {
-      this.setState({ notificationType: 'error' });
-      this.setState({ notificationText: error });
-    } else {
-      this.setState({ notificationType: type });
-    }
-    window.scrollTo(0, 0);
-  };
-
-  dismissNotification = () => {
-    this.setState(state => ({
-      ...state.filter,
-      notification: false,
-      notificationType: null,
-      notificationText: null,
-    }));
-  };
-
   render() {
-    const { collectiveSlug, data, LoggedInUser } = this.props;
-    const { notification, notificationType, notificationText } = this.state;
+    const { slug, data, intl, loadingLoggedInUser } = this.props;
 
-    if (!data.loading) {
+    const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
+
+    if (!data?.loading && !loadingLoggedInUser) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
       }
     }
 
     const collective = data && data.account;
     const recurringContributions = collective && collective.orders;
-
     return (
       <AuthenticatedPage>
-        {data.loading || !LoggedInUser ? (
+        {data?.loading || loadingLoggedInUser ? (
           <Container py={[5, 6]}>
             <Loading />
           </Container>
         ) : (
           <Fragment>
-            {notification && (
-              <TemporaryNotification
-                onDismiss={this.dismissNotification}
-                type={notificationType === 'error' ? 'error' : 'default'}
-              >
-                {notificationType === 'activate' && (
-                  <FormattedMessage
-                    id="subscription.createSuccessActivate"
-                    defaultMessage="Recurring contribution <strong>activated</strong>! Woohoo! 🎉"
-                    values={I18nFormatters}
-                  />
-                )}
-                {notificationType === 'cancel' && (
-                  <FormattedMessage
-                    id="subscription.createSuccessCancel"
-                    defaultMessage="Your recurring contribution has been <strong>cancelled</strong>."
-                    values={I18nFormatters}
-                  />
-                )}
-                {notificationType === 'update' && (
-                  <FormattedMessage
-                    id="subscription.createSuccessUpdated"
-                    defaultMessage="Your recurring contribution has been <strong>updated</strong>."
-                    values={I18nFormatters}
-                  />
-                )}
-                {notificationType === 'error' && <P>{notificationText}</P>}
-              </TemporaryNotification>
-            )}
-            <Container py={[5, 6]} px={[3, 4]}>
-              <H2 my={2} fontWeight="300">
-                <FormattedMessage
-                  id="Subscriptions.Title"
-                  defaultMessage="{collectiveName}'s recurring financial contributions"
-                  values={{
-                    collectiveName: collective.name,
-                  }}
+            <CollectiveNavbar collective={collective} />
+            <MainContainer py={[3, 4]} px={[2, 3, 4]}>
+              <SectionTitle textAlign="left" mb={1}>
+                <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
+              </SectionTitle>
+              <Box mt={4} mx="auto">
+                <StyledFilters
+                  filters={filters}
+                  getLabel={key => intl.formatMessage(I18nFilters[key])}
+                  selected={this.state.filter}
+                  justifyContent="left"
+                  minButtonWidth={175}
+                  onChange={filter => this.setState({ filter: filter })}
                 />
-              </H2>
-              <Flex my={3} flexWrap="wrap">
-                <FilterTag
-                  type={this.state.filter === 'active' ? 'dark' : null}
-                  variant="rounded"
-                  minWidth="180px"
-                  mx={2}
-                  onClick={() => this.setState({ filter: 'active' })}
-                  data-cy="recurring-contribution-filter-tag-active"
-                >
-                  <FormattedMessage id="Subscriptions.Active" defaultMessage="Active" />
-                </FilterTag>
-                <FilterTag
-                  type={this.state.filter === 'monthly' ? 'dark' : null}
-                  variant="rounded"
-                  minWidth="180px"
-                  mx={2}
-                  onClick={() => this.setState({ filter: 'monthly' })}
-                  data-cy="recurring-contribution-filter-tag-monthly"
-                >
-                  <FormattedMessage id="Frequency.Monthly" defaultMessage="Monthly" />
-                </FilterTag>
-                <FilterTag
-                  type={this.state.filter === 'yearly' ? 'dark' : null}
-                  variant="rounded"
-                  minWidth="180px"
-                  mx={2}
-                  onClick={() => this.setState({ filter: 'yearly' })}
-                  data-cy="recurring-contribution-filter-tag-yearly"
-                >
-                  <FormattedMessage id="Frequency.Yearly" defaultMessage="Yearly" />
-                </FilterTag>
-                <FilterTag
-                  type={this.state.filter === 'cancelled' ? 'dark' : null}
-                  variant="rounded"
-                  mx={2}
-                  onClick={() => this.setState({ filter: 'cancelled' })}
-                  data-cy="recurring-contribution-filter-tag-cancelled"
-                >
-                  <FormattedMessage id="Subscriptions.Cancelled" defaultMessage="Cancelled" />
-                </FilterTag>
-              </Flex>
+              </Box>
               <RecurringContributionsContainer
                 recurringContributions={recurringContributions}
                 account={collective}
                 filter={this.state.filter}
-                createNotification={this.createNotification}
               />
-            </Container>
+            </MainContainer>
           </Fragment>
         )}
       </AuthenticatedPage>
@@ -231,10 +122,11 @@ class recurringContributionsPage extends React.Component {
   }
 }
 
-const getData = graphql(recurringContributionsPageQuery, {
+const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
+  skip: props => !props.LoggedInUser,
   options: {
     context: API_V2_CONTEXT,
   },
 });
 
-export default injectIntl(withUser(getData(recurringContributionsPage)));
+export default withUser(injectIntl(addRecurringContributionsPageData(recurringContributionsPage)));

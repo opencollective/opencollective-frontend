@@ -1,8 +1,8 @@
 import '../env';
 import 'raf/polyfill';
 
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import Enzyme from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
 import jsdom from 'jsdom';
 
 const { JSDOM } = jsdom;

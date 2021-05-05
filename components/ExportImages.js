@@ -1,8 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
+import SettingsSectionTitle from './edit-collective/sections/SettingsSectionTitle';
+import Container from './Container';
+import { Box } from './Grid';
 import InputField from './InputField';
+import StyledLink from './StyledLink';
+import { Label, Strong } from './Text';
+
+const ParameterColumnHeader = styled.th`
+  font-size: 12px;
+  font-weight: bold;
+  padding: 0.1rem 1rem 0.1rem 0;
+`;
 
 class ExportImages extends React.Component {
   static propTypes = {
@@ -21,27 +33,25 @@ class ExportImages extends React.Component {
       return <div />;
     }
 
-    let i = 0;
     const tiers = collective.tiers.map(tier => {
+      const encodedTierName = encodeURIComponent(tier.name);
       return {
-        index: i++,
         id: tier.id,
         name: tier.name,
         images: [
           {
             name: 'Tier badge',
-            url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${tier.name}&color=brightgreen`,
-            code: `<img src="https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${tier.name}&color=brightgreen" />`,
+            url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen`,
+            code: `<img alt="open collective badge" src="https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen" />`,
             options: [
               {
                 name: 'label',
-                description: 'label of the badge',
-                defaultValue: `name of the tier (${tier.name})`,
+                description: 'badge label',
+                defaultValue: `tier name (${tier.name})`,
               },
               {
                 name: 'color',
-                description:
-                  'color of the badge (brightgreen, green, yellowgreen, yellow, orange, red, lightgrey, blue)',
+                description: 'badge color (brightgreen, green, yellowgreen, yellow, orange, red, lightgrey, blue)',
                 defaultValue: 'brightgreen',
               },
             ],
@@ -49,33 +59,33 @@ class ExportImages extends React.Component {
           {
             name: 'Financial contributors widget',
             url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36`,
-            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600"></object>`,
+            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600" style="max-width: 100%;"></object>`,
             options: [
               {
                 name: 'width',
-                description: 'width of the image',
+                description: 'image width',
               },
               {
                 name: 'height',
-                description: 'height of the image',
+                description: 'image height',
               },
               {
                 name: 'limit',
-                description: 'max number of financial contributors to show',
+                description: 'max contributors to show',
                 defaultValue: '(unlimited)',
               },
               {
                 name: 'avatarHeight',
-                description: 'max height of each avatar / logo',
+                description: 'max avatar/logo height',
               },
               {
                 name: 'button',
-                description: 'show "become a backer/sponsor" button',
+                description: 'show "become a contributor" button',
                 defaultValue: 'true',
               },
               {
                 name: 'format',
-                description: 'format of the image (replace .svg with .png or .jpg)',
+                description: 'image format (replace .svg with .png or .jpg)',
               },
             ],
           },
@@ -83,48 +93,16 @@ class ExportImages extends React.Component {
       };
     });
 
-    const tierOptions = tiers.map(tier => {
-      return { [tier.index]: tier.name };
+    const tierOptions = tiers.map((tier, index) => {
+      return { [index]: tier.name };
     });
     const tier = tiers[this.state.tierIndex];
 
     return (
-      <div className="ExportImages">
-        <style global jsx>
-          {`
-            table {
-              font-size: 1.3rem;
-            }
-            table tr td,
-            table tr th {
-              vertical-align: top;
-              padding: 0.1rem 0.3rem;
-            }
-            .param {
-              font-weight: bold;
-              padding-right: 0.5rem;
-              font-family: 'Courrier';
-            }
-            .actions {
-              text-align: center;
-            }
-            .url {
-              font-size: 1.4rem;
-            }
-            .code {
-              font-size: 1.4rem;
-              font-family: Courrier;
-              padding: 0.1rem 0.3rem;
-              background: #ddd;
-              margin: 0.5rem;
-              border: 1px solid #ccc;
-            }
-          `}
-        </style>
-
-        <h1>
-          <FormattedMessage id="export.images.title" defaultMessage="Export images" />
-        </h1>
+      <div>
+        <SettingsSectionTitle>
+          <FormattedMessage id="export.images.title" defaultMessage="Export tier images" />
+        </SettingsSectionTitle>
         <p>
           <FormattedMessage
             id="ExportImages.Title"
@@ -140,58 +118,68 @@ class ExportImages extends React.Component {
           />
         </div>
         {tier && (
-          <div>
+          <ul>
             {tier.images.map(image => (
-              <div key={image.name}>
-                <label>{image.name}</label>
+              <Container as="li" key={image.name} mb={4}>
+                <Label fontWeight="500">{image.name}</Label>
                 <div
+                  style={{ maxWidth: '100%', overflowY: 'auto' }}
                   dangerouslySetInnerHTML={{
                     __html: image.code,
                   }}
                 />
-                <div className="url">
-                  <a href={image.url} target="_blank" rel="noopener noreferrer">
+                <Box my={1}>
+                  <StyledLink fontSize="14px" href={image.url} openInNewTab>
                     {image.url}
-                  </a>
-                </div>
-                <div className="code">{image.code}</div>
-                <div>
-                  <label>Options:</label>
-                  <table>
+                  </StyledLink>
+                </Box>
+                <Container as="pre" whiteSpace="pre-wrap" fontSize="11px" maxWidth={880}>
+                  {image.code}
+                </Container>
+                <Container fontSize="14px" mt={3}>
+                  <Strong>
+                    <FormattedMessage id="export.json.parameters.title" defaultMessage="Parameters" />
+                  </Strong>
+                  <Container as="table" width="100%" css={{ borderSpacing: 16 }}>
                     <tbody>
                       <tr>
-                        <th>parameter</th>
-                        <th>description</th>
-                        <th>default value</th>
+                        <ParameterColumnHeader>
+                          <FormattedMessage id="Parameter" defaultMessage="Parameter" />
+                        </ParameterColumnHeader>
+                        <ParameterColumnHeader>
+                          <FormattedMessage id="Fields.description" defaultMessage="Description" />
+                        </ParameterColumnHeader>
+                        <ParameterColumnHeader>
+                          <FormattedMessage id="DefaultValue" defaultMessage="Default value" />
+                        </ParameterColumnHeader>
                       </tr>
                       {image.options.map(option => (
                         <tr key={option.name}>
-                          <th valign="top">{option.name}</th>
+                          <td valign="top">{option.name}</td>
                           <td valign="top">{option.description}</td>
                           <td valign="top">{option.defaultValue}</td>
                         </tr>
                       ))}
                     </tbody>
-                  </table>
-                </div>
-              </div>
+                  </Container>
+                </Container>
+              </Container>
             ))}
-          </div>
+          </ul>
         )}
-        <hr />
-        <label>
+        <SettingsSectionTitle mt={4}>
           <FormattedMessage id="ExportImages.AllFinancial" defaultMessage="All financial contributors badge" />
-        </label>
-        <div className="url">
-          <a
+        </SettingsSectionTitle>
+        <Box mb={2}>
+          <StyledLink
+            fontSize="14px"
+            openInNewTab
             href={`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
-            target="_blank"
-            rel="noopener noreferrer"
           >
             {`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
-          </a>
-        </div>
-        <img src={`https://opencollective.com/${collective.slug}/tiers/badge.svg`} />
+          </StyledLink>
+        </Box>
+        <img alt="open collective badge" src={`https://opencollective.com/${collective.slug}/tiers/badge.svg`} />
       </div>
     );
   }

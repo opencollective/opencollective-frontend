@@ -2,15 +2,40 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
-import colors from '../lib/constants/colors';
 import { formatCurrency } from '../lib/currency-utils';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
 
 import Avatar from './Avatar';
 import CollectiveCard from './CollectiveCard';
+import Container from './Container';
 import { Flex } from './Grid';
 import LinkCollective from './LinkCollective';
+
+const MemberContainer = styled.div`
+  max-width: 300px;
+  float: left;
+  position: relative;
+
+  .USER {
+    margin: 0.5rem 0.25rem;
+  }
+
+  .small {
+    width: 48px;
+  }
+
+  .small .avatar {
+    margin: 0;
+  }
+
+  .ORGANIZATION,
+  .COLLECTIVE {
+    width: 200px;
+    margin: 1rem;
+  }
+`;
 
 class Member extends React.Component {
   static propTypes = {
@@ -26,7 +51,7 @@ class Member extends React.Component {
 
     this.messages = defineMessages({
       'membership.since': { id: 'membership.since', defaultMessage: 'since {date}' },
-      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Collective Admin' },
+      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Admin' },
       MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
       BACKER: { id: 'Member.Role.BACKER', defaultMessage: 'Financial Contributor' },
       'membership.totalDonations': {
@@ -89,75 +114,32 @@ ${totalDonationsStr}`;
     }
 
     return (
-      <div className={`Member ${className} ${member.type} viewMode-${viewMode}`}>
-        <style jsx>
-          {`
-            .Member {
-              width: 100%;
-              max-width: 300px;
-              float: left;
-              position: relative;
-            }
-
-            .Member.small {
-              width: 48px;
-            }
-
-            .Member.viewMode-ORGANIZATION {
-              width: 200px;
-              margin: 1rem;
-            }
-
-            .bubble {
-              padding: 1rem;
-              padding-top: 0;
-              text-align: left;
-              overflow: hidden;
-            }
-
-            .small .avatar {
-              margin: 0;
-            }
-
-            .small .bubble {
-              display: none;
-            }
-
-            .name {
-              font-size: 1.7rem;
-            }
-
-            .description,
-            .meta {
-              font-size: 1.4rem;
-            }
-          `}
-        </style>
-        <div>
+      <MemberContainer>
+        <Container className={`${className} ${member.type} viewMode-${viewMode}`}>
           {viewMode === 'USER' && (
             <LinkCollective collective={this.props.member.member} target="_top" title={title}>
               <Flex mt={2}>
                 <Avatar collective={member} radius={45} className="noFrame" />
-                <div className="bubble">
-                  <div className="name">{name}</div>
-                  <div className="description" style={{ color: colors.darkgray }}>
+                <Container padding="1rem" paddingTop="0" textAlign="left" overflow="hidden" display="none">
+                  <Container fontSize="1.7rem">{name}</Container>
+                  <Container fontSize="1.4rem" color="black.600">
                     {firstSentence(description || member.description, 64)}
-                  </div>
-                  <div className="meta since" style={{ color: colors.darkgray }}>
+                  </Container>
+                  <Container className="since" fontSize="1.4rem">
                     {memberSinceStr}
-                  </div>
+                  </Container>
                   {totalDonationsStr && (
-                    <div className="meta totalDonations" style={{ color: colors.darkgray }}>
+                    <Container className="totalDonations" fontSize="1.4rem" color="black.600">
                       {totalDonationsStr}
-                    </div>
+                    </Container>
                   )}
-                </div>
+                </Container>
               </Flex>
             </LinkCollective>
           )}
           {viewMode === 'ORGANIZATION' && <CollectiveCard collective={member} membership={membership} />}
-        </div>
-      </div>
+        </Container>
+      </MemberContainer>
     );
   }
 }

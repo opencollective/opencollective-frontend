@@ -1,15 +1,11 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
-import {
-  BudgetItemExpenseFragment,
-  BudgetItemExpenseTypeFragment,
-  BudgetItemOrderFragment,
-} from '../../BudgetItemsList';
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/Contribute';
 
 import * as fragments from './fragments';
 
-export const getCollectivePageQuery = gql`
-  query getCollectivePageQuery($slug: String!, $nbContributorsPerContributeCard: Int) {
+export const collectivePageQuery = gql`
+  query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
       id
       slug
@@ -33,19 +29,32 @@ export const getCollectivePageQuery = gql`
       isArchived
       isHost
       isIncognito
+      isGuest
       hostFeePercent
       platformFeePercent
       image
       imageUrl(height: 256)
       canApply
       canContact
+      features {
+        ...NavbarFields
+      }
+      ordersFromCollective(subscriptionsOnly: true) {
+        isSubscriptionActive
+      }
+      memberOf(onlyActiveCollectives: true, limit: 1) {
+        id
+      }
       stats {
         id
         balance
+        balanceWithBlockedFunds
         yearlyBudget
         updates
         activeRecurringContributions
         totalAmountReceived(periodInMonths: 12)
+        totalAmountRaised: totalAmountReceived
+        totalNetAmountRaised: totalNetAmountReceived
         backers {
           id
           all
@@ -70,8 +79,12 @@ export const getCollectivePageQuery = gql`
         name
         slug
         image
+        backgroundImageUrl
         twitterHandle
         type
+        coreContributors: contributors(roles: [ADMIN, MEMBER]) {
+          ...ContributorsFields
+        }
       }
       host {
         id
@@ -79,19 +92,24 @@ export const getCollectivePageQuery = gql`
         slug
         type
         settings
+        plan {
+          id
+          hostFees
+          hostFeeSharePercent
+        }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
-        ...ContributorsFieldsFragment
+        ...ContributorsFields
       }
       financialContributors: contributors(roles: [BACKER], limit: 150) {
-        ...ContributorsFieldsFragment
+        ...ContributorsFields
       }
       tiers {
         id
         name
         slug
         description
-        hasLongDescription
+        useStandalonePage
         goal
         interval
         currency
@@ -120,6 +138,7 @@ export const getCollectivePageQuery = gql`
           collectiveSlug
           name
           type
+          isGuest
         }
       }
       events(includePastEvents: true, includeInactive: true) {
@@ -137,6 +156,32 @@ export const getCollectivePageQuery = gql`
           image
           collectiveSlug
           name
+          type
+          isGuest
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
+      }
+      projects {
+        id
+        slug
+        name
+        description
+        image
+        isActive
+        backgroundImageUrl(height: 208)
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
+          id
+          name
+          image
+          collectiveSlug
           type
         }
         stats {
@@ -176,20 +221,12 @@ export const getCollectivePageQuery = gql`
           }
         }
       }
-      transactions(limit: 3, includeExpenseTransactions: false) {
-        ...BudgetItemOrderFragment
-        ...BudgetItemExpenseFragment
-      }
-      expenses(limit: 3) {
-        ...BudgetItemExpenseTypeFragment
-      }
       updates(limit: 3, onlyPublishedUpdates: true) {
-        ...UpdatesFieldsFragment
+        ...UpdatesFields
       }
       plan {
-        hostDashboard
+        id
         hostedCollectives
-        hostedCollectivesLimit
       }
 
       ... on Event {
@@ -203,6 +240,7 @@ export const getCollectivePageQuery = gql`
           lat
           long
         }
+        privateInstructions
         orders {
           id
           createdAt
@@ -232,9 +270,14 @@ export const getCollectivePageQuery = gql`
     }
   }
 
-  ${BudgetItemExpenseFragment}
-  ${BudgetItemOrderFragment}
-  ${BudgetItemExpenseTypeFragment}
-  ${fragments.UpdatesFieldsFragment}
-  ${fragments.ContributorsFieldsFragment}
+  ${fragments.updatesFieldsFragment}
+  ${fragments.contributorsFieldsFragment}
+  ${fragments.collectiveNavbarFieldsFragment}
 `;
+
+export const getCollectivePageQueryVariables = slug => {
+  return {
+    slug: slug,
+    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+  };
+};

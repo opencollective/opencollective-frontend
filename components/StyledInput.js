@@ -25,6 +25,10 @@ const getBorderColor = ({ error, success }) => {
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
 const StyledInput = styled.input`
+  &:not([type='checkbox']):not([type='radio']) {
+    min-height: 36px;
+  }
+
   ${background}
   ${border}
   ${color}
@@ -56,6 +60,10 @@ const StyledInput = styled.input`
     }
   }}
 
+  &[type=radio] {
+    cursor: pointer;
+  }
+
   &:disabled {
     background-color: ${themeGet('colors.black.50')};
     cursor: not-allowed;
@@ -73,7 +81,7 @@ const StyledInput = styled.input`
     color: ${themeGet('colors.black.400')};
   }
 
-  &[type="date"] {
+  &[type='date'] {
     font-family: inherit;
   }
 `;
@@ -104,7 +112,7 @@ StyledInput.defaultProps = {
   px: 3,
   py: 2,
   lineHeight: '1.5',
-  fontSize: 'Paragraph',
+  fontSize: '14px',
 };
 
 export const TextInput = styled(StyledInput)``;

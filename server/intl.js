@@ -21,7 +21,7 @@ const localeDataCache = new Map();
 const getLocaleDataScript = locale => {
   const lang = locale.split('-')[0];
   if (!localeDataCache.has(lang)) {
-    const localeDataFile = require.resolve(`@formatjs/intl-relativetimeformat/dist/locale-data/${lang}`);
+    const localeDataFile = require.resolve(`@formatjs/intl-relativetimeformat/locale-data/${lang}`);
     const localeDataScript = fs.readFileSync(localeDataFile, 'utf8');
     localeDataCache.set(lang, localeDataScript);
   }
@@ -47,7 +47,7 @@ function middleware() {
     }
 
     // No auto-detection in test environments
-    if (['test', 'e2e', 'ci'].includes(process.env.NODE_ENV)) {
+    if (['test', 'e2e', 'ci'].includes(process.env.OC_ENV)) {
       req.locale = req.language || 'en';
     } else {
       req.locale = req.language || accepts(req).language(supportedLanguages) || 'en';

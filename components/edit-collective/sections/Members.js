@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get, omit, update } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import roles from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import formatMemberRole from '../../../lib/i18n/member-role';
+import { compose } from '../../../lib/utils';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
@@ -17,12 +19,14 @@ import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
 import Link from '../../Link';
 import Loading from '../../Loading';
+import MemberRoleDescription, { hasRoleDescription } from '../../MemberRoleDescription';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
-import { H3, P } from '../../Text';
+import { withUser } from '../../UserProvider';
 import WarnIfUnsavedChanges from '../../WarnIfUnsavedChanges';
+import SettingsTitle from '../SettingsTitle';
 
 /**
  * This pages sets some global styles that are causing troubles in new components. This
@@ -42,16 +46,17 @@ class Members extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
+    refetchLoggedInUser: PropTypes.func.isRequired,
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
-    mutate: PropTypes.func.isRequired,
+    editCoreContributors: PropTypes.func.isRequired,
     /** @ignore from Apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
       refetch: PropTypes.func.isRequired,
-      data: PropTypes.object,
+      Collective: PropTypes.object,
     }),
   };
 
@@ -66,31 +71,28 @@ class Members extends React.Component {
     };
     this.messages = defineMessages({
       roleLabel: { id: 'members.role.label', defaultMessage: 'role' },
-      addMember: { id: 'members.add', defaultMessage: 'Add Core Contributor' },
-      removeMember: { id: 'members.remove', defaultMessage: 'Remove Core Contributor' },
-      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Collective Admin' },
-      MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
+      addMember: { id: 'members.add', defaultMessage: 'Add Team Member' },
+      removeMember: { id: 'members.remove', defaultMessage: 'Remove Team Member' },
       descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
       sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },
       memberPendingDetails: {
         id: 'members.pending.details',
-        defaultMessage: 'This member has not approved the invitation to join the collective yet',
+        defaultMessage: 'This person has not accepted their invitation yet',
       },
-      cantRemoveYourself: {
-        id: 'members.remove.cantRemoveYourself',
-        defaultMessage:
-          'You cannot remove yourself as a Collective admin. If you are the only admin, please add a new one and ask them to remove you.',
+      cantRemoveLast: {
+        id: 'members.remove.cantRemoveLast',
+        defaultMessage: 'The last admin cannot be removed. Please add another admin first.',
       },
       removeConfirm: {
         id: 'members.remove.confirm',
-        defaultMessage: `Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}} from the core contributors of the collective?`,
+        defaultMessage: `Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?`,
       },
     });
 
     const getOptions = arr => {
       return arr.map(key => {
         const obj = {};
-        obj[key] = intl.formatMessage(this.messages[key]);
+        obj[key] = formatMemberRole(intl, key);
         return obj;
       });
     };
@@ -99,8 +101,8 @@ class Members extends React.Component {
       {
         name: 'role',
         type: 'select',
-        options: getOptions(['ADMIN', 'MEMBER']),
-        defaultValue: 'ADMIN',
+        options: getOptions([roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT]),
+        defaultValue: roles.ADMIN,
         label: intl.formatMessage(this.messages.roleLabel),
       },
       {
@@ -183,7 +185,7 @@ class Members extends React.Component {
 
     try {
       this.setState({ isSubmitting: true, error: null });
-      await this.props.mutate({
+      await this.props.editCoreContributors({
         variables: {
           collectiveId: this.props.collective.id,
           members: this.state.members.map(member => ({
@@ -200,6 +202,7 @@ class Members extends React.Component {
         },
       });
       await this.props.data.refetch();
+      await this.props.refetchLoggedInUser();
       this.setState({ isSubmitting: false, isSubmitted: true, isTouched: false });
     } catch (e) {
       this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
@@ -211,23 +214,24 @@ class Members extends React.Component {
     return !this.state.members.some(m => !m.member);
   }
 
-  renderMember = (member, index) => {
-    const { intl, LoggedInUser } = this.props;
+  renderMember = (member, index, nbAdmins) => {
+    const { intl } = this.props;
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
     const collectiveId = get(member, 'member.id');
     const memberCollective = member.member;
-    const isSelf = memberCollective && memberCollective.id === LoggedInUser.CollectiveId;
     const memberKey = member.id ? `member-${member.id}` : `collective-${collectiveId}`;
+    const isLastAdmin = nbAdmins === 1 && member.role === roles.ADMIN && member.id;
 
     return (
       <Container key={`member-${index}-${memberKey}`} mt={4} pb={4} borderBottom={BORDER} data-cy={`member-${index}`}>
         <ResetGlobalStyles>
           <Flex mt={2} flexWrap="wrap">
-            <div className="col-sm-2" />
+            <Box width={[1, 2 / 12]} />
             <Flex flex="1" justifyContent="space-between" alignItems="center" flexWrap="wrap" mb={2}>
               <Box ml={1} my={1}>
                 <CollectivePickerAsync
+                  inputId={`member-collective-picker-${index}`}
                   creatable
                   width="100%"
                   minWidth={325}
@@ -249,40 +253,46 @@ class Members extends React.Component {
                   </StyledTooltip>
                 </Flex>
               )}
-              {isSelf ? (
-                <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveYourself)}>
+              {isLastAdmin ? (
+                <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveLast)}>
                   <StyledButton my={1} disabled>
                     {intl.formatMessage(this.messages.removeMember)}
                   </StyledButton>
                 </StyledTooltip>
               ) : (
-                <StyledButton my={1} onClick={() => this.removeMember(index)} disabled={isSelf}>
+                <StyledButton my={1} onClick={() => this.removeMember(index)}>
                   {intl.formatMessage(this.messages.removeMember)}
                 </StyledButton>
               )}
             </Flex>
           </Flex>
         </ResetGlobalStyles>
-        <Form horizontal>
-          {this.fields.map(
-            field =>
-              (!field.when || field.when(member)) && (
-                <InputField
-                  className="horizontal"
-                  key={field.name}
-                  name={field.name}
-                  label={field.label}
-                  type={field.type}
-                  disabled={typeof field.disabled === 'function' ? field.disabled(member) : field.disabled}
-                  defaultValue={get(member, field.name) || field.defaultValue}
-                  options={field.options}
-                  pre={field.pre}
-                  placeholder={field.placeholder}
-                  onChange={value => this.editMember(index, field.name, value)}
-                />
-              ),
-          )}
-        </Form>
+        <form>
+          {this.fields.map(field => (
+            <React.Fragment key={field.name}>
+              <InputField
+                className="horizontal"
+                name={field.name}
+                label={field.label}
+                type={field.type}
+                disabled={field.name === 'role' ? isLastAdmin : false}
+                defaultValue={get(member, field.name) || field.defaultValue}
+                options={field.options}
+                pre={field.pre}
+                placeholder={field.placeholder}
+                onChange={value => this.editMember(index, field.name, value)}
+              />
+              {field.name === 'role' && hasRoleDescription(member.role) && (
+                <Flex mb={3}>
+                  <Box flex="0 1" flexBasis={['0%', '17.5%']} />
+                  <Container flex="1 1" fontSize="12px" color="black.600" fontStyle="italic">
+                    <MemberRoleDescription role={member.role} />
+                  </Container>
+                </Flex>
+              )}
+            </React.Fragment>
+          ))}
+        </form>
       </Container>
     );
   };
@@ -291,24 +301,25 @@ class Members extends React.Component {
     const { intl, collective } = this.props;
     const { members, error, isSubmitting, isSubmitted, isTouched } = this.state;
     const isValid = this.validate();
+    const nbAdmins = members.filter(m => m.role === roles.ADMIN && m.id).length;
 
     return (
       <WarnIfUnsavedChanges hasUnsavedChanges={isTouched}>
         <div className="EditMembers">
           <div className="members">
-            <H3>
-              <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Core Contributors" />
-            </H3>
-            {collective.type === 'COLLECTIVE' && (
-              <P>
-                <FormattedMessage
-                  id="members.edit.description"
-                  defaultMessage="Note: Only Collective Admins can edit this Collective and approve or reject expenses."
-                />
-              </P>
-            )}
-            <hr />
-            {members.map(this.renderMember)}
+            <SettingsTitle
+              subtitle={
+                collective.type === 'COLLECTIVE' && (
+                  <FormattedMessage
+                    id="members.edit.description"
+                    defaultMessage="Note: Only Collective Admins can edit this Collective and approve expenses."
+                  />
+                )
+              }
+            >
+              <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Team" />
+            </SettingsTitle>
+            {members.map((m, idx) => this.renderMember(m, idx, nbAdmins))}
           </div>
           <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>
             <StyledButton onClick={() => this.addMember()} data-cy="add-member-btn">
@@ -321,7 +332,7 @@ class Members extends React.Component {
             </MessageBox>
           )}
           <Flex justifyContent="center" flexWrap="wrap" mt={5}>
-            <Link route="collective" params={{ slug: collective.slug }}>
+            <Link href={`/${collective.slug}`}>
               <StyledButton mx={2} minWidth={200}>
                 <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
               </StyledButton>
@@ -358,14 +369,27 @@ class Members extends React.Component {
           {getErrorFromGraphqlException(data.error).message}
         </MessageBox>
       );
+    } else if (data.Collective?.parentCollective) {
+      const parent = data.Collective.parentCollective;
+      return (
+        <MessageBox type="info" withIcon>
+          <FormattedMessage
+            id="Members.DefinedInParent"
+            defaultMessage="Team members are defined in the settings of {parentName}"
+            values={{
+              parentName: <Link href={`/${parent.slug}/edit/members`}>{parent.name}</Link>,
+            }}
+          />
+        </MessageBox>
+      );
     } else {
       return this.renderForm();
     }
   }
 }
 
-const MemberFieldsFragment = gql`
-  fragment MemberFieldsFragment on Member {
+const memberFieldsFragment = gql`
+  fragment MemberFields on Member {
     id
     role
     since
@@ -384,53 +408,64 @@ const MemberFieldsFragment = gql`
   }
 `;
 
-const addGetCoreContributorsQuery = graphql(
-  gql`
-    query CollectiveCoreContributors($collectiveId: Int!) {
-      Collective(id: $collectiveId) {
+const coreContributorsQuery = gql`
+  query CoreContributors($collectiveId: Int!) {
+    Collective(id: $collectiveId) {
+      id
+      parentCollective {
         id
-        members(roles: ["ADMIN", "MEMBER"]) {
-          ...MemberFieldsFragment
-        }
+        slug
+        type
+        name
       }
-      memberInvitations(CollectiveId: $collectiveId) {
-        id
-        role
-        since
-        createdAt
-        description
-        member {
-          id
-          name
-          slug
-          type
-          imageUrl(height: 64)
-          ... on User {
-            email
-          }
-        }
+      members(roles: ["ADMIN", "MEMBER", "ACCOUNTANT"]) {
+        ...MemberFields
       }
     }
-    ${MemberFieldsFragment}
-  `,
-  {
-    options: props => ({
-      fetchPolicy: 'network-only',
-      variables: { collectiveId: props.collective.id },
-    }),
-  },
-);
-
-const addEditCoreContributorsMutation = graphql(gql`
-  mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
-    editCoreContributors(collectiveId: $collectiveId, members: $members) {
+    memberInvitations(CollectiveId: $collectiveId) {
       id
-      members(roles: ["ADMIN", "MEMBER"]) {
-        ...MemberFieldsFragment
+      role
+      since
+      createdAt
+      description
+      member {
+        id
+        name
+        slug
+        type
+        imageUrl(height: 64)
+        ... on User {
+          email
+        }
       }
     }
   }
-  ${MemberFieldsFragment}
-`);
+  ${memberFieldsFragment}
+`;
 
-export default injectIntl(addEditCoreContributorsMutation(addGetCoreContributorsQuery(Members)));
+const addCoreContributorsData = graphql(coreContributorsQuery, {
+  options: props => ({
+    fetchPolicy: 'network-only',
+    variables: { collectiveId: props.collective.id },
+  }),
+});
+
+const editCoreContributorsMutation = gql`
+  mutation EditCoreContributors($collectiveId: Int!, $members: [MemberInputType!]!) {
+    editCoreContributors(collectiveId: $collectiveId, members: $members) {
+      id
+      members(roles: ["ADMIN", "MEMBER"]) {
+        ...MemberFields
+      }
+    }
+  }
+  ${memberFieldsFragment}
+`;
+
+const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
+  name: 'editCoreContributors',
+});
+
+const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation);
+
+export default injectIntl(addGraphql(withUser(Members)));

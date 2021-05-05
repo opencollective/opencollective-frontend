@@ -14,25 +14,40 @@ import DraggableContributeCardWrapper from './DraggableContributeCardWrapper';
 /**
  * Display a list of contribution cards wrapped in a DragAndDrop provider
  */
-const AdminContributeCardsContainer = ({ collective, cards, onContributionCardMove, onContributionCardDrop }) => {
+const AdminContributeCardsContainer = ({
+  collective,
+  cards,
+  onContributionCardMove,
+  onContributionCardDrop,
+  onMount,
+}) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   const createContributionTierRoute = isEvent
-    ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/edit#tiers`
+    ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/edit/tiers`
     : `/${collective.slug}/edit/tiers`;
+
+  React.useEffect(() => {
+    if (onMount) {
+      onMount();
+    }
+  }, [onMount]);
 
   return (
     <DndProviderHTML5Backend>
       <ContributeCardsContainer>
         {cards.map(({ key, Component, componentProps }, index) => (
           <ContributeCardContainer key={key}>
-            <DraggableContributeCardWrapper
-              key={key}
-              Component={Component}
-              componentProps={componentProps}
-              index={index}
-              onMove={onContributionCardMove}
-              onDrop={onContributionCardDrop}
-            />
+            {cards.length === 1 ? (
+              <Component {...componentProps} />
+            ) : (
+              <DraggableContributeCardWrapper
+                Component={Component}
+                componentProps={componentProps}
+                index={index}
+                onMove={onContributionCardMove}
+                onDrop={onContributionCardDrop}
+              />
+            )}
           </ContributeCardContainer>
         ))}
         <ContributeCardContainer>
@@ -60,6 +75,7 @@ AdminContributeCardsContainer.propTypes = {
   }).isRequired,
   onContributionCardMove: PropTypes.func.isRequired,
   onContributionCardDrop: PropTypes.func.isRequired,
+  onMount: PropTypes.func,
 };
 
 export default AdminContributeCardsContainer;

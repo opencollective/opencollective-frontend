@@ -1,14 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/client/react/hoc';
+import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
 import { get, groupBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
+import ConfirmationModal from '../ConfirmationModal';
+import { Box, Flex } from '../Grid';
+import StyledRoundButton from '../StyledRoundButton';
 import StyledSelect from '../StyledSelect';
 import { Span } from '../Text';
+
+import PayoutMethodData from './PayoutMethodData';
+import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
 const newPayoutMethodMsg = defineMessages({
   [PayoutMethodType.PAYPAL]: {
@@ -31,6 +41,13 @@ const newPayoutMethodMsg = defineMessages({
 
 const MAX_PAYOUT_OPTION_DATA_LENGTH = 20;
 
+const payoutMethodLabels = defineMessages({
+  accountBalance: {
+    id: 'PayoutMethod.AccountBalance',
+    defaultMessage: 'Open Collective (Account Balance)',
+  },
+});
+
 /**
  * An overset of `StyledSelect` specialized for payout methods. Accepts all the props
  * from `StyledSelect`.
@@ -39,6 +56,8 @@ class PayoutMethodSelect extends React.Component {
   static propTypes = {
     /** @ignore from injectIntl */
     intl: PropTypes.object,
+    /** @ignore from mutation */
+    removePayoutMethod: PropTypes.func,
     /** Use this prop to control the component */
     payoutMethod: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -59,17 +78,31 @@ class PayoutMethodSelect extends React.Component {
     /** The Collective paying the expense */
     collective: PropTypes.shape({
       host: PropTypes.shape({
-        transferwise: PropTypes.shape({
-          availableCurrencies: PropTypes.arrayOf(PropTypes.string),
-        }),
+        id: PropTypes.string,
+        connectedAccounts: PropTypes.arrayOf(PropTypes.shape({ service: PropTypes.string })),
+        supportedPayoutMethods: PropTypes.array,
       }),
     }).isRequired,
+    /** The Acccount being paid with the expense */
+    payee: PropTypes.shape({
+      id: PropTypes.string,
+      type: PropTypes.string,
+      host: PropTypes.shape({
+        id: PropTypes.string,
+      }),
+    }),
+    onChange: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
   };
+
+  state = { removingPayoutMethod: null };
 
   getPayoutMethodLabel = payoutMethod => {
     if (payoutMethod.id) {
       if (payoutMethod.name) {
         return payoutMethod.name;
+      } else if (payoutMethod.type === PayoutMethodType.ACCOUNT_BALANCE) {
+        return this.props.intl.formatMessage(payoutMethodLabels.accountBalance);
       } else if (payoutMethod.type === PayoutMethodType.PAYPAL) {
         return `PayPal - ${get(payoutMethod.data, 'email')}`;
       } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
@@ -123,23 +156,70 @@ class PayoutMethodSelect extends React.Component {
     }
   }
 
+  async removePayoutMethod(payoutMethod) {
+    await this.props.removePayoutMethod({ variables: { id: payoutMethod.id } });
+    this.setState({ removingPayoutMethod: null });
+    this.props.onRemove(payoutMethod);
+    if (this.props.payoutMethod?.id === payoutMethod.id) {
+      this.props.onChange({ value: null });
+    }
+  }
+
+  formatOptionLabel = ({ value }, { context }) => {
+    const isMenu = context === 'menu';
+    return (
+      <Flex justifyContent="space-between" alignItems="center">
+        <Span fontSize={isMenu ? '13px' : '14px'}>{this.getPayoutMethodLabel(value)}</Span>
+        {isMenu && value.id && value.type !== PayoutMethodType.ACCOUNT_BALANCE && this.props.onRemove && (
+          <StyledRoundButton
+            size={20}
+            ml={2}
+            type="button"
+            flex="0 0 20px"
+            buttonStyle="dangerSecondary"
+            isBorderless
+            onClick={e => {
+              e.stopPropagation();
+              this.setState({ removingPayoutMethod: value });
+            }}
+          >
+            <RemoveIcon size={10} />
+          </StyledRoundButton>
+        )}
+      </Flex>
+    );
+  };
+
   getOptionFromPayoutMethod = pm => ({
     value: pm,
-    label: this.getPayoutMethodLabel(pm),
     title: this.getPayoutMethodTitle(pm),
   });
 
-  getOptions = memoizeOne(payoutMethods => {
+  getOptions = memoizeOne((payoutMethods, payee) => {
+    const hostSupportedPayoutMethods = this.props.collective.host?.supportedPayoutMethods || [PayoutMethodType.OTHER];
     const groupedPms = groupBy(payoutMethods, 'type');
-    const pmTypes = Object.values(PayoutMethodType).filter(type => {
-      if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
-        return false;
-      } else if (type === PayoutMethodType.PAYPAL && this.props.collective.host?.settings?.disablePaypalPayouts) {
-        return false;
-      } else {
-        return true;
-      }
-    });
+    const payeeIsSelfHosted = payee && payee.id == payee.host?.id;
+    const payeeIsCollectiveFamilyType =
+      payee &&
+      AccountTypesWithHost.includes(payee.type) &&
+      hostSupportedPayoutMethods.includes(PayoutMethodType.ACCOUNT_BALANCE);
+
+    // If the Account is of the "Collective" family, account balance should be the only option
+    const pmTypes =
+      payeeIsCollectiveFamilyType && !payeeIsSelfHosted
+        ? [PayoutMethodType.ACCOUNT_BALANCE]
+        : Object.values(PayoutMethodType).filter(type => {
+            // Account Balance only on Same Host
+            if (
+              type === PayoutMethodType.ACCOUNT_BALANCE &&
+              hostSupportedPayoutMethods.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
+              payee?.host?.id != this.props.collective.host?.id
+            ) {
+              return false;
+            } else {
+              return hostSupportedPayoutMethods.includes(type);
+            }
+          });
 
     return pmTypes.map(pmType => ({
       label: i18nPayoutMethodType(this.props.intl, pmType),
@@ -147,28 +227,65 @@ class PayoutMethodSelect extends React.Component {
         // Add existing payout methods for this type
         ...get(groupedPms, pmType, []).map(this.getOptionFromPayoutMethod),
         // Add "+ Create new ..." for this payment type
-        this.getOptionFromPayoutMethod({
-          type: pmType,
-          isSaved: true,
-          data: this.getDefaultData(pmType),
-        }),
-      ],
+        pmType !== PayoutMethodType.ACCOUNT_BALANCE
+          ? this.getOptionFromPayoutMethod({
+              type: pmType,
+              isSaved: true,
+              data: this.getDefaultData(pmType),
+            })
+          : null,
+      ].filter(option => option !== null),
     }));
   });
 
   render() {
     const { payoutMethods, defaultPayoutMethod, payoutMethod, ...props } = this.props;
+    const { removingPayoutMethod } = this.state;
     const value = payoutMethod && this.getOptionFromPayoutMethod(payoutMethod);
     return (
-      <StyledSelect
-        data-cy="payout-method-select"
-        {...props}
-        options={this.getOptions(payoutMethods)}
-        defaultValue={defaultPayoutMethod ? this.getOptionFromPayoutMethod(defaultPayoutMethod) : undefined}
-        value={typeof value === 'undefined' ? undefined : value}
-      />
+      <React.Fragment>
+        <StyledSelect
+          inputId="payout-method-select"
+          data-cy="payout-method-select"
+          {...props}
+          options={this.getOptions(payoutMethods, props.payee)}
+          defaultValue={defaultPayoutMethod ? this.getOptionFromPayoutMethod(defaultPayoutMethod) : undefined}
+          value={typeof value === 'undefined' ? undefined : value}
+          formatOptionLabel={this.formatOptionLabel}
+          isSearchable={false}
+        />
+        {removingPayoutMethod && (
+          <ConfirmationModal
+            show
+            isDanger
+            type="remove"
+            onClose={() => this.setState({ removingPayoutMethod: null })}
+            continueHandler={() => this.removePayoutMethod(removingPayoutMethod)}
+            header={<FormattedMessage id="PayoutMethod.RemoveWarning" defaultMessage="Remove this payout method?" />}
+          >
+            <Box mb={2}>
+              <PayoutMethodTypeWithIcon type={removingPayoutMethod.type} />
+            </Box>
+            <PayoutMethodData payoutMethod={removingPayoutMethod} />
+          </ConfirmationModal>
+        )}
+      </React.Fragment>
     );
   }
 }
 
-export default React.memo(injectIntl(PayoutMethodSelect));
+const removePayoutMethodMutation = gqlV2/* GraphQL */ `
+  mutation RemovePayoutMethod($id: String!) {
+    removePayoutMethod(payoutMethodId: $id) {
+      id
+      isSaved
+    }
+  }
+`;
+
+const addRemovePayoutMethodMutation = graphql(removePayoutMethodMutation, {
+  name: 'removePayoutMethod',
+  options: { context: API_V2_CONTEXT },
+});
+
+export default React.memo(injectIntl(addRemovePayoutMethodMutation(PayoutMethodSelect)));

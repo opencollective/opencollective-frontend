@@ -113,7 +113,7 @@ export default class StyledMultiEmailInput extends Component {
       <InputContainer
         width="100%"
         bg={disabled ? 'black.50' : 'white.full'}
-        fontSize="Paragraph"
+        fontSize="14px"
         borderColor={getInputBorderColor(invalids && invalids.length > 0)}
         {...omit(this.props, ['invalids', 'onChange', 'initialState', 'onClose'])}
       >
@@ -126,7 +126,7 @@ export default class StyledMultiEmailInput extends Component {
           stripPastedStyles
         />
         {this.state.showErrors && invalids && invalids.length > 0 && (
-          <Span className="multiemails-errors" display="block" color="red.500" pt={2} fontSize="Tiny">
+          <Span className="multiemails-errors" display="block" color="red.500" pt={2} fontSize="10px">
             <strong>
               <FormattedMessage id="multiemail.invalids" defaultMessage="Invalid emails:" />{' '}
             </strong>

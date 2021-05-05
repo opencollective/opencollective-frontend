@@ -39,9 +39,15 @@ If it's not already setup, look at the "Install" instructions in the [README](RE
 
 Make sure the Frontend is talking to the local API:
 
-- copy [`.env.local`](.env.local) to `.env`.
+In your `.env`, paste the following content:
 
-We recommend to run a build of the Frontend. It will be faster and more reliable.
+```
+API_URL=http://localhost:3060
+API_KEY=dvl-1510egmf4a23d80342403fb599qd
+```
+
+You can simply start a local server by running `npm run dev`. This is useful to quickly iterate
+when developing, but if you're looking for stable and reproducible results we recommend to run a build of the Frontend. It will be faster and more reliable. To do so:
 
 - `npm run build:e2e`
 

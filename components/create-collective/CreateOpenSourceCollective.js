@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import themeGet from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { URLSearchParams } from 'universal-url';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
-import { getWebsiteUrl } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
@@ -17,7 +15,7 @@ import { H1, P } from '../Text';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
-  font-size: ${themeGet('fontSizes.Paragraph')}px;
+  font-size: 14px;
 `;
 
 const messages = defineMessages({
@@ -31,11 +29,7 @@ const FISCAL_SPONSOR_TERMS =
   'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub';
 
 const getGithubConnectUrl = () => {
-  const urlParams = new URLSearchParams({
-    context: 'createCollective',
-    // TODO: would be better if the path was generated dynamically
-    redirect: `${getWebsiteUrl()}/create/opensource`,
-  });
+  const urlParams = new URLSearchParams({ context: 'createCollective' });
 
   const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
   if (accessToken) {
@@ -51,24 +45,30 @@ const CreateOpenSourceCollective = () => {
   const [error, setError] = useState();
 
   return (
-    <Flex flexDirection="column" m={[3, 0]} mb={[4]}>
+    <Flex flexDirection="column" m={[3, 0]} mb={4}>
       <Flex flexDirection="column" my={[2, 4]}>
-        <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
+        <Box textAlign="left" minHeight="32px" marginLeft={['none', '224px']}>
           <BackButton asLink onClick={() => window && window.history.back()}>
             ←&nbsp;
             <FormattedMessage id="Back" defaultMessage="Back" />
           </BackButton>
         </Box>
         <Box mb={[2, 3]}>
-          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" textAlign="center" color="black.900">
+          <H1
+            fontSize={['20px', '32px']}
+            lineHeight={['24px', '36px']}
+            fontWeight="bold"
+            textAlign="center"
+            color="black.900"
+          >
             <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
           </H1>
         </Box>
-        <Box textAlign="center" minHeight={['24px']}>
-          <P fontSize="LeadParagraph" color="black.600" mb={2}>
+        <Box textAlign="center" minHeight="24px">
+          <P fontSize="16px" color="black.600" mb={2}>
             <FormattedMessage
               id="collective.subtitle.opensource"
-              defaultMessage="Open source projects are invited to join the Open Source Collective fiscal host."
+              defaultMessage="Open source projects are invited to join the Open Source Collective Fiscal Host."
             />
           </P>
         </Box>
@@ -85,17 +85,17 @@ const CreateOpenSourceCollective = () => {
           <P mb={3}>
             <FormattedMessage
               id="createcollective.opensource.p1"
-              defaultMessage="You're creating software. You don't want to worry about creating a legal entity or separate bank account, paying taxes, or providing invoices to sponsors. Let us take care of all that, so you can stay focused on your project."
+              defaultMessage="You're creating software. You don't want to worry about creating a legal entity or bank account, taxes, invoices, and a bunch of other admin. Let us take care of all that, so you can stay focused on your project."
             />
           </P>
           <P mb={3}>
             <FormattedMessage
               id="createcollective.opensource.p2"
-              defaultMessage="We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on GitHub or meet our {criterialink}."
+              defaultMessage="We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on GitHub or to meet our {criterialink}."
               values={{
                 osclink: (
                   <StyledLink href="https://opencollective.com/opensource" openInNewTab>
-                    Open Source Collective 501c6
+                    Open Source Collective
                   </StyledLink>
                 ),
                 criterialink: (
@@ -115,7 +115,7 @@ const CreateOpenSourceCollective = () => {
           <P mb={3}>
             <FormattedMessage
               id="createcollective.opensource.p4"
-              defaultMessage="Our fees cover operating costs like accounting, payments, tax reporting, invoices, legal liability, use of the Open Collective Platform, and providing support. We also run a range of initiatives for our mission of supporting a sustainable and healthy open source ecosystem. Learn more on our website. Join us!"
+              defaultMessage="Our fees cover operating costs like accounting, payments, tax reporting, invoices, legal liability, use of the Open Collective Platform, and providing support. We also run a range of initiatives to support a sustainable and healthy open source ecosystem. Join us!"
             />
           </P>
           <Box mx={1} my={4}>
@@ -152,7 +152,7 @@ const CreateOpenSourceCollective = () => {
                 if (!checked) {
                   setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
                 } else {
-                  window.location.replace(getGithubConnectUrl());
+                  window.location.href = getGithubConnectUrl();
                 }
               }}
             >
@@ -162,13 +162,7 @@ const CreateOpenSourceCollective = () => {
               />
             </StyledButton>
             <Link
-              route="create-collective"
-              params={{
-                hostCollectiveSlug: 'opensource',
-                verb: 'apply',
-                step: 'form',
-                hostTos: true,
-              }}
+              href={{ pathname: `/opensource/apply/form`, query: { hostTos: true } }}
               onClick={e => {
                 if (!checked) {
                   e.preventDefault();

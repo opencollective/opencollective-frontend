@@ -6,6 +6,7 @@ import { truncate } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import DayJs from '../../lib/dayjs';
 import { canOrderTicketsFromEvent, isPastEvent } from '../../lib/events';
 
 import Container from '../Container';
@@ -22,19 +23,19 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const isTruncated = description && description.length < event.description.length;
   const isPassed = isPastEvent(event);
   const canOrderTickets = canOrderTicketsFromEvent(event);
-  const showYearOnStartDate = endsAt ? undefined : 'numeric'; // only if there's no end date
-  const eventRouteParams = { parentCollectiveSlug: collective.slug, eventSlug: event.slug };
+  const takesMultipleDays = startsAt && endsAt && !DayJs(startsAt).isSame(endsAt, 'day');
+  const showYearOnStartDate = !endsAt || !takesMultipleDays ? 'numeric' : undefined; // only if there's no end date
+
   return (
     <Contribute
-      route="event"
-      routeParams={eventRouteParams}
+      route={`/${collective.slug}/events/${event.slug}`}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
       disableCTA={!isPassed && !canOrderTickets}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
       title={
-        <StyledLink as={Link} color="black.800" route="event" params={eventRouteParams}>
+        <StyledLink as={Link} color="black.800" href={`/${collective.slug}/events/${event.slug}`}>
           {event.name}
         </StyledLink>
       }
@@ -42,16 +43,24 @@ const ContributeEvent = ({ collective, event, ...props }) => {
     >
       {(startsAt || endsAt) && (
         <Box mb={3}>
-          <Container display="flex" alignItems="center" fontSize="Caption">
+          <Container display="flex" alignItems="center" fontSize="12px">
             <Calendar size="1.3em" color="#C4C7CC" />
             <Span ml={2} color="black.700">
-              {startsAt && <FormattedDate value={startsAt} month="short" day="numeric" year={showYearOnStartDate} />}
-              {startsAt && startsAt && ' → '}
-              {endsAt && <FormattedDate value={endsAt} month="short" day="numeric" year="numeric" />}
+              {startsAt && (
+                <time dateTime={startsAt}>
+                  <FormattedDate value={startsAt} month="short" day="numeric" year={showYearOnStartDate} />
+                </time>
+              )}
+              {takesMultipleDays && ' → '}
+              {(takesMultipleDays || (!startsAt && endsAt)) && (
+                <time dateTime={endsAt}>
+                  <FormattedDate value={endsAt} month="short" day="numeric" year="numeric" />
+                </time>
+              )}
             </Span>
           </Container>
           {startsAt && (
-            <Container display="flex" alignItems="center" fontSize="Caption" mt={1}>
+            <Container display="flex" alignItems="center" fontSize="12px" mt={1}>
               <Clock size="1.3em" color="#C4C7CC" />
               <Span ml={2} color="black.700">
                 <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
@@ -62,7 +71,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       )}
       {description}
       {isTruncated && (
-        <Link route="event" params={{ parentCollectiveSlug: collective.slug, eventSlug: event.slug }}>
+        <Link href={`/${collective.slug}/events/${event.slug}`}>
           <Span textTransform="capitalize" whiteSpace="nowrap">
             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
           </Span>

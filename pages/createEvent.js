@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/client/react/hoc';
 
-import { addCollectiveData } from '../lib/graphql/queries';
+import { legacyCollectiveQuery } from '../lib/graphql/queries';
 
 import CreateEvent from '../components/CreateEvent';
 import ErrorPage from '../components/ErrorPage';
@@ -15,9 +16,8 @@ class CreateEventPage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveData
+    slug: PropTypes.string, // for addLegacyCollectiveData
     data: PropTypes.object.isRequired, // from withData
-    LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
   };
 
@@ -26,14 +26,16 @@ class CreateEventPage extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { data, loadingLoggedInUser } = this.props;
 
     if (loadingLoggedInUser || !data.Collective) {
       return <ErrorPage loading={loadingLoggedInUser} data={data} />;
     }
 
-    return <CreateEvent parentCollective={data.Collective} LoggedInUser={LoggedInUser} />;
+    return <CreateEvent parentCollective={data.Collective} />;
   }
 }
 
-export default withUser(addCollectiveData(CreateEventPage));
+export const addLegacyCollectiveData = graphql(legacyCollectiveQuery);
+
+export default withUser(addLegacyCollectiveData(CreateEventPage));

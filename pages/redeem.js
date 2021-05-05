@@ -1,21 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import sanitizeHtml from 'sanitize-html';
 import styled from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { isValidEmail } from '../lib/utils';
-import { Router } from '../server/pages';
+import { compose, isValidEmail } from '../lib/utils';
 
 import Body from '../components/Body';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import Footer from '../components/Footer';
+import CollectiveCard from '../components/gift-cards/CollectiveCard';
+import HappyBackground from '../components/gift-cards/HappyBackground';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import LinkCollective from '../components/LinkCollective';
@@ -25,8 +26,6 @@ import RedeemSuccess from '../components/RedeemSuccess';
 import StyledButton from '../components/StyledButton';
 import { H1, H5, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import CollectiveCard from '../components/virtual-cards/CollectiveCard';
-import HappyBackground from '../components/virtual-cards/HappyBackground';
 
 const ShadowBox = styled(Box)`
   box-shadow: 0px 8px 16px rgba(20, 20, 20, 0.12);
@@ -44,25 +43,16 @@ class RedeemPage extends React.Component {
   static getInitialProps({ query: { code, email, name, collectiveSlug } }) {
     return {
       collectiveSlug,
-      code: sanitizeHtml(code || '', {
-        allowedTags: [],
-        allowedAttributes: [],
-      }),
-      email: sanitizeHtml(email || '', {
-        allowedTags: [],
-        allowedAttributes: [],
-      }),
-      name: sanitizeHtml(name || '', {
-        allowedTags: [],
-        allowedAttributes: [],
-      }),
+      code: code?.trim(),
+      email: email?.trim(),
+      name: name?.trim(),
     };
   }
 
   static propTypes = {
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     intl: PropTypes.object.isRequired, // from injectIntl
-    claimPaymentMethod: PropTypes.func.isRequired, // from redeemMutation
+    redeemPaymentMethod: PropTypes.func.isRequired, // from addRedeemPaymentMethodMutation
     LoggedInUser: PropTypes.object, // from withUser
     loadingLoggedInUser: PropTypes.bool, // from withUser
     code: PropTypes.string,
@@ -78,6 +68,7 @@ class RedeemPage extends React.Component {
         name: PropTypes.string,
       }),
     }),
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -108,12 +99,12 @@ class RedeemPage extends React.Component {
     const { code, email, name } = this.state.form;
     try {
       if (this.props.LoggedInUser) {
-        await this.props.claimPaymentMethod(code);
+        await this.props.redeemPaymentMethod({ variables: { code } });
         await this.props.refetchLoggedInUser();
-        Router.pushRoute('redeemed', { code, collectiveSlug: this.props.collectiveSlug });
+        this.props.router.push({ pathname: `/${this.props.collectiveSlug}/redeemed/${code}` });
         return;
       } else {
-        await this.props.claimPaymentMethod(code, { email, name });
+        await this.props.redeemPaymentMethod({ variables: { code, user: { email, name } } });
       }
       // TODO: need to know from API if an account was created or not
       // TODO: or refuse to create an account automatically and ask to sign in
@@ -266,28 +257,27 @@ class RedeemPage extends React.Component {
   }
 }
 
-const getPageData = graphql(
-  gql`
-    query RedeemPageData($collectiveSlug: String!) {
-      Collective(slug: $collectiveSlug) {
-        id
-        name
-        type
-        slug
-        imageUrl
-        backgroundImageUrl
-        description
-        settings
-      }
+const redeemPageQuery = gql`
+  query RedeemPage($collectiveSlug: String!) {
+    Collective(slug: $collectiveSlug) {
+      id
+      name
+      type
+      slug
+      imageUrl
+      backgroundImageUrl
+      description
+      settings
     }
-  `,
-  {
-    skip: props => !props.collectiveSlug,
-  },
-);
+  }
+`;
 
-const redeemMutation = gql`
-  mutation claimPaymentMethod($code: String!, $user: UserInputType) {
+const addRedeemPageData = graphql(redeemPageQuery, {
+  skip: props => !props.collectiveSlug,
+});
+
+const redeemPaymentMethodMutation = gql`
+  mutation RedeemPaymentMethod($code: String!, $user: UserInputType) {
     claimPaymentMethod(code: $code, user: $user) {
       id
       description
@@ -295,12 +285,10 @@ const redeemMutation = gql`
   }
 `;
 
-const addMutation = graphql(redeemMutation, {
-  props: ({ mutate }) => ({
-    claimPaymentMethod: async (code, user) => {
-      return await mutate({ variables: { code, user } });
-    },
-  }),
+const addRedeemPaymentMethodMutation = graphql(redeemPaymentMethodMutation, {
+  name: 'redeemPaymentMethod',
 });
 
-export default injectIntl(withUser(addMutation(getPageData(RedeemPage))));
+const addGraphql = compose(addRedeemPageData, addRedeemPaymentMethodMutation);
+
+export default injectIntl(withUser(withRouter(addGraphql(RedeemPage))));

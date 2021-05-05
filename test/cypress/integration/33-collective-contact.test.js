@@ -14,7 +14,7 @@ describe('Contact collective', () => {
 
   it('Shows a disclaimer about email being shared', () => {
     cy.login({ redirect: `/${collectiveSlug}/contact` });
-    cy.contains('Your email address will be shared with the admins of the Collective who will receive this message.');
+    cy.contains('Your email address will be shared with the admins who will receive this message.');
   });
 
   it("Can't contact organizations", () => {

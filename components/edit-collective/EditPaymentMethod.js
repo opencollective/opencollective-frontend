@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCurrencySymbol } from '../../lib/currency-utils';
 import { paymentMethodLabelWithIcon } from '../../lib/payment_method_label';
 import { capitalize } from '../../lib/utils';
-import { Link } from '../../server/pages';
 
+import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 
@@ -54,12 +54,12 @@ class EditPaymentMethod extends React.Component {
       },
       'paymentMethod.monthlyLimitPerMember.label': {
         id: 'paymentMethod.monthlyLimitPerMember.label',
-        defaultMessage: 'Monthly limit per member',
+        defaultMessage: 'Monthly limit per team member',
       },
       'paymentMethod.monthlyLimitPerMember.description': {
         id: 'paymentMethod.monthlyLimitPerMember.description',
         defaultMessage:
-          'Set a monthly limit to allow other team members of your Organization to use this credit card within that limit. If set to zero, only Organization admins will be able to use this card.',
+          'Set a monthly limit for Organization team members using this card. If set to zero, only Organization admins will be able to use this card.',
       },
     });
   }
@@ -93,33 +93,23 @@ class EditPaymentMethod extends React.Component {
 
     return (
       <div className="EditPaymentMethod">
-        <style global jsx>
-          {`
-            .monthlyLimitPerMember input {
-              width: 10rem !important;
-            }
-          `}
-        </style>
-
         <Flex flexDirection={['column-reverse', null, 'row']}>
           <Flex alignItems="center" css={{ flexGrow: 1 }}>
-            <Box as="label" className="control-label">
+            <Box minWidth="150px" as="label" className="control-label">
               <FormattedMessage
                 id="paymentMethod.typeSelect"
                 values={{ type }}
-                defaultMessage="{type, select, virtualcard {Gift card} creditcard {Credit card} prepaid {Prepaid}}"
+                defaultMessage="{type, select, giftcard {Gift card} creditcard {Credit card} prepaid {Prepaid}}"
               />
             </Box>
             <Box>
               <div className="name col">{paymentMethodLabelWithIcon(intl, paymentMethod)}</div>
               {hasSubscriptions && (
-                <div className="actions">
-                  <FormattedMessage
-                    id="paymentMethod.activeSubscriptions"
-                    defaultMessage="{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}"
-                    values={{ n: subscriptions.length }}
-                  />
-                </div>
+                <FormattedMessage
+                  id="paymentMethod.activeSubscriptions"
+                  defaultMessage="{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}"
+                  values={{ n: subscriptions.length }}
+                />
               )}
             </Box>
           </Flex>
@@ -143,31 +133,29 @@ class EditPaymentMethod extends React.Component {
                 </StyledButton>
               )}
               {hasSubscriptions && (
-                <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }} passHref>
-                  <StyledLink buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
+                <Link href={`/${this.props.collectiveSlug}/recurring-contributions`}>
+                  <StyledLink as={Container} buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
                     {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}
                   </StyledLink>
                 </Link>
               )}
               {canRemove && (
-                <div className="actions">
-                  <StyledButton
-                    disabled={isSaving}
-                    buttonStyle="standard"
-                    buttonSize="medium"
-                    onClick={() => this.removePaymentMethod()}
-                    mx={1}
-                  >
-                    {intl.formatMessage(this.messages['paymentMethod.remove'])}
-                  </StyledButton>
-                </div>
+                <StyledButton
+                  disabled={isSaving}
+                  buttonStyle="standard"
+                  buttonSize="medium"
+                  onClick={() => this.removePaymentMethod()}
+                  mx={1}
+                >
+                  {intl.formatMessage(this.messages['paymentMethod.remove'])}
+                </StyledButton>
               )}
             </Flex>
           )}
         </Flex>
 
         {this.props.hasMonthlyLimitPerMember && (
-          <Row>
+          <Flex flexWrap="wrap">
             <InputField
               className="horizontal"
               label={capitalize(intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.label']))}
@@ -180,7 +168,7 @@ class EditPaymentMethod extends React.Component {
               disabled={isSaving}
               options={{ step: 1 }}
             />
-          </Row>
+          </Flex>
         )}
       </div>
     );

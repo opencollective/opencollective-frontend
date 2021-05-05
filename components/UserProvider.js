@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withApollo } from '@apollo/react-hoc';
+import { withApollo } from '@apollo/client/react/hoc';
 import { isEqual } from 'lodash';
+import Router from 'next/router';
 
 import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import { Router } from '../server/pages';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -35,6 +35,7 @@ class UserProvider extends React.Component {
     loadingLoggedInUser: true,
     LoggedInUser: null,
     errorLoggedInUser: null,
+    enforceTwoFactorAuthForLoggedInUser: null,
   };
 
   async componentDidMount() {
@@ -76,14 +77,18 @@ class UserProvider extends React.Component {
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
   };
 
-  login = async token => {
+  login = async (token, options = {}) => {
     const { getLoggedInUser } = this.props;
+    const { twoFactorAuthenticatorCode, recoveryCode } = options;
     try {
-      const LoggedInUser = token ? await getLoggedInUser({ token }) : await getLoggedInUser();
+      const LoggedInUser = token
+        ? await getLoggedInUser({ token, twoFactorAuthenticatorCode, recoveryCode })
+        : await getLoggedInUser();
       this.setState({
         loadingLoggedInUser: false,
         errorLoggedInUser: null,
         LoggedInUser,
+        enforceTwoFactorAuthForLoggedInUser: false,
       });
       return LoggedInUser;
     } catch (error) {
@@ -94,6 +99,19 @@ class UserProvider extends React.Component {
 
       // Store the error
       this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
+      if (error.message.includes('Two-factor authentication is enabled')) {
+        this.setState({ enforceTwoFactorAuthForLoggedInUser: true });
+        throw new Error(error.message);
+      }
+      if (error.type === 'too_many_requests') {
+        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
+        throw new Error(error.message);
+      }
+      // We don't want to catch "Two-factor authentication code failed. Please try again" here
+      if (error.type === 'unauthorized' && error.message.includes('Cannot use this token')) {
+        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
+        throw new Error(error.message);
+      }
     }
   };
 
@@ -141,6 +159,8 @@ const withUser = WrappedComponent => {
   return WithUser;
 };
 
+const useUser = () => React.useContext(UserContext);
+
 export default withApollo(withLoggedInUser(UserProvider));
 
-export { UserConsumer, withUser };
+export { UserConsumer, withUser, useUser };

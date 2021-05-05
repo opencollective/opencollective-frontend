@@ -1,131 +1,203 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Query } from '@apollo/react-components';
-import gql from 'graphql-tag';
-import { get, isEmpty, orderBy } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { useQuery } from '@apollo/client';
+import { get, orderBy } from 'lodash';
+import Image from 'next/image';
+import { FormattedMessage } from 'react-intl';
+import styled, { css } from 'styled-components';
 
-import { formatCurrency } from '../../../lib/currency-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import BudgetItemsList, {
-  BudgetItemExpenseFragment,
-  BudgetItemExpenseTypeFragment,
-  BudgetItemOrderFragment,
-} from '../../BudgetItemsList';
+import { DebitItem } from '../../budget/DebitCreditList';
+import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
 import Container from '../../Container';
-import DefinedTerm, { Terms } from '../../DefinedTerm';
+import { expensesListFieldsFragment } from '../../expenses/graphql/fragments';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
-import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledCard from '../../StyledCard';
-import { P, Span } from '../../Text';
+import StyledFilters from '../../StyledFilters';
+import { P } from '../../Text';
+import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
+import TransactionItem from '../../transactions/TransactionItem';
+import { withUser } from '../../UserProvider';
+import BudgetStats from '../BudgetStats';
 import ContainerSectionContent from '../ContainerSectionContent';
-import SectionTitle from '../SectionTitle';
 
-/** Query to re-fetch transactions and expenses */
-const TransactionsAndExpensesQuery = gql`
-  query BudgetSection($slug: String!) {
-    Collective(slug: $slug) {
-      id
-      transactions(limit: 3, includeExpenseTransactions: false) {
-        ...BudgetItemOrderFragment
-        ...BudgetItemExpenseFragment
-      }
-      expenses(limit: 3) {
-        ...BudgetItemExpenseTypeFragment
+export const budgetSectionQuery = gqlV2/* GraphQL */ `
+  query BudgetSection($slug: String!, $limit: Int!) {
+    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false) {
+      ...TransactionsQueryCollectionFragment
+    }
+    expenses(account: { slug: $slug }, limit: $limit) {
+      totalCount
+      nodes {
+        ...ExpensesListFieldsFragment
       }
     }
   }
-  ${BudgetItemExpenseFragment}
-  ${BudgetItemOrderFragment}
-  ${BudgetItemExpenseTypeFragment}
+  ${transactionsQueryCollectionFragment}
+  ${expensesListFieldsFragment}
 `;
+
+export const getBudgetSectionQueryVariables = slug => {
+  return { slug, limit: 3 };
+};
+
+const BudgetItemContainer = styled.div`
+  ${props =>
+    !props.$isFirst &&
+    css`
+      border-top: 1px solid #e6e8eb;
+    `}
+`;
+
+const FILTERS = ['all', 'expenses', 'transactions'];
+
+const geFilterLabel = filter => {
+  switch (filter) {
+    case 'all':
+      return <FormattedMessage id="SectionTransactions.All" defaultMessage="All" />;
+    case 'expenses':
+      return <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />;
+    case 'transactions':
+      return <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />;
+    default:
+      return null;
+  }
+};
+
+const EMPTY_ARRAY = [];
+
+const getBudgetItems = (transactions, expenses, filter) => {
+  if (filter === 'expenses') {
+    return expenses;
+  } else if (filter === 'transactions') {
+    return transactions;
+  } else {
+    return orderBy([...transactions, ...expenses], 'createdAt', 'desc').slice(0, 3);
+  }
+};
+
+const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
+  const isFilterAll = filter === 'all';
+  if (filter === 'expenses' || (isFilterAll && hasExpenses && !hasTransactions)) {
+    return (
+      <Link href={`/${collective.slug}/expenses`} data-cy="view-all-expenses-link">
+        <span>
+          <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
+          &rarr;
+        </span>
+      </Link>
+    );
+  } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
+    return (
+      <Link href={`/${collective.slug}/transactions`} data-cy="view-all-transactions-link">
+        <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> &rarr;
+      </Link>
+    );
+  } else {
+    return null;
+  }
+};
+
+ViewAllLink.propTypes = {
+  collective: PropTypes.object,
+  hasExpenses: PropTypes.bool,
+  hasTransactions: PropTypes.bool,
+  filter: PropTypes.oneOf(FILTERS),
+};
 
 /**
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats }) => {
-  const monthlyRecurring =
-    (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
-  const isFeesOnTop = collective.platformFeePercent === 0 && get(collective, 'host.settings.feesOnTop');
-  return (
-    <ContainerSectionContent pt={[4, 5]} pb={3}>
-      <SectionTitle>
-        <FormattedMessage id="section.budget.title" defaultMessage="Budget" />
-      </SectionTitle>
-      <P color="black.600" mb={4} maxWidth={830}>
-        <FormattedMessage
-          id="CollectivePage.SectionBudget.Description"
-          defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reimbursed and more!"
-          values={{ collectiveName: collective.name }}
-        />
-      </P>
-      <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
-        <Query query={TransactionsAndExpensesQuery} variables={{ slug: collective.slug }}>
-          {({ data }) => {
-            const expenses = get(data, 'Collective.expenses');
-            const transactions = get(data, 'Collective.transactions');
-            if (isEmpty(expenses) && isEmpty(transactions)) {
-              return (
-                <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="Paragraph">
-                  <FormattedMessage
-                    id="SectionBudget.Empty"
-                    defaultMessage="No transaction or expense created yet. They'll start appearing here as soon as you get your first
-                  financial contributors or when someone creates an expense."
-                  />
-                </MessageBox>
-              );
-            }
+const SectionBudget = ({ collective, stats, LoggedInUser }) => {
+  const [filter, setFilter] = React.useState('all');
+  const budgetQueryResult = useQuery(budgetSectionQuery, {
+    variables: getBudgetSectionQueryVariables(collective.slug),
+    context: API_V2_CONTEXT,
+  });
+  const { data, refetch } = budgetQueryResult;
 
-            // Merge items, filter expenses that already have a transaction as they'll already be
-            // included in `transactions`.
-            const budgetItemsUnsorted = [...transactions, ...expenses];
-            const budgetItems = orderBy(budgetItemsUnsorted, i => new Date(i.createdAt), ['desc']).slice(0, 3);
-            return (
-              <Container flex="10" mb={3} width="100%" maxWidth={800}>
-                <BudgetItemsList items={budgetItems} isCompact isFeesOnTop={isFeesOnTop} />
-                <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
-                  <Box flex="1 1" mx={[0, 2]}>
-                    <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-                      <StyledButton
-                        data-cy="view-all-transactions-btn"
-                        my={2}
-                        minWidth={290}
-                        width="100%"
-                        buttonSize="small"
-                        fontSize="Paragraph"
-                      >
-                        <FormattedMessage
-                          id="CollectivePage.SectionBudget.ViewAll"
-                          defaultMessage="View all transactions"
-                        />
-                      </StyledButton>
-                    </Link>
-                  </Box>
-                  <Box flex="1 1" mx={[0, 2]}>
-                    <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
-                      <StyledButton
-                        data-cy="view-all-expenses-btn"
-                        my={2}
-                        minWidth={290}
-                        width="100%"
-                        buttonSize="small"
-                        fontSize="Paragraph"
-                      >
-                        <FormattedMessage
-                          id="CollectivePage.SectionBudget.ViewAllExpenses"
-                          defaultMessage="View all expenses"
-                        />
-                      </StyledButton>
-                    </Link>
-                  </Box>
-                </Flex>
+  const transactions = get(data, 'transactions.nodes') || EMPTY_ARRAY;
+  const expenses = get(data, 'expenses.nodes') || EMPTY_ARRAY;
+  const budgetItemsParams = [transactions, expenses, filter];
+  const allItems = React.useMemo(() => getBudgetItems(...budgetItemsParams), budgetItemsParams);
+  const isLoading = !allItems.length && budgetQueryResult.loading;
+  const hasExpenses = Boolean(expenses.length);
+  const hasTransactions = Boolean(transactions.length);
+
+  // Refetch data when user logs in to refresh permissions
+  React.useEffect(() => {
+    if (LoggedInUser) {
+      refetch();
+    }
+  }, [LoggedInUser]);
+
+  return (
+    <ContainerSectionContent pb={4}>
+      {(hasExpenses || hasTransactions) && (
+        <Flex mb={3} flexWrap="wrap" justifyContent="space-between" alignItems="center" maxWidth={720}>
+          <StyledFilters filters={FILTERS} getLabel={geFilterLabel} selected={filter} onChange={setFilter} />
+          <ViewAllLink
+            collective={collective}
+            filter={filter}
+            hasExpenses={hasExpenses}
+            hasTransactions={hasTransactions}
+          />
+        </Flex>
+      )}
+      <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
+        <Container flex="10" mb={3} width="100%" maxWidth={800}>
+          <StyledCard>
+            {isLoading ? (
+              <LoadingPlaceholder height={300} />
+            ) : !allItems.length ? (
+              <Container textAlign="center" py={94} px={2}>
+                <Image src="/static/images/empty-jars.png" alt="Empty jars" width={125} height={125} />
+                <P fontWeight="500" fontSize="20px" lineHeight="28px">
+                  <FormattedMessage id="Budget.Empty" defaultMessage="There are no transactions yet." />
+                </P>
+                <P mt={2} fontSize="16px" lineHeight="24px" color="black.600">
+                  <FormattedMessage
+                    id="Budget.EmptyComeBackLater"
+                    defaultMessage="Come back to this section once there is at least one transaction!"
+                  />
+                </P>
               </Container>
-            );
-          }}
-        </Query>
+            ) : (
+              allItems.map((item, idx) => {
+                return (
+                  <BudgetItemContainer
+                    key={`${item.__typename}-${item?.id || idx}`}
+                    $isFirst={!idx}
+                    data-cy="single-budget-item"
+                  >
+                    {item.__typename === 'Expense' ? (
+                      <DebitItem>
+                        <ExpenseBudgetItem
+                          expense={item}
+                          collective={collective}
+                          host={collective.host}
+                          showAmountSign
+                          showProcessActions
+                        />
+                      </DebitItem>
+                    ) : (
+                      <TransactionItem
+                        transaction={item}
+                        collective={collective}
+                        displayActions
+                        onMutationSuccess={refetch}
+                      />
+                    )}
+                  </BudgetItemContainer>
+                );
+              })
+            )}
+          </StyledCard>
+        </Container>
 
         <Box width="32px" flex="1" />
 
@@ -137,41 +209,7 @@ const SectionBudget = ({ collective, stats }) => {
           mb={2}
           mx={[null, null, 3]}
         >
-          <Box data-cy="budgetSection-today-balance" flex="1" py={16} px={4}>
-            <P fontSize="Tiny" textTransform="uppercase" color="black.700">
-              <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
-            </P>
-            <P fontSize="H5" mt={1}>
-              {formatCurrency(stats.balance, collective.currency)} <Span color="black.400">{collective.currency}</Span>
-            </P>
-          </Box>
-          <Container data-cy="budgetSection-estimated-budget" flex="1" background="#F5F7FA" py={16} px={4}>
-            <DefinedTerm
-              term={Terms.ESTIMATED_BUDGET}
-              fontSize="Tiny"
-              textTransform="uppercase"
-              color="black.700"
-              extraTooltipContent={
-                <Box mt={2}>
-                  <FormattedMessage
-                    id="CollectivePage.SectionBudget.MonthlyRecurringAmount"
-                    defaultMessage="Monthly recurring: {amount}"
-                    values={{ amount: formatCurrency(monthlyRecurring, collective.currency) }}
-                  />
-                  <br />
-                  <FormattedMessage
-                    id="CollectivePage.SectionBudget.TotalAmountReceived"
-                    defaultMessage="Total received in the last 12 months: {amount}"
-                    values={{ amount: formatCurrency(stats?.totalAmountReceived || 0, collective.currency) }}
-                  />
-                </Box>
-              }
-            />
-            <P fontSize="H5" mt={2}>
-              <Span fontWeight="bold">~ {formatCurrency(stats.yearlyBudget, collective.currency)}</Span>{' '}
-              <Span color="black.400">{collective.currency}</Span>
-            </P>
-          </Container>
+          <BudgetStats collective={collective} stats={stats} />
         </StyledCard>
       </Flex>
     </ContainerSectionContent>
@@ -183,9 +221,11 @@ SectionBudget.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     isArchived: PropTypes.bool,
-    platformFeePercent: PropTypes.number,
+    settings: PropTypes.object,
+    host: PropTypes.object,
   }),
 
   /** Stats */
@@ -194,10 +234,10 @@ SectionBudget.propTypes = {
     yearlyBudget: PropTypes.number.isRequired,
     activeRecurringContributions: PropTypes.object,
     totalAmountReceived: PropTypes.number,
+    totalAmountRaised: PropTypes.number,
   }),
 
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
+  LoggedInUser: PropTypes.object,
 };
 
-export default React.memo(injectIntl(SectionBudget));
+export default React.memo(withUser(SectionBudget));

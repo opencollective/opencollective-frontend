@@ -1,16 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import classNames from 'classnames';
-import gql from 'graphql-tag';
 import { uniqBy } from 'lodash';
-import { Button, ButtonGroup } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
+import Container from './Container';
 import Error from './Error';
 import Member from './Member';
+import StyledButton from './StyledButton';
 
 const MEMBERS_PER_PAGE = 10;
+
+const MembersContainer = styled.div`
+  .filterBtnGroup {
+    width: 100%;
+  }
+
+  .filterBtn {
+    width: 33%;
+  }
+`;
 
 class MembersWithData extends React.Component {
   static propTypes = {
@@ -20,10 +32,9 @@ class MembersWithData extends React.Component {
     onChange: PropTypes.func,
     LoggedInUser: PropTypes.object,
     fetchMore: PropTypes.func.isRequired,
-    refetch: PropTypes.func,
     className: PropTypes.string,
     data: PropTypes.object,
-    role: PropTypes.string,
+    memberRole: PropTypes.string,
     type: PropTypes.string,
   };
 
@@ -53,13 +64,8 @@ class MembersWithData extends React.Component {
     });
   };
 
-  refetch = role => {
-    this.setState({ role });
-    this.props.refetch({ role });
-  };
-
   render() {
-    const { data, LoggedInUser, collective, tier, role, type } = this.props;
+    const { data, LoggedInUser, collective, tier, type } = this.props;
 
     if (data.error) {
       return <Error message={data.error.message} />;
@@ -96,81 +102,16 @@ class MembersWithData extends React.Component {
     }
     const limit = this.props.limit || MEMBERS_PER_PAGE * 2;
     return (
-      <div className="MembersContainer" ref={node => (this.node = node)}>
-        <style jsx>
-          {`
-            .MembersContainer :global(.loadMoreBtn) {
-              margin: 1rem;
-              text-align: center;
-            }
-            .filter {
-              width: 100%;
-              max-width: 400px;
-              margin: 0 auto;
-            }
-            :global(.filterBtnGroup) {
-              width: 100%;
-            }
-            :global(.filterBtn) {
-              width: 33%;
-            }
-            .Members {
-              display: flex;
-              flex-wrap: wrap;
-              flex-direction: row;
-              justify-content: center;
-              overflow: hidden;
-              margin: 1rem 0;
-            }
-          `}
-        </style>
-        <style jsx global>
-          {`
-            .cardsList .Member.ORGANIZATION {
-              margin: 1rem !important;
-            }
-            .cardsList .Member.USER {
-              margin: 0.5rem 0.25rem;
-            }
-          `}
-        </style>
-
-        {!role && !tier && (
-          <div className="filter">
-            <ButtonGroup className="filterBtnGroup">
-              <Button
-                className="filterBtn"
-                bsStyle={!this.state.role ? 'primary' : 'default'}
-                onClick={() => this.refetch()}
-              >
-                <FormattedMessage id="members.all" defaultMessage="all" />
-              </Button>
-              <Button
-                className="filterBtn"
-                bsStyle={this.state.role === 'ADMIN' ? 'primary' : 'default'}
-                onClick={() => this.refetch('ADMIN')}
-              >
-                <FormattedMessage id="members.admin" defaultMessage="administrators" />
-              </Button>
-              <Button
-                className="filterBtn"
-                bsStyle={this.state.role === 'MEMBER' ? 'primary' : 'default'}
-                onClick={() => this.refetch('MEMBER')}
-              >
-                <FormattedMessage id="members.members" defaultMessage="members" />
-              </Button>
-              <Button
-                className="filterBtn"
-                bsStyle={this.state.role === 'BACKER' ? 'primary' : 'default'}
-                onClick={() => this.refetch('BACKER')}
-              >
-                <FormattedMessage id="members.paid" defaultMessage="backers" />
-              </Button>
-            </ButtonGroup>
-          </div>
-        )}
-
-        <div className="Members cardsList">
+      <MembersContainer ref={node => (this.node = node)}>
+        <Container
+          className="cardsList"
+          display="flex"
+          flexWrap="wrap"
+          flexDirection="row"
+          justifyContent="center"
+          overflow="hidden"
+          margin="1rem 0"
+        >
           {members.map(member => (
             <Member
               key={member.id}
@@ -181,23 +122,23 @@ class MembersWithData extends React.Component {
               LoggedInUser={LoggedInUser}
             />
           ))}
-        </div>
+        </Container>
         {members.length % 10 === 0 && members.length >= limit && (
-          <div className="loadMoreBtn">
-            <Button bsStyle="default" onClick={this.fetchMore}>
+          <Container margin="1rem" textAlign="center">
+            <StyledButton onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
-            </Button>
-          </div>
+            </StyledButton>
+          </Container>
         )}
-      </div>
+      </MembersContainer>
     );
   }
 }
 
-const getMembersQuery = gql`
+const membersQuery = gql`
   query Members(
-    $CollectiveId: Int!
+    $collectiveSlug: String!
     $TierId: Int
     $role: String
     $type: String
@@ -206,7 +147,7 @@ const getMembersQuery = gql`
     $orderBy: String
   ) {
     allMembers(
-      CollectiveId: $CollectiveId
+      collectiveSlug: $collectiveSlug
       TierId: $TierId
       role: $role
       type: $type
@@ -243,14 +184,14 @@ const getMembersQuery = gql`
   }
 `;
 
-export const addMembersData = graphql(getMembersQuery, {
+export const addMembersData = graphql(membersQuery, {
   options: props => ({
     variables: {
-      CollectiveId: props.collective.id,
+      collectiveSlug: props.collective.slug,
       TierId: props.tier && props.tier.id,
       offset: 0,
       type: props.type,
-      role: props.role,
+      role: props.memberRole,
       orderBy: props.orderBy,
       limit: props.limit || MEMBERS_PER_PAGE * 2,
     },

@@ -18,7 +18,7 @@ export default class PricingPage extends Component {
   render() {
     return (
       <Page>
-        <Pricing tab={this.props.tab} />
+        <Pricing />
       </Page>
     );
   }

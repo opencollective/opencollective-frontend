@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     types:
       - opened
@@ -12,7 +12,8 @@ on:
 
 env:
   TZ: UTC
-  NODE_ENV: ci
+  OC_ENV: ci
+  NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
@@ -65,10 +66,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
-      # - name: Setup node
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: '12.x'
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
 
       - name: Restore node_modules
         uses: actions/cache@v1
@@ -93,6 +94,43 @@ jobs:
 
       - run: npm run prettier:check
 
+  depcheck:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2-beta
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+
+      - name: Restore node_modules
+        uses: actions/cache@v1
+        id: node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Restore .npm cache
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}
+            ${{ runner.os }}-npm-cache-
+
+      - name: Install dependencies
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
+
+      - run: npm run depcheck
+
   check-langs:
     runs-on: ubuntu-latest
 
@@ -102,10 +140,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
-      # - name: Setup node
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: '12.x'
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
 
       - name: Restore node_modules
         uses: actions/cache@v1
@@ -139,10 +177,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
-      # - name: Setup node
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: '12.x'
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
 
       - name: Restore node_modules
         uses: actions/cache@v1
@@ -192,10 +230,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
-      # - name: Setup node
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: '12.x'
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
 
       - name: Restore node_modules
         uses: actions/cache@v1

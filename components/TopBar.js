@@ -1,17 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
+import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { rotateMixin } from '../lib/constants/animations';
 import theme from '../lib/theme';
-import { Link } from '../server/pages';
 
+import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
+import Link from './Link';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
+import StyledLink from './StyledLink';
+import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import { withUser } from './UserProvider';
 
@@ -42,8 +46,9 @@ NavLinkContainer.defaultProps = {
   px: [1, 2, 3],
 };
 
-const NavLink = styled.a`
-  color: #777777;
+const NavLink = styled(StyledLink)`
+  color: #313233;
+  font-weight: 500;
   font-size: 1.4rem;
 `;
 
@@ -66,6 +71,31 @@ class TopBar extends React.Component {
     },
   };
 
+  constructor(props) {
+    super(props);
+    this.state = { showMobileMenu: false };
+    this.ref = React.createRef();
+  }
+
+  componentDidMount() {
+    document.addEventListener('click', this.onClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.onClickOutside);
+  }
+
+  onClickOutside = e => {
+    const ref = this.ref.current;
+    if (this.state.showMobileMenu && ref && !ref.contains(e.target)) {
+      this.setState({ showMobileMenu: false });
+    }
+  };
+
+  toggleMobileMenu = () => {
+    this.setState(state => ({ showMobileMenu: !state.showMobileMenu }));
+  };
+
   render() {
     const { showSearch, menuItems } = this.props;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
@@ -78,44 +108,35 @@ class TopBar extends React.Component {
         flexDirection="row"
         justifyContent="space-around"
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
+        ref={this.ref}
       >
-        <Link route="home" passHref>
-          <Flex as="a" alignItems="center">
+        <Link href="/">
+          <Flex alignItems="center">
             <Logo width="24" height="24" />
             <Hide xs>
               <Box mx={2}>
-                <img height="16px" src="/static/images/logotype.svg" alt="Open collective" />
+                <Image height={16} width={100} src="/static/images/logotype.svg" alt="Open collective" />
               </Box>
             </Hide>
           </Flex>
         </Link>
 
         {showSearch && (
-          <Flex justifyContent="center" flex="1 1 auto">
-            <Hide xs width={1}>
+          <Flex justifyContent="flex-end" flex="1 1 auto">
+            <Hide xs sm md>
               <SearchFormContainer p={2}>
-                <SearchForm />
+                <SearchForm borderRadius="6px" />
               </SearchFormContainer>
             </Hide>
           </Flex>
         )}
 
-        <Flex alignItems="center" justifyContent="flex-end" flex="1 1 auto">
-          <Hide sm md lg>
+        <Flex alignItems="center" justifyContent={['flex-end', 'flex-start']} flex="1 1 auto">
+          <Hide lg>
             <Box mx={3}>
               <Link href="/search">
-                <Flex as="a">
+                <Flex>
                   <SearchIcon fill="#aaaaaa" size={24} />
-                </Flex>
-              </Link>
-            </Box>
-          </Hide>
-
-          <Hide sm md lg>
-            <Box mx={3}>
-              <Link href="#footer">
-                <Flex as="a">
-                  <MenuIcon color="#aaaaaa" size={24} />
                 </Flex>
               </Link>
             </Box>
@@ -125,8 +146,8 @@ class TopBar extends React.Component {
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               {merged.discover && (
                 <NavLinkContainer>
-                  <Link route="discover" passHref>
-                    <NavLink>
+                  <Link href="/discover">
+                    <NavLink as={Container}>
                       <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                     </NavLink>
                   </Link>
@@ -134,8 +155,8 @@ class TopBar extends React.Component {
               )}
               {merged.howItWorks && (
                 <NavLinkContainer>
-                  <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
-                    <NavLink>
+                  <Link href="/how-it-works">
+                    <NavLink as={Container}>
                       <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
                     </NavLink>
                   </Link>
@@ -143,8 +164,8 @@ class TopBar extends React.Component {
               )}
               {merged.pricing && (
                 <NavLinkContainer>
-                  <Link route="pricing" passHref>
-                    <NavLink>
+                  <Link href="/pricing">
+                    <NavLink as={Container}>
                       <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
                     </NavLink>
                   </Link>
@@ -159,9 +180,20 @@ class TopBar extends React.Component {
               )}
             </NavList>
           </Hide>
-
-          <TopBarProfileMenu />
         </Flex>
+        <TopBarProfileMenu />
+        <Hide sm md lg>
+          <TopBarMobileMenu
+            showMobileMenu={this.state.showMobileMenu}
+            menuItems={merged}
+            closeMenu={this.toggleMobileMenu}
+          />
+          <Box mx={3} onClick={this.toggleMobileMenu}>
+            <Flex as="a">
+              <MenuIcon color="#aaaaaa" size={24} />
+            </Flex>
+          </Box>
+        </Hide>
       </Flex>
     );
   }

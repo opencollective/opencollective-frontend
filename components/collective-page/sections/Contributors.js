@@ -4,14 +4,12 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-
-// Local imports
-import { Dimensions } from '../_constants';
 import Container from '../../Container';
 import * as ContributorsFilter from '../../ContributorsFilter';
 import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../../ContributorsGrid';
 import { H3, P, Span } from '../../Text';
+// Local imports
+import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
@@ -103,46 +101,36 @@ export default class SectionContributors extends React.PureComponent {
   render() {
     const { collective, financialContributors, coreContributors, stats } = this.props;
     const { filter } = this.state;
-    const onlyShowCore = collective.type === CollectiveType.ORGANIZATION;
-    const activeFilter = onlyShowCore ? ContributorsFilter.CONTRIBUTOR_FILTERS.CORE : filter;
     const filters = this.getContributorsFilters(coreContributors, financialContributors);
-    const contributors = this.filterContributors(coreContributors, financialContributors, activeFilter);
-    const hasFilters = !onlyShowCore && filters.length > 1;
+    const contributors = this.filterContributors(coreContributors, financialContributors, filter);
+    const hasFilters = filters.length > 1;
 
     return (
-      <MainContainer data-cy="Contributors" pt={80} pb={[2, 3]}>
+      <MainContainer data-cy="Contributors" pb={4}>
         <ContainerSectionContent>
-          {!onlyShowCore ? (
-            <React.Fragment>
-              <SectionTitle fontWeight="bold" fontSize={this.getTitleFontSize(collective.name)} lineHeight="1em">
-                <FormattedMessage
-                  id="CollectivePage.AllOfUs"
-                  defaultMessage="{collectiveName} is all of us"
-                  values={{ collectiveName: collective.name }}
-                />
-              </SectionTitle>
-              <H3 mb={3} fontWeight="normal" color="black.900">
-                <FormattedMessage
-                  id="CollectivePage.OurContributors"
-                  defaultMessage="Our contributors {count}"
-                  values={{
-                    count: <Span color="black.400">{stats.backers.all + coreContributors.length}</Span>,
-                  }}
-                />
-              </H3>
-              <P color="black.600" mb={4}>
-                <FormattedMessage
-                  id="CollectivePage.ContributorsDescription"
-                  defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
-                  values={{ collectiveName: collective.name }}
-                />
-              </P>
-            </React.Fragment>
-          ) : (
-            <SectionTitle data-cy="section-contributors-title">
-              <FormattedMessage id="ContributorsFilter.Core" defaultMessage="Core contributors" />
-            </SectionTitle>
-          )}
+          <SectionTitle fontWeight="bold" fontSize={this.getTitleFontSize(collective.name)} lineHeight="1em">
+            <FormattedMessage
+              id="CollectivePage.AllOfUs"
+              defaultMessage="{collectiveName} is all of us"
+              values={{ collectiveName: collective.name }}
+            />
+          </SectionTitle>
+          <H3 mb={3} fontWeight="normal" color="black.900">
+            <FormattedMessage
+              id="CollectivePage.OurContributors"
+              defaultMessage="Our contributors {count}"
+              values={{
+                count: <Span color="black.600">{stats.backers.all + coreContributors.length}</Span>,
+              }}
+            />
+          </H3>
+          <P color="black.700" mb={4}>
+            <FormattedMessage
+              id="CollectivePage.ContributorsDescription"
+              defaultMessage="Thank you for supporting {collectiveName}."
+              values={{ collectiveName: collective.name }}
+            />
+          </P>
         </ContainerSectionContent>
         {hasFilters && (
           <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} margin="0 auto">

@@ -13,8 +13,7 @@ const ContributeCollective = ({ collective, ...props }) => {
   const description = truncate(collective.description, { length: 100 });
   return (
     <Contribute
-      route="collective"
-      routeParams={{ slug: collective.slug }}
+      route={`/${collective.slug}`}
       type={ContributionTypes.CHILD_COLLECTIVE}
       title={collective.name}
       contributors={collective.contributors}

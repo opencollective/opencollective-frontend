@@ -1,41 +1,60 @@
-import mockRecaptcha from '../mocks/recaptcha';
-
 describe('Recurring contributions', () => {
+  let user;
+
   before(() => {
-    const visitParams = { onBeforeLoad: mockRecaptcha };
-    cy.login().then(() => {
-      cy.visit('/apex/contribute/sponsors-470/checkout', visitParams);
-      cy.get(`[type="radio"][name=contributeAs]`).first().check();
-      cy.wait(1000);
-      cy.contains('Next step').click();
-      cy.contains('Next step').click();
-      cy.get('#PaymentMethod').then($paymentMethod => {
-        if ($paymentMethod.text().includes('VISA **** 4242')) {
-          cy.contains('button', 'Make contribution').click();
-        } else {
-          cy.get('input[type=checkbox][name=save]').should('be.checked');
-          cy.wait(1000);
-          cy.fillStripeInput();
-          cy.contains('button', 'Make contribution').click();
-        }
-        cy.wait(5000);
-      });
+    cy.signup({ redirect: '/apex/contribute/sponsors-470/checkout' }).then(u => {
+      user = u;
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.contains('Contribute as');
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.useAnyPaymentMethod();
+      cy.contains('button', 'Contribute').click();
+      cy.getByDataCy('order-success');
     });
   });
 
-  it.skip('Has contributions in the right categories', () => {
-    cy.login().then(() => {
-      cy.visit(`/testuseradmin/recurring-contributions`);
-      cy.getByDataCy('recurring-contribution-filter-tag-monthly').click();
+  it('Has contributions in the right categories', () => {
+    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
+      cy.getByDataCy('filter-button monthly').click();
       cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
-      cy.getByDataCy('recurring-contribution-filter-tag-yearly').click();
+      cy.getByDataCy('filter-button yearly').click();
       cy.getByDataCy('recurring-contribution-card').should('have.length', 0);
     });
   });
 
-  it.skip('Can cancel an active contribution', () => {
-    cy.login().then(() => {
-      cy.visit(`/testuseradmin/recurring-contributions`);
+  it('Can add a new payment method and use it for the recurring contribution', () => {
+    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
+      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
+      cy.getByDataCy('recurring-contribution-menu-payment-option').click();
+      cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
+      cy.getByDataCy('recurring-contribution-add-pm-button').click();
+      cy.wait(3000);
+      cy.fillStripeInput();
+      cy.getByDataCy('recurring-contribution-submit-pm-button').click();
+      cy.contains('[data-cy="recurring-contribution-pm-box"]', 'VISA **** 4242').within(() => {
+        cy.getByDataCy('radio-select').check();
+      });
+      cy.getByDataCy('recurring-contribution-update-pm-button').click();
+      cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
+    });
+  });
+
+  it('Can change the tier and amount of the order', () => {
+    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
+      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
+      cy.getByDataCy('recurring-contribution-menu-tier-option').click();
+      cy.getByDataCy('recurring-contribution-order-menu').should('exist');
+      cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Backers').within(() => {
+        cy.getByDataCy('radio-select').check();
+      });
+      cy.getByDataCy('recurring-contribution-update-order-button').click();
+      cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
+      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$5.00 USD / month');
+    });
+  });
+
+  it('Can cancel an active contribution', () => {
+    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
       cy.getByDataCy('recurring-contribution-menu').should('exist');
@@ -46,53 +65,10 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-cancel-yes')
         .click()
         .then(() => {
-          cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been cancelled');
-          cy.getByDataCy('recurring-contribution-filter-tag-cancelled').click();
+          cy.getByDataCy('toast-notification').contains('Your recurring contribution has been cancelled');
+          cy.getByDataCy('filter-button cancelled').click();
           cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
         });
-    });
-  });
-
-  it.skip('Can reactivate a cancelled contribution', () => {
-    cy.login().then(() => {
-      cy.visit(`/testuseradmin/recurring-contributions`);
-      cy.getByDataCy('recurring-contribution-filter-tag-cancelled').click();
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Activate');
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-      cy.getByDataCy('recurring-contribution-activate-yes')
-        .click()
-        .then(() => {
-          cy.getByDataCy('temporary-notification').contains('Recurring contribution activated!');
-          cy.getByDataCy('recurring-contribution-filter-tag-active').click();
-          cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
-        });
-    });
-  });
-
-  it.skip('Can add a new payment method and use it for the recurring contribution', () => {
-    cy.login().then(() => {
-      cy.visit(`/testuseradmin/recurring-contributions`);
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-      cy.getByDataCy('recurring-contribution-menu-payment-option').click();
-      cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
-      cy.getByDataCy('recurring-contribution-add-pm-button').click();
-      cy.getByDataCy('new-credit-card-form').should('exist');
-      cy.fillStripeInput({
-        card: { creditCardNumber: 5555555555554444, expirationDate: '07/23', cvcCode: 713, postalCode: 12345 },
-      });
-      cy.server();
-      // no third argument, we don't want to stub the response, we just want to wait on it
-      cy.route('POST', '/api/graphql/v2').as('cardadded');
-      cy.route('POST', '/api/graphql/v1').as('cardupdated');
-      cy.getByDataCy('recurring-contribution-submit-pm-button').click();
-      cy.wait(['@cardadded', '@cardupdated'], { responseTimeout: 15000 });
-      // eslint-disable-next-line no-unused-vars
-      cy.contains('[data-cy="recurring-contribution-pm-box"]', 'MASTERCARD **** 4444').within($listBox => {
-        cy.getByDataCy('radio-select').check();
-      });
-      cy.getByDataCy('recurring-contribution-update-pm-button').click();
-      cy.wait(2000);
-      cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been updated.');
     });
   });
 });

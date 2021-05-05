@@ -1,25 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { sumBy } from 'lodash';
+import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import AutosizeText from '../AutosizeText';
-import Avatar from '../Avatar';
+import ExpenseBudgetItem from '../budget/ExpenseBudgetItem';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
-import LinkCollective from '../LinkCollective';
-import LinkExpense from '../LinkExpense';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
-import { H3, P, Span } from '../Text';
-
-import ExpenseStatusTag from './ExpenseStatusTag';
-import ExpenseTags from './ExpenseTags';
+import { P } from '../Text';
 
 const ExpenseContainer = styled.div`
-  display: flex;
-  padding: 15px;
-
   ${props =>
     !props.isFirst &&
     css`
@@ -27,126 +19,122 @@ const ExpenseContainer = styled.div`
     `}
 `;
 
-const ExpensesList = ({ collective, expenses, isLoading, nbPlaceholders }) => {
-  expenses = !isLoading ? expenses : [...new Array(nbPlaceholders)];
+const FooterContainer = styled.div`
+  padding: 16px 27px;
+  border-top: 1px solid #e6e8eb;
+`;
 
-  if (!expenses?.length) {
+const FooterLabel = styled.span`
+  font-size: 15px;
+  margin-right: 5px;
+  text-transform: uppercase;
+`;
+
+const ExpensesList = ({
+  collective,
+  host,
+  usePreviewModal,
+  expenses,
+  isLoading,
+  nbPlaceholders,
+  isInverted,
+  view,
+  onDelete,
+  onProcess,
+}) => {
+  if (!expenses?.length && !isLoading) {
     return null;
   }
 
+  const totalAmount = sumBy(expenses, 'amount');
   return (
     <StyledCard>
-      {expenses.map((expense, idx) => (
-        <ExpenseContainer key={expense?.id || idx} isFirst={!idx}>
-          <Box mr={3}>
-            {isLoading ? (
-              <LoadingPlaceholder width={40} height={40} />
-            ) : (
-              <LinkCollective collective={expense.payee}>
-                <Avatar collective={expense.payee} radius={40} />
-              </LinkCollective>
-            )}
-          </Box>
-          <Box flex="1">
-            <Flex flexWrap="wrap" justifyContent="space-between" alignItems="flex-start" width="100%">
-              {isLoading ? (
-                <LoadingPlaceholder height={70} width="70%" />
-              ) : (
-                <Box maxWidth="70%">
-                  <LinkExpense collective={collective} expense={expense} isV2>
-                    <AutosizeText
-                      value={expense.description}
-                      maxLength={255}
-                      minFontSizeInPx={13}
-                      maxFontSizeInPx={16}
-                      lengthThreshold={72}
-                    >
-                      {({ value, fontSize }) => (
-                        <H3
-                          fontWeight="500"
-                          lineHeight="1.5em"
-                          textDecoration="none"
-                          color="black.900"
-                          fontSize={`${fontSize}px`}
-                        >
-                          {value}
-                        </H3>
-                      )}
-                    </AutosizeText>
-                  </LinkExpense>
-                  <P mt={2} fontSize="12px" color="black.600">
-                    <FormattedMessage
-                      id="Expense.SubmittedByOnDate"
-                      defaultMessage="Submitted by {name} on {date, date, long}"
-                      values={{
-                        date: new Date(expense.createdAt),
-                        name: <LinkCollective collective={expense.createdByAccount} />,
-                      }}
-                    />
-                  </P>
-                </Box>
-              )}
-              {isLoading ? (
-                <LoadingPlaceholder height={28} width={140} />
-              ) : (
-                <Flex alignItems="center">
-                  <Box mr={3}>
-                    <ExpenseStatusTag status={expense.status} />
-                  </Box>
-                  <Span color="black.500" fontSize="16px">
-                    <FormattedMoneyAmount amount={expense.amount} currency={expense.currency} />
-                  </Span>
-                </Flex>
-              )}
+      {isLoading ? (
+        [...new Array(nbPlaceholders)].map((_, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <ExpenseContainer key={idx} isFirst={!idx}>
+            <ExpenseBudgetItem isLoading />
+          </ExpenseContainer>
+        ))
+      ) : (
+        <FlipMove enterAnimation="fade" leaveAnimation="fade">
+          {expenses.map((expense, idx) => (
+            <ExpenseContainer key={expense.id} isFirst={!idx} data-cy={`expense-${expense.status}`}>
+              <ExpenseBudgetItem
+                isInverted={isInverted}
+                collective={collective || expense.account}
+                expense={expense}
+                host={host}
+                showProcessActions
+                view={view}
+                usePreviewModal={usePreviewModal}
+                onDelete={onDelete}
+                onProcess={onProcess}
+              />
+            </ExpenseContainer>
+          ))}
+        </FlipMove>
+      )}
+      {!isLoading && (
+        <FooterContainer>
+          <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
+            <Flex
+              my={2}
+              mr={[3, 0]}
+              minWidth={100}
+              justifyContent="flex-end"
+              data-cy="transaction-amount"
+              flexDirection="column"
+            >
+              <Box alignSelf="flex-end">
+                <FooterLabel color="black.500">
+                  <FormattedMessage id="expense.page.total" defaultMessage="Page Total" />:
+                </FooterLabel>
+                <FooterLabel color="black.500">
+                  <FormattedMoneyAmount amount={totalAmount} currency={collective?.currency} precision={2} />
+                </FooterLabel>
+              </Box>
+              <P fontSize="12px" color="black.600">
+                <FormattedMessage id="expense.page.description" defaultMessage="Payment processor fees may apply." />
+              </P>
             </Flex>
-            <Box mt={3}>
-              <ExpenseTags expense={expense} isLoading={isLoading} />
-            </Box>
-          </Box>
-        </ExpenseContainer>
-      ))}
+          </Flex>
+        </FooterContainer>
+      )}
     </StyledCard>
   );
 };
 
 ExpensesList.propTypes = {
   isLoading: PropTypes.bool,
+  /** Set this to true to invert who's displayed (payee or collective) */
+  isInverted: PropTypes.bool,
   /** When `isLoading` is true, this sets the number of "loadin" items displayed */
   nbPlaceholders: PropTypes.number,
+  host: PropTypes.object,
+  view: PropTypes.oneOf(['public', 'admin']),
+  usePreviewModal: PropTypes.bool,
+  onDelete: PropTypes.func,
+  onProcess: PropTypes.func,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    parentCollective: PropTypes.shape({
+    parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
+    currency: PropTypes.string,
   }),
   expenses: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       legacyId: PropTypes.number.isRequired,
-      type: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-      status: PropTypes.string.isRequired,
-      createdAt: PropTypes.string.isRequired,
-      tags: PropTypes.arrayOf(PropTypes.string),
-      amount: PropTypes.number.isRequired,
-      currency: PropTypes.string.isRequired,
-      payee: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        imageUrl: PropTypes.string.isRequired,
-      }),
-      createdByAccount: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-      }),
     }),
   ),
+  totalAmount: PropTypes.number,
 };
 
 ExpensesList.defaultProps = {
   nbPlaceholders: 10,
+  view: 'public',
 };
 
 export default ExpensesList;

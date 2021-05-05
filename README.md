@@ -5,7 +5,7 @@
 
 <p align="center">
   <a href="https://github.com/opencollective/opencollective-frontend">
-    <img width="525"src="http://res.cloudinary.com/opencollective/image/upload/c_scale,w_1050/v1536861775/opencollective-babel-2018-09-13_ue8yhg.png" alt="Babel - Open Collective">
+    <img width="838" src="https://user-images.githubusercontent.com/1556356/91951703-030aa180-ed01-11ea-8b1d-b3e4a0ca1fed.png" alt="Babel - Open Collective">
   </a>
 </p>
 
@@ -17,7 +17,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ### Prerequisite
 
-1. Make sure you have Node.js version >= 12.
+1. Make sure you have Node.js version >= 14.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm use`.
 
@@ -40,7 +40,12 @@ By default, it will try to connect to the Open Collective staging API, **you don
 In case you want to connect to the Open Collective API running locally:
 
 - clone, install and start [opencollective-api](https://github.com/opencollective/opencollective-api)
-- in this project, copy [`.env.local`](.env.local) to `.env`.
+- in this project, copy the following content to a `.env` file:
+
+```
+API_URL=http://localhost:3060
+API_KEY=dvl-1510egmf4a23d80342403fb599qd
+```
 
 ### Start
 
@@ -87,6 +92,10 @@ Code style? Commit convention? Please check our [Contributing guidelines](CONTRI
 
 TL;DR: we use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/), we do like great commit messages and clean Git history.
 
+## Bounties
+
+This repo is part of the Open Collective bounty program. Get paid to contribute to Open Source! The Open Collective engineering team is small and we're always looking for new contributors to our Open Source codebases. Our Bounty program is an opportunity to solve issues that could be neglected otherwise. Contributors who fix these issues will be rewarded financially. Please see our docs for more information: https://docs.opencollective.com/help/contributing/development/bounties
+
 ## Deployment
 
 This project is currently deployed to staging and production with [Heroku](https://www.heroku.com/). To deploy, you need to be a core member of the Open Collective team.
@@ -96,5 +105,5 @@ More info: [docs/deployment.md](docs/deployment.md)
 ## Discussion
 
 If you have any questions, ping us on Slack
-(https://slack.opencollective.org) or on Twitter
+(https://slack.opencollective.com) or on Twitter
 ([@opencollect](https://twitter.com/opencollect)).

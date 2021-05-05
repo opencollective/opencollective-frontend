@@ -29,27 +29,27 @@ You can configure the scale through `fontSize` and `lineHeight` props.
 ```jsx
 import { P } from 'components/Text';
 <div>
-  <P fontSize="H1">H1: We are on a mission to help collaborative groups collect and spend money transparently.</P>
-  <P fontSize="H2">H2: We are on a mission to help collaborative groups collect and spend money transparently.</P>
-  <P fontSize="H3">H3: We are on a mission to help collaborative groups collect and spend money transparently.</P>
-  <P fontSize="H4">H4: We are on a mission to help collaborative groups collect and spend money transparently.</P>
-  <P fontSize="H5">H5: We are on a mission to help collaborative groups collect and spend money transparently.</P>
-  <P fontSize="H6">H6: We are on a mission to help collaborative groups collect and spend money transparently.</P>
-  <P fontSize="LeadParagraph">
+  <P fontSize="52px">H1: We are on a mission to help collaborative groups collect and spend money transparently.</P>
+  <P fontSize="40px">H2: We are on a mission to help collaborative groups collect and spend money transparently.</P>
+  <P fontSize="32px">H3: We are on a mission to help collaborative groups collect and spend money transparently.</P>
+  <P fontSize="24px">H4: We are on a mission to help collaborative groups collect and spend money transparently.</P>
+  <P fontSize="20px">H5: We are on a mission to help collaborative groups collect and spend money transparently.</P>
+  <P fontSize="9px">H6: We are on a mission to help collaborative groups collect and spend money transparently.</P>
+  <P fontSize="16px">
     LeadParagraph: We are on a mission to help collaborative groups collect and spend money transparently.
   </P>
-  <P fontSize="Paragraph">
+  <P fontSize="14px">
     Paragraph: We are on a mission to help collaborative groups collect and spend money transparently.
   </P>
-  <P fontSize="LeadCaption">
+  <P fontSize="13px">
     LeadCaption: We are on a mission to help collaborative groups collect and spend money transparently.
   </P>
-  <P fontSize="Caption">
+  <P fontSize="12px">
     Caption: We are on a mission to help collaborative groups collect and spend money transparently.
   </P>
-  <P fontSize="SmallCaption">
+  <P fontSize="11px">
     SmallCaption: We are on a mission to help collaborative groups collect and spend money transparently.
   </P>
-  <P fontSize="Tiny">Tiny: We are on a mission to help collaborative groups collect and spend money transparently.</P>
+  <P fontSize="10px">Tiny: We are on a mission to help collaborative groups collect and spend money transparently.</P>
 </div>;
 ```

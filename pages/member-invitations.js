@@ -1,6 +1,6 @@
 import React from 'react';
-import { Query } from '@apollo/react-components';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { Query } from '@apollo/client/react/components';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
@@ -49,7 +49,7 @@ class MemberInvitationsPage extends React.Component {
 
   render() {
     return (
-      <AuthenticatedPage noRobots title="Pending invitations" withoutGlobalStyles>
+      <AuthenticatedPage title="Pending invitations" disableSignup>
         {LoggedInUser => (
           <Query
             query={memberInvitationsPageQuery}

@@ -1,10 +1,10 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 /**
  * Fields fetched for updates
  */
-export const UpdatesFieldsFragment = gql`
-  fragment UpdatesFieldsFragment on UpdateType {
+export const updatesFieldsFragment = gql`
+  fragment UpdatesFields on UpdateType {
     id
     slug
     title
@@ -26,8 +26,8 @@ export const UpdatesFieldsFragment = gql`
 /**
  * Fields fetched for contributors
  */
-export const ContributorsFieldsFragment = gql`
-  fragment ContributorsFieldsFragment on Contributor {
+export const contributorsFieldsFragment = gql`
+  fragment ContributorsFields on Contributor {
     id
     name
     roles
@@ -42,7 +42,33 @@ export const ContributorsFieldsFragment = gql`
     type
     publicMessage
     isIncognito
+    isGuest
     tiersIds
     collectiveId
+  }
+`;
+
+/**
+ * Fields fetched for all possible collective page features
+ */
+export const collectiveNavbarFieldsFragment = gql`
+  fragment NavbarFields on CollectiveFeatures {
+    CONNECTED_ACCOUNTS
+    RECEIVE_FINANCIAL_CONTRIBUTIONS
+    RECURRING_CONTRIBUTIONS
+    EVENTS
+    PROJECTS
+    USE_EXPENSES
+    RECEIVE_EXPENSES
+    USE_EXPENSES
+    COLLECTIVE_GOALS
+    TOP_FINANCIAL_CONTRIBUTORS
+    CONVERSATIONS
+    UPDATES
+    TEAM
+    CONTACT_FORM
+    RECEIVE_HOST_APPLICATIONS
+    HOST_DASHBOARD
+    TRANSACTIONS
   }
 `;

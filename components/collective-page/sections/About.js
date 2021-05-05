@@ -13,49 +13,37 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
-import { EditCollectiveLongDescriptionMutation } from '../graphql/mutations';
-import SectionTitle from '../SectionTitle';
+import ContainerSectionContent from '../ContainerSectionContent';
+import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 
-// Dynamicly load HTMLEditor to download it only if user can edit the page
-const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
-const HTMLEditor = dynamic(() => import('../../RichTextEditor'), {
-  loading: HTMLEditorLoadingPlaceholder,
+// Dynamicly load RichTextEditor to download it only if user can edit the page
+const RichTextEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
+const RichTextEditor = dynamic(() => import('../../RichTextEditor'), {
+  loading: RichTextEditorLoadingPlaceholder,
   ssr: false, // No need for SSR as user needs to be logged in
 });
 
 const messages = defineMessages({
   placeholder: {
     id: 'CollectivePage.AddLongDescription',
-    defaultMessage: 'Add a description',
+    defaultMessage: 'Add description',
   },
 });
 
 /**
- * Display the inline editable description section for the collective
+ * About section category with editable description
  */
 const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
-  const isFund = collective.settings?.fund === true; // Funds MVP, to refactor
+  const isFund = collective.type === CollectiveType.FUND;
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
-    <Container
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      px={2}
-      py={[4, 5]}
-      background="#f5f7fa"
-      boxShadow="0px 11px 15px -5px #bfbfbf2b inset"
-    >
-      <SectionTitle textAlign="center" mb={5}>
-        <FormattedMessage id="collective.about.title" defaultMessage="About" />
-      </SectionTitle>
-
-      <Container width="100%" maxWidth={700} margin="0 auto">
+    <ContainerSectionContent px={2} pb={5}>
+      <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
         <InlineEditField
-          mutation={EditCollectiveLongDescriptionMutation}
+          mutation={editCollectiveLongDescriptionMutation}
           values={collective}
           field="longDescription"
           canEdit={canEdit}
@@ -70,13 +58,14 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           {({ isEditing, value, setValue, enableEditor }) => {
             if (isEditing) {
               return (
-                <HTMLEditor
+                <RichTextEditor
                   defaultValue={collective.longDescription}
                   onChange={e => setValue(e.target.value)}
                   placeholder={intl.formatMessage(messages.placeholder)}
-                  toolbarTop={[60, null, 119]}
+                  toolbarTop={[56, 64]}
                   toolbarBackgroundColor="#F7F8FA"
                   withStickyToolbar
+                  videoEmbedEnabled
                   autoFocus
                 />
               );
@@ -86,22 +75,22 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                   {canEdit ? (
                     <Flex flexDirection="column" alignItems="center">
                       {isCollective && !isFund && (
-                        <MessageBox type="info" withIcon fontStyle="italic" fontSize="Paragraph" mb={4}>
+                        <MessageBox type="info" withIcon fontStyle="italic" fontSize="14px" mb={4}>
                           <FormattedMessage
                             id="SectionAbout.Why"
-                            defaultMessage="Your collective is unique and wants to achieve great things. Here is the place to explain it!"
+                            defaultMessage="Tell your story and explain your purpose."
                           />
                         </MessageBox>
                       )}
                       <StyledButton buttonSize="large" onClick={enableEditor}>
-                        <FormattedMessage id="CollectivePage.AddLongDescription" defaultMessage="Add a description" />
+                        <FormattedMessage id="CollectivePage.AddLongDescription" defaultMessage="Add description" />
                       </StyledButton>
                     </Flex>
                   ) : (
                     <Span color="black.500" fontStyle="italic">
                       <FormattedMessage
                         id="SectionAbout.MissingDescription"
-                        defaultMessage="{collectiveName} didn't write a presentation yet"
+                        defaultMessage="{collectiveName} hasn't provided this information yet."
                         values={{ collectiveName: collective.name }}
                       />
                     </Span>
@@ -114,7 +103,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           }}
         </InlineEditField>
       </Container>
-    </Container>
+    </ContainerSectionContent>
   );
 };
 
@@ -127,6 +116,7 @@ SectionAbout.propTypes = {
     type: PropTypes.string,
     isArchived: PropTypes.bool,
     settings: PropTypes.object,
+    currency: PropTypes.string,
   }).isRequired,
 
   /** Can user edit the description? */

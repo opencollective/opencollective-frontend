@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
 
+import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
@@ -69,7 +70,7 @@ class CreateConversationPage extends React.Component {
 
   onCreateSuccess = async conversation => {
     const { collectiveSlug } = this.props;
-    await Router.pushRoute('conversation', { collectiveSlug, slug: conversation.slug, id: conversation.id });
+    await this.props.router.push(`/${collectiveSlug}/conversations/${conversation.slug}-${conversation.id}`);
   };
 
   getSuggestedTags(collective) {
@@ -84,7 +85,7 @@ class CreateConversationPage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
@@ -92,7 +93,7 @@ class CreateConversationPage extends React.Component {
 
     const collective = data && data.account;
     return (
-      <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
+      <Page collective={collective} {...this.getPageMetaData(collective)}>
         {data.loading ? (
           <Container borderTop="1px solid #E8E9EB">
             <Loading />
@@ -100,7 +101,11 @@ class CreateConversationPage extends React.Component {
         ) : (
           <CollectiveThemeProvider collective={collective}>
             <Container borderTop="1px solid #E8E9EB">
-              <CollectiveNavbar collective={collective} selected={Sections.CONVERSATIONS} />
+              <CollectiveNavbar
+                collective={collective}
+                selected={Sections.CONVERSATIONS}
+                selectedCategory={NAVBAR_CATEGORIES.CONNECT}
+              />
               <Container position="relative">
                 {!loadingLoggedInUser && !LoggedInUser && (
                   <ContainerOverlay>
@@ -108,7 +113,7 @@ class CreateConversationPage extends React.Component {
                   </ContainerOverlay>
                 )}
                 <Box maxWidth={1160} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
-                  <StyledLink as={Link} color="black.600" route="conversations" params={{ collectiveSlug }}>
+                  <StyledLink as={Link} color="black.600" href={`/${collectiveSlug}/conversations`}>
                     &larr; <FormattedMessage id="Conversations.GoBack" defaultMessage="Back to conversations" />
                   </StyledLink>
                   <Box mt={4}>
@@ -130,34 +135,37 @@ class CreateConversationPage extends React.Component {
   }
 }
 
-const getCollective = graphql(
-  gqlV2`
-    query CreateConversations($collectiveSlug: String!) {
-      account(slug: $collectiveSlug, throwIfMissing: false) {
+const createConversationPageQuery = gqlV2/* GraphQL */ `
+  query CreateConversationPage($collectiveSlug: String!) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      name
+      type
+      description
+      settings
+      imageUrl
+      twitterHandle
+      conversationsTags {
         id
-        slug
-        name
-        type
-        description
-        settings
-        imageUrl
-        twitterHandle
-        conversationsTags {
-          id
-          tag
-        }
+        tag
+      }
+      features {
+        ...NavbarFields
+      }
 
-        ... on Collective {
-          isApproved
-        }
+      ... on AccountWithHost {
+        isApproved
       }
     }
-  `,
-  {
-    options: {
-      context: API_V2_CONTEXT,
-    },
-  },
-);
+  }
+  ${collectiveNavbarFieldsFragment}
+`;
 
-export default withUser(getCollective(withRouter(CreateConversationPage)));
+const addCreateConversationPageData = graphql(createConversationPageQuery, {
+  options: {
+    context: API_V2_CONTEXT,
+  },
+});
+
+export default withUser(withRouter(addCreateConversationPageData(CreateConversationPage)));

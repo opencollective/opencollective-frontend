@@ -1,19 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
+import { CardElement } from '@stripe/react-stripe-js';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { getSubscriptionsQuery } from '../lib/graphql/queries';
+import { subscriptionsQuery } from '../lib/graphql/queries';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { compose } from '../lib/utils';
 
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
+import HappyBackground from '../components/gift-cards/HappyBackground';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
@@ -24,7 +26,6 @@ import { withStripeLoader } from '../components/StripeProvider';
 import StyledButton from '../components/StyledButton';
 import { H1, H5 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import HappyBackground from '../components/virtual-cards/HappyBackground';
 
 const ShadowBox = styled(Box)`
   box-shadow: 0px 8px 16px rgba(20, 20, 20, 0.12);
@@ -45,7 +46,6 @@ const AlignedBullets = styled.ul`
 
 class UpdatePaymentPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, id } }) {
-    console.log(`Updating Payment Method: ${collectiveSlug} ${id}`);
     return { slug: collectiveSlug, id: Number(id) };
   }
 
@@ -67,6 +67,7 @@ class UpdatePaymentPage extends React.Component {
     newCreditCardInfo: {},
     error: null,
     stripe: null,
+    stripeElements: null,
     submitting: false,
     success: false,
   };
@@ -89,16 +90,19 @@ class UpdatePaymentPage extends React.Component {
     } else {
       try {
         this.setState({ submitting: true });
-        const { token, error } = await this.state.stripe.createToken();
+        const cardElement = this.state.stripeElements.getElement(CardElement);
+        const { token, error } = await this.state.stripe.createToken(cardElement);
         if (error) {
           this.setState({ error: 'There was a problem with Stripe.', submitting: false, showCreditCardForm: false });
           throw error;
         }
         const paymentMethod = stripeTokenToPaymentMethod(token);
         const res = await this.props.replaceCreditCard({
-          CollectiveId: this.props.LoggedInUser.collective.id,
-          ...paymentMethod,
-          id: parseInt(this.props.id),
+          variables: {
+            CollectiveId: this.props.LoggedInUser.collective.id,
+            ...paymentMethod,
+            id: parseInt(this.props.id),
+          },
         });
         const updatedCreditCard = res.data.replaceCreditCard;
 
@@ -108,7 +112,7 @@ class UpdatePaymentPage extends React.Component {
           this.handleSuccess();
         }
       } catch (e) {
-        const message = e.message.replace('GraphQL error: ', '');
+        const message = e.message;
         this.setState({ error: message, submitting: false, showCreditCardForm: false });
       }
     }
@@ -238,7 +242,7 @@ class UpdatePaymentPage extends React.Component {
                             profileType={get(this.props.collective, 'type')}
                             hasSaveCheckBox={false}
                             onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
-                            onReady={({ stripe }) => this.setState({ stripe })}
+                            onReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                           />
                         </Box>
                       )}
@@ -287,7 +291,7 @@ class UpdatePaymentPage extends React.Component {
                       </StyledButton>
                     )}
                     {!showCreditCardForm && success && (
-                      <Link route={`/${this.props.slug}`}>
+                      <Link href={`/${this.props.slug}`}>
                         <StyledButton
                           buttonStyle="primary"
                           buttonSize="large"
@@ -298,7 +302,7 @@ class UpdatePaymentPage extends React.Component {
                         >
                           <FormattedMessage
                             id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
-                            defaultMessage="Go to Collective page"
+                            defaultMessage="Go to profile page"
                           />
                         </StyledButton>
                       </Link>
@@ -314,30 +318,27 @@ class UpdatePaymentPage extends React.Component {
   }
 }
 
-export const replaceCreditCard = graphql(
-  gql`
-    mutation replaceCreditCard(
-      $id: Int!
-      $CollectiveId: Int!
-      $name: String!
-      $token: String!
-      $data: StripeCreditCardDataInputType!
-    ) {
-      replaceCreditCard(CollectiveId: $CollectiveId, name: $name, token: $token, data: $data, id: $id) {
-        id
-        data
-        createdAt
-      }
+const replaceCreditCardMutation = gql`
+  mutation ReplaceCreditCard(
+    $id: Int!
+    $CollectiveId: Int!
+    $name: String!
+    $token: String!
+    $data: StripeCreditCardDataInputType!
+  ) {
+    replaceCreditCard(CollectiveId: $CollectiveId, name: $name, token: $token, data: $data, id: $id) {
+      id
+      data
+      createdAt
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      replaceCreditCard: variables => mutate({ variables }),
-    }),
-  },
-);
+  }
+`;
 
-const addSubscriptionsData = graphql(getSubscriptionsQuery, {
+const addReplaceCreditCardMutation = graphql(replaceCreditCardMutation, {
+  name: 'replaceCreditCard',
+});
+
+const addSubscriptionsData = graphql(subscriptionsQuery, {
   options: props => ({
     variables: {
       slug: props.slug,
@@ -362,6 +363,6 @@ const addSubscriptionsData = graphql(getSubscriptionsQuery, {
   },
 });
 
-const addData = compose(addSubscriptionsData, replaceCreditCard);
+const addGraphql = compose(addSubscriptionsData, addReplaceCreditCardMutation);
 
-export default injectIntl(withUser(addData(withStripeLoader(UpdatePaymentPage))));
+export default injectIntl(withUser(addGraphql(withStripeLoader(UpdatePaymentPage))));

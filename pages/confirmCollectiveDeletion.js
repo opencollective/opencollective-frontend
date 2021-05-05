@@ -26,7 +26,7 @@ class ConfirmCollectiveDeletion extends Component {
       res.setHeader('Location', '/');
       res.end();
     } else {
-      router.pushRoute('home');
+      router.push('/home');
     }
     return {};
   }
@@ -46,6 +46,10 @@ class ConfirmCollectiveDeletion extends Component {
         return 'collective';
       case 'EVENT':
         return 'event';
+      case 'PROJECT':
+        return 'project';
+      case 'FUND':
+        return 'fund';
       default:
         return 'account';
     }
@@ -71,14 +75,14 @@ class ConfirmCollectiveDeletion extends Component {
             />
           </H3>
           {type === 'USER' ? (
-            <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mt={4}>
+            <P fontSize="16px" lineHeight="24px" color="black.900" mt={4}>
               <FormattedMessage
                 id="confirmCollective.user.deletion.description"
                 defaultMessage="We've deleted your user account, expenses, payment methods, and connected accounts."
               />
             </P>
           ) : (
-            <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mt={4}>
+            <P fontSize="16px" lineHeight="24px" color="black.900" mt={4}>
               <FormattedMessage
                 id="confirmCollective.other.deletion.description"
                 values={{ collectiveType }}

@@ -1,19 +1,19 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import slugify from 'slugify';
 import styled from 'styled-components';
 
+import { suggestSlug } from '../lib/collective.lib';
 import { defaultImage } from '../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { getCollectiveQuery } from '../lib/graphql/queries';
+import { legacyCollectiveQuery } from '../lib/graphql/queries';
 import { imagePreview } from '../lib/image-utils';
 import { compose } from '../lib/utils';
-import { Router } from '../server/pages';
 
 import Avatar from '../components/Avatar';
 import Body from '../components/Body';
@@ -26,6 +26,7 @@ import I18nFormatters from '../components/I18nFormatters';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import { pledgedCollectivePageQuery } from '../components/PledgedCollectivePage';
 import StyledButtonSet from '../components/StyledButtonSet';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import StyledInputAmount from '../components/StyledInputAmount';
@@ -46,7 +47,7 @@ const labelStyles = {
 
 const Details = styled.details`
   &[open] {
-    font-size: ${themeGet('fontSizes.Paragraph')}px;
+    font-size: 14px;
     margin-bottom: ${themeGet('space.4')}px;
 
     summary::after {
@@ -56,7 +57,7 @@ const Details = styled.details`
 
   summary {
     color: ${themeGet('colors.black.900')};
-    font-size: ${themeGet('fontSizes.LeadParagraph')}px;
+    font-size: 16px;
     font-weight: 500;
     margin-bottom: ${themeGet('space.3')}px;
   }
@@ -84,7 +85,7 @@ const WordCountTextarea = () => {
         border="1px solid"
         borderColor="black.300"
         borderRadius="4px"
-        fontSize="Paragraph"
+        fontSize="14px"
         as="textarea"
         id="publicMessage"
         name="publicMessage"
@@ -164,6 +165,7 @@ class CreatePledgePage extends React.Component {
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     createPledge: PropTypes.func,
+    router: PropTypes.object,
   };
 
   state = {
@@ -230,10 +232,9 @@ class CreatePledgePage extends React.Component {
     try {
       const {
         data: { createOrder: result },
-      } = await this.props.createPledge(order, this.props.slug);
+      } = await this.props.createPledge(order, this.props.data?.Collective);
       if (result.collective.slug) {
-        const params = { slug: result.collective.slug };
-        Router.pushRoute('collective', params);
+        this.props.router.push(`/${result.collective.slug}`);
       }
     } catch (error) {
       this.setState({
@@ -318,25 +319,21 @@ class CreatePledgePage extends React.Component {
               <P my={3} color="black.500">
                 <FormattedMessage
                   id="createPledge.why"
-                  defaultMessage="If the cause or collective that you want to support is not yet on Open Collective, you can make a
-                pledge. This will incentivize them to create an open collective for their activities and offer you much
-                more visibility on how your money is spent to advance their cause."
+                  defaultMessage="If the cause or collective that you want to support is not yet on Open Collective, you can make a pledge. This will incentivize them to create an open collective for their activities and offer you much more visibility on how your money is spent to advance their cause."
                 />
               </P>
 
               <P my={3} color="black.500">
                 <FormattedMessage
                   id="createPledge.onceTheyCreateIt"
-                  defaultMessage="Once they create it (and verify that they own the URL you’ll enter in this form), you will receive an
-                email to ask you to fulfill your pledge."
+                  defaultMessage="Once they create it (and verify that they own the URL you’ll enter in this form), you will receive an email to ask you to fulfill your pledge."
                 />
               </P>
 
               <P my={3} color="black.500">
                 <FormattedMessage
                   id="createPledge.conditions"
-                  defaultMessage="At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We
-                request the project to have a least 100 stars on GitHub!"
+                  defaultMessage="At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We request the project to have a least 100 stars on GitHub!"
                 />
               </P>
 
@@ -347,19 +344,18 @@ class CreatePledgePage extends React.Component {
               )}
 
               {!loadingLoggedInUser && !LoggedInUser && (
-                <P
-                  mt={[5, null, 4]}
-                  color="black.700"
-                  fontSize="LeadParagraph"
-                  lineHeight="LeadParagraph"
-                  data-cy="signupOrLogin"
-                >
+                <P mt={[5, null, 4]} color="black.700" fontSize="16px" lineHeight="24px" data-cy="signupOrLogin">
                   <FormattedMessage
                     id="createPledge.signinToCreate"
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
                     values={{
                       'signin-link': msg => (
-                        <Link route="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
+                        <Link
+                          href={{
+                            pathname: '/signin',
+                            query: { next: slug ? `/${slug}/pledges/new` : '/pledges/new' },
+                          }}
+                        >
                           {msg}
                         </Link>
                       ),
@@ -389,11 +385,10 @@ class CreatePledgePage extends React.Component {
                         </P>
                       </Container>
 
-                      <P color="black.500" fontSize="Caption" mt={2}>
+                      <P color="black.500" fontSize="12px" mt={2}>
                         <FormattedMessage
                           id="createPledge.priviledge"
-                          defaultMessage="You’ve earned the privilege to name and describe this awesome cause. We’ll create a pledged
-                        collective page for it so other people can find it and pledge to it too."
+                          defaultMessage="You’ve earned the privilege to name and describe this awesome cause. We’ll create a pledged collective page for it so other people can find it and pledge to it too."
                         />
                       </P>
 
@@ -418,7 +413,7 @@ class CreatePledgePage extends React.Component {
                             prepend="https://opencollective.com/"
                             id="slug"
                             name="slug"
-                            defaultValue={slugify(name || '').toLowerCase()}
+                            defaultValue={suggestSlug(name || '').toLowerCase()}
                             data-cy="slugInput"
                           />
                         </Flex>
@@ -435,7 +430,7 @@ class CreatePledgePage extends React.Component {
                           prepend="https://github.com/"
                           id="githubHandle"
                           name="githubHandle"
-                          placeholder="i.e. babel/babel"
+                          placeholder="e.g. babel/babel"
                           defaultValue={githubHandle || ''}
                           data-cy="githubHandleInput"
                         />
@@ -448,20 +443,18 @@ class CreatePledgePage extends React.Component {
                       <FormattedMessage id="createPledge.pledgeAs" defaultMessage="Pledge as:" />
                     </H5>
 
-                    {LoggedInUser && (
-                      <Flex flexDirection="column" my={3}>
-                        <P {...labelStyles} htmlFor="fromCollective">
-                          <FormattedMessage id="createPledge.profile" defaultMessage="Choose a profile" />
-                        </P>
-                        <select id="fromCollective" name="fromCollective" defaultValue={LoggedInUser.CollectiveId}>
-                          {profiles.map(({ collective }) => (
-                            <option key={collective.slug + collective.id} value={collective.id}>
-                              {collective.name}
-                            </option>
-                          ))}
-                        </select>
-                      </Flex>
-                    )}
+                    <Flex flexDirection="column" my={3}>
+                      <P {...labelStyles} htmlFor="fromCollective">
+                        <FormattedMessage id="createPledge.profile" defaultMessage="Choose a profile" />
+                      </P>
+                      <select id="fromCollective" name="fromCollective" defaultValue={LoggedInUser.CollectiveId}>
+                        {profiles.map(({ collective }) => (
+                          <option key={collective.slug + collective.id} value={collective.id}>
+                            {collective.name}
+                          </option>
+                        ))}
+                      </select>
+                    </Flex>
                   </Box>
 
                   <Box mb={5}>
@@ -527,7 +520,7 @@ class CreatePledgePage extends React.Component {
                     {data.Collective.name}
                   </H3>
 
-                  <StyledLink fontSize="Paragraph" href={website}>
+                  <StyledLink fontSize="14px" href={website}>
                     {website}
                   </StyledLink>
                 </Container>
@@ -563,7 +556,7 @@ class CreatePledgePage extends React.Component {
                       .filter(({ fromCollective }) => fromCollective.type === 'USER')
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                          <Link href={`/${fromCollective.slug}`}>
                             <Avatar collective={fromCollective} radius={40} />
                           </Link>
                         </Box>
@@ -578,7 +571,7 @@ class CreatePledgePage extends React.Component {
                       )
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                          <Link href={`/${fromCollective.slug}`}>
                             <Container
                               backgroundImage={`url(${imagePreview(
                                 fromCollective.image,
@@ -620,9 +613,7 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.what"
-                  defaultMessage="A pledge allows supporters (companies and individuals) to pledge
-                funds towards a collective that hasn’t been created yet. If you can’t find a collective you want to
-                support, pledge to it!"
+                  defaultMessage="A pledge allows supporters (companies and individuals) to pledge funds towards a collective that hasn’t been created yet. If you can’t find a collective you want to support, pledge to it!"
                 />
               </Details>
 
@@ -635,8 +626,7 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.whatHappens"
-                  defaultMessage="Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam
-                folks, so please help us reach out to the community via twitter / github or, if you can, via email."
+                  defaultMessage="Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam folks, so please help us reach out to the community via twitter / github or, if you can, via email."
                 />
               </Details>
 
@@ -659,7 +649,7 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.howToClaim"
-                  defaultMessage="You’ll need to contact <SupportLink></SupportLink> to proove that you are an admin of this project."
+                  defaultMessage="You’ll need to contact <SupportLink></SupportLink> to prove that you are an admin of this project."
                   values={I18nFormatters}
                 />
               </Details>
@@ -672,72 +662,71 @@ class CreatePledgePage extends React.Component {
   }
 }
 
-const addCollectiveData = graphql(
-  gql`
-    query CreatePledgeQuery($slug: String!) {
-      Collective(slug: $slug) {
-        currency
+const createPledgePageQuery = gql`
+  query CreatePledgePage($slug: String!) {
+    Collective(slug: $slug) {
+      currency
+      id
+      name
+      website
+      githubHandle
+      pledges: orders(status: PENDING) {
         id
-        name
-        website
-        githubHandle
-        pledges: orders(status: PENDING) {
-          id
-          totalAmount
-          fromCollective {
-            id
-            imageUrl(height: 128)
-            slug
-            name
-            type
-          }
-        }
-      }
-    }
-  `,
-  {
-    skip: props => !props.slug,
-  },
-);
-
-export const addCreatePledgeMutation = graphql(
-  gql`
-    mutation createOrder($order: OrderInputType!) {
-      createOrder(order: $order) {
-        id
-        createdAt
-        status
-        createdByUser {
-          id
-        }
+        totalAmount
         fromCollective {
           id
+          imageUrl(height: 128)
           slug
-        }
-        collective {
-          id
-          slug
-        }
-        transactions(type: "CREDIT") {
-          id
-          uuid
+          name
+          type
         }
       }
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      createPledge: async (order, collectiveSlug) => {
-        return await mutate({
-          variables: { order },
-          refetchQueries: !collectiveSlug ? [] : [{ query: getCollectiveQuery, variables: { slug: collectiveSlug } }],
-        });
-      },
-    }),
-  },
-);
+  }
+`;
 
-const addGraphQL = compose(addCollectiveData, addCreatePledgeMutation);
+const addCreatePledgePageData = graphql(createPledgePageQuery, {
+  skip: props => !props.slug,
+});
 
-export { CreatePledgePage as MockCreatePledgePage };
-export default injectIntl(withUser(addGraphQL(CreatePledgePage)));
+const createPledgeMutation = gql`
+  mutation CreatePledge($order: OrderInputType!) {
+    createOrder(order: $order) {
+      id
+      createdAt
+      status
+      fromCollective {
+        id
+        slug
+      }
+      collective {
+        id
+        slug
+      }
+      transactions(type: "CREDIT") {
+        id
+        uuid
+      }
+    }
+  }
+`;
+
+export const addCreatePledgeMutation = graphql(createPledgeMutation, {
+  props: ({ mutate }) => ({
+    createPledge: async (order, collective) => {
+      return await mutate({
+        variables: { order },
+        refetchQueries: !collective
+          ? []
+          : [
+              { query: legacyCollectiveQuery, variables: { slug: collective.slug } },
+              { query: pledgedCollectivePageQuery, variables: { id: collective.id } },
+            ],
+      });
+    },
+  }),
+});
+
+const addGraphql = compose(addCreatePledgePageData, addCreatePledgeMutation);
+
+export default injectIntl(withUser(addGraphql(withRouter(CreatePledgePage))));

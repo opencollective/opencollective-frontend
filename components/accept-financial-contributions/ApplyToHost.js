@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import StyledTag from '../../components/StyledTag';
 
-import CollectiveNavbar from '../CollectiveNavbar';
+import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -57,16 +57,16 @@ class ApplyToHost extends React.Component {
       },
       applyToHost: {
         id: 'pricing.applyFiscalHost',
-        defaultMessage: 'Apply to a fiscal host',
+        defaultMessage: 'Apply to a Fiscal Host',
       },
       infoParagraph: {
         id: 'fiscalHost.apply.info',
         defaultMessage:
-          "With this option, you don't need to set up a legal entity and bank account for your project. The fiscal host will hold funds on your behalf, and take care of accounting, invoices, tax, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the host's page before confirming).",
+          "With this option, you don't need a legal entity and bank account for your project. The Fiscal Host will hold funds on your behalf, and take care of accounting, invoices, tax, admin, payments, and liability. Most Hosts charge a fee for this service (you'll have a chance to review these details before applying to join a Host).",
       },
       becomeHost: {
-        id: 'home.fiscalHost.becomeHostBtn',
-        defaultMessage: 'Become a fiscal host',
+        id: 'home.becomeFiscalHost',
+        defaultMessage: 'Become a Fiscal Host',
       },
       interestedInHosting: {
         id: 'fiscalHost.interestedInHosting',
@@ -74,11 +74,11 @@ class ApplyToHost extends React.Component {
       },
       seeMoreHosts: {
         id: 'fiscalHost.seeMoreHosts',
-        defaultMessage: 'See more hosts',
+        defaultMessage: 'See more Hosts',
       },
       allFiscalHosts: {
         id: 'fiscalHost.allFiscalHosts',
-        defaultMessage: 'All fiscal hosts',
+        defaultMessage: 'All Fiscal Hosts',
       },
     });
 
@@ -104,13 +104,19 @@ class ApplyToHost extends React.Component {
 
     return (
       <Fragment>
-        <CollectiveNavbar collective={collective} onlyInfos={true} />
+        <CollectiveNavbar collective={collective} />
         <Box mb={4} mt={5}>
-          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
+          <H1
+            fontSize={['20px', '32px']}
+            lineHeight={['24px', '36px']}
+            fontWeight="bold"
+            color="black.900"
+            textAlign="center"
+          >
             {intl.formatMessage(this.messages.header)}
           </H1>
         </Box>
-        <Container px={[1, null, 7]}>
+        <Container px={[1, null, 7]} mb={5}>
           <Container
             display="flex"
             alignItems={['center', 'flex-end']}
@@ -119,12 +125,12 @@ class ApplyToHost extends React.Component {
             px={[3, 5]}
             my={3}
           >
-            <img src={umbrellaIllustration} width="160px" height="160px" />
-            <Box maxWidth={'480px'} ml={[0, 4]}>
-              <H2 fontSize="H5" color="black.900" textAlign={['center', 'left']} my={[3, 0]}>
+            <img alt="" src={umbrellaIllustration} width="160px" height="160px" />
+            <Box maxWidth={'480px'} minWidth={'240px'} ml={[0, 4]}>
+              <H2 fontSize="20px" color="black.900" textAlign={['center', 'left']} my={[3, 0]}>
                 {intl.formatMessage(this.messages.applyToHost)}
               </H2>
-              <P mb={2} lineHeight="LeadParagraph" color="black.700">
+              <P mb={2} lineHeight="24px" color="black.700">
                 {intl.formatMessage(this.messages.infoParagraph)}
               </P>
             </Box>
@@ -165,12 +171,12 @@ class ApplyToHost extends React.Component {
             >
               <Box order={[2, 1, 1]}>
                 <H3
-                  fontSize={['LeadParagraph', 'H5']}
+                  fontSize={['16px', '20px']}
                   fontWeight="500"
-                  lineHeight={['LeadParagraph', 'H5']}
+                  lineHeight={['24px', '24px']}
                   color="black.600"
                   textAlign="center"
-                  order={[2]}
+                  order={2}
                   py={[2, 0]}
                 >
                   {intl.formatMessage(this.messages.interestedInHosting)}
@@ -184,7 +190,7 @@ class ApplyToHost extends React.Component {
                 </StyledLink>
               </Box>
               <Box order={[1, 3, 2]}>
-                <img src={becomeFiscalHostIllustration} width="192px" height="192px" />
+                <img alt="" src={becomeFiscalHostIllustration} width="192px" height="192px" />
               </Box>
             </InterestedContainer>
           </Container>

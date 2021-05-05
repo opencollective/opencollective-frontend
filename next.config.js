@@ -1,8 +1,10 @@
 require('./env');
 
 const withSourceMaps = require('@zeit/next-source-maps')();
+const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
+  useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true',
   webpack: (config, { webpack, isServer, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
@@ -12,6 +14,7 @@ const nextConfig = {
       // Set extra environment variables accessible through process.env.*
       // Will be replaced by webpack by their values!
       new webpack.EnvironmentPlugin({
+        OC_ENV: null,
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
@@ -19,9 +22,10 @@ const nextConfig = {
         WEBSITE_URL: null,
         SENTRY_DSN: null,
         ONBOARDING_MODAL: true,
-        TRANSFERWISE_ENABLED: null,
         NEW_HOST_APPLICATION_FLOW: null,
         TW_API_COLLECTIVE_SLUG: null,
+        REJECT_CONTRIBUTION: false,
+        REJECTED_CATEGORIES: false,
       }),
     );
 
@@ -66,24 +70,6 @@ const nextConfig = {
       use: ['babel-loader', 'raw-loader', 'markdown-loader'],
     });
 
-    // Inspired by https://github.com/rohanray/next-fonts
-    // Load Bootstrap and Font-Awesome fonts
-    config.module.rules.push({
-      test: /fonts[\\/].*\.(woff|woff2|eot|ttf|otf|svg)$/,
-      use: [
-        {
-          loader: 'url-loader',
-          options: {
-            limit: 8192,
-            fallback: 'file-loader',
-            publicPath: '/_next/static/fonts/',
-            outputPath: 'static/fonts/',
-            name: '[name]-[hash].[ext]',
-          },
-        },
-      ],
-    });
-
     // Configuration for images
     config.module.rules.unshift({
       test: /public\/.*\/images[\\/].*\.(jpg|gif|png|svg)$/,
@@ -106,9 +92,9 @@ const nextConfig = {
       },
     });
 
-    // Load SVGs in base64
+    // Load images in base64
     config.module.rules.push({
-      test: /components\/.*\.(svg)$/,
+      test: /components\/.*\.(svg|png|jpg|gif)$/,
       use: {
         loader: 'url-loader',
         options: {
@@ -117,11 +103,21 @@ const nextConfig = {
       },
     });
 
-    if (['ci', 'e2e'].includes(process.env.NODE_ENV)) {
+    if (['ci', 'e2e'].includes(process.env.OC_ENV)) {
       config.optimization.minimize = false;
     }
 
+    // mjs
+    config.module.rules.push({
+      test: /\.mjs$/,
+      include: /node_modules/,
+      type: 'javascript/auto',
+    });
+
     return config;
+  },
+  async rewrites() {
+    return REWRITES;
   },
 };
 

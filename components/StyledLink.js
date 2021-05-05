@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
-import { border, color, layout, space, typography } from 'styled-system';
+import { background, border, color, layout, space, typography } from 'styled-system';
 
 import { textDecoration, whiteSpace } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
@@ -19,13 +19,19 @@ const StyledLink = styled.a.attrs(props => {
       rel: 'noopener noreferrer',
     };
   }
+  if (props.openInNewTabNoFollow) {
+    return {
+      target: '_blank',
+      rel: 'noopener noreferrer nofollow',
+    };
+  }
 })`
-  color: ${themeGet('colors.primary.500')};
+  color: ${themeGet(`colors.primary.500`)};
   cursor: pointer;
   text-decoration: none;
 
   &:hover {
-    color: ${themeGet('colors.primary.300')};
+    color: ${themeGet(`colors.primary.400`)};
   }
 
   ${border}
@@ -53,6 +59,7 @@ const StyledLink = styled.a.attrs(props => {
 
   ${buttonStyle}
   ${buttonSize}
+  ${background}
 
   &[disabled] {
     pointer-events: none;
@@ -90,7 +97,7 @@ StyledLink.propTypes = {
   fontSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'font-weight' value */
   fontWeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  href: PropTypes.string,
+  href: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   /**
    * styled-system prop: adds margin & padding props
    * see: https://github.com/jxnblk/styled-system/blob/master/docs/api.md#space
@@ -102,10 +109,12 @@ StyledLink.propTypes = {
   textDecoration: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** Disable the link, make it unclickable */
   disabled: PropTypes.bool,
-  /** Wether text should be truncated if too long */
+  /** Whether text should be truncated if too long */
   truncateOverflow: PropTypes.bool,
   /** If true, the link will open in a new tab when clicked */
   openInNewTab: PropTypes.bool,
+  /** If true, the link will open in a new tab and also adds rel=nofollow */
+  openInNewTabNoFollow: PropTypes.bool,
 };
 
 /** @component */

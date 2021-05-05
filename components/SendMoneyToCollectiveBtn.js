@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { compose } from '../lib/utils';
 
+import Container from './Container';
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
 
@@ -20,7 +21,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
     toCollective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     data: PropTypes.object,
-    createOrder: PropTypes.func,
+    sendMoneyToCollective: PropTypes.func,
     confirmTransfer: PropTypes.func,
     isTransferApproved: PropTypes.bool,
   };
@@ -58,10 +59,10 @@ class SendMoneyToCollectiveBtn extends React.Component {
       paymentMethod: { uuid: paymentMethods[0].uuid },
     };
     try {
-      await this.props.createOrder(order);
+      await this.props.sendMoneyToCollective({ variables: { order } });
       this.setState({ loading: false });
     } catch (e) {
-      const error = e.message && e.message.replace(/GraphQL error:/, '');
+      const error = e.message;
       this.setState({ error, loading: false });
     }
   }
@@ -70,13 +71,6 @@ class SendMoneyToCollectiveBtn extends React.Component {
     const { amount, currency, toCollective } = this.props;
     return (
       <div className="SendMoneyToCollectiveBtn">
-        <style jsx>
-          {`
-            .error {
-              font-size: 1.1rem;
-            }
-          `}
-        </style>
         <Flex justifyContent="center" mb={1}>
           <StyledButton onClick={this.props.confirmTransfer || this.onClick}>
             {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
@@ -92,14 +86,14 @@ class SendMoneyToCollectiveBtn extends React.Component {
             )}
           </StyledButton>
         </Flex>
-        {this.state.error && <div className="error">{this.state.error}</div>}
+        {this.state.error && <Container fontSize="1.1rem">{this.state.error}</Container>}
       </div>
     );
   }
 }
 
-const addPaymentMethodsQuery = gql`
-  query Collective($slug: String) {
+const paymentMethodsQuery = gql`
+  query SendMoneyToCollectivePaymentMethods($slug: String) {
     Collective(slug: $slug) {
       id
       paymentMethods(service: "opencollective") {
@@ -112,7 +106,7 @@ const addPaymentMethodsQuery = gql`
   }
 `;
 
-const addPaymentMethods = graphql(addPaymentMethodsQuery, {
+const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   options: props => ({
     variables: {
       slug: get(props, 'fromCollective.slug'),
@@ -123,8 +117,8 @@ const addPaymentMethods = graphql(addPaymentMethodsQuery, {
   },
 });
 
-const createOrderQuery = gql`
-  mutation createOrder($order: OrderInputType!) {
+const sendMoneyToCollectiveMutation = gql`
+  mutation SendMoneyToCollective($order: OrderInputType!) {
     createOrder(order: $order) {
       id
       fromCollective {
@@ -145,14 +139,10 @@ const createOrderQuery = gql`
   }
 `;
 
-const addMutation = graphql(createOrderQuery, {
-  props: ({ mutate }) => ({
-    createOrder: async order => {
-      return await mutate({ variables: { order } });
-    },
-  }),
+const addSendMoneyToCollectiveMutation = graphql(sendMoneyToCollectiveMutation, {
+  name: 'sendMoneyToCollective',
 });
 
-const addData = compose(addMutation, addPaymentMethods);
+const addGraphql = compose(addPaymentMethodsData, addSendMoneyToCollectiveMutation);
 
-export default addData(SendMoneyToCollectiveBtn);
+export default addGraphql(SendMoneyToCollectiveBtn);

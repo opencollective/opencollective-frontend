@@ -15,7 +15,7 @@ describe('Onboarding modal', () => {
     cy.get('button[type="submit"]').click();
     cy.wait(1000);
     // check if there is Modal with New collective created message
-    cy.get('[data-cy="onboarding-collective-created"]').contains('The New collective Collective has been created!');
+    cy.get('[data-cy="onboarding-collective-created"]').contains('New collective has been created!');
     cy.get('[data-cy="step-forward-button"]').click();
     // Current count of admins
     cy.get('[data-cy="profile-card"]').children().should('have.length', 1);

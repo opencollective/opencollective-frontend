@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -19,7 +19,7 @@ import StyledInput from '../StyledInput';
 import StyledInputTags from '../StyledInputTags';
 import { H4, P } from '../Text';
 
-const CreateConversationMutation = gqlV2`
+const createConversationMutation = gqlV2/* GraphQL */ `
   mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
     createConversation(title: $title, html: $html, CollectiveId: $CollectiveId, tags: $tags) {
       id
@@ -41,8 +41,7 @@ const messages = defineMessages({
   },
   bodyPlaceholder: {
     id: 'CreateConversation.Body.Placeholder',
-    defaultMessage:
-      'You can add links, lists, code snipets and more using this text editor. Type and start adding content to your conversation here.',
+    defaultMessage: 'You can add text, links, lists, code snipets, and more here.',
   },
 });
 
@@ -74,7 +73,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
   const intl = useIntl();
   const { id: collectiveId, slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();
-  const [createConversation, { error: submitError }] = useMutation(CreateConversationMutation, mutationOptions);
+  const [createConversation, { error: submitError }] = useMutation(createConversationMutation, mutationOptions);
   const [formPersister] = React.useState(new FormPersister());
 
   const { values, errors, getFieldProps, handleSubmit, setFieldValue, setValues, isSubmitting, touched } = useFormik({
@@ -126,7 +125,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
               error={touched.title && errors.title}
               withOutline
               width="100%"
-              fontSize="H4"
+              fontSize="24px"
               border="none"
               maxLength={255}
               px={0}
@@ -209,7 +208,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
         minWidth={200}
         mt={3}
       >
-        <FormattedMessage id="CreateConversationForm.Submit" defaultMessage="Submit conversation" />
+        <FormattedMessage id="CreateConversationForm.Submit" defaultMessage="Create Conversation" />
       </StyledButton>
     </form>
   );

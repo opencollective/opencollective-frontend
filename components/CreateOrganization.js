@@ -1,32 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { graphql } from '@apollo/client/react/hoc';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
-import { Router } from '../server/pages';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { compose } from '../lib/utils';
 
-import Body from './Body';
+import { addEditCollectiveMembersMutation } from './onboarding-modal/OnboardingModal';
 import Container from './Container';
-import CreateCollectiveForm from './CreateCollectiveForm';
-import Footer from './Footer';
-import Header from './Header';
+import CreateOrganizationForm from './CreateOrganizationForm';
+import { Box, Flex } from './Grid';
 import SignInOrJoinFree from './SignInOrJoinFree';
 import { H1, P } from './Text';
 
 class CreateOrganization extends React.Component {
   static propTypes = {
-    host: PropTypes.object,
-    createCollective: PropTypes.func,
+    createOrganization: PropTypes.func,
+    editCollectiveMembers: PropTypes.func,
     LoggedInUser: PropTypes.object,
-    refetchLoggedInUser: PropTypes.func.isRequired, // props coming from withUser
+    refetchLoggedInUser: PropTypes.func.isRequired,
+    router: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
-    this.state = { collective: { type: 'ORGANIZATION' }, result: {} };
-    this.createCollective = this.createCollective.bind(this);
+    this.state = { collective: { type: 'ORGANIZATION' }, result: {}, admins: [] };
+    this.createOrganization = this.createOrganization.bind(this);
     this.error = this.error.bind(this);
     this.resetError = this.resetError.bind(this);
   }
@@ -39,129 +40,129 @@ class CreateOrganization extends React.Component {
     this.error();
   }
 
-  async createCollective(CollectiveInputType) {
-    if (!CollectiveInputType.tos) {
+  updateAdmins = admins => {
+    this.setState({ admins });
+  };
+
+  async createOrganization(organization) {
+    if (!organization.authorization) {
       this.setState({
-        result: { error: 'Please accept the terms of service' },
-      });
-      return;
-    }
-    if (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos) {
-      this.setState({
-        result: { error: 'Please accept the terms of fiscal sponsorship' },
+        result: { error: 'Verify that you are an authorized organization representative' },
       });
       return;
     }
 
     this.setState({ status: 'loading' });
-    CollectiveInputType.type = 'ORGANIZATION';
+
+    delete organization.authorization;
 
     try {
-      const res = await this.props.createCollective(CollectiveInputType);
-      const collective = res.data.createCollective;
-      const collectiveUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}?status=collectiveCreated&CollectiveId=${collective.id}`;
-      this.setState({
-        status: 'idle',
-        result: {
-          success: `Organization created successfully: ${collectiveUrl}`,
+      const response = await this.props.createOrganization({
+        variables: {
+          organization,
         },
       });
+
+      if (response) {
+        await this.props.refetchLoggedInUser();
+        const member = await this.props.LoggedInUser.memberOf.filter(
+          member => member.collective.id === response.data.createOrganization.legacyId,
+        );
+        const adminList = this.state.admins.filter(admin => {
+          if (admin.member.id !== this.props.LoggedInUser.collective.id) {
+            return admin;
+          }
+        });
+
+        this.setState({
+          admins: [...adminList, { role: 'ADMIN', member: this.props.LoggedInUser.collective, id: member[0].id }],
+        });
+
+        await this.props.editCollectiveMembers({
+          variables: {
+            collectiveId: response.data.createOrganization.legacyId,
+            members: this.state.admins.map(member => ({
+              id: member.id,
+              role: member.role,
+              member: {
+                id: member.member.id,
+                name: member.member.name,
+              },
+            })),
+          },
+        });
+      }
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', {
-        CollectiveId: collective.id,
-        slug: collective.slug,
-        status: 'collectiveCreated',
-      });
+
+      this.props.router
+        .push({ pathname: `/${response.data.createOrganization.slug}`, query: { status: 'collectiveCreated' } })
+        .then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      this.setState({ result: { error: errorMsg } });
+      this.setState({ result: { error: errorMsg }, status: 'error' });
       throw new Error(errorMsg);
     }
   }
 
   render() {
     const { LoggedInUser } = this.props;
-
-    const title = 'Create a new organization';
+    const { result, collective, status } = this.state;
 
     return (
-      <div className="CreateOrganization">
-        <style jsx>
-          {`
-            .result {
-              text-align: center;
-              margin-bottom: 5rem;
-            }
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-            .CollectiveTemplatePicker {
-              max-width: 700px;
-              margin: 0 auto;
-            }
-            .CollectiveTemplatePicker .field {
-              margin: 0;
-            }
-            .login {
-              margin: 0 auto;
-              text-align: center;
-            }
-            .signin {
-              text-align: center;
-            }
-          `}
-        </style>
-
-        <Header
-          title={title}
-          className={this.state.status}
-          LoggedInUser={LoggedInUser}
-          menuItems={{ pricing: true, howItWorks: true }}
-        />
-
-        <Body>
-          <Container mt={2} mb={2}>
-            <H1 fontSize={['H4', 'H2']} lineHeight={3} fontWeight="bold" textAlign="center" color="black.900">
-              {title}
-            </H1>
-            <P textAlign="center">
-              <FormattedMessage
-                id="collectives.create.description"
-                defaultMessage="An Organization allows you to make financial contributions as a company or team. You can also add a credit card with a monthly limit that team members can use to make contributions."
-              />
-            </P>
-          </Container>
-
-          <div className="content">
-            {!LoggedInUser && (
-              <div className="signin">
-                <SignInOrJoinFree />
-              </div>
-            )}
-            {LoggedInUser && (
-              <div>
-                <CreateCollectiveForm
-                  collective={this.state.collective}
-                  onSubmit={this.createCollective}
-                  onChange={this.resetError}
-                />
-
-                <div className="result">
-                  <div className="success">{this.state.result.success}</div>
-                  <div className="error">{this.state.result.error}</div>
-                </div>
-              </div>
-            )}
-          </div>
-        </Body>
-
-        <Footer />
-      </div>
+      <Container>
+        {!LoggedInUser && (
+          <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
+            <Flex flexDirection="column" p={4} mt={2}>
+              <Box mb={3}>
+                <H1 fontSize="32px" lineHeight="36px" fontWeight="bold" textAlign="center">
+                  <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
+                </H1>
+              </Box>
+              <Box textAlign="center">
+                <P fontSize="14px" color="black.600" mb={1}>
+                  <FormattedMessage
+                    id="organization.create.createOrSignIn"
+                    defaultMessage="Create an account (or sign in) to create an organization."
+                  />
+                </P>
+              </Box>
+            </Flex>
+            <SignInOrJoinFree />
+          </Flex>
+        )}
+        {LoggedInUser && (
+          <CreateOrganizationForm
+            collective={collective}
+            onSubmit={this.createOrganization}
+            onChange={this.resetError}
+            error={result.error}
+            updateAdmins={this.updateAdmins}
+            loading={status === 'loading'}
+          />
+        )}
+      </Container>
     );
   }
 }
 
-export default addCreateCollectiveMutation(CreateOrganization);
+const createOrganizationMutation = gqlV2/* GraphQL */ `
+  mutation CreateOrganization($organization: OrganizationCreateInput!) {
+    createOrganization(organization: $organization) {
+      id
+      name
+      slug
+      description
+      website
+      legacyId
+    }
+  }
+`;
+
+const addCreateOrganizationMutation = graphql(createOrganizationMutation, {
+  name: 'createOrganization',
+  options: { context: API_V2_CONTEXT },
+});
+
+const addGraphql = compose(addCreateOrganizationMutation, addEditCollectiveMembersMutation);
+
+export default addGraphql(withRouter(CreateOrganization));

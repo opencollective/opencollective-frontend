@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
+import { Mutation } from '@apollo/client/react/components';
 import { Check } from '@styled-icons/fa-solid/Check';
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { isHexColor } from 'validator';
@@ -16,7 +16,7 @@ import StyledCard from '../../StyledCard';
 import StyledInput from '../../StyledInput';
 import StyledInputGroup from '../../StyledInputGroup';
 import { P } from '../../Text';
-import { EditCollectiveSettingsMutation } from '../graphql/mutations';
+import { editCollectiveSettingsMutation } from '../graphql/mutations';
 
 const colorPath = 'collectivePage.primaryColor';
 
@@ -45,7 +45,7 @@ const PRESET_COLORS = [
 const validateColor = value => isHexColor(value) && value.length === 7;
 
 const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
-  const color = theme.colors.primary[500];
+  const color = theme.colors.primary.base || theme.colors.primary[500];
   const [textValue, setTextValue] = React.useState(color.replace('#', ''));
   const [showError, setShowError] = React.useState(false);
   const hasError = !validateColor(`#${textValue}`);
@@ -55,7 +55,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
   };
 
   return (
-    <Mutation mutation={EditCollectiveSettingsMutation}>
+    <Mutation mutation={editCollectiveSettingsMutation}>
       {(editSettings, { loading }) => (
         <StyledCard
           data-cy="collective-color-picker-card"
@@ -64,10 +64,10 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
           maxWidth={360}
         >
           <Box px={32} py={24}>
-            <P fontSize="H5" fontWeight={600} mb={3}>
+            <P fontSize="20px" fontWeight={600} mb={3}>
               <FormattedMessage id="CollectiveColorPicker.Title" defaultMessage="Select page color" />
             </P>
-            <P fontSize="LeadParagraph" mb={3}>
+            <P fontSize="16px" mb={3}>
               <FormattedMessage id="CollectiveColorPicker.Preset" defaultMessage="Preset colors" />
             </P>
             <Flex flexWrap="wrap" justifyContent="space-between">
@@ -82,7 +82,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                 </ColorPreset>
               ))}
             </Flex>
-            <P fontSize="LeadParagraph" mt={3} mb={2}>
+            <P fontSize="16px" mt={3} mb={2}>
               <FormattedMessage id="CollectiveColorPicker.Custom" defaultMessage="Use custom color" />
             </P>
             <Flex>
@@ -164,17 +164,16 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                   flex="1 1 50%"
                   loading={loading}
                   disabled={hasError}
-                  onClick={() =>
+                  onClick={() => {
+                    const newSettings = cloneDeep(collective.settings || {});
+                    set(newSettings, colorPath, color);
                     editSettings({
-                      variables: {
-                        id: collective.id,
-                        settings: set(collective.settings, colorPath, color),
-                      },
+                      variables: { id: collective.id, settings: newSettings },
                     }).then(() => {
                       onChange(null);
                       onClose();
-                    })
-                  }
+                    });
+                  }}
                 >
                   <FormattedMessage id="save" defaultMessage="Save" />
                 </StyledButton>

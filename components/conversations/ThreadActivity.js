@@ -9,12 +9,11 @@ import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
 import { Update as UpdateIcon } from '@styled-icons/material/Update';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import Avatar from '../Avatar';
 import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
-import MessageBox from '../MessageBox';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
@@ -59,6 +58,10 @@ const ACTIVITIES_INFO = {
     type: 'error',
     icon: ErrorIcon,
   },
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
+    type: 'error',
+    icon: RejectedIcon,
+  },
 };
 
 const MESSAGES = defineMessages({
@@ -98,9 +101,13 @@ const MESSAGES = defineMessages({
     id: 'Expense.Activity.Error',
     defaultMessage: 'Expense error',
   },
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
+    id: 'Expense.Activity.MarkedAsSpam',
+    defaultMessage: 'Expense marked as spam',
+  },
 });
 
-const getActivityIconColor = (activityType, theme) => {
+const getActivityColor = (activityType, theme) => {
   switch (ACTIVITIES_INFO[activityType]?.type) {
     case 'info':
       return theme.colors.blue[500];
@@ -115,23 +122,27 @@ const getActivityIconColor = (activityType, theme) => {
 
 export const getActivityIcon = (activity, theme) => {
   const IconComponent = ACTIVITIES_INFO[activity.type]?.icon || UpdateIcon;
-  return <IconComponent size={18} color={getActivityIconColor(activity.type, theme)} />;
+  return <IconComponent size={18} color={getActivityColor(activity.type, theme)} />;
 };
 
 export const isSupportedActivity = activity => {
   return Object.prototype.hasOwnProperty.call(ACTIVITIES_INFO, activity.type);
 };
 
-const ActivityMessage = styled(MessageBox).attrs({ border: '0px', mt: 2, fontSize: 'Tiny' })`
+const ActivityMessage = styled.div`
+  font-size: 10px;
   font-weight: 600;
   padding: 10px 12px;
-  border-left: 4px solid;
+  border-left: 4px solid ${props => props.color};
   background: white;
   border-radius: 0;
+  color: ${props => props.color};
 `;
 
 const ThreadActivity = ({ activity }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const activityColor = getActivityColor(activity.type, theme);
   return (
     <div>
       {activity.individual && (
@@ -149,7 +160,7 @@ const ThreadActivity = ({ activity }) => {
                 }}
               />
             </Span>
-            <Span color="black.600" fontSize="Caption" title={activity.createdAt}>
+            <Span color="black.600" fontSize="12px" title={activity.createdAt}>
               <FormattedMessage
                 id="UpdatedOnDate"
                 defaultMessage="Updated on {date, date, long}"
@@ -160,8 +171,9 @@ const ThreadActivity = ({ activity }) => {
         </Flex>
       )}
       {MESSAGES[activity.type] && (
-        <ActivityMessage type={ACTIVITIES_INFO[activity.type]?.type}>
+        <ActivityMessage color={activityColor}>
           {formatMessage(MESSAGES[activity.type])}
+          {activity.data?.error?.message ? `: ${activity.data.error.message}` : ''}
         </ActivityMessage>
       )}
     </div>
@@ -173,6 +185,11 @@ ThreadActivity.propTypes = {
     id: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.keys(ACTIVITIES_INFO)).isRequired,
     createdAt: PropTypes.string.isRequired,
+    data: PropTypes.shape({
+      error: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+    }),
     individual: PropTypes.shape({
       id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,

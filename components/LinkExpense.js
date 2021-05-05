@@ -1,29 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+
 import Link from './Link';
 
-const LinkExpense = ({ collective, expense, isV2, ...props }) => {
-  const route = isV2 ? 'expense-v2' : 'expense';
-  return (
-    <Link
-      route={route}
-      params={{
-        parentCollectiveSlug: collective.parentCollective?.slug,
-        collectiveType: collective.parentCollective ? 'events' : undefined,
-        collectiveSlug: collective.slug,
-        ExpenseId: expense.legacyId || expense.id,
-      }}
-      {...props}
-    />
-  );
+const LinkExpense = ({ collective, expense, ...props }) => {
+  const parentCollectiveSlugRoute = collective.parent?.slug
+    ? `/${collective.parent.slug}/${getCollectiveTypeForUrl(collective)}`
+    : '';
+  const expenseId = expense.legacyId || expense.id;
+
+  return <Link href={`${parentCollectiveSlugRoute}/${collective.slug}/expenses/${expenseId}`} {...props} />;
 };
 
 LinkExpense.propTypes = {
-  isV2: PropTypes.bool,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    parentCollective: PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
   }).isRequired,

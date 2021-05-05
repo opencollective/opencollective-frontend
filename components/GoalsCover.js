@@ -7,8 +7,8 @@ import { v4 as uuid } from 'uuid';
 
 import { formatCurrency } from '../lib/currency-utils';
 
+import Container from './Container';
 import { fadeIn } from './StyledKeyframes';
-import { P, Span } from './Text';
 
 const getProgressColor = theme => theme.colors.primary[600];
 const getEmptyProgressColor = () => '#e2e2e2';
@@ -20,10 +20,10 @@ const GoalContainer = styled.div`
   left: 0;
   text-align: right;
   transition: width 3s;
-  height: 15px;
-  color: ${props => props.theme.colors.black[500]};
-  border-right: 1px solid ${props =>
-    props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme)};
+  height: 25px;
+  color: ${props => props.theme.colors.black[700]};
+  border-right: 1px solid
+    ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme))};
   width: ${props => `${props.goal.progress * 100}%`};
   z-index: ${props => (['balance', 'yearlyBudget'].includes(props.goal.slug) ? 310 : (20 - props.index) * 10)};
   transition: ${props =>
@@ -32,6 +32,7 @@ const GoalContainer = styled.div`
       : 'opacity 2s, height 1s, padding-top 1s, width 2s ease-in-out;'};
 
   .caption {
+    display: inline-block;
     padding: 1rem 0.5rem 1rem 0.5rem;
     font-size: 13px;
     line-height: 15px;
@@ -59,7 +60,7 @@ const GoalContainer = styled.div`
   ${props =>
     props.goal.isReached &&
     css`
-      color: ${props.theme.colors.black[600]};
+      color: ${props.theme.colors.black[800]};
     `}
 
   ${props =>
@@ -92,7 +93,7 @@ const GoalContainer = styled.div`
         `;
       } else {
         return css`
-          height: 50px;
+          height: 70px;
         `;
       }
     }
@@ -115,6 +116,29 @@ const GoalContainer = styled.div`
     css`
       opacity: 0;
     `}
+`;
+
+const BarContainer = styled.div`
+  position: relative;
+  width: 100%;
+  margin: 6rem auto 1rem;
+  min-height: 80px;
+
+  .withGoals {
+    margin-top: 10rem;
+  }
+
+  .max-level-above-1 {
+    margin-top: 15rem;
+  }
+
+  @media (max-width: 1400px) {
+    width: 90%;
+  }
+
+  @media (max-width: 420px) {
+    width: 95%;
+  }
 `;
 
 class GoalsCover extends React.Component {
@@ -169,9 +193,10 @@ class GoalsCover extends React.Component {
     this.setState({ ...this.populateGoals(), firstMount });
   }
 
-  /** Returns a percentage (0.0-1.0) that reprensent X position */
+  /** Returns a percentage (0.0-1.0) that represent X position */
   getTranslatedPercentage(x) {
-    if (this.interpolation === 'logarithm' || (this.interpolation === 'auto' && this.currentProgress <= 0.3)) {
+    const interpolation = this.props.interpolation || this.interpolation;
+    if (interpolation === 'logarithm' || (interpolation === 'auto' && this.currentProgress <= 0.3)) {
       // See https://www.desmos.com/calculator/30pua5xx7q
       return -1 * Math.pow(x - 1, 2) + 1;
     }
@@ -409,7 +434,7 @@ class GoalsCover extends React.Component {
       }
 
       // Change progress to animate goal. Never animate the last goal as it would
-      // result in a patial progress bar for first rendering. Hide when rendered
+      // result in a partial progress bar for first rendering. Hide when rendered
       // on server side to avoid getting the marker stuck while waiting for
       // re-hydrating
       if (goal.animateProgress && !isLastGoal) {
@@ -477,71 +502,18 @@ class GoalsCover extends React.Component {
     }
 
     return (
-      <div className="GoalsCover">
-        <style jsx>
-          {`
-            .GoalsCover {
-              overflow: hidden;
-            }
-
-            .barContainer {
-              position: relative;
-              width: 80%;
-              margin: 6rem auto 1rem;
-              min-height: 80px;
-            }
-
-            .barContainer.withGoals {
-              margin-top: 10rem;
-            }
-
-            .barContainer.max-level-above-1 {
-              margin-top: 15rem;
-            }
-
-            @media (max-width: 1400px) {
-              .barContainer {
-                width: 90%;
-              }
-            }
-
-            @media (max-width: 420px) {
-              .barContainer {
-                width: 95%;
-              }
-            }
-          `}
-        </style>
-        <div>
-          {get(collective, 'stats.backers.all') > 0 && (
-            <P textAlign="center" color="black.700" mx={2}>
-              <FormattedMessage
-                id="cover.budget.text"
-                defaultMessage="Thanks to your financial contributions, we are operating on an estimated annual budget of {yearlyBudget}"
-                values={{
-                  yearlyBudget: (
-                    <Span fontWeight="bold">
-                      {formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}
-                    </Span>
-                  ),
-                }}
-              />
-            </P>
-          )}
-          <div
-            className={`barContainer max-level-above-${this.state.maxLevelAbove} ${
-              this.state.hasCustomGoals ? 'withGoals' : ''
-            }`}
-          >
-            <div className="bars">
-              {this.state.goals &&
-                this.state.goals.map((goal, index) => {
-                  return this.renderGoal(goal, index);
-                })}
-            </div>
-          </div>
-        </div>
-      </div>
+      <BarContainer>
+        <Container
+          className={`max-level-above-${this.state.maxLevelAbove} ${this.state.hasCustomGoals ? 'withGoals' : ''}`}
+        >
+          <Container>
+            {this.state.goals &&
+              this.state.goals.map((goal, index) => {
+                return this.renderGoal(goal, index);
+              })}
+          </Container>
+        </Container>
+      </BarContainer>
     );
   }
 }

@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
+import INTERVALS from '../../lib/constants/intervals';
+import { isTierExpired } from '../../lib/tier-utils';
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
 
+import CollectiveNavbar from '../collective-navbar';
 import { Sections } from '../collective-page/_constants';
-import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -74,7 +77,7 @@ const ProgressInfoContainer = styled.div`
 `;
 
 /** A mutation with all the info that user is allowed to edit on this page */
-const EditTierMutation = gql`
+const editTierMutation = gql`
   mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String, $videoUrl: String) {
     editTier(
       tier: { id: $id, description: $description, name: $name, longDescription: $longDescription, videoUrl: $videoUrl }
@@ -114,6 +117,7 @@ class TierPage extends Component {
       interval: PropTypes.string.isRequired,
       currency: PropTypes.string,
       endsAt: PropTypes.string,
+      button: PropTypes.string,
       goal: PropTypes.number,
       description: PropTypes.string,
       longDescription: PropTypes.string,
@@ -135,6 +139,8 @@ class TierPage extends Component {
       users: PropTypes.number.isRequired,
     }).isRequired,
 
+    redirect: PropTypes.string,
+
     /** The logged in user */
     LoggedInUser: PropTypes.object,
 
@@ -146,8 +152,8 @@ class TierPage extends Component {
     const pageUrl = `${getWebsiteUrl()}${this.props.router.asPath}`;
     return (
       <div>
-        <P fontSize="LeadParagraph" color="black.700" fontWeight="bold" mt={4} mb={3}>
-          <FormattedMessage id="TierPage.ShareGoal" defaultMessage="Share this goal" />
+        <P fontSize="16px" color="black.700" fontWeight="bold" mt={4} mb={3}>
+          <FormattedMessage id="Share" defaultMessage="Share" />
         </P>
         <ShareButtons pageUrl={pageUrl} collective={this.props.collective} />
       </div>
@@ -155,17 +161,22 @@ class TierPage extends Component {
   }
 
   render() {
-    const { collective, tier, contributors, contributorsStats, LoggedInUser } = this.props;
+    const { collective, tier, contributors, contributorsStats, redirect, LoggedInUser } = this.props;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
     const shareBlock = this.renderShareBlock();
-    const isPassed = tier.endsAt && new Date(tier.endsAt) < new Date();
+    const isPassed = isTierExpired(tier);
 
     return (
       <Container pb={4}>
         {/** ---- Hero / Banner ---- */}
         <Container position="sticky" top={0} zIndex={999}>
-          <CollectiveNavbar collective={collective} selected={Sections.CONTRIBUTE} isAdmin={canEdit} />
+          <CollectiveNavbar
+            collective={collective}
+            selected={Sections.CONTRIBUTE}
+            selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE}
+            isAdmin={canEdit}
+          />
         </Container>
         <Container position="relative">
           <Container position="absolute" width={1} zIndex={-1} overflow="hidden">
@@ -199,12 +210,9 @@ class TierPage extends Component {
                 py={[4, 5]}
                 boxShadow="-3px 11px 13px rgba(75, 75, 75, 0.1)"
               >
-                <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
-                  <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
-                </P>
-                <H1 fontSize="H2" textAlign="left" color="black.900" wordBreak="break-word" mb={3} data-cy="TierName">
+                <H1 fontSize="40px" textAlign="left" color="black.900" wordBreak="break-word" mb={3} data-cy="TierName">
                   <InlineEditField
-                    mutation={EditTierMutation}
+                    mutation={editTierMutation}
                     canEdit={canEdit}
                     values={tier}
                     field="name"
@@ -214,7 +222,7 @@ class TierPage extends Component {
                 </H1>
                 <H2
                   color="black.600"
-                  fontSize="H5"
+                  fontSize="20px"
                   lineHeight="1.5em"
                   mb={4}
                   whiteSpace="pre-line"
@@ -222,7 +230,7 @@ class TierPage extends Component {
                   wordBreak="break-word"
                 >
                   <InlineEditField
-                    mutation={EditTierMutation}
+                    mutation={editTierMutation}
                     canEdit={canEdit}
                     values={tier}
                     field="description"
@@ -234,7 +242,7 @@ class TierPage extends Component {
                 </H2>
                 <Container display="flex" flexDirection="column-reverse" position="relative" flexWrap="wrap">
                   <div>
-                    <TierLongDescription tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
+                    <TierLongDescription tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </div>
                   <Container
                     position={['relative', null, null, 'absolute']}
@@ -243,7 +251,7 @@ class TierPage extends Component {
                     mb={[4, 5]}
                     top={[0, null, null, -50]}
                   >
-                    <TierVideo tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
+                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </Container>
                 </Container>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
@@ -271,9 +279,9 @@ class TierPage extends Component {
               <ProgressInfoContainer>
                 {tier.goal && (
                   <P
-                    fontSize={['Caption', 'Paragraph', null, 'H5']}
+                    fontSize={['12px', '14px', null, '20px']}
                     color="black.500"
-                    lineHeight={['LeadParagraph', null, null, 'H3']}
+                    lineHeight={['24px', null, null, '36px']}
                     mb={[0, null, null, 3]}
                     truncateOverflow
                   >
@@ -285,10 +293,11 @@ class TierPage extends Component {
                           <FormattedMoneyAmount
                             amount={tier.goal}
                             currency={tier.currency}
-                            interval={tier.interval}
+                            interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                             abbreviateAmount={tier.goal > 1000000}
                             abbreviateInterval
                             amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
+                            precision={0}
                           />
                         ),
                       }}
@@ -296,9 +305,9 @@ class TierPage extends Component {
                   </P>
                 )}
                 <P
-                  fontSize={['Tiny', 'Paragraph']}
+                  fontSize={['10px', '14px']}
                   color="black.500"
-                  lineHeight={['Caption', null, 'LeadParagraph']}
+                  lineHeight={['18px', null, '24px']}
                   mb={[0, null, null, 2]}
                   truncateOverflow
                 >
@@ -312,9 +321,10 @@ class TierPage extends Component {
                             color="black.700"
                             amount={amountRaised}
                             currency={tier.currency}
-                            interval={tier.interval}
+                            interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                             amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
                             abbreviateAmount={amountRaised > 1000000}
+                            precision={0}
                             abbreviateInterval
                           />
                         ),
@@ -334,8 +344,8 @@ class TierPage extends Component {
                 <Box width={1}>
                   {isPassed ? (
                     <P textAlign="center">
-                      <FormattedMessage id="Tier.Past" defaultMessage="This contribution type is not active anymore." />{' '}
-                      <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+                      <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
+                      <Link href={{ pathname: `/${collective.slug}/contribute`, query: { redirect } }}>
                         <FormattedMessage
                           id="createOrder.backToTier"
                           defaultMessage="View all the other ways to contribute"
@@ -345,16 +355,13 @@ class TierPage extends Component {
                     </P>
                   ) : (
                     <Link
-                      route="orderCollectiveTierNew"
-                      params={{
-                        verb: 'contribute',
-                        tierId: tier.id,
-                        tierSlug: tier.slug,
-                        collectiveSlug: collective.slug,
+                      href={{
+                        pathname: `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
+                        query: { redirect },
                       }}
                     >
                       <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
-                        <FormattedMessage id="Contribute" defaultMessage="Contribute" />
+                        {tier.button ? tier.button : <FormattedMessage id="Contribute" defaultMessage="Contribute" />}
                       </StyledButton>
                     </Link>
                   )}

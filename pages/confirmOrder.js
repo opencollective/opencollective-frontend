@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -12,10 +12,6 @@ import Container from '../components/Container';
 import MessageBox from '../components/MessageBox';
 import { withUser } from '../components/UserProvider';
 
-/**
- * Main contribution flow entrypoint. Render all the steps from contributeAs
- * to payment.
- */
 class ConfirmOrderPage extends React.Component {
   static getInitialProps({ query }) {
     return { id: parseInt(query.id) };
@@ -57,7 +53,7 @@ class ConfirmOrderPage extends React.Component {
   async triggerRequest() {
     try {
       this.setState({ isRequestSent: true });
-      const res = await this.props.confirmOrder(this.props.id);
+      const res = await this.props.confirmOrder({ variables: { order: { id: this.props.id } } });
       const orderConfirmed = res.data.confirmOrder;
       if (orderConfirmed.stripeError) {
         this.handleStripeError(orderConfirmed);
@@ -91,7 +87,7 @@ class ConfirmOrderPage extends React.Component {
     this.setState({ status: ConfirmOrderPage.SUBMITTING, error: null });
 
     try {
-      const res = await this.props.confirmOrder(order);
+      const res = await this.props.confirmOrder({ variables: { order: { id: order.id } } });
       const orderConfirmed = res.data.confirmOrder;
       if (orderConfirmed.stripeError) {
         this.handleStripeError(orderConfirmed);
@@ -140,28 +136,25 @@ class ConfirmOrderPage extends React.Component {
   }
 }
 
-export const addConfirmOrderMutation = graphql(
-  gql`
-    mutation confirmOrder($order: ConfirmOrderInputType!) {
-      confirmOrder(order: $order) {
+const confirmOrderMutation = gql`
+  mutation ConfirmOrder($order: ConfirmOrderInputType!) {
+    confirmOrder(order: $order) {
+      id
+      status
+      stripeError {
+        message
+        account
+        response
+      }
+      transactions {
         id
-        status
-        stripeError {
-          message
-          account
-          response
-        }
-        transactions {
-          id
-        }
       }
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      confirmOrder: id => mutate({ variables: { order: { id } } }),
-    }),
-  },
-);
+  }
+`;
 
-export default addConfirmOrderMutation(withUser(ConfirmOrderPage));
+const addConfirmOrderMutation = graphql(confirmOrderMutation, {
+  name: 'confirmOrder',
+});
+
+export default withUser(addConfirmOrderMutation(ConfirmOrderPage));

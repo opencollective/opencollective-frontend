@@ -17,7 +17,7 @@ const LoadingPlaceholder = styled.div`
   background: linear-gradient(to right, #eee 2%, #ddd 18%, #eee 33%);
   background-size: 200%;
   width: 100%;
-  
+
   ${border}
   ${layout}
   ${space}

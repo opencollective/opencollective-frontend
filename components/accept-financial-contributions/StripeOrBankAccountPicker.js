@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { CheckboxChecked } from '@styled-icons/boxicons-regular/CheckboxChecked';
 import themeGet from '@styled-system/theme-get';
 import { find, has } from 'lodash';
@@ -10,14 +10,12 @@ import styled from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import Loading from '../Loading';
 import StyledButton from '../StyledButton';
-import StyledLink from '../StyledLink';
 import { P } from '../Text';
 
 import bankAccountIllustration from '../../public/static/images/create-collective/bankAccountIllustration.png';
@@ -46,9 +44,6 @@ const ConnectedAccountCard = styled(Flex)`
 const GreenCheckbox = styled(CheckboxChecked)`
   color: ${themeGet('colors.green.700')};
 `;
-
-const FEES_LINK = 'https://docs.opencollective.com/help/about/pricing';
-const HOST_PLANS_LINK = 'https://opencollective.com/pricing';
 
 class StripeOrBankAccountPicker extends React.Component {
   static propTypes = {
@@ -85,6 +80,8 @@ class StripeOrBankAccountPicker extends React.Component {
       const json = await connectAccount(this.props.host.id, service);
       window.location.href = json.redirectUrl;
     } catch (err) {
+      // TODO: this should be reported to the user
+      // eslint-disable-next-line no-console
       console.error(`>>> /api/connected-accounts/${service} error`, err);
     }
   };
@@ -96,14 +93,18 @@ class StripeOrBankAccountPicker extends React.Component {
     const { loading, host } = data;
 
     if (loading) {
-      return <Loading />;
+      return (
+        <Box pb={4}>
+          <Loading />
+        </Box>
+      );
     }
 
     const isBankAccountAlreadyThere = has(host, 'settings.paymentMethods.manual');
     const stripeAccount = find(host.connectedAccounts, { service: 'stripe' });
 
     return (
-      <Flex flexDirection="column" justifyContent="center" alignItems="center" my={[5]}>
+      <Flex flexDirection="column" justifyContent="center" alignItems="center" my={5}>
         <Box alignItems="center">
           <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
             <Container alignItems="center" width={[null, 280, 312]} mb={[2, 0]}>
@@ -133,8 +134,8 @@ class StripeOrBankAccountPicker extends React.Component {
                     mt={[2, 3]}
                     mb={3}
                     minWidth={'145px'}
-                    onClick={() => {
-                      addHost(collective, host);
+                    onClick={async () => {
+                      await addHost(collective, host);
                       this.connectStripe();
                     }}
                   >
@@ -142,17 +143,10 @@ class StripeOrBankAccountPicker extends React.Component {
                   </StyledButton>
                 )}
                 <Box minHeight={50} px={3}>
-                  <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
+                  <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                     <FormattedMessage
                       id="acceptContributions.stripe.info"
-                      defaultMessage="Automatically accept contributions with credit cards from all over the world. {fees}."
-                      values={{
-                        fees: (
-                          <StyledLink href={FEES_LINK} openInNewTab>
-                            <FormattedMessage id="feesApply" defaultMessage="Fees apply" />
-                          </StyledLink>
-                        ),
-                      }}
+                      defaultMessage="Accept contributions via credit card. The budget will update automatically."
                     />
                   </P>
                 </Box>
@@ -188,14 +182,7 @@ class StripeOrBankAccountPicker extends React.Component {
                     </Flex>
                   </ConnectedAccountCard>
                 ) : (
-                  <Link
-                    route="accept-financial-contributions"
-                    params={{
-                      slug: router.query.slug,
-                      path: router.query.path,
-                      method: 'bank',
-                    }}
-                  >
+                  <Link href={`/${router.query.slug}/accept-financial-contributions/${router.query.path}/bank`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="dark"
@@ -210,17 +197,10 @@ class StripeOrBankAccountPicker extends React.Component {
                   </Link>
                 )}
                 <Box minHeight={50} px={3}>
-                  <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
+                  <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                     <FormattedMessage
                       id="acceptContributions.bankAccount.info"
-                      defaultMessage="Manually sync contributions received on your bank account with your Collective's budget. It's free up to $1000. {hostPlans}."
-                      values={{
-                        hostPlans: (
-                          <StyledLink href={HOST_PLANS_LINK} openInNewTab>
-                            <FormattedMessage id="hostPlans" defaultMessage="Host plans" />
-                          </StyledLink>
-                        ),
-                      }}
+                      defaultMessage="Accept contributions via bank transfer. The budget will update when you confirm receipt of funds."
                     />
                   </P>
                 </Box>
@@ -238,11 +218,9 @@ class StripeOrBankAccountPicker extends React.Component {
             onClick={async () => {
               this.setState({ buttonLoading: true });
               await addHost(collective, host);
-              await Router.pushRoute('accept-financial-contributions', {
-                slug: router.query.slug,
-                path: router.query.path,
-                state: 'success',
-              });
+              await this.props.router.push(
+                `/${router.query.slug}/accept-financial-contributions/${router.query.path}/success`,
+              );
               window.scrollTo(0, 0);
             }}
             data-cy="afc-finish-button"
@@ -257,8 +235,8 @@ class StripeOrBankAccountPicker extends React.Component {
 }
 
 // We query on "account" and not "host" because the account is not necessarily an host yet
-const hostQuery = gqlV2`
-  query host($slug: String!) {
+const hostQuery = gqlV2/* GraphQL */ `
+  query AcceptFinancialContributionsHost($slug: String!) {
     host: account(slug: $slug) {
       id
       slug
@@ -267,10 +245,11 @@ const hostQuery = gqlV2`
         service
       }
       settings
+    }
   }
-}`;
+`;
 
-const addHost = graphql(hostQuery, {
+const addHostData = graphql(hostQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
     variables: {
@@ -279,4 +258,4 @@ const addHost = graphql(hostQuery, {
   }),
 });
 
-export default injectIntl(addHost(withRouter(StripeOrBankAccountPicker)));
+export default injectIntl(withRouter(addHostData(StripeOrBankAccountPicker)));

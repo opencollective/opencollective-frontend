@@ -5,9 +5,9 @@
 
 import propTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
-import { color, compose, flexbox, layout, space, typography } from 'styled-system';
+import { color, compose, flexbox, grid, layout, space, typography } from 'styled-system';
 
-const boxProps = compose(space, color, layout, typography, flexbox);
+const boxProps = compose(space, color, layout, typography, flexbox, grid);
 export const Box = styled('div')(
   {
     boxSizing: 'border-box',
@@ -30,3 +30,12 @@ export const Flex = styled(Box)({
 });
 
 Flex.displayName = 'Flex';
+
+export const Grid = styled('div')(
+  {
+    boxSizing: 'border-box',
+    display: 'grid',
+    '> div': { 'min-width': 0 },
+  },
+  compose(space, grid, layout, flexbox),
+);

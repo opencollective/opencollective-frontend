@@ -27,7 +27,7 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
       <Content>
         <FormattedMessage
           id="CreateExpenseFAQ.howAreApprovedDetails"
-          defaultMessage="Collective admins are notified when an expense is submitted and they can approve or reject it."
+          defaultMessage="Collective admins are notified when an expense is submitted, and they can approve or reject it."
         />
       </Content>
     </Entry>
@@ -49,7 +49,7 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
       <Content>
         <FormattedMessage
           id="CreateExpenseFAQ.whenPaidDetails"
-          defaultMessage="Payments are processed by the Collective's fiscal host, the organization that hold funds on their behalf. Many fiscal hosts pay expenses weekly, but each one is different."
+          defaultMessage="Payments are processed by the Collective's Fiscal Host, the organization that hold funds on their behalf. Many Fiscal Hosts pay expenses weekly, but each one is different."
         />
       </Content>
     </Entry>
@@ -58,7 +58,7 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
         as={StyledLink}
         href="https://docs.opencollective.com/help/expenses-and-getting-paid/submitting-expenses"
         openInNewTab
-        fontSize="Caption"
+        fontSize="12px"
         color="black.700"
       >
         <FormattedMessage id="moreInfo" defaultMessage="More info" />

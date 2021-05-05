@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { gql, useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -9,9 +8,9 @@ import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Box } from '../../Grid';
 import { P } from '../../Text';
 
-const TotalCollectiveContributionsQuery = gql`
-  query TotalCollectiveContributions($id: Int) {
-    Collective(id: $id) {
+export const totalCollectiveContributionsQuery = gql`
+  query HeroTotalCollectiveContributions($slug: String!) {
+    Collective(slug: $slug) {
       id
       currency
       stats {
@@ -22,15 +21,19 @@ const TotalCollectiveContributionsQuery = gql`
   }
 `;
 
-const amountStyles = { fontSize: 'H5', fontWeight: 'bold' };
+export const getTotalCollectiveContributionsQueryVariables = slug => {
+  return { slug };
+};
+
+const amountStyles = { fontSize: '20px', fontWeight: 'bold' };
 
 /**
  * This component fetches its own data because we don't want to query these fields
  * for regular collective.
  */
 const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
-  const { data, loading, error } = useQuery(TotalCollectiveContributionsQuery, {
-    variables: { id: collective.id },
+  const { data, loading, error } = useQuery(totalCollectiveContributionsQuery, {
+    variables: getTotalCollectiveContributionsQueryVariables(collective.slug),
   });
 
   if (error || loading || !get(data, 'Collective.stats.totalAmountSpent')) {
@@ -39,8 +42,8 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
 
   const { stats, currency } = data.Collective;
   return (
-    <Box my={2}>
-      <P fontSize="Tiny" textTransform="uppercase">
+    <Box my={2} data-cy="hero-total-amount-contributed">
+      <P fontSize="10px" textTransform="uppercase">
         <FormattedMessage id="membership.totalDonations" defaultMessage="Total amount contributed" />
       </P>
       <FormattedMoneyAmount amount={stats.totalAmountSpent} currency={currency} amountStyles={amountStyles} />
@@ -50,7 +53,7 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
 
 HeroTotalCollectiveContributionsWithData.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.number,
+    slug: PropTypes.string,
   }),
 };
 

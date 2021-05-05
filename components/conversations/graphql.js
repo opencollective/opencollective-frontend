@@ -1,11 +1,14 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 const gqlV2 = gql;
-export const CommentFieldsFragment = gqlV2`
+
+export const commentFieldsFragment = gqlV2/* GraphQL */ `
   fragment CommentFields on Comment {
     id
     createdAt
     html
+    reactions
+    userReactions
     fromCollective {
       id
       type
@@ -16,7 +19,7 @@ export const CommentFieldsFragment = gqlV2`
   }
 `;
 
-export const ConversationListFragment = gqlV2`
+export const conversationListFragment = gqlV2/* GraphQL */ `
   fragment ConversationListFragment on ConversationCollection {
     totalCount
     offset
@@ -53,8 +56,8 @@ export const ConversationListFragment = gqlV2`
   }
 `;
 
-export const isUserFollowingConversationQuery = gqlV2`
-  query IsFollowingConversation($id: String!) {
+export const isUserFollowingConversationQuery = gqlV2/* GraphQL */ `
+  query IsUserFollowingConversation($id: String!) {
     loggedInAccount {
       id
       slug
@@ -63,6 +66,31 @@ export const isUserFollowingConversationQuery = gqlV2`
       name
       ... on Individual {
         isFollowingConversation(id: $id)
+      }
+    }
+  }
+`;
+
+export const updateListFragment = gqlV2/* GraphQL */ `
+  fragment UpdateListFragment on UpdateCollection {
+    totalCount
+    offset
+    limit
+    nodes {
+      id
+      slug
+      title
+      summary
+      createdAt
+      publishedAt
+      isPrivate
+      userCanSeeUpdate
+      fromAccount {
+        id
+        type
+        name
+        slug
+        imageUrl
       }
     }
   }

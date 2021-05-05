@@ -5,12 +5,14 @@ import { get, isEmpty } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
+import expenseTypes from '../../lib/constants/expenseTypes';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
 
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
@@ -52,7 +54,11 @@ export const msg = defineMessages({
 
 /** Validates a single expense item, one field at a time (doesn't return multiple errors) */
 export const validateExpenseItem = (expense, item) => {
-  const errors = requireFields(item, ['description', 'incurredAt', 'amount']);
+  const requiredFields = ['description', 'amount'];
+  if (expense.type !== expenseTypes.FUNDING_REQUEST) {
+    requiredFields.push('incurredAt');
+  }
+  const errors = requireFields(item, requiredFields);
 
   if (isNaN(item.amount)) {
     errors.amount = createError(ERROR.FORM_FIELD_PATTERN);
@@ -75,7 +81,7 @@ export const validateExpenseItem = (expense, item) => {
 };
 
 const AttachmentLabel = () => (
-  <Span fontSize="LeadCaption" whiteSpace="nowrap">
+  <Span fontSize="13px" whiteSpace="nowrap">
     <FormattedMessage id="Expense.Attachment" defaultMessage="Attachment" />
     &nbsp;&nbsp;
     <PrivateInfoIcon color="#969BA3" />
@@ -85,7 +91,19 @@ const AttachmentLabel = () => (
 /**
  * Form for a single attachment. Must be used with Formik.
  */
-const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, name }) => {
+const ExpenseItemForm = ({
+  attachment,
+  errors,
+  onRemove,
+  onUploadError,
+  currency,
+  requireFile,
+  requireDate,
+  isRichText,
+  name,
+  isOptional,
+  editOnlyDescriptiveInfo,
+}) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
@@ -106,7 +124,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
                   htmlFor={attachmentKey}
                   label={<AttachmentLabel />}
                   data-cy="attachment-url-field"
-                  required
+                  required={!isOptional}
                   error={
                     meta.error?.type === ERROR.FORM_FIELD_REQUIRED
                       ? formatMessage(msg.receiptRequired)
@@ -121,9 +139,10 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
                     error={meta.error}
                     onSuccess={url => form.setFieldValue(field.name, url)}
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
-                    fontSize="LeadCaption"
+                    fontSize="13px"
                     size={[84, 112]}
                     value={hasValidUrl && field.value}
+                    onReject={onUploadError}
                   />
                 </StyledInputField>
               );
@@ -136,48 +155,58 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
             error={getError('description')}
             htmlFor={`${attachmentKey}-description`}
             label={formatMessage(msg.descriptionLabel)}
-            labelFontSize="LeadCaption"
-            required
+            labelFontSize="13px"
+            required={!isOptional}
           >
-            {inputProps => <Field as={StyledInput} {...inputProps} />}
+            {inputProps =>
+              isRichText ? (
+                <Field as={RichTextEditor} {...inputProps} inputName={inputProps.name} withBorders />
+              ) : (
+                <Field as={StyledInput} {...inputProps} />
+              )
+            }
           </StyledInputField>
-          <Flex flexWrap="wrap" justifyContent="space-between">
-            <StyledInputField
-              name={getFieldName('incurredAt')}
-              error={getError('incurredAt')}
-              htmlFor={`${attachmentKey}-incurredAt`}
-              inputType="date"
-              required
-              label={formatMessage(msg.dateLabel)}
-              labelFontSize="LeadCaption"
-              flex={requireFile ? '1 1 44%' : '1 1 50%'}
-              mt={3}
-            >
-              {inputProps => (
-                <Field maxHeight={39} {...inputProps}>
-                  {({ field }) => (
-                    <StyledInput
-                      {...inputProps}
-                      {...field}
-                      value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
-                    />
-                  )}
-                </Field>
-              )}
-            </StyledInputField>
-            <Box flex="0 1 8px" width={[0, 8]} />
+          <Flex justifyContent="flex-end" flexDirection={['column', 'row']}>
+            {requireDate && (
+              <StyledInputField
+                name={getFieldName('incurredAt')}
+                error={getError('incurredAt')}
+                htmlFor={`${attachmentKey}-incurredAt`}
+                inputType="date"
+                required={!isOptional}
+                label={formatMessage(msg.dateLabel)}
+                labelFontSize="13px"
+                flex={requireFile ? '1 1 44%' : '1 1 50%'}
+                mt={3}
+                mr={[0, '8px']}
+                disabled={editOnlyDescriptiveInfo}
+              >
+                {inputProps => (
+                  <Field maxHeight={39} {...inputProps}>
+                    {({ field }) => (
+                      <StyledInput
+                        {...inputProps}
+                        {...field}
+                        value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
+                      />
+                    )}
+                  </Field>
+                )}
+              </StyledInputField>
+            )}
             <StyledInputField
               name={getFieldName('amount')}
               error={getError('amount')}
               htmlFor={`${attachmentKey}-amount`}
               label={formatMessage(msg.amountLabel)}
-              required
-              labelFontSize="LeadCaption"
+              required={!isOptional}
+              labelFontSize="13px"
               inputType="number"
               flex="1 1 30%"
               minWidth={150}
-              maxWidth="100%"
+              maxWidth={['100%', '40%']}
               mt={3}
+              disabled={editOnlyDescriptiveInfo}
             >
               {inputProps => (
                 <Field name={inputProps.name}>
@@ -187,7 +216,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
                       {...inputProps}
                       currency={currency}
                       currencyDisplay="CODE"
-                      min={1}
+                      min={isOptional ? undefined : 1}
                       maxWidth="100%"
                       placeholder="0.00"
                       onChange={(value, e) => setFieldValue(e.target.name, value)}
@@ -200,7 +229,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
         </Box>
       </Flex>
       <Flex alignItems="center" mt={3}>
-        {onRemove && (
+        {onRemove && !editOnlyDescriptiveInfo && (
           <StyledButton
             type="button"
             buttonStyle="dangerSecondary"
@@ -227,8 +256,16 @@ ExpenseItemForm.propTypes = {
   onRemove: PropTypes.func,
   /** A map of errors for this object */
   errors: PropTypes.object,
-  /** Wether a file is required for this attachment type */
+  /** Whether a file is required for this attachment type */
   requireFile: PropTypes.bool,
+  /** Whether a date is required for this expense type */
+  requireDate: PropTypes.bool,
+  /** Wheter this whole item is optional */
+  isOptional: PropTypes.bool,
+  /** True if description is HTML */
+  isRichText: PropTypes.bool,
+  /** Called when an attachment upload fails */
+  onUploadError: PropTypes.func.isRequired,
   /** the attachment data */
   attachment: PropTypes.shape({
     id: PropTypes.string,
@@ -237,6 +274,11 @@ ExpenseItemForm.propTypes = {
     incurredAt: PropTypes.string,
     amount: PropTypes.number,
   }).isRequired,
+  editOnlyDescriptiveInfo: PropTypes.bool,
+};
+
+ExpenseItemForm.defaultProps = {
+  isOptional: false,
 };
 
 ExpenseItemForm.whyDidYouRender = true;

@@ -13,7 +13,7 @@ import { H1 } from '../Text';
 
 const ExamplesLink = styled(StyledLink)`
   color: ${themeGet('colors.blue.500')};
-  font-size: ${themeGet('fontSizes.Caption')}px;
+  font-size: 12px;
 
   &:hover {
     color: #dc5f7d;
@@ -41,22 +41,30 @@ const messages = defineMessages({
     defaultMessage: 'For any community',
   },
   opensource: {
-    id: 'createCollective.category.newOpenSource',
+    id: 'OSC.description',
     defaultMessage: 'For open source projects',
   },
   climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
-  covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 initiatives' },
+  covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 groups' },
 });
 
 const CollectiveCategoryPicker = () => {
   const router = useRouter();
   const { formatMessage } = useIntl();
+  const { hostCollectiveSlug, verb } = router.query;
+  const baseRoute = `/${[hostCollectiveSlug, verb].filter(Boolean).join('/')}`;
 
   return (
     <Fragment>
       <Box mb={4} mt={5}>
-        <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
-          <FormattedMessage id="createCollective.header.create" defaultMessage="Create a Collective" />
+        <H1
+          fontSize={['20px', '32px']}
+          lineHeight={['24px', '36px']}
+          fontWeight="bold"
+          color="black.900"
+          textAlign="center"
+        >
+          <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
         </H1>
       </Box>
       <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>
@@ -68,14 +76,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/openSourceIllustration.png"
                   alt={formatMessage(messages.opensource)}
                 />
-                <Link
-                  route="create-collective"
-                  params={{
-                    hostCollectiveSlug: router.query.hostCollectiveSlug,
-                    verb: router.query.verb,
-                    category: 'opensource',
-                  }}
-                >
+                <Link href={`${baseRoute}/opensource`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.opensource)}
                   </StyledButton>
@@ -97,14 +98,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/climateIllustration.png"
                   alt={formatMessage(messages.covid)}
                 />
-                <Link
-                  route="create-collective"
-                  params={{
-                    hostCollectiveSlug: router.query.hostCollectiveSlug,
-                    verb: router.query.verb,
-                    category: 'covid-19',
-                  }}
-                >
+                <Link href={`${baseRoute}/covid-19`}>
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                     {formatMessage(messages.covid)}
                   </StyledButton>
@@ -125,14 +119,7 @@ const CollectiveCategoryPicker = () => {
                   src="/static/images/create-collective/communityIllustration.png"
                   alt={formatMessage(messages.community)}
                 />
-                <Link
-                  route="create-collective"
-                  params={{
-                    hostCollectiveSlug: router.query.hostCollectiveSlug,
-                    verb: router.query.verb,
-                    category: 'community',
-                  }}
-                >
+                <Link href={`${baseRoute}/community`}>
                   <StyledButton
                     fontSize="13px"
                     buttonStyle="primary"

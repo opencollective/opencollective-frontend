@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { Support } from '@styled-icons/boxicons-regular/Support';
 import { Redo } from '@styled-icons/fa-solid/Redo';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ERROR } from '../lib/errors';
-import { Router } from '../server/pages';
 
 import Body from './Body';
 import Container from './Container';
@@ -31,7 +31,7 @@ class ErrorPage extends React.Component {
       type: PropTypes.oneOf(Object.values(ERROR)),
       payload: PropTypes.object,
     }),
-    /** If true, a loading indicator will be displayed instad of an error */
+    /** If true, a loading indicator will be displayed instead of an error */
     loading: PropTypes.bool,
     /** Define if error should be logged to console. Default: true */
     log: PropTypes.bool,
@@ -41,6 +41,7 @@ class ErrorPage extends React.Component {
     message: PropTypes.string,
     /** @deprecated please generate errors with the `createError` helper */
     data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
+    router: PropTypes.object,
   };
 
   getErrorComponent() {
@@ -49,6 +50,7 @@ class ErrorPage extends React.Component {
     if (log && get(data, 'error')) {
       if (data.error.message !== 'Test error') {
         // That might not be the right place to log the error. Remove?
+        // eslint-disable-next-line no-console
         console.error(data.error);
       }
     }
@@ -89,8 +91,8 @@ class ErrorPage extends React.Component {
         <MessageBox type="error" withIcon mb={5}>
           {message}
         </MessageBox>
-        <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => Router.back()}>
-          &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to previous page" />
+        <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => this.props.router.back()}>
+          &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to the previous page" />
         </StyledButton>
       </Flex>
     );
@@ -100,17 +102,14 @@ class ErrorPage extends React.Component {
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={6}>
         <H1 fontSize={30} textAlign="center">
-          <FormattedMessage
-            id="page.error.networkError"
-            defaultMessage="The Open Collective Server is momentarily unreachable"
-          />
+          <FormattedMessage id="page.error.networkError" defaultMessage="Open Collective is momentarily unreachable" />
           &nbsp; 🙀
         </H1>
         <Flex mt={3}>
           <P textAlign="center">
             <FormattedMessage
               id="page.error.networkError.description"
-              defaultMessage="Worry not! One of our engineers is probably already on it  👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)"
+              defaultMessage="Don't worry! One of our engineers is probably already on it 👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)"
             />
           </P>
         </Flex>
@@ -121,13 +120,13 @@ class ErrorPage extends React.Component {
   unknownError() {
     const message = get(this.props, 'data.error.message');
     const stackTrace = get(this.props, 'data.error.stack');
-    const expandError = process.env.NODE_ENV !== 'production';
-    const fontSize = ['ci', 'e2e', 'test'].includes(process.env.NODE_ENV) ? 22 : 13;
+    const expandError = process.env.OC_ENV !== 'production';
+    const fontSize = ['ci', 'e2e', 'test'].includes(process.env.OC_ENV) ? 22 : 13;
 
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={[4, 6]}>
         <H1 fontSize={30} textAlign="center">
-          <FormattedMessage id="error.unexpected" defaultMessage="Ooops, an unexpected error seems to have occurred" />
+          <FormattedMessage id="error.unexpected" defaultMessage="Oops, an unexpected error seems to have occurred" />
           &nbsp; 🤕
         </H1>
         <Flex mt={5} flexWrap="wrap" alignItems="center" justifyContent="center">
@@ -172,12 +171,10 @@ class ErrorPage extends React.Component {
     const component = this.getErrorComponent();
 
     return (
-      <div className="ErrorPage">
+      <div className="ErrorPage" data-cy="error-page">
         <Header LoggedInUser={LoggedInUser} />
         <Body>
-          <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
-            {component}
-          </Container>
+          <Container py={[5, 6]}>{component}</Container>
         </Body>
         <Footer />
       </div>
@@ -185,4 +182,4 @@ class ErrorPage extends React.Component {
   }
 }
 
-export default withUser(ErrorPage);
+export default withUser(withRouter(ErrorPage));

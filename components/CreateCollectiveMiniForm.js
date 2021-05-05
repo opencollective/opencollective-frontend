@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
-import gql from 'graphql-tag';
 import { assign, cloneDeep, get, pick } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -13,10 +12,13 @@ import { isValidEmail } from '../lib/utils';
 
 import Container from './Container';
 import { Box } from './Grid';
+import InputTypeCountry from './InputTypeCountry';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
+import StyledInputFormikField from './StyledInputFormikField';
+import StyledTextarea from './StyledTextarea';
 import { H5 } from './Text';
 import { withUser } from './UserProvider';
 
@@ -27,11 +29,11 @@ const CreateNewMessages = defineMessages({
   },
   [CollectiveType.USER]: {
     id: 'User.InviteNew',
-    defaultMessage: 'Invite new user',
+    defaultMessage: 'Invite new User',
   },
   [CollectiveType.EVENT]: {
     id: 'Event.CreateNew',
-    defaultMessage: 'Create new event',
+    defaultMessage: 'Create new Event',
   },
   [CollectiveType.ORGANIZATION]: {
     id: 'Organization.CreateNew',
@@ -41,7 +43,7 @@ const CreateNewMessages = defineMessages({
 
 const msg = defineMessages({
   emailTitle: {
-    id: 'EditUserEmailForm.title',
+    id: 'User.EmailAddress',
     defaultMessage: 'Email address',
   },
   adminEmail: {
@@ -94,19 +96,33 @@ const msg = defineMessages({
   },
 });
 
+const labels = defineMessages({
+  'location.address': {
+    id: 'collective.address.label',
+    defaultMessage: 'Address',
+  },
+  'location.country': {
+    id: 'collective.country.label',
+    defaultMessage: 'Country',
+  },
+});
+
 /** Prepare mutation variables based on collective type */
 const prepareMutationVariables = collective => {
+  const includeLocation = collective.location?.address || collective.location?.country;
+  const locationFields = includeLocation ? ['location.address', 'location.country'] : [];
+
   if (collective.type === CollectiveType.USER) {
-    return { user: pick(collective, ['name', 'email']) };
+    return { user: pick(collective, ['name', 'email', ...locationFields]) };
   } else if (collective.type === CollectiveType.ORGANIZATION) {
     collective.members.forEach(member => (member.role = roles.ADMIN));
-    return { collective: pick(collective, ['name', 'type', 'website', 'members']) };
+    return { collective: pick(collective, ['name', 'type', 'website', 'members', ...locationFields]) };
   } else {
-    return { collective: pick(collective, ['name', 'type', 'website']) };
+    return { collective: pick(collective, ['name', 'type', 'website', ...locationFields]) };
   }
 };
 
-const CreateCollectiveMutation = gql`
+const createCollectiveMutation = gql`
   mutation CreateCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
@@ -114,6 +130,10 @@ const CreateCollectiveMutation = gql`
       slug
       type
       imageUrl(height: 64)
+      location {
+        address
+        country
+      }
       members {
         id
         role
@@ -127,7 +147,7 @@ const CreateCollectiveMutation = gql`
   }
 `;
 
-const CreateUserMutation = gql`
+const createUserMutation = gql`
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
       user {
@@ -137,6 +157,10 @@ const CreateUserMutation = gql`
           name
           slug
           type
+          location {
+            address
+            country
+          }
           imageUrl(height: 64)
           ... on User {
             email
@@ -158,6 +182,7 @@ const CreateCollectiveMiniForm = ({
   addLoggedInUserAsAdmin,
   LoggedInUser,
   excludeAdminFields,
+  optionalFields,
   email = '',
   name = '',
 }) => {
@@ -165,7 +190,7 @@ const CreateCollectiveMiniForm = ({
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
   const noAdminFields = isOrganization && excludeAdminFields;
-  const mutation = isUser ? CreateUserMutation : CreateCollectiveMutation;
+  const mutation = isUser ? createUserMutation : createCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
   const { formatMessage } = useIntl();
 
@@ -245,7 +270,8 @@ const CreateCollectiveMiniForm = ({
                       {...inputProps}
                       type="email"
                       width="100%"
-                      placeholder="i.e. john-smith@youremail.com"
+                      placeholder="e.g. jane-smith@youremail.com"
+                      data-cy="mini-form-email-field"
                     />
                   )}
                 </StyledInputField>
@@ -261,7 +287,7 @@ const CreateCollectiveMiniForm = ({
                   value={get(values, 'members[0].member.name')}
                 >
                   {inputProps => (
-                    <Field as={StyledInput} {...inputProps} width="100%" placeholder="i.e. John Doe, Frank Zappa" />
+                    <Field as={StyledInput} {...inputProps} width="100%" placeholder="e.g. Jane Doe, Frank Zappa" />
                   )}
                 </StyledInputField>
               )}
@@ -281,10 +307,10 @@ const CreateCollectiveMiniForm = ({
                     width="100%"
                     placeholder={
                       isUser
-                        ? 'i.e. John Doe, Frank Zappa'
+                        ? 'e.g. Jane Doe, Frank Zappa'
                         : isCollective
-                        ? 'i.e. Webpack, Babel'
-                        : 'i.e. AirBnb, TripleByte'
+                        ? 'e.g. Webpack, Babel'
+                        : 'e.g. AirBnb, TripleByte'
                     }
                     data-cy="mini-form-name-field"
                   />
@@ -303,13 +329,41 @@ const CreateCollectiveMiniForm = ({
                     <Field
                       as={StyledInput}
                       {...inputProps}
-                      placeholder="i.e. opencollective.com"
+                      placeholder="e.g. opencollective.com"
                       width="100%"
                       data-cy="mini-form-website-field"
                     />
                   )}
                 </StyledInputField>
               )}
+              {optionalFields?.map(name => (
+                <StyledInputFormikField
+                  key={name}
+                  name={name}
+                  htmlFor={`createCollectiveMiniForm-${name}`}
+                  label={formatMessage(labels[name])}
+                  required={false}
+                  mt={3}
+                >
+                  {({ field, form }) => {
+                    switch (field.name) {
+                      case 'location.address':
+                        return <StyledTextarea {...field} />;
+                      case 'location.country':
+                        return (
+                          <InputTypeCountry
+                            {...field}
+                            inputId="location.country"
+                            onChange={country => form.setFieldValue(name, country)}
+                            maxMenuHeight={95}
+                          />
+                        );
+                      default:
+                        return null;
+                    }
+                  }}
+                </StyledInputFormikField>
+              ))}
             </Box>
             {submitError && (
               <MessageBox type="error" withIcon mt={2}>
@@ -362,6 +416,8 @@ CreateCollectiveMiniForm.propTypes = {
   email: PropTypes.string,
   /** The collective name */
   name: PropTypes.string,
+  /** A list of optional fields to include in the form */
+  optionalFields: PropTypes.arrayOf(PropTypes.oneOf(['location.address', 'location.country'])),
 };
 
 export default withUser(CreateCollectiveMiniForm);

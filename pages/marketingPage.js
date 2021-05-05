@@ -10,23 +10,13 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { withUser } from '../components/UserProvider';
 
-import becomeAFiscalHostStyle from '!css-loader!../public/become-a-fiscal-host-page/stylesheets/styles.css'; // eslint-disable-line
 import giftCardPageStyle from '!css-loader!../public/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
 import holidayGiftCardPageStyle from '!css-loader!../public/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
 import howItWorksPageStyle from '!css-loader!../public/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
-import sponsorPageStyle from '!css-loader!../public/sponsor-page/stylesheets/styles.css'; // eslint-disable-line
 
 import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../public/how-it-works-page/javascripts/scripts.js'; // eslint-disable-line
-// hardcode loaders for specific files
-import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../public/sponsor-page/javascripts/scripts.js'; // eslint-disable-line
 
 const PAGES = {
-  'become-a-sponsor': {
-    pageContents: importAll(require.context('../public/sponsor-page', false, /\.(html)$/)),
-    css: sponsorPageStyle,
-    js: sponsorPageScript,
-    className: 'sponsorPage',
-  },
   'how-it-works': {
     pageContents: importAll(require.context('../public/how-it-works-page', false, /\.(html)$/)),
     css: howItWorksPageStyle,
@@ -42,11 +32,6 @@ const PAGES = {
     css: giftCardPageStyle,
     className: 'mkt-page-how-it-works',
   },
-  'become-a-fiscal-host': {
-    pageContents: importAll(require.context('../public/become-a-fiscal-host-page', false, /\.(html)$/)),
-    css: becomeAFiscalHostStyle,
-    className: 'mkt-page-become-a-fiscal-host',
-  },
 };
 
 function importAll(r) {
@@ -58,7 +43,7 @@ function importAll(r) {
 }
 
 function getmenuItem(pageSlug) {
-  if (['how-it-works', 'pricing', 'become-a-sponsor', 'become-a-fiscal-host'].includes(pageSlug)) {
+  if ('how-it-works' === pageSlug) {
     return { pricing: true, howItWorks: true };
   } else {
     return { pricing: false, howItWorks: false };

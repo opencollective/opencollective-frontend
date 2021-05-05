@@ -1,3 +1,5 @@
+import speakeasy from 'speakeasy';
+
 import { randomEmail, randomGmailEmail, randomHotMail } from '../support/faker';
 import generateToken from '../support/token';
 
@@ -6,7 +8,7 @@ describe('signin', () => {
     cy.visit('/signin?next=/testuseradmin');
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');
     cy.get('button[type=submit]').click();
-    cy.get('.LoginTopBarProfileButton-name').contains('testuseradmin', { timeout: 15000 });
+    cy.getByDataCy('topbar-login-username').contains('Test User Admin', { timeout: 15000 });
   });
 
   it('can signin with a valid token and is redirected', () => {
@@ -115,14 +117,14 @@ describe('signin', () => {
 
   it('can signup a user with gmail and show Open Gmail button ', () => {
     // Submit the form using the email providers--gmail)
-    const gmail_email = randomGmailEmail(false);
+    const gmailEmail = randomGmailEmail(false);
     cy.visit('/signin');
     cy.contains('a', 'Join Free').click();
     cy.get('input[name=name]').type('Dummy Name');
-    cy.get('input[name=email]').type(`{selectall}${gmail_email}`);
+    cy.get('input[name=email]').type(`{selectall}${gmailEmail}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${gmail_email}.`);
+    cy.contains(`We've sent it to ${gmailEmail}.`);
     cy.getByDataCy('open-inbox-link').should(
       'have.prop',
       'href',
@@ -170,5 +172,43 @@ describe('signin', () => {
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${email}.`);
+  });
+});
+
+describe('signin with 2FA', () => {
+  let user = null;
+  let secret;
+  let TOTPCode;
+
+  before(() => {
+    cy.signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` }).then(u => (user = u));
+  });
+
+  before(() => {
+    secret = speakeasy.generateSecret({ length: 64 });
+    cy.enableTwoFactorAuth({
+      userEmail: user.email,
+      userSlug: user.collective.slug,
+      secret: secret.base32,
+    });
+  });
+
+  it('can signin with 2fa enabled', () => {
+    // now login with 2FA enabled
+    cy.login({ email: user.email, redirect: '/apex' });
+    cy.getByDataCy('signin-two-factor-auth-input').type('123456');
+    cy.getByDataCy('signin-two-factor-auth-button').click();
+    cy.getByDataCy('signin-message-box').contains(
+      'Sign In failed: Two-factor authentication code failed. Please try again',
+    );
+    TOTPCode = speakeasy.totp({
+      algorithm: 'SHA1',
+      encoding: 'base32',
+      secret: secret.base32,
+    });
+    cy.getByDataCy('signin-two-factor-auth-input').clear().type(TOTPCode);
+    cy.getByDataCy('signin-two-factor-auth-button').click();
+    cy.assertLoggedIn();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
   });
 });

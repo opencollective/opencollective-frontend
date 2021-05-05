@@ -11,19 +11,6 @@ import { H1, P } from './Text';
 const NotFound = ({ searchTerm }) => {
   return (
     <Flex data-cy="not-found" flexDirection="column" alignItems="center">
-      <style jsx>
-        {`
-          .shrug {
-            font-size: 3.6rem;
-            text-align: center;
-            color: #3385ff;
-          }
-          p {
-            margin: 4rem 0;
-            text-align: center;
-          }
-        `}
-      </style>
       <H1 textAlign="center">
         <FormattedMessage id="notFound" defaultMessage="Not found" />
       </H1>
@@ -33,9 +20,9 @@ const NotFound = ({ searchTerm }) => {
       {searchTerm && (
         <Flex flexWrap="wrap" justifyContent="center">
           <StyledButton m={2} onClick={() => Router.back()}>
-            &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to previous page" />
+            &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to the previous page" />
           </StyledButton>
-          <Link route="search" params={{ q: searchTerm }}>
+          <Link href={{ pathname: '/search', query: { q: searchTerm } }}>
             <StyledButton m={2} buttonStyle="primary">
               <FormattedMessage
                 id="notFound.search"

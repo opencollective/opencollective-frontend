@@ -71,7 +71,7 @@ const VideoLinkerBox = ({ url, onChange, isEditing, setEditing }) => {
   return !isEditing ? (
     <VideoPlaceholder onClick={() => setEditing(true)}>
       <VideoPlus size="50%" />
-      <P fontWeight="bold" fontSize="LeadParagraph">
+      <P fontWeight="bold" fontSize="16px">
         <FormattedMessage id="VideoLinkerBox.AddVideo" defaultMessage="Add a video" />
       </P>
     </VideoPlaceholder>
@@ -94,7 +94,7 @@ const VideoLinkerBox = ({ url, onChange, isEditing, setEditing }) => {
           placeholder={
             <VideoPlaceholder>
               <ArrowUpCircle size="50%" />
-              <P fontWeight="bold" fontSize="LeadParagraph" textAlign="center" color="black.400" mt={2}>
+              <P fontWeight="bold" fontSize="16px" textAlign="center" color="black.400" mt={2}>
                 <FormattedMessage
                   id="VideoLinkerBox.SetUrl"
                   defaultMessage="Set the video URL above. We support the following platforms: {supportedVideoProviders}"

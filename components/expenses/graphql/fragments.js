@@ -1,9 +1,9 @@
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
-import { CommentFieldsFragment } from '../../conversations/graphql';
+import { commentFieldsFragment } from '../../conversations/graphql';
 
-export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
-  fragment loggedInAccountExpensePayoutFieldsFragment on Individual {
+export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
+  fragment LoggedInAccountExpensePayoutFields on Individual {
     id
     slug
     imageUrl
@@ -12,14 +12,20 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
     location {
       address
       country
+      structured
     }
     payoutMethods {
       id
       type
       name
       data
+      isSaved
     }
-    adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, INDIVIDUAL]) {
+    adminMemberships: memberOf(
+      role: ADMIN
+      includeIncognito: false
+      accountType: [ORGANIZATION, COLLECTIVE, EVENT, FUND, PROJECT, INDIVIDUAL]
+    ) {
       nodes {
         id
         account {
@@ -28,15 +34,28 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
           imageUrl
           type
           name
+          isActive
+          ... on AccountWithHost {
+            host {
+              id
+            }
+          }
+          ... on Organization {
+            host {
+              id
+            }
+          }
           location {
             address
             country
+            structured
           }
           payoutMethods {
             id
             type
             name
             data
+            isSaved
           }
         }
       }
@@ -44,38 +63,41 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
   }
 `;
 
-const HostFieldsFragment = gqlV2`
-  fragment HostFieldsFragment on Host {
+export const expenseHostFields = gqlV2/* GraphQL */ `
+  fragment ExpenseHostFields on Host {
     id
     name
     slug
     type
+    currency
+    isHost
     expensePolicy
     website
     settings
-    connectedAccounts {
+    paypalPreApproval {
       id
-      service
+      balance {
+        currency
+        valueInCents
+      }
     }
     location {
       address
       country
     }
+    supportedPayoutMethods
     plan {
-      transferwisePayouts
-      transferwisePayoutsLimit
-    }
-    transferwise {
-      availableCurrencies
+      id
     }
   }
 `;
 
-export const expensePageExpenseFieldsFragment = gqlV2`
-  fragment expensePageExpenseFieldsFragment on Expense {
+export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
+  fragment ExpensePageExpenseFields on Expense {
     id
     legacyId
     description
+    longDescription
     currency
     type
     status
@@ -85,6 +107,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     createdAt
     invoiceInfo
     requiredLegalDocuments
+    draft
     items {
       id
       incurredAt
@@ -101,6 +124,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       slug
       name
       type
+      isAdmin
       location {
         address
         country
@@ -110,13 +134,37 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         type
         name
         data
+        isSaved
+      }
+
+      # For Collectives, Funds, Events and Projects
+      ... on AccountWithHost {
+        isApproved
+        host {
+          id
+        }
+      }
+
+      # For Fiscal Hosts
+      ... on Organization {
+        host {
+          id
+        }
       }
     }
     payeeLocation {
       address
       country
+      structured
     }
     createdByAccount {
+      id
+      slug
+      name
+      type
+      imageUrl
+    }
+    requestedByAccount {
       id
       slug
       name
@@ -138,31 +186,46 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         id
         tag
       }
+      location {
+        address
+        country
+      }
+
+      stats {
+        balanceWithBlockedFunds {
+          valueInCents
+          currency
+        }
+      }
+
+      ... on AccountWithHost {
+        isApproved
+        host {
+          ...ExpenseHostFields
+        }
+      }
+
+      # For Hosts with Budget capabilities
 
       ... on Organization {
-        id
         isHost
-        balance
-        # Missing
-        # ...HostFieldsFragment
+        isActive
+        host {
+          ...ExpenseHostFields
+        }
       }
 
-      ... on Collective {
-        id
-        isApproved
-        balance
-        host {
-          ...HostFieldsFragment
+      ... on Event {
+        parent {
+          id
+          slug
+          name
+          type
+          imageUrl
         }
       }
-      ... on Event {
-        id
-        isApproved
-        balance
-        host {
-          ...HostFieldsFragment
-        }
-        parentCollective {
+      ... on Project {
+        parent {
           id
           slug
           name
@@ -175,6 +238,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       id
       type
       data
+      isSaved
     }
     comments(limit: 300) {
       nodes {
@@ -188,6 +252,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       canApprove
       canUnapprove
       canReject
+      canMarkAsSpam
       canPay
       canMarkAsUnpaid
       canComment
@@ -196,6 +261,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       id
       type
       createdAt
+      data
       individual {
         id
         type
@@ -206,6 +272,88 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     }
   }
 
-  ${CommentFieldsFragment}
-  ${HostFieldsFragment}
+  ${commentFieldsFragment}
+  ${expenseHostFields}
+`;
+
+export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
+  fragment ExpensesListFieldsFragment on Expense {
+    id
+    legacyId
+    description
+    status
+    createdAt
+    tags
+    amount
+    currency
+    type
+    requiredLegalDocuments
+    permissions {
+      canDelete
+      canApprove
+      canUnapprove
+      canReject
+      canMarkAsSpam
+      canPay
+      canMarkAsUnpaid
+      canSeeInvoiceInfo
+    }
+    payoutMethod {
+      id
+      type
+      data
+      isSaved
+    }
+    payee {
+      id
+      type
+      slug
+      name
+      imageUrl(height: 80)
+      isAdmin
+
+      # For Collectives, Funds, Events and Projects
+      ... on AccountWithHost {
+        isApproved
+        host {
+          id
+        }
+      }
+
+      # For Fiscal Hosts
+      ... on Organization {
+        host {
+          id
+        }
+      }
+    }
+    createdByAccount {
+      id
+      type
+      slug
+      name
+    }
+  }
+`;
+
+export const expensesListAdminFieldsFragment = gqlV2/* GraphQL */ `
+  fragment ExpensesListAdminFieldsFragment on Expense {
+    id
+    payoutMethod {
+      id
+      type
+      data
+    }
+    items {
+      id
+      description
+      incurredAt
+      url
+      amount
+    }
+    attachedFiles {
+      id
+      url
+    }
+  }
 `;

@@ -41,12 +41,12 @@ const TAG_TYPE_VARIANTS = {
   success: {
     backgroundColor: 'green.100',
     borderColor: 'green.500',
-    color: 'green.700',
+    color: 'green.800',
   },
   warning: {
-    backgroundColor: 'yellow.200',
+    backgroundColor: 'yellow.300',
     borderColor: 'yellow.500',
-    color: 'yellow.800',
+    color: 'yellow.900',
   },
   error: {
     backgroundColor: 'red.100',
@@ -58,16 +58,17 @@ const TAG_TYPE_VARIANTS = {
 const StyledTagBase = styled.div`
   text-align: center;
   white-space: nowrap;
+  letter-spacing: 0.06em;
 
   ${variant({
     prop: 'variant',
     variants: {
       squared: {
-        color: '#71757A',
+        color: 'black.700',
         background: '#F0F2F5',
         borderRadius: '4px',
-        padding: '8px',
-        fontSize: '8px',
+        padding: '6px 8px',
+        fontSize: '9px',
         lineHeight: '12px',
       },
       'rounded-right': {
@@ -104,7 +105,10 @@ const StyledTagBase = styled.div`
   ${textTransform}
 `;
 
-const CloseButton = styled.button`
+const CloseButton = styled.button.attrs({
+  type: 'button',
+  'data-cy': 'remove-btn',
+})`
   cursor: pointer;
   color: inherit;
   text-align: center;
@@ -112,7 +116,6 @@ const CloseButton = styled.button`
   border: none;
   padding: 0;
   line-height: inherit;
-  outline: none;
 `;
 
 /** Simple tag to display a short string */
@@ -135,12 +138,7 @@ StyledTag.propTypes = {
   closeButtonProps: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   /** If defined, a close button will be displayed on the tag */
   onClose: PropTypes.func,
-  iconWidth: PropTypes.string,
-  iconHeight: PropTypes.string,
   backgroundColor: PropTypes.string,
-  iconColor: PropTypes.string,
-  iconDisplay: PropTypes.string,
-  iconAlign: PropTypes.string,
   variant: PropTypes.oneOf(['squared', 'rounded-right', 'rounded-left', 'rounded']),
   children: PropTypes.node,
   type: PropTypes.oneOf(Object.keys(TAG_TYPE_VARIANTS)),
@@ -148,10 +146,6 @@ StyledTag.propTypes = {
 
 StyledTag.defaultProps = {
   variant: 'squared',
-  iconHeight: '2.5em',
-  iconWidth: '2.5em',
-  iconBackgroundColor: 'rgba(33, 33, 33, 1)',
-  iconColor: 'white',
 };
 
 export default StyledTag;

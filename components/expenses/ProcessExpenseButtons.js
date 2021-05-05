@@ -1,26 +1,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import MessageBox from '../MessageBox';
+import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
+import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 
-const PROCESS_EXPENSE_MUTATION = gqlV2`
-  mutation processExpense($id: String, $legacyId: Int, $action: ExpenseProcessAction!, $paymentParams: ProcessExpensePaymentParams) {
-    processExpense(expense: {id: $id, legacyId: $legacyId}, action: $action, paymentParams: $paymentParams) {
-      ...expensePageExpenseFieldsFragment
+const processExpenseMutation = gqlV2/* GraphQL */ `
+  mutation ProcessExpense(
+    $id: String
+    $legacyId: Int
+    $action: ExpenseProcessAction!
+    $paymentParams: ProcessExpensePaymentParams
+  ) {
+    processExpense(expense: { id: $id, legacyId: $legacyId }, action: $action, paymentParams: $paymentParams) {
+      ...ExpensePageExpenseFields
     }
   }
 
@@ -39,25 +48,92 @@ export const hasProcessButtons = permissions => {
 
   return (
     permissions.canApprove ||
+    permissions.canUnapprove ||
     permissions.canReject ||
-    permissions.canPay ||
     permissions.canPay ||
     permissions.canMarkAsUnpaid
   );
+};
+
+const getErrorContent = (intl, error, host, LoggedInUser) => {
+  // TODO: The proper way to check for error types is with error.type, not the message
+  const message = error?.message;
+  if (message) {
+    if (message.startsWith('Insufficient Paypal balance')) {
+      return {
+        title: 'Insufficient Paypal balance',
+        message: (
+          <React.Fragment>
+            <Link href={`/${host.slug}/dashboard`}>
+              <FormattedMessage
+                id="PayExpenseModal.RefillBalanceError"
+                defaultMessage="Refill your balance from the Host dashboard"
+              />
+            </Link>
+          </React.Fragment>
+        ),
+      };
+    } else if (message.startsWith('Host has two-factor authentication enabled for large payouts')) {
+      return {
+        title: 'Host has two-factor authentication enabled for large payouts',
+        message: (
+          <FormattedMessage
+            id="PayExpenseModal.HostTwoFactorAuthEnabled"
+            defaultMessage="Please go to your <SettingsLink>settings</SettingsLink> to enable two-factor authentication for your account."
+            values={{
+              SettingsLink: getI18nLink({
+                as: Link,
+                href: `${LoggedInUser.collective.slug}/edit/${EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH}`,
+                openInNewTab: true,
+              }),
+            }}
+          />
+        ),
+      };
+    } else if (message.startsWith('Two-factor authentication')) {
+      return {
+        type: TOAST_TYPE.INFO,
+        message: (
+          <FormattedMessage
+            id="2FA.PleaseEnterCode"
+            defaultMessage="Two-factor authentication enabled: please enter your code."
+          />
+        ),
+      };
+    }
+  }
+
+  return { message: i18nGraphqlException(intl, error) };
 };
 
 /**
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
  */
-const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }) => {
+const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps, onSuccess }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const mutationOptions = { context: API_V2_CONTEXT, variables: { id: expense.id, legacyId: expense.legacyId } };
-  const [processExpense, { loading, error }] = useMutation(PROCESS_EXPENSE_MUTATION, mutationOptions);
+  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache);
+  const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
+  const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
+  const intl = useIntl();
+  const { addToast } = useToasts();
+  const { LoggedInUser } = useUser();
 
-  const triggerAction = (action, paymentParams) => {
+  const triggerAction = async (action, paymentParams) => {
+    // Prevent submitting the action if another one is being submitted at the same time
+    if (loading) {
+      return;
+    }
+
     setSelectedAction(action);
-    return processExpense({ variables: { action, paymentParams } });
+
+    try {
+      const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
+      await processExpense({ variables });
+    } catch (e) {
+      // Display a toast with light variant since we're in a modal
+      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', ...getErrorContent(intl, e, host, LoggedInUser) });
+    }
   };
 
   const getButtonProps = (action, hasOnClick = true) => {
@@ -72,13 +148,8 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
 
   return (
     <React.Fragment>
-      {!loading && error && selectedAction !== 'PAY' && (
-        <MessageBox flex="1 0 100%" type="error" withIcon>
-          {getErrorFromGraphqlException(error).message}
-        </MessageBox>
-      )}
       {permissions.canApprove && (
-        <StyledButton {...getButtonProps('APPROVE')} buttonStyle="secondary">
+        <StyledButton {...getButtonProps('APPROVE')} buttonStyle="secondary" data-cy="approve-button">
           <ApproveIcon size={12} />
           <ButtonLabel>
             <FormattedMessage id="actions.approve" defaultMessage="Approve" />
@@ -86,10 +157,18 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
         </StyledButton>
       )}
       {permissions.canReject && (
-        <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary">
+        <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
           <RejectIcon size={14} />
           <ButtonLabel>
             <FormattedMessage id="actions.reject" defaultMessage="Reject" />
+          </ButtonLabel>
+        </StyledButton>
+      )}
+      {permissions.canMarkAsSpam && (
+        <StyledButton {...getButtonProps('MARK_AS_SPAM')} buttonStyle="dangerSecondary" data-cy="spam-button">
+          <RejectIcon size={14} />
+          <ButtonLabel>
+            <FormattedMessage id="actions.spam" defaultMessage="Mark as Spam" />
           </ButtonLabel>
         </StyledButton>
       )}
@@ -99,11 +178,12 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
           onSubmit={triggerAction}
           expense={expense}
           collective={collective}
-          error={error && getErrorFromGraphqlException(error).message}
+          host={host}
+          error={error}
         />
       )}
       {permissions.canUnapprove && (
-        <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary">
+        <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
           <UnapproveIcon size={12} />
           <ButtonLabel>
             <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
@@ -112,6 +192,7 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
       )}
       {permissions.canMarkAsUnpaid && (
         <MarkExpenseAsUnpaidButton
+          data-cy="mark-as-unpaid-button"
           {...getButtonProps('MARK_AS_UNPAID', false)}
           onConfirm={hasPaymentProcessorFeesRefunded =>
             triggerAction('MARK_AS_UNPAID', {
@@ -129,6 +210,7 @@ ProcessExpenseButtons.propTypes = {
     canApprove: PropTypes.bool,
     canUnapprove: PropTypes.bool,
     canReject: PropTypes.bool,
+    canMarkAsSpam: PropTypes.bool,
     canPay: PropTypes.bool,
     canMarkAsUnpaid: PropTypes.bool,
   }).isRequired,
@@ -138,17 +220,22 @@ ProcessExpenseButtons.propTypes = {
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
+  host: PropTypes.object,
   /** Props passed to all buttons. Useful to customize sizes, spaces, etc. */
   buttonProps: PropTypes.object,
+  showError: PropTypes.bool,
+  onSuccess: PropTypes.func,
+};
+
+export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
+  buttonSize: 'small',
+  minWidth: 130,
+  mx: 2,
+  mt: 2,
 };
 
 ProcessExpenseButtons.defaultProps = {
-  buttonProps: {
-    buttonSize: 'small',
-    minWidth: 90,
-    mx: 2,
-    mt: 2,
-  },
+  buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
 };
 
 export default ProcessExpenseButtons;

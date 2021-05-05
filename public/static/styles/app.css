@@ -3,16 +3,16 @@
   font-style:  normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-Regular.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-Regular.woff") format("woff");
+  src: url("../fonts/inter/Inter-Regular.woff2") format("woff2"),
+       url("../fonts/inter/Inter-Regular.woff") format("woff");
 }
 @font-face {
   font-family: 'Inter';
   font-style:  italic;
   font-weight: 400;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-Italic.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-Italic.woff") format("woff");
+  src: url("../fonts/inter/Inter-Italic.woff2") format("woff2"),
+       url("../fonts/inter/Inter-Italic.woff") format("woff");
 }
 
 @font-face {
@@ -20,16 +20,16 @@
   font-style:  normal;
   font-weight: 500;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-Medium.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-Medium.woff") format("woff");
+  src: url("../fonts/inter/Inter-Medium.woff2") format("woff2"),
+       url("../fonts/inter/Inter-Medium.woff") format("woff");
 }
 @font-face {
   font-family: 'Inter';
   font-style:  italic;
   font-weight: 500;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-MediumItalic.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-MediumItalic.woff") format("woff");
+  src: url("../fonts/inter/Inter-MediumItalic.woff2") format("woff2"),
+       url("../fonts/inter/Inter-MediumItalic.woff") format("woff");
 }
 
 @font-face {
@@ -37,16 +37,16 @@
   font-style:  normal;
   font-weight: 600;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-SemiBold.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-SemiBold.woff") format("woff");
+  src: url("../fonts/inter/Inter-SemiBold.woff2") format("woff2"),
+       url("../fonts/inter/Inter-SemiBold.woff") format("woff");
 }
 @font-face {
   font-family: 'Inter';
   font-style:  italic;
   font-weight: 600;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-SemiBoldItalic.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-SemiBoldItalic.woff") format("woff");
+  src: url("../fonts/inter/Inter-SemiBoldItalic.woff2") format("woff2"),
+       url("../fonts/inter/Inter-SemiBoldItalic.woff") format("woff");
 }
 
 @font-face {
@@ -54,16 +54,16 @@
   font-style:  normal;
   font-weight: 700;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-Bold.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-Bold.woff") format("woff");
+  src: url("../fonts/inter/Inter-Bold.woff2") format("woff2"),
+       url("../fonts/inter/Inter-Bold.woff") format("woff");
 }
 @font-face {
   font-family: 'Inter';
   font-style:  italic;
   font-weight: 700;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-BoldItalic.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-BoldItalic.woff") format("woff");
+  src: url("../fonts/inter/Inter-BoldItalic.woff2") format("woff2"),
+       url("../fonts/inter/Inter-BoldItalic.woff") format("woff");
 }
 
 @font-face {
@@ -71,16 +71,16 @@
   font-style:  normal;
   font-weight: 800;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-ExtraBold.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-ExtraBold.woff") format("woff");
+  src: url("../fonts/inter/Inter-ExtraBold.woff2") format("woff2"),
+       url("../fonts/inter/Inter-ExtraBold.woff") format("woff");
 }
 @font-face {
   font-family: 'Inter';
   font-style:  italic;
   font-weight: 800;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-ExtraBoldItalic.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-ExtraBoldItalic.woff") format("woff");
+  src: url("../fonts/inter/Inter-ExtraBoldItalic.woff2") format("woff2"),
+       url("../fonts/inter/Inter-ExtraBoldItalic.woff") format("woff");
 }
 
 @font-face {
@@ -88,16 +88,16 @@
   font-style:  normal;
   font-weight: 900;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-Black.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-Black.woff") format("woff");
+  src: url("../fonts/inter/Inter-Black.woff2") format("woff2"),
+       url("../fonts/inter/Inter-Black.woff") format("woff");
 }
 @font-face {
   font-family: 'Inter';
   font-style:  italic;
   font-weight: 900;
   font-display: swap;
-  src: url("/static/fonts/inter/Inter-BlackItalic.woff2") format("woff2"),
-       url("/static/fonts/inter/Inter-BlackItalic.woff") format("woff");
+  src: url("../fonts/inter/Inter-BlackItalic.woff2") format("woff2"),
+       url("../fonts/inter/Inter-BlackItalic.woff") format("woff");
 }
 
 html {
@@ -124,7 +124,6 @@ body {
 
 a:hover {
   color: #797d80;
-  text-decoration: none;
 }
 
 summary {
@@ -176,7 +175,6 @@ h1 {
   margin: 40px 0px 20px;
   font-size: 4rem;
   letter-spacing: -1.2px;
-  font-weight: bold;
 }
 
 h2,
@@ -253,14 +251,6 @@ a {
   }
 }
 
-.col-sm-12 {
-  width: 100%;
-}
-
-.help-block {
-  font-size: 1.2rem;
-}
-
 @media (max-width: 420px) {
   .mobileOnly {
     display: inherit !important;
@@ -270,3 +260,80 @@ a {
 #nprogress .spinner {
   display: none;
 }
+
+/** @deprecated These legacy styles from `Body.js` should be removed */
+.content {
+  max-width: 1260px;
+  padding: 2rem 30px;
+  margin: 0 auto;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+@media (max-width: 420px) {
+  .content {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.content p {
+  text-overflow: ellipsis;
+}
+
+/* START: Legacy Bootstrap styles, added for retro-compatibility */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  color: #333;
+  font-size: 14px;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+}
+
+label {
+  display: inline-block;
+  font-weight: 700;
+}
+
+.form-control {
+  width: 100%;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+th {
+  text-align: left;
+}
+
+/* END: Legacy Bootstrap styles, added for retro-compatibility */

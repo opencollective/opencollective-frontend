@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { trim } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { getCollectiveToEditQuery } from '../../lib/graphql/queries';
+import { editCollectivePageQuery } from '../../lib/graphql/queries';
 
 import { getI18nLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
@@ -14,7 +14,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 
-const createConnectedAccountMutation = gqlV2`
+const createConnectedAccountMutation = gqlV2/* GraphQL */ `
   mutation createConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
     createConnectedAccount(connectedAccount: $connectedAccount, account: $account) {
       id
@@ -26,7 +26,7 @@ const createConnectedAccountMutation = gqlV2`
   }
 `;
 
-const deleteConnectedAccountMutation = gqlV2`
+const deleteConnectedAccountMutation = gqlV2/* GraphQL */ `
   mutation deleteConnectedAccount($connectedAccount: ConnectedAccountReferenceInput!) {
     deleteConnectedAccount(connectedAccount: $connectedAccount) {
       id
@@ -35,9 +35,10 @@ const deleteConnectedAccountMutation = gqlV2`
 `;
 
 const EditPayPalAccount = props => {
+  const isReceiving = props.variation == 'RECEIVING';
   const mutationOptions = {
     context: API_V2_CONTEXT,
-    refetchQueries: [{ query: getCollectiveToEditQuery, variables: { slug: props.collective.slug } }],
+    refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: props.collective.slug } }],
     awaitRefetchQueries: true,
   };
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
@@ -53,7 +54,6 @@ const EditPayPalAccount = props => {
     initialValues: {
       token: '',
       clientId: '',
-      webhookId: '',
     },
     async onSubmit(values) {
       const {
@@ -64,7 +64,6 @@ const EditPayPalAccount = props => {
             token: trim(values.token),
             clientId: trim(values.clientId),
             service: 'paypal',
-            settings: { webhookId: trim(values.webhookId) },
           },
           account: { slug: props.collective.slug },
         },
@@ -79,9 +78,6 @@ const EditPayPalAccount = props => {
       if (!values.clientId) {
         errors.clientId = 'Required';
       }
-      if (!values.webhookId) {
-        errors.webhookId = 'Required';
-      }
       return errors;
     },
   });
@@ -94,53 +90,55 @@ const EditPayPalAccount = props => {
   if (!connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
-        <P fontSize="Caption" color="black.600" fontWeight="normal">
-          <FormattedMessage
-            id="collective.create.connectedAccounts.paypal.description"
-            defaultMessage="Connect a PayPal account to pay expenses with one click. For instructions on how to connect to PayPal, please, <a>read our documentation</a>."
-            values={{
-              a: getI18nLink({
-                href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts#how-do-i-pay-out-expenses-with-paypal',
-                openInNewTab: true,
-              }),
-            }}
-          />
+        <P fontSize="12px" color="black.700" fontWeight="normal" mb={3}>
+          {isReceiving ? null : (
+            <FormattedMessage
+              id="collective.create.connectedAccounts.paypal.description"
+              defaultMessage="Connect a PayPal account to pay expenses with one click. (<a>Instructions</a>)."
+              values={{
+                a: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-paypal',
+                  openInNewTab: true,
+                }),
+              }}
+            />
+          )}
         </P>
         <StyledInputField
           name="clientId"
           label="Client ID"
-          error={
-            (formik.touched.clientId && formik.errors.clientId) || createError?.message.replace('GraphQL error: ', '')
-          }
+          error={(formik.touched.clientId && formik.errors.clientId) || createError?.message}
           disabled={isCreating}
         >
           {inputProps => (
-            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.clientId} />
+            <StyledInput
+              type="text"
+              {...inputProps}
+              onChange={formik.handleChange}
+              value={formik.values.clientId}
+              autoComplete="off"
+            />
           )}
         </StyledInputField>
         <StyledInputField
           mt={2}
           name="token"
-          label="Token"
-          error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
+          label="Secret"
+          error={(formik.touched.token && formik.errors.token) || createError?.message}
           disabled={isCreating}
         >
           {inputProps => (
-            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.token} />
+            <StyledInput
+              type="text"
+              {...inputProps}
+              onChange={formik.handleChange}
+              value={formik.values.token}
+              autoComplete="off"
+            />
           )}
         </StyledInputField>
-        <StyledInputField
-          mt={2}
-          name="webhookId"
-          label="Webhook ID"
-          error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
-          disabled={isCreating}
-        >
-          {inputProps => (
-            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.webhookId} />
-          )}
-        </StyledInputField>
-        <StyledButton mt={10} type="submit" buttonSize="tiny" loading={isCreating}>
+
+        <StyledButton type="submit" mt={2} minWidth={150} loading={isCreating}>
           <FormattedMessage id="collective.connectedAccounts.paypal.button" defaultMessage="Connect PayPal" />
         </StyledButton>
       </form>
@@ -151,14 +149,14 @@ const EditPayPalAccount = props => {
         <P>
           <FormattedMessage
             id="collective.connectedAccounts.paypal.connected"
-            defaultMessage="PayPal account connected on {updatedAt, date, short}"
+            defaultMessage="PayPal connected on {updatedAt, date, short}"
             values={{
               updatedAt: new Date(connectedAccount.updatedAt || connectedAccount.createdAt),
             }}
           />
         </P>
         <P>
-          <StyledButton type="submit" buttonSize="tiny" loading={isDeleting} onClick={handleDelete}>
+          <StyledButton type="submit" mt={2} loading={isDeleting} onClick={handleDelete}>
             <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
           </StyledButton>
         </P>
@@ -171,6 +169,7 @@ EditPayPalAccount.propTypes = {
   connectedAccount: PropTypes.object,
   collective: PropTypes.object,
   intl: PropTypes.object.isRequired,
+  variation: PropTypes.string,
 };
 
 export default EditPayPalAccount;

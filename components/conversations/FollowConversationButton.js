@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { Bell } from '@styled-icons/feather/Bell';
 import { BellOff } from '@styled-icons/feather/BellOff';
 import { get } from 'lodash';
+import Router from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -18,7 +18,7 @@ import { withUser } from '../UserProvider';
 
 import { isUserFollowingConversationQuery } from './graphql';
 
-const followConversationMutation = gqlV2`
+const followConversationMutation = gqlV2/* GraphQL */ `
   mutation FollowConversation($id: String!, $isActive: Boolean) {
     followConversation(id: $id, isActive: $isActive)
   }
@@ -37,7 +37,6 @@ const ButtonLabel = styled(Span).attrs({
 const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedInUser, loadingLoggedInUser }) => {
   const [followConversation, { loading: submitting }] = useMutation(followConversationMutation, {
     context: API_V2_CONTEXT,
-    variables: { id: conversationId },
   });
 
   const { data, loading } = useQuery(isUserFollowingConversationQuery, {
@@ -57,11 +56,7 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
             defaultMessage="You must be <login-link>logged in</login-link>"
             values={{
               // eslint-disable-next-line react/display-name
-              'login-link': msg => (
-                <Link route="signin" params={{ next: Router.asPath }}>
-                  {msg}
-                </Link>
-              ),
+              'login-link': msg => <Link href={{ pathname: '/signin', query: { next: Router.asPath } }}>{msg}</Link>,
             }}
           />
         )}
@@ -83,7 +78,7 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
       disabled={!LoggedInUser || loadingLoggedInUser || loading || submitting}
       onClick={() => {
         return followConversation({
-          variables: { isActive: !isFollowing },
+          variables: { id: conversationId, isActive: !isFollowing },
           update: (client, { data }) => {
             const isFollowing = get(data, 'followConversation');
             const queryParams = { query: isUserFollowingConversationQuery, variables: { id: conversationId } };
@@ -107,7 +102,7 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
             {isCompact ? (
               <FormattedMessage id="actions.unfollow" defaultMessage="Unfollow" />
             ) : (
-              <FormattedMessage id="conversation.unfollow" defaultMessage="Unfollow this conversation" />
+              <FormattedMessage id="conversation.unfollow" defaultMessage="Unfollow this Conversation" />
             )}
           </ButtonLabel>
         </React.Fragment>
@@ -118,7 +113,7 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
             {isCompact ? (
               <FormattedMessage id="actions.follow" defaultMessage="Follow" />
             ) : (
-              <FormattedMessage id="conversation.follow" defaultMessage="Follow this conversation" />
+              <FormattedMessage id="conversation.follow" defaultMessage="Follow this Conversation" />
             )}
           </ButtonLabel>
         </React.Fragment>

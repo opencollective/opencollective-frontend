@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { Button } from 'react-bootstrap';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
 import CollectiveCard from './CollectiveCard';
+import Container from './Container';
 import Error from './Error';
+import StyledButton from './StyledButton';
 
 const COLLECTIVE_CARDS_PER_PAGE = 10;
 
@@ -71,58 +72,34 @@ class HostsWithData extends React.Component {
 
     const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
     return (
-      <div className="HostsContainer" ref={node => (this.node = node)}>
-        <style jsx>
-          {`
-            :global(.loadMoreBtn) {
-              margin: 1rem;
-              text-align: center;
-            }
-            .filter {
-              width: 100%;
-              max-width: 400px;
-              margin: 0 auto;
-            }
-            :global(.filterBtnGroup) {
-              width: 100%;
-            }
-            :global(.filterBtn) {
-              width: 33%;
-            }
-            .Hosts {
-              display: flex;
-              flex-wrap: wrap;
-              flex-direction: row;
-              justify-content: center;
-              overflow: hidden;
-              margin: 1rem 0;
-            }
-            .HostsContainer :global(.CollectiveCard) {
-              margin: 1rem;
-            }
-          `}
-        </style>
-
-        <div className="Hosts cardsList">
+      <Container ref={node => (this.node = node)}>
+        <Container
+          display="flex"
+          flexWrap="wrap"
+          flexDirection="row"
+          justifyContent="center"
+          overflow="hidden"
+          margin="1rem 0"
+        >
           {collectives.map(collective => (
-            <CollectiveCard key={collective.id} collective={collective} />
+            <CollectiveCard margin="1rem" key={collective.id} collective={collective} />
           ))}
-        </div>
+        </Container>
         {collectives.length % 10 === 0 && collectives.length >= limit && (
-          <div className="loadMoreBtn">
-            <Button bsStyle="default" onClick={this.fetchMore}>
+          <Container margin="1rem" textAlign="center">
+            <StyledButton onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
-            </Button>
-          </div>
+            </StyledButton>
+          </Container>
         )}
-      </div>
+      </Container>
     );
   }
 }
 
-const getHostsQuery = gql`
-  query allHosts(
+const hostsQuery = gql`
+  query Hosts(
     $tags: [String]
     $currency: String
     $limit: Int
@@ -161,7 +138,7 @@ const getHostsQuery = gql`
   }
 `;
 
-export const addHostsData = graphql(getHostsQuery, {
+export const addHostsData = graphql(hostsQuery, {
   options: props => ({
     variables: {
       tags: props.tags,

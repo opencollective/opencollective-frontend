@@ -69,7 +69,7 @@ const getBorderColor = ({ error, focused, success }) => {
     return 'green.300';
   }
 
-  return 'black.400';
+  return 'black.300';
 };
 
 /**
@@ -85,6 +85,8 @@ const StyledInputGroup = ({
   maxWidth,
   containerProps,
   prependProps,
+  appendProps,
+  innerRef,
   ...inputProps
 }) => {
   const [focused, setFocus] = useState(false);
@@ -103,11 +105,12 @@ const StyledInputGroup = ({
       >
         {prepend && (
           <Container
-            fontSize="Paragraph"
+            fontSize="14px"
             borderRadius="4px 0 0 4px"
-            py={2}
-            px={2}
+            p={2}
             color={getColor({ error, success })}
+            maxHeight="100%"
+            whiteSpace="nowrap"
             {...prependProps}
             bg={(disabled && 'black.50') || get(prependProps, 'bg') || getBgColor({ error, focused, success })}
           >
@@ -119,12 +122,16 @@ const StyledInputGroup = ({
           color={getColor({ error, success })}
           type="text"
           overflow="scroll"
-          fontSize="Paragraph"
+          fontSize="14px"
           flex="1 1 auto"
           disabled={disabled}
           py="0"
           px={2}
+          maxHeight="100%"
           error={error}
+          minWidth="0"
+          width="100%"
+          ref={innerRef}
           {...inputProps}
           onFocus={e => {
             setFocus(true);
@@ -140,15 +147,20 @@ const StyledInputGroup = ({
           }}
         />
         {append && (
-          <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" p={2}>
-            <Span color={getColor({ error, success })} fontSize="Paragraph">
-              {append}
-            </Span>
+          <Container
+            borderRadius="4px 0 0 4px"
+            p={2}
+            color={getColor({ error, success })}
+            fontSize="14px"
+            {...appendProps}
+            bg={getBgColor({ error, focused, success })}
+          >
+            {append}
           </Container>
         )}
       </InputContainer>
-      {error && typeof error !== 'boolean' && (
-        <Span display="block" color="red.500" pt={2} fontSize="Tiny">
+      {Boolean(error) && typeof error !== 'boolean' && (
+        <Span display="block" color="red.500" pt={2} fontSize="10px">
           {error}
         </Span>
       )}
@@ -173,8 +185,11 @@ StyledInputGroup.propTypes = {
   containerProps: PropTypes.object,
   /** Props passed to the prepend `Container` */
   prependProps: PropTypes.object,
+  /** Props passed to the append `Container` */
+  appendProps: PropTypes.object,
   /** Max Width */
   maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  innerRef: PropTypes.any,
 };
 
 export default StyledInputGroup;

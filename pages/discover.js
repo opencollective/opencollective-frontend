@@ -1,43 +1,42 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
-import { Query } from '@apollo/react-components';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { Query } from '@apollo/client/react/components';
 import { get, times } from 'lodash';
-import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-
-import { Link } from '../server/pages';
 
 import Container from '../components/Container';
 import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
 import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
-import { Box, Flex } from '../components/Grid';
+import { Box, Flex, Grid } from '../components/Grid';
+import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
+import { fadeIn } from '../components/StyledKeyframes';
 import StyledSelect from '../components/StyledSelect';
 import { H1, P } from '../components/Text';
 
-const AllCardsContainer = styled(Flex).attrs({
-  flexWrap: 'wrap',
+const AllCardsContainer = styled(Grid).attrs({
   width: '100%',
-  maxWidth: 1300,
+  maxWidth: 1200,
   mx: 'auto',
-  my: 3,
-  justifyContent: 'space-evenly',
+  my: 4,
+  px: 3,
+  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+  gridGap: [24, null, 50],
   'data-cy': 'container-collectives',
 })``;
 
 const CollectiveCardContainer = styled.div`
-  width: 280px;
-  padding: 20px 15px;
+  animation: ${fadeIn} 0.2s;
 `;
 
-const DiscoverPageDataQuery = gql`
-  query DiscoverPageDataQuery(
+const DiscoverPageQuery = gql`
+  query DiscoverPageQuery(
     $offset: Int
     $tags: [String]
     $orderBy: CollectiveOrderField
@@ -112,7 +111,7 @@ NavLinkContainer.defaultProps = {
   px: [1, 2, 3],
 };
 
-const NavLink = styled.a`
+const NavLink = styled.div`
   color: #777777;
   font-size: 1.4rem;
 
@@ -140,13 +139,15 @@ const I18nSortLabels = defineMessages({
   },
 });
 
-const DiscoverPage = ({ router, intl }) => {
-  const { query } = router;
+const DiscoverPage = () => {
+  const intl = useIntl();
+  const router = useRouter();
+  const query = router?.query || {};
 
   const params = {
     offset: Number(query.offset) || 0,
     tags: !query.show || query.show === 'all' ? undefined : [query.show],
-    orderBy: query.sort === 'newest' ? 'createdAt' : 'totalDonations',
+    orderBy: query.sort === 'newest' ? 'createdAt' : 'financialContributors',
     limit: Number(query.limit) || 40,
     isActive: query.show !== 'pledged',
     isPledged: query.show === 'pledged',
@@ -169,7 +170,7 @@ const DiscoverPage = ({ router, intl }) => {
 
   return (
     <Page title="Discover">
-      <Query query={DiscoverPageDataQuery} variables={params}>
+      <Query query={DiscoverPageQuery} variables={params}>
         {({ data, error, loading }) => (
           <Fragment>
             <Container
@@ -185,10 +186,15 @@ const DiscoverPage = ({ router, intl }) => {
               textAlign="center"
               data-cy="discover-banner"
             >
-              <H1 color="white.full" fontSize={['H3', null, 'H2']} lineHeight={['H3', null, 'H2']} textAlign="center">
+              <H1
+                color="white.full"
+                fontSize={['32px', null, '40px']}
+                lineHeight={['36px', null, '44px']}
+                textAlign="center"
+              >
                 <FormattedMessage id="discover.title" defaultMessage="Discover awesome collectives to support" />
               </H1>
-              <P color="white.full" fontSize="H5" lineHeight="H5" mt={1}>
+              <P color="white.full" fontSize="20px" lineHeight="24px" mt={1}>
                 <FormattedMessage id="discover.subTitle" defaultMessage="Let's make great things together." />
               </P>
 
@@ -208,15 +214,15 @@ const DiscoverPage = ({ router, intl }) => {
               py={[20, 60]}
               width={1}
             >
-              <Flex width={[1]} justifyContent="left" flexWrap="wrap" mb={4} maxWidth={1200} m="0 auto">
+              <Flex width={1} justifyContent="left" flexWrap="wrap" mb={4} maxWidth={1200} m="0 auto">
                 <Flex width={[1, 0.8]} my={2}>
                   <NavList as="ul" p={0} justifyContent="space-between" width={1}>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'all', sort: query.sort }}>
+                      <Link href={{ pathname: '/discover', query: { show: 'all', sort: query.sort } }}>
                         <NavLink
                           data-cy="all-collectives-section"
                           className={
-                            query.show == 'all' || query.show == '' || query.show == undefined ? 'selected' : ''
+                            query.show === 'all' || query.show === '' || query.show === undefined ? 'selected' : ''
                           }
                         >
                           <FormattedMessage id="discover.allCollectives" defaultMessage="All collectives" />
@@ -224,8 +230,8 @@ const DiscoverPage = ({ router, intl }) => {
                       </Link>
                     </NavLinkContainer>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'open source', sort: query.sort }}>
-                        <NavLink className={query.show == 'open source' ? 'selected' : ''}>
+                      <Link href={{ pathname: '/discover', query: { show: 'open source', sort: query.sort } }}>
+                        <NavLink className={query.show === 'open source' ? 'selected' : ''}>
                           <FormattedMessage
                             id="discover.openSourceCollectives"
                             defaultMessage="Open Source collectives"
@@ -234,21 +240,21 @@ const DiscoverPage = ({ router, intl }) => {
                       </Link>
                     </NavLinkContainer>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'covid-19', sort: query.sort }}>
-                        <NavLink className={query.show == 'covid-19' ? 'selected' : ''}>
+                      <Link href={{ pathname: '/discover', query: { show: 'covid-19', sort: query.sort } }}>
+                        <NavLink className={query.show === 'covid-19' ? 'selected' : ''}>
                           <FormattedMessage id="discover.covidCollectives" defaultMessage="COVID-19 collectives" />
                         </NavLink>
                       </Link>
                     </NavLinkContainer>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'pledged', sort: query.sort }}>
-                        <NavLink className={query.show == 'pledged' ? 'selected' : ''}>
+                      <Link href={{ pathname: '/discover', query: { show: 'pledged', sort: query.sort } }}>
+                        <NavLink className={query.show === 'pledged' ? 'selected' : ''}>
                           <FormattedMessage id="discover.pledgedCollectives" defaultMessage="Pledged collectives" />
                         </NavLink>
                       </Link>
                     </NavLinkContainer>
                     <NavLinkContainer>
-                      <Link route="discover" params={{ show: 'other', sort: query.sort }}>
+                      <Link href={{ pathname: '/discover', query: { show: 'other', sort: query.sort } }}>
                         <NavLink className={query.show == 'other' ? 'selected' : ''}>
                           <FormattedMessage id="discover.other" defaultMessage="Other" />
                         </NavLink>
@@ -261,12 +267,14 @@ const DiscoverPage = ({ router, intl }) => {
                   <StyledSelect
                     name="sort"
                     id="sort"
+                    inputId="sort-select"
                     options={sortOptions}
                     defaultValue={selectedSort}
                     placeholder={'Sort by'}
                     minWidth={140}
                     getOptionLabel={({ value }) => intl.formatMessage(I18nSortLabels[value])}
                     onChange={({ value }) => setRouteParam('sort', value)}
+                    isSearchable={false}
                   />
                 </Flex>
               </Flex>
@@ -281,7 +289,7 @@ const DiscoverPage = ({ router, intl }) => {
                     {loading
                       ? times(params.limit, idx => (
                           <CollectiveCardContainer key={idx}>
-                            <LoadingPlaceholder height={360} width={250} />
+                            <LoadingPlaceholder height={334} borderRadius={16} />
                           </CollectiveCardContainer>
                         ))
                       : get(data, 'allCollectives.collectives', []).map(c =>
@@ -314,7 +322,7 @@ const DiscoverPage = ({ router, intl }) => {
                 <MessageBox my={5} type="info">
                   <FormattedMessage
                     id="discover.searchNoResult"
-                    defaultMessage="No collective matches the current search."
+                    defaultMessage="No Collectives match the current search."
                   />
                 </MessageBox>
               )}
@@ -326,11 +334,4 @@ const DiscoverPage = ({ router, intl }) => {
   );
 };
 
-DiscoverPage.propTypes = {
-  /** @ignore from withRouter */
-  router: PropTypes.object,
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
-};
-
-export default withRouter(injectIntl(DiscoverPage));
+export default DiscoverPage;

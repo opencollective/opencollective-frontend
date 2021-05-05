@@ -1,10 +1,10 @@
 import React from 'react';
-import { ApolloProvider } from '@apollo/react-components';
+import { ApolloProvider } from '@apollo/client';
 import { get } from 'lodash';
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
-import initClient from '../lib/initClient';
+import { initClient } from '../lib/apollo-client';
 import theme from '../lib/theme';
 import * as Intl from '../server/intl';
 

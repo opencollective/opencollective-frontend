@@ -12,7 +12,7 @@ const UserCompany = ({ company, ...props }) => {
   // By splitting on `/` we limit that risk.
   const companySlug = company.split('/')[0].slice(1);
   return (
-    <Link route="collective" params={{ slug: companySlug }} {...props}>
+    <Link href={`/${companySlug}`} {...props}>
       @{companySlug}
     </Link>
   );

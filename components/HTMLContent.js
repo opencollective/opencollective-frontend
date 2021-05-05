@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
 import { getLuminance } from 'polished';
+import { FormattedMessage } from 'react-intl';
+import sanitizeHtml from 'sanitize-html';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
@@ -26,8 +29,22 @@ export const isEmptyValue = value => {
   }
 };
 
+const getFirstSentenceFromHTML = html => html.split?.(/<\/?\w+>/).filter(a => a.length)[0] || '';
+
+const ReadFullLink = styled.a`
+  cursor: pointer;
+  font-size: 12px;
+  > svg {
+    vertical-align: baseline;
+  }
+`;
+
+const DisplayBox = styled.div`
+  display: inline;
+`;
+
 /**
- * `HTMLEditor`'s associate, this component will display raw HTML with some CSS
+ * `RichTextEditor`'s associate, this component will display raw HTML with some CSS
  * resets to ensure we don't mess with the styles. Content can be omitted if you're
  * just willing to take the styles, for example to match the content displayed in the
  * editor with how it's rendered on the page.
@@ -35,21 +52,79 @@ export const isEmptyValue = value => {
  * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
  * always ensure `content` is properly sanitized!
  */
-const HTMLContent = styled(({ content, ...props }) => {
-  return content ? <div dangerouslySetInnerHTML={{ __html: content }} {...props} /> : <div {...props} />;
+const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
+  const [isOpen, setOpen] = React.useState(false);
+  if (!content) {
+    return <div {...props} />;
+  }
+  let __html = sanitize ? sanitizeHtml(content) : content;
+
+  if (collapsable && !isOpen) {
+    __html = getFirstSentenceFromHTML(__html);
+  }
+
+  return (
+    <div>
+      <DisplayBox collapsed={collapsable && !isOpen} dangerouslySetInnerHTML={{ __html }} {...props} />
+      {!isOpen && collapsable && (
+        <ReadFullLink
+          onClick={() => setOpen(true)}
+          {...props}
+          role="button"
+          tabIndex={0}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              setOpen(true);
+            }
+          }}
+        >
+          &nbsp;
+          <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
+          <CaretDown size="10px" />
+        </ReadFullLink>
+      )}
+    </div>
+  );
 })`
   /** Override global styles to match what we have in the editor */
   width: 100%;
   line-height: 1.75em;
-  word-break: break-word;
+  overflow-wrap: break-word;
 
   h1,
   h2,
   h3 {
     margin: 0;
-    margin-bottom: 0.5em;
     font-weight: normal;
     text-align: left;
+  }
+
+  h3 {
+    font-size: 1.25em;
+    margin-bottom: 0.25em;
+  }
+
+  figure {
+    margin: 0;
+    &[data-trix-content-type='--embed-iframe-video'] {
+      position: relative;
+      padding-bottom: 56.25%; /* proportion value to aspect ratio 16:9 (9 / 16 = 0.5625 or 56.25%) */
+      height: 0;
+      overflow: hidden;
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+    &[data-trix-content-type='--embed-iframe-anchorFm'] {
+      iframe {
+        min-height: 300px;
+      }
+    }
   }
 
   img {
@@ -73,16 +148,20 @@ const HTMLContent = styled(({ content, ...props }) => {
   blockquote {
     font-size: 1em;
     border-left: 5px solid #e9e9e9;
-    background-color: #f9f9f9;
+    background: white;
+    color: #757677;
+    margin: 0;
+    padding: 16px;
   }
 
   pre {
-    font-size: 1em;
-    background: #F7F8FA;
-    color: #76777A;
+    font-size: 0.85em;
+    background: #f6f8fa;
+    color: #333;
     border: none;
-    padding: 8px 16px;
-    font-familly: Courier;
+    padding: 16px;
+    font-family: monospace;
+    overflow-x: auto;
   }
 
   ${typography}
@@ -119,10 +198,13 @@ const HTMLContent = styled(({ content, ...props }) => {
 HTMLContent.propTypes = {
   /** The HTML string. Makes sure this is sanitized properly! */
   content: PropTypes.string,
+  sanitize: PropTypes.bool,
+  collapsable: PropTypes.bool,
 };
 
 HTMLContent.defaultProps = {
-  fontSize: 'Paragraph',
+  fontSize: '14px',
+  sanitize: false,
 };
 
 export default HTMLContent;

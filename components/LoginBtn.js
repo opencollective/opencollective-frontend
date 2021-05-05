@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { Link } from '../server/pages';
-
+import Container from './Container';
+import Link from './Link';
 import StyledLink from './StyledLink';
 import StyledSpinner from './StyledSpinner';
 import { withUser } from './UserProvider';
@@ -19,6 +19,7 @@ class LoginBtn extends React.Component {
      */
     children: PropTypes.node,
     loadingLoggedInUser: PropTypes.bool,
+    asLink: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -45,17 +46,20 @@ class LoginBtn extends React.Component {
   }
 
   render() {
+    const buttonProps = this.props.asLink
+      ? { display: 'inline' }
+      : {
+          border: '1px solid #D5DAE0',
+          borderRadius: '20px',
+          color: 'primary.700',
+          display: 'inline-block',
+          fontSize: '1.4rem',
+          px: 3,
+          py: 2,
+        };
     return (
-      <Link route="signin" params={{ next: this.redirectAfterSignin }} passHref>
-        <StyledLink
-          border="1px solid #D5DAE0"
-          borderRadius="20px"
-          color="#3385FF"
-          display="inline-block"
-          fontSize="1.4rem"
-          px={3}
-          py={2}
-        >
+      <Link href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}>
+        <StyledLink as={Container} {...buttonProps}>
           {this.renderContent()}
         </StyledLink>
       </Link>

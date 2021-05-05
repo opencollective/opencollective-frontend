@@ -1,208 +1,191 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
-import { graphql } from '@apollo/react-hoc';
-import { Check } from '@styled-icons/boxicons-regular/Check';
-import { Github } from '@styled-icons/fa-brands/Github';
-import gql from 'graphql-tag';
-import { get } from 'lodash';
+import { useQuery } from '@apollo/client';
+import { omitBy } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import Avatar from '../Avatar';
-import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import LinkCollective from '../LinkCollective';
-import Loading from '../Loading';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
-import StyledCard from '../StyledCard';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import Pagination from '../Pagination';
+import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
-import StyledLink from '../StyledLink';
-import { Span } from '../Text';
-import { withUser } from '../UserProvider';
+import { H1 } from '../Text';
 
-import AppRejectionReasonModal from './AppRejectionReasonModal';
+import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from './HostAdminCollectiveFilters';
+import PendingApplication, { processApplicationAccountFields } from './PendingApplication';
 
-const ApproveCollectiveMutation = gql`
-  mutation approveCollective($id: Int!) {
-    approveCollective(id: $id) {
+const COLLECTIVES_PER_PAGE = 20;
+
+const pendingApplicationsQuery = gqlV2/* GraphQL */ `
+  query HostDashboardPendingApplications(
+    $hostSlug: String!
+    $limit: Int!
+    $offset: Int!
+    $orderBy: ChronologicalOrderInput!
+    $searchTerm: String
+  ) {
+    host(slug: $hostSlug) {
       id
-      isActive
-    }
-  }
-`;
-
-class HostPendingApplications extends React.Component {
-  static propTypes = {
-    hostCollectiveSlug: PropTypes.string.isRequired,
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      Collective: PropTypes.shape({
-        id: PropTypes.number,
-      }),
-    }),
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      showRejectionModal: false,
-      collectiveId: null,
-    };
-  }
-
-  componentDidMount() {
-    this.scrollToSelectedApplication();
-  }
-
-  componentDidUpdate(oldProps) {
-    if (!oldProps.data.Collective && this.props.data.Collective) {
-      this.scrollToSelectedApplication();
-    }
-  }
-
-  scrollToSelectedApplication() {
-    const selectedCollectiveId = this.getSelectedApplicationCollectiveId();
-    if (selectedCollectiveId) {
-      const elem = document.getElementById(`application-${selectedCollectiveId}`);
-      if (elem) {
-        elem.scrollIntoView();
+      slug
+      name
+      type
+      settings
+      pendingApplications(limit: $limit, offset: $offset, orderBy: $orderBy, searchTerm: $searchTerm) {
+        offset
+        limit
+        totalCount
+        nodes {
+          message
+          customData
+          account {
+            id
+            legacyId
+            name
+            slug
+            website
+            description
+            type
+            imageUrl(height: 96)
+            createdAt
+            ... on AccountWithHost {
+              ...ProcessHostApplicationFields
+            }
+            admins: members(role: ADMIN) {
+              totalCount
+              nodes {
+                id
+                account {
+                  id
+                  type
+                  slug
+                  name
+                  imageUrl(height: 48)
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
+  ${processApplicationAccountFields}
+`;
 
-  getSelectedApplicationCollectiveId() {
-    try {
-      const hash = window.location.hash;
-      const regex = /application-(\d+)/;
-      const idStr = regex.exec(hash)[1];
-      const idInt = parseInt(idStr);
-      return idInt || null;
-    } catch {
-      return null;
-    }
-  }
+const checkIfQueryHasFilters = query =>
+  Object.entries(query).some(([key, value]) => {
+    return !['view', 'offset', 'limit', 'hostCollectiveSlug', 'sort-by'].includes(key) && value;
+  });
 
-  renderPendingCollectives(data, loading) {
-    if (loading) {
-      return (
-        <Box px={2} py={5}>
-          <Loading />
-        </Box>
-      );
-    }
+const getVariablesFromQuery = query => {
+  return {
+    offset: parseInt(query.offset) || 0,
+    limit: parseInt(query.limit) || COLLECTIVES_PER_PAGE,
+    searchTerm: query.searchTerm,
+    hostFeesStructure: query['fees-structure'],
+    orderBy: {
+      field: 'CREATED_AT',
+      direction: query['sort-by'] === 'oldest' ? 'ASC' : 'DESC',
+    },
+  };
+};
 
-    const pendingCollectives = get(data, 'Collective.pending.collectives', []);
-    const selectedCollectiveId = this.getSelectedApplicationCollectiveId();
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'view'];
 
-    return (
-      <Container
-        display="flex"
-        background="linear-gradient(180deg, #EBF4FF, #FFFFFF)"
-        flexDirection="column"
-        alignItems="center"
-        px={2}
-        py={5}
-      >
-        {pendingCollectives.length === 0 && (
-          <MessageBox type="info" withIcon mb={5}>
-            <FormattedMessage
-              id="host.pending-applications.noPending"
-              defaultMessage="No collective waiting for approval"
-            />
-          </MessageBox>
-        )}
+const updateQuery = (router, newParams) => {
+  const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+  const pathname = router.asPath.split('?')[0];
+  return router.push({ pathname, query });
+};
 
-        {pendingCollectives.map(c => (
-          <StyledCard
-            key={c.id}
-            width={1}
-            maxWidth={400}
-            p={3}
-            mb={4}
-            id={`application-${c.id}`}
-            boxShadow="rgba(144, 144, 144, 0.25) 4px 4px 16px"
-            borderColor={selectedCollectiveId === c.id ? 'primary.300' : undefined}
-          >
-            <Flex>
-              <Avatar collective={c} mr={2} radius={42} />
-              <Container pl={2} flex="1 1" borderLeft="1px solid #e8e8e8">
-                <div>
-                  <LinkCollective collective={c}>
-                    <strong>{c.name}</strong> <small>({c.slug})</small>
-                  </LinkCollective>
-                </div>
-                {c.githubHandle && (
-                  <StyledLink href={`https://github.com/${c.githubHandle}`} openInNewTab>
-                    <Github size="1em" />
-                    <Span ml={1}>{c.githubHandle}</Span>
-                  </StyledLink>
-                )}
-              </Container>
-            </Flex>
-            <StyledHr my={3} borderColor="black.200" />
-            <Flex justifyContent="space-evenly" flexWrap="wrap">
-              {c.isActive ? (
-                <Box color="green.700" data-cy={`${c.slug}-approved`}>
-                  <Check size={39} />
-                </Box>
-              ) : (
-                <Fragment>
-                  <Mutation mutation={ApproveCollectiveMutation}>
-                    {(approveCollective, { loading }) => (
-                      <StyledButton
-                        m={1}
-                        loading={loading}
-                        onClick={() => approveCollective({ variables: { id: c.id } })}
-                        data-cy={`${c.slug}-approve`}
-                        buttonStyle="success"
-                        minWidth={125}
-                      >
-                        <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-                      </StyledButton>
-                    )}
-                  </Mutation>
-                  <StyledButton
-                    buttonStyle="danger"
-                    minWidth={125}
-                    m={1}
-                    onClick={() => this.setState({ showRejectionModal: true, collectiveId: c.id })}
-                  >
-                    <FormattedMessage id="actions.reject" defaultMessage="Reject" />
-                  </StyledButton>
-                </Fragment>
-              )}
-            </Flex>
-          </StyledCard>
-        ))}
+const PendingApplications = ({ hostSlug }) => {
+  const router = useRouter() || {};
+  const query = router.query;
+  const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
+  const { data, error, loading, variables } = useQuery(pendingApplicationsQuery, {
+    variables: { hostSlug, ...getVariablesFromQuery(query) },
+    context: API_V2_CONTEXT,
+  });
 
-        {this.state.showRejectionModal && (
-          <AppRejectionReasonModal
-            show={this.state.showRejectionModal}
-            onClose={() => this.setState({ showRejectionModal: false })}
-            collectiveId={this.state.collectiveId}
-            hostCollectiveSlug={this.props.hostCollectiveSlug}
+  const hostApplications = data?.host?.pendingApplications;
+  return (
+    <Box maxWidth={1000} m="0 auto" px={2}>
+      <Flex alignItems="center" mb={24} flexWrap="wrap">
+        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+          <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
+        </H1>
+        <Box mx="auto" />
+        <Box p={2}>
+          <SearchBar
+            defaultValue={query.searchTerm}
+            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
           />
-        )}
-      </Container>
-    );
-  }
+        </Box>
+      </Flex>
+      <StyledHr mb={26} borderWidth="0.5px" />
+      <Box mb={34}>
+        {data?.host ? (
+          <HostAdminCollectiveFilters
+            filters={[COLLECTIVE_FILTER.SORT_BY]}
+            values={query}
+            onChange={queryParams =>
+              updateQuery(router, {
+                ...queryParams,
+                offset: null,
+              })
+            }
+          />
+        ) : loading ? (
+          <LoadingPlaceholder height={70} />
+        ) : null}
+      </Box>
 
-  render() {
-    const { data } = this.props;
+      {error && <MessageBoxGraphqlError error={error} mb={2} />}
 
-    return data.error ? (
-      <MessageBox type="error" withIcon>
-        {getErrorFromGraphqlException(data.error).message}
-      </MessageBox>
-    ) : (
-      this.renderPendingCollectives(data, data.loading)
-    );
-  }
-}
+      {!error && !loading && !hostApplications?.nodes.length ? (
+        <MessageBox type="info" withIcon data-cy="zero-collective-message">
+          {hasFilters ? (
+            <FormattedMessage id="discover.searchNoResult" defaultMessage="No Collectives match the current search." />
+          ) : (
+            <FormattedMessage id="menu.collective.none" defaultMessage="No Collectives yet" />
+          )}
+        </MessageBox>
+      ) : (
+        <React.Fragment>
+          {loading
+            ? Array.from(new Array(COLLECTIVES_PER_PAGE)).map((_, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <Box key={index} mb={24}>
+                  <LoadingPlaceholder height={362} borderRadius="8px" />
+                </Box>
+              ))
+            : hostApplications?.nodes.map(application => (
+                <Box key={application.id} mb={24} data-cy="host-application">
+                  <PendingApplication host={data.host} application={application} />
+                </Box>
+              ))}
+          <Flex mt={5} justifyContent="center">
+            <Pagination
+              route={`/${hostSlug}/dashboard/pending-applications`}
+              total={hostApplications?.totalCount}
+              limit={variables.limit}
+              offset={variables.offset}
+              ignoredQueryParams={ROUTE_PARAMS}
+              scrollToTopOnChange
+            />
+          </Flex>
+        </React.Fragment>
+      )}
+    </Box>
+  );
+};
 
-export default withUser(graphql(getHostPendingApplicationsQuery)(HostPendingApplications));
+PendingApplications.propTypes = {
+  hostSlug: PropTypes.string.isRequired,
+};
+
+export default PendingApplications;

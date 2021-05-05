@@ -50,7 +50,8 @@ const TextArea = styled.textarea`
     cursor: not-allowed;
   }
 
-  &:focus, &:hover:not(:disabled) {
+  &:focus,
+  &:hover:not(:disabled) {
     border-color: ${themeGet('colors.primary.300')};
   }
 
@@ -90,7 +91,7 @@ export default class StyledTextarea extends React.PureComponent {
   static defaultProps = {
     border: '1px solid',
     borderColor: 'black.300',
-    borderRadius: '4px',
+    borderRadius: '6px',
     fontSize: 'inherit',
     px: 12,
     py: 12,

@@ -64,8 +64,8 @@ const GithubRepositories = ({ repositories, submitGithubInfo, ...fieldProps }) =
             <StyledInput
               bare
               type="text"
-              fontSize="Paragraph"
-              lineHeight="Paragraph"
+              fontSize="14px"
+              lineHeight="20px"
               placeholder={formatMessage(messages.filterByName)}
               onChange={({ target }) => {
                 setSearch(target.value);
@@ -135,6 +135,7 @@ const GithubRepositories = ({ repositories, submitGithubInfo, ...fieldProps }) =
           disabled={disabled}
           onClick={() => submitGithubInfo(githubInfo)}
           m={2}
+          mt={4}
           px={[2, 3]}
           data-cy="connect-github-continue"
         >

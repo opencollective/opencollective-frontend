@@ -26,6 +26,7 @@ const Image = styled.img`
 
 const messages = defineMessages({
   foundation: { id: 'createFund.category.foundation', defaultMessage: 'For non-profit initiatives' },
+  opensource: { id: 'createFund.category.opensource', defaultMessage: 'For open source initiatives' },
   fund: { id: 'createFund.category.fund', defaultMessage: 'For other initiatives' },
 });
 
@@ -36,7 +37,13 @@ const CreateFundCategoryPicker = () => {
   return (
     <Fragment>
       <Box mb={4} mt={5}>
-        <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
+        <H1
+          fontSize={['20px', '32px']}
+          lineHeight={['24px', '36px']}
+          fontWeight="bold"
+          color="black.900"
+          textAlign="center"
+        >
           <FormattedMessage id="createFund.create" defaultMessage="Create a Fund" />
         </H1>
       </Box>
@@ -55,11 +62,9 @@ const CreateFundCategoryPicker = () => {
                   alt={formatMessage(messages.foundation)}
                 />
                 <Link
-                  route="create-fund"
-                  params={{
-                    hostCollectiveSlug: router.query.hostCollectiveSlug,
-                    verb: router.query.verb,
-                    category: 'foundation',
+                  href={{
+                    pathname: `/fund/${router.query.verb}`,
+                    query: { category: 'foundation' },
                   }}
                 >
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
@@ -70,6 +75,35 @@ const CreateFundCategoryPicker = () => {
                   It will be hosted by
                   <br />
                   Open Collective Foundation 501(c)(3).
+                </P>
+              </Flex>
+            </Container>
+            <Container
+              borderLeft={['none', '1px solid #E6E8EB']}
+              borderTop={['1px solid #E6E8EB', 'none']}
+              alignItems="center"
+              width={[null, 280, 312]}
+              mb={[4, 0]}
+            >
+              <Flex flexDirection="column" justifyContent="center" alignItems="center">
+                <Image
+                  src="/static/images/create-collective/openSourceIllustration.png"
+                  alt={formatMessage(messages.opensource)}
+                />
+                <Link
+                  href={{
+                    pathname: `/fund/${router.query.verb}`,
+                    query: { category: 'opensource' },
+                  }}
+                >
+                  <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
+                    {formatMessage(messages.opensource)}
+                  </StyledButton>
+                </Link>
+                <P textAlign="center">
+                  It will be hosted by
+                  <br />
+                  Open Source Collective 501(c)(6).
                 </P>
               </Flex>
             </Container>

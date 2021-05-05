@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { get, truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import Markdown from 'react-markdown';
 
 import { Box } from './Grid';
 import HTMLContent from './HTMLContent';
@@ -36,16 +35,7 @@ const EventDetails = ({ event, tier }) => {
       )}
       {description && (
         <Box>
-          {/* Fallback for handling both markdown and html descriptions */}
-          {description[0] !== '<' ? (
-            <HTMLContent>
-              <Markdown source={truncatedDescription} />
-            </HTMLContent>
-          ) : event.longDescription ? (
-            <HTMLContent content={truncatedDescription} />
-          ) : (
-            <HTMLContent>{truncatedDescription}</HTMLContent>
-          )}
+          {truncatedDescription && <HTMLContent content={truncatedDescription} />}
           {(isExpended || truncatedDescription.length !== description.length) &&
             (isExpended ? (
               <StyledLink onClick={() => setExpended(false)}>

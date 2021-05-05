@@ -13,10 +13,19 @@ const ContributeCardsContainer = styled.div`
   position: relative;
 
   ${props =>
+    props.disableScroll &&
+    css`
+      overflow-x: hidden;
+    `}
+
+  ${props =>
     !props.disableScrollSnapping &&
     css`
       scroll-behavior: smooth;
-      scroll-snap-type: x mandatory;
+      /* smartphones, touchscreens */
+      @media (hover: none) {
+        scroll-snap-type: x mandatory;
+      }
     `}
 
   ${CustomScrollbarCSS}
@@ -33,7 +42,6 @@ const ContributeCardsContainer = styled.div`
   }
 
   /** Respect left margin / center cards on widescreens */
-
   @supports (width: fit-content) {
     @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
       margin: 0 auto;
@@ -42,7 +50,6 @@ const ContributeCardsContainer = styled.div`
       max-width: 100%;
     }
   }
-
   @supports not (width: fit-content) {
     @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
       padding-left: calc((100% - ${Dimensions.MAX_SECTION_WIDTH + 10}px) / 2);

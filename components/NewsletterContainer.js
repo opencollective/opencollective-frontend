@@ -37,7 +37,7 @@ class NewsletterContainer extends React.Component {
             >
               <StyledInput
                 bare
-                fontSize="Paragraph"
+                fontSize="14px"
                 name="EMAIL"
                 px={3}
                 py={1}

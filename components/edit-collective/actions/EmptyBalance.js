@@ -8,17 +8,15 @@ import Container from '../../Container';
 import SendMoneyToCollectiveBtn from '../../SendMoneyToCollectiveBtn';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
-import { H2, P } from '../../Text';
+import { P } from '../../Text';
+import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
 const EmptyBalance = ({ collective, LoggedInUser }) => {
   const [modal, setModal] = useState({ type: 'Transfer', show: false, isApproved: false });
 
-  if (!collective.host) {
+  if (!collective.host || collective.host.id === collective.id) {
     return null;
   }
-
-  // Funds MVP, to refactor
-  const collectiveType = collective.settings?.fund ? 'Fund' : 'Collective';
 
   const confirmTransfer = () => {
     setModal({ ...modal, show: true, isApproved: false });
@@ -27,29 +25,31 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
   const closeModal = () => setModal({ ...modal, show: false, isApproved: false });
 
   return (
-    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={2}>
-      <H2>
+    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={50}>
+      <SettingsSectionTitle>
         <FormattedMessage
           id="collective.balance.title"
-          defaultMessage={'Empty {collectiveType} balance'}
-          values={{ collectiveType }}
+          defaultMessage={
+            'Empty {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance'
+          }
+          values={{ type: collective.type }}
         />
-      </H2>
-      <P>
+      </SettingsSectionTitle>
+      <P mb={2} lineHeight="16px" fontSize="14px">
         <FormattedMessage
           id="collective.balance.description"
           defaultMessage={
-            'Transfer remaining balance to the fiscal host. {collectiveType} balance must be zero to archive it or change hosts. Alternatively, you can submit an expense or donate to another Collective.'
+            'Transfer remaining balance to the Fiscal Host. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive or change Hosts. Alternatively, you can submit an expense or donate to another Collective to zero the balance.'
           }
-          values={{ collectiveType }}
+          values={{ type: collective.type }}
         />
       </P>
       {!collective.host.hostCollective && (
-        <P color="rgb(224, 183, 0)">
+        <P color="rgb(224, 183, 0)" my={2}>
           <FormattedMessage
             id="collective.balance.notAvailable"
             defaultMessage={
-              "The host doesn't support this feature. Submit an expense, donate to another Collective or contact support if you're blocked."
+              "The Host doesn't support this feature. Submit an expense, donate to another Collective, or contact support if you're blocked."
             }
           />
         </P>

@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
+import { CardElement } from '@stripe/react-stripe-js';
 import { Add } from '@styled-icons/material/Add';
-import gql from 'graphql-tag';
-import { get, sortBy } from 'lodash';
+import { get, merge, pick, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../../lib/stripe';
@@ -18,10 +20,15 @@ import Link from '../../Link';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
 import NewCreditCardForm from '../../NewCreditCardForm';
+import {
+  addCreditCardMutation,
+  confirmCreditCardMutation,
+} from '../../recurring-contributions/UpdatePaymentMethodPopUp';
 import { withStripeLoader } from '../../StripeProvider';
 import StyledButton from '../../StyledButton';
-import { H3, Span } from '../../Text';
+import { P, Span } from '../../Text';
 import EditPaymentMethod from '../EditPaymentMethod';
+import SettingsTitle from '../SettingsTitle';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {
@@ -31,7 +38,9 @@ class EditPaymentMethods extends React.Component {
     /** From intl */
     intl: PropTypes.object.isRequired,
     /** From graphql query */
-    addCreditCard: PropTypes.func.isRequired,
+    createCreditCardEditCollective: PropTypes.func.isRequired,
+    /** From graphql query */
+    confirmCreditCardEditCollective: PropTypes.func.isRequired,
     /** From graphql query */
     removePaymentMethod: PropTypes.func.isRequired,
     /** From graphql query */
@@ -47,7 +56,7 @@ class EditPaymentMethods extends React.Component {
     this.messages = defineMessages({
       removeConfirm: {
         id: 'paymentMethods.removeConfirm',
-        defaultMessage: 'Do you really want to remove this payment method from your account?',
+        defaultMessage: 'Do you really want to remove this payment method?',
       },
     });
   }
@@ -58,6 +67,7 @@ class EditPaymentMethods extends React.Component {
     bankDetails: null,
     error: null,
     stripe: null,
+    stripeElements: null,
     submitting: false,
     removedId: null,
     savingId: null,
@@ -76,16 +86,25 @@ class EditPaymentMethods extends React.Component {
     } else {
       try {
         this.setState({ submitting: true });
-        const { token, error } = await this.state.stripe.createToken();
+        const cardElement = this.state.stripeElements.getElement(CardElement);
+        const { token, error } = await this.state.stripe.createToken(cardElement);
         if (error) {
           throw error;
         }
-        const paymentMethod = stripeTokenToPaymentMethod(token);
-        const res = await this.props.addCreditCard({ CollectiveId: this.props.data.Collective.id, ...paymentMethod });
-        const createdCreditCard = res.data.createCreditCard;
+        const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
+        const newCreditCardInfo = merge(newStripePaymentMethod.data, pick(newStripePaymentMethod, ['token']));
+        const res = await this.props.createCreditCardEditCollective({
+          variables: {
+            creditCardInfo: newCreditCardInfo,
+            name: get(newStripePaymentMethod, 'name'),
+            account: { legacyId: this.props.data.Collective.id },
+          },
+        });
 
-        if (createdCreditCard.stripeError) {
-          this.handleStripeError(createdCreditCard.stripeError);
+        const { paymentMethod, stripeError } = res.data.addCreditCard;
+
+        if (stripeError) {
+          this.handleStripeError(paymentMethod, stripeError);
         } else {
           this.handleSuccess();
         }
@@ -105,7 +124,9 @@ class EditPaymentMethods extends React.Component {
     });
   };
 
-  handleStripeError = async ({ message, response }) => {
+  handleStripeError = async (paymentMethod, stripeError) => {
+    const { message, response } = stripeError;
+
     if (!response) {
       this.setState({ error: message, submitting: false });
       return;
@@ -116,9 +137,15 @@ class EditPaymentMethods extends React.Component {
       const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
       if (result.error) {
         this.setState({ submitting: false, error: result.error.message });
-      }
-      if (result.setupIntent && result.setupIntent.status === 'succeeded') {
-        this.handleSuccess();
+      } else {
+        try {
+          await this.props.confirmCreditCardEditCollective({
+            variables: { paymentMethod: { id: paymentMethod.id } },
+          });
+          this.handleSuccess();
+        } catch (error) {
+          this.setState({ submitting: false, error: result.error.message });
+        }
       }
     }
   };
@@ -126,7 +153,7 @@ class EditPaymentMethods extends React.Component {
   updatePaymentMethod = async paymentMethod => {
     this.setState({ savingId: paymentMethod.id });
     try {
-      await this.props.updatePaymentMethod(paymentMethod);
+      await this.props.updatePaymentMethod({ variables: paymentMethod });
       await this.props.data.refetch();
       this.setState({ savingId: null });
     } catch (e) {
@@ -135,13 +162,13 @@ class EditPaymentMethods extends React.Component {
     }
   };
 
-  removePaymentMethod = async pm => {
-    const pmLabel = paymentMethodLabel(this.props.intl, pm, get(this.props.data, 'Collective.name'));
+  removePaymentMethod = async paymentMethod => {
+    const pmLabel = paymentMethodLabel(this.props.intl, paymentMethod, get(this.props.data, 'Collective.name'));
     const confirmQuestion = this.props.intl.formatMessage(this.messages['removeConfirm']);
     if (confirm(`${pmLabel} - ${confirmQuestion}`)) {
       try {
-        this.setState({ removedId: pm.id });
-        await this.props.removePaymentMethod(pm.id);
+        this.setState({ removedId: paymentMethod.id });
+        await this.props.removePaymentMethod({ variables: { id: paymentMethod.id } });
         this.setState({ error: null });
         await this.props.data.refetch();
       } catch (e) {
@@ -158,7 +185,7 @@ class EditPaymentMethods extends React.Component {
 
   getPaymentMethodsToDisplay() {
     const paymentMethods = get(this.props, 'data.Collective.paymentMethods', []).filter(
-      pm => pm.balance > 0 || (pm.type === 'virtualcard' && pm.monthlyLimitPerMember),
+      pm => pm.balance > 0 || (pm.type === 'giftcard' && pm.monthlyLimitPerMember),
     );
     return sortBy(paymentMethods, ['type', 'id']);
   }
@@ -173,7 +200,7 @@ class EditPaymentMethods extends React.Component {
             id="errors.PM.Remove.HasActiveSubscriptions"
             defaultMessage="This payment method cannot be removed because it has active recurring financial contributions."
           />{' '}
-          <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }}>
+          <Link href={`/${this.props.collectiveSlug}/recurring-contributions`}>
             <Span textTransform="capitalize">
               <FormattedMessage
                 id="paymentMethod.editSubscriptions"
@@ -196,6 +223,9 @@ class EditPaymentMethods extends React.Component {
       <Loading />
     ) : (
       <Flex className="EditPaymentMethods" flexDirection="column">
+        <SettingsTitle>
+          <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
+        </SettingsTitle>
         {error && (
           <MessageBox type="error" withIcon mb={4}>
             {this.renderError(error)}
@@ -203,9 +233,6 @@ class EditPaymentMethods extends React.Component {
         )}
         {
           <Flex className="paymentMethods" flexDirection="column" my={2}>
-            <H3>
-              <FormattedMessage id="paymentMethods.send.title" defaultMessage="Sending money" />
-            </H3>
             {paymentMethods.map(pm => (
               <Container
                 className="paymentMethod"
@@ -241,10 +268,10 @@ class EditPaymentMethods extends React.Component {
               {'  '}
               <FormattedMessage id="paymentMethods.creditcard.add" defaultMessage="Add a credit card" />
             </StyledButton>
-            <Span fontSize="Caption" mt={2} color="black.600">
+            <Span fontSize="12px" mt={2} color="black.600">
               <FormattedMessage
                 id="paymentMethods.creditcard.add.info"
-                defaultMessage="To make donations as {contributeAs}"
+                defaultMessage="For making contributions as {contributeAs}"
                 values={{ contributeAs: Collective.name }}
               />
             </Span>
@@ -261,14 +288,14 @@ class EditPaymentMethods extends React.Component {
             borderRadius={4}
             border="1px solid #dedede"
           >
-            <H3 mr={4}>
+            <P fontSize="14px" fontWeight="bold" mr={4}>
               <FormattedMessage id="paymentMethod.add" defaultMessage="New Credit Card" />
-            </H3>
+            </P>
             <Box mr={2} css={{ flexGrow: 1 }}>
               <NewCreditCardForm
                 hasSaveCheckBox={false}
                 onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
-                onReady={({ stripe }) => this.setState({ stripe })}
+                onReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
               />
             </Box>
             <Box my={2}>
@@ -299,8 +326,8 @@ class EditPaymentMethods extends React.Component {
   }
 }
 
-const getPaymentMethods = graphql(gql`
-  query Collective($collectiveSlug: String) {
+const paymentMethodsQuery = gql`
+  query EditCollectivePaymentMethods($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
       type
@@ -310,17 +337,12 @@ const getPaymentMethods = graphql(gql`
       isHost
       settings
       plan {
-        addedFunds
-        addedFundsLimit
-        bankTransfers
-        bankTransfersLimit
-        hostDashboard
+        id
         hostedCollectives
-        hostedCollectivesLimit
         manualPayments
         name
       }
-      paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
+      paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
         id
         uuid
         name
@@ -337,75 +359,51 @@ const getPaymentMethods = graphql(gql`
       }
     }
   }
-`);
+`;
 
-export const addCreditCard = graphql(
-  gql`
-    mutation addCreditCard(
-      $CollectiveId: Int!
-      $name: String!
-      $token: String!
-      $data: StripeCreditCardDataInputType!
-      $monthlyLimitPerMember: Int
-    ) {
-      createCreditCard(
-        CollectiveId: $CollectiveId
-        name: $name
-        token: $token
-        data: $data
-        monthlyLimitPerMember: $monthlyLimitPerMember
-      ) {
-        id
-        stripeError {
-          message
-          response
-        }
-      }
+const addPaymentMethodsData = graphql(paymentMethodsQuery);
+
+const addCreateCreditCardMutation = graphql(addCreditCardMutation, {
+  name: 'createCreditCardEditCollective',
+  options: { context: API_V2_CONTEXT },
+});
+
+const addConfirmCreditCardMutation = graphql(confirmCreditCardMutation, {
+  name: 'confirmCreditCardEditCollective',
+  options: { context: API_V2_CONTEXT },
+});
+
+const removePaymentMethodMutation = gql`
+  mutation EditCollectiveremovePaymentMethod($id: Int!) {
+    removePaymentMethod(id: $id) {
+      id
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      addCreditCard: variables => mutate({ variables }),
-    }),
-  },
-);
+  }
+`;
 
-const removePaymentMethod = graphql(
-  gql`
-    mutation removePaymentMethod($id: Int!) {
-      removePaymentMethod(id: $id) {
-        id
-      }
+const addRemovePaymentMethodMutation = graphql(removePaymentMethodMutation, {
+  name: 'removePaymentMethod',
+});
+
+const updatePaymentMethodMutation = gql`
+  mutation EditCollectiveUpdatePaymentMethod($id: Int!, $monthlyLimitPerMember: Int) {
+    updatePaymentMethod(id: $id, monthlyLimitPerMember: $monthlyLimitPerMember) {
+      id
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      removePaymentMethod: id => mutate({ variables: { id } }),
-    }),
-  },
-);
+  }
+`;
 
-const updatePaymentMethod = graphql(
-  gql`
-    mutation updatePaymentMethod($id: Int!, $monthlyLimitPerMember: Int) {
-      updatePaymentMethod(id: $id, monthlyLimitPerMember: $monthlyLimitPerMember) {
-        id
-      }
-    }
-  `,
-  {
-    props: ({ mutate }) => ({
-      updatePaymentMethod: paymentMethod => mutate({ variables: paymentMethod }),
-    }),
-  },
-);
+const addUpdatePaymentMethodMutation = graphql(updatePaymentMethodMutation, {
+  name: 'updatePaymentMethod',
+});
 
-const addData = compose(
-  getPaymentMethods,
-  removePaymentMethod,
-  updatePaymentMethod,
+const addGraphql = compose(
+  addPaymentMethodsData,
+  addRemovePaymentMethodMutation,
+  addUpdatePaymentMethodMutation,
   addEditCollectiveMutation,
-  addCreditCard,
+  addCreateCreditCardMutation,
+  addConfirmCreditCardMutation,
 );
 
-export default injectIntl(withStripeLoader(addData(EditPaymentMethods)));
+export default injectIntl(withStripeLoader(addGraphql(EditPaymentMethods)));

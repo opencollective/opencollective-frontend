@@ -13,15 +13,14 @@ const messages = defineMessages({
   },
   description: {
     id: 'CollectivePage.Contribute.Custom.Description',
-    defaultMessage: 'Make a custom one time or recurring contribution to support this collective.',
+    defaultMessage: 'Make a custom one-time or recurring contribution.',
   },
 });
 
 const ContributeCustom = ({ intl, collective, contributors, stats, ...props }) => {
   return (
     <Contribute
-      route="orderCollectiveNew"
-      routeParams={{ collectiveSlug: collective.slug, verb: 'donate' }}
+      route={`/${collective.slug}/donate`}
       type={ContributionTypes.FINANCIAL_CUSTOM}
       title={intl.formatMessage(messages.title)}
       contributors={contributors}

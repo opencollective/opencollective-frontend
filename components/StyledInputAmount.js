@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isUndefined } from 'lodash';
+import { isNil, isUndefined } from 'lodash';
 
 import { getCurrencySymbol } from '../lib/currency-utils';
+import { floatAmountToCents } from '../lib/math';
 
 import StyledInputGroup from './StyledInputGroup';
 
@@ -25,17 +26,17 @@ const parseValueFromEvent = (e, precision, ignoreComma) => {
   }
 };
 
-const floatAmountToCents = floatAmount => {
-  if (isNaN(floatAmount) || floatAmount === null) {
-    return floatAmount;
-  } else {
-    return Math.round(floatAmount * 100);
+/** Formats value is valid, fallsback on rawValue otherwise */
+const getValue = (value, rawValue, isEmpty) => {
+  if (isEmpty) {
+    return '';
   }
+
+  return isNaN(value) || value === null ? rawValue : value / 100;
 };
 
-/** Formats value is valid, fallsback on rawValue otherwise */
-const getValue = (value, rawValue) => {
-  return isNaN(value) || value === null ? rawValue : value / 100;
+const getError = (curVal, minAmount, required) => {
+  return Boolean((required && isNil(curVal)) || (minAmount && curVal < minAmount));
 };
 
 /**
@@ -51,10 +52,14 @@ const StyledInputAmount = ({
   value,
   onBlur,
   onChange,
+  isEmpty,
   ...props
 }) => {
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
   const isControlled = !isUndefined(value);
+  const hasMin = !isUndefined(min);
+  const curValue = isControlled ? getValue(value, rawValue, isEmpty) : undefined;
+  const minAmount = hasMin ? min / 100 : min;
   const dispatchValue = (e, parsedValue) => {
     if (isControlled) {
       setRawValue(e.target.value);
@@ -76,13 +81,18 @@ const StyledInputAmount = ({
       maxWidth="10em"
       step="0.01"
       {...props}
-      min={isUndefined(min) ? min : min / 100}
+      min={minAmount}
       max={isUndefined(max) ? max : max / 100}
       prepend={getPrepend(currency, currencyDisplay)}
       type="number"
       inputMode="decimal"
+      error={getError(curValue, minAmount, props.required)}
       defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
-      value={isControlled ? getValue(value, rawValue) : undefined}
+      value={curValue}
+      onWheel={e => {
+        e.preventDefault();
+        e.target.blur();
+      }}
       onChange={e => {
         e.stopPropagation();
         dispatchValue(e, parseValueFromEvent(e, precision));
@@ -126,6 +136,8 @@ StyledInputAmount.propTypes = {
   currencyDisplay: PropTypes.oneOf(['SYMBOL', 'CODE', 'FULL']),
   /** Number of decimals */
   precision: PropTypes.number,
+  /** A special prop to force the empty state */
+  isEmpty: PropTypes.bool,
   /** Accept all PropTypes from `StyledInputGroup` */
   ...StyledInputGroup.propTypes,
 };

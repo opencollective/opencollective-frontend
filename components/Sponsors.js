@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Container from './Container';
 import EventSponsorCard from './EventSponsorCard';
 
 class Sponsors extends React.Component {
@@ -18,21 +19,11 @@ class Sponsors extends React.Component {
       return <div />;
     }
     return (
-      <div className="Sponsors">
-        <style jsx>
-          {`
-            .Sponsors {
-              max-width: 640px;
-              margin: 3rem auto 3rem;
-              text-align: center;
-              overflow: hidden;
-            }
-          `}
-        </style>
+      <Container maxWidth="640px" margin="3rem auto 3rem" textAlign="center" overflow="hidden">
         {sponsors.map(sponsor => (
           <EventSponsorCard type="sponsor" key={sponsor.id} sponsor={sponsor} />
         ))}
-      </div>
+      </Container>
     );
   }
 }

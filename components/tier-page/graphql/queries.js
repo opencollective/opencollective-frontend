@@ -1,6 +1,8 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
-export const getTierPageQuery = gql`
+import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+
+export const tierPageQuery = gql`
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id
@@ -13,6 +15,7 @@ export const getTierPageQuery = gql`
       currency
       interval
       endsAt
+      button
 
       stats {
         id
@@ -49,6 +52,9 @@ export const getTierPageQuery = gql`
             all
           }
         }
+        features {
+          ...NavbarFields
+        }
         admins: members(role: "ADMIN") {
           id
           role
@@ -62,6 +68,7 @@ export const getTierPageQuery = gql`
         }
         parentCollective {
           id
+          slug
           twitterHandle
           image
         }
@@ -86,4 +93,5 @@ export const getTierPageQuery = gql`
       }
     }
   }
+  ${collectiveNavbarFieldsFragment}
 `;

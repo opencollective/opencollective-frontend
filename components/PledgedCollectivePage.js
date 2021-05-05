@@ -1,16 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { gql, useQuery } from '@apollo/client';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
-import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
-
-import { Link } from '../server/pages';
 
 import Container from './Container';
 import Currency from './Currency';
-import { Box, Flex } from './Grid';
+import { Box, Flex, Grid } from './Grid';
 import I18nFormatters from './I18nFormatters';
+import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import Page from './Page';
@@ -21,11 +19,11 @@ import { withUser } from './UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
-const CollectivePledgesQuery = gql`
-  query CollectivePledges($id: Int!) {
+export const pledgedCollectivePageQuery = gql`
+  query PledgedCollectivePage($id: Int!) {
     Collective(id: $id) {
       id
-      pledges: orders(status: PENDING) {
+      pledges: orders(status: PLEDGED) {
         id
         currency
         interval
@@ -49,7 +47,7 @@ const CollectivePledgesQuery = gql`
  * Display a collective with all its pledges
  */
 const PledgedCollectivePage = ({ collective }) => {
-  const { loading, error, data } = useQuery(CollectivePledgesQuery, { variables: { id: collective.id } });
+  const { loading, error, data } = useQuery(pledgedCollectivePageQuery, { variables: { id: collective.id } });
 
   if (loading) {
     return (
@@ -67,7 +65,7 @@ const PledgedCollectivePage = ({ collective }) => {
     );
   }
 
-  const pledges = [...data.Collective.pledges].reverse();
+  const pledges = [...data.Collective.pledges].reverse().filter(pledge => pledge.fromCollective);
   const pledgeStats = pledges.reduce(
     (stats, { fromCollective, totalAmount }) => {
       stats[fromCollective.type]++;
@@ -101,7 +99,7 @@ const PledgedCollectivePage = ({ collective }) => {
           <H2 as="h1">{collective.name}</H2>
 
           <Box mb={4} mt={3}>
-            <StyledLink href={website} color="primary.500" fontSize="Caption">
+            <StyledLink href={website} color="primary.500" fontSize="12px" openInNewTabNoFollow>
               <ExternalLinkAlt size="1em" /> {website}
             </StyledLink>
           </Box>
@@ -109,11 +107,15 @@ const PledgedCollectivePage = ({ collective }) => {
       </Container>
 
       <Container display="flex" justifyContent="center" position="relative" top={-30}>
-        <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
-          <StyledLink buttonStyle="primary" buttonSize="large" data-cy="makeAPledgeButton">
-            <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
-          </StyledLink>
-        </Link>
+        <StyledLink
+          as={Link}
+          href={`/${collective.slug}/pledges/new`}
+          buttonStyle="primary"
+          buttonSize="large"
+          data-cy="makeAPledgeButton"
+        >
+          <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
+        </StyledLink>
       </Container>
 
       <Container
@@ -149,29 +151,26 @@ const PledgedCollectivePage = ({ collective }) => {
           />
         </H3>
 
-        <P color="black.600" fontSize="Caption" my={4}>
+        <P color="black.600" fontSize="12px" lineHeight="18px" my={4}>
           <FormattedMessage
             id="pledge.definition"
-            defaultMessage="A pledge is a way for the community to show interest in supporting a cause or project that is not yet on
-              Open Collective, just like {collective}. This will incentivize them to create a
-              collective for their activities and offer you much more visibility on how your money is spent to advance
-              their cause. Once they create it, you will receive an email to ask you to fulfill your pledge."
+            defaultMessage="A pledge is a way to show interest in supporting a cause or project that is not yet on Open Collective, just like {collective}. If they create a Collective, you will receive an email asking you to fulfill your pledge."
             values={{ collective: <strong>{collective.name}</strong> }}
           />
         </P>
       </Container>
 
-      <Container display="flex" flexWrap="wrap" maxWidth={800} mx="auto" mb={5} px={3} data-cy="contributersGrouped">
+      <Grid
+        maxWidth={800}
+        mx="auto"
+        mb={5}
+        px={3}
+        data-cy="contributersGrouped"
+        gridTemplateColumns="repeat(auto-fill, minmax(165px, 1fr))"
+        gridGap={24}
+      >
         {pledges.map((pledge, index) => (
-          <Container
-            width={[0.5, null, 0.25]}
-            mb={2}
-            position="relative"
-            px={1}
-            minWidth={160}
-            key={pledge.id}
-            data-cy="contributers"
-          >
+          <Container position="relative" key={pledge.id} data-cy="contributers">
             {index === 0 && (
               <Container position="absolute" right={15} top={-10}>
                 <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />
@@ -180,7 +179,7 @@ const PledgedCollectivePage = ({ collective }) => {
             <PledgeCard {...pledge} />
           </Container>
         ))}
-      </Container>
+      </Grid>
       <Box px={3}>
         <Container
           alignItems="center"
@@ -204,7 +203,7 @@ const PledgedCollectivePage = ({ collective }) => {
                 values={{ collective: <strong>{collective.name}</strong> }}
               />
             </H5>
-            <P fontSize="Caption" color="black.500" mt={3}>
+            <P fontSize="12px" color="black.500" mt={3}>
               <FormattedMessage
                 id="pledge.contactToClaim"
                 defaultMessage="To claim this Collective, contact <SupportLink></SupportLink>."

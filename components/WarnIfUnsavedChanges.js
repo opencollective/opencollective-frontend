@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Router from 'next/router';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { IgnorableError } from '../lib/errors';
-import { Router } from '../server/pages';
 
 /**
  * A component to warn users if they try to leave with unsaved data. Just set
@@ -30,7 +30,7 @@ class WarnIfUnsavedChanges extends React.Component {
   messages = defineMessages({
     warning: {
       id: 'WarningUnsavedChanges',
-      defaultMessage: 'You are trying to leave this page with un-saved changes. Are you sure?',
+      defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
     },
   });
 

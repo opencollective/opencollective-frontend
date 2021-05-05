@@ -16,19 +16,19 @@ const StyledAvatar = styled(Flex).attrs(props => ({
 }))`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
-  ${color}
+  color: ${themeGet('colors.black.400')};
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: ${({ type }) => getAvatarBorderRadius(type)};
   ${border}
-  color: ${themeGet('colors.black.400')};
-  font-weight: bold;
+  font-weight: 600;
   justify-content: center;
   overflow: hidden;
   width: 64px;
   height: 64px;
   flex-shrink: 0;
+  ${color}
   ${space}
   ${layout}
 `;
@@ -39,7 +39,11 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
     type = collective.type;
     name = collective.name;
     if (collective.isIncognito) {
-      src = defaultImage['ANONYMOUS'];
+      src = defaultImage.ANONYMOUS;
+    } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
+      src = defaultImage.GUEST;
+    } else if (type === 'VENDOR') {
+      src = defaultImage.ORGANIZATION;
     } else {
       src = getCollectiveImage(collective);
     }
@@ -59,44 +63,61 @@ Avatar.propTypes = {
     slug: PropTypes.string,
     image: PropTypes.string,
     isIncognito: PropTypes.bool,
+    isGuest: PropTypes.bool,
   }),
   /** Collective name */
   name: PropTypes.string,
   /** Collective image url */
   src: PropTypes.string,
   /** Collective type */
-  type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+  type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS', 'VENDOR']),
   /** Avatar size */
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** Duration to transition size. Disabled if 0, null or undefined */
   animationDuration: PropTypes.number,
+};
+
+const shouldUseDefaultGuestAvatar = name => {
+  return !name || name === 'Guest';
 };
 
 /**
  * Similar to `Avatar`, but builds from a Contributor instead of a collective
  */
 export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
-  const image = contributor.isIncognito
-    ? defaultImage['ANONYMOUS']
-    : getCollectiveImage({ slug: contributor.collectiveSlug });
+  let image = null;
+  if (contributor.isIncognito) {
+    image = defaultImage.ANONYMOUS;
+  } else if (contributor.isGuest && shouldUseDefaultGuestAvatar(contributor.name)) {
+    image = defaultImage.GUEST;
+  } else {
+    image = getCollectiveImage({ slug: contributor.collectiveSlug, imageUrl: contributor.image });
+  }
 
-  return <StyledAvatar size={radius} type={contributor.type} src={image} {...styleProps} />;
+  return <StyledAvatar size={radius} type={contributor.type} src={image} title={contributor.name} {...styleProps} />;
 };
 
 ContributorAvatar.propTypes = {
   /** Collective object */
   contributor: PropTypes.shape({
     name: PropTypes.string,
+    image: PropTypes.string,
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
-    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+    isGuest: PropTypes.bool,
+    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   }).isRequired,
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 };
 
 /** A simple avatar for incognito users */
 export const IncognitoAvatar = avatarProps => {
   return <StyledAvatar {...avatarProps} type={CollectiveType.USER} src={defaultImage.ANONYMOUS} />;
+};
+
+/** A simple avatar for guest users */
+export const GuestAvatar = avatarProps => {
+  return <StyledAvatar {...avatarProps} type={CollectiveType.USER} src={defaultImage.GUEST} />;
 };
 
 /** @component */

@@ -16,6 +16,12 @@
 <UploadedFilePreview isPrivate />
 ```
 
+### Download with onClick
+
+```jsx
+<UploadedFilePreview onClick={console.log} />
+```
+
 ### With an image
 
 ```jsx

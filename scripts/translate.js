@@ -9,7 +9,16 @@ import locales from '../lib/constants/locales';
 const MESSAGES_PATTERN = './dist/messages/**/*.json';
 const LANG_DIR = './lang/';
 const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
-const DUPLICATED_IGNORED_IDS = new Set(['section.team.title', 'contribute.step.details']);
+const DUPLICATED_IGNORED_IDS = new Set([
+  'section.team.title',
+  'contribute.step.details',
+  'order.status',
+  'expense.status',
+  'expense.markAsPaid',
+  'expense.approved',
+  'expense.rejected',
+  'order.rejected',
+]);
 const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', 'other']);
 
 /* eslint-disable no-console */
@@ -28,22 +37,22 @@ const defaultMessages = globSync(MESSAGES_PATTERN)
         if (collection[id] !== defaultMessage) {
           duplicates.push({ id, base: collection[id], other: defaultMessage });
         }
-        return;
+      } else {
+        collection[id] = defaultMessage;
       }
-      collection[id] = defaultMessage;
     });
-
-    if (duplicates.length > 0) {
-      duplicates.forEach(({ id, base, other }) => {
-        console.error(`🛑 [Error] Duplicate message id with different messages for "${id}"`);
-        console.error(`--- Base:  "${base}"`);
-        console.error(`--- Other: "${other}"`);
-      });
-      throw new Error('The strings include duplicate IDs with different messages');
-    }
 
     return collection;
   }, {});
+
+if (duplicates.length > 0) {
+  duplicates.forEach(({ id, base, other }) => {
+    console.error(`🛑 [Error] Duplicate message id with different messages for "${id}"`);
+    console.error(`--- Base:  "${base}"`);
+    console.error(`--- Other: "${other}"`);
+  });
+  throw new Error('The strings include duplicate IDs with different messages');
+}
 
 /**
  * Store new keys in translation file without overwritting the existing ones.

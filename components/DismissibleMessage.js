@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { get } from 'lodash';
 
 import { BANNER, DISMISSABLE_HELP_MESSAGE_KEY, HELP_MESSAGE } from '../lib/constants/dismissable-help-message';
@@ -9,7 +9,7 @@ import { getFromLocalStorage, setLocalStorage } from '../lib/local-storage';
 
 import { withUser } from './UserProvider';
 
-const accountSettingsQuery = gqlV2`
+const accountSettingsQuery = gqlV2/* GraphQL */ `
   query AccountSettings {
     loggedInAccount {
       id
@@ -18,7 +18,7 @@ const accountSettingsQuery = gqlV2`
   }
 `;
 
-const editAccountSettingsMutation = gqlV2`
+const dismissMessageMutation = gqlV2/* GraphQL */ `
   mutation DismissMessage($account: AccountReferenceInput!, $key: AccountSettingsKey!) {
     editAccountSetting(account: $account, key: $key, value: true) {
       id
@@ -43,7 +43,7 @@ const DismissibleMessage = ({
 }) => {
   const settingsKey = `${DISMISSABLE_HELP_MESSAGE_KEY}.${messageId}`;
   const [isDismissedLocally, setDismissedLocally] = React.useState(getFromLocalStorage(settingsKey));
-  const [editAccountSettings] = useMutation(editAccountSettingsMutation, {
+  const [dismissMessage] = useMutation(dismissMessageMutation, {
     context: API_V2_CONTEXT,
   });
   const { data, loading } = useQuery(accountSettingsQuery, {
@@ -71,7 +71,7 @@ const DismissibleMessage = ({
       setLocalStorage(settingsKey, 'true');
       return (
         loggedInAccount &&
-        editAccountSettings({
+        dismissMessage({
           variables: { account: { id: loggedInAccount.id }, key: settingsKey },
         })
       );

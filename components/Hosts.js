@@ -8,7 +8,6 @@ import Container from './Container';
 import Footer from './Footer';
 import Header from './Header';
 import HostsWithData from './HostsWithData';
-import Link from './Link';
 import { H1, P } from './Text';
 
 const CoverSmallCTA = styled.span`
@@ -35,11 +34,11 @@ class Hosts extends React.Component {
       'hosts.description': {
         id: 'hosts.description',
         defaultMessage:
-          "Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services. {findOutMoreLink}",
+          'Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}',
       },
       'hosts.findOutMoreLink': {
         id: 'hosts.description.findOutMoreLink',
-        defaultMessage: 'Find out more about becoming an Open Collective Host.',
+        defaultMessage: 'Find out more about becoming a Fiscal Host.',
       },
     });
   }
@@ -53,52 +52,26 @@ class Hosts extends React.Component {
 
     const findOutMoreLink = (
       <CoverSmallCTA>
-        <Link route="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">{findOutMoreMessage}</Link>
+        <a href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">{findOutMoreMessage}</a>
       </CoverSmallCTA>
     );
 
-    const description = (
-      <FormattedMessage
-        id="hosts.description"
-        defaultMessage="Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services. {findOutMoreLink}"
-        values={{ findOutMoreLink }}
-      />
-    );
-
     return (
-      <div className="Hosts">
-        <style jsx>
-          {`
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-            .login {
-              text-align: center;
-            }
-            .actions {
-              text-align: center;
-              margin-bottom: 5rem;
-            }
-          `}
-        </style>
-
-        <Header
-          title={title}
-          description={description}
-          twitterHandle="opencollect"
-          className={this.state.status}
-          LoggedInUser={LoggedInUser}
-        />
+      <Container>
+        <Header title={title} twitterHandle="opencollect" className={this.state.status} LoggedInUser={LoggedInUser} />
 
         <Body>
           <Container mt={2} mb={2}>
-            <H1 fontSize={['H4', 'H2']} lineHeight={3} fontWeight="bold" textAlign="center" color="black.900">
+            <H1 fontSize={['24px', '40px']} lineHeight={3} fontWeight="bold" textAlign="center" color="black.900">
               {title}
             </H1>
-            <P textAlign="center">{description}</P>
+            <P textAlign="center">
+              <FormattedMessage
+                id="hosts.description"
+                defaultMessage="Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}"
+                values={{ findOutMoreLink }}
+              />
+            </P>
           </Container>
 
           <div className="content">
@@ -106,7 +79,7 @@ class Hosts extends React.Component {
           </div>
         </Body>
         <Footer />
-      </div>
+      </Container>
     );
   }
 }

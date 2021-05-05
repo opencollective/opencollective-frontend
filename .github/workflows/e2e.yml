@@ -1,12 +1,16 @@
 name: E2E
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - 'i18n/crowdin'
 
 env:
   CI: true
   TZ: UTC
   E2E_TEST: 1
-  NODE_ENV: ci
+  OC_ENV: ci
+  NODE_ENV: ci # TODO: should be ideally development, test or production
   PGHOST: localhost
   PGUSER: postgres
   WEBSITE_URL: http://localhost:3000
@@ -42,10 +46,11 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: mdillon/postgis:9.6
+        image: postgis/postgis:9.6-2.5
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
@@ -83,37 +88,40 @@ jobs:
       # Checkouts
 
       - name: Checkout (frontend)
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v2
+
+      - name: Set REF in env, removing the `refs/` part
+        run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV
 
       - name: Check matching branch (api)
         id: check-matching-branch
         uses: octokit/request-action@v2.x
         with:
-          route: GET /repos/:owner/:repo/git/:ref
+          route: GET /repos/{owner}/{repo}/git/ref/{ref}
           owner: opencollective
           repo: opencollective-api
-          ref: ${{ github.ref }}
+          ref: ${{ env.MATCHING_BRANCH_REF }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
       - name: Checkout (api - matching branch)
         if: steps.check-matching-branch.outputs.status == 200
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v2
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
           ref: ${{ github.ref }}
 
-      - name: Checkout (api - master)
+      - name: Checkout (api - main)
         if: steps.check-matching-branch.outputs.status != 200
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v2
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
 
       - name: Checkout (images)
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v2
         with:
           repository: opencollective/opencollective-images
           path: opencollective-images
@@ -206,6 +214,13 @@ jobs:
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
+
+      - name: Archive test screenshots
+        uses: actions/upload-artifact@v1
+        with:
+          name: screenshots
+          path: test/cypress/screenshots
+        if: ${{ failure() }}
 
       - name: Report Coverage
         run: npm run test:coverage

@@ -13,14 +13,12 @@ import Link from './Link';
  * In the future it may also link to external profiles like Github.
  */
 const LinkContributor = ({ contributor, children }) => {
-  if (contributor.isIncognito) {
+  if (contributor.isGuest) {
+    return children || <FormattedMessage id="profile.guest" defaultMessage="Guest" />;
+  } else if (contributor.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (contributor.collectiveSlug) {
-    return (
-      <Link route="collective" params={{ slug: contributor.collectiveSlug }}>
-        {children || contributor.name}
-      </Link>
-    );
+    return <Link href={`/${contributor.collectiveSlug}`}>{children || contributor.name}</Link>;
   } else {
     return children || <span>{contributor.name}</span>;
   }

@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { getGithubRepos } from '../../lib/api';
-import { Router } from '../../server/pages';
 
 import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
 import { Box, Flex } from '../Grid';
@@ -22,7 +21,7 @@ import GithubRepositories from './GithubRepositories';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
-  font-size: ${themeGet('fontSizes.Paragraph')}px;
+  font-size: 14px;
 `;
 
 class ConnectGithub extends React.Component {
@@ -51,7 +50,7 @@ class ConnectGithub extends React.Component {
       } else {
         this.setState({
           loadingRepos: false,
-          error: "We couldn't find any repositories (with >= 100 stars) linked to this account",
+          error: "We couldn't find any repositories with at least 100 stars linked to this account",
         });
       }
     } catch (error) {
@@ -62,13 +61,10 @@ class ConnectGithub extends React.Component {
     }
   }
 
-  changeRoute = async params => {
-    params = {
-      ...params,
-      verb: this.props.router.query.verb,
-      hostCollectiveSlug: this.props.router.query.hostCollectiveSlug || undefined,
-    };
-    await Router.pushRoute('create-collective', params);
+  changeRoute = async ({ category, step }) => {
+    const { hostCollectiveSlug, verb } = this.props.router.query;
+    const route = [hostCollectiveSlug, verb || 'create', category, step].filter(Boolean).join('/');
+    await this.props.router.push(`/${route}`);
     window.scrollTo(0, 0);
   };
 
@@ -76,9 +72,9 @@ class ConnectGithub extends React.Component {
     const { repositories, loadingRepos, error } = this.state;
 
     return (
-      <Flex flexDirection="column" m={[3, 0]} mb={[4]}>
+      <Flex flexDirection="column" m={[3, 0]} mb={4}>
         <Flex flexDirection="column" my={[2, 4]}>
-          <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
+          <Box textAlign="left" minHeight="32px" marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>
               ←&nbsp;
               <FormattedMessage id="Back" defaultMessage="Back" />
@@ -86,8 +82,8 @@ class ConnectGithub extends React.Component {
           </Box>
           <Box mb={[2, 3]}>
             <H1
-              fontSize={['H5', 'H3']}
-              lineHeight={['H5', 'H3']}
+              fontSize={['20px', '32px']}
+              lineHeight={['24px', '36px']}
               fontWeight="bold"
               textAlign="center"
               color="black.900"
@@ -96,8 +92,8 @@ class ConnectGithub extends React.Component {
               <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
             </H1>
           </Box>
-          <Box textAlign="center" minHeight={['24px']}>
-            <P fontSize="LeadParagraph" color="black.600" mb={2}>
+          <Box textAlign="center" minHeight="24px">
+            <P fontSize="16px" color="black.600" mb={2}>
               <FormattedMessage
                 id="collective.subtitle.seeRepo"
                 defaultMessage="Don't see the repository you're looking for? {helplink}."
@@ -110,21 +106,13 @@ class ConnectGithub extends React.Component {
                 }}
               />
             </P>
-            <P fontSize="LeadParagraph" color="black.600" mb={2}>
+            <P fontSize="16px" color="black.600" mb={2}>
               <FormattedMessage
                 id="collective.subtitle.altVerification"
                 defaultMessage="Want to apply using {altverification}? {applylink}."
                 values={{
                   applylink: (
-                    <Link
-                      route="create-collective"
-                      params={{
-                        hostCollectiveSlug: 'opensource',
-                        verb: 'apply',
-                        step: 'form',
-                        hostTos: true,
-                      }}
-                    >
+                    <Link href={{ pathname: `/opensource/apply/form`, query: { hostTos: true } }}>
                       <FormattedMessage id="clickHere" defaultMessage="Click here" />
                     </Link>
                   ),
@@ -148,7 +136,11 @@ class ConnectGithub extends React.Component {
             </MessageBox>
           </Flex>
         )}
-        {loadingRepos && <Loading />}
+        {loadingRepos && (
+          <Box pb={4}>
+            <Loading />
+          </Box>
+        )}
         {repositories.length !== 0 && (
           <Flex justifyContent="center" width={1} mb={4} flexDirection={['column', 'row']}>
             <Box width={1 / 5} display={['none', null, 'block']} />
@@ -172,7 +164,10 @@ class ConnectGithub extends React.Component {
               display={['block', null, 'block']}
               width={[1, 1 / 5]}
               maxWidth={[250, null, 335]}
-              alignSelf={['center', 'none']}
+              alignSelf={['center', 'flex-start']}
+              position="sticky"
+              top={0}
+              pt={[0, 3]}
             />
           </Flex>
         )}

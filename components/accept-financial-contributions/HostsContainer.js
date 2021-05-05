@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -15,7 +15,7 @@ import StyledButton from '../StyledButton';
 
 import HostCollectiveCard from './HostCollectiveCard';
 
-const Limit = 12; // nice round number to make even rows of 2, 3, 4
+const LIMIT = 12; // nice round number to make even rows of 2, 3, 4
 
 const AllCardsContainer = styled(Flex).attrs({
   flexWrap: 'wrap',
@@ -23,10 +23,8 @@ const AllCardsContainer = styled(Flex).attrs({
   justifyContent: 'space-evenly',
 })``;
 
-const AllCardsContainerMobile = styled(Flex)`
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  width: 95vw;
+const AllCardsContainerMobile = styled.div`
+  display: flex;
   padding: 16px;
 `;
 
@@ -40,7 +38,6 @@ class HostsContainer extends React.Component {
     collective: PropTypes.object,
     onChange: PropTypes.func,
     data: PropTypes.object.isRequired,
-    viewport: PropTypes.string,
     tags: PropTypes.array,
     intl: PropTypes.object.isRequired,
   };
@@ -51,7 +48,7 @@ class HostsContainer extends React.Component {
     this.messages = defineMessages({
       seeMoreHosts: {
         id: 'fiscalHost.seeMoreHosts',
-        defaultMessage: 'See more hosts',
+        defaultMessage: 'See more Hosts',
       },
     });
   }
@@ -60,33 +57,33 @@ class HostsContainer extends React.Component {
     const { onChange, data, intl } = this.props;
 
     if (!data.hosts || !data.hosts.nodes) {
-      return <Loading />;
+      return (
+        <Flex justifyContent="center" width="100%" py={4}>
+          <Loading />
+        </Flex>
+      );
     }
 
     const hosts = [...data.hosts.nodes];
 
     return (
-      <Flex flexDirection="column" flexGrow={1}>
+      <Flex flexDirection="column" flexGrow={1} css={{ maxWidth: '100%' }}>
         <Hide md lg>
-          <HorizontalScroller>
-            {ref => (
-              <AllCardsContainerMobile ref={ref}>
-                {hosts.map(host => (
-                  <HostCollectiveCard
-                    key={host.legacyId}
-                    host={host}
-                    collective={this.props.collective}
-                    onChange={onChange}
-                    style={{
-                      flexBasis: 250,
-                      height: 360,
-                      marginRight: 20,
-                      flexShrink: 0,
-                    }}
-                  />
-                ))}
-              </AllCardsContainerMobile>
-            )}
+          <HorizontalScroller container={AllCardsContainerMobile}>
+            {hosts.map(host => (
+              <HostCollectiveCard
+                key={host.legacyId}
+                host={host}
+                collective={this.props.collective}
+                onChange={onChange}
+                style={{
+                  flexBasis: 250,
+                  height: 360,
+                  marginRight: 20,
+                  flexShrink: 0,
+                }}
+              />
+            ))}
           </HorizontalScroller>
         </Hide>
         <Hide xs sm>
@@ -105,7 +102,7 @@ class HostsContainer extends React.Component {
           </AllCardsContainer>
         </Hide>
         <Flex justifyContent="center" mt={[2, 0]} width={['100%', null, '90%']}>
-          <Link route="hosts">
+          <Link href="/hosts">
             <StyledButton fontSize="13px" buttonStyle="dark" minHeight="36px" mt={[2, 3]} mb={3} px={4}>
               {intl.formatMessage(this.messages.seeMoreHosts)}
             </StyledButton>
@@ -116,39 +113,39 @@ class HostsContainer extends React.Component {
   }
 }
 
-const getHostsQuery = gqlV2`
-query getHosts($tags: [String], $limit: Int) {
-  hosts(tags: $tags, limit: $limit) {
-    totalCount
-    nodes {
-      id
-      legacyId
-      createdAt
-      settings
-      type
-      name
-      slug
-      description
-      longDescription
-      currency
-      totalHostedCollectives
-      hostFeePercent
-      stats {
-        yearlyBudgetManaged {
-          value
+const hostsQuery = gqlV2/* GraphQL */ `
+  query AcceptFinancialContributionsHosts($tags: [String], $limit: Int) {
+    hosts(tags: $tags, limit: $limit) {
+      totalCount
+      nodes {
+        id
+        legacyId
+        createdAt
+        settings
+        type
+        name
+        slug
+        description
+        longDescription
+        currency
+        totalHostedCollectives
+        hostFeePercent
+        stats {
+          yearlyBudgetManaged {
+            value
+          }
         }
       }
     }
   }
-}
 `;
 
-export const addHostsData = graphql(getHostsQuery, {
+const addHostsData = graphql(hostsQuery, {
   options(props) {
     return {
       variables: {
         tags: props.tags,
-        limit: Limit,
+        limit: LIMIT,
       },
       context: API_V2_CONTEXT,
     };

@@ -41,6 +41,7 @@ const ConfirmationModal = ({
   onClose,
   type,
   isDanger,
+  isSuccess,
   cancelLabel,
   continueLabel,
   cancelHandler,
@@ -51,7 +52,7 @@ const ConfirmationModal = ({
   const { formatMessage } = useIntl();
 
   return (
-    <Modal width="570px" show={show} onClose={onClose} {...props}>
+    <Modal role="alertdialog" width="570px" show={show} onClose={onClose} trapFocus {...props}>
       <ModalHeader onClose={onClose}>{header}</ModalHeader>
       <ModalBody pt={2}>{children || <P>{body}</P>}</ModalBody>
       <ModalFooter>
@@ -59,6 +60,7 @@ const ConfirmationModal = ({
           <StyledButton
             mx={20}
             my={1}
+            autoFocus
             minWidth={140}
             onClick={cancelHandler || onClose}
             disabled={submitting}
@@ -69,7 +71,7 @@ const ConfirmationModal = ({
           <StyledButton
             my={1}
             minWidth={140}
-            buttonStyle={isDanger ? 'danger' : 'primary'}
+            buttonStyle={isDanger ? 'danger' : isSuccess ? 'success' : 'primary'}
             data-cy="confirmation-modal-continue"
             loading={submitting}
             onClick={async () => {
@@ -98,7 +100,7 @@ ConfirmationModal.propTypes = {
   /** body of the confirmation modal */
   children: PropTypes.node,
   /** Body of the confirmation modal, used in a paragraph if there's no children */
-  body: PropTypes.string,
+  body: PropTypes.node,
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
   /** handles onClick continue button */
@@ -107,12 +109,13 @@ ConfirmationModal.propTypes = {
   type: PropTypes.oneOf(['confirm', 'delete', 'remove']),
   /** If true, a danger style button will be used for the main button */
   isDanger: PropTypes.bool,
+  isSuccess: PropTypes.bool,
   /** handles onClick cancel button. Defaults to `onClose` prop. */
   cancelHandler: PropTypes.func,
   /** continue button label of the confirmation modal. Defaults to `Confirm`. */
-  continueLabel: PropTypes.string,
+  continueLabel: PropTypes.node,
   /** cancel button label of the confirmation modal. Defaults to `Cancel`. */
-  cancelLabel: PropTypes.string,
+  cancelLabel: PropTypes.node,
 };
 
 ConfirmationModal.defaultProps = {

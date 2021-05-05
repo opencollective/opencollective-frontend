@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
+import { omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { Router } from '../../server/pages';
 
 import { Box, Flex } from '../Grid';
 import SignInOrJoinFree from '../SignInOrJoinFree';
@@ -15,12 +15,6 @@ import { withUser } from '../UserProvider';
 
 import CategoryPicker from './CategoryPicker';
 import Form from './Form';
-
-const defaultSettings = {
-  fund: true,
-  features: { conversations: false },
-  collectivePage: { sections: ['budget', 'about'] },
-};
 
 class CreateFund extends Component {
   static propTypes = {
@@ -46,34 +40,42 @@ class CreateFund extends Component {
     if (this.props.router.query.category === 'foundation') {
       return {
         slug: 'foundation',
+        name: 'Open Collective Foundation',
         termsUrl:
           'https://docs.google.com/document/u/2/d/e/2PACX-1vQ_fs7IOojAHaMBKYtaJetlTXJZLnJ7flIWkwxUSQtTkWUMtwFYC2ssb-ooBnT-Ldl6wbVhNQiCkSms/pub',
+        faqUrl: 'https://docs.opencollective.foundation/',
+      };
+    }
+    if (this.props.router.query.category === 'opensource') {
+      return {
+        slug: 'opensource',
+        name: 'Open Source Collective',
+        termsUrl:
+          'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub',
       };
     }
   }
 
-  async createFund(collective) {
+  async createFund(fund) {
     const host = this.getHost();
 
     // set state to loading
     this.setState({ creating: true });
 
-    // Settings
-    collective.settings = defaultSettings;
-
-    delete collective.tos;
-    delete collective.hostTos;
-    delete host.termsUrl;
-
     // try mutation
     try {
-      const res = await this.props.createFund({ variables: { collective, host } });
-      const newCollective = res.data.createCollective;
+      const res = await this.props.createFund({
+        variables: { fund: omit(fund, ['tos', 'hostTos']), host: omit(host, ['termsUrl', 'name']) },
+      });
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', {
-        slug: newCollective.slug,
-        status: 'fundCreated',
-      }).then(() => window.scrollTo(0, 0));
+      this.props.router
+        .push({
+          pathname: `/${res.data.createFund.slug}`,
+          query: {
+            status: 'fundCreated',
+          },
+        })
+        .then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ error: errorMsg, creating: false });
@@ -82,7 +84,7 @@ class CreateFund extends Component {
 
   render() {
     const { LoggedInUser, router } = this.props;
-    const { error } = this.state;
+    const { creating, error } = this.state;
     const { category } = router.query;
 
     if (!LoggedInUser) {
@@ -90,12 +92,12 @@ class CreateFund extends Component {
         <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
           <Flex flexDirection="column" p={4} mt={2}>
             <Box mb={3}>
-              <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
+              <H1 fontSize="32px" lineHeight="36px" fontWeight="bold" textAlign="center">
                 <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
               </H1>
             </Box>
             <Box textAlign="center">
-              <P fontSize="Paragraph" color="black.600" mb={1}>
+              <P fontSize="14px" color="black.600" mb={1}>
                 <FormattedMessage
                   id="collective.create.createOrSignIn"
                   defaultMessage="Create an account (or sign in) to start a collective."
@@ -112,30 +114,18 @@ class CreateFund extends Component {
       return <CategoryPicker />;
     }
 
-    return (
-      <Form
-        host={this.getHost()}
-        onSubmit={this.createFund}
-        onChange={this.handleChange}
-        loading={this.state.creating}
-        error={error}
-      />
-    );
+    return <Form host={this.getHost()} onSubmit={this.createFund} loading={creating} error={error} />;
   }
 }
 
-const createFundMutation = gqlV2`
-  mutation CreateFund(
-    $collective: CollectiveCreateInput!
-    $host: AccountReferenceInput,
-  ) {
-    createCollective(collective: $collective, host: $host) {
+const createFundMutation = gqlV2/* GraphQL */ `
+  mutation CreateFund($fund: FundCreateInput!, $host: AccountReferenceInput) {
+    createFund(fund: $fund, host: $host) {
+      id
       name
       slug
       tags
       description
-      githubHandle
-      legacyId
     }
   }
 `;

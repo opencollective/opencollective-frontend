@@ -1,6 +1,8 @@
 import 'cypress-file-upload';
+import './third-party-commands';
 
-import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { loggedInUserQuery } from '../../../lib/graphql/queries';
 
 import { CreditCards } from '../../stripe-helpers';
 
@@ -26,6 +28,11 @@ Cypress.Commands.add('login', (params = {}) => {
     // opencollective-api/server/controllers/users.js for more info
     return cy.visit(redirect, visitParams).then(() => user);
   });
+});
+
+Cypress.Commands.add('logout', () => {
+  cy.getByDataCy('user-menu-trigger').click();
+  cy.getByDataCy('logout').click();
 });
 
 /**
@@ -143,29 +150,33 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 /**
  * Create a expense.
  */
-Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, ...params } = {}) => {
+Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, account, ...params } = {}) => {
   const expense = {
-    category: 'Engineering',
+    tags: ['Engineering'],
     type: 'INVOICE',
-    payoutMethod: 'paypal',
+    payoutMethod: { type: 'PAYPAL', data: { email: userEmail || randomEmail() } },
     description: 'Expense 1',
-    amount: 10000,
-    attachment: 'https://d.pr/free/i/OlQVIb+',
-    currency: 'USD',
+    items: [{ description: 'Some stuff', amount: 1000 }],
     ...params,
   };
 
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
-    return graphqlQuery(token, {
+    return graphqlQueryV2(token, {
       operationName: 'createExpense',
       query: `
-          mutation createExpense($expense: ExpenseInputType!) {
-            createExpense(expense: $expense) {
+          mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
+            createExpense(expense: $expense, account: $account) {
               id
+              legacyId
+              account {
+                id
+                slug
+              }
             }
           }
         `,
-      variables: { expense },
+      variables: { expense, account },
+      failOnStatusCode: false,
     }).then(({ body }) => {
       return body.data.createExpense;
     });
@@ -232,6 +243,38 @@ Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
 Cypress.Commands.add('fillStripeInput', fillStripeInput);
 
 /**
+ * Completes a 3DSecure Stripe modal
+ *
+ * @param {boolean} approve: Set to false to reject
+ */
+Cypress.Commands.add('complete3dSecure', (approve = true) => {
+  const iframeSelector = 'iframe[name^="__privateStripeFrame"]';
+
+  return cy.waitUntil(() =>
+    cy.get(iframeSelector).then($3dSecureIframe => {
+      const $challengeIframe = $3dSecureIframe.contents().find('body iframe#challengeFrame');
+      const $acsIframe = $challengeIframe.contents().find('iframe[name="acsFrame"]');
+      const $finalContent = $acsIframe.contents().find('body');
+      const targetBtn = approve ? '#test-source-authorize-3ds' : '#test-source-fail-3ds';
+      $finalContent.find(targetBtn).click();
+    }),
+  );
+});
+
+Cypress.Commands.add('iframeLoaded', { prevSubject: 'element' }, $iframe => {
+  const contentWindow = $iframe.prop('contentWindow');
+  return new Promise(resolve => {
+    if (contentWindow && contentWindow.document.readyState === 'complete') {
+      resolve(contentWindow);
+    } else {
+      $iframe.on('load', () => {
+        resolve(contentWindow);
+      });
+    }
+  });
+});
+
+/**
  * To use on the "Payment" step in the contribution flow.
  * Use the first payment method if available or fill the
  * stripe form otherwise.
@@ -252,8 +295,8 @@ Cypress.Commands.add('useAnyPaymentMethod', () => {
  * of strings or a single string.
  */
 Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => {
-  const isEnabled = step => cy.get(`.step-${step}`).should('not.have.class', 'disabled');
-  const isDisabled = step => cy.get(`.step-${step}`).should('have.class', 'disabled');
+  const isEnabled = step => cy.get(`[data-cy="progress-step-${step}"][data-disabled=false]`);
+  const isDisabled = step => cy.get(`[data-cy="progress-step-${step}"][data-disabled=true]`);
 
   Array.isArray(enabled) ? enabled.forEach(isEnabled) : isEnabled(enabled);
   Array.isArray(disabled) ? disabled.forEach(isDisabled) : isDisabled(disabled);
@@ -262,12 +305,9 @@ Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => 
 /**
  * Check if user is logged in by searching for its username in navbar
  */
-Cypress.Commands.add('assertLoggedIn', (username, timeout) => {
+Cypress.Commands.add('assertLoggedIn', params => {
   cy.log('Ensure user is logged in');
-  const loginSection = cy.get('.LoginTopBarProfileButton-name', { timeout });
-  if (username) {
-    loginSection.should('contain', username);
-  }
+  cy.getByDataCy('topbar-login-username', params);
 });
 
 /**
@@ -324,6 +364,86 @@ Cypress.Commands.add('disableSmoothScroll', () => {
   disableSmoothScroll();
 });
 
+/**
+ * Add 2FA to a test account
+ */
+Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail, userSlug, secret } = {}) => {
+  let authToken;
+  return signinRequestAndReturnToken({ email: userEmail, slug: userSlug }, null).then(token => {
+    authToken = token;
+    return graphqlV2Query(authToken, {
+      operationName: 'AccountHasTwoFactorAuth',
+      query: `
+        query AccountHasTwoFactorAuth($slug: String) {
+          individual(slug: $slug) {
+            id
+            slug
+            name
+            type
+            id
+            slug
+            name
+            type
+            ... on Individual {
+              hasTwoFactorAuth
+            }
+          }
+        }
+          `,
+      variables: { slug: userSlug },
+      options: { context: API_V2_CONTEXT },
+    })
+      .then(({ body }) => {
+        const account = {
+          id: body.data.individual.id,
+        };
+        const token = secret;
+
+        return graphqlV2Query(authToken, {
+          operationName: 'AddTwoFactorAuthToIndividual',
+          query: `
+          mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
+            addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
+              account {
+                id
+                ... on Individual {
+                  hasTwoFactorAuth
+                }
+              }
+              recoveryCodes
+            }
+          }
+        `,
+          variables: { account, token },
+          options: { context: API_V2_CONTEXT },
+        });
+      })
+      .then(({ body }) => {
+        return body.data;
+      });
+  });
+});
+
+let localStorageSnapshot = {};
+
+Cypress.Commands.add('resetLocalStorage', () => {
+  localStorageSnapshot = {};
+  localStorage.clear();
+});
+
+Cypress.Commands.add('saveLocalStorage', () => {
+  localStorageSnapshot = {};
+  Object.keys(localStorage).forEach(key => {
+    localStorageSnapshot[key] = localStorage[key];
+  });
+});
+
+Cypress.Commands.add('restoreLocalStorage', () => {
+  Object.keys(localStorageSnapshot).forEach(key => {
+    localStorage.setItem(key, localStorageSnapshot[key]);
+  });
+});
+
 // ---- Private ----
 
 /**
@@ -366,10 +486,36 @@ function graphqlQuery(token, body) {
   });
 }
 
+function graphqlQueryV2(token, body) {
+  return cy.request({
+    url: '/api/graphql/v2',
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+function graphqlV2Query(token, body) {
+  return cy.request({
+    url: '/api/graphql/v2',
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+}
+
 function getLoggedInUserFromToken(token) {
   return graphqlQuery(token, {
     operationName: 'LoggedInUser',
-    query: getLoggedInUserQuery.loc.source.body,
+    query: loggedInUserQuery.loc.source.body,
   }).then(({ body }) => {
     return body.data.LoggedInUser;
   });

@@ -44,8 +44,7 @@ describe('Conversations', () => {
       const sampleTag = 'alot more amazing stuff';
       cy.getByDataCy('InlineEditField-Trigger-tags').click();
       cy.getByDataCy('styled-input-tags-open').click();
-      cy.getByDataCy('styled-input-tags-input').type(`${sampleTag}{enter}{enter}`);
-      cy.getByDataCy('InlineEditField-Btn-Save').click();
+      cy.getByDataCy('styled-input-tags-input').type(`${sampleTag}{enter}`).blur();
       cy.contains(`${sampleTag}`.toLowerCase());
 
       // Add comment
@@ -62,7 +61,7 @@ describe('Conversations', () => {
       cy.getByDataCy('replies-count').contains('2');
       cy.getByDataCy('conversation-preview').should(
         'have.html',
-        'Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis;...',
+        'Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levi...',
       );
     });
   });

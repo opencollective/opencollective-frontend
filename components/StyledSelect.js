@@ -49,7 +49,7 @@ const MultiValue = ({ children, removeProps }) => {
   }
 
   return (
-    <StyledTag mr="8px" variant="rounded-right" textTransform="uppercase" closeButtonProps={removeProps}>
+    <StyledTag m="4px" variant="rounded-right" maxHeight="none" closeButtonProps={removeProps}>
       {children}
     </StyledTag>
   );
@@ -78,8 +78,8 @@ const GroupHeading = ({ children, ...props }) => (
     <Flex justifyContent="space-between" alignItems="center" mr={2}>
       <P
         fontWeight="600"
-        fontSize="H6"
-        lineHeight="H6"
+        fontSize="9px"
+        lineHeight="14px"
         textTransform="uppercase"
         letterSpacing="0.6px"
         whiteSpace="nowrap"
@@ -103,15 +103,32 @@ export const searchableCustomComponents = { ...customComponents, DropdownIndicat
  * See https://react-select.com for more documentation.
  */
 export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs(
-  ({ theme, intl, placeholder, disabled, isDisabled, useSearchIcon, hideDropdownIndicator, hideMenu, error }) => ({
+  ({
+    theme,
+    intl,
+    placeholder,
+    disabled,
+    inputId,
+    instanceId,
+    isDisabled,
+    useSearchIcon,
+    hideDropdownIndicator,
+    hideMenu,
+    error,
+    styles,
+    isSearchable,
+    menuPortalTarget,
+  }) => ({
+    menuPortalTarget: menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body,
     isDisabled: disabled || isDisabled,
     placeholder: placeholder || intl.formatMessage(Messages.placeholder),
     loadingMessage: () => intl.formatMessage(Messages.loading),
     noOptionsMessage: () => intl.formatMessage(Messages.noOptions),
     components: useSearchIcon ? searchableCustomComponents : customComponents,
+    instanceId: instanceId ? instanceId : inputId,
     styles: {
       control: (baseStyles, state) => {
-        const customStyles = { borderColor: theme.colors.black[300], cursor: 'text' };
+        const customStyles = { borderColor: theme.colors.black[300] };
 
         if (error) {
           customStyles.borderColor = theme.colors.red[500];
@@ -125,7 +142,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           customStyles.boxShadow = `inset 0px 2px 2px ${theme.colors.primary[50]}`;
         }
 
-        return { ...baseStyles, ...customStyles };
+        if (isSearchable !== false) {
+          customStyles.cursor = 'text';
+        } else {
+          customStyles.cursor = 'pointer';
+        }
+
+        return { ...baseStyles, ...customStyles, ...styles?.control };
       },
       option: (baseStyles, state) => {
         const customStyles = { cursor: 'pointer' };
@@ -153,12 +176,14 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           ? STYLES_DISPLAY_NONE
           : {
               ...baseStyles,
+              ...styles?.menu,
               overflow: 'hidden', // for children border-radius to apply
               zIndex: 10,
             };
       },
       menuList: baseStyles => ({
         ...baseStyles,
+        ...styles?.menuList,
         paddingTop: 0,
         paddingBottom: 0,
       }),
@@ -187,8 +212,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
 const StyledSelect = makeStyledSelect(Select);
 
 StyledSelect.propTypes = {
+  /** The id of the search input */
+  inputId: PropTypes.string.isRequired,
+  /** Define an id prefix for the select components e.g. {your-id}-value */
+  instanceId: PropTypes.string,
+  /** Placeholder for the select value */
   placeholder: PropTypes.node,
-  /** Wether the component is disabled */
+  /** Whether the component is disabled */
   disabled: PropTypes.bool,
   /** Alias for `disabled` */
   isDisabled: PropTypes.bool,
@@ -200,12 +230,17 @@ StyledSelect.propTypes = {
   hideDropdownIndicator: PropTypes.bool,
   /** If true, options list will not be displayed */
   hideMenu: PropTypes.bool,
+  /** Default placement of the menu in relation to the control */
+  menuPlacement: PropTypes.oneOf(['bottom', 'top', 'auto']),
   /** Displays a red border when truthy */
   error: PropTypes.any,
   /** @ignore from injectIntl */
   intl: PropTypes.object,
   /** Default option */
   defaultValue: PropTypes.object,
+  styles: PropTypes.object,
+  /** To render menu in a portal */
+  menuPortalTarget: PropTypes.any,
   // Styled-system
   ...propTypes.typography,
   ...propTypes.layout,
@@ -213,7 +248,8 @@ StyledSelect.propTypes = {
 };
 
 StyledSelect.defaultProps = {
-  fontSize: 'Paragraph',
+  fontSize: '14px',
+  styles: {},
 };
 
 /** @component */
