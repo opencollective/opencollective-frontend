@@ -218,7 +218,7 @@ describe('New expense flow', () => {
       cy.get('input[name="items[0].description"]').type('Peeling potatoes');
       cy.get('input[name="items[0].amount"]').type('{selectall}4200');
 
-      // Switch to receipt and acnkowledge error
+      // Switch to receipt and acknowledge error
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-summary-btn').click();
@@ -263,6 +263,7 @@ describe('New expense flow', () => {
         cy.get('input[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
 
+        cy.wait(10000);
         cy.getByDataCy('expense-summary-btn').click();
         cy.wait(500);
 
