@@ -14,7 +14,6 @@ import {
 import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
-export const BRAINTREE_KEY = 'braintree';
 
 export const generatePaymentMethodOptions = (
   paymentMethods,
@@ -23,13 +22,14 @@ export const generatePaymentMethodOptions = (
   stepSummary,
   collective,
   isRoot,
+  hasNewPaypal,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL);
   const hostHasStripe = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
-  const hostHasBraintree = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BRAINTREE_PAYPAL);
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
+  const interval = get(stepDetails, 'interval', null);
 
   const paymentMethodsOptions = paymentMethods.map(pm => ({
     id: pm.id,
@@ -97,7 +97,7 @@ export const generatePaymentMethodOptions = (
     }
 
     // Paypal
-    if (hostHasPaypal && !stepDetails.interval) {
+    if (hostHasPaypal && (!interval || hasNewPaypal)) {
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
@@ -107,7 +107,6 @@ export const generatePaymentMethodOptions = (
     }
 
     // Manual (bank transfer)
-    const interval = get(stepDetails, 'interval', null);
     if (hostHasManual && !interval) {
       uniquePMs.push({
         key: 'manual',
@@ -120,14 +119,6 @@ export const generatePaymentMethodOptions = (
             defaultMessage="Instructions to make a transfer will be given on the next page."
           />
         ),
-      });
-    }
-
-    if (hostHasBraintree && isRoot) {
-      uniquePMs.push({
-        key: 'braintree',
-        title: 'PayPal (Braintree)', // TODO(Braintree): remove (Braintree) for the beta
-        icon: getPaymentMethodIcon({ service: 'paypal', type: 'payment' }, collective),
       });
     }
   }

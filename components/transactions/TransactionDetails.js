@@ -38,7 +38,7 @@ const rejectAndRefundTooltipContent = (showRefundHelp, showRejectHelp) => (
       <P fontSize="12px" lineHeight="18px">
         <FormattedMessage
           id="transaction.reject.helpText"
-          defaultMessage="<bold>Reject:</bold> This action prevents the contributor from contributing in the future and will reimburse the full amount back to the them."
+          defaultMessage="<bold>Reject:</bold> This action prevents the contributor from contributing in the future and will reimburse the full amount back to them."
           values={{ bold: I18nBold }}
         />
       </P>

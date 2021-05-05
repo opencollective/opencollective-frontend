@@ -34,6 +34,7 @@ class TimezonePicker extends React.Component {
           </P>
         )}
         <StyledSelect
+          inputId="timezone-select"
           options={timezones.map(tz => ({
             label: tz,
             value: tz,

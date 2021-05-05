@@ -220,7 +220,17 @@ const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }
               })}
             </Modal>
           </TrapContainer>
-          <ModalOverlay onClick={onClose} />
+          <ModalOverlay
+            role="button"
+            tabIndex={0}
+            onClick={onClose}
+            onKeyDown={event => {
+              if (event.key === 'Escape') {
+                event.preventDefault();
+                onClose();
+              }
+            }}
+          />
         </Wrapper>
       </React.Fragment>,
       document.body,
@@ -231,7 +241,7 @@ const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }
 };
 
 StyledModal.propTypes = {
-  /** a boolean to determin when to show modal */
+  /** a boolean to determine when to show modal */
   show: PropTypes.bool.isRequired,
   /** width of the modal component */
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
@@ -247,7 +257,7 @@ StyledModal.propTypes = {
   minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
-  /** wether to render the modal at the root with a potal */
+  /** whether to render the modal at the root with a portal */
   usePortal: PropTypes.bool,
   /** set this to true if the modal contains a form or buttons */
   trapFocus: PropTypes.bool,

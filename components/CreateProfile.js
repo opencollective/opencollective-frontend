@@ -68,11 +68,9 @@ Tab.propTypes = {
 
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
-    <Link href={onSecondaryAction}>
-      <StyledLink disabled={loading} fontSize="14px">
-        {children}
-      </StyledLink>
-    </Link>
+    <StyledLink as={Link} href={onSecondaryAction} disabled={loading} fontSize="14px">
+      {children}
+    </StyledLink>
   ) : (
     <StyledButton asLink fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
       {children}
@@ -114,7 +112,7 @@ const useForm = ({ onEmailChange, errors, formatMessage }) => {
       type: 'text',
       width: 1,
       onChange: ({ target }) => {
-        // Email state is not local so any changes should be handled seprately
+        // Email state is not local so any changes should be handled separately
         let value = target.value,
           error = null;
         if (target.name === 'email') {

@@ -57,20 +57,3 @@ import { webpackCollective } from '../../mocks/collectives';
   collective={{ ...webpackCollective, balance: 500 }}
 />;
 ```
-
-### Transferwise limit reached
-
-```jsx
-import { webpackCollective } from '../../mocks/collectives';
-<PayExpenseButton
-  onSubmit={console.log}
-  expense={{ id: '1', amount: 4200, payoutMethod: { type: 'BANK_ACCOUNT' } }}
-  collective={{
-    ...webpackCollective,
-    host: {
-      ...webpackCollective.host,
-      plan: { transferwisePayoutsLimit: 1000, transferwisePayouts: 5000 },
-    },
-  }}
-/>;
-```

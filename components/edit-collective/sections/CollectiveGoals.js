@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { get, sortBy } from 'lodash';
+import { get, sortBy, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -21,7 +21,8 @@ import StyledTextarea from '../../StyledTextarea';
 import SettingsTitle from '../SettingsTitle';
 
 const BORDER = '1px solid #efefef';
-
+const getInterpolationOption = value => ({ label: startCase(value), value });
+const INTERPOLATION_OPTIONS = ['auto', 'logarithm', 'linear'].map(getInterpolationOption);
 class CollectiveGoals extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
@@ -45,6 +46,7 @@ class CollectiveGoals extends React.Component {
       error: null,
       submitting: false,
       submitted: false,
+      goalsInterpolation: get(collective.settings, 'goalsInterpolation', 'auto'),
       goals: sortBy(get(collective.settings, 'goals', []), 'amount').map(goal => ({
         ...goal,
         key: goal.key || uuid(),
@@ -145,6 +147,7 @@ class CollectiveGoals extends React.Component {
           settings: {
             ...this.props.collective.settings,
             goals: this.state.goals,
+            goalsInterpolation: this.state.goalsInterpolation,
             collectivePage: this.state.collectivePage,
           },
         },
@@ -181,6 +184,7 @@ class CollectiveGoals extends React.Component {
           <Box mb={4}>
             <StyledInputField name={this.fields[1].name} label={this.fields[1].label}>
               <StyledSelect
+                inputId={`collective-goals-${this.fields[1].name}`}
                 options={this.fields[1].options}
                 onChange={obj => this.editGoal(index, this.fields[1].name, obj.value)}
                 isSearchable={false}
@@ -226,7 +230,7 @@ class CollectiveGoals extends React.Component {
 
   render() {
     const { intl, collective } = this.props;
-    const { goals, collectivePage, isSubmitting, submitted, isTouched, error } = this.state;
+    const { goals, goalsInterpolation, collectivePage, isSubmitting, submitted, isTouched, error } = this.state;
 
     return (
       <Container>
@@ -250,9 +254,17 @@ class CollectiveGoals extends React.Component {
             />
           </Container>
         </Container>
+        <Box mb={3}>
+          <StyledSelect
+            options={INTERPOLATION_OPTIONS}
+            onChange={({ value }) => this.setState({ goalsInterpolation: value, isTouched: true })}
+            value={getInterpolationOption(goalsInterpolation)}
+            isSearchable={false}
+          />
+        </Box>
         <Container textAlign="left">
-          <Container background="rgb(245, 247, 250)" pt={5} pb={40}>
-            <GoalsCover collective={{ ...collective, settings: { goals } }} />
+          <Container background="rgb(245, 247, 250)" pt={5} pb={40} px={3}>
+            <GoalsCover collective={{ ...collective, settings: { goals } }} interpolation={goalsInterpolation} />
           </Container>
           <Container borderTop={BORDER}>{goals.map(this.renderGoal)}</Container>
         </Container>

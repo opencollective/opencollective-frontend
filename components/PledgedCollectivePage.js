@@ -107,11 +107,15 @@ const PledgedCollectivePage = ({ collective }) => {
       </Container>
 
       <Container display="flex" justifyContent="center" position="relative" top={-30}>
-        <Link href={`/${collective.slug}/pledges/new`}>
-          <StyledLink buttonStyle="primary" buttonSize="large" data-cy="makeAPledgeButton">
-            <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
-          </StyledLink>
-        </Link>
+        <StyledLink
+          as={Link}
+          href={`/${collective.slug}/pledges/new`}
+          buttonStyle="primary"
+          buttonSize="large"
+          data-cy="makeAPledgeButton"
+        >
+          <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
+        </StyledLink>
       </Container>
 
       <Container

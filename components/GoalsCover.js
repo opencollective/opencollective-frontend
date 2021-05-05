@@ -93,7 +93,7 @@ const GoalContainer = styled.div`
         `;
       } else {
         return css`
-          height: 50px;
+          height: 70px;
         `;
       }
     }
@@ -120,7 +120,7 @@ const GoalContainer = styled.div`
 
 const BarContainer = styled.div`
   position: relative;
-  width: 80%;
+  width: 100%;
   margin: 6rem auto 1rem;
   min-height: 80px;
 
@@ -193,9 +193,10 @@ class GoalsCover extends React.Component {
     this.setState({ ...this.populateGoals(), firstMount });
   }
 
-  /** Returns a percentage (0.0-1.0) that reprensent X position */
+  /** Returns a percentage (0.0-1.0) that represent X position */
   getTranslatedPercentage(x) {
-    if (this.interpolation === 'logarithm' || (this.interpolation === 'auto' && this.currentProgress <= 0.3)) {
+    const interpolation = this.props.interpolation || this.interpolation;
+    if (interpolation === 'logarithm' || (interpolation === 'auto' && this.currentProgress <= 0.3)) {
       // See https://www.desmos.com/calculator/30pua5xx7q
       return -1 * Math.pow(x - 1, 2) + 1;
     }

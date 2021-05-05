@@ -4,7 +4,6 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
 
-import { getBraintree } from '../lib/braintree';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
@@ -13,7 +12,10 @@ import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
 import { STEPS } from '../components/contribution-flow/constants';
-import ContributionBlocker, { getContributionBlocker } from '../components/contribution-flow/ContributionBlocker';
+import ContributionBlocker, {
+  CONTRIBUTION_BLOCKER,
+  getContributionBlocker,
+} from '../components/contribution-flow/ContributionBlocker';
 import ContributionFlowSuccess from '../components/contribution-flow/ContributionFlowSuccess';
 import {
   contributionFlowAccountQuery,
@@ -24,6 +26,7 @@ import { getContributionFlowMetadata } from '../components/contribution-flow/uti
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import Redirect from '../components/Redirect';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
 
@@ -90,6 +93,7 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    hasNewPaypal: PropTypes.bool,
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -108,9 +112,6 @@ class NewContributionFlowPage extends React.Component {
     const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
     if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
       this.props.loadStripe();
-    }
-    if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BRAINTREE_PAYPAL)) {
-      getBraintree();
     }
   }
 
@@ -131,9 +132,12 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBLocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
-    if (contributionBLocker) {
-      return <ContributionBlocker blocker={contributionBLocker} account={account} />;
+    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    if (contributionBlocker) {
+      if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
+        return <Redirect to={`/${account.slug}/contribute`} />;
+      }
+      return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
       return <ContributionFlowSuccess collective={account} />;
     } else {
@@ -153,6 +157,7 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
+          hasNewPaypal={!get(account, 'host.settings.useLegacyPayPalPayments', false)}
         />
       );
     }

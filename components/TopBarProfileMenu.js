@@ -169,8 +169,6 @@ class TopBarProfileMenu extends React.Component {
       m => m.collective.id,
     );
 
-    const incognitoProfileMembership = memberships.find(m => m.collective.isIncognito);
-
     const collectives = memberships
       .filter(m => m.collective.type === 'COLLECTIVE')
       .sort((a, b) => {
@@ -261,18 +259,6 @@ class TopBarProfileMenu extends React.Component {
                   </StyledLink>
                 </Link>
               </ListItem>
-              {incognitoProfileMembership && (
-                <ListItem py={1}>
-                  <Link href={`/${incognitoProfileMembership.collective.slug}/recurring-contributions`}>
-                    <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                      <FormattedMessage
-                        id="menu.incognitoProfileSubscriptions"
-                        defaultMessage="Manage incognito Contributions"
-                      />
-                    </StyledLink>
-                  </Link>
-                </ListItem>
-              )}
               <ListItem py={1}>
                 <Link href={`/${LoggedInUser.username}/recurring-contributions`}>
                   <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">

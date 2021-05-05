@@ -9,7 +9,7 @@ import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import Modal from '../../StyledModal';
 import { H1, H2, P, Span } from '../../Text';
-import Illustration from '../HomeIllustration';
+import NextIllustration from '../HomeNextIllustration';
 
 const SustainTextWrapper = styled(Span)`
   background-image: url('/static/images/home/sustain-underline-sm.png');
@@ -110,15 +110,11 @@ const MakeCommunity = () => {
           alignItems="center"
           ml={[null, null, null, null, 3]}
         >
-          <Illustration
+          <NextIllustration
+            width={558}
+            height={448}
             alt="Make your community sustainable"
             src="/static/images/home/makecommunity-section-illustration.png"
-            display={['none', null, 'block']}
-          />
-          <Illustration
-            alt="Make your community sustainable"
-            src="/static/images/home/makecommunity-illustration-sm.png"
-            display={['block', null, 'none']}
           />
         </Flex>
       </Flex>
@@ -143,15 +139,11 @@ const MakeCommunity = () => {
           <FormattedMessage id="home.whatIsGreatAboutOC" defaultMessage="What's great about Open Collective?" />
         </H2>
         <Box width={['320px', '414px', '548px', null, '696px']} mr={[null, 3, null, null, 4]}>
-          <Illustration
-            alt="Make your community sustainable"
-            src="/static/images/home/whatisgreataboutOC-Illustration-sm.png"
-            display={[null, 'none']}
-          />
-          <Illustration
+          <NextIllustration
+            width={696}
+            height={396}
             alt="Make your community sustainable"
             src="/static/images/home/whatisgreataboutOC-Illustration-2x.png"
-            display={['none', 'inline-block']}
           />
         </Box>
         <Box width={['288px', '224px', '396px']}>
@@ -189,6 +181,7 @@ const MakeCommunity = () => {
       >
         <Container display="flex" width={1} height={400} maxWidth={712} background="black">
           <iframe
+            title="YouTube video"
             width="100%"
             height="400px"
             src="https://www.youtube.com/embed/IBU5fSILAe8"

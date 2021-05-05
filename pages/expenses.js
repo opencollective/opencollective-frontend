@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { has, mapValues, omit, omitBy } from 'lodash';
+import { has, omit, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -233,13 +233,7 @@ class ExpensePage extends React.Component {
                         defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
                         values={{
                           ResetLink: text => (
-                            <Link
-                              data-cy="reset-expenses-filters"
-                              href={{
-                                pathname: '/expenses',
-                                query: this.buildFilterLinkParams(mapValues(this.props.query, () => null)),
-                              }}
-                            >
+                            <Link data-cy="reset-expenses-filters" href={`/${collectiveSlug}/expenses`}>
                               <span>{text}</span>
                             </Link>
                           ),
@@ -361,8 +355,6 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
           settings
           plan {
             id
-            transferwisePayouts
-            transferwisePayoutsLimit
           }
         }
       }

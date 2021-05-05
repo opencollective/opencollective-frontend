@@ -271,6 +271,7 @@ const CreateCollectiveMiniForm = ({
                       type="email"
                       width="100%"
                       placeholder="e.g. jane-smith@youremail.com"
+                      data-cy="mini-form-email-field"
                     />
                   )}
                 </StyledInputField>
@@ -352,6 +353,7 @@ const CreateCollectiveMiniForm = ({
                         return (
                           <InputTypeCountry
                             {...field}
+                            inputId="location.country"
                             onChange={country => form.setFieldValue(name, country)}
                             maxMenuHeight={95}
                           />

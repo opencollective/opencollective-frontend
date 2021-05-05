@@ -86,6 +86,7 @@ const StyledInputGroup = ({
   containerProps,
   prependProps,
   appendProps,
+  innerRef,
   ...inputProps
 }) => {
   const [focused, setFocus] = useState(false);
@@ -130,6 +131,7 @@ const StyledInputGroup = ({
           error={error}
           minWidth="0"
           width="100%"
+          ref={innerRef}
           {...inputProps}
           onFocus={e => {
             setFocus(true);
@@ -187,6 +189,7 @@ StyledInputGroup.propTypes = {
   appendProps: PropTypes.object,
   /** Max Width */
   maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  innerRef: PropTypes.any,
 };
 
 export default StyledInputGroup;

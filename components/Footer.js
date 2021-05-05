@@ -6,6 +6,7 @@ import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/octicons/Mail';
 import { truncate } from 'lodash';
+import Image from 'next/image';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -248,11 +249,11 @@ const Footer = () => {
             maxWidth="300px"
           >
             <Flex my="12px">
-              <img
+              <Image
                 src="/static/images/opencollectivelogo-footer-n.svg"
                 alt="Open Collective logo"
-                height="28px"
-                width="167px"
+                height={28}
+                width={167}
                 style={{ maxWidth: '100%' }}
               />
             </Flex>
@@ -307,6 +308,7 @@ const Footer = () => {
             </P>
             <Container width="230px" my={2}>
               <StyledSelect
+                inputId="language-options"
                 options={languageOptions}
                 onChange={({ value }) => switchLanguage(value)}
                 defaultValue={defaultLanguage}
@@ -429,6 +431,7 @@ const Footer = () => {
           </P>
           <Container width={['230px']} my={2}>
             <StyledSelect
+              inputId="language-switcher"
               data-cy="language-switcher"
               options={languageOptions}
               onChange={({ value }) => switchLanguage(value)}

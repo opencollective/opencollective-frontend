@@ -13,6 +13,8 @@ export const NAVBAR_ACTION_TYPE = {
   CONTACT: 'hasContact',
   ADD_PREPAID_BUDGET: 'addPrepaidBudget',
   ADD_FUNDS: 'addFunds',
+  ASSIGN_CARD: 'assignCard',
+  REQUEST_CARD: 'requestCard',
   CONTRIBUTE: 'hasContribute',
   MANAGE_SUBSCRIPTIONS: 'hasManageSubscriptions',
   REQUEST_GRANT: 'hasRequestGrant',
@@ -35,6 +37,18 @@ const titles = defineMessages({
   UPDATES: {
     id: 'updates',
     defaultMessage: 'Updates',
+  },
+  EVENTS: {
+    id: 'Events',
+    defaultMessage: 'Events',
+  },
+  PROJECTS: {
+    id: 'CollectivePage.SectionProjects.Title',
+    defaultMessage: 'Projects',
+  },
+  CONNECTED_COLLECTIVES: {
+    id: 'ConnectedCollectives',
+    defaultMessage: 'Connected Collectives',
   },
   CONVERSATIONS: {
     id: 'conversations',
@@ -63,7 +77,6 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
     // About
     addSectionLink(intl, links, collective, sections, Sections.ABOUT);
     addSectionLink(intl, links, collective, sections, Sections.OUR_TEAM);
-    addSectionLink(intl, links, collective, sections, Sections.CONNECTED_COLLECTIVES);
     addSectionLink(intl, links, collective, sections, Sections.GOALS);
   } else if (category === NAVBAR_CATEGORIES.CONTRIBUTE) {
     // Contribute
@@ -74,8 +87,26 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
       });
     }
 
-    addSectionLink(intl, links, collective, sections, Sections.EVENTS);
-    addSectionLink(intl, links, collective, sections, Sections.PROJECTS);
+    if (hasFeature(collective, FEATURES.EVENTS) && hasSection(sections, Sections.EVENTS)) {
+      links.push({
+        route: `/${collectiveSlug}/events`,
+        title: intl.formatMessage(titles.EVENTS),
+      });
+    }
+
+    if (hasFeature(collective, FEATURES.PROJECTS) && hasSection(sections, Sections.PROJECTS)) {
+      links.push({
+        route: `/${collectiveSlug}/projects`,
+        title: intl.formatMessage(titles.PROJECTS),
+      });
+    }
+
+    if (hasFeature(collective, FEATURES.CONNECTED_ACCOUNTS) && hasSection(sections, Sections.CONNECTED_COLLECTIVES)) {
+      links.push({
+        route: `/${collectiveSlug}/connected-collectives`,
+        title: intl.formatMessage(titles.CONNECTED_COLLECTIVES),
+      });
+    }
   } else if (category === NAVBAR_CATEGORIES.CONTRIBUTIONS) {
     addSectionLink(intl, links, collective, sections, Sections.CONTRIBUTIONS);
   } else if (category === NAVBAR_CATEGORIES.BUDGET) {

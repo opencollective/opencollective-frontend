@@ -50,19 +50,24 @@ describe('edit collective', () => {
       cy.wrap($form).find('input[name="name"]').type('AmazingNewUser');
       cy.wrap($form).find('button[type="submit"]').click();
     });
+    cy.wait(200);
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
     cy.getByDataCy('save-members-btn').click();
     cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
 
     // Check invitation email
     cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
-    cy.contains('Test User Admin just invited you to join CollectiveToEdit with the role "Administrator"');
+    cy.contains('Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective');
 
     // Accept invitation as new user
     cy.login({ email: invitedUserEmail, redirect: `/member-invitations` });
     cy.getByDataCy('member-invitation-card').contains('CollectiveToEdit');
     cy.getByDataCy('member-invitation-accept-btn').click();
-    cy.getByDataCy('member-invitation-card').contains('Accepted');
+
+    // Should be redirected to the collective page and added to the team section
+    cy.url().should('eq', `${Cypress.config().baseUrl}/${collectiveSlug}`);
+    cy.contains('#section-our-team', 'AmazingNewUser');
+
     cy.visit(`/${collectiveSlug}/edit/members`);
     cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
   });

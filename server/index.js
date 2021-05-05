@@ -17,7 +17,6 @@ const { Sentry } = require('./sentry');
 const hyperwatch = require('./hyperwatch');
 const rateLimiter = require('./rate-limiter');
 const duplicateHandler = require('./duplicate-handler');
-const { getContentSecurityPolicyConfig } = require('./content-security-policy');
 const { serviceLimiterMiddleware, increaseServiceLevel } = require('./service-limiter');
 const { parseToBooleanDefaultFalse } = require('./utils');
 
@@ -48,7 +47,8 @@ const start = id =>
       app.use(serviceLimiterMiddleware);
     }
 
-    app.use(helmet({ contentSecurityPolicy: getContentSecurityPolicyConfig() }));
+    // Content security policy is generated from `_document` for compatibility with Vercel
+    app.use(helmet({ contentSecurityPolicy: false }));
 
     app.use(cookieParser());
 

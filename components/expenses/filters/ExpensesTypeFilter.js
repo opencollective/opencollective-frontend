@@ -13,6 +13,7 @@ const ExpenseTypeFilter = ({ onChange, value, ...props }) => {
 
   return (
     <StyledSelectFilter
+      inputId="expenses-type-filter"
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}
       options={[

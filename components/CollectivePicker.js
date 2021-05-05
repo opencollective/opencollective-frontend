@@ -265,6 +265,7 @@ class CollectivePicker extends React.PureComponent {
 
   render() {
     const {
+      inputId,
       intl,
       collectives,
       customOptions,
@@ -302,6 +303,7 @@ class CollectivePicker extends React.PureComponent {
               ref={mergeRefs([this.containerRef, ref])}
             >
               <StyledSelect
+                inputId={inputId}
                 options={allOptions}
                 defaultValue={getDefaultOptions && getDefaultOptions(this.buildCollectiveOption, allOptions)}
                 menuIsOpen={this.getMenuIsOpen(menuIsOpen)}
@@ -359,6 +361,7 @@ class CollectivePicker extends React.PureComponent {
                     boxShadow="-2px 4px 7px 0 rgba(78, 78, 78, 14%)"
                     maxHeight={315}
                     overflowY="auto"
+                    data-cy="collective-mini-form-scroll"
                     {...this.props.styles?.menu}
                   >
                     {createFormCollectiveType && (
@@ -394,6 +397,8 @@ class CollectivePicker extends React.PureComponent {
 }
 
 CollectivePicker.propTypes = {
+  /** The id of the search input */
+  inputId: PropTypes.string.isRequired,
   /** The list of collectives to display */
   collectives: PropTypes.arrayOf(
     PropTypes.shape({

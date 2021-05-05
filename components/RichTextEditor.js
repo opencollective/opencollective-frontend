@@ -133,6 +133,12 @@ const TrixEditorContainer = styled.div`
       // See https://feathericons.com/?query=image
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E");
     }
+    .trix-button--video-attach::before {
+      top: 8%;
+      bottom: 4%;
+      // See https://feathericons.com/?query=video
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-video'%3E%3Cpolygon points='23 7 16 12 23 17 23 7'%3E%3C/polygon%3E%3Crect x='1' y='5' width='15' height='14' rx='2' ry='2'%3E%3C/rect%3E%3C/svg%3E");
+    }
   } // End of toolbar customization
 
   /** Disabled mode */
@@ -173,13 +179,13 @@ export default class RichTextEditor extends React.Component {
     showCount: PropTypes.bool,
     /** max length which is allowed */
     maxLength: PropTypes.number,
-    /** Wether the toolbar should stick to the top */
+    /** Whether the toolbar should stick to the top */
     withStickyToolbar: PropTypes.bool,
     /** This component is borderless by default. Set this to `true` to change that. */
     withBorders: PropTypes.bool,
     /** This component is borderless by default. Set this to `true` to change that. */
     version: PropTypes.oneOf(['default', 'simplified']),
-    /** Wether the field should be disabled */
+    /** Whether the field should be disabled */
     disabled: PropTypes.bool,
     /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
     toolbarTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
@@ -191,6 +197,7 @@ export default class RichTextEditor extends React.Component {
     /** If truthy, will display a red outline */
     error: PropTypes.any,
     'data-cy': PropTypes.string,
+    videoEmbedEnabled: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -201,6 +208,7 @@ export default class RichTextEditor extends React.Component {
     toolbarBackgroundColor: 'white',
     version: 'default',
     'data-cy': 'RichTextEditor',
+    videoEmbedEnabled: false,
   };
 
   constructor(props) {
@@ -238,6 +246,7 @@ export default class RichTextEditor extends React.Component {
       this.editorRef.current.removeEventListener('trix-change', this.handleChange);
       this.editorRef.current.removeEventListener('trix-attachment-add', this.handleUpload);
       this.editorRef.current.removeEventListener('trix-attachment-add', this.handleFileAccept);
+      this.editorRef.current.removeEventListener('trix-action-invoke', this.trixActionInvoke);
     }
   }
 
@@ -251,7 +260,12 @@ export default class RichTextEditor extends React.Component {
       this.editorRef.current.addEventListener('trix-change', this.handleChange, false);
       this.editorRef.current.addEventListener('trix-attachment-add', this.handleUpload);
       this.editorRef.current.addEventListener('trix-file-accept', this.handleFileAccept);
-      this.editorRef.current.addEventListener('trix-initialize', () => {
+      this.editorRef.current.addEventListener('trix-action-invoke', this.trixActionInvoke);
+      this.editorRef.current.addEventListener('trix-initialize', event => {
+        if (this.props.videoEmbedEnabled) {
+          this.replaceEmbeddedIFrames(this.props.value || this.props.defaultValue);
+          this.trixEmbed(event);
+        }
         // Some special handling for links
         if (this.mainContainerRef.current) {
           // We must listen when the user presses the 'Enter' key and when the user clicks the 'Link' button as well
@@ -273,6 +287,127 @@ export default class RichTextEditor extends React.Component {
   };
 
   /** ---- Trix handlers ---- */
+  replaceEmbeddedIFrames = value => {
+    const iframeRegex = new RegExp(`<iframe.+?iframe>`, 'ig');
+    let match;
+    let lastIndex = 0;
+
+    while ((match = iframeRegex.exec(value))) {
+      if (lastIndex === 0) {
+        this.getEditor().loadHTML('');
+      }
+      const iframe = match[0];
+      const position = match.index;
+      const preText = value.substring(lastIndex, position);
+      this.getEditor().setSelectedRange([lastIndex, position]);
+      this.getEditor().insertHTML(preText);
+      const attachment = new this.Trix.Attachment({ content: iframe });
+      this.getEditor().insertAttachment(attachment);
+      lastIndex = match.index + iframe.length;
+    }
+  };
+
+  trixEmbed = e => {
+    const videoEmbedButton = `<button type="button" tabindex="-1" data-trix-action="x-video-dialog-open" title="Attach Video" class="trix-button trix-button--icon trix-button--video-attach">Attach Video</button>`;
+    const videoEmbedDialog = `
+            <div class="trix-dialog" data-trix-dialog="video-url" data-trix-dialog-attribute="video">
+              <div class="trix-dialog__link-fields">
+                <input type="url" name="video-url" class="trix-input trix-input--dialog trix-input--dialog-embed" placeholder="Enter Video URL…" aria-label="Video URL" data-trix-input="">
+                <div class="trix-button-group">
+                  <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
+                </div>
+              </div>
+              <strong>Note: Only YouTube and Anchor.fm links are supported.</strong>
+            </div>`;
+    const { toolbarElement } = e.target;
+    const attachFilesButton = toolbarElement.querySelector('[data-trix-action=attachFiles]');
+    attachFilesButton.insertAdjacentHTML('afterend', videoEmbedButton);
+    const trixDialog = toolbarElement.querySelector('.trix-dialog--link');
+    trixDialog.insertAdjacentHTML('afterend', videoEmbedDialog);
+  };
+
+  trixActionInvoke = e => {
+    const { toolbarElement } = e.target;
+    if (e.actionName === 'x-video-dialog-open') {
+      const attachVideoDialog = toolbarElement.querySelector('[data-trix-dialog=video-url]');
+      const attachVideoDialogInput = toolbarElement.querySelector('.trix-input--dialog-embed');
+      if (attachVideoDialog.getAttribute('data-trix-active') === '') {
+        attachVideoDialog.removeAttribute('data-trix-active');
+      } else {
+        attachVideoDialog.setAttribute('data-trix-active', '');
+        attachVideoDialogInput.removeAttribute('disabled');
+      }
+    } else if (e.actionName === 'x-add-embed') {
+      const embedLink = toolbarElement.querySelector('.trix-input--dialog-embed').value?.trim();
+      if (embedLink) {
+        this.embedIframe(embedLink);
+      }
+    }
+  };
+
+  constructVideoEmbedURL = (service, id) => {
+    if (service === 'youtube') {
+      return `https://www.youtube-nocookie.com/embed/${id}`;
+    } /* else if (service === 'vimeo') {
+      return `https://player.vimeo.com/video/${id}`;
+    } */ else if (
+      service === 'anchorFm'
+    ) {
+      return `https://anchor.fm/${id}`;
+    } else {
+      return null;
+    }
+  };
+
+  parseServiceLink = videoLink => {
+    const regexps = {
+      youtube: new RegExp(
+        '(?:https?://)?(?:www\\.)?youtu(?:\\.be/|be\\.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
+        'i',
+      ),
+      vimeo: new RegExp(
+        '(http|https)?://(www\\.)?vimeo\\.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
+      ),
+      anchorFm: /^(http|https)?:\/\/(www\.)?anchor\.fm\/([^/]+)(\/embed)?(\/episodes\/)?([^/]+)?\/?$/,
+    };
+    for (const service in regexps) {
+      const matches = regexps[service].exec(videoLink);
+      if (matches) {
+        if (service === 'anchorFm') {
+          const podcastName = matches[3];
+          const episodeId = matches[6];
+          const podcastUrl = `${podcastName}/embed`;
+          return { service, id: episodeId ? `${podcastUrl}/episodes/${episodeId}` : podcastUrl };
+        } else {
+          return { service, id: matches[matches.length - 1] };
+        }
+      }
+    }
+    return {};
+  };
+
+  embedIframe = videoLink => {
+    const { id, service } = this.parseServiceLink(videoLink);
+    const embedLink = this.constructVideoEmbedURL(service, id);
+    if (embedLink) {
+      const sanitizedLink = embedLink.replace(/["\\]/g, ''); // Small security enhancement, prevents going out of `src`
+      const videoServices = ['youtube', 'vimeo'];
+      let attachmentData;
+      if (videoServices.includes(service)) {
+        attachmentData = {
+          contentType: '--embed-iframe-video',
+          content: `<iframe src="${sanitizedLink}/?showinfo=0" width="100%" height="394" frameborder="0" allowfullscreen/>`,
+        };
+      } else {
+        attachmentData = {
+          contentType: `--embed-iframe-${service}`,
+          content: `<iframe src="${sanitizedLink}" width="100%" frameborder="0"/>`,
+        };
+      }
+
+      this.getEditor().insertAttachment(new this.Trix.Attachment(attachmentData));
+    }
+  };
 
   handleChange = e => {
     // Trigger content formatters
@@ -489,7 +624,7 @@ export default class RichTextEditor extends React.Component {
               />
               <Container position="absolute" bottom="1em" right="1em">
                 <StyledTag textTransform="uppercase">
-                  <span>{stripHTML(defaultValue).length}</span>
+                  <span>{stripHTML(value || defaultValue).length}</span>
                   {maxLength && <span> / {maxLength}</span>}
                 </StyledTag>
               </Container>

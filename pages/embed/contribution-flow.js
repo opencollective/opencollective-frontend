@@ -5,7 +5,6 @@ import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
-import { getBraintree } from '../../lib/braintree';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -27,7 +26,6 @@ import EmbeddedPage from '../../components/EmbeddedPage';
 import ErrorPage from '../../components/ErrorPage';
 import { Box } from '../../components/Grid';
 import Loading from '../../components/Loading';
-import MessageBox from '../../components/MessageBox';
 import { withStripeLoader } from '../../components/StripeProvider';
 import { withUser } from '../../components/UserProvider';
 
@@ -123,9 +121,6 @@ class NewContributionFlowPage extends React.Component {
     if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
       this.props.loadStripe();
     }
-    if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BRAINTREE_PAYPAL)) {
-      getBraintree();
-    }
   }
 
   getPageMetadata() {
@@ -148,17 +143,11 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBLocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
-    if (contributionBLocker) {
-      return <ContributionBlocker blocker={contributionBLocker} account={account} />;
+    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    if (contributionBlocker) {
+      return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
       return <ContributionFlowSuccess collective={account} isEmbed />;
-    } else if (!get(data.account, 'settings.beta.embedContributionFlow')) {
-      return (
-        <MessageBox type="info" withIcon m={4}>
-          Embedded contribution flow feature is not enabled for this account
-        </MessageBox>
-      );
     } else {
       return (
         <Box height="100%" pt={3}>
