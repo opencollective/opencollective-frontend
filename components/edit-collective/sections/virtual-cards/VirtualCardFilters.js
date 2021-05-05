@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -34,6 +35,8 @@ const VirtualCardFilters = ({
   collective,
   host,
 }) => {
+  const allowRequestVirtualCard = get(host, 'settings.virtualcards.requestcard');
+
   const getFilterProps = name => {
     return {
       inputId: `virtual-cards-filter-${name}`,
@@ -70,13 +73,15 @@ const VirtualCardFilters = ({
           </FilterLabel>
           <MerchantFilter {...getFilterProps('merchant')} virtualCardMerchants={virtualCardMerchants} />
         </FilterContainer>
-        <RequestVirtualCardBtn collective={collective} host={host}>
-          {btnProps => (
-            <StyledButton m={3} {...btnProps}>
-              <FormattedMessage id="VirtualCards.RequestCardButton" defaultMessage="Request card" />
-            </StyledButton>
-          )}
-        </RequestVirtualCardBtn>
+        {allowRequestVirtualCard && (
+          <RequestVirtualCardBtn collective={collective} host={host}>
+            {btnProps => (
+              <StyledButton m={3} {...btnProps}>
+                <FormattedMessage id="VirtualCards.RequestCardButton" defaultMessage="Request card" />
+              </StyledButton>
+            )}
+          </RequestVirtualCardBtn>
+        )}
       </Flex>
     </Container>
   );
