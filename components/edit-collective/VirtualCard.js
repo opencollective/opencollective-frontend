@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable camelcase */
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
@@ -7,6 +8,7 @@ import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
 
+import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
@@ -263,6 +265,35 @@ ActionsButton.propTypes = {
   onUpdate: PropTypes.func,
 };
 
+const getLimitString = ({ spend_limit, spend_limit_duration }) => {
+  const value = formatCurrency(spend_limit, 'USD');
+  if (spend_limit === 0) {
+    return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
+  }
+  switch (spend_limit_duration) {
+    case 'MONTHLY':
+      return (
+        <Fragment>
+          <FormattedMessage id="VirtualCards.LimittedTo" defaultMessage="Limitted to" />
+          &nbsp;
+          {value}/<FormattedMessage id="Frequency.Monthly.Short" defaultMessage="mo." />
+        </Fragment>
+      );
+    case 'ANNUALLY':
+      return (
+        <Fragment>
+          <FormattedMessage id="VirtualCards.LimittedTo" defaultMessage="Limitted to" />
+          &nbsp;
+          {value}/<FormattedMessage id="Frequency.Yearly.Short" defaultMessage="yr." />
+        </Fragment>
+      );
+    case 'TRANSACTION':
+    case 'FOREVER':
+    default:
+      return value;
+  }
+};
+
 const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
 
@@ -343,6 +374,8 @@ const VirtualCard = props => {
                   createdAt: new Date(props.createdAt),
                 }}
               />
+              &nbsp;&middot;&nbsp;
+              {getLimitString(props.data)}
             </P>
           </React.Fragment>
         )}

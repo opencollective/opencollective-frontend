@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { INVITE, PayoutMethodType } from '../../lib/constants/payout-method';
+import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -58,6 +58,8 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
   const payee = isDraft ? expense?.draft?.payee : expense?.payee;
   const isInvoice = expense?.type === expenseTypes.INVOICE;
+  const isCharge = expense?.type === expenseTypes.CHARGE;
+  const isPaid = expense?.status === expenseStatus.PAID;
 
   return isLoading ? (
     <LoadingPlaceholder height={150} mt={3} />
@@ -69,7 +71,11 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
     >
       <PrivateInfoColumn data-cy="expense-summary-payee" borderless={borderless}>
         <PrivateInfoColumnHeader>
-          <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
+          {isPaid ? (
+            <FormattedMessage id="Expense.PaidTo" defaultMessage="Paid to" />
+          ) : (
+            <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
+          )}
         </PrivateInfoColumnHeader>
         <LinkCollective collective={payee}>
           <Flex alignItems="center" fontSize="12px">
@@ -116,8 +122,11 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               type={
                 !expense.payoutMethod?.type && (expense.draft || expense.payee.isInvite)
                   ? expense.draft?.payoutMethod || INVITE
+                  : isCharge
+                  ? VIRTUAL_CARD
                   : expense.payoutMethod?.type
               }
+              name={expense?.virtualCard?.name && `${expense.virtualCard.name} Card (${expense.virtualCard.last4})`}
             />
           </Box>
           <div data-cy="expense-summary-payout-method-data">
@@ -140,7 +149,11 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
       {host && (
         <PrivateInfoColumn data-cy="expense-summary-host" borderless={borderless}>
           <PrivateInfoColumnHeader>
-            <FormattedMessage id="expense.PayFromFiscalhost" defaultMessage="Pay from Fiscal Host" />
+            {isPaid ? (
+              <FormattedMessage id="expense.PaidFromFiscalhost" defaultMessage="Paid from Fiscal Host" />
+            ) : (
+              <FormattedMessage id="expense.PayFromFiscalhost" defaultMessage="Pay from Fiscal Host" />
+            )}
           </PrivateInfoColumnHeader>
           <LinkCollective collective={host}>
             <Flex alignItems="center">
@@ -236,6 +249,11 @@ ExpensePayeeDetails.propTypes = {
       id: PropTypes.string,
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
       data: PropTypes.object,
+    }),
+    virtualCard: PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      last4: PropTypes.string,
     }),
   }),
   /** Disable border and paiding in styled card, usefull for modals */

@@ -3383,6 +3383,11 @@ type Expense {
   payoutMethod: PayoutMethod
 
   """
+  The virtual card used to pay for this charge
+  """
+  virtualCard: VirtualCard
+
+  """
   (Optional) files attached to the expense
   """
   attachedFiles: [ExpenseAttachedFile!]
