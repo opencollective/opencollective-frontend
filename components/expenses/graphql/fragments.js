@@ -246,6 +246,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     permissions {
+      id
       canEdit
       canDelete
       canSeeInvoiceInfo
@@ -289,6 +290,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     type
     requiredLegalDocuments
     permissions {
+      id
       canDelete
       canApprove
       canUnapprove
