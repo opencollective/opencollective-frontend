@@ -23,6 +23,13 @@ Cypress.on('uncaught:exception', err => {
     // See https://github.com/cypress-io/cypress/issues/3170
     // Ignore this error
     return false;
+  } else if (
+    err.message.includes('S3 service object not initialized') ||
+    err.message.includes('Invariant Violation: 19') ||
+    err.message.includes('No collective found with slug new-tester') ||
+    err.message.includes('Please provide a slug or an id')
+  ) {
+    return false;
   } else {
     throw err;
   }

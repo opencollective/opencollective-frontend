@@ -182,7 +182,7 @@ describe('New expense flow', () => {
       cy.intercept({
         method: 'POST',
         url: 'https://country-service.shopifycloud.com/graphql',
-        routeHandler: { fixture: 'countries.json' },
+        query: { fixture: 'countries.json' },
       });
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
