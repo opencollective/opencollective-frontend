@@ -243,7 +243,6 @@ describe('New expense flow', () => {
         cy.get('input[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
 
-        cy.wait(10000);
         cy.getByDataCy('expense-summary-btn').click();
         cy.wait(500);
 
