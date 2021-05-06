@@ -104,8 +104,8 @@ const RequestVirtualCardModal = props => {
             }
             htmlFor="notes"
             error={formik.touched.notes && formik.errors.notes}
-            required={false}
             labelFontWeight="500"
+            required
           >
             {inputProps => (
               <StyledTextarea
@@ -153,7 +153,7 @@ the host and Open Collective"
               data-cy="confirmation-modal-continue"
               loading={isCreating}
               type="submit"
-              disabled={!formik.values.agreement}
+              disabled={!formik.values.agreement || formik.values.notes?.length < 10}
             >
               <FormattedMessage id="RequestCard" defaultMessage="Request Card" />
             </StyledButton>
