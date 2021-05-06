@@ -62,7 +62,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
             <P textTransform="uppercase" fontSize="10px" lineHeight="14px" fontWeight="400" color="black.500">
               <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
             </P>
-            <Flex>
+            <Flex flexDirection="column">
               <P fontSize="14px" lineHeight="20px" fontWeight="bold">
                 <FormattedMoneyAmount
                   amount={contribution.amount.value * 100}
