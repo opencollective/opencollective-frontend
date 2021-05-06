@@ -3675,6 +3675,8 @@ input ExpenseItemInput {
 Fields for the user permissions on an expense
 """
 type ExpensePermissions {
+  id: String!
+
   """
   Whether the current user can edit the expense
   """
@@ -6040,6 +6042,8 @@ enum OrderDirection {
 Fields for the user permissions on an order
 """
 type OrderPermissions {
+  id: String!
+
   """
   Whether the current user can mark this order as expired
   """
@@ -7515,6 +7519,8 @@ type TransactionCollection implements Collection {
 Fields for the user permissions on an transaction
 """
 type TransactionPermissions {
+  id: String!
+
   """
   Whether the current user can edit the transaction
   """

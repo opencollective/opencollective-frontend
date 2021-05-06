@@ -91,7 +91,6 @@ MobileCollectiveInfoStickyBar.propTypes = {
   /** Must be provided if `isLoading` is false */
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
-    balance: PropTypes.number.isRequired,
     type: PropTypes.string,
     isApproved: PropTypes.bool,
     stats: PropTypes.shape({

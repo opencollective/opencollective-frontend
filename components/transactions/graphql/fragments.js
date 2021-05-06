@@ -88,6 +88,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         imageUrl
       }
       permissions {
+        id
         canRefund
         canDownloadInvoice
         canReject
