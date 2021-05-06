@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 import themeGet from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -8,10 +7,8 @@ import styled, { css } from 'styled-components';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
-import SectionSubtitle from '../home/SectionSubtitle';
 import SectionTitle from '../home/SectionTitle';
 import StyledCarousel from '../StyledCarousel';
-import StyledLink from '../StyledLink';
 import { H4, P, Span } from '../Text';
 
 const SelectFeatureButton = styled.button`
@@ -68,19 +65,6 @@ const FeatureList = styled(Box)`
   flex-direction: column;
   width: 100%;
   margin: 14px 0;
-`;
-
-const LearnMoreLink = styled(StyledLink)`
-  color: #dc5f7d;
-  &:hover {
-    color: #dc5f7d;
-  }
-`;
-
-const LineBreak = styled.br`
-  @media screen and (min-width: 40em) {
-    display: none;
-  }
 `;
 
 const features = [
@@ -212,7 +196,7 @@ FeatureTitle.propTypes = {
   intl: PropTypes.any.isRequired,
 };
 
-const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
+const FeatureDescription = ({ intl, id, ...props }) => (
   <Box {...props}>
     <P
       fontSize={['16px', null, null, null, '18px']}
@@ -222,19 +206,6 @@ const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
       textAlign={['center', 'left']}
     >
       {intl.formatMessage(messages[`fiscalHosting.feature.${id}.description`])}{' '}
-      {/* {learnMoreLink && (
-        <React.Fragment>
-          <LineBreak />
-          <LearnMoreLink href={learnMoreLink} openInNewTab>
-            <FormattedMessage id="LearnMore" defaultMessage="Learn more" />
-            <Span display={[null, 'none']}>
-              {' '}
-              <ArrowRight size="24" />
-            </Span>
-            <Span display={['none', 'inline-block']}>...</Span>
-          </LearnMoreLink>
-        </React.Fragment>
-      )} */}
     </P>
   </Box>
 );
@@ -279,14 +250,11 @@ const HowToUseOpenCollective = () => {
   return (
     <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 0]}>
       <SectionTitle mb="0">
-        <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective" />
+        <FormattedMessage id="fiscalHosting.howCanAFiscalHostHelp" defaultMessage="How can a fiscal host help?" />
       </SectionTitle>
-      <SectionSubtitle>
-        <FormattedMessage id="home.featureSection.subTitle" defaultMessage="Discover our features." />
-      </SectionSubtitle>
       <Flex
         flexDirection={['column', 'row-reverse']}
-        alignItems={[null, 'flex-start', null, null, 'center']}
+        alignItems={[null, 'flex-start']}
         mt={[3, null, 4]}
         justifyContent="center"
       >

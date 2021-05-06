@@ -2,89 +2,136 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
+import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import SectionSubTitle from '../home/SectionSubtitle';
 import SectionTitle from '../home/SectionTitle';
 import Link from '../Link';
 import StyledCarousel from '../StyledCarousel';
-import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
 
-const Img = styled.img`
-  max-width: 100%;
-`;
-
-const ImgWrapper = styled(Box)`
-  border-radius: 8px;
-  &:hover {
-    box-shadow: 0px 8px 12px rgba(20, 20, 20, 0.16);
-  }
-`;
-
 const messages = defineMessages({
-  'fiscalHosting.hosts.opensource': {
-    id: 'fiscalHosting.hosts.opensource',
+  'fiscalHosting.hosts.OCF': {
+    id: 'fiscalHosting.hosts.OCF',
     defaultMessage:
       'A US 501(c)(3) nonprofit entity with a broad mission covering most charitable activities in the United States.',
   },
-  'fiscalHosting.hosts.meetups': {
-    id: 'fiscalHosting.hosts.meetups',
+  'fiscalHosting.hosts.OSC': {
+    id: 'fiscalHosting.hosts.OSC',
     defaultMessage:
       'A US 501(c)(6) nonprofit entity serving as fiscal host to open source projects and related communities around the world.',
   },
-  'fiscalHosting.hosts.movements': {
-    id: 'fiscalHosting.hosts.movements',
+  'fiscalHosting.hosts.socialchangenestcollective': {
+    id: 'fiscalHosting.hosts.socialchangenestcollective',
     defaultMessage:
       'A UK host for mutual aid groups and social movements, providing tools, strategy, and back office support to scale up and get on with changing the world.',
   },
+  'fiscalHosting.hosts.allForClimate': {
+    id: 'fiscalHosting.hosts.allForClimate',
+    defaultMessage:
+      'Dedicated to movements for climate and social justice, host to many local Extinction Rebellion chapters and related communities.',
+  },
+  'fiscalHosting.hosts.OCE': {
+    id: 'fiscalHosting.hosts.OCE',
+    defaultMessage:
+      'A Brussels-based nonprofit hosting groups across Europe, including open source projects and community social action.',
+  },
+  'fiscalHosting.hosts.OCN': {
+    id: 'fiscalHosting.hosts.OCN',
+    defaultMessage: 'Offering kiwi impact projects fundholding options through a charity or a company structure.',
+  },
 });
+
+const groupIntoThree = array =>
+  array.reduce((rows, key, index) => (index % 3 == 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows, []);
 
 const hosts = [
   {
-    id: 'opensource',
+    id: 'OCF',
     name: 'Open Collective Foundation',
     location: '🇺🇸 United States',
     collectivePath: '/foundation',
     learnMorePath: '/discover?show=open%20source',
-    picture: '/static/images/home/oc-users-babel.png',
+    bgImage: 'ocf',
+    logo: '/static/images/become-a-host/ocf-logo.png',
   },
   {
-    id: 'meetups',
-    name: 'Women Who Code',
+    id: 'OSC',
+    name: 'Open Source Collective',
     location: '🇺🇸 United States',
-    collectivePath: '/wwcodeatl',
-    learnMorePath: '/wwcodeinc',
-    picture: '/static/images/home/oc-users-womenwhocode.png',
+    collectivePath: '/opensource',
+    learnMorePath: '/opensource',
+    bgImage: 'osc',
+    logo: '/static/images/become-a-host/osc-logo.png',
   },
   {
-    id: 'movements',
-    name: 'Extinction Rebellion',
+    id: 'socialchangenestcollective',
+    name: 'Social Change Nest',
     location: '🇬🇧 United Kingdom',
     collectivePath: '/xr-belgium',
     learnMorePath: '/search?q=rebellion',
-    picture: '/static/images/home/oc-users-extinctionrebllion.png',
+    bgImage: 'socialchangenest',
+    logo: '/static/images/become-a-host/socialchangenest-logo.png',
+  },
+  {
+    id: 'allForClimate',
+    name: 'All for climate',
+    location: ' 🇪🇺 Europe',
+    collectivePath: '/foundation',
+    learnMorePath: '/discover?show=open%20source',
+    bgImage: 'allforclimate-collective',
+    logo: '/static/images/become-a-host/climate-logo.png',
+  },
+  {
+    id: 'OCE',
+    name: 'Open Collective Europe',
+    location: ' 🇪🇺 Europe',
+    collectivePath: '/wwcodeatl',
+    learnMorePath: '/wwcodeinc',
+    bgImage: 'oce-bg',
+    logo: '/static/images/fiscal-hosting/oce.png',
+  },
+  {
+    id: 'OCN',
+    name: 'Open Collective NZ',
+    location: '🇳🇿 New Zealand',
+    collectivePath: '/xr-belgium',
+    learnMorePath: '/search?q=rebellion',
+    bgImage: 'ocn-bg',
+    logo: '/static/images/fiscal-hosting/ocn.png',
   },
 ];
 
-const Host = ({ id, name, picture, location, collectivePath }) => {
+const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
   const intl = useIntl();
-
   return (
-    <Container textAlign="center" display="flex" flexDirection="column" alignItems="center" mx={[null, 3, 3]}>
-      <ImgWrapper width={[1, '205px', null, '288px', '368px']}>
-        <Link href={collectivePath}>
-          <Img alt={name} src={picture} width="100%" />
-        </Link>
-      </ImgWrapper>
+    <Container
+      textAlign="center"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      mx={[null, 2, null, null, 3]}
+      my={3}
+    >
+      <Container
+        width={['288px', '205px', '250px', null, '304px']}
+        height={['210px', '218px', '250px', null, '256px']}
+        background={`url("/static/images/become-a-host/${bgImage}.png") no-repeat`}
+        backgroundSize={['contain', '100% 100%']}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Avatar radius="96px" src={logo} name={name} type="ORGANIZATION" />
+      </Container>
       <Container
         textAlign="center"
         display="flex"
         flexDirection="column"
         alignItems="flex-start"
-        width={[1, '206px', null, '288px', '368px']}
+        width={['288px', '205px', '250px', null, '304px']}
       >
         <P
           fontSize={['15px', '18px']}
@@ -92,8 +139,8 @@ const Host = ({ id, name, picture, location, collectivePath }) => {
           color="black.600"
           lineSpacing={['-0.12px', '-0.2px']}
           fontWeight="normal"
-          mt={24}
-          mb={12}
+          mt="16px"
+          mb="12px"
         >
           {location}
         </P>
@@ -141,54 +188,52 @@ Host.propTypes = {
   learnMorePath: PropTypes.string,
 };
 
-const ApplyToFiscalHosts = () => {
-  return (
-    <Flex my={4} flexDirection="column" mx={[3, 4]} alignItems="center">
-      <SectionTitle
+const ApplyToFiscalHosts = () => (
+  <Flex my={4} flexDirection="column" mx={[3, 4]} alignItems="center">
+    <SectionTitle
+      textAlign="center"
+      fontSize={['24px', '32px']}
+      lineHeight={['32px', '40px']}
+      letterSpacing={['-0.008em', '-1.2px']}
+      mb="8px"
+    >
+      <FormattedMessage id="fiscalHosting.applyToFiscalHost" defaultMessage="Apply to one of our Fiscal Hosts" />
+    </SectionTitle>
+    <Container width={['286px', '648px']} textAlign="center" mb={4}>
+      <SectionSubTitle
+        color="black.700"
+        fontWeight="500"
         textAlign="center"
-        fontSize={[null, '32px']}
-        lineHeight={[null, '40px']}
-        letterSpacing={[null, '-1.2px']}
+        fontSize={['16px', '20px']}
+        lineHeight={['24px', '28px']}
+        letterSpacing={[null, '-0.6px']}
+        my="0"
       >
-        <FormattedMessage id="fiscalHosting.applyToFiscalHost" defaultMessage="Apply to one of our Fiscal Hosts" />
-      </SectionTitle>
-      <Container width={['286px', '648px']} mb={4} textAlign="center">
-        <SectionSubTitle
-          color="black.700"
-          fontWeight="500"
-          textAlign="center"
-          mb={4}
-          fontSize={[null, '20px']}
-          lineHeight={[null, '28px']}
-          letterSpacing={[null, '-0.6px']}
-        >
-          <FormattedMessage
-            id="fiscalHosting.applyToFiscalHost.description"
-            defaultMessage="Organizations around the world are using Open Collective to host multiple projects, groups and communities Find out more about them!"
-          />
-        </SectionSubTitle>
-      </Container>
-      <StyledCarousel options={hosts} display={[null, 'none']} width={1}>
-        {hosts.map(host => (
-          <Host key={host.id} {...host} />
+        <FormattedMessage
+          id="fiscalHosting.applyToFiscalHost.description"
+          defaultMessage="Organizations around the world are using Open Collective to host multiple projects, groups and communities Find out more about them!"
+        />
+      </SectionSubTitle>
+    </Container>
+    <StyledCarousel options={hosts} display={[null, 'none']} width={1}>
+      {hosts.map(host => (
+        <Host key={host.id} {...host} />
+      ))}
+    </StyledCarousel>
+    <Flex mt={2} width={1}>
+      <StyledCarousel options={groupIntoThree(hosts)} width={1} display={['none', 'block']}>
+        {groupIntoThree(hosts).map((groupedHost, index) => (
+          <Container display={['none', 'flex']} key={index.toString()} justifyContent="center" width={1}>
+            {groupedHost.map(host => (
+              <Fragment key={host.id}>
+                <Host {...host} />
+              </Fragment>
+            ))}
+          </Container>
         ))}
       </StyledCarousel>
-      <Flex mt={2}>
-        <Container display={['none', 'flex']}>
-          {hosts.map(host => (
-            <Fragment key={host.id}>
-              <Host {...host} />
-            </Fragment>
-          ))}
-        </Container>
-      </Flex>
-      <Box mt={4}>
-        <StyledLink as={Link} buttonStyle="standard" buttonSize="medium" href="/discover">
-          <FormattedMessage id="home.discover" defaultMessage="Discover more" />
-        </StyledLink>
-      </Box>
     </Flex>
-  );
-};
+  </Flex>
+);
 
 export default ApplyToFiscalHosts;

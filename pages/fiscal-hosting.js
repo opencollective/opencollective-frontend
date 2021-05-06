@@ -4,7 +4,7 @@ import { defineMessages, useIntl } from 'react-intl';
 import APlaceToGrowAndThrive from '../components/fiscal-hosting/APlaceToGrowAndThriveSection';
 import ApplyToFiscalHosts from '../components/fiscal-hosting/ApplyToFiscalHostSection';
 import FindTheRightFiscalHost from '../components/fiscal-hosting/FindTheRightFiscalHostSection';
-import HowToUseOpenCollective from '../components/fiscal-hosting/HowToUseOpenCollective';
+import HowCanAFiscalHostHelp from '../components/fiscal-hosting/HowCanAFiscalHostHelpSection';
 import WhatAreTheBenefits from '../components/fiscal-hosting/WhatAreTheBenefitsSection';
 import WhatIsFiscalHost from '../components/fiscal-hosting/WhatIsFiscalHostSection';
 import WhoIsFiscalHosting from '../components/fiscal-hosting/WhoIsFiscalHostingForSection';
@@ -20,23 +20,20 @@ const messages = defineMessages({
   },
 });
 
-const BecomeAHost = () => {
+const FiscalHosting = () => {
   const { formatMessage } = useIntl();
   return (
     <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
       <APlaceToGrowAndThrive />
       <WhatIsFiscalHost />
       <WhatAreTheBenefits />
-      <HowToUseOpenCollective />
+      <HowCanAFiscalHostHelp />
       <WhoIsFiscalHosting />
       <ApplyToFiscalHosts />
       <FindTheRightFiscalHost />
-      {/* <WhoAreFiscalHosts />
-      <WhatAreTheBenefits />
-      <CaseStudies /> */}
-      <JoinUs />
+      <JoinUs page="fiscalHosting" />
     </Page>
   );
 };
 
-export default BecomeAHost;
+export default FiscalHosting;
