@@ -33,6 +33,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
     $offset: Int!
     $state: String
     $merchantAccount: AccountReferenceInput
+    $collectiveAccountIds: [AccountReferenceInput]
   ) {
     host(slug: $slug) {
       id
@@ -41,7 +42,13 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
       supportedPayoutMethods
       name
       imageUrl
-      hostedVirtualCards(limit: $limit, offset: $offset, state: $state, merchantAccount: $merchantAccount) {
+      hostedVirtualCards(
+        limit: $limit
+        offset: $offset
+        state: $state
+        merchantAccount: $merchantAccount
+        collectiveAccountIds: $collectiveAccountIds
+      ) {
         totalCount
         limit
         offset
@@ -70,6 +77,18 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
             address
             country
           }
+          imageUrl(height: 64)
+        }
+      }
+      hostedVirtualCardCollectives {
+        totalCount
+        limit
+        offset
+        nodes {
+          id
+          slug
+          name
+          legacyId
           imageUrl(height: 64)
         }
       }
@@ -107,7 +126,7 @@ const HostVirtualCards = props => {
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { state, merchant } = routerQuery;
+  const { state, merchant, collectiveAccountIds } = routerQuery;
   const { formatMessage } = useIntl();
   const { addToast } = useToasts();
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
@@ -118,15 +137,11 @@ const HostVirtualCards = props => {
       offset,
       state,
       merchantAccount: { slug: merchant },
+      collectiveAccountIds: collectiveAccountIds
+        ? collectiveAccountIds.split(',').map(collectiveAccountId => ({ legacyId: parseInt(collectiveAccountId) }))
+        : undefined,
     },
   });
-
-  function updateFilters(queryParams) {
-    return router.push({
-      pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
-      query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
-    });
-  }
 
   const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
     context: API_V2_CONTEXT,
@@ -149,6 +164,17 @@ const HostVirtualCards = props => {
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
   );
+
+  const handleUpdateFilters = queryParams => {
+    return router.push(
+      {
+        pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
+        query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
+      },
+      null,
+      { scroll: false },
+    );
+  };
 
   const handleAssignCardSuccess = () => {
     addToast({
@@ -291,20 +317,22 @@ const HostVirtualCards = props => {
 
       <Box mt={4}>
         <SettingsSectionTitle>
-          <FormattedMessage id="Host.VirtualCards.List.Title" defaultMessage="Assigned Cards" />
+          <FormattedMessage id="Host.VirtualCards.List.Title" defaultMessage="Virtual Cards" />
         </SettingsSectionTitle>
         <P>
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
-            defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier! Learn more"
+            defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier!"
           />
         </P>
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
+            isCollectiveFilter={true}
             filters={routerQuery}
             collective={props.collective}
             virtualCardMerchants={data.host.hostedVirtualCardMerchants.nodes}
-            onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
+            virtualCardCollectives={data.host.hostedVirtualCardCollectives.nodes}
+            onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
           />
         </Flex>
       </Box>

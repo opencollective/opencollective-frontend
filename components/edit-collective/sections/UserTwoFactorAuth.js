@@ -507,6 +507,8 @@ class UserTwoFactorAuth extends React.Component {
                                       pattern="[0-9]{6}"
                                       inputMode="numeric"
                                       autoFocus
+                                      minLength={6}
+                                      maxLength={6}
                                       data-cy="add-two-factor-auth-totp-code-field"
                                     />
                                   )}

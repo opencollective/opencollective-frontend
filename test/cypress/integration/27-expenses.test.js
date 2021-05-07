@@ -179,30 +179,10 @@ describe('New expense flow', () => {
 
     // This can happen if you start with an invoice then switch to receipts
     it('should prevent submitting receipts if missing items', () => {
-      cy.server();
-      cy.route({
+      cy.intercept({
         method: 'POST',
         url: 'https://country-service.shopifycloud.com/graphql',
-        response: {
-          country: {
-            name: 'Angola',
-            labels: {
-              address1: 'Address',
-              address2: 'Apartment, suite, etc.',
-              city: 'City',
-              postalCode: 'Postal code',
-              zone: 'Region',
-            },
-            optionalLabels: {
-              address2: 'Apartment, suite, etc. (optional)',
-            },
-            formatting: {
-              edit: '{firstName}{lastName}_{company}_{address1}_{address2}_{city}_{country}_{phone}',
-              show: '{firstName} {lastName}_{company}_{address1}_{address2}_{city}_{country}_{phone}',
-            },
-            zones: [],
-          },
-        },
+        query: { fixture: 'countries.json' },
       });
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
@@ -218,7 +198,7 @@ describe('New expense flow', () => {
       cy.get('input[name="items[0].description"]').type('Peeling potatoes');
       cy.get('input[name="items[0].amount"]').type('{selectall}4200');
 
-      // Switch to receipt and acnkowledge error
+      // Switch to receipt and acknowledge error
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-summary-btn').click();

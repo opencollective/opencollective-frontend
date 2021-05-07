@@ -3383,6 +3383,11 @@ type Expense {
   payoutMethod: PayoutMethod
 
   """
+  The virtual card used to pay for this charge
+  """
+  virtualCard: VirtualCard
+
+  """
   (Optional) files attached to the expense
   """
   attachedFiles: [ExpenseAttachedFile!]
@@ -3675,6 +3680,8 @@ input ExpenseItemInput {
 Fields for the user permissions on an expense
 """
 type ExpensePermissions {
+  id: String!
+
   """
   Whether the current user can edit the expense
   """
@@ -4568,8 +4575,10 @@ type Host implements Account & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    collectiveAccountIds: [AccountReferenceInput] = null
   ): VirtualCardCollection!
   hostedVirtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  hostedVirtualCardCollectives(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
 
 type HostApplication {
@@ -5746,6 +5755,21 @@ type Mutation {
   confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
 
   """
+  Add platform tips to a transaction
+  """
+  addPlatformTipToTransaction(
+    """
+    Reference to the transaction in the platform tip
+    """
+    transaction: TransactionReferenceInput!
+
+    """
+    Amount of the platform tip
+    """
+    amount: AmountInput!
+  ): Transaction!
+
+  """
   Refunds transaction
   """
   refundTransaction(
@@ -6023,6 +6047,8 @@ enum OrderDirection {
 Fields for the user permissions on an order
 """
 type OrderPermissions {
+  id: String!
+
   """
   Whether the current user can mark this order as expired
   """
@@ -7498,6 +7524,8 @@ type TransactionCollection implements Collection {
 Fields for the user permissions on an transaction
 """
 type TransactionPermissions {
+  id: String!
+
   """
   Whether the current user can edit the transaction
   """

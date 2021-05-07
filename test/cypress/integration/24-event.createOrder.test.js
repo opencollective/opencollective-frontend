@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 describe('event.createOrder page', () => {
   let collectiveSlug = null;
 
@@ -26,11 +28,11 @@ describe('event.createOrder page', () => {
     cy.get('.inputs input[name="name"]').type('Test Event with VAT');
     cy.get('.inputs .startsAt input[type="text"]')
       .clear()
-      .type(`${Cypress.moment().format('MM/DD/YYYY')} 7:00 PM`)
+      .type(`${dayjs().format('MM/DD/YYYY')} 7:00 PM`)
       .blur();
     cy.get('.inputs .endsAt input[type="text"]')
       .clear()
-      .type(`${Cypress.moment().add(1, 'day').format('MM/DD/YYYY')} 7:00 PM`)
+      .type(`${dayjs().add(1, 'day').format('MM/DD/YYYY')} 7:00 PM`)
       .blur();
 
     cy.contains('button', 'Create Event').click();

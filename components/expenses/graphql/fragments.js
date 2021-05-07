@@ -240,12 +240,18 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       data
       isSaved
     }
+    virtualCard {
+      id
+      name
+      last4
+    }
     comments(limit: 300) {
       nodes {
         ...CommentFields
       }
     }
     permissions {
+      id
       canEdit
       canDelete
       canSeeInvoiceInfo
@@ -289,6 +295,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     type
     requiredLegalDocuments
     permissions {
+      id
       canDelete
       canApprove
       canUnapprove

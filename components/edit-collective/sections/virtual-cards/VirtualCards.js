@@ -28,6 +28,18 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
       id
       legacyId
       slug
+      type
+      name
+      imageUrl
+      host {
+        legacyId
+        slug
+        id
+        type
+        name
+        imageUrl
+        settings
+      }
       virtualCards(limit: $limit, offset: $offset, state: $state, merchantAccount: $merchantAccount) {
         totalCount
         limit
@@ -87,12 +99,12 @@ const VirtualCards = props => {
     return <Loading />;
   }
 
-  function updateFilters(queryParams) {
+  const handleUpdateFilters = queryParams => {
     return router.push({
       pathname: `/${props.collective.slug}/edit/virtual-cards`,
       query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
     });
-  }
+  };
 
   return (
     <Box width={['366px', '764px']}>
@@ -111,8 +123,9 @@ const VirtualCards = props => {
           <VirtualCardFilters
             filters={routerQuery}
             collective={props.collective}
+            host={props.collective.host}
             virtualCardMerchants={data.collective.virtualCardMerchants.nodes}
-            onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
+            onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
           />
         </Flex>
       </Box>
@@ -139,7 +152,8 @@ VirtualCards.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
     virtualCards: PropTypes.object,
-    virtualCardMerchants: PropTypes.object,
+    virtualCardMerchants: PropTypes.array,
+    host: PropTypes.object,
   }),
   hideTopsection: PropTypes.func,
 };

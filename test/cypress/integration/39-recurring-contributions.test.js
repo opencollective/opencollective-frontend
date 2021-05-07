@@ -28,9 +28,10 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-menu-payment-option').click();
       cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
       cy.getByDataCy('recurring-contribution-add-pm-button').click();
-      cy.wait(3000);
+      cy.wait(5000);
       cy.fillStripeInput();
       cy.getByDataCy('recurring-contribution-submit-pm-button').click();
+      cy.wait(1000);
       cy.contains('[data-cy="recurring-contribution-pm-box"]', 'VISA **** 4242').within(() => {
         cy.getByDataCy('radio-select').check();
       });

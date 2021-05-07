@@ -510,7 +510,6 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
 UpdatePaymentMethodPopUp.propTypes = {
   data: PropTypes.object,
   setMenuState: PropTypes.func,
-  router: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
   onCloseEdit: PropTypes.func,
   loadStripe: PropTypes.func.isRequired,
