@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Container from '../Container';
@@ -7,7 +8,7 @@ import Illustration from '../home/HomeIllustration';
 import StyledCarousel from '../StyledCarousel';
 import { H2, H3, P } from '../Text';
 
-const hostConsiderations = ['missionAlignment', 'location', 'legalStructure', 'serviceOffered', 'fees', 'operations'];
+import { HOST_CONSIDERATIONS } from './constants';
 
 const messages = defineMessages({
   'fiscalHosting.missionAlignment': {
@@ -72,17 +73,11 @@ const Consideration = ({ consideration }) => {
     <Container
       display="flex"
       flexDirection={['column', 'row', 'column']}
-      alignItems="center"
-      mb={4}
-      textAlign={['center', 'left', 'center']}
+      alignItems={['center', null, null, null, 'flex-start']}
+      textAlign={['center', 'left', 'center', null, 'left']}
       key={consideration}
     >
-      <Box
-        width={['132px', null, null, null, '208px']}
-        height={['132px', null, null, null, '208px']}
-        mb={[2, null, '17px', null, '51px']}
-        mr={[null, 4, 0]}
-      >
+      <Box width="140px" height="140px" mb={[2, 0, '24px']} mr={[null, 4, 0]}>
         <Illustration src={`/static/images/fiscal-hosting/${consideration}.png`} alt="Icon" />
       </Box>
       <Box width={['288px', '472px', '250px', null, '289px']}>
@@ -103,9 +98,19 @@ const Consideration = ({ consideration }) => {
   );
 };
 
+Consideration.propTypes = {
+  consideration: PropTypes.string,
+};
+
 const FindTheRightFiscalHost = () => {
   return (
-    <Flex mt={['96px', '80px', null, null, '104px']} mb="80px" flexDirection="column">
+    <Flex
+      mt={['96px', '80px', null, null, '104px']}
+      mb="80px"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+    >
       <Container display="flex" flexDirection="column" alignItems="center" mx={3}>
         <Box mb={[2, 3]} width={['288px', 1]}>
           <H2
@@ -137,9 +142,9 @@ const FindTheRightFiscalHost = () => {
           </P>
         </Box>
       </Container>
-      <Container display={['display', 'none']} justifyContent="center" alignItems="center" mt="56px">
-        <StyledCarousel options={hostConsiderations} display={[null, 'none']} width={1}>
-          {hostConsiderations.map(consideration => (
+      <Container width={1} display={['display', 'none']} justifyContent="center" alignItems="center" mt="56px">
+        <StyledCarousel options={HOST_CONSIDERATIONS} display={[null, 'none']} width={1}>
+          {HOST_CONSIDERATIONS.map(consideration => (
             <Consideration key={consideration} consideration={consideration} />
           ))}
         </StyledCarousel>
@@ -147,13 +152,14 @@ const FindTheRightFiscalHost = () => {
       <Grid
         mx={3}
         gridTemplateColumns={[null, null, 'repeat(3, 1fr)']}
-        columnGap="48px"
+        gridGap={[null, '32px', '56px 48px', null, '56px 96px']}
         placeSelf="center"
         alignItems="center"
         mt="56px"
         display={['none', 'grid']}
+        maxWidth="1200px"
       >
-        {hostConsiderations.map(consideration => (
+        {HOST_CONSIDERATIONS.map(consideration => (
           <Consideration key={consideration} consideration={consideration} />
         ))}
       </Grid>

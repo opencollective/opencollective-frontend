@@ -12,6 +12,8 @@ import Link from '../Link';
 import StyledCarousel from '../StyledCarousel';
 import { P, Span } from '../Text';
 
+import { HOSTS } from './constants';
+
 const messages = defineMessages({
   'fiscalHosting.hosts.OCF': {
     id: 'fiscalHosting.hosts.OCF',
@@ -44,65 +46,8 @@ const messages = defineMessages({
   },
 });
 
-const groupIntoThree = array =>
-  array.reduce((rows, key, index) => (index % 3 == 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows, []);
-
-const hosts = [
-  {
-    id: 'OCF',
-    name: 'Open Collective Foundation',
-    location: '🇺🇸 United States',
-    collectivePath: '/foundation',
-    learnMorePath: '/discover?show=open%20source',
-    bgImage: 'ocf',
-    logo: '/static/images/become-a-host/ocf-logo.png',
-  },
-  {
-    id: 'OSC',
-    name: 'Open Source Collective',
-    location: '🇺🇸 United States',
-    collectivePath: '/opensource',
-    learnMorePath: '/opensource',
-    bgImage: 'osc',
-    logo: '/static/images/become-a-host/osc-logo.png',
-  },
-  {
-    id: 'socialchangenestcollective',
-    name: 'Social Change Nest',
-    location: '🇬🇧 United Kingdom',
-    collectivePath: '/xr-belgium',
-    learnMorePath: '/search?q=rebellion',
-    bgImage: 'socialchangenest',
-    logo: '/static/images/become-a-host/socialchangenest-logo.png',
-  },
-  {
-    id: 'allForClimate',
-    name: 'All for climate',
-    location: ' 🇪🇺 Europe',
-    collectivePath: '/foundation',
-    learnMorePath: '/discover?show=open%20source',
-    bgImage: 'allforclimate-collective',
-    logo: '/static/images/become-a-host/climate-logo.png',
-  },
-  {
-    id: 'OCE',
-    name: 'Open Collective Europe',
-    location: ' 🇪🇺 Europe',
-    collectivePath: '/wwcodeatl',
-    learnMorePath: '/wwcodeinc',
-    bgImage: 'oce-bg',
-    logo: '/static/images/fiscal-hosting/oce.png',
-  },
-  {
-    id: 'OCN',
-    name: 'Open Collective NZ',
-    location: '🇳🇿 New Zealand',
-    collectivePath: '/xr-belgium',
-    learnMorePath: '/search?q=rebellion',
-    bgImage: 'ocn-bg',
-    logo: '/static/images/fiscal-hosting/ocn.png',
-  },
-];
+const groupHostsIntoSections = hosts =>
+  hosts.reduce((rows, key, index) => (index % 3 == 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows, []);
 
 const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
   const intl = useIntl();
@@ -168,10 +113,12 @@ const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
             {intl.formatMessage(messages[`fiscalHosting.hosts.${id}`])}
           </P>
         </Box>
-        <Link href="#">
-          <FormattedMessage id="apply" defaultMessage="Apply" />
+        <Link href={collectivePath}>
+          <Span color="#3220A3">
+            <FormattedMessage id="apply" defaultMessage="Apply" />
+          </Span>
           <Span ml="8px">
-            <ArrowRight2 size="18" />
+            <ArrowRight2 color="#3220A3" size="18" />
           </Span>
         </Link>
       </Container>
@@ -185,7 +132,8 @@ Host.propTypes = {
   picture: PropTypes.string,
   location: PropTypes.string,
   collectivePath: PropTypes.string,
-  learnMorePath: PropTypes.string,
+  logo: PropTypes.string,
+  bgImage: PropTypes.string,
 };
 
 const ApplyToFiscalHosts = () => (
@@ -215,14 +163,14 @@ const ApplyToFiscalHosts = () => (
         />
       </SectionSubTitle>
     </Container>
-    <StyledCarousel options={hosts} display={[null, 'none']} width={1}>
-      {hosts.map(host => (
+    <StyledCarousel options={HOSTS} display={[null, 'none']} width={1}>
+      {HOSTS.map(host => (
         <Host key={host.id} {...host} />
       ))}
     </StyledCarousel>
     <Flex mt={2} width={1}>
-      <StyledCarousel options={groupIntoThree(hosts)} width={1} display={['none', 'block']}>
-        {groupIntoThree(hosts).map((groupedHost, index) => (
+      <StyledCarousel options={groupHostsIntoSections(HOSTS)} width={1} display={['none', 'block']}>
+        {groupHostsIntoSections(HOSTS).map((groupedHost, index) => (
           <Container display={['none', 'flex']} key={index.toString()} justifyContent="center" width={1}>
             {groupedHost.map(host => (
               <Fragment key={host.id}>

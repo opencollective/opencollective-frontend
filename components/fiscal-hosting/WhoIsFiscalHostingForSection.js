@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -9,6 +10,8 @@ import SectionSubtitle from '../home/SectionSubtitle';
 import SectionTitle from '../home/SectionTitle';
 import StyledCarousel from '../StyledCarousel';
 import { H3, P } from '../Text';
+
+import { WHO_IS_FISCAL_HOSTING_FOR } from './constants';
 
 const IconWrapper = styled(Box)`
   display: flex;
@@ -26,46 +29,6 @@ const IconWrapper = styled(Box)`
 const Wrapper = styled(Grid)`
   justify-items: center;
 `;
-
-const OCPotentialUsers = {
-  firstCategories: [
-    {
-      id: 'community',
-    },
-    {
-      id: 'grantRecipients',
-    },
-    {
-      id: 'timeLimited',
-    },
-    {
-      id: 'unincorporatedGroup',
-    },
-    {
-      id: 'crowdFunding',
-    },
-    {
-      id: 'youngActivists',
-    },
-  ],
-  secondCategories: [
-    {
-      id: 'newlyFormingCharity',
-    },
-    {
-      id: 'distributeCollaboration',
-    },
-    {
-      id: 'founderCoalition',
-    },
-    {
-      id: 'companiesGivingBack',
-    },
-    {
-      id: 'grantMakingInstitution',
-    },
-  ],
-};
 
 const messages = defineMessages({
   'fiscalHosting.community': {
@@ -210,6 +173,10 @@ const PotentialUsers = ({ users }) => {
   );
 };
 
+PotentialUsers.propTypes = {
+  users: PropTypes.array,
+};
+
 const WhoIsFiscalHosting = () => {
   return (
     <React.Fragment>
@@ -271,9 +238,9 @@ const WhoIsFiscalHosting = () => {
         justifyContent="center"
         alignItems="center"
       >
-        <StyledCarousel options={Object.keys(OCPotentialUsers)} width="100%">
-          {Object.keys(OCPotentialUsers).map((categories, index) => (
-            <PotentialUsers key={index.toString()} users={OCPotentialUsers[categories]} />
+        <StyledCarousel options={Object.keys(WHO_IS_FISCAL_HOSTING_FOR)} width="100%" maxWidth="1200px">
+          {Object.keys(WHO_IS_FISCAL_HOSTING_FOR).map((categories, index) => (
+            <PotentialUsers key={index.toString()} users={WHO_IS_FISCAL_HOSTING_FOR[categories]} />
           ))}
         </StyledCarousel>
       </Container>
