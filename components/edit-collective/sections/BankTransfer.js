@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
 import { get } from 'lodash';
+import Image from 'next/image';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../../lib/constants/payout-method';
@@ -191,7 +192,7 @@ const BankTransfer = props => {
                     defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout and instructions will be autmatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on Open Collective.'
                   />
                 </P>
-                <img alt="" src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} />
+                <Image alt="" src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} height={168} />
               </Flex>
               {useStructuredForm && (
                 <React.Fragment>

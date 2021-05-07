@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import StyledLink from '../StyledLink';
 import { H1, H3, P } from '../Text';
 
@@ -46,9 +46,11 @@ const YourInitiativeIsNearlyThere = () => (
         height={('128px', '160px')}
         mb="24px"
       >
-        <Illustration
+        <NextIllustration
           alt="Your initiative is nearly there illustration"
           src="/static/images/ocf-host-application/ocf-initiativeIsAlmostThere-illustration.png"
+          width={360}
+          height={160}
         />
       </Container>
       <Box textAlign="center" width={['288px', '404px']} mb="14px" ml={[null, '24px']}>
@@ -106,7 +108,9 @@ const YourInitiativeIsNearlyThere = () => (
           mr="24px"
         >
           <Box width="80px" height="80px">
-            <Illustration alt="Chrome logo" src="/static/images/ocf-host-application/chrome-logo.png" />
+            <NextIllustration alt="Chrome logo" src="/static/images/ocf-host-application/chrome-logo.png" />
+            width={80}
+            height={80}
           </Box>
           <Box width="176px" textAlign="center">
             <H3 fontSize="20px" color="black.900" lineHeight="28px" my={2}>
@@ -129,7 +133,9 @@ const YourInitiativeIsNearlyThere = () => (
           flexDirection="column"
         >
           <Box width="80px" height="80px">
-            <Illustration alt="CVKey logo" src="/static/images/ocf-host-application/cvKey-logo.png" />
+            <NextIllustration alt="CVKey logo" src="/static/images/ocf-host-application/cvKey-logo.png" />
+            width={80}
+            height={80}
           </Box>
           <Box width="176px" textAlign="center">
             <H3 fontSize="20px" color="black.900" lineHeight="28px" my={2}>
@@ -153,7 +159,9 @@ const YourInitiativeIsNearlyThere = () => (
           ml="24px"
         >
           <Box width="80px" height="80px">
-            <Illustration alt="WTV logo" src="/static/images/ocf-host-application/wtv-logo.svg" />
+            <NextIllustration alt="WTV logo" src="/static/images/ocf-host-application/wtv-logo.svg" />
+            width={80}
+            height={80}
           </Box>
           <Box width="176px" textAlign="center">
             <H3 fontSize="20px" color="black.900" lineHeight="28px" my={2}>

@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import StyledButton from '../StyledButton';
 import { H2, P } from '../Text';
 
@@ -73,7 +73,12 @@ const GiftOFGiving = () => (
       height={['216px', '230px', '306px']}
       mt={[3, 0]}
     >
-      <Illustration src="/static/images/become-a-sponsor/giftCard-illustration-sm.png" alt="Gift Card Illustration" />
+      <NextIllustration
+        src="/static/images/become-a-sponsor/giftCard-illustration-sm.png"
+        alt="Gift Card Illustration"
+        width={409}
+        height={306}
+      />
     </Box>
   </SectionWrapper>
 );
