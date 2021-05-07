@@ -1965,7 +1965,7 @@
   "VirtualCards.Description": "Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them.",
   "VirtualCards.DisplayDetails": "View Card Details →",
   "VirtualCards.ExpireDate": "MM/YYYY",
-  "VirtualCards.LimittedTo": "Limitted to",
+  "VirtualCards.LimitedTo": "Limited to",
   "VirtualCards.NoLimit": "No Limit",
   "VirtualCards.PauseCard": "Pause Card",
   "VirtualCards.RequestCardButton": "Request card",
