@@ -47,7 +47,7 @@
     "currency-symbol-map": "5.0.1",
     "dayjs": "1.10.4",
     "debug": "4.3.1",
-    "dotenv": "8.2.0",
+    "dotenv": "8.4.0",
     "draft-js": "0.11.7",
     "express": "4.17.1",
     "express-basic-auth": "1.2.0",
