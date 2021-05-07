@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
+import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
+import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import { Box, Grid } from '../Grid';
@@ -25,11 +26,16 @@ const initialValues = {
   collective: undefined,
   expireDate: undefined,
   cvv: undefined,
+  user: undefined,
 };
 
 const assignNewVirtualCardMutation = gqlV2/* GraphQL */ `
-  mutation assignNewVirtualCard($virtualCard: VirtualCardInput!, $account: AccountReferenceInput!) {
-    assignNewVirtualCard(virtualCard: $virtualCard, account: $account) {
+  mutation assignNewVirtualCard(
+    $virtualCard: VirtualCardInput!
+    $account: AccountReferenceInput!
+    $userAccount: AccountReferenceInput!
+  ) {
+    assignNewVirtualCard(virtualCard: $virtualCard, account: $account, userAccount: $userAccount) {
       id
       name
       last4
@@ -38,21 +44,47 @@ const assignNewVirtualCardMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const collectiveMembersQuery = gqlV2/* GraphQL */ `
+  query CollectiveMembers($slug: String!) {
+    collective(slug: $slug) {
+      id
+      members(role: ADMIN) {
+        nodes {
+          account {
+            id
+            name
+            imageUrl
+            slug
+          }
+        }
+      }
+    }
+  }
+`;
+
+const throttledCall = debounce((searchFunc, variables) => {
+  return searchFunc({ variables });
+}, 750);
+
 const AssignVirtualCardModal = props => {
   const [assignNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(
     assignNewVirtualCardMutation,
     { context: API_V2_CONTEXT },
   );
+  const [getCollectiveUsers, { data: users }] = useLazyQuery(collectiveMembersQuery, {
+    context: API_V2_CONTEXT,
+  });
 
   const formik = useFormik({
     initialValues: { ...initialValues, collective: props.collective },
     async onSubmit(values) {
-      const { collective, ...privateData } = values;
+      const { collective, user, ...privateData } = values;
       await assignNewVirtualCard({
         variables: {
           virtualCard: {
             privateData,
           },
+          userAccount: { id: user.id },
           account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
         },
       });
@@ -83,6 +115,12 @@ const AssignVirtualCardModal = props => {
     formik.setErrors({});
     props.onClose?.();
   };
+  const handleCollectivePick = async option => {
+    formik.setFieldValue('collective', option.value);
+    throttledCall(getCollectiveUsers, { slug: option.value.slug });
+  };
+
+  const collectiveUsers = users?.collective?.members.nodes.map(node => node.account);
 
   return (
     <Modal width="382px" onClose={handleClose} trapFocus {...props}>
@@ -121,7 +159,26 @@ const AssignVirtualCardModal = props => {
                       [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
                     },
                   ]}
-                  onChange={option => formik.setFieldValue('collective', option.value)}
+                  onChange={handleCollectivePick}
+                />
+              )}
+            </StyledInputField>
+            <StyledInputField
+              gridColumn="1/3"
+              labelFontSize="13px"
+              label="Which user will be responsible for this card?"
+              htmlFor="user"
+              error={formik.touched.user && formik.errors.user}
+            >
+              {inputProps => (
+                <CollectivePicker
+                  {...inputProps}
+                  name="user"
+                  id="user"
+                  groupByType={false}
+                  collectives={collectiveUsers}
+                  collective={formik.values.user}
+                  onChange={option => formik.setFieldValue('user', option.value)}
                 />
               )}
             </StyledInputField>
