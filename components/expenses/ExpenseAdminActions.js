@@ -27,6 +27,24 @@ const deleteExpenseMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const removeExpenseFromCache = (cache, { data: { deleteExpense } }) => {
+  cache.modify({
+    fields: {
+      expenses(existingExpenses, { readField }) {
+        if (!existingExpenses?.nodes) {
+          return existingExpenses;
+        } else {
+          return {
+            ...existingExpenses,
+            totalCount: existingExpenses.totalCount - 1,
+            nodes: existingExpenses.nodes.filter(expense => deleteExpense.id !== readField('id', expense)),
+          };
+        }
+      },
+    },
+  });
+};
+
 const ButtonWithLabel = ({ label, icon, size, tooltipPosition, ...props }) => {
   return (
     <StyledTooltip content={label} delayHide={0} place={tooltipPosition}>
@@ -135,7 +153,7 @@ const ExpenseAdminActions = ({
             {...buttonProps}
           />
           {hasDeleteConfirm && (
-            <Mutation mutation={deleteExpenseMutation} context={API_V2_CONTEXT}>
+            <Mutation mutation={deleteExpenseMutation} context={API_V2_CONTEXT} update={removeExpenseFromCache}>
               {deleteExpense => (
                 <ConfirmationModal
                   isDanger

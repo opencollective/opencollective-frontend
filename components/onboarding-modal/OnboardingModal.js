@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
+import Image from 'next/image';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -100,15 +101,15 @@ const FormWithStyles = styled(Form)`
 
 const params = {
   0: {
-    height: '114px',
+    height: 114,
     src: '/static/images/create-collective/onboardingWelcomeIllustration.png',
   },
   1: {
-    height: '112px',
+    height: 112,
     src: '/static/images/create-collective/onboardingAdminsIllustration.png',
   },
   2: {
-    height: '119px',
+    height: 119,
     src: '/static/images/create-collective/onboardingContactIllustration.png',
   },
 };
@@ -343,9 +344,9 @@ class OnboardingModal extends React.Component {
                   <FormWithStyles>
                     <ResponsiveModalBody>
                       <Flex flexDirection="column" alignItems="center">
-                        <img
+                        <Image
                           alt="OnBoarding"
-                          width={'160px'}
+                          width={160}
                           height={this.getStepParams(step, 'height')}
                           src={this.getStepParams(step, 'src')}
                         />

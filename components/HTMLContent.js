@@ -107,6 +107,24 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
 
   figure {
     margin: 0;
+    &[data-trix-content-type='--embed-iframe-video'] {
+      position: relative;
+      padding-bottom: 56.25%; /* proportion value to aspect ratio 16:9 (9 / 16 = 0.5625 or 56.25%) */
+      height: 0;
+      overflow: hidden;
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+    &[data-trix-content-type='--embed-iframe-anchorFm'] {
+      iframe {
+        min-height: 300px;
+      }
+    }
   }
 
   img {

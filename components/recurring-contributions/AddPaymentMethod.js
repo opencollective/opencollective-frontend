@@ -13,7 +13,6 @@ import NewCreditCardForm from '../NewCreditCardForm';
 import PayWithPaypalButton from '../PayWithPaypalButton';
 import StyledButton from '../StyledButton';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { useUser } from '../UserProvider';
 
 /** Return the next charge date, or `undefined` if subscription is past due */
 export const getSubscriptionStartDate = order => {
@@ -24,10 +23,8 @@ export const getSubscriptionStartDate = order => {
 
 const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodInfo, order, isSubmitting }) => {
   const host = order.toAccount.host;
-  const { LoggedInUser } = useUser();
   const hasStripe = host.supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
-  // TODO: Remove LoggedInUser.isRoot() for release
-  const hasPaypal = host.supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) && LoggedInUser?.isRoot();
+  const hasPaypal = host.supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL);
   const defaultProvider = hasStripe && !hasPaypal ? 'stripe' : null;
   const [selectedProvider, setSelectedProvider] = React.useState(defaultProvider);
   const { addToast } = useToasts();
@@ -35,11 +32,18 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
   if (!selectedProvider) {
     return (
       <Flex flexDirection="column">
-        <StyledButton buttonSize="small" onClick={() => setSelectedProvider('stripe')} mb={2}>
-          <CreditCard size={24} />
-          &nbsp;
-          <FormattedMessage id="CreditCard" defaultMessage="Credit Card" />
-        </StyledButton>
+        {hasStripe && (
+          <StyledButton
+            buttonSize="small"
+            data-cy="add-pm-select-provider-credit-card-btn"
+            onClick={() => setSelectedProvider('stripe')}
+            mb={2}
+          >
+            <CreditCard size={24} />
+            &nbsp;
+            <FormattedMessage id="CreditCard" defaultMessage="Credit Card" />
+          </StyledButton>
+        )}
         {host.paypalClientId && (
           <PayWithPaypalButton
             totalAmount={order.amount.valueInCents}

@@ -89,7 +89,6 @@ const WhatCanYouDo = () => {
             width={558}
             height={418}
             src="/static/images/home/collectmoney-illustration-lg.png"
-            display={['block', null, null, 'none']}
             alt="Collect money"
           />
         </Box>
@@ -120,7 +119,6 @@ const WhatCanYouDo = () => {
             width={558}
             height={429}
             src="/static/images/home/spendmoney-illustration-lg.png"
-            display={['block', null, null, 'none']}
             alt="Spend money"
           />
         </Box>

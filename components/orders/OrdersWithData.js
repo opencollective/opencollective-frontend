@@ -85,6 +85,7 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
           imageUrl
         }
         permissions {
+          id
           canMarkAsExpired
           canMarkAsPaid
         }

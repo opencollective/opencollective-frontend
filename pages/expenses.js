@@ -355,8 +355,6 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
           settings
           plan {
             id
-            transferwisePayouts
-            transferwisePayoutsLimit
           }
         }
       }

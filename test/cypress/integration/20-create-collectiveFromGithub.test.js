@@ -1,31 +1,6 @@
 describe('Create collective from Github', () => {
   it('Should submit create github page', () => {
-    cy.server();
-    cy.route({
-      method: 'GET',
-      url: '/api/github-repositories?*',
-      /* eslint-disable camelcase */
-      response: [
-        {
-          description: 'Adblock Plus browser extension',
-          fork: true,
-          full_name: 'testuseradmingithub/adblockpluschrome',
-          name: 'adblockpluschrome',
-          owner: { login: 'testuseradmingithub', type: 'Organization' },
-          stargazers_count: 113,
-        },
-        {
-          description:
-            'A new form of association, transparent by design. Please report issues there. Feature requests and ideas welcome!',
-          fork: true,
-          full_name: 'testuseradmingithub/jobtweets',
-          name: 'JobTweets',
-          owner: { login: 'testuseradmingithub', type: 'User' },
-          stargazers_count: 103,
-        },
-      ],
-      /* eslint-enable camelcase */
-    });
+    cy.intercept('GET', '/api/github-repositories?*', { fixture: 'github-repos.json' });
     cy.login({ email: 'testuser@opencollective.com', redirect: '/create/opensource?token=foofoo' });
     cy.contains('[data-cy=connect-github-header]', 'Pick a repository');
     cy.get('[data-cy=radio-select]').first().check();

@@ -4,14 +4,18 @@ import { useMutation } from '@apollo/client';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
+import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
@@ -51,24 +55,69 @@ export const hasProcessButtons = permissions => {
   );
 };
 
+const getErrorContent = (intl, error, host, LoggedInUser) => {
+  // TODO: The proper way to check for error types is with error.type, not the message
+  const message = error?.message;
+  if (message) {
+    if (message.startsWith('Insufficient Paypal balance')) {
+      return {
+        title: 'Insufficient Paypal balance',
+        message: (
+          <React.Fragment>
+            <Link href={`/${host.slug}/dashboard`}>
+              <FormattedMessage
+                id="PayExpenseModal.RefillBalanceError"
+                defaultMessage="Refill your balance from the Host dashboard"
+              />
+            </Link>
+          </React.Fragment>
+        ),
+      };
+    } else if (message.startsWith('Host has two-factor authentication enabled for large payouts')) {
+      return {
+        title: 'Host has two-factor authentication enabled for large payouts',
+        message: (
+          <FormattedMessage
+            id="PayExpenseModal.HostTwoFactorAuthEnabled"
+            defaultMessage="Please go to your <SettingsLink>settings</SettingsLink> to enable two-factor authentication for your account."
+            values={{
+              SettingsLink: getI18nLink({
+                as: Link,
+                href: `${LoggedInUser.collective.slug}/edit/${EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH}`,
+                openInNewTab: true,
+              }),
+            }}
+          />
+        ),
+      };
+    } else if (message.startsWith('Two-factor authentication')) {
+      return {
+        type: TOAST_TYPE.INFO,
+        message: (
+          <FormattedMessage
+            id="2FA.PleaseEnterCode"
+            defaultMessage="Two-factor authentication enabled: please enter your code."
+          />
+        ),
+      };
+    }
+  }
+
+  return { message: i18nGraphqlException(intl, error) };
+};
+
 /**
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
  */
-const ProcessExpenseButtons = ({
-  expense,
-  collective,
-  host,
-  permissions,
-  buttonProps,
-  showError,
-  onError,
-  onSuccess,
-}) => {
+const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps, onSuccess }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const mutationOptions = { context: API_V2_CONTEXT };
-  const [processExpense, { loading }] = useMutation(processExpenseMutation, mutationOptions);
-  const [error, setError] = React.useState(null);
+  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache);
+  const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
+  const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
+  const intl = useIntl();
+  const { addToast } = useToasts();
+  const { LoggedInUser } = useUser();
 
   const triggerAction = async (action, paymentParams) => {
     // Prevent submitting the action if another one is being submitted at the same time
@@ -80,17 +129,10 @@ const ProcessExpenseButtons = ({
 
     try {
       const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
-      const processedExpense = await processExpense({ variables });
-      if (onSuccess) {
-        await onSuccess(processedExpense, action, paymentParams);
-      }
-
-      return processedExpense;
+      await processExpense({ variables });
     } catch (e) {
-      setError(e);
-      if (onError && selectedAction !== 'PAY') {
-        onError(getErrorFromGraphqlException(e));
-      }
+      // Display a toast with light variant since we're in a modal
+      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', ...getErrorContent(intl, e, host, LoggedInUser) });
     }
   };
 
@@ -106,9 +148,6 @@ const ProcessExpenseButtons = ({
 
   return (
     <React.Fragment>
-      {!loading && showError && error && selectedAction !== 'PAY' && (
-        <MessageBoxGraphqlError flex="1 0 100%" error={error} />
-      )}
       {permissions.canApprove && (
         <StyledButton {...getButtonProps('APPROVE')} buttonStyle="secondary" data-cy="approve-button">
           <ApproveIcon size={12} />
@@ -140,8 +179,7 @@ const ProcessExpenseButtons = ({
           expense={expense}
           collective={collective}
           host={host}
-          error={error && getErrorFromGraphqlException(error).message}
-          resetError={() => setError(null)}
+          error={error}
         />
       )}
       {permissions.canUnapprove && (
@@ -186,7 +224,6 @@ ProcessExpenseButtons.propTypes = {
   /** Props passed to all buttons. Useful to customize sizes, spaces, etc. */
   buttonProps: PropTypes.object,
   showError: PropTypes.bool,
-  onError: PropTypes.func,
   onSuccess: PropTypes.func,
 };
 
@@ -199,7 +236,6 @@ export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
 
 ProcessExpenseButtons.defaultProps = {
   buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
-  showError: true,
 };
 
 export default ProcessExpenseButtons;

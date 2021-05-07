@@ -11,7 +11,7 @@ import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
-import { get, pickBy } from 'lodash';
+import { pickBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -25,6 +25,7 @@ import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
+import RequestVirtualCardBtn from '../RequestVirtualCardBtn';
 import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
@@ -177,10 +178,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
-  const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
-  const hostWithinLimit = hostedCollectivesLimit
-    ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
-    : true;
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -280,7 +277,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <AddFundsBtn collective={collective} host={collective.host}>
                         {btnProps => (
                           <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps} data-cy="add-funds-btn">
                               <AttachMoney size="20px" />
                               <Span>
                                 <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
@@ -321,7 +318,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
                         <ApplyToHostBtn
                           hostSlug={collective.slug}
-                          hostWithinLimit={hostWithinLimit}
                           buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
                         />
                       </MenuItem>
@@ -342,6 +338,26 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                           </MenuItem>
                         )}
                       </AssignVirtualCardBtn>
+                    )}
+                    {callsToAction.requestVirtualCard && (
+                      <RequestVirtualCardBtn collective={collective} host={collective.host}>
+                        {btnProps => (
+                          <MenuItem
+                            py={1}
+                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
+                          >
+                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                              <CreditCard size="20px" />
+                              <Span>
+                                <FormattedMessage
+                                  id="Collective.VirtualCards.RequestCard"
+                                  defaultMessage="Request a Card"
+                                />
+                              </Span>
+                            </StyledButton>
+                          </MenuItem>
+                        )}
+                      </RequestVirtualCardBtn>
                     )}
                   </Box>
                 </DropdownContent>
@@ -388,6 +404,8 @@ CollectiveNavbarActionsMenu.propTypes = {
     addPrepaidBudget: PropTypes.bool,
     /** Add new card to Collective */
     assignVirtualCard: PropTypes.bool,
+    /** Request card to Collective */
+    requestVirtualCard: PropTypes.bool,
     /** Button to Edit the Collective */
     hasSettings: PropTypes.bool,
   }).isRequired,

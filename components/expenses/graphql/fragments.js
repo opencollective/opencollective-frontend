@@ -88,8 +88,6 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     supportedPayoutMethods
     plan {
       id
-      transferwisePayouts
-      transferwisePayoutsLimit
     }
   }
 `;
@@ -242,12 +240,18 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       data
       isSaved
     }
+    virtualCard {
+      id
+      name
+      last4
+    }
     comments(limit: 300) {
       nodes {
         ...CommentFields
       }
     }
     permissions {
+      id
       canEdit
       canDelete
       canSeeInvoiceInfo
@@ -291,6 +295,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     type
     requiredLegalDocuments
     permissions {
+      id
       canDelete
       canApprove
       canUnapprove
@@ -313,6 +318,21 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       name
       imageUrl(height: 80)
       isAdmin
+
+      # For Collectives, Funds, Events and Projects
+      ... on AccountWithHost {
+        isApproved
+        host {
+          id
+        }
+      }
+
+      # For Fiscal Hosts
+      ... on Organization {
+        host {
+          id
+        }
+      }
     }
     createdByAccount {
       id

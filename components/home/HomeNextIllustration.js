@@ -1,18 +1,26 @@
+import React from 'react';
+import { PropTypes } from 'prop-types';
 import Image from 'next/image';
-import styled from 'styled-components';
-import { display, space } from 'styled-system';
 
-import { rotateMixin } from '../../lib/constants/animations';
+import { Box } from '../Grid';
 
-/* Temporary file that mimics HomeIllustration.js but converts img to next/image.
- * This is created to experiment with next/image on the homepage.
+/*
+ * Illustrations that use the next/image component.
  */
 
-const NextIllustration = styled(Image)`
-  ${space}
-  ${display}
+function NextIllustration(props) {
+  return (
+    <Box display={props.display}>
+      <Image src={props.src} width={props.width} height={props.height} />
+    </Box>
+  );
+}
 
-  ${({ animate }) => (animate ? rotateMixin : null)};
-`;
+NextIllustration.propTypes = {
+  display: PropTypes.array,
+  src: PropTypes.string,
+  width: PropTypes.number,
+  height: PropTypes.number,
+};
 
 export default NextIllustration;

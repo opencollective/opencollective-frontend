@@ -19,6 +19,7 @@ const processPendingOrderMutation = gqlV2/* GraphQL */ `
       id
       status
       permissions {
+        id
         canMarkAsPaid
         canMarkAsExpired
       }

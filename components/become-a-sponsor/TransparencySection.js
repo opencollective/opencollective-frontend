@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { H2, H3, P } from '../Text';
 
 const TransactionShadow = styled(Box)`
@@ -55,35 +55,31 @@ const Transparency = () => (
         />
       </P>
     </Box>
-    <Box width={['304px', '552px']} height={[null, '341px']} maxHeight={['187px', '341px']} overflowY="auto">
-      <Illustration
-        display={[null, 'none']}
-        src="/static/images/become-a-sponsor/transactionScreenshot-scrollable-xs.png"
+    <Box width={['304px', '552px']} height={[null, '341px']} maxHeight={['187px', '341px']}>
+      <NextIllustration
+        src="/static/images/become-a-sponsor/transactionScreenshot.png"
         alt="Transaction Screenshot"
-      />
-      <Illustration
-        display={['none', 'block', 'none']}
-        src="/static/images/become-a-sponsor/transactionScreenshot-sm.png"
-        alt="Transaction Screenshot"
-      />
-      <Illustration
-        display={['none', 'none', 'block', null, 'none']}
-        src="/static/images/become-a-sponsor/transactionScreenshot-md.png"
-        alt="Transaction Screenshot"
-      />
-      <Illustration
-        display={['none', 'none', 'none', null, 'block']}
-        src="/static/images/become-a-sponsor/transactionScreenshot-lg.png"
-        alt="Transaction Screenshot"
+        width={552}
+        height={341}
       />
     </Box>
     <TransactionShadow />
     <JarIllustrationWrapper>
       <Box width={[null, '202px']} height={[null, '115px']} mr={[null, '67px', '200px', null, '217px']}>
-        <Illustration src="/static/images/become-a-sponsor/jar1-illustration-sm.png" alt="Transaction Screenshot" />
+        <NextIllustration
+          src="/static/images/become-a-sponsor/jar1-illustration-sm.png"
+          alt="Transaction Screenshot"
+          width={202}
+          height={115}
+        />
       </Box>
       <Box width={[null, '201px']} height={[null, '117px']} ml={[null, '67px', '200px', null, '217px']}>
-        <Illustration src="/static/images/become-a-sponsor/jar2-illustration-sm.png" alt="Transaction Screenshot" />
+        <NextIllustration
+          src="/static/images/become-a-sponsor/jar2-illustration-sm.png"
+          alt="Transaction Screenshot"
+          width={201}
+          height={117}
+        />
       </Box>
     </JarIllustrationWrapper>
 
@@ -96,9 +92,11 @@ const Transparency = () => (
     >
       <Flex flexDirection={['column', 'row', 'column']} mb={[4, null, 0]} mr={[null, null, '40px', null, '96px']}>
         <Box size="56px" mb={2} mr={[null, '32px']}>
-          <Illustration
+          <NextIllustration
             src="/static/images/become-a-sponsor/invoiceReceipts-illustration.png"
             alt="Invoices and Receipts illustration"
+            width={56}
+            height={56}
           />
         </Box>
         <Box>
@@ -130,7 +128,12 @@ const Transparency = () => (
       </Flex>
       <Flex flexDirection={['column', 'row', 'column']} mb={[4, null, 0]} mr={[null, null, '40px', null, '96px']}>
         <Box size="56px" mb={2} mr={[null, '32px']}>
-          <Illustration src="/static/images/become-a-sponsor/paperWork-illustration.png" alt="PaperWork illustration" />
+          <NextIllustration
+            src="/static/images/become-a-sponsor/paperWork-illustration.png"
+            alt="PaperWork illustration"
+            width={56}
+            height={56}
+          />
         </Box>
         <Box width={['286px', '560px', '250px', null, '297px']}>
           <H3
@@ -161,7 +164,12 @@ const Transparency = () => (
       </Flex>
       <Flex flexDirection={['column', 'row', 'column']}>
         <Box size="56px" mb={2} mr={[null, '32px']}>
-          <Illustration src="/static/images/become-a-sponsor/reporting-illustration.png" alt="Reporting illustration" />
+          <NextIllustration
+            src="/static/images/become-a-sponsor/reporting-illustration.png"
+            alt="Reporting illustration"
+            width={56}
+            height={56}
+          />
         </Box>
         <Box>
           <H3
@@ -202,7 +210,12 @@ const Transparency = () => (
         </P>
       </Box>
       <Box width="223px" height="143px" mt={['68px', '17px']}>
-        <Illustration src="/static/images/become-a-sponsor/invoice-illustration.png" alt="Invoice Illustration" />
+        <NextIllustration
+          src="/static/images/become-a-sponsor/invoice-illustration.png"
+          alt="Invoice Illustration"
+          width={223}
+          height={143}
+        />
       </Box>
     </Flex>
   </Flex>

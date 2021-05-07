@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { H2, H3, P, Span } from '../Text';
 
 const SectionWrapper = styled(Flex)`
@@ -56,9 +56,11 @@ const MoreFeatures = () => (
         mr={[null, '63px', '94px', null, '111px']}
       >
         <Box width={['160px']} height={['160px']} mb="24px">
-          <Illustration
+          <NextIllustration
             src="/static/images/become-a-sponsor/bulkPayment-illustration.png"
             alt="Bulk Payments Illustration"
+            width={160}
+            height={160}
           />
         </Box>
         <H3 fontSize="24px" lineHeight="32px" color="black.800" mb="12px">
@@ -75,9 +77,11 @@ const MoreFeatures = () => (
       </Flex>
       <Flex flexDirection="column" alignItems={['center', 'flex-start']} textAlign={['center', 'left']} mb="36px">
         <Box width={['160px']} height={['160px']} mb="24px">
-          <Illustration
+          <NextIllustration
             src="/static/images/become-a-sponsor/backYourStack-illustration.png"
             alt="BackYourStack Illustration"
+            width={160}
+            height={160}
           />
         </Box>
         <H3 fontSize="24px" lineHeight="32px" color="black.800" mb="12px">
@@ -139,20 +143,11 @@ const MoreFeatures = () => (
         width={['194px', '304px', '337px', null, '575px']}
         height={['163px', '256px', '274px', null, '404px']}
       >
-        <Illustration
-          display={[null, 'none']}
-          src="/static/images/become-a-sponsor/sustainerKit-illustration-xs.png"
+        <NextIllustration
+          src="/static/images/become-a-sponsor/sustainersKit-illustration.png"
           alt="Sustainers Kit Illustration"
-        />
-        <Illustration
-          display={['none', 'block', null, null, 'none']}
-          src="/static/images/become-a-sponsor/sustainerKit-illustration-md.png"
-          alt="Sustainers Kit Illustration"
-        />
-        <Illustration
-          display={['none', null, null, null, 'block']}
-          src="/static/images/become-a-sponsor/sustainersKit-illustration-lg.png"
-          alt="Sustainers Kit Illustration"
+          width={575}
+          height={404}
         />
       </Box>
     </Flex>

@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, get, orderBy, set } from 'lodash';
+import { cloneDeep, orderBy, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
@@ -11,6 +11,7 @@ import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { canOrderTicketsFromEvent, isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { getCollectiveContributionCardsOrder, sortTiers, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
 
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
@@ -34,8 +35,6 @@ import { collectivePageQuery, getCollectivePageQueryVariables } from '../graphql
 const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {
   ssr: false,
 });
-
-const TIERS_ORDER_KEY = 'collectivePage.tiersOrder';
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
@@ -102,13 +101,9 @@ class SectionContribute extends React.PureComponent {
     return contributors.find(c => c.isBacker);
   });
 
-  getCollectiveContributionCardsOrder = () => {
-    return get(this.props.collective.settings, TIERS_ORDER_KEY, []);
-  };
-
   onContributionCardMove = memoizeOne((dragIndex, hoverIndex) => {
     this.setState(() => {
-      const baseCardsOrder = this.getCollectiveContributionCardsOrder();
+      const baseCardsOrder = getCollectiveContributionCardsOrder(this.props.collective);
       const sortedTiers = this.getSortedCollectiveTiers(this.props.tiers, baseCardsOrder);
       const cardKeys = [...this.getFinancialContributions(sortedTiers).map(c => c.key)];
       cardKeys.splice(hoverIndex, 0, cardKeys.splice(dragIndex, 1)[0]);
@@ -127,7 +122,7 @@ class SectionContribute extends React.PureComponent {
     // Save the new positions
     this.setState({ isSaving: true });
     try {
-      const baseCardsOrder = this.getCollectiveContributionCardsOrder();
+      const baseCardsOrder = getCollectiveContributionCardsOrder(collective);
       const sortedTiers = this.getSortedCollectiveTiers(tiers, baseCardsOrder);
       const cardKeys = [...this.getFinancialContributions(sortedTiers).map(c => c.key)];
       cardKeys.splice(hoverIndex, 0, cardKeys.splice(dragIndex, 1)[0]);
@@ -160,12 +155,7 @@ class SectionContribute extends React.PureComponent {
   }
 
   getSortedCollectiveTiers = memoizeOne((baseTiers, orderKeys) => {
-    const tiers = ['custom', ...baseTiers.filter(tier => tier.type !== TierTypes.TICKET)];
-    return orderBy(tiers, tier => {
-      const itemKey = tier === 'custom' ? 'custom' : tier.id;
-      const index = orderKeys.findIndex(key => key === itemKey);
-      return index === -1 ? Infinity : index; // put unsorted tiers at the end
-    });
+    return sortTiers(baseTiers, orderKeys, true);
   });
 
   getFinancialContributions = memoizeOne(sortedTiers => {
@@ -213,7 +203,7 @@ class SectionContribute extends React.PureComponent {
   render() {
     const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
     const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
-    const orderKeys = draggingContributionsOrder || this.getCollectiveContributionCardsOrder();
+    const orderKeys = draggingContributionsOrder || getCollectiveContributionCardsOrder(collective);
     const sortedTiers = this.getSortedCollectiveTiers(tiers, orderKeys);
     const isEvent = collective.type === CollectiveType.EVENT;
     const isProject = collective.type === CollectiveType.PROJECT;
@@ -272,48 +262,38 @@ class SectionContribute extends React.PureComponent {
             {/* Financial contributions tiers */}
             {hasContribute && (
               <Box pb={4} data-cy="financial-contributions">
-                <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-                  {(ref, Chevrons) => (
-                    <div>
-                      <ContainerSectionContent>
-                        <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                          <Box m={2} flex="0 0 50px">
-                            <Chevrons />
-                          </Box>
-                        </Flex>
-                      </ContainerSectionContent>
-                      <Container position="relative">
-                        {isSaving && (
-                          <ContainerOverlay alignItems="center">
-                            <StyledSpinner size={64} />
-                            <P mt={3} fontSize="15px">
-                              <FormattedMessage id="Saving" defaultMessage="Saving..." />
-                            </P>
-                          </ContainerOverlay>
-                        )}
-                        {!(isAdmin && showTiersAdmin) && (
-                          <ContributeCardsContainer ref={ref} disableScrollSnapping={!!draggingContributionsOrder}>
-                            {waysToContribute.map(({ key, Component, componentProps }) => (
-                              <ContributeCardContainer key={key}>
-                                <Component {...componentProps} />
-                              </ContributeCardContainer>
-                            ))}
-                          </ContributeCardsContainer>
-                        )}
-                        {isAdmin && (
-                          <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
-                            <AdminContributeCardsContainer
-                              collective={collective}
-                              cards={waysToContribute}
-                              onContributionCardMove={this.onContributionCardMove}
-                              onContributionCardDrop={this.onContributionCardDrop}
-                              onMount={this.onTiersAdminReady}
-                            />
-                          </Container>
-                        )}
+                <HorizontalScroller
+                  getScrollDistance={this.getContributeCardsScrollDistance}
+                  container={ContributeCardsContainer}
+                  containerProps={{ disableScrollSnapping: Boolean(draggingContributionsOrder) }}
+                >
+                  <React.Fragment>
+                    {isSaving && (
+                      <ContainerOverlay position="fixed" top={0} alignItems="center">
+                        <StyledSpinner size={64} />
+                        <P mt={3} fontSize="15px">
+                          <FormattedMessage id="Saving" defaultMessage="Saving..." />
+                        </P>
+                      </ContainerOverlay>
+                    )}
+                    {!(isAdmin && showTiersAdmin) &&
+                      waysToContribute.map(({ key, Component, componentProps }) => (
+                        <ContributeCardContainer key={key}>
+                          <Component {...componentProps} />
+                        </ContributeCardContainer>
+                      ))}
+                    {isAdmin && (
+                      <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
+                        <AdminContributeCardsContainer
+                          collective={collective}
+                          cards={waysToContribute}
+                          onContributionCardMove={this.onContributionCardMove}
+                          onContributionCardDrop={this.onContributionCardDrop}
+                          onMount={this.onTiersAdminReady}
+                        />
                       </Container>
-                    </div>
-                  )}
+                    )}
+                  </React.Fragment>
                 </HorizontalScroller>
               </Box>
             )}
@@ -321,42 +301,33 @@ class SectionContribute extends React.PureComponent {
             {/* Tickets for type EVENT */}
             {isEvent && !cannotOrderTickets && !hideTicketsFromNonAdmins && (
               <Box pb={4} data-cy="Tickets">
-                <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-                  {(ref, Chevrons) => (
-                    <div>
-                      <ContainerSectionContent>
-                        <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                          <H3 fontSize="20px" fontWeight="600" color="black.700">
-                            <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
-                          </H3>
-                          <Box m={2} flex="0 0 50px">
-                            <Chevrons />
-                          </Box>
-                        </Flex>
-                      </ContainerSectionContent>
-
-                      <ContributeCardsContainer ref={ref}>
-                        {sortedTicketTiers.map(tier => (
-                          <ContributeCardContainer key={tier.id}>
-                            <ContributeTier
-                              collective={collective}
-                              tier={tier}
-                              hideContributors={hasNoContributor}
-                              disableCTA={!collective.isActive}
-                            />
-                          </ContributeCardContainer>
-                        ))}
-                        {isAdmin && (
-                          <ContributeCardContainer minHeight={150}>
-                            <CreateNew
-                              route={`/${collective.parentCollective.slug}/events/${collective.slug}/edit/tickets`}
-                            >
-                              <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
-                            </CreateNew>
-                          </ContributeCardContainer>
-                        )}
-                      </ContributeCardsContainer>
-                    </div>
+                <ContainerSectionContent>
+                  <Flex alignItems="left" mb={3}>
+                    <H3 fontSize="20px" fontWeight="600" color="black.700">
+                      <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
+                    </H3>
+                  </Flex>
+                </ContainerSectionContent>
+                <HorizontalScroller
+                  container={ContributeCardsContainer}
+                  getScrollDistance={this.getContributeCardsScrollDistance}
+                >
+                  {sortedTicketTiers.map(tier => (
+                    <ContributeCardContainer key={tier.id}>
+                      <ContributeTier
+                        collective={collective}
+                        tier={tier}
+                        hideContributors={hasNoContributor}
+                        disableCTA={!collective.isActive}
+                      />
+                    </ContributeCardContainer>
+                  ))}
+                  {isAdmin && (
+                    <ContributeCardContainer minHeight={150}>
+                      <CreateNew route={`/${collective.parentCollective.slug}/events/${collective.slug}/edit/tickets`}>
+                        <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
+                      </CreateNew>
+                    </ContributeCardContainer>
                   )}
                 </HorizontalScroller>
               </Box>

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -117,7 +117,12 @@ const ForCollectiveCard = () => {
     <Card padding={['24px', null, '32px']} width={['288px', '636px']} borderRadius="8px" border="1px solid #DCDEE0">
       <Flex justifyContent="center" alignItems="center" mb={['32px', '35px']}>
         <Box width="72px" height="72px" mr="16px">
-          <Illustration src="/static/images/pricing/for-collective-illustration.png" alt="Collective Illustration" />
+          <NextIllustration
+            src="/static/images/pricing/for-collective-illustration.png"
+            alt="Collective Illustration"
+            width={72}
+            height={72}
+          />
         </Box>
         <Box width={[null, '500px', '672px', null, '702px']}>
           <H3
@@ -278,9 +283,11 @@ const ForCollectiveCard = () => {
                 height={access === 'collectivePage' ? '32px' : null}
                 mr={[null, '13px']}
               >
-                <Illustration
+                <NextIllustration
                   src={`/static/images/pricing/${access}-icon.${access === 'collectivePage' ? 'png' : 'svg'}`}
                   alt="Icon"
+                  width={32}
+                  height={32}
                 />
               </Box>
               <Box width={['112px', '230px', '176px']}>

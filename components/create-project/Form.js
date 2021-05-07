@@ -10,7 +10,7 @@ import { suggestSlug } from '../../lib/collective.lib';
 import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
@@ -183,7 +183,7 @@ class CreateProjectForm extends React.Component {
                           }}
                           as={StyledInputGroup}
                           {...inputProps}
-                          prepend={`opencollective.com/${parent.slug}/`}
+                          prepend={`opencollective.com/${parent.slug}/projects/`}
                           placeholder={placeholders.slug}
                         />
                       )}
@@ -228,7 +228,7 @@ class CreateProjectForm extends React.Component {
               }}
             </Formik>
             <Flex justifyContent="center" mb={4} display={['flex', 'none']}>
-              <Illustration
+              <NextIllustration
                 display={['block', 'none']}
                 src="/static/images/create-collective/mobileForm.png"
                 width="320px"

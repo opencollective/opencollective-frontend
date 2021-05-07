@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
 import { Question } from '@styled-icons/octicons/Question';
 import { isUndefined } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { CardElement, Elements, injectStripe } from 'react-stripe-elements';
 import styled from 'styled-components';
 
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
@@ -42,6 +42,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     onChange: PropTypes.func,
     onReady: PropTypes.func,
     stripe: PropTypes.object,
+    stripeElements: PropTypes.object,
     useLegacyCallback: PropTypes.bool,
     defaultIsSaved: PropTypes.bool,
   };
@@ -56,13 +57,13 @@ class NewCreditCardFormWithoutStripe extends React.Component {
 
   componentDidMount() {
     if (this.props.onReady && this.props.stripe) {
-      this.props.onReady({ stripe: this.props.stripe });
+      this.props.onReady({ stripe: this.props.stripe, stripeElements: this.props.stripeElements });
     }
   }
 
   componentDidUpdate(oldProps) {
     if (this.props.onReady && !oldProps.stripe && this.props.stripe) {
-      this.props.onReady({ stripe: this.props.stripe });
+      this.props.onReady({ stripe: this.props.stripe, stripeElements: this.props.stripeElements });
     }
   }
 
@@ -176,12 +177,10 @@ class NewCreditCardFormWithoutStripe extends React.Component {
   }
 }
 
-const NewCreditCardFormWithStripe = injectStripe(NewCreditCardFormWithoutStripe);
-
 const NewCreditCardForm = props => (
-  <Elements locale={props.intl.locale || 'en'}>
-    <NewCreditCardFormWithStripe {...props} />
-  </Elements>
+  <ElementsConsumer>
+    {({ stripe, elements }) => <NewCreditCardFormWithoutStripe stripe={stripe} stripeElements={elements} {...props} />}
+  </ElementsConsumer>
 );
 
 NewCreditCardForm.propTypes = {

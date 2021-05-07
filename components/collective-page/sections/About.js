@@ -65,6 +65,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                   toolbarTop={[56, 64]}
                   toolbarBackgroundColor="#F7F8FA"
                   withStickyToolbar
+                  videoEmbedEnabled
                   autoFocus
                 />
               );

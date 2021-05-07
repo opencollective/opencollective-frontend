@@ -202,45 +202,6 @@ const HostPlan = props => {
       </SettingsTitle>
 
       <PlanGrid>
-        <Plan active={collective.plan.name === 'default'}>
-          <PlanName>Default Plan (old)</PlanName>
-          <PlanFeatures>
-            <ul>
-              <li>
-                <FormattedMessage
-                  id="Host.Plan.PlatformTips.sometimes"
-                  defaultMessage="5% Platform Fees or Platform Tips"
-                />
-              </li>
-              <li>
-                <FormattedMessage id="Host.Plan.HostFees.yes" defaultMessage="Configurable Host Fee" />
-                .&nbsp;
-                <FormattedMessage
-                  id="Host.Plan.RevenueCharge.no"
-                  defaultMessage="No Platform fee charges on Host fee."
-                />
-              </li>
-              <li>
-                <FormattedMessage id="Host.Plan.AddedFunds.limited" defaultMessage="Up to $1000 added funds" />
-              </li>
-              <li>
-                <FormattedMessage id="Host.Plan.BankTransfers.limited" defaultMessage="Up to $1000 bank transfers" />
-              </li>
-              <li>
-                <FormattedMessage
-                  id="Host.Plan.TransferwisePayouts.limited"
-                  defaultMessage="Up to $1000 payouts with Wise"
-                />
-              </li>
-              <li>
-                <FormattedMessage id="Host.Plan.MinimalRevenue.no" defaultMessage="No minimum revenue." />
-              </li>
-            </ul>
-          </PlanFeatures>
-          <StyledButton disabled={true}>Deprecated</StyledButton>
-          {collective.plan.name === 'default' && <DisabledMessage>Current plan.</DisabledMessage>}
-        </Plan>
-
         <NewPlanFeatures
           collective={collective}
           plan="start-plan-2021"
@@ -305,83 +266,6 @@ const HostPlan = props => {
       <ul>
         <li>
           <strong>Current Plan</strong>: {collective.plan.name}
-        </li>
-        <li>
-          <strong>Collective Limit</strong>:&nbsp;
-          {collective.plan.hostedCollectivesLimit && (
-            <span>
-              {collective.plan.hostedCollectives} of {collective.plan.hostedCollectivesLimit}
-            </span>
-          )}
-          {!collective.plan.hostedCollectivesLimit && (
-            <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
-          )}
-        </li>
-        <li>
-          <strong>Added Funds Limit</strong>{' '}
-          <StyledTooltip
-            content={() => (
-              <FormattedMessage
-                id="collective.hostSettings.help.fundsLimit"
-                defaultMessage="Max funds added, all time, all Collectives."
-              />
-            )}
-          >
-            <LimitsInfoCircle size={12} />
-          </StyledTooltip>
-          :{' '}
-          {collective.plan.addedFundsLimit && (
-            <span>
-              ${collective.plan.addedFunds / 100} of ${collective.plan.addedFundsLimit / 100}
-            </span>
-          )}
-          {!collective.plan.addedFundsLimit && (
-            <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
-          )}
-        </li>
-        <li>
-          <strong>Bank Transfers Limit</strong>{' '}
-          <StyledTooltip
-            content={() => (
-              <FormattedMessage
-                id="collective.hostSettings.help.manualPayments"
-                defaultMessage="Financial contributors can select 'bank transfer' at checkout and will receive email instructions with your bank details. You confirm once funds are received."
-              />
-            )}
-          >
-            <LimitsInfoCircle size={12} />
-          </StyledTooltip>
-          :{' '}
-          {collective.plan.bankTransfersLimit && (
-            <span>
-              ${collective.plan.bankTransfers / 100} of ${collective.plan.bankTransfersLimit / 100}
-            </span>
-          )}
-          {!collective.plan.bankTransfersLimit && (
-            <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
-          )}
-        </li>
-        <li>
-          <strong>Payouts with Wise Limit</strong>{' '}
-          <StyledTooltip
-            content={() => (
-              <FormattedMessage
-                id="collective.hostSettings.help."
-                defaultMessage="You can pay expenses with one-click using Wise."
-              />
-            )}
-          >
-            <LimitsInfoCircle size={12} />
-          </StyledTooltip>
-          :{' '}
-          {collective.plan.transferwisePayoutsLimit && (
-            <span>
-              ${collective.plan.transferwisePayouts / 100} of ${collective.plan.transferwisePayoutsLimit / 100}
-            </span>
-          )}
-          {!collective.plan.transferwisePayoutsLimit && (
-            <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
-          )}
         </li>
         <li>
           <strong>

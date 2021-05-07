@@ -70,7 +70,7 @@ describe('Contribution Flow: Order', () => {
         cy.contains('[data-cy="progress-step-details"]', '$500.00 USD / mo.');
 
         // Frequency must not be disabled
-        cy.contains('#interval button').should('not.be.disabled');
+        cy.contains('button', '$100').should('not.be.disabled');
         cy.contains('the next charge will be on June 1, 2042');
         cy.get('button[data-cy="cf-next-step"]').click();
 
@@ -120,7 +120,7 @@ describe('Contribution Flow: Order', () => {
         cy.visit(`${routeBase}/sponsors-470/checkout`, visitParams);
 
         // Details
-        cy.contains('#interval button').should('not.be.disabled');
+        cy.contains('button', '$100').should('not.be.disabled');
         cy.contains('the next charge will be on June 1, 2042');
         cy.get('#amount > :nth-child(1)').click();
         cy.getByDataCy('cf-next-step').click();

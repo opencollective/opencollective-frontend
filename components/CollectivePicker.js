@@ -361,6 +361,7 @@ class CollectivePicker extends React.PureComponent {
                     boxShadow="-2px 4px 7px 0 rgba(78, 78, 78, 14%)"
                     maxHeight={315}
                     overflowY="auto"
+                    data-cy="collective-mini-form-scroll"
                     {...this.props.styles?.menu}
                   >
                     {createFormCollectiveType && (
