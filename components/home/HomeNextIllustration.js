@@ -17,7 +17,7 @@ function NextIllustration(props) {
 }
 
 NextIllustration.propTypes = {
-  display: PropTypes.object,
+  display: PropTypes.array,
   src: PropTypes.string,
   width: PropTypes.number,
   height: PropTypes.number,

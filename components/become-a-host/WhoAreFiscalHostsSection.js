@@ -122,8 +122,8 @@ const WhoAreFiscalHosts = () => {
           <NextIllustration
             src="/static/images/become-a-host/whoAreFiscalHost-illustration.png"
             alt="Who are Fiscal Hosts illustration"
-            width={330}
-            height={142.48}
+            width={222.73}
+            height={142.33}
           />
         </Box>
       </Container>
