@@ -304,6 +304,8 @@ export default class RichTextEditor extends React.Component {
       const attachment = new this.Trix.Attachment({ content: iframe });
       this.getEditor().insertAttachment(attachment);
       lastIndex = match.index + iframe.length;
+      const postText = value.substring(lastIndex, value.length);
+      this.getEditor().insertHTML(postText);
     }
   };
 
