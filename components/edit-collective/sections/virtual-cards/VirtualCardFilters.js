@@ -52,7 +52,7 @@ const VirtualCardFilters = ({
       {isCollectiveFilter && (
         <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
           <FilterLabel htmlFor="virtual-card-filter-collective">
-            <FormattedMessage id="VirtualCard.Collective" defaultMessage="Collective" />
+            <FormattedMessage id="VirtualCard.Collective" defaultMessage="Filter" />
           </FilterLabel>
           <CollectiveFilter
             {...getFilterProps('collectiveAccountIds')}
