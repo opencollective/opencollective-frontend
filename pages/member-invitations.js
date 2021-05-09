@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
@@ -12,7 +12,7 @@ import MemberInvitationsList from '../components/MemberInvitationsList';
 import MessageBox from '../components/MessageBox';
 import { H1 } from '../components/Text';
 
-const memberInvitationsPageQuery = gql`
+const memberInvitationsPageQuery = gqlV2`
   query MemberInvitationsPage($memberCollectiveId: Int!) {
     memberInvitations(MemberCollectiveId: $memberCollectiveId) {
       id
@@ -55,6 +55,7 @@ class MemberInvitationsPage extends React.Component {
             query={memberInvitationsPageQuery}
             variables={{ memberCollectiveId: LoggedInUser.CollectiveId }}
             fetchPolicy="network-only"
+            context={API_V2_CONTEXT}
           >
             {({ data, error, loading }) => (
               <Container background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" py={[4, 5, 6]} px={[2, 3, 4]}>
