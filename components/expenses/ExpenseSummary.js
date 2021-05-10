@@ -65,6 +65,7 @@ const ExpenseSummary = ({
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const showProcessButtons = !isEditing && existsInAPI && collective && hasProcessButtons(permissions);
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
+  const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];
 
   return (
     <StyledCard
@@ -184,7 +185,7 @@ const ExpenseSummary = ({
         <LoadingPlaceholder height={68} mb={3} />
       ) : (
         <div data-cy="expense-summary-items">
-          {(expense.items.length > 0 ? expense.items : expense.draft?.items || []).map(attachment => (
+          {expenseItems.map(attachment => (
             <React.Fragment key={attachment.id}>
               <Flex my={24} flexWrap="wrap">
                 {(isReceipt || attachment.url) && (
@@ -257,7 +258,7 @@ const ExpenseSummary = ({
           {isLoading ? (
             <LoadingPlaceholder height={18} width={100} />
           ) : (
-            <ExpenseItemsTotalAmount currency={expense.currency} items={expense.items} />
+            <ExpenseItemsTotalAmount currency={expense.currency} items={expenseItems} />
           )}
         </Flex>
       </Flex>
