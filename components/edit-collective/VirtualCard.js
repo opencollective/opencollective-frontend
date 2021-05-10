@@ -274,7 +274,7 @@ const getLimitString = ({ spend_limit, spend_limit_duration }) => {
     case 'MONTHLY':
       return (
         <Fragment>
-          <FormattedMessage id="VirtualCards.LimittedTo" defaultMessage="Limitted to" />
+          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
           &nbsp;
           {value}/<FormattedMessage id="Frequency.Monthly.Short" defaultMessage="mo." />
         </Fragment>
@@ -282,7 +282,7 @@ const getLimitString = ({ spend_limit, spend_limit_duration }) => {
     case 'ANNUALLY':
       return (
         <Fragment>
-          <FormattedMessage id="VirtualCards.LimittedTo" defaultMessage="Limitted to" />
+          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
           &nbsp;
           {value}/<FormattedMessage id="Frequency.Yearly.Short" defaultMessage="yr." />
         </Fragment>
