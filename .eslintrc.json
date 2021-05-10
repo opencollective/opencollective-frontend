@@ -80,6 +80,15 @@
 
     // This is deprecated and replaced by jsx-a11y/label-has-associated-control;
     // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/master/docs/rules/label-has-for.md
-    "jsx-a11y/label-has-for": ["off"]
+    "jsx-a11y/label-has-for": ["off"],
+    // The rational behind this is; https://github.com/brendanmorrell/eslint-plugin-styled-components-a11y/issues/18#issuecomment-837229005
+    "jsx-a11y/label-has-associated-control": [
+      "error",
+      {
+        "required": {
+          "some": ["nesting", "id"]
+        }
+      }
+    ]
   }
 }
