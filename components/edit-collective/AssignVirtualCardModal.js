@@ -100,6 +100,9 @@ const AssignVirtualCardModal = props => {
       if (!values.collective) {
         errors.collective = 'Required';
       }
+      if (!values.user) {
+        errors.user = 'Required';
+      }
       if (!values.expireDate) {
         errors.expireDate = 'Required';
       }
