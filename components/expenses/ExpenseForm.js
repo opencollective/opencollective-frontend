@@ -345,6 +345,7 @@ const ExpenseFormBody = ({
           setOnBehalf(isInvite);
           formik.setFieldValue('payeeLocation', {});
           formik.setFieldValue('payee', {});
+          formik.setFieldValue('payoutMethod', {});
         }}
       />
     );
