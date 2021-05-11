@@ -28,7 +28,6 @@ const ExpenseModal = ({ expense, onDelete, onProcess, onClose, show }) => {
   const { data, loading } = useQuery(expenseModalQuery, {
     variables: { legacyExpenseId: expense.legacyId },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
   });
 
   return (

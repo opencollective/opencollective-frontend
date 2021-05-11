@@ -415,7 +415,6 @@ const addExpensesPageData = graphql(expensesPageQuery, {
     const [dateFrom] = getDateRangeFromPeriod(props.query.period);
     return {
       context: API_V2_CONTEXT,
-      fetchPolicy: 'cache-and-network',
       variables: {
         collectiveSlug: props.collectiveSlug,
         offset: props.query.offset || 0,
