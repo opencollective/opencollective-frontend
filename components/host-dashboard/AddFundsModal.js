@@ -173,10 +173,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const [fundDetails, setFundDetails] = useState({});
   const { addToast } = useToasts();
   const intl = useIntl();
-  const options = React.useMemo(() => getOptions(fundDetails.fundAmount, collective.currency, intl), [
-    fundDetails.fundAmount,
-    collective.currency,
-  ]);
+  const options = React.useMemo(
+    () => getOptions(fundDetails.fundAmount, collective.currency, intl),
+    [fundDetails.fundAmount, collective.currency],
+  );
   const formatOptionLabel = option => {
     if (option.currency) {
       return (

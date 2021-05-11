@@ -69,11 +69,10 @@ const NewContributionFlowStepProfileLoggedInForm = ({
     onChange({ stepProfile: defaultSelectedProfile, stepPayment: null, stepSummary: null });
   }, [defaultSelectedProfile]);
 
-  const filteredProfiles = React.useMemo(() => prepareProfiles(intl, profiles, collective, canUseIncognito), [
-    profiles,
-    collective,
-    canUseIncognito,
-  ]);
+  const filteredProfiles = React.useMemo(
+    () => prepareProfiles(intl, profiles, collective, canUseIncognito),
+    [profiles, collective, canUseIncognito],
+  );
 
   return (
     <Fragment>

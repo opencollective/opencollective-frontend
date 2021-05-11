@@ -100,9 +100,10 @@ const TrixEditorContainer = styled.div`
         '.trix-button-group--file-tools': {
           display: 'none',
         },
-        '.trix-button-group--block-tools .trix-button:not(.trix-button--icon-number-list):not(.trix-button--icon-bullet-list)': {
-          display: 'none',
-        },
+        '.trix-button-group--block-tools .trix-button:not(.trix-button--icon-number-list):not(.trix-button--icon-bullet-list)':
+          {
+            display: 'none',
+          },
         '.trix-button--icon-bullet-list': {
           borderLeft: 'none',
         },
@@ -352,9 +353,7 @@ export default class RichTextEditor extends React.Component {
       return `https://www.youtube-nocookie.com/embed/${id}`;
     } /* else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
-    } */ else if (
-      service === 'anchorFm'
-    ) {
+    } */ else if (service === 'anchorFm') {
       return `https://anchor.fm/${id}`;
     } else {
       return null;
