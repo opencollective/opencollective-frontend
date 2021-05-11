@@ -10,9 +10,8 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
-import { Box, Grid } from '../Grid';
+import { Grid } from '../Grid';
 import CreditCard from '../icons/CreditCard';
-import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInputField from '../StyledInputField';
@@ -20,6 +19,7 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledInputMask from '../StyledInputMask';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const initialValues = {
   cardNumber: undefined,
@@ -36,6 +36,17 @@ const assignNewVirtualCardMutation = gqlV2/* GraphQL */ `
     $userAccount: AccountReferenceInput!
   ) {
     assignNewVirtualCard(virtualCard: $virtualCard, account: $account, userAccount: $userAccount) {
+      id
+      name
+      last4
+      data
+    }
+  }
+`;
+
+const editVirtualCardMutation = gqlV2/* GraphQL */ `
+  mutation editVirtualCard($virtualCard: VirtualCardEditInput!, $userAccount: AccountReferenceInput) {
+    editVirtualCard(virtualCard: $virtualCard, userAccount: $userAccount) {
       id
       name
       last4
@@ -66,29 +77,77 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-const AssignVirtualCardModal = props => {
-  const [assignNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(
-    assignNewVirtualCardMutation,
-    { context: API_V2_CONTEXT },
-  );
+const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onClose, ...modalProps }) => {
+  const isEditing = virtualCard;
+  const { addToast } = useToasts();
+  const [assignNewVirtualCard, { loading: isCallingAssignMutation }] = useMutation(assignNewVirtualCardMutation, {
+    context: API_V2_CONTEXT,
+    onError: e => {
+      addToast({
+        type: TOAST_TYPE.ERROR,
+        message: (
+          <FormattedMessage
+            id="Host.VirtualCards.AssignCard.Error"
+            defaultMessage="Error assigning card: {error}"
+            values={{
+              error: e.message,
+            }}
+          />
+        ),
+      });
+    },
+  });
+  const [editVirtualCard, { loading: isCallingEdigMutation }] = useMutation(editVirtualCardMutation, {
+    context: API_V2_CONTEXT,
+    onError: e => {
+      addToast({
+        type: TOAST_TYPE.ERROR,
+        message: (
+          <FormattedMessage
+            id="Host.VirtualCards.EditCard.Error"
+            defaultMessage="Error editing card: {error}"
+            values={{
+              error: e.message,
+            }}
+          />
+        ),
+      });
+    },
+  });
   const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
     context: API_V2_CONTEXT,
   });
+  const isBusy = isCallingAssignMutation || isCallingEdigMutation;
 
   const formik = useFormik({
-    initialValues: { ...initialValues, collective: props.collective },
+    initialValues: {
+      ...(virtualCard ? { ...virtualCard.privateData, user: virtualCard.userAccount } : initialValues),
+      collective: collective || virtualCard.account,
+    },
     async onSubmit(values) {
       const { collective, user, ...privateData } = values;
-      await assignNewVirtualCard({
-        variables: {
-          virtualCard: {
-            privateData,
+      if (isEditing) {
+        await editVirtualCard({
+          variables: {
+            virtualCard: {
+              privateData,
+              id: virtualCard.id,
+            },
+            userAccount: { id: user.id },
           },
-          userAccount: { id: user.id },
-          account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
-        },
-      });
-      props.onSuccess?.();
+        });
+      } else {
+        await assignNewVirtualCard({
+          variables: {
+            virtualCard: {
+              privateData,
+            },
+            userAccount: { id: user.id },
+            account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
+          },
+        });
+      }
+      onSuccess?.();
     },
     validate(values) {
       const errors = {};
@@ -122,7 +181,7 @@ const AssignVirtualCardModal = props => {
   const handleClose = () => {
     formik.resetForm(initialValues);
     formik.setErrors({});
-    props.onClose?.();
+    onClose?.();
   };
   const handleCollectivePick = async option => {
     formik.setFieldValue('collective', option.value);
@@ -132,17 +191,28 @@ const AssignVirtualCardModal = props => {
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <Modal width="382px" onClose={handleClose} trapFocus {...props}>
+    <Modal width="382px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
-        <ModalHeader onClose={props.onClose}>
-          <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
+        <ModalHeader onClose={onClose}>
+          {isEditing ? (
+            <FormattedMessage id="Host.VirtualCards.CardDetails" defaultMessage="Card Details" />
+          ) : (
+            <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
+          )}
         </ModalHeader>
         <ModalBody pt={2}>
           <P>
-            <FormattedMessage
-              id="Host.VirtualCards.AssignCard.Description"
-              defaultMessage="Assign existing card to a collective sharing the private information below."
-            />
+            {isEditing ? (
+              <FormattedMessage
+                id="Host.VirtualCards.CardDetails.Description"
+                defaultMessage="You can view and edit the credit card details."
+              />
+            ) : (
+              <FormattedMessage
+                id="Host.VirtualCards.AssignCard.Description"
+                defaultMessage="Assign existing card to a collective sharing the private information below."
+              />
+            )}
           </P>
           <StyledHr borderColor="black.300" mt={3} />
           <Grid mt={3} gridTemplateColumns="repeat(2, 1fr)" gridGap="26px 8px">
@@ -156,15 +226,15 @@ const AssignVirtualCardModal = props => {
               {inputProps => (
                 <CollectivePickerAsync
                   {...inputProps}
-                  hostCollectiveIds={[props.host.legacyId]}
+                  hostCollectiveIds={[host.legacyId]}
                   name="collective"
                   id="collective"
                   collective={formik.values.collective}
-                  isDisabled={!!props.collective}
+                  isDisabled={!!collective || isEditing || isBusy}
                   customOptions={[
                     {
-                      value: props.host,
-                      label: props.host.name,
+                      value: host,
+                      label: host.name,
                       [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
                     },
                   ]}
@@ -187,7 +257,7 @@ const AssignVirtualCardModal = props => {
                   groupByType={false}
                   collectives={collectiveUsers}
                   collective={formik.values.user}
-                  isDisabled={isLoadingUsers}
+                  isDisabled={isLoadingUsers || isBusy}
                   onChange={option => formik.setFieldValue('user', option.value)}
                 />
               )}
@@ -238,7 +308,7 @@ const AssignVirtualCardModal = props => {
                       {...props}
                     />
                   )}
-                  disabled={isCreating}
+                  disabled={isBusy || isEditing}
                   guide={false}
                 />
               )}
@@ -259,7 +329,7 @@ const AssignVirtualCardModal = props => {
                   mask={[/[01]/, /\d/, '/', '2', '0', /\d/, /\d/]}
                   placeholder="MM/YYYY"
                   guide={false}
-                  disabled={isCreating}
+                  disabled={isBusy}
                 />
               )}
             </StyledInputField>
@@ -279,17 +349,10 @@ const AssignVirtualCardModal = props => {
                   mask={[/\d/, /\d/, /\d/]}
                   guide={false}
                   placeholder="123"
-                  disabled={isCreating}
+                  disabled={isBusy}
                 />
               )}
             </StyledInputField>
-            {createError && (
-              <Box gridColumn="1/3">
-                <MessageBox type="error" fontSize="13px">
-                  {createError.message}
-                </MessageBox>
-              </Box>
-            )}
           </Grid>
         </ModalBody>
         <ModalFooter isFullWidth>
@@ -297,12 +360,17 @@ const AssignVirtualCardModal = props => {
             <StyledButton
               my={1}
               minWidth={140}
-              buttonStyle={'primary'}
+              buttonStyle="primary"
               data-cy="confirmation-modal-continue"
-              loading={isCreating}
+              loading={isBusy}
               type="submit"
+              textTransform="capitalize"
             >
-              <FormattedMessage id="SaveCard" defaultMessage="Save Card" />
+              {isEditing ? (
+                <FormattedMessage id="SaveChanges" defaultMessage="Save changes" />
+              ) : (
+                <FormattedMessage id="SaveCard" defaultMessage="Save Card" />
+              )}
             </StyledButton>
           </Container>
         </ModalFooter>
@@ -328,6 +396,28 @@ AssignVirtualCardModal.propTypes = {
     type: PropTypes.string,
     name: PropTypes.string,
     imageUrl: PropTypes.string,
+  }),
+  virtualCard: PropTypes.shape({
+    id: PropTypes.string,
+    account: {
+      id: PropTypes.string,
+      imageUrl: PropTypes.string,
+      name: PropTypes.string,
+      slug: PropTypes.string,
+    },
+    createdAt: PropTypes.string,
+    name: PropTypes.string,
+    privateData: {
+      cardNumber: PropTypes.string,
+      cvv: PropTypes.string,
+      expireDate: PropTypes.string,
+    },
+    userAccount: {
+      id: PropTypes.string,
+      imageUrl: PropTypes.string,
+      name: PropTypes.string,
+      slug: PropTypes.string,
+    },
   }),
 };
 
