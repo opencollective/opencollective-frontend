@@ -315,6 +315,8 @@
   "collective.isArchived": "{name} foi arquivado.",
   "collective.isArchived.description": "{name} foi arquivado e não está mais ativo.",
   "collective.isArchived.edit.description": "Este {type} foi arquivado e não está mais ativo.",
+  "collective.paypalDisable.button": "Disable PayPal",
+  "collective.paypalEnable.button": "Enable PayPal",
   "collective.pending": "Aprovação do Coletivo pendente.",
   "collective.pending.description": "Aguardando aprovação de {host}.",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organização está} other {organizações estão}} apoiando {collective}",

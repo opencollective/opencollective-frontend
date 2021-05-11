@@ -315,6 +315,8 @@
   "collective.isArchived": "{name} is gearchiveerd.",
   "collective.isArchived.description": "{name} has been archived and is no longer active.",
   "collective.isArchived.edit.description": "This {type} has been archived and is no longer active.",
+  "collective.paypalDisable.button": "Disable PayPal",
+  "collective.paypalEnable.button": "Enable PayPal",
   "collective.pending": "Collectief wacht op goedkeuring.",
   "collective.pending.description": "Awaiting approval from {host}.",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organisatie} other {organisaties}} steunen {collective}",

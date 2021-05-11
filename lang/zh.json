@@ -315,6 +315,8 @@
   "collective.isArchived": "{name} 已存档。",
   "collective.isArchived.description": "{name} has been archived and is no longer active.",
   "collective.isArchived.edit.description": "This {type} has been archived and is no longer active.",
+  "collective.paypalDisable.button": "Disable PayPal",
+  "collective.paypalEnable.button": "Enable PayPal",
   "collective.pending": "Collective 正在等待批准。",
   "collective.pending.description": "Awaiting approval from {host}.",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}",
