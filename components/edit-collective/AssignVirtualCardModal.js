@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
@@ -46,7 +46,7 @@ const assignNewVirtualCardMutation = gqlV2/* GraphQL */ `
 
 const collectiveMembersQuery = gqlV2/* GraphQL */ `
   query CollectiveMembers($slug: String!) {
-    collective(slug: $slug) {
+    account(slug: $slug) {
       id
       members(role: ADMIN) {
         nodes {
@@ -71,7 +71,7 @@ const AssignVirtualCardModal = props => {
     assignNewVirtualCardMutation,
     { context: API_V2_CONTEXT },
   );
-  const [getCollectiveUsers, { data: users }] = useLazyQuery(collectiveMembersQuery, {
+  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
     context: API_V2_CONTEXT,
   });
 
@@ -113,6 +113,12 @@ const AssignVirtualCardModal = props => {
     },
   });
 
+  useEffect(() => {
+    if (formik.values.collective?.slug) {
+      throttledCall(getCollectiveUsers, { slug: formik.values.collective.slug });
+    }
+  }, [formik.values.collective]);
+
   const handleClose = () => {
     formik.resetForm(initialValues);
     formik.setErrors({});
@@ -120,10 +126,10 @@ const AssignVirtualCardModal = props => {
   };
   const handleCollectivePick = async option => {
     formik.setFieldValue('collective', option.value);
-    throttledCall(getCollectiveUsers, { slug: option.value.slug });
+    formik.setFieldValue('user', null);
   };
 
-  const collectiveUsers = users?.collective?.members.nodes.map(node => node.account);
+  const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
     <Modal width="382px" onClose={handleClose} trapFocus {...props}>
@@ -181,6 +187,7 @@ const AssignVirtualCardModal = props => {
                   groupByType={false}
                   collectives={collectiveUsers}
                   collective={formik.values.user}
+                  isDisabled={isLoadingUsers}
                   onChange={option => formik.setFieldValue('user', option.value)}
                 />
               )}
