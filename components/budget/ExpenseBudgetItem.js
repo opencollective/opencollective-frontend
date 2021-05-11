@@ -119,6 +119,7 @@ const ExpenseBudgetItem = ({
   showProcessActions,
   usePreviewModal,
   view,
+  suggestedTags,
   onDelete,
   onProcess,
 }) => {
@@ -292,7 +293,11 @@ const ExpenseBudgetItem = ({
               )}
             </Flex>
           ) : (
-            <ExpenseTags expense={expense} />
+            <ExpenseTags
+              expense={expense}
+              canEdit={get(expense, 'permissions.canEditTags', false)}
+              suggestedTags={suggestedTags}
+            />
           )}
         </Box>
         {showProcessActions && expense?.permissions && (
@@ -347,6 +352,7 @@ ExpenseBudgetItem.propTypes = {
     }),
   }),
   host: PropTypes.object,
+  suggestedTags: PropTypes.arrayOf(PropTypes.string),
   expense: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     legacyId: PropTypes.number,

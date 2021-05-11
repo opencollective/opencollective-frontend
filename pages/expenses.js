@@ -8,6 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getSuggestedTags } from '../lib/collective.lib';
 import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
@@ -171,6 +172,8 @@ class ExpensePage extends React.Component {
     }
   };
 
+  getSuggestedTags = memoizeOne(getSuggestedTags);
+
   render() {
     const { collectiveSlug, data, query, LoggedInUser } = this.props;
     const hasFilters = this.hasFilter(query);
@@ -251,6 +254,7 @@ class ExpensePage extends React.Component {
                       host={data.account?.isHost ? data.account : data.account?.host}
                       expenses={data.expenses?.nodes}
                       nbPlaceholders={data.variables.limit}
+                      suggestedTags={this.getSuggestedTags(data.account)}
                     />
                     <Flex mt={5} justifyContent="center">
                       <Pagination
