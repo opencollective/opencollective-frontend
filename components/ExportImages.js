@@ -59,7 +59,7 @@ class ExportImages extends React.Component {
           {
             name: 'Financial contributors widget',
             url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36`,
-            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600" style="max-width: 100%;"></object>`,
+            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600"></object>`,
             options: [
               {
                 name: 'width',
@@ -123,7 +123,7 @@ class ExportImages extends React.Component {
               <Container as="li" key={image.name} mb={4}>
                 <Label fontWeight="500">{image.name}</Label>
                 <div
-                  style={{ maxWidth: '100%', overflowY: 'auto' }}
+                  style={{ maxWidth: '100%' }}
                   dangerouslySetInnerHTML={{
                     __html: image.code,
                   }}
