@@ -28,8 +28,9 @@ describe('New expense flow ', () => {
     cy.get('[data-cy^="expense-container"]').should('have.length', 1);
 
     // Filter by period
-    cy.getByDataCy('expenses-filter-period').click();
-    cy.getByDataCy('select-option').contains('Past month').click();
+    cy.getByDataCy('period-filter').click();
+    cy.get('input[name="dateFrom"]').type('2021-01-01');
+    cy.getByDataCy('btn-apply-period-filter').click();
     cy.get('[data-cy^="expense-container"]').should('have.length', 0);
 
     // Reset filters

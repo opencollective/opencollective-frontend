@@ -43,6 +43,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
     $dateFrom: ISODateTime
+    $dateTo: ISODateTime
     $searchTerm: String
   ) {
     host(slug: $hostSlug) {
@@ -60,6 +61,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
       maxAmount: $maxAmount
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
+      dateTo: $dateTo
       searchTerm: $searchTerm
     ) {
       totalCount
@@ -119,7 +121,7 @@ const isValidStatus = status => {
 
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom] = getDateRangeFromPeriod(query.period);
+  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: (parseInt(query.limit) || NB_EXPENSES_DISPLAYED) * 2,
@@ -130,6 +132,7 @@ const getVariablesFromQuery = query => {
     maxAmount: amountRange[1] && amountRange[1] * 100,
     payoutMethodType: query.payout,
     dateFrom,
+    dateTo,
     searchTerm: query.searchTerm,
   };
 };
