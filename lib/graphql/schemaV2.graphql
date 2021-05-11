@@ -1149,7 +1149,6 @@ type Comment {
   id: String
   createdAt: DateTime
   html: String
-  markdown: String @deprecated(reason: "2020-01-25: Use html")
   fromAccount: Account
   account: Account
 
@@ -1196,7 +1195,6 @@ input CommentReferenceInput {
 
 input CommentUpdateInput {
   id: String!
-  markdown: String
   html: String
 }
 
@@ -5822,6 +5820,21 @@ type Mutation {
   ): VirtualCard!
 
   """
+  Edit existing Virtual Card information
+  """
+  editVirtualCard(
+    """
+    Virtual Card being edited its new values
+    """
+    virtualCard: VirtualCardEditInput!
+
+    """
+    The user account reference to attach the Virtual Card to if desired
+    """
+    userAccount: AccountReferenceInput
+  ): VirtualCard!
+
+  """
   Request Virtual Card to host
   """
   requestVirtualCard(
@@ -8005,6 +8018,7 @@ type VirtualCard {
   id: String
   account: Account
   host: Account
+  userAccount: Account
   name: String
   last4: String
   data: JSONObject
@@ -8021,6 +8035,11 @@ type VirtualCardCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [VirtualCard]
+}
+
+input VirtualCardEditInput {
+  id: String
+  privateData: JSONObject
 }
 
 input VirtualCardInput {
