@@ -4,6 +4,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import PeriodFilter from '../../../budget/filters/PeriodFilter';
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
 import RequestVirtualCardBtn from '../../../RequestVirtualCardBtn';
@@ -34,6 +35,7 @@ const VirtualCardFilters = ({
   virtualCardCollectives,
   collective,
   host,
+  isPeriodFilter,
 }) => {
   const allowRequestVirtualCard = get(host, 'settings.virtualcards.requestcard');
 
@@ -67,6 +69,14 @@ const VirtualCardFilters = ({
           </FilterLabel>
           <StatusFilter {...getFilterProps('state')} />
         </FilterContainer>
+        {isPeriodFilter && (
+          <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+            <FilterLabel htmlFor="virtual-card-filter-period">
+              <FormattedMessage id="VirtualCard.Period" defaultMessage="Period" />
+            </FilterLabel>
+            <PeriodFilter {...getFilterProps('period')} />
+          </FilterContainer>
+        )}
         <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
           <FilterLabel htmlFor="virtual-card-filter-amount">
             <FormattedMessage id="VirtualCard.Merchant" defaultMessage="Merchant" />
@@ -95,6 +105,7 @@ VirtualCardFilters.propTypes = {
   isCollectiveFilter: PropTypes.bool,
   host: PropTypes.object,
   collective: PropTypes.object,
+  isPeriodFilter: PropTypes.bool,
 };
 
 export default React.memo(VirtualCardFilters);
