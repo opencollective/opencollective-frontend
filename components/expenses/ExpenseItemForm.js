@@ -137,7 +137,7 @@ const ExpenseItemForm = ({
                     name={field.name}
                     isMulti={false}
                     error={meta.error}
-                    onSuccess={url => form.setFieldValue(field.name, url)}
+                    onSuccess={({ url }) => form.setFieldValue(field.name, url)}
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
                     fontSize="13px"
                     size={[84, 112]}

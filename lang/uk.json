@@ -951,6 +951,7 @@
   "Fields.description": "Опис",
   "Fields.name": "Ім’я",
   "Fields.website": "Вебсайт",
+  "File.NoFilename": "No filename",
   "FilesPreviewModal.AttachmentPreview": "Попередній перегляд вкладення",
   "FilesUploadFailed": "Не вдалося завантажити {count, plural, one {файл} other {# файлів}}",
   "Filter.ByName": "Фільтр за назвою",

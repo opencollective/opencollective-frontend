@@ -951,6 +951,7 @@
   "Fields.description": "Descrição",
   "Fields.name": "Nome",
   "Fields.website": "Site",
+  "File.NoFilename": "No filename",
   "FilesPreviewModal.AttachmentPreview": "Visualização do anexo",
   "FilesUploadFailed": "{count, plural, one {O arquivo} other {# arquivos}} falhou ao carregar",
   "Filter.ByName": "Filtrar por nome",
