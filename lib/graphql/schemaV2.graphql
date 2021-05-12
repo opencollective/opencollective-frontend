@@ -5819,9 +5819,24 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
-    User account responsible for the card
+    Individual account responsible for the card
     """
-    userAccount: AccountReferenceInput!
+    assignee: AccountReferenceInput!
+  ): VirtualCard!
+
+  """
+  Edit existing Virtual Card information
+  """
+  editVirtualCard(
+    """
+    Virtual Card being edited its new values
+    """
+    virtualCard: VirtualCardUpdateInput!
+
+    """
+    The individual account reference to attach the Virtual Card to if desired
+    """
+    assignee: AccountReferenceInput
   ): VirtualCard!
 
   """
@@ -8018,6 +8033,7 @@ type VirtualCard {
   id: String
   account: Account
   host: Account
+  assignee: Individual
   name: String
   last4: String
   data: JSONObject
@@ -8046,4 +8062,9 @@ input VirtualCardInput {
 
 input VirtualCardReferenceInput {
   id: String
+}
+
+input VirtualCardUpdateInput {
+  id: String
+  privateData: JSONObject
 }

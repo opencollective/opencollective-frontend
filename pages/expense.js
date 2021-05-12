@@ -598,7 +598,7 @@ class ExpensePage extends React.Component {
                         {isDraft && !loggedInAccount ? (
                           <FormattedMessage id="Expense.JoinAndSubmit" defaultMessage="Join and Submit" />
                         ) : (
-                          <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
+                          <FormattedMessage id="SaveChanges" defaultMessage="Save changes" />
                         )}
                       </StyledButton>
                     </Flex>
