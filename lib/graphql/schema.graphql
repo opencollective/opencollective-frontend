@@ -819,7 +819,6 @@ Input type for CommentType
 """
 input CommentAttributesInputType {
   id: Int
-  markdown: String
   html: String
   UpdateId: Int
 }
@@ -829,7 +828,6 @@ Input type for CommentType
 """
 input CommentInputType {
   id: Int
-  markdown: String
   html: String
 
   """

@@ -318,6 +318,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
     $dateFrom: ISODateTime
+    $dateTo: ISODateTime
     $searchTerm: String
   ) {
     account(slug: $collectiveSlug) {
@@ -394,6 +395,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       maxAmount: $maxAmount
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
+      dateTo: $dateTo
       searchTerm: $searchTerm
     ) {
       totalCount
@@ -412,7 +414,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
 const addExpensesPageData = graphql(expensesPageQuery, {
   options: props => {
     const amountRange = parseAmountRange(props.query.amount);
-    const [dateFrom] = getDateRangeFromPeriod(props.query.period);
+    const [dateFrom, dateTo] = getDateRangeFromPeriod(props.query.period);
     return {
       context: API_V2_CONTEXT,
       variables: {
@@ -426,6 +428,7 @@ const addExpensesPageData = graphql(expensesPageQuery, {
         maxAmount: amountRange[1] && amountRange[1] * 100,
         payoutMethodType: props.query.payout,
         dateFrom,
+        dateTo,
         searchTerm: props.query.searchTerm,
       },
     };

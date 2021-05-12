@@ -1149,7 +1149,6 @@ type Comment {
   id: String
   createdAt: DateTime
   html: String
-  markdown: String @deprecated(reason: "2020-01-25: Use html")
   fromAccount: Account
   account: Account
 
@@ -1196,7 +1195,6 @@ input CommentReferenceInput {
 
 input CommentUpdateInput {
   id: String!
-  markdown: String
   html: String
 }
 
@@ -7112,6 +7110,11 @@ type Query {
     dateFrom: ISODateTime
 
     """
+    Only return expenses that were created after this date
+    """
+    dateTo: ISODateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -7204,6 +7207,11 @@ type Query {
     Only return orders that were created after this date
     """
     dateFrom: ISODateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: ISODateTime
 
     """
     The term to search
