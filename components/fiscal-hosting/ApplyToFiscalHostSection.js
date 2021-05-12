@@ -123,7 +123,7 @@ const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
         </Box>
         <ApplyLink as={Link} href={collectivePath}>
           <Span color="#3220A3">
-            <FormattedMessage id="apply" defaultMessage="Apply" />
+            <FormattedMessage id="Apply" defaultMessage="Apply" />
           </Span>
           <Span ml="8px">
             <ArrowRight2 color="#3220A3" size="18" />
