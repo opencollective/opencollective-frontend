@@ -80,16 +80,20 @@ class SendingMoney extends React.Component {
             {!this.props.collective.settings?.disablePaypalPayouts && (
               <P mb={3}>
                 <FormattedMessage
-                  id="collective.sendMoney.paypalEnable.description"
-                  defaultMessage={"PayPal is active by default. You don't have to configure anything."}
+                  id="collective.sendMoney.paypalEnabled.description"
+                  defaultMessage={
+                    'PayPal Payouts are active. Contributors can request Expenses to be paid with PayPal.'
+                  }
                 />
               </P>
             )}
             {this.props.collective.settings?.disablePaypalPayouts && (
               <P mb={3}>
                 <FormattedMessage
-                  id="collective.sendMoney.paypalDisable.description"
-                  defaultMessage={'PayPal is disabled. Click below to enable it.'}
+                  id="collective.sendMoney.paypalDisabled.description"
+                  defaultMessage={
+                    'PayPal Payouts are disabled. Contributors are not able to request Expenses to be paid with PayPal.'
+                  }
                 />
               </P>
             )}
