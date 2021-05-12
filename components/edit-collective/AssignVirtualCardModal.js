@@ -147,8 +147,8 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
           },
         });
+        onSuccess?.();
       }
-      onSuccess?.();
     },
     validate(values) {
       const errors = {};
