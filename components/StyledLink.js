@@ -130,7 +130,7 @@ StyledLink.propTypes = {
   openInNewTab: PropTypes.bool,
   /** If true, the link will open in a new tab and also adds rel=nofollow */
   openInNewTabNoFollow: PropTypes.bool,
-  /** Wether to underline the link on hover */
+  /** Whether to underline the link on hover */
   underlineOnHover: PropTypes.bool,
 };
 
