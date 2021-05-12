@@ -29,6 +29,15 @@ const StyledContributeCard = styled.div`
   border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
   border: 1px solid #dcdee0;
   background: white;
+  transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s; // Opacity for DragNDrop
+
+  &:hover {
+    /* Primitives / OC Blue */
+    border: 1px solid ${props => props.theme.colors.primary[600]};
+
+    /* Drop Shadow / Z 300 */
+    box-shadow: 0px 8px 12px rgba(20, 20, 20, 0.16);
+  }
 `;
 
 /** Tier card banner */
@@ -60,6 +69,9 @@ const Description = styled.div`
   line-height: 20px;
   height: 100%;
   flex: 1 1;
+
+  /* Neutral Tints / 700 */
+  color: #4e5052;
 `;
 
 /** Translations */
@@ -116,8 +128,6 @@ const I18nContributionType = defineMessages({
 
 const getContributeCTA = type => {
   switch (type) {
-    case ContributionTypes.FINANCIAL_GOAL:
-      return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute to this goal" />;
     case ContributionTypes.TICKET:
       return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="RVSP" />;
     case ContributionTypes.EVENT_PARTICIPATE:
@@ -140,7 +150,7 @@ const getFooterHeading = type => {
     case ContributionTypes.EVENT_PASSED:
       return <FormattedMessage id="ContributeCard.footer.pastEvent" defaultMessage="Attended by" />;
     default:
-      return <FormattedMessage id="ContributeCard.contributionsBy" defaultMessage="Contributions by" />;
+      return <FormattedMessage id="ContributeCard.latestActivity" defaultMessage="Latest activity by" />;
   }
 };
 
@@ -177,19 +187,20 @@ const ContributeCard = ({
         <StyledTag
           position="absolute"
           bottom="8px"
-          left="8px"
+          left="16px"
           background="white"
           color="black.700"
-          fontWeight="600"
-          letterSpacing="0.5px"
+          fontWeight="700"
+          letterSpacing="0.06em"
           textTransform="uppercase"
+          fontSize="12px"
         >
           {intl.formatMessage(I18nContributionType[type])}
         </StyledTag>
       </CoverImage>
       <Flex px={3} py={3} flexDirection="column" justifyContent="space-between" flex="1">
         <Flex flexDirection="column" flex="1 1">
-          <P fontSize="20px" mt={1} mb={2} fontWeight="bold" data-cy="contribute-title">
+          <P fontSize="20px" mt={1} mb={2} fontWeight="bold" data-cy="contribute-title" color="black.900">
             {title}
           </P>
           <Description data-cy="contribute-description">{children}</Description>
@@ -209,7 +220,8 @@ const ContributeCard = ({
                   <Flex alignItems="center" mt={3} mb={2}>
                     <P
                       color="black.700"
-                      fontSize="9px"
+                      fontSize="12px"
+                      lineHeight="16px"
                       fontWeight="500"
                       letterSpacing="0.06em"
                       pr={2}
