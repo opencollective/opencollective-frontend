@@ -230,7 +230,7 @@ const useUpdatePaymentMethod = contribution => {
   };
 };
 
-const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loadStripe, account }) => {
+const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, account }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
 
@@ -419,8 +419,8 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
               buttonSize="tiny"
               minWidth={75}
               onClick={() => {
-                setShowAddPaymentMethod(false);
                 setNewPaymentMethodInfo(null);
+                onCloseEdit();
               }}
             >
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
@@ -480,13 +480,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
           </Fragment>
         ) : (
           <Fragment>
-            <StyledButton
-              buttonSize="tiny"
-              minWidth={75}
-              onClick={() => {
-                setMenuState('mainMenu');
-              }}
-            >
+            <StyledButton buttonSize="tiny" minWidth={75} onClick={onCloseEdit}>
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
             <StyledButton
@@ -509,7 +503,6 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
 
 UpdatePaymentMethodPopUp.propTypes = {
   data: PropTypes.object,
-  setMenuState: PropTypes.func,
   contribution: PropTypes.object.isRequired,
   onCloseEdit: PropTypes.func,
   loadStripe: PropTypes.func.isRequired,
