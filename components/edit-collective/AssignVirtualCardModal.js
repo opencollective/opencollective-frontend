@@ -122,7 +122,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
   const formik = useFormik({
     initialValues: {
       ...(virtualCard ? { ...virtualCard.privateData, assignee: virtualCard.assignee } : initialValues),
-      collective: collective || virtualCard.account,
+      collective: collective || virtualCard?.account,
     },
     async onSubmit(values) {
       const { collective, assignee, ...privateData } = values;
