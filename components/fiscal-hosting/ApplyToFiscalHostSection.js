@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -10,9 +11,16 @@ import SectionSubTitle from '../home/SectionSubtitle';
 import SectionTitle from '../home/SectionTitle';
 import Link from '../Link';
 import StyledCarousel from '../StyledCarousel';
+import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
 
 import { HOSTS } from './constants';
+
+const ApplyLink = styled(StyledLink)`
+  &:hover {
+    text-decoration: underline !important;
+  }
+`;
 
 const messages = defineMessages({
   'fiscalHosting.hosts.OCF': {
@@ -64,7 +72,7 @@ const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
         width={['288px', '205px', '250px', null, '304px']}
         height={['210px', '218px', '250px', null, '256px']}
         background={`url("/static/images/become-a-host/${bgImage}.png") no-repeat`}
-        backgroundSize={['contain', '100% 100%']}
+        backgroundSize={['contain', 'cover', '100% 100%']}
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -113,14 +121,14 @@ const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
             {intl.formatMessage(messages[`fiscalHosting.hosts.${id}`])}
           </P>
         </Box>
-        <Link href={collectivePath}>
+        <ApplyLink as={Link} href={collectivePath}>
           <Span color="#3220A3">
             <FormattedMessage id="apply" defaultMessage="Apply" />
           </Span>
           <Span ml="8px">
             <ArrowRight2 color="#3220A3" size="18" />
           </Span>
-        </Link>
+        </ApplyLink>
       </Container>
     </Container>
   );
@@ -134,6 +142,25 @@ Host.propTypes = {
   collectivePath: PropTypes.string,
   logo: PropTypes.string,
   bgImage: PropTypes.string,
+};
+
+const HostDesktopCarousel = ({ display, controllerPosition }) => (
+  <StyledCarousel controllerPosition={controllerPosition} width={1} display={display}>
+    {groupHostsIntoSections(HOSTS).map((groupedHost, index) => (
+      <Container display={['none', 'flex']} key={index.toString()} justifyContent="center" width={1}>
+        {groupedHost.map(host => (
+          <Fragment key={host.id}>
+            <Host {...host} />
+          </Fragment>
+        ))}
+      </Container>
+    ))}
+  </StyledCarousel>
+);
+
+HostDesktopCarousel.propTypes = {
+  display: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+  controllerPosition: PropTypes.string,
 };
 
 const ApplyToFiscalHosts = () => (
@@ -163,23 +190,14 @@ const ApplyToFiscalHosts = () => (
         />
       </SectionSubTitle>
     </Container>
-    <StyledCarousel options={HOSTS} display={[null, 'none']} width={1}>
+    <StyledCarousel display={[null, 'none']} width={1}>
       {HOSTS.map(host => (
         <Host key={host.id} {...host} />
       ))}
     </StyledCarousel>
-    <Flex mt={2} width={1}>
-      <StyledCarousel options={groupHostsIntoSections(HOSTS)} width={1} display={['none', 'block']}>
-        {groupHostsIntoSections(HOSTS).map((groupedHost, index) => (
-          <Container display={['none', 'flex']} key={index.toString()} justifyContent="center" width={1}>
-            {groupedHost.map(host => (
-              <Fragment key={host.id}>
-                <Host {...host} />
-              </Fragment>
-            ))}
-          </Container>
-        ))}
-      </StyledCarousel>
+    <Flex mt={2} width={1} maxWidth="1200px">
+      <HostDesktopCarousel display={['none', 'block', 'none']} controllerPosition="bottom" />
+      <HostDesktopCarousel display={['none', null, 'block']} controllerPosition="side" />
     </Flex>
   </Flex>
 );

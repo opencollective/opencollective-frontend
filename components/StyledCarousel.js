@@ -59,16 +59,26 @@ const Indicator = styled(Box)`
   background: ${props => (props.active ? '#DC5F7D' : '#E8E9EB')};
 `;
 
+const ControllerButton = styled(StyledRoundButton)`
+  padding: 12px;
+
+  &:active {
+    background: #141414;
+  }
+`;
+
 class StyledCarousel extends React.Component {
   static propTypes = {
     children: PropTypes.any,
     activeIndex: PropTypes.number,
     showArrowController: PropTypes.bool,
+    controllerPosition: PropTypes.string,
     onChange: PropTypes.func,
   };
 
   static defaultProps = {
     showArrowController: true,
+    controllerPosition: 'bottom',
   };
 
   constructor(props) {
@@ -149,42 +159,58 @@ class StyledCarousel extends React.Component {
     }
   };
 
+  renderRightController() {
+    const { activeIndex } = this.state;
+    const children = this.props.children;
+    const numItems = children.length - 1;
+
+    return (
+      <ControllerButton size={40} mx={1} onClick={() => this.handleSwipe(true)} disabled={activeIndex === numItems}>
+        →
+      </ControllerButton>
+    );
+  }
+
+  renderLeftController() {
+    const { activeIndex } = this.state;
+    return (
+      <ControllerButton padding="12px" size={40} mx={1} onClick={() => this.handleSwipe()} disabled={activeIndex === 0}>
+        ←
+      </ControllerButton>
+    );
+  }
+
   render() {
-    const { children, showArrowController, ...props } = this.props;
+    const { children, showArrowController, controllerPosition, ...props } = this.props;
     const { sliding, direction, activeIndex } = this.state;
 
     return (
       <Container {...props}>
-        <Box overflow="hidden" px={2}>
-          <Swipeable onSwipedLeft={() => this.handleSwipe(true)} onSwipedRight={() => this.handleSwipe()}>
-            <CarouselContainer sliding={sliding} direction={direction} numSlides={children.length}>
-              {React.Children.map(children, (child, index) => {
-                return (
-                  <CarouselSlot order={this.getOrder(index)} mx={2}>
-                    {child}
-                  </CarouselSlot>
-                );
-              })}
-            </CarouselContainer>
-          </Swipeable>
-        </Box>
-
+        <Flex justifyContent="center" alignItems="center" width={1}>
+          {showArrowController && controllerPosition === 'side' && this.renderLeftController()}
+          <Box overflow="hidden" px={2}>
+            <Swipeable onSwipedLeft={() => this.handleSwipe(true)} onSwipedRight={() => this.handleSwipe()}>
+              <CarouselContainer sliding={sliding} direction={direction} numSlides={children.length}>
+                {React.Children.map(children, (child, index) => {
+                  return (
+                    <CarouselSlot order={this.getOrder(index)} mx={2}>
+                      {child}
+                    </CarouselSlot>
+                  );
+                })}
+              </CarouselContainer>
+            </Swipeable>
+          </Box>
+          {showArrowController && controllerPosition === 'side' && this.renderRightController()}
+        </Flex>
         <Container width={1} display="flex" alignItems="center" justifyContent={'center'}>
-          {showArrowController && (
-            <StyledRoundButton size={40} mx={1} onClick={() => this.handleSwipe()}>
-              ←
-            </StyledRoundButton>
-          )}
+          {showArrowController && controllerPosition === 'bottom' && this.renderLeftController()}
           <Flex mx={3} my={3} display={props.display}>
             {Array.from({ length: children.length }, (_, i) => (
               <Indicator key={i} active={i === activeIndex} mx={1} onClick={() => this.handleOnClickIndicator(i)} />
             ))}
           </Flex>
-          {showArrowController && (
-            <StyledRoundButton size={40} mx={1} onClick={() => this.handleSwipe(true)}>
-              →
-            </StyledRoundButton>
-          )}
+          {showArrowController && controllerPosition === 'bottom' && this.renderRightController()}
         </Container>
       </Container>
     );

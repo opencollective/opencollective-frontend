@@ -169,10 +169,10 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
       : `/static/images/fiscal-hosting/${id}-icon.png`;
 
   return (
-    <Flex alignItems="center" justifyContent={['center', 'space-between']} width={1} {...props}>
+    <Container alignItems="center" justifyContent={['center', 'space-between']} width={1} {...props}>
       <Container display="flex" alignItems="center">
-        <Box display={['none', 'block']} width={[null, '48px']} height={[null, '48px']} mr={[3, 2]}>
-          <NextIllustration width={50} height={50} src={iconUrl} alt={`${id} icon`} />
+        <Box width={[null, '48px']} height={[null, '48px']} mr={[3, 2]}>
+          <NextIllustration width={50} height={50} src={iconUrl} alt={`${id} icon`} preload="true" />
         </Box>
         <Span
           color={['black.800', 'black.900']}
@@ -186,7 +186,7 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
           {intl.formatMessage(messages[`fiscalHosting.feature.${id}.tabName`])}
         </Span>
       </Container>
-    </Flex>
+    </Container>
   );
 };
 
@@ -218,17 +218,19 @@ FeatureDescription.propTypes = {
 
 const Feature = ({ id, learnMoreLink, intl }) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
+    <FeatureTitle intl={intl} id={id} activeFeature={id} display={['flex', 'none']} />
     <Container mb={[2, 3, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
       <H4 display={['none', 'block']} letterSpacing="-0.4px" fontWeight="bold" color="black.800" my={3}>
         {intl.formatMessage(messages[`fiscalHosting.feature.${id}`])}
       </H4>
       <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', 'block']} />
     </Container>
-    <Container width={[null, '392px', '466px', null, '756px']}>
+    <Container mt={['14px', 0]} width={[null, '392px', '466px', null, '756px']}>
       <NextIllustration
         loading="eager"
         width={756}
-        height={575}
+        height={502}
+        layout="intrinsic"
         src={`/static/images/fiscal-hosting/${id}-screenshot.png`}
         alt={intl.formatMessage(messages[`fiscalHosting.feature.${id}`])}
       />
@@ -266,7 +268,7 @@ const HowToUseOpenCollective = () => {
                 onClick={() => setActiveFeature(feature)}
                 active={activeFeature.id === feature.id}
               >
-                <FeatureTitle intl={intl} id={feature.id} activeFeature={activeFeature.id} />
+                <FeatureTitle intl={intl} id={feature.id} activeFeature={activeFeature.id} display={['none', 'flex']} />
               </SelectFeatureButton>
             </FeatureList>
           ))}

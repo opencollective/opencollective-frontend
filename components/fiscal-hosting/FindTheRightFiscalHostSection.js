@@ -143,7 +143,7 @@ const FindTheRightFiscalHost = () => {
         </Box>
       </Container>
       <Container width={1} display={['display', 'none']} justifyContent="center" alignItems="center" mt="56px">
-        <StyledCarousel options={HOST_CONSIDERATIONS} display={[null, 'none']} width={1}>
+        <StyledCarousel display={[null, 'none']} width={1}>
           {HOST_CONSIDERATIONS.map(consideration => (
             <Consideration key={consideration} consideration={consideration} />
           ))}

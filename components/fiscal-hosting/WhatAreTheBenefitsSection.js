@@ -127,13 +127,26 @@ const WhatAreTheBenefits = () => {
         justifyContent={[null, 'space-between', null, 'center']}
         width={1}
       >
-        <Box width={[null, '390px', '488px', null, '558px']} mr={[null, null, 3, null, 5]}>
+        <Box display={[null, 'none']}>
           <NextIllustration
-            width={558}
-            height={350}
-            src="/static/images/fiscal-hosting/money-management.png"
+            width={288}
+            height={238}
+            layout="fixed"
+            src={'/static/images/fiscal-hosting/money-management-xs.png'}
             alt="Money management"
-            display={['block', null, null, 'none']}
+          />
+        </Box>
+        <Box
+          display={['none', 'block']}
+          width={['288px', '390px', '488px', null, '558px']}
+          height={[null, '323px']}
+          mr={[null, null, 3, null, 5]}
+        >
+          <NextIllustration
+            width={555}
+            height={452}
+            src={'/static/images/fiscal-hosting/money-management.png'}
+            alt="Money management"
           />
         </Box>
         <Box width={[null, '264px', '344px', null, '408px']} textAlign={['center', 'left']} ml={[null, 4, 0, 5]}>

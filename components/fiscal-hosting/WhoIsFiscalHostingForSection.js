@@ -128,9 +128,49 @@ const messages = defineMessages({
   },
 });
 
-const PotentialUsers = ({ users }) => {
+const PotentialUser = ({ id }) => {
   const intl = useIntl();
+  return (
+    <Container
+      display="flex"
+      flexDirection="column"
+      alignItems={['center', 'flex-start']}
+      my={[0, null, null, null, 4]}
+    >
+      <Flex flexDirection={['row', 'column']} width={['288px']} alignItems={['center', 'flex-start']} mb={[3, 0]}>
+        <IconWrapper my={[0, 2]}>
+          <NextIllustration
+            width={60}
+            height={60}
+            src={`/static/images/fiscal-hosting/${id}.png`}
+            alt={`${id} illustration`}
+          />
+        </IconWrapper>
+        <H3 ml={['16px', 0]} fontSize="20px" lineHeight="28px" letterSpacing="-0.6px" mb={2} color="black.800">
+          {intl.formatMessage(messages[`fiscalHosting.${id}`])}
+        </H3>
+      </Flex>
+      <Box width={['288px', null, null, null, '289px']}>
+        <P
+          color={['black.700', 'black.600', 'black.700']}
+          fontSize={['18px', '16px', null, null, '18px']}
+          lineHeight={['26px', '24px', null, null, '27px']}
+          letterSpacing={['-0.12px', '-0.16px']}
+          mb={[0, 3]}
+          fontWeight={['500', 'normal']}
+        >
+          {intl.formatMessage(messages[`fiscalHosting.${id}.description`])}
+        </P>
+      </Box>
+    </Container>
+  );
+};
 
+PotentialUser.propTypes = {
+  id: PropTypes.string,
+};
+
+const PotentialUsers = ({ users }) => {
   return (
     <Wrapper
       gridTemplateColumns={['100%', 'repeat(2, 1fr)', null, null, 'repeat(3, 1fr)']}
@@ -138,36 +178,7 @@ const PotentialUsers = ({ users }) => {
       alignItems="center"
     >
       {users.map(user => (
-        <Container
-          key={user.id}
-          display="flex"
-          flexDirection="column"
-          alignItems="flex-start"
-          my={[2, null, null, null, 4]}
-        >
-          <IconWrapper my={2}>
-            <NextIllustration
-              width={60}
-              height={60}
-              src={`/static/images/fiscal-hosting/${user.id}.png`}
-              alt={`${user.id} illustration`}
-            />
-          </IconWrapper>
-          <Box width={['288px', null, null, null, '289px']}>
-            <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px" mb={2} color="black.800">
-              {intl.formatMessage(messages[`fiscalHosting.${user.id}`])}
-            </H3>
-            <P
-              color={['black.700', 'black.600', 'black.700']}
-              fontSize={['15px', '16px', null, null, '18px']}
-              lineHeight={['23px', '24px', null, null, '27px']}
-              letterSpacing={['-0.12px', '-0.16px']}
-              mb={3}
-            >
-              {intl.formatMessage(messages[`fiscalHosting.${user.id}.description`])}
-            </P>
-          </Box>
-        </Container>
+        <PotentialUser key={user.id} id={user.id} />
       ))}
     </Wrapper>
   );
@@ -238,7 +249,13 @@ const WhoIsFiscalHosting = () => {
         justifyContent="center"
         alignItems="center"
       >
-        <StyledCarousel options={Object.keys(WHO_IS_FISCAL_HOSTING_FOR)} width="100%" maxWidth="1200px">
+        <StyledCarousel display={['block', 'none']} width="100%" maxWidth="1200px">
+          {[...WHO_IS_FISCAL_HOSTING_FOR.firstCategories, ...WHO_IS_FISCAL_HOSTING_FOR.secondCategories].map(user => (
+            <PotentialUser id={user.id} key={user.id} />
+          ))}
+        </StyledCarousel>
+
+        <StyledCarousel display={['none', 'block']} width="100%" maxWidth="1200px" controllerPosition="side">
           {Object.keys(WHO_IS_FISCAL_HOSTING_FOR).map((categories, index) => (
             <PotentialUsers key={index.toString()} users={WHO_IS_FISCAL_HOSTING_FOR[categories]} />
           ))}
