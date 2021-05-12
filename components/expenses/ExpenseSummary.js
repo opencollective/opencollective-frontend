@@ -267,7 +267,7 @@ const ExpenseSummary = ({
         host={host}
         expense={expense}
         collective={collective}
-        isDraft={!isEditing && expense?.status == expenseStatus.DRAFT}
+        isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}
       />
       {showProcessButtons && (
         <Container

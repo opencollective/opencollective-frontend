@@ -217,7 +217,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   // Some currencies offer different methods for the transaction
   // e.g. USD allows ABA and SWIFT transactions.
   const availableMethods = data.host.transferwise.requiredFields.find(
-    method => method.type == get(formik.values, getFieldName(`data.type`)),
+    method => method.type === get(formik.values, getFieldName(`data.type`)),
   );
   const [addressFields, otherFields] = partition(availableMethods?.fields, field =>
     field.group.every(g => g.key.includes('address.')),

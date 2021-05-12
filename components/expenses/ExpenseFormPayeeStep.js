@@ -130,7 +130,7 @@ const ExpenseFormPayeeStep = ({
     label: value.name,
     [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
   }));
-  const [myself, myorganizations] = partition(profileOptions, p => p.value.type == 'INDIVIDUAL');
+  const [myself, myorganizations] = partition(profileOptions, p => p.value.type === 'INDIVIDUAL');
 
   myorganizations.push({
     label: null,

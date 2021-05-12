@@ -250,7 +250,7 @@ class CreateGiftCardsForm extends Component {
     const { values, errors, deliverType } = this.state;
 
     if (deliverType === 'email') {
-      return values.emails.length > 0 && errors.emails.length == 0;
+      return values.emails.length > 0 && errors.emails.length === 0;
     } else {
       return values.numberOfGiftCards !== 0;
     }

@@ -175,10 +175,10 @@ class ExpensePage extends React.Component {
 
     const expense = this.props.data?.expense;
     if (
-      expense?.status == expenseStatus.UNVERIFIED &&
+      expense?.status === expenseStatus.UNVERIFIED &&
       expense?.permissions?.canEdit &&
       this.props.LoggedInUser &&
-      expense?.createdByAccount?.slug == this.props.LoggedInUser?.collective?.slug
+      expense?.createdByAccount?.slug === this.props.LoggedInUser?.collective?.slug
     ) {
       this.handleExpenseVerification();
     }
