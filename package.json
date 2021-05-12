@@ -175,7 +175,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "enzyme": "^3.11.0",
     "eslint": "^7.25.0",
-    "eslint-config-opencollective": "^2.2.0",
+    "eslint-config-opencollective": "^3.0.0",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-cypress": "^2.11.2",
     "eslint-plugin-formatjs": "^2.14.9",
