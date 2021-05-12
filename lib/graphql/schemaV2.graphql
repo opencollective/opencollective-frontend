@@ -3668,6 +3668,11 @@ type ExpensePermissions {
   canEdit: Boolean!
 
   """
+  Tags permissions are a bit different, and can be edited by admins even if the expense has already been paid
+  """
+  canEditTags: Boolean!
+
+  """
   Whether the current user can edit the expense
   """
   canDelete: Boolean!

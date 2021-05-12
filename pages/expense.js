@@ -6,7 +6,7 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import expenseStatus from '../lib/constants/expense-status';
@@ -319,10 +319,7 @@ class ExpensePage extends React.Component {
     return [data, query, variables];
   }
 
-  getSuggestedTags(collective) {
-    const tagsStats = (collective && collective.expensesTags) || null;
-    return tagsStats && tagsStats.map(({ tag }) => tag);
-  }
+  getSuggestedTags = memoizeOne(getSuggestedTags);
 
   onCommentAdded = comment => {
     // Add comment to cache if not already fetched
@@ -476,11 +473,13 @@ class ExpensePage extends React.Component {
                   isLoading={!expense}
                   isEditing={status === PAGE_STATUS.EDIT_SUMMARY}
                   isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
-                  permissions={expense?.permissions}
                   collective={collective}
                   onError={error => this.setState({ error })}
                   onEdit={this.onEditBtnClick}
                   onDelete={this.onDelete}
+                  suggestedTags={this.getSuggestedTags(collective)}
+                  canEditTags={get(expense, 'permissions.canEditTags', false)}
+                  showProcessButtons
                 />
                 {status !== PAGE_STATUS.EDIT_SUMMARY && (
                   <React.Fragment>
