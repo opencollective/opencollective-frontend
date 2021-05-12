@@ -209,9 +209,6 @@ const HostVirtualCards = props => {
       message: <FormattedMessage id="Host.VirtualCards.Settings.Success" defaultMessage="Setting updated" />,
     });
   };
-  const handleEdit = card => () => {
-    setEditingVirtualCard(card);
-  };
 
   if (loading) {
     return <Loading />;
@@ -370,7 +367,13 @@ const HostVirtualCards = props => {
           </Box>
         </AddCardPlaceholder>
         {data.host.hostedVirtualCards.nodes.map(vc => (
-          <VirtualCard key={vc.id} {...vc} onSuccess={refetch} editHandler={handleEdit(vc)} hasActions />
+          <VirtualCard
+            key={vc.id}
+            {...vc}
+            onSuccess={refetch}
+            editHandler={() => setEditingVirtualCard(vc)}
+            hasActions
+          />
         ))}
       </Grid>
       <Flex mt={5} justifyContent="center">

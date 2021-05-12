@@ -97,7 +97,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
       });
     },
   });
-  const [editVirtualCard, { loading: isCallingEdigMutation }] = useMutation(editVirtualCardMutation, {
+  const [editVirtualCard, { loading: isCallingEditMutation }] = useMutation(editVirtualCardMutation, {
     context: API_V2_CONTEXT,
     onError: e => {
       addToast({
@@ -117,7 +117,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
   const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
     context: API_V2_CONTEXT,
   });
-  const isBusy = isCallingAssignMutation || isCallingEdigMutation;
+  const isBusy = isCallingAssignMutation || isCallingEditMutation;
 
   const formik = useFormik({
     initialValues: {
