@@ -60,14 +60,14 @@ const VirtualCardFilters = ({
           />
         </FilterContainer>
       )}
-      <Flex flexDirection={['column', 'row']} flexGrow={[1, 0.5]}>
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+      <Flex flexDirection={['column', 'row']}>
+        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, 0.5]}>
           <FilterLabel htmlFor="virtual-card-filter-status">
             <FormattedMessage id="VirtualCard.Status" defaultMessage="Status" />
           </FilterLabel>
           <StatusFilter {...getFilterProps('state')} />
         </FilterContainer>
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, 0.5]}>
           <FilterLabel htmlFor="virtual-card-filter-amount">
             <FormattedMessage id="VirtualCard.Merchant" defaultMessage="Merchant" />
           </FilterLabel>

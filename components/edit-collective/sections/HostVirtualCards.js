@@ -368,7 +368,6 @@ const HostVirtualCards = props => {
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
           ignoredQueryParams={['slug', 'section']}
-          scrollToTopOnChange
         />
       </Flex>
       {displayAssignCardModal && (
