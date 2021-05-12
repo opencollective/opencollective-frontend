@@ -164,8 +164,8 @@ const ActionsButton = props => {
     } else {
       await pauseCard({ variables: { virtualCard: { id: props.id } } });
     }
-    if (props.onUpdate) {
-      await props.onUpdate();
+    if (props.onSuccess) {
+      await props.onSuccess();
     }
   };
   const handleDelete = () => setDeleteModal(true);
@@ -206,7 +206,6 @@ const ActionsButton = props => {
                   mb={2}
                   overflow="auto"
                   overflowY="auto"
-                  {...props}
                   padding="12px 15px"
                   width="180px"
                   borderWidth="0px"
@@ -245,8 +244,8 @@ const ActionsButton = props => {
         header={<FormattedMessage id="VirtualCards.DeleteCard" defaultMessage="Delete Card" />}
         continueHandler={async () => {
           await deleteCard({ variables: { virtualCard: { id: props.id } } });
-          if (props.onUpdate) {
-            await props.onUpdate();
+          if (props.onSuccess) {
+            await props.onSuccess();
           }
         }}
         continueLabel="Delete"
@@ -266,7 +265,7 @@ const ActionsButton = props => {
 ActionsButton.propTypes = {
   id: PropTypes.string,
   state: PropTypes.string,
-  onUpdate: PropTypes.func,
+  onSuccess: PropTypes.func,
   editHandler: PropTypes.func,
 };
 
@@ -398,7 +397,7 @@ const VirtualCard = props => {
           <ActionsButton
             id={props.id}
             state={props.data.state}
-            onUpdate={props.onUpdate}
+            onSuccess={props.onSuccess}
             editHandler={props.editHandler}
           />
         )}
@@ -419,7 +418,7 @@ const VirtualCard = props => {
 
 VirtualCard.propTypes = {
   hasActions: PropTypes.bool,
-  onUpdate: PropTypes.func,
+  onSuccess: PropTypes.func,
   editHandler: PropTypes.func,
 
   account: PropTypes.shape({

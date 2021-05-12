@@ -65,7 +65,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
             slug
             imageUrl
           }
-          userAccount {
+          assignee {
             id
             name
             slug
@@ -184,10 +184,10 @@ const HostVirtualCards = props => {
     );
   };
 
-  const handleAssignCardSuccess = () => {
+  const handleAssignCardSuccess = message => {
     addToast({
       type: TOAST_TYPE.SUCCESS,
-      message: (
+      message: message || (
         <FormattedMessage id="Host.VirtualCards.AssignCard.Success" defaultMessage="Card successfully assigned" />
       ),
     });
@@ -370,7 +370,7 @@ const HostVirtualCards = props => {
           </Box>
         </AddCardPlaceholder>
         {data.host.hostedVirtualCards.nodes.map(vc => (
-          <VirtualCard key={vc.id} {...vc} onUpdate={refetch} editHandler={handleEdit(vc)} hasActions />
+          <VirtualCard key={vc.id} {...vc} onSuccess={refetch} editHandler={handleEdit(vc)} hasActions />
         ))}
       </Grid>
       <Flex mt={5} justifyContent="center">

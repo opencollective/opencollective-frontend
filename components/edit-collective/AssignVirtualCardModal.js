@@ -26,16 +26,16 @@ const initialValues = {
   collective: undefined,
   expireDate: undefined,
   cvv: undefined,
-  user: undefined,
+  assignee: undefined,
 };
 
 const assignNewVirtualCardMutation = gqlV2/* GraphQL */ `
   mutation assignNewVirtualCard(
     $virtualCard: VirtualCardInput!
     $account: AccountReferenceInput!
-    $userAccount: AccountReferenceInput!
+    $assignee: AccountReferenceInput!
   ) {
-    assignNewVirtualCard(virtualCard: $virtualCard, account: $account, userAccount: $userAccount) {
+    assignNewVirtualCard(virtualCard: $virtualCard, account: $account, assignee: $assignee) {
       id
       name
       last4
@@ -45,8 +45,8 @@ const assignNewVirtualCardMutation = gqlV2/* GraphQL */ `
 `;
 
 const editVirtualCardMutation = gqlV2/* GraphQL */ `
-  mutation editVirtualCard($virtualCard: VirtualCardEditInput!, $userAccount: AccountReferenceInput) {
-    editVirtualCard(virtualCard: $virtualCard, userAccount: $userAccount) {
+  mutation editVirtualCard($virtualCard: VirtualCardUpdateInput!, $assignee: AccountReferenceInput) {
+    editVirtualCard(virtualCard: $virtualCard, assignee: $assignee) {
       id
       name
       last4
@@ -78,7 +78,7 @@ const throttledCall = debounce((searchFunc, variables) => {
 }, 750);
 
 const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onClose, ...modalProps }) => {
-  const isEditing = virtualCard;
+  const isEditing = !!virtualCard;
   const { addToast } = useToasts();
   const [assignNewVirtualCard, { loading: isCallingAssignMutation }] = useMutation(assignNewVirtualCardMutation, {
     context: API_V2_CONTEXT,
@@ -121,11 +121,11 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
 
   const formik = useFormik({
     initialValues: {
-      ...(virtualCard ? { ...virtualCard.privateData, user: virtualCard.userAccount } : initialValues),
+      ...(virtualCard ? { ...virtualCard.privateData, assignee: virtualCard.assignee } : initialValues),
       collective: collective || virtualCard.account,
     },
     async onSubmit(values) {
-      const { collective, user, ...privateData } = values;
+      const { collective, assignee, ...privateData } = values;
       if (isEditing) {
         await editVirtualCard({
           variables: {
@@ -133,16 +133,17 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
               privateData,
               id: virtualCard.id,
             },
-            userAccount: { id: user.id },
+            assignee: { id: assignee.id },
           },
         });
+        onSuccess?.(<FormattedMessage id="Host.VirtualCards.UpdateCard.Success" defaultMessage="Card updated" />);
       } else {
         await assignNewVirtualCard({
           variables: {
             virtualCard: {
               privateData,
             },
-            userAccount: { id: user.id },
+            assignee: { id: assignee.id },
             account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
           },
         });
@@ -159,8 +160,8 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
       if (!values.collective) {
         errors.collective = 'Required';
       }
-      if (!values.user) {
-        errors.user = 'Required';
+      if (!values.assignee) {
+        errors.assignee = 'Required';
       }
       if (!values.expireDate) {
         errors.expireDate = 'Required';
@@ -185,7 +186,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
   };
   const handleCollectivePick = async option => {
     formik.setFieldValue('collective', option.value);
-    formik.setFieldValue('user', null);
+    formik.setFieldValue('assignee', null);
   };
 
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
@@ -246,19 +247,19 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
               gridColumn="1/3"
               labelFontSize="13px"
               label="Which user will be responsible for this card?"
-              htmlFor="user"
-              error={formik.touched.user && formik.errors.user}
+              htmlFor="assignee"
+              error={formik.touched.assignee && formik.errors.assignee}
             >
               {inputProps => (
                 <CollectivePicker
                   {...inputProps}
-                  name="user"
-                  id="user"
+                  name="assignee"
+                  id="assignee"
                   groupByType={false}
                   collectives={collectiveUsers}
-                  collective={formik.values.user}
+                  collective={formik.values.assignee}
                   isDisabled={isLoadingUsers || isBusy}
-                  onChange={option => formik.setFieldValue('user', option.value)}
+                  onChange={option => formik.setFieldValue('assignee', option.value)}
                 />
               )}
             </StyledInputField>
@@ -412,7 +413,7 @@ AssignVirtualCardModal.propTypes = {
       cvv: PropTypes.string,
       expireDate: PropTypes.string,
     },
-    userAccount: {
+    assignee: {
       id: PropTypes.string,
       imageUrl: PropTypes.string,
       name: PropTypes.string,

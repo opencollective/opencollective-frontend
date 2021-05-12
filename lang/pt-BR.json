@@ -1206,6 +1206,7 @@
   "Host.VirtualCards.Settings.Error": "Error updating setting: {error}",
   "Host.VirtualCards.Settings.Success": "Setting updated",
   "Host.VirtualCards.Settings.Title": "Settings and Policy",
+  "Host.VirtualCards.UpdateCard.Success": "Card updated",
   "HostApplication.Approved": "{name} foi aprovado",
   "HostApplication.Rejected": "{name} foi rejeitado",
   "HostApplicationMessageInfo": "A mensagem será pública por padrão. Se você quer que ela seja privada, marque a caixa de seleção privada.",
