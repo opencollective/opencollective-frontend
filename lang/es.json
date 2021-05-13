@@ -677,6 +677,7 @@
   "Currency": "Moneda",
   "currency": "moneda",
   "Date.BeforeShort": "Before {date, date, short}",
+  "Date.DateRange": "{dateFrom, date, short}-{dateTo, date, short}",
   "Date.SinceShort": "Since {date, date, short}",
   "DateRange.All": "Todos",
   "Decline": "Denegar",
