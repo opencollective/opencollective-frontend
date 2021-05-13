@@ -35,7 +35,7 @@ const VirtualCardFilters = ({
   virtualCardCollectives,
   collective,
   host,
-  isPeriodFilter,
+  displayPeriodFilter,
 }) => {
   const allowRequestVirtualCard = get(host, 'settings.virtualcards.requestcard');
 
@@ -69,7 +69,7 @@ const VirtualCardFilters = ({
           </FilterLabel>
           <StatusFilter {...getFilterProps('state')} />
         </FilterContainer>
-        {isPeriodFilter && (
+        {displayPeriodFilter && (
           <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
             <FilterLabel htmlFor="virtual-card-filter-period">
               <FormattedMessage id="VirtualCard.Period" defaultMessage="Period" />
@@ -105,7 +105,7 @@ VirtualCardFilters.propTypes = {
   isCollectiveFilter: PropTypes.bool,
   host: PropTypes.object,
   collective: PropTypes.object,
-  isPeriodFilter: PropTypes.bool,
+  displayPeriodFilter: PropTypes.bool,
 };
 
 export default React.memo(VirtualCardFilters);

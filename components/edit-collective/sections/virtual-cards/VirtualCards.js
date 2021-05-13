@@ -137,7 +137,7 @@ const VirtualCards = props => {
             host={props.collective.host}
             virtualCardMerchants={data.collective.virtualCardMerchants.nodes}
             onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
-            isPeriodFilter
+            displayPeriodFilter
           />
         </Flex>
       </Box>
