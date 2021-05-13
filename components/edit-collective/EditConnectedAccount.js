@@ -151,7 +151,7 @@ class EditConnectedAccount extends React.Component {
       return (
         <EditTransferWiseAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />
       );
-    } else if (service === 'paypal') {
+    } else if (service === 'paypal' && !collective.settings?.disablePaypalPayouts) {
       return (
         <EditPayPalAccount
           collective={collective}
