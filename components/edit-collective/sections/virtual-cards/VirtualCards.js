@@ -7,7 +7,9 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 
+import Collapse from '../../../Collapse';
 import { Box, Flex, Grid } from '../../../Grid';
+import HTMLContent from '../../../HTMLContent';
 import Loading from '../../../Loading';
 import Pagination from '../../../Pagination';
 import { P } from '../../../Text';
@@ -119,6 +121,23 @@ const VirtualCards = props => {
             defaultMessage="Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them."
           />
         </P>
+        {props.collective.host?.settings?.virtualcards?.policy && (
+          <P mt={3}>
+            <Collapse
+              title={
+                <FormattedMessage
+                  id="VirtualCards.Policy.Reminder"
+                  defaultMessage="{hostName} Virtual Card use Policy"
+                  values={{
+                    hostName: props.collective.host.name,
+                  }}
+                />
+              }
+            >
+              <HTMLContent content={props.collective.host?.settings?.virtualcards?.policy} />
+            </Collapse>
+          </P>
+        )}
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             filters={routerQuery}
