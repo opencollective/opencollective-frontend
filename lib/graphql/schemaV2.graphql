@@ -768,23 +768,6 @@ type Bot implements Account {
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
 
-input BraintreePaymentInput {
-  nonce: String!
-  type: BraintreePaymentInputType!
-  details: JSON
-  binData: JSON
-  deviceData: JSON
-  description: String
-  vaulted: Boolean
-}
-
-"""
-Type of account used to pay with Braintree
-"""
-enum BraintreePaymentInputType {
-  PayPalAccount
-}
-
 """
 Input to order results chronologically
 """
@@ -1166,7 +1149,6 @@ type Comment {
   id: String
   createdAt: DateTime
   html: String
-  markdown: String @deprecated(reason: "2020-01-25: Use html")
   fromAccount: Account
   account: Account
 
@@ -1213,7 +1195,6 @@ input CommentReferenceInput {
 
 input CommentUpdateInput {
   id: String!
-  markdown: String
   html: String
 }
 
@@ -1318,7 +1299,6 @@ enum ConnectedAccountService {
   twitter
   transferwise
   privacy
-  braintree
   meetup @deprecated(reason: "Not using this service anymore")
 }
 
@@ -3688,6 +3668,11 @@ type ExpensePermissions {
   canEdit: Boolean!
 
   """
+  Tags permissions are a bit different, and can be edited by admins even if the expense has already been paid
+  """
+  canEditTags: Boolean!
+
+  """
   Whether the current user can edit the expense
   """
   canDelete: Boolean!
@@ -5832,6 +5817,26 @@ type Mutation {
     Account where the virtual card will be associated
     """
     account: AccountReferenceInput!
+
+    """
+    Individual account responsible for the card
+    """
+    assignee: AccountReferenceInput!
+  ): VirtualCard!
+
+  """
+  Edit existing Virtual Card information
+  """
+  editVirtualCard(
+    """
+    Virtual Card being edited its new values
+    """
+    virtualCard: VirtualCardUpdateInput!
+
+    """
+    The individual account reference to attach the Virtual Card to if desired
+    """
+    assignee: AccountReferenceInput
   ): VirtualCard!
 
   """
@@ -6490,11 +6495,6 @@ input PaymentMethodInput {
   To pass when type is PAYPAL
   """
   paypalInfo: PaypalPaymentInput
-
-  """
-  To pass when type is BRAINTREE
-  """
-  braintreeInfo: BraintreePaymentInput
 }
 
 enum PaymentMethodLegacyType {
@@ -6503,7 +6503,6 @@ enum PaymentMethodLegacyType {
   PREPAID_BUDGET
   ACCOUNT_BALANCE
   PAYPAL
-  BRAINTREE_PAYPAL
   BANK_TRANSFER
   ADDED_FUNDS
 }
@@ -6517,7 +6516,6 @@ input PaymentMethodReferenceInput {
 
 enum PaymentMethodService {
   PAYPAL
-  BRAINTREE
   STRIPE
   OPENCOLLECTIVE
   PREPAID
@@ -6531,7 +6529,6 @@ enum PaymentMethodType {
   collective
   host
   adaptive
-  paypal
   giftcard
   manual
 }
@@ -7133,6 +7130,11 @@ type Query {
     dateFrom: ISODateTime
 
     """
+    Only return expenses that were created after this date
+    """
+    dateTo: ISODateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -7225,6 +7227,11 @@ type Query {
     Only return orders that were created after this date
     """
     dateFrom: ISODateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: ISODateTime
 
     """
     The term to search
@@ -7357,18 +7364,6 @@ type Query {
     """
     tier: TierReferenceInput
   ): PaypalPlan!
-  thirdPartyApiClientToken(
-    """
-    The account that serves as a payment target
-    """
-    account: AccountReferenceInput!
-
-    """
-    The account that is contributing
-    """
-    fromAccount: AccountReferenceInput
-    service: ThirdPartyApiWithClientToken!
-  ): String!
   loggedInAccount: Account
 }
 
@@ -7396,13 +7391,6 @@ type TagStat {
   Number of entries for this tag
   """
   count: Int!
-}
-
-"""
-Third party APIs for which Open Collective API can generate tokens
-"""
-enum ThirdPartyApiWithClientToken {
-  BRAINTREE
 }
 
 """
@@ -8045,6 +8033,7 @@ type VirtualCard {
   id: String
   account: Account
   host: Account
+  assignee: Individual
   name: String
   last4: String
   data: JSONObject
@@ -8073,4 +8062,9 @@ input VirtualCardInput {
 
 input VirtualCardReferenceInput {
   id: String
+}
+
+input VirtualCardUpdateInput {
+  id: String
+  privateData: JSONObject
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
@@ -122,7 +123,7 @@ const RecurringContributionsCard = ({
                 currency={contribution.amount.currency}
               />
             </P>
-            {contribution.platformContributionAmount && (
+            {!isNil(contribution.platformContributionAmount?.valueInCents) && (
               <StyledTooltip
                 content={() => (
                   <FormattedMessage

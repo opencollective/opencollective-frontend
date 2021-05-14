@@ -11,8 +11,7 @@ const getProvider = email => {
     {
       name: 'Gmail',
       regexp: /@gmail\.com$/,
-      link:
-        'https://mail.google.com/mail/u/2/#advanced-search/subject=Open+Collective%3A+Login&amp;subset=all&amp;within=2d',
+      link: 'https://mail.google.com/mail/u/2/#advanced-search/subject=Open+Collective%3A+Login&amp;subset=all&amp;within=2d',
     },
     {
       name: 'Outlook',

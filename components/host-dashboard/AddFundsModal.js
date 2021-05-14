@@ -173,10 +173,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const [fundDetails, setFundDetails] = useState({});
   const { addToast } = useToasts();
   const intl = useIntl();
-  const options = React.useMemo(() => getOptions(fundDetails.fundAmount, collective.currency, intl), [
-    fundDetails.fundAmount,
-    collective.currency,
-  ]);
+  const options = React.useMemo(
+    () => getOptions(fundDetails.fundAmount, collective.currency, intl),
+    [fundDetails.fundAmount, collective.currency],
+  );
   const formatOptionLabel = option => {
     if (option.currency) {
       return (
@@ -519,50 +519,54 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </StyledLink>
                     </Container>
                   </Container>
-                  <StyledHr my={3} borderColor="black.300" />
-                  <div>
-                    <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
-                      <FormattedMessage
-                        id="AddFundsModal.platformTipInfo"
-                        defaultMessage="Since you are not charging a host fee to the collective, Open Collective is free to use. We rely on your generosity to keep this possible!"
-                      />
-                    </P>
-                    <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
-                      <Flex alignItems="center">
-                        <Illustration alt="" />
-                        <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
+                  {hostFee === 0 && (
+                    <Container>
+                      <StyledHr my={3} borderColor="black.300" />
+                      <div>
+                        <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
                           <FormattedMessage
-                            id="AddFundsModal.thankYou"
-                            defaultMessage="Thank you for supporting us. Platform tip will be deducted from the host budget:"
+                            id="AddFundsModal.platformTipInfo"
+                            defaultMessage="Since you are not charging a host fee to the collective, Open Collective is free to use. We rely on your generosity to keep this possible!"
                           />
                         </P>
-                      </Flex>
-                      <StyledSelect
-                        aria-label="Donation percentage"
-                        data-cy="donation-percentage"
-                        width="100%"
-                        maxWidth={['100%', 190]}
-                        mt={[2, 0]}
-                        isSearchable={false}
-                        fontSize="15px"
-                        options={options}
-                        onChange={setSelectedOption}
-                        formatOptionLabel={formatOptionLabel}
-                        value={selectedOption}
-                      />
-                    </Flex>
-                    {selectedOption.value === 'CUSTOM' && (
-                      <Flex justifyContent="flex-end" mt={2}>
-                        <StyledInputAmount
-                          id="platformTip"
-                          currency={collective.currency}
-                          onChange={amount => setCustomAmount(amount)}
-                          defaultValue={options[1].value}
-                        />
-                      </Flex>
-                    )}
-                  </div>
-                  {platformTipError && <MessageBoxGraphqlError error={platformTipError} mt={3} fontSize="13px" />}
+                        <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
+                          <Flex alignItems="center">
+                            <Illustration alt="" />
+                            <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
+                              <FormattedMessage
+                                id="AddFundsModal.thankYou"
+                                defaultMessage="Thank you for supporting us. Platform tip will be deducted from the host budget:"
+                              />
+                            </P>
+                          </Flex>
+                          <StyledSelect
+                            aria-label="Donation percentage"
+                            data-cy="donation-percentage"
+                            width="100%"
+                            maxWidth={['100%', 190]}
+                            mt={[2, 0]}
+                            isSearchable={false}
+                            fontSize="15px"
+                            options={options}
+                            onChange={setSelectedOption}
+                            formatOptionLabel={formatOptionLabel}
+                            value={selectedOption}
+                          />
+                        </Flex>
+                        {selectedOption.value === 'CUSTOM' && (
+                          <Flex justifyContent="flex-end" mt={2}>
+                            <StyledInputAmount
+                              id="platformTip"
+                              currency={collective.currency}
+                              onChange={amount => setCustomAmount(amount)}
+                              defaultValue={options[1].value}
+                            />
+                          </Flex>
+                        )}
+                      </div>
+                      {platformTipError && <MessageBoxGraphqlError error={platformTipError} mt={3} fontSize="13px" />}
+                    </Container>
+                  )}
                 </ModalBody>
                 <ModalFooter isFullWidth>
                   <Flex justifyContent="center" flexWrap="wrap">

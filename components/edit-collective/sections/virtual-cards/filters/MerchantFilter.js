@@ -13,7 +13,7 @@ function MerchantFilter({ inputId, onChange, virtualCardMerchants }) {
     <CollectivePicker
       id={inputId}
       inputId={inputId}
-      types={[CollectiveType.COLLECTIVE]}
+      types={[CollectiveType.VENDOR]}
       maxMenuHeight={200}
       placeholder="Search for Merchants"
       limit={10}

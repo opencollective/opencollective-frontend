@@ -47,10 +47,12 @@ const VirtualCardFilters = ({
     };
   };
 
+  const filterWidth = allowRequestVirtualCard ? 0.34 : 0.49;
+
   return (
     <Container>
       {isCollectiveFilter && (
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+        <FilterContainer mr={[0, '8px']} mb={['8px', 0]}>
           <FilterLabel htmlFor="virtual-card-filter-collective">
             <FormattedMessage id="VirtualCard.Collective" defaultMessage="Filter" />
           </FilterLabel>
@@ -60,14 +62,14 @@ const VirtualCardFilters = ({
           />
         </FilterContainer>
       )}
-      <Flex flexDirection={['column', 'row']} flexGrow={[1, 0.5]}>
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+      <Flex flexWrap="wrap">
+        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
           <FilterLabel htmlFor="virtual-card-filter-status">
             <FormattedMessage id="VirtualCard.Status" defaultMessage="Status" />
           </FilterLabel>
           <StatusFilter {...getFilterProps('state')} />
         </FilterContainer>
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
           <FilterLabel htmlFor="virtual-card-filter-amount">
             <FormattedMessage id="VirtualCard.Merchant" defaultMessage="Merchant" />
           </FilterLabel>
@@ -76,7 +78,7 @@ const VirtualCardFilters = ({
         {allowRequestVirtualCard && (
           <RequestVirtualCardBtn collective={collective} host={host}>
             {btnProps => (
-              <StyledButton m={3} {...btnProps}>
+              <StyledButton m={3} {...btnProps} width={[1, 1 / 4]}>
                 <FormattedMessage id="VirtualCards.RequestCardButton" defaultMessage="Request card" />
               </StyledButton>
             )}

@@ -60,7 +60,12 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
   let __html = sanitize ? sanitizeHtml(content) : content;
 
   if (collapsable && !isOpen) {
-    __html = getFirstSentenceFromHTML(__html);
+    const firstSentence = getFirstSentenceFromHTML(__html);
+    // Hide "Read full description" if we can display everything in the firstSentence
+    if (firstSentence === __html) {
+      collapsable = false;
+    }
+    __html = firstSentence;
   }
 
   return (

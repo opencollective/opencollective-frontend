@@ -253,6 +253,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     permissions {
       id
       canEdit
+      canEditTags
       canDelete
       canSeeInvoiceInfo
       canApprove
@@ -304,6 +305,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       canPay
       canMarkAsUnpaid
       canSeeInvoiceInfo
+      canEditTags
     }
     payoutMethod {
       id

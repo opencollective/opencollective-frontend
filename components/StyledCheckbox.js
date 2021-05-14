@@ -144,19 +144,8 @@ class StyledCheckbox extends React.Component {
   }
 
   render() {
-    const {
-      name,
-      checked,
-      label,
-      disabled,
-      size,
-      inputId,
-      width,
-      alignItems,
-      isLoading,
-      fontSize,
-      ...props
-    } = this.props;
+    const { name, checked, label, disabled, size, inputId, width, alignItems, isLoading, fontSize, ...props } =
+      this.props;
     const realChecked = checked === undefined ? this.state.checked : checked;
 
     return (
