@@ -49,7 +49,14 @@ const VirtualCardFilters = ({
     };
   };
 
-  const filterWidth = allowRequestVirtualCard ? 0.34 : 0.49;
+  let filterWidth;
+  if (allowRequestVirtualCard && displayPeriodFilter) {
+    filterWidth = 0.22;
+  } else if (allowRequestVirtualCard || displayPeriodFilter) {
+    filterWidth = 0.32;
+  } else {
+    filterWidth = 0.48;
+  }
 
   return (
     <Container>
