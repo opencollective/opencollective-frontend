@@ -1964,6 +1964,7 @@
   "VirtualCard.Paused": "Paused",
   "VirtualCard.PendingActivation": "Pending Activation",
   "VirtualCard.PendingFulfillment": "Pending Fulfillment",
+  "VirtualCard.Period": "Period",
   "VirtualCard.Status": "Status",
   "VirtualCards.Actions": "Actions",
   "VirtualCards.AssignedOn": "Assigned on {createdAt, date, short}",

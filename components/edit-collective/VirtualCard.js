@@ -39,10 +39,9 @@ const CardContainer = styled(Flex)`
   }
 
   > div {
-    z-index: 100;
+    z-index: 1;
   }
   > div:first-child {
-    z-index: 1;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -198,7 +197,6 @@ const ActionsButton = props => {
                 ref={ref}
                 style={{
                   ...style,
-                  zIndex: 9999,
                 }}
               >
                 <StyledCard

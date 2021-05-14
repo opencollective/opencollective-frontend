@@ -231,6 +231,16 @@ interface Account {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
@@ -764,6 +774,16 @@ type Bot implements Account {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
@@ -1010,6 +1030,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -3193,6 +3223,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -4120,6 +4160,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -4443,6 +4493,16 @@ type Host implements Account & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -4988,6 +5048,16 @@ type Individual implements Account {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
   firstName: String @deprecated(reason: "2020-10-12: Use the name field")
@@ -6363,6 +6433,16 @@ type Organization implements Account & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -6884,6 +6964,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -7306,7 +7396,7 @@ type Query {
     dateFrom: ISODateTime
 
     """
-    Only return expenses that were created after this date
+    Only return expenses that were created before this date
     """
     dateTo: ISODateTime
 
@@ -7954,6 +8044,16 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
