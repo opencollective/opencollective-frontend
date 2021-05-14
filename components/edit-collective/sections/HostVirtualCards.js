@@ -62,6 +62,13 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           account {
             id
             name
+            slug
+            imageUrl
+          }
+          assignee {
+            id
+            name
+            slug
             imageUrl
           }
         }
@@ -161,6 +168,7 @@ const HostVirtualCards = props => {
     },
   });
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
+  const [editingVirtualCard, setEditingVirtualCard] = React.useState(undefined);
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
   );
@@ -176,14 +184,15 @@ const HostVirtualCards = props => {
     );
   };
 
-  const handleAssignCardSuccess = () => {
+  const handleAssignCardSuccess = message => {
     addToast({
       type: TOAST_TYPE.SUCCESS,
-      message: (
+      message: message || (
         <FormattedMessage id="Host.VirtualCards.AssignCard.Success" defaultMessage="Card successfully assigned" />
       ),
     });
     setAssignCardModalDisplay(false);
+    setEditingVirtualCard(undefined);
     refetch();
   };
   const handleSettingsUpdate = key => async value => {
@@ -358,7 +367,13 @@ const HostVirtualCards = props => {
           </Box>
         </AddCardPlaceholder>
         {data.host.hostedVirtualCards.nodes.map(vc => (
-          <VirtualCard key={vc.id} {...vc} onUpdate={refetch} hasActions />
+          <VirtualCard
+            key={vc.id}
+            {...vc}
+            onSuccess={refetch}
+            editHandler={() => setEditingVirtualCard(vc)}
+            hasActions
+          />
         ))}
       </Grid>
       <Flex mt={5} justifyContent="center">
@@ -371,11 +386,15 @@ const HostVirtualCards = props => {
           scrollToTopOnChange
         />
       </Flex>
-      {displayAssignCardModal && (
+      {(displayAssignCardModal || editingVirtualCard) && (
         <AssignVirtualCardModal
           host={data.host}
           onSuccess={handleAssignCardSuccess}
-          onClose={() => setAssignCardModalDisplay(false)}
+          onClose={() => {
+            setAssignCardModalDisplay(false);
+            setEditingVirtualCard(undefined);
+          }}
+          virtualCard={editingVirtualCard}
           show
         />
       )}

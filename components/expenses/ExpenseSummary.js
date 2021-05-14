@@ -50,9 +50,11 @@ const ExpenseSummary = ({
   host,
   isLoading,
   isLoadingLoggedInUser,
-  permissions,
   isEditing,
   borderless,
+  canEditTags,
+  suggestedTags,
+  showProcessButtons,
   onClose,
   onDelete,
   onEdit,
@@ -63,7 +65,6 @@ const ExpenseSummary = ({
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
   const existsInAPI = expense && (expense.id || expense.legacyId);
-  const showProcessButtons = !isEditing && existsInAPI && collective && hasProcessButtons(permissions);
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
   const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];
 
@@ -117,7 +118,7 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
-      <ExpenseTags expense={expense} isLoading={isLoading} />
+      <ExpenseTags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
       <Flex alignItems="center" mt={3}>
         {isLoading ? (
           <LoadingPlaceholder height={24} width={200} />
@@ -269,7 +270,9 @@ const ExpenseSummary = ({
         collective={collective}
         isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}
       />
-      {showProcessButtons && (
+      {Boolean(
+        showProcessButtons && !isEditing && existsInAPI && collective && hasProcessButtons(expense?.permissions),
+      ) && (
         <Container
           display="flex"
           width={1}
@@ -297,7 +300,12 @@ const ExpenseSummary = ({
             />
           </Box>
           <Flex flexWrap="wrap" justifyContent="flex-end">
-            <ProcessExpenseButtons expense={expense} permissions={permissions} collective={collective} host={host} />
+            <ProcessExpenseButtons
+              expense={expense}
+              permissions={expense?.permissions}
+              collective={collective}
+              host={host}
+            />
           </Flex>
         </Container>
       )}
@@ -387,12 +395,16 @@ ExpenseSummary.propTypes = {
       canDelete: PropTypes.bool,
     }),
   }),
+  /** Whether current user can edit the tags */
+  canEditTags: PropTypes.bool,
+  /** If canEdit is true, this array is used to display suggested tags */
+  suggestedTags: PropTypes.arrayOf(PropTypes.string),
   /** Whether or not this is being displayed for an edited Expense */
   isEditing: PropTypes.bool,
+  /** Whether to show the process buttons (Approve, Pay, etc) */
+  showProcessButtons: PropTypes.bool,
   /** The account where the expense has been submitted, required to display the process actions */
   collective: PropTypes.object,
-  /** To know which process buttons to display (if any) */
-  permissions: PropTypes.object,
   /** Disable border and paiding in styled card, usefull for modals */
   borderless: PropTypes.bool,
   /** Passed down from ExpenseModal */

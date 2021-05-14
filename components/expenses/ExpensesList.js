@@ -38,6 +38,7 @@ const ExpensesList = ({
   isLoading,
   nbPlaceholders,
   isInverted,
+  suggestedTags,
   view,
   onDelete,
   onProcess,
@@ -70,6 +71,7 @@ const ExpensesList = ({
                 usePreviewModal={usePreviewModal}
                 onDelete={onDelete}
                 onProcess={onProcess}
+                suggestedTags={suggestedTags}
               />
             </ExpenseContainer>
           ))}
@@ -113,6 +115,7 @@ ExpensesList.propTypes = {
   nbPlaceholders: PropTypes.number,
   host: PropTypes.object,
   view: PropTypes.oneOf(['public', 'admin']),
+  suggestedTags: PropTypes.arrayOf(PropTypes.string),
   usePreviewModal: PropTypes.bool,
   onDelete: PropTypes.func,
   onProcess: PropTypes.func,
