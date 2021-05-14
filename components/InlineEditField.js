@@ -161,20 +161,12 @@ class InlineEditField extends Component {
       const matchIdRegex = new RegExp(`img.youtube.com\\/vi\\/(.+?)\\/`, 'ig');
       const videoId = matchIdRegex.exec(match[0])[1];
       return { videoService: 'youtube', videoId };
-    } else if (match[0].includes('vimeo')) {
-      const matchIdRegex = new RegExp(`video\\/(.+?)\\/`, 'ig');
-      const videoId = matchIdRegex.exec(match[0])[1];
-      return { videoService: 'vimeo', videoId };
     }
   };
 
   constructVideoEmbedURL = (service, id) => {
     if (service === 'youtube') {
       return `https://www.youtube-nocookie.com/embed/${id}`;
-    } else if (service === 'vimeo') {
-      return `https://player.vimeo.com/video/${id}`;
-    } else if (service === 'anchorFm') {
-      return `https://anchor.fm/${id}`;
     } else {
       return null;
     }
@@ -188,20 +180,16 @@ class InlineEditField extends Component {
     );
     return longDescription.replaceAll(regexImg, match => {
       let iframeReplacement;
-      if (match.includes('img.youtube.com')){
+      if (match.includes('img.youtube.com')) {
         if (match.includes('\\&quot')) {
           iframeReplacement = match.replace('<img', '<iframe width=\\&quot100%\\&quot height=\\&quot394\\&quot');
-          const { videoService, videoId } = this.getEmbedDetails(iframeReplacement);
-          const videoIframeURL = this.constructVideoEmbedURL(videoService, videoId);
-          return iframeReplacement.replace(regexUrl, videoIframeURL);
         } else {
           iframeReplacement = match.replace('<img', '<iframe width="100%" height="394"');
-          const { videoService, videoId } = this.getEmbedDetails(iframeReplacement);
-          const videoIframeURL = this.constructVideoEmbedURL(videoService, videoId);
-          return iframeReplacement.replace(regexUrl, videoIframeURL);
         }
+        const { videoService, videoId } = this.getEmbedDetails(iframeReplacement);
+        const videoIframeURL = this.constructVideoEmbedURL(videoService, videoId);
+        return iframeReplacement.replace(regexUrl, videoIframeURL);
       }
-      //TODO: handle vimeo embeds
     });
   };
 

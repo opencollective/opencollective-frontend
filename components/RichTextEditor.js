@@ -328,10 +328,10 @@ export default class RichTextEditor extends React.Component {
       const matchIdRegex = new RegExp(`embed\\/(.+?)(\\/|$)`, 'ig');
       const videoId = matchIdRegex.exec(match[0])[1];
       return { videoService: 'youtube', videoId };
-    } else if (match[0].includes('vimeo')) {
-      const matchIdRegex = new RegExp(`video\\/(.+?)(\\/|$)`, 'ig');
-      const videoId = matchIdRegex.exec(match[0])[1];
-      return { videoService: 'vimeo', videoId };
+      // } else if (match[0].includes('vimeo')) {
+      //   const matchIdRegex = new RegExp(`video\\/(.+?)(\\/|$)`, 'ig');
+      //   const videoId = matchIdRegex.exec(match[0])[1];
+      //   return { videoService: 'vimeo', videoId };
     }
   };
 
@@ -345,7 +345,7 @@ export default class RichTextEditor extends React.Component {
                   <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
                 </div>
               </div>
-              <strong>Note: Only YouTube, Vimeo and Anchor.fm links are supported.</strong>
+              <strong>Note: Only YouTube and Anchor.fm links are supported.</strong>
             </div>`;
     const { toolbarElement } = e.target;
     const attachFilesButton = toolbarElement.querySelector('[data-trix-action=attachFiles]');
@@ -376,9 +376,9 @@ export default class RichTextEditor extends React.Component {
   constructVideoEmbedURL = (service, id) => {
     if (service === 'youtube') {
       return `https://www.youtube-nocookie.com/embed/${id}`;
-    } else if (service === 'vimeo') {
+    } /* else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
-    } else if (service === 'anchorFm') {
+    } */ else if (service === 'anchorFm') {
       return `https://anchor.fm/${id}`;
     } else {
       return null;
@@ -388,10 +388,10 @@ export default class RichTextEditor extends React.Component {
   constructPreviewImageURL = async (service, id) => {
     if (service === 'youtube') {
       return `https://img.youtube.com/vi/${id}/0.jpg`;
-    } else if (service === 'vimeo') {
-      const videoDetailsObj = await fetch(`https://vimeo.com/api/v2/video/${id}.json`);
-      const videoDetails = await videoDetailsObj.json();
-      return videoDetails[0].thumbnail_large;
+      // } else if (service === 'vimeo') {
+      //   const videoDetailsObj = await fetch(`https://vimeo.com/api/v2/video/${id}.json`);
+      //   const videoDetails = await videoDetailsObj.json();
+      //   return videoDetails[0].thumbnail_large;
     } else {
       return null;
     }
