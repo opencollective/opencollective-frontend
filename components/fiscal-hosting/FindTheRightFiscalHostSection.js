@@ -154,7 +154,7 @@ const FindTheRightFiscalHost = () => {
         gridTemplateColumns={[null, null, 'repeat(3, 1fr)']}
         gridGap={[null, '32px', '56px 48px', null, '56px 96px']}
         placeSelf="center"
-        alignItems="center"
+        alignItems={['center', null, null, 'flex-start']}
         mt="56px"
         display={['none', 'grid']}
         maxWidth="1200px"

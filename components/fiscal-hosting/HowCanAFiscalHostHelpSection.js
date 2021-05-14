@@ -231,6 +231,7 @@ const Feature = ({ id, learnMoreLink, intl }) => (
         width={756}
         height={502}
         layout="intrinsic"
+        preload="true"
         src={`/static/images/fiscal-hosting/${id}-screenshot.png`}
         alt={intl.formatMessage(messages[`fiscalHosting.feature.${id}`])}
       />

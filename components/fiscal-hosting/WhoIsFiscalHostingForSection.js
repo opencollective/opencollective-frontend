@@ -30,6 +30,30 @@ const Wrapper = styled(Grid)`
   justify-items: center;
 `;
 
+const CarouselWrapper = styled(Container)`
+  @media screen and (min-width: 40em) {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  @media screen and (min-width: 48em) {
+    margin-right: 32px;
+    margin-left: 32px;
+  }
+`;
+
+const PotentialUserContainer = styled(Container)`
+  width: 288px;
+
+  @media screen and (min-width: 40em) {
+    width: 250px;
+  }
+
+  @media screen and (min-width: 48em) {
+    width: 288px;
+  }
+`;
+
 const messages = defineMessages({
   'fiscalHosting.community': {
     id: 'fiscalHosting.community',
@@ -131,13 +155,14 @@ const messages = defineMessages({
 const PotentialUser = ({ id }) => {
   const intl = useIntl();
   return (
-    <Container
+    <PotentialUserContainer
       display="flex"
       flexDirection="column"
       alignItems={['center', 'flex-start']}
       my={[0, null, null, null, 4]}
+      width="288px"
     >
-      <Flex flexDirection={['row', 'column']} width={['288px']} alignItems={['center', 'flex-start']} mb={[3, 0]}>
+      <Flex flexDirection={['row', 'column']} width={1} alignItems={['center', 'flex-start']} mb={[3, 0]}>
         <IconWrapper my={[0, 2]}>
           <NextIllustration
             width={60}
@@ -150,7 +175,7 @@ const PotentialUser = ({ id }) => {
           {intl.formatMessage(messages[`fiscalHosting.${id}`])}
         </H3>
       </Flex>
-      <Box width={['288px', null, null, null, '289px']}>
+      <Box width={1}>
         <P
           color={['black.700', 'black.600', 'black.700']}
           fontSize={['18px', '16px', null, null, '18px']}
@@ -162,7 +187,7 @@ const PotentialUser = ({ id }) => {
           {intl.formatMessage(messages[`fiscalHosting.${id}.description`])}
         </P>
       </Box>
-    </Container>
+    </PotentialUserContainer>
   );
 };
 
@@ -241,8 +266,7 @@ const WhoIsFiscalHosting = () => {
           </Box>
         </Container>
       </Flex>
-      <Container
-        mx={[null, 4]}
+      <CarouselWrapper
         my={4}
         display={[null, 'flex']}
         flexDirection={[null, 'column']}
@@ -260,7 +284,7 @@ const WhoIsFiscalHosting = () => {
             <PotentialUsers key={index.toString()} users={WHO_IS_FISCAL_HOSTING_FOR[categories]} />
           ))}
         </StyledCarousel>
-      </Container>
+      </CarouselWrapper>
     </React.Fragment>
   );
 };
