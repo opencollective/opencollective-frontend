@@ -325,11 +325,11 @@ export default class RichTextEditor extends React.Component {
     );
     const match = regex.exec(iframe);
     if (match[0].includes('youtube')) {
-      const matchIdRegex = new RegExp(`embed\\/(.+?)\\/`, 'ig');
+      const matchIdRegex = new RegExp(`embed\\/(.+?)(\\/|$)`, 'ig');
       const videoId = matchIdRegex.exec(match[0])[1];
       return { videoService: 'youtube', videoId };
     } else if (match[0].includes('vimeo')) {
-      const matchIdRegex = new RegExp(`video\\/(.+?)\\/`, 'ig');
+      const matchIdRegex = new RegExp(`video\\/(.+?)(\\/|$)`, 'ig');
       const videoId = matchIdRegex.exec(match[0])[1];
       return { videoService: 'vimeo', videoId };
     }
