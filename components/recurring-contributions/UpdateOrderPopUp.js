@@ -143,6 +143,7 @@ const getTierAmountOptions = (selectedTier, contribution) => {
   if (selectedTier && !selectedTier?.flexible) {
     return [buildOptionFromAmount(selectedTier.amount)];
   } else {
+    // TODO: use getTierPresets from tier-utils
     const presets = selectedTier?.presets || DEFAULT_PRESETS;
     const otherValue = null; // The way it's currently implemented, it doesn't need a value
     return [...presets.map(buildOptionFromAmount), { label: OTHER_LABEL, value: otherValue }];
