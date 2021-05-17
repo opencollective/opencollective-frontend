@@ -368,7 +368,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
                               currency={currency}
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
-                              min={MINIMUM_AMOUNT_IN_CENTS}
+                              min={DEFAULT_MINIMUM_AMOUNT}
                               precision={2}
                               px="2px"
                             />
