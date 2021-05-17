@@ -246,54 +246,49 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
         validate={validate}
-        onSubmit={(values, actions) => {
+        onSubmit={async values => {
           if (!fundDetails.showPlatformTipModal) {
-            submitAddFunds({
-              variables: {
-                ...values,
-                amount: { valueInCents: values.amount },
-                platformTip: { valueInCents: 0 },
-                fromAccount: buildAccountReference(values.fromAccount),
-                account: buildAccountReference(values.account),
-              },
-            })
-              .then(() => {
-                setFundDetails({
-                  showPlatformTipModal: true,
-                  fundAmount: values.amount,
-                  description: values.description,
-                  source: values.fromAccount.name,
-                });
-                actions.setSubmitting(false);
-              })
-              .catch(error => {
-                actions.setSubmitting(false);
-                setAddFundsError(error);
+            try {
+              await submitAddFunds({
+                variables: {
+                  ...values,
+                  amount: { valueInCents: values.amount },
+                  platformTip: { valueInCents: 0 },
+                  fromAccount: buildAccountReference(values.fromAccount),
+                  account: buildAccountReference(values.account),
+                },
               });
+            } catch (error) {
+              setAddFundsError(error);
+              return;
+            }
+            setFundDetails({
+              showPlatformTipModal: true,
+              fundAmount: values.amount,
+              description: values.description,
+              source: values.fromAccount.name,
+            });
           } else if (selectedOption.value !== 0) {
             const creditTransaction = data.addFunds.transactions.filter(
               transaction => transaction.type === 'CREDIT',
             )[0];
-            addPlatformTip({
-              variables: {
-                ...values,
-                amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
-                transaction: { id: creditTransaction.id },
-              },
-            })
-              .then(() => {
-                handleClose();
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
-                  message: (
-                    <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />
-                  ),
-                });
-              })
-              .catch(error => {
-                actions.setSubmitting(false);
-                setPlatformTipError(error);
+            try {
+              await addPlatformTip({
+                variables: {
+                  ...values,
+                  amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
+                  transaction: { id: creditTransaction.id },
+                },
               });
+            } catch (error) {
+              setPlatformTipError(error);
+              return;
+            }
+            handleClose();
+            addToast({
+              type: TOAST_TYPE.SUCCESS,
+              message: <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />,
+            });
           } else {
             handleClose();
           }
