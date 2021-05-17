@@ -677,6 +677,7 @@
   "Currency": "Valuta",
   "currency": "valuta",
   "Date.BeforeShort": "Before {date, date, short}",
+  "Date.DateRange": "{dateFrom, date, short} to {dateTo, date, short}",
   "Date.SinceShort": "Since {date, date, short}",
   "DateRange.All": "All",
   "Decline": "Rifiuta",

@@ -677,6 +677,7 @@
   "Currency": "Валюта",
   "currency": "валюта",
   "Date.BeforeShort": "Before {date, date, short}",
+  "Date.DateRange": "{dateFrom, date, short} to {dateTo, date, short}",
   "Date.SinceShort": "Since {date, date, short}",
   "DateRange.All": "Все",
   "Decline": "Отклонить",
