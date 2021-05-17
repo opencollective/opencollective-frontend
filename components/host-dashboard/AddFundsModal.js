@@ -170,6 +170,8 @@ const getOptions = (amount, currency, intl) => {
 
 const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
+  const [platformTipError, setPlatformTipError] = useState(null);
+  const [addFundsError, setAddFundsError] = useState(null);
   const [fundDetails, setFundDetails] = useState({});
   const { addToast } = useToasts();
   const intl = useIntl();
@@ -192,7 +194,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(options[3]);
   const [customAmount, setCustomAmount] = useState(0);
 
-  const [submitAddFunds, { data, error }] = useMutation(addFundsMutation, {
+  const [submitAddFunds, { data }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
@@ -205,7 +207,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     awaitRefetchQueries: true,
   });
 
-  const [addPlatformTip, { platformTipError }] = useMutation(addPlatformTipMutation, {
+  const [addPlatformTip] = useMutation(addPlatformTipMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -226,6 +228,8 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     setFundDetails({ showPlatformTipModal: false });
     setSelectedOption(options[3]);
     setCustomAmount(0);
+    setPlatformTipError(null);
+    setAddFundsError(null);
     props.onClose();
   };
 
@@ -252,15 +256,20 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 fromAccount: buildAccountReference(values.fromAccount),
                 account: buildAccountReference(values.account),
               },
-            }).then(() => {
-              setFundDetails({
-                showPlatformTipModal: true,
-                fundAmount: values.amount,
-                description: values.description,
-                source: values.fromAccount.name,
+            })
+              .then(() => {
+                setFundDetails({
+                  showPlatformTipModal: true,
+                  fundAmount: values.amount,
+                  description: values.description,
+                  source: values.fromAccount.name,
+                });
+                actions.setSubmitting(false);
+              })
+              .catch(error => {
+                actions.setSubmitting(false);
+                setAddFundsError(error);
               });
-              actions.setSubmitting(false);
-            });
           } else if (selectedOption.value !== 0) {
             const creditTransaction = data.addFunds.transactions.filter(
               transaction => transaction.type === 'CREDIT',
@@ -271,15 +280,20 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
                 transaction: { id: creditTransaction.id },
               },
-            }).then(() => {
-              handleClose();
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
-                message: (
-                  <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />
-                ),
+            })
+              .then(() => {
+                handleClose();
+                addToast({
+                  type: TOAST_TYPE.SUCCESS,
+                  message: (
+                    <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />
+                  ),
+                });
+              })
+              .catch(error => {
+                actions.setSubmitting(false);
+                setPlatformTipError(error);
               });
-            });
           } else {
             handleClose();
           }
@@ -465,7 +479,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       values={{ amount: formatCurrency(values.amount, collective.currency) }}
                     />
                   </P>
-                  {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
+                  {addFundsError && <MessageBoxGraphqlError error={addFundsError} mt={3} fontSize="13px" />}
                 </ModalBody>
                 <ModalFooter isFullWidth>
                   <Flex justifyContent="center" flexWrap="wrap">
