@@ -22,23 +22,31 @@ describe('Recurring contributions', () => {
     });
   });
 
-  it('Can add a new payment method and use it for the recurring contribution', () => {
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-      cy.getByDataCy('recurring-contribution-menu-payment-option').click();
-      cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
-      cy.getByDataCy('recurring-contribution-add-pm-button').click();
-      cy.wait(5000);
-      cy.fillStripeInput();
-      cy.getByDataCy('recurring-contribution-submit-pm-button').click();
-      cy.wait(1000);
-      cy.contains('[data-cy="recurring-contribution-pm-box"]', 'VISA **** 4242').within(() => {
-        cy.getByDataCy('radio-select').check();
+  it(
+    'Can add a new payment method and use it for the recurring contribution',
+    {
+      retries: {
+        runMode: 2,
+        openMode: 1,
+      },
+    },
+    () => {
+      cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
+        cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
+        cy.getByDataCy('recurring-contribution-menu-payment-option').click();
+        cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
+        cy.getByDataCy('recurring-contribution-add-pm-button').click();
+        cy.wait(3000);
+        cy.fillStripeInput();
+        cy.getByDataCy('recurring-contribution-submit-pm-button').click();
+        cy.contains('[data-cy="recurring-contribution-pm-box"]', 'VISA **** 4242').within(() => {
+          cy.getByDataCy('radio-select').check();
+        });
+        cy.getByDataCy('recurring-contribution-update-pm-button').click();
+        cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
       });
-      cy.getByDataCy('recurring-contribution-update-pm-button').click();
-      cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
-    });
-  });
+    },
+  );
 
   it('Can change the tier and amount of the order', () => {
     cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
