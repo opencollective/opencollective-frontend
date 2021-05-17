@@ -334,7 +334,7 @@ class SectionContribute extends React.PureComponent {
             )}
 
             {/* "View all ways to contribute" button */}
-            {!isEvent && (
+            {(tiers.length > 6 || hasOtherWaysToContribute) && (
               <ContainerSectionContent pb={4}>
                 <Link href={`/${collective.slug}/contribute`}>
                   <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
