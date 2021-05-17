@@ -125,7 +125,7 @@
   "bankaccount.instructions.collective": "Colectivo a recibir los fondos. Si solamente tienes un Colectivo, puede que no necesites incluir esto.",
   "bankaccount.instructions.preview": "Vista previa:",
   "bankaccount.instructions.reference": "Código único de identificación, para confirmar la recepción de los fondos.",
-  "bankaccount.instructions.variables": "Este es el correo que los pagadores recibirán automáticamente cuando hacen una contribución por transferencia bancaria. Incluye los detalles que necesitan para completar su pago, incluyendo la información de referencia para que puedas encontrar las transacciones pendientes. Una variable es como un espacio en blanco que es rellenado automáticamente. Puedes usar las siguientes variables en las instrucciones:",
+  "bankaccount.instructions.variables": "Financial contributors will receive these instructions when they select bank transfer as the payment method. You can use the following variables (like blanks that gets filled in):",
   "BankInfo.AccountHolder": "Titular de la cuenta: {name}",
   "BankInfo.Type": "Tipo: {type}",
   "becomeAHost.aBetterExperience": "Una mejor experiencia",

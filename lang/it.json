@@ -125,7 +125,7 @@
   "bankaccount.instructions.collective": "Il collettivo che riceverà il denaro. Se hai un solo collettivo, potrebbe non essere necessario includere questa informazione.",
   "bankaccount.instructions.preview": "Anteprima:",
   "bankaccount.instructions.reference": "Codice ID unico per confermare la ricezione del contributo.",
-  "bankaccount.instructions.variables": "Questa è l'email che i pagatori riceveranno automaticamente quando effettuano un bonifico bancario. Includi i dettagli di cui hanno bisogno per completare il pagamento, comprese le informazioni di riferimento in modo da poter far corrispondere il pagamento alla transazione in sospeso. Una variabile è come un campo vuoto che viene riempito automaticamente. Nelle istruzioni puoi utilizzare le seguenti variabili:",
+  "bankaccount.instructions.variables": "Financial contributors will receive these instructions when they select bank transfer as the payment method. You can use the following variables (like blanks that gets filled in):",
   "BankInfo.AccountHolder": "Titolare del conto bancario: {name}",
   "BankInfo.Type": "Tipo: {type}",
   "becomeAHost.aBetterExperience": "Un'esperienza migliore",
