@@ -1335,7 +1335,7 @@
   "NewContributionFlow.Success.DiscoverMore": "Знайдіть більше колективів, подібних до {collective}→",
   "NewContributionFlow.Success.Header": "Спасибі! 🎉",
   "NewContributionFlow.Success.NowSupporting": "Тепер ви підтримуєте {collective}.",
-  "NewCreditCardForm.PostalCode": "Credit card zip/postal code is required",
+  "NewCreditCardForm.PostalCode": "Credit card ZIP code and CVC are required",
   "NewOrganization.Admin.Email": "Електронна адреса адміністратора",
   "NewOrganization.Admin.Name": "Ім'я адміністратора",
   "newPricing.tab.hostFeeChargeExample": "If your Host fee is 10% and your Collectives bring in $1,000, your Platform fee will be $15. If you host fee is 0%, your Platform fee will be 0.",

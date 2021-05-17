@@ -1335,7 +1335,7 @@
   "NewContributionFlow.Success.DiscoverMore": "发现更多的社群，比如 {collective}→",
   "NewContributionFlow.Success.Header": "感谢你！🎉",
   "NewContributionFlow.Success.NowSupporting": "您现在正在支持 {collective}。",
-  "NewCreditCardForm.PostalCode": "Credit card zip/postal code is required",
+  "NewCreditCardForm.PostalCode": "Credit card ZIP code and CVC are required",
   "NewOrganization.Admin.Email": "管理邮箱",
   "NewOrganization.Admin.Name": "管理名称",
   "newPricing.tab.hostFeeChargeExample": "If your Host fee is 10% and your Collectives bring in $1,000, your Platform fee will be $15. If you host fee is 0%, your Platform fee will be 0.",

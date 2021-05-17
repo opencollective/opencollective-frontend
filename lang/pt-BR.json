@@ -1335,7 +1335,7 @@
   "NewContributionFlow.Success.DiscoverMore": "Descubra mais Coletivos como {collective} →",
   "NewContributionFlow.Success.Header": "Obrigado! 🎉",
   "NewContributionFlow.Success.NowSupporting": "Agora você está apoiando {collective}.",
-  "NewCreditCardForm.PostalCode": "O CEP / código postal do cartão de crédito é obrigatório",
+  "NewCreditCardForm.PostalCode": "Credit card ZIP code and CVC are required",
   "NewOrganization.Admin.Email": "E-mail do administrador",
   "NewOrganization.Admin.Name": "Nome do administrador",
   "newPricing.tab.hostFeeChargeExample": "Se sua taxa de anfitrião for de 10% e seus Coletivos trouxerem $1.000, sua taxa de plataforma será de $15. Se você hospedar taxa é de 0%, sua taxa de plataforma será 0.",
