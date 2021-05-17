@@ -953,6 +953,7 @@
   "Fields.description": "Popis",
   "Fields.name": "Název",
   "Fields.website": "Webová stránka",
+  "File.NoFilename": "No filename",
   "FilesPreviewModal.AttachmentPreview": "Attachment preview",
   "FilesUploadFailed": "{count, plural, one {The file} other {# files}} failed to upload",
   "Filter.ByName": "Filtrovat podle jména",

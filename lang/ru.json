@@ -953,6 +953,7 @@
   "Fields.description": "Описание",
   "Fields.name": "Название",
   "Fields.website": "Сайт",
+  "File.NoFilename": "No filename",
   "FilesPreviewModal.AttachmentPreview": "Предпросмотр вложений",
   "FilesUploadFailed": "{count, plural, one {The file} other {# files}} failed to upload",
   "Filter.ByName": "Фильтр по названию",

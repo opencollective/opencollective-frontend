@@ -953,6 +953,7 @@
   "Fields.description": "描述",
   "Fields.name": "名称",
   "Fields.website": "网站",
+  "File.NoFilename": "No filename",
   "FilesPreviewModal.AttachmentPreview": "附件预览",
   "FilesUploadFailed": "{count, plural, one {The file} other {# files}} failed to upload",
   "Filter.ByName": "通过名称过滤",
