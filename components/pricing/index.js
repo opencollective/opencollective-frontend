@@ -129,7 +129,7 @@ const Pricing = () => {
   }, 100);
 
   React.useEffect(() => {
-    window.addEventListener('scroll', handleOnScroll);
+    window.addEventListener('scroll', handleOnScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleOnScroll);
   });
 
