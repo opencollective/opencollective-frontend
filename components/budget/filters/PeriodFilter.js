@@ -75,7 +75,7 @@ const DateRange = ({ from, to }) => {
     return (
       <FormattedMessage
         id="Date.DateRange"
-        defaultMessage="{dateFrom, date, short}-{dateTo, date, short}"
+        defaultMessage="{dateFrom, date, short} to {dateTo, date, short}"
         values={{ dateFrom: from, dateTo: to }}
       />
     );
