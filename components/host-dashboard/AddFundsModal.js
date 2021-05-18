@@ -170,8 +170,6 @@ const getOptions = (amount, currency, intl) => {
 
 const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
-  const [platformTipError, setPlatformTipError] = useState(null);
-  const [addFundsError, setAddFundsError] = useState(null);
   const [fundDetails, setFundDetails] = useState({});
   const { addToast } = useToasts();
   const intl = useIntl();
@@ -194,7 +192,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(options[3]);
   const [customAmount, setCustomAmount] = useState(0);
 
-  const [submitAddFunds, { data }] = useMutation(addFundsMutation, {
+  const [submitAddFunds, { data, error: fundError }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
@@ -207,7 +205,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     awaitRefetchQueries: true,
   });
 
-  const [addPlatformTip] = useMutation(addPlatformTipMutation, {
+  const [addPlatformTip, { error: platformTipError }] = useMutation(addPlatformTipMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -228,8 +226,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     setFundDetails({ showPlatformTipModal: false });
     setSelectedOption(options[3]);
     setCustomAmount(0);
-    setPlatformTipError(null);
-    setAddFundsError(null);
     props.onClose();
   };
 
@@ -248,20 +244,15 @@ const AddFundsModal = ({ host, collective, ...props }) => {
         validate={validate}
         onSubmit={async values => {
           if (!fundDetails.showPlatformTipModal) {
-            try {
-              await submitAddFunds({
-                variables: {
-                  ...values,
-                  amount: { valueInCents: values.amount },
-                  platformTip: { valueInCents: 0 },
-                  fromAccount: buildAccountReference(values.fromAccount),
-                  account: buildAccountReference(values.account),
-                },
-              });
-            } catch (error) {
-              setAddFundsError(error);
-              return;
-            }
+            await submitAddFunds({
+              variables: {
+                ...values,
+                amount: { valueInCents: values.amount },
+                platformTip: { valueInCents: 0 },
+                fromAccount: buildAccountReference(values.fromAccount),
+                account: buildAccountReference(values.account),
+              },
+            });
             setFundDetails({
               showPlatformTipModal: true,
               fundAmount: values.amount,
@@ -272,18 +263,13 @@ const AddFundsModal = ({ host, collective, ...props }) => {
             const creditTransaction = data.addFunds.transactions.filter(
               transaction => transaction.type === 'CREDIT',
             )[0];
-            try {
-              await addPlatformTip({
-                variables: {
-                  ...values,
-                  amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
-                  transaction: { id: creditTransaction.id },
-                },
-              });
-            } catch (error) {
-              setPlatformTipError(error);
-              return;
-            }
+            await addPlatformTip({
+              variables: {
+                ...values,
+                amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
+                transaction: { id: creditTransaction.id },
+              },
+            });
             handleClose();
             addToast({
               type: TOAST_TYPE.SUCCESS,
@@ -474,7 +460,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       values={{ amount: formatCurrency(values.amount, collective.currency) }}
                     />
                   </P>
-                  {addFundsError && <MessageBoxGraphqlError error={addFundsError} mt={3} fontSize="13px" />}
+                  {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
                 </ModalBody>
                 <ModalFooter isFullWidth>
                   <Flex justifyContent="center" flexWrap="wrap">
