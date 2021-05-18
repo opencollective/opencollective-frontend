@@ -78,7 +78,7 @@ class CollectivePage extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('scroll', this.onScroll);
+    window.addEventListener('scroll', this.onScroll, { passive: true });
     this.onScroll(); // First tick in case scroll is restored when page loads
   }
 
