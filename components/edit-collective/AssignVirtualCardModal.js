@@ -149,6 +149,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
         });
         onSuccess?.();
       }
+      handleClose();
     },
     validate(values) {
       const errors = {};
@@ -194,7 +195,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
   return (
     <Modal width="382px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
-        <ModalHeader onClose={onClose}>
+        <ModalHeader onClose={handleClose}>
           {isEditing ? (
             <FormattedMessage id="Host.VirtualCards.CardDetails" defaultMessage="Card Details" />
           ) : (
