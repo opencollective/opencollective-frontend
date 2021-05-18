@@ -82,37 +82,9 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
   const { addToast } = useToasts();
   const [assignNewVirtualCard, { loading: isCallingAssignMutation }] = useMutation(assignNewVirtualCardMutation, {
     context: API_V2_CONTEXT,
-    onError: e => {
-      addToast({
-        type: TOAST_TYPE.ERROR,
-        message: (
-          <FormattedMessage
-            id="Host.VirtualCards.AssignCard.Error"
-            defaultMessage="Error assigning card: {error}"
-            values={{
-              error: e.message,
-            }}
-          />
-        ),
-      });
-    },
   });
   const [editVirtualCard, { loading: isCallingEditMutation }] = useMutation(editVirtualCardMutation, {
     context: API_V2_CONTEXT,
-    onError: e => {
-      addToast({
-        type: TOAST_TYPE.ERROR,
-        message: (
-          <FormattedMessage
-            id="Host.VirtualCards.EditCard.Error"
-            defaultMessage="Error editing card: {error}"
-            values={{
-              error: e.message,
-            }}
-          />
-        ),
-      });
-    },
   });
   const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
     context: API_V2_CONTEXT,
@@ -127,26 +99,58 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
     async onSubmit(values) {
       const { collective, assignee, ...privateData } = values;
       if (isEditing) {
-        await editVirtualCard({
-          variables: {
-            virtualCard: {
-              privateData,
-              id: virtualCard.id,
+        try {
+          await editVirtualCard({
+            variables: {
+              virtualCard: {
+                privateData,
+                id: virtualCard.id,
+              },
+              assignee: { id: assignee.id },
             },
-            assignee: { id: assignee.id },
-          },
-        });
+          });
+        } catch (e) {
+          addToast({
+            type: TOAST_TYPE.ERROR,
+            message: (
+              <FormattedMessage
+                id="Host.VirtualCards.EditCard.Error"
+                defaultMessage="Error editing card: {error}"
+                values={{
+                  error: e.message,
+                }}
+              />
+            ),
+          });
+          return;
+        }
         onSuccess?.(<FormattedMessage id="Host.VirtualCards.UpdateCard.Success" defaultMessage="Card updated" />);
       } else {
-        await assignNewVirtualCard({
-          variables: {
-            virtualCard: {
-              privateData,
+        try {
+          await assignNewVirtualCard({
+            variables: {
+              virtualCard: {
+                privateData,
+              },
+              assignee: { id: assignee.id },
+              account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
             },
-            assignee: { id: assignee.id },
-            account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
-          },
-        });
+          });
+        } catch (e) {
+          addToast({
+            type: TOAST_TYPE.ERROR,
+            message: (
+              <FormattedMessage
+                id="Host.VirtualCards.AssignCard.Error"
+                defaultMessage="Error assigning card: {error}"
+                values={{
+                  error: e.message,
+                }}
+              />
+            ),
+          });
+          return;
+        }
         onSuccess?.();
       }
     },
