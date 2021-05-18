@@ -192,7 +192,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(options[3]);
   const [customAmount, setCustomAmount] = useState(0);
 
-  const [submitAddFunds, { data, error }] = useMutation(addFundsMutation, {
+  const [submitAddFunds, { data, error: fundError }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
@@ -205,7 +205,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     awaitRefetchQueries: true,
   });
 
-  const [addPlatformTip, { platformTipError }] = useMutation(addPlatformTipMutation, {
+  const [addPlatformTip, { error: platformTipError }] = useMutation(addPlatformTipMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -242,9 +242,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
         validate={validate}
-        onSubmit={(values, actions) => {
+        onSubmit={async values => {
           if (!fundDetails.showPlatformTipModal) {
-            submitAddFunds({
+            await submitAddFunds({
               variables: {
                 ...values,
                 amount: { valueInCents: values.amount },
@@ -252,33 +252,28 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 fromAccount: buildAccountReference(values.fromAccount),
                 account: buildAccountReference(values.account),
               },
-            }).then(() => {
-              setFundDetails({
-                showPlatformTipModal: true,
-                fundAmount: values.amount,
-                description: values.description,
-                source: values.fromAccount.name,
-              });
-              actions.setSubmitting(false);
+            });
+            setFundDetails({
+              showPlatformTipModal: true,
+              fundAmount: values.amount,
+              description: values.description,
+              source: values.fromAccount.name,
             });
           } else if (selectedOption.value !== 0) {
             const creditTransaction = data.addFunds.transactions.filter(
               transaction => transaction.type === 'CREDIT',
             )[0];
-            addPlatformTip({
+            await addPlatformTip({
               variables: {
                 ...values,
                 amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
                 transaction: { id: creditTransaction.id },
               },
-            }).then(() => {
-              handleClose();
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
-                message: (
-                  <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />
-                ),
-              });
+            });
+            handleClose();
+            addToast({
+              type: TOAST_TYPE.SUCCESS,
+              message: <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />,
             });
           } else {
             handleClose();
@@ -465,7 +460,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       values={{ amount: formatCurrency(values.amount, collective.currency) }}
                     />
                   </P>
-                  {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
+                  {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
                 </ModalBody>
                 <ModalFooter isFullWidth>
                   <Flex justifyContent="center" flexWrap="wrap">
