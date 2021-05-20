@@ -124,7 +124,7 @@ class UserProvider extends React.Component {
   refetchLoggedInUser = async () => {
     const { getLoggedInUser } = this.props;
     try {
-      const LoggedInUser = await getLoggedInUser({ ignoreLocalStorage: true });
+      const LoggedInUser = await getLoggedInUser();
       this.setState({
         errorLoggedInUser: null,
         loadingLoggedInUser: false,
