@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
+import { toPx } from '../../lib/theme/helpers';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
@@ -80,8 +81,10 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                 value={order.description}
                 maxLength={255}
                 minFontSizeInPx={12}
-                maxFontSizeInPx={14}
+                maxFontSizeInPx={16}
                 lengthThreshold={72}
+                mobileRatio={0.875}
+                valueFormatter={toPx}
               >
                 {({ value, fontSize }) => (
                   <H3
@@ -89,7 +92,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                     lineHeight="1.5em"
                     textDecoration="none"
                     color="black.900"
-                    fontSize={`${fontSize}px`}
+                    fontSize={fontSize}
                     data-cy="expense-title"
                   >
                     {value}

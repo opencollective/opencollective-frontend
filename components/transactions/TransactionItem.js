@@ -98,9 +98,9 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               <P
                 data-cy="transaction-description"
                 fontWeight="500"
-                fontSize="14px"
-                lineHeight="21px"
-                color={description ? 'black.900' : 'black.500'}
+                fontSize={['14px', null, null, '16px']}
+                lineHeight={['20px', null, null, '24px']}
+                color={description ? 'black.900' : 'black.600'}
                 cursor={!hasOrder ? 'pointer' : 'initial'}
                 onClick={() => !hasOrder && setExpanded(true)}
               >
@@ -122,7 +122,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   </Span>
                 )}
               </P>
-              <P mt="5px" fontSize="12px" lineHeight="16px" color="black.700" data-cy="transaction-details">
+              <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
                 {hasOrder ? (
                   <FormattedMessage
                     id="Transaction.from"

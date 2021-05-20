@@ -18,7 +18,7 @@ import 'nprogress/nprogress.css';
 import 'react-datetime/css/react-datetime.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
-import '../public/static/styles/react-tags.css';
+import '../public/static/styles/react-tags.css'; // TODO is this still used?
 
 Router.onRouteChangeStart = () => NProgress.start();
 

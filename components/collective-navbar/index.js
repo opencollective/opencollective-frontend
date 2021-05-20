@@ -12,7 +12,6 @@ import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
-import { darken } from 'polished';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { display } from 'styled-system';
@@ -23,6 +22,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import { getSettingsRoute } from '../../lib/url_helpers';
 
+import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
@@ -252,12 +252,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
         <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
               <FormattedMessage id="Settings" defaultMessage="Settings" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -266,12 +266,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
         <Link href={`/${collective.slug}/dashboard`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Dashboard size="1em" />
             <Span ml={2}>
               <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -280,31 +280,31 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
         <Link href={getContributeRoute(collective)}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Planet size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
   } else if (callsToAction.includes('hasApply')) {
     return {
       type: NAVBAR_ACTION_TYPE.APPLY,
-      component: <ApplyToHostBtn hostSlug={collective.slug} buttonRenderer={props => <MainActionBtn {...props} />} />,
+      component: <ApplyToHostBtn hostSlug={collective.slug} buttonRenderer={props => <ActionButton {...props} />} />,
     };
   } else if (callsToAction.includes('hasRequestGrant')) {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
         <Link href={`/${collective.slug}/expenses/new`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -313,12 +313,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
         <Link href={`/${collective.slug}/expenses/new`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -327,12 +327,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
         <Link href={`/${collective.slug}/recurring-contributions`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -341,12 +341,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
         <Link href={`/${collective.slug}/contact`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Envelope size="1em" />
             <Span ml={2}>
               <FormattedMessage id="Contact" defaultMessage="Contact" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -356,12 +356,12 @@ const getMainAction = (collective, callsToAction) => {
       component: (
         <AddFundsBtn collective={collective} host={collective.host}>
           {btnProps => (
-            <MainActionBtn {...btnProps}>
+            <ActionButton {...btnProps}>
               <AttachMoney size="1em" />
               <Span>
                 <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
               </Span>
-            </MainActionBtn>
+            </ActionButton>
           )}
         </AddFundsBtn>
       ),
@@ -372,12 +372,12 @@ const getMainAction = (collective, callsToAction) => {
       component: (
         <AddPrepaidBudgetBtn collective={collective}>
           {btnProps => (
-            <MainActionBtn {...btnProps}>
+            <ActionButton {...btnProps}>
               <AttachMoney size="1em" />
               <Span>
                 <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
               </Span>
-            </MainActionBtn>
+            </ActionButton>
           )}
         </AddPrepaidBudgetBtn>
       ),
@@ -386,39 +386,6 @@ const getMainAction = (collective, callsToAction) => {
     return null;
   }
 };
-
-export const MainActionBtn = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
-  padding: 5px 10px;
-  white-space: nowrap;
-  text-transform: uppercase;
-  background: ${themeGet('colors.primary.100')};
-  border-radius: 8px;
-  color: ${themeGet('colors.primary.700')};
-  border: none;
-
-  &,
-  span {
-    letter-spacing: 0.01em;
-  }
-
-  &:hover {
-    background: ${props => darken(0.025, props.theme.colors.primary[100])};
-  }
-
-  &:active,
-  &:focus {
-    background: ${themeGet('colors.primary.700')};
-    color: ${themeGet('colors.white.full')};
-    box-shadow: none;
-  }
-
-  span {
-    vertical-align: middle;
-  }
-`;
 
 /**
  * The NavBar that displays all the individual sections.

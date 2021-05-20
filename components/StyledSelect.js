@@ -148,7 +148,11 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           customStyles.cursor = 'pointer';
         }
 
-        return { ...baseStyles, ...customStyles, ...styles?.control };
+        if (typeof styles?.control === 'function') {
+          return styles.control({ ...baseStyles, ...customStyles }, state);
+        } else {
+          return { ...baseStyles, ...customStyles, ...styles?.control };
+        }
       },
       option: (baseStyles, state) => {
         const customStyles = { cursor: 'pointer' };
@@ -212,6 +216,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
 const StyledSelect = makeStyledSelect(Select);
 
 StyledSelect.propTypes = {
+  // Styled-system
+  ...propTypes.typography,
+  ...propTypes.layout,
+  ...propTypes.space,
   /** The id of the search input */
   inputId: PropTypes.string.isRequired,
   /** Define an id prefix for the select components e.g. {your-id}-value */
@@ -241,10 +249,6 @@ StyledSelect.propTypes = {
   styles: PropTypes.object,
   /** To render menu in a portal */
   menuPortalTarget: PropTypes.any,
-  // Styled-system
-  ...propTypes.typography,
-  ...propTypes.layout,
-  ...propTypes.space,
 };
 
 StyledSelect.defaultProps = {

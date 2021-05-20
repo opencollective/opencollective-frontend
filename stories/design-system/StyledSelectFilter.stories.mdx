@@ -1,0 +1,31 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { StyledSelectFilter } from '../../components/StyledSelectFilter';
+import theme from '../../lib/theme';
+
+<Meta
+  title="Design system/StyledSelectFilter"
+  component={StyledSelectFilter}
+  argTypes={{
+    options: {
+      defaultValue: [
+        { label: 'Filter 1', value: '1' },
+        { label: 'Filter 2', value: '2' },
+      ],
+    },
+  }}
+  parameters={{
+    actions: {
+      handles: ['onChange'],
+    },
+  }}
+/>
+
+# StyledSelectFilter
+
+## Default
+
+export const DefaultStory = props => <StyledSelectFilter {...props} />;
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />

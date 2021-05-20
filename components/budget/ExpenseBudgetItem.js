@@ -6,6 +6,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { toPx } from '../../lib/theme/helpers';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
@@ -156,8 +157,10 @@ const ExpenseBudgetItem = ({
                   value={expense.description}
                   maxLength={255}
                   minFontSizeInPx={12}
-                  maxFontSizeInPx={14}
+                  maxFontSizeInPx={16}
                   lengthThreshold={72}
+                  mobileRatio={0.875}
+                  valueFormatter={toPx}
                 >
                   {({ value, fontSize }) => (
                     <H3
