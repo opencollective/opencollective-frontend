@@ -309,6 +309,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       canMarkAsUnpaid
       canSeeInvoiceInfo
       canEditTags
+      canUnschedulePayment
     }
     payoutMethod {
       id
