@@ -297,6 +297,7 @@ export default class RichTextEditor extends React.Component {
     const iframeRegex = new RegExp(`<iframe.+?iframe>`, 'ig');
     let match;
     let lastIndex = 0;
+    let index = 0;
 
     while ((match = iframeRegex.exec(value))) {
       if (lastIndex === 0) {
@@ -306,7 +307,7 @@ export default class RichTextEditor extends React.Component {
       const position = match.index;
       const preText = value.substring(lastIndex, position);
       this.getEditor().setSelectedRange([lastIndex, position]);
-      this.getEditor().insertHTML(preText);
+      this.getEditor().insertHTML(preText.trim());
       const { videoService, videoId } = this.getEmbedDetails(iframe);
       const attachment = new this.Trix.Attachment({
         content: `<img alt="Preview Image" src="${await this.constructPreviewImageURL(videoService, videoId)}"/>`,
@@ -314,7 +315,10 @@ export default class RichTextEditor extends React.Component {
       this.getEditor().insertAttachment(attachment);
       lastIndex = match.index + iframe.length;
       const postText = value.substring(lastIndex, value.length);
-      this.getEditor().insertHTML(postText);
+      if (index > 0) {
+        this.getEditor().insertHTML(postText.trim());
+      }
+      index++;
     }
   };
 
