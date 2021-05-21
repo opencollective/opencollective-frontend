@@ -331,7 +331,10 @@ const HostVirtualCards = props => {
         <P>
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
-            defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier!"
+            defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier! {learnMoreLink}"
+            values={{
+              learnMoreLink: <a href="https://docs.opencollective.com/help/fiscal-hosts/virtual-cards">Learn more</a>,
+            }}
           />
         </P>
         <Flex mt={3} flexDirection={['row', 'column']}>

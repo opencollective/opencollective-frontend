@@ -129,7 +129,12 @@ const VirtualCards = props => {
         <P>
           <FormattedMessage
             id="VirtualCards.Description"
-            defaultMessage="Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them."
+            defaultMessage="Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them. {learnMoreLink}"
+            values={{
+              learnMoreLink: (
+                <a href="https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards">Learn more</a>
+              ),
+            }}
           />
         </P>
         {props.collective.host?.settings?.virtualcards?.policy && (
