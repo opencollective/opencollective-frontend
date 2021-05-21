@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import dayjs from 'dayjs';
-import { FormattedDateTimeRange, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { addMonths, addYears } from '../../../lib/date-utils';
@@ -72,7 +72,13 @@ const DateRange = ({ from, to }) => {
   if (!from && !to) {
     return <FormattedMessage id="DateRange.All" defaultMessage="All" />;
   } else if (from && to) {
-    return <FormattedDateTimeRange from={from} to={to} />;
+    return (
+      <FormattedMessage
+        id="Date.DateRange"
+        defaultMessage="{dateFrom, date, short} to {dateTo, date, short}"
+        values={{ dateFrom: from, dateTo: to }}
+      />
+    );
   } else if (from) {
     return <FormattedMessage id="Date.SinceShort" defaultMessage="Since {date, date, short}" values={{ date: from }} />;
   } else {

@@ -192,7 +192,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(options[3]);
   const [customAmount, setCustomAmount] = useState(0);
 
-  const [submitAddFunds, { data, error }] = useMutation(addFundsMutation, {
+  const [submitAddFunds, { data, error: fundError }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
@@ -205,7 +205,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     awaitRefetchQueries: true,
   });
 
-  const [addPlatformTip, { platformTipError }] = useMutation(addPlatformTipMutation, {
+  const [addPlatformTip, { error: platformTipError }] = useMutation(addPlatformTipMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -242,9 +242,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
         validate={validate}
-        onSubmit={(values, actions) => {
+        onSubmit={async values => {
           if (!fundDetails.showPlatformTipModal) {
-            submitAddFunds({
+            await submitAddFunds({
               variables: {
                 ...values,
                 amount: { valueInCents: values.amount },
@@ -252,33 +252,28 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 fromAccount: buildAccountReference(values.fromAccount),
                 account: buildAccountReference(values.account),
               },
-            }).then(() => {
-              setFundDetails({
-                showPlatformTipModal: true,
-                fundAmount: values.amount,
-                description: values.description,
-                source: values.fromAccount.name,
-              });
-              actions.setSubmitting(false);
+            });
+            setFundDetails({
+              showPlatformTipModal: true,
+              fundAmount: values.amount,
+              description: values.description,
+              source: values.fromAccount.name,
             });
           } else if (selectedOption.value !== 0) {
             const creditTransaction = data.addFunds.transactions.filter(
               transaction => transaction.type === 'CREDIT',
             )[0];
-            addPlatformTip({
+            await addPlatformTip({
               variables: {
                 ...values,
                 amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
                 transaction: { id: creditTransaction.id },
               },
-            }).then(() => {
-              handleClose();
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
-                message: (
-                  <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />
-                ),
-              });
+            });
+            handleClose();
+            addToast({
+              type: TOAST_TYPE.SUCCESS,
+              message: <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />,
             });
           } else {
             handleClose();
@@ -465,7 +460,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       values={{ amount: formatCurrency(values.amount, collective.currency) }}
                     />
                   </P>
-                  {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
+                  {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
                 </ModalBody>
                 <ModalFooter isFullWidth>
                   <Flex justifyContent="center" flexWrap="wrap">
@@ -519,50 +514,54 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </StyledLink>
                     </Container>
                   </Container>
-                  <StyledHr my={3} borderColor="black.300" />
-                  <div>
-                    <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
-                      <FormattedMessage
-                        id="AddFundsModal.platformTipInfo"
-                        defaultMessage="Since you are not charging a host fee to the collective, Open Collective is free to use. We rely on your generosity to keep this possible!"
-                      />
-                    </P>
-                    <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
-                      <Flex alignItems="center">
-                        <Illustration alt="" />
-                        <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
+                  {hostFee === 0 && (
+                    <Container>
+                      <StyledHr my={3} borderColor="black.300" />
+                      <div>
+                        <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
                           <FormattedMessage
-                            id="AddFundsModal.thankYou"
-                            defaultMessage="Thank you for supporting us. Platform tip will be deducted from the host budget:"
+                            id="AddFundsModal.platformTipInfo"
+                            defaultMessage="Since you are not charging a host fee to the collective, Open Collective is free to use. We rely on your generosity to keep this possible!"
                           />
                         </P>
-                      </Flex>
-                      <StyledSelect
-                        aria-label="Donation percentage"
-                        data-cy="donation-percentage"
-                        width="100%"
-                        maxWidth={['100%', 190]}
-                        mt={[2, 0]}
-                        isSearchable={false}
-                        fontSize="15px"
-                        options={options}
-                        onChange={setSelectedOption}
-                        formatOptionLabel={formatOptionLabel}
-                        value={selectedOption}
-                      />
-                    </Flex>
-                    {selectedOption.value === 'CUSTOM' && (
-                      <Flex justifyContent="flex-end" mt={2}>
-                        <StyledInputAmount
-                          id="platformTip"
-                          currency={collective.currency}
-                          onChange={amount => setCustomAmount(amount)}
-                          defaultValue={options[1].value}
-                        />
-                      </Flex>
-                    )}
-                  </div>
-                  {platformTipError && <MessageBoxGraphqlError error={platformTipError} mt={3} fontSize="13px" />}
+                        <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
+                          <Flex alignItems="center">
+                            <Illustration alt="" />
+                            <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
+                              <FormattedMessage
+                                id="AddFundsModal.thankYou"
+                                defaultMessage="Thank you for supporting us. Platform tip will be deducted from the host budget:"
+                              />
+                            </P>
+                          </Flex>
+                          <StyledSelect
+                            aria-label="Donation percentage"
+                            data-cy="donation-percentage"
+                            width="100%"
+                            maxWidth={['100%', 190]}
+                            mt={[2, 0]}
+                            isSearchable={false}
+                            fontSize="15px"
+                            options={options}
+                            onChange={setSelectedOption}
+                            formatOptionLabel={formatOptionLabel}
+                            value={selectedOption}
+                          />
+                        </Flex>
+                        {selectedOption.value === 'CUSTOM' && (
+                          <Flex justifyContent="flex-end" mt={2}>
+                            <StyledInputAmount
+                              id="platformTip"
+                              currency={collective.currency}
+                              onChange={amount => setCustomAmount(amount)}
+                              defaultValue={options[1].value}
+                            />
+                          </Flex>
+                        )}
+                      </div>
+                      {platformTipError && <MessageBoxGraphqlError error={platformTipError} mt={3} fontSize="13px" />}
+                    </Container>
+                  )}
                 </ModalBody>
                 <ModalFooter isFullWidth>
                   <Flex justifyContent="center" flexWrap="wrap">

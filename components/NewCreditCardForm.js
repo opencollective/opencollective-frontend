@@ -119,7 +119,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
           return (
             <FormattedMessage
               id="NewCreditCardForm.PostalCode"
-              defaultMessage="Credit card zip/postal code is required"
+              defaultMessage="Credit card ZIP code and CVC are required"
             />
           );
         }

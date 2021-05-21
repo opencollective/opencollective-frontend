@@ -10,10 +10,12 @@ import { imagePreview } from '../lib/image-utils';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
+import { Box } from './Grid';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import { fadeInDown } from './StyledKeyframes';
 import StyledLink from './StyledLink';
 import StyledSpinner from './StyledSpinner';
+import { P } from './Text';
 
 const ImageLink = styled(StyledLink)`
   cursor: pointer;
@@ -37,7 +39,7 @@ const DownloadIcon = styled(Download)`
   opacity: 0;
 `;
 
-const MainContainer = styled(Container)`
+const CardContainer = styled(Container)`
   position: relative;
   border-radius: 8px;
   padding: 4px;
@@ -53,7 +55,7 @@ const MainContainer = styled(Container)`
   }
 
   ${props =>
-    props.onClick &&
+    props.hasOnClick &&
     css`
       cursor: pointer;
       &:hover {
@@ -89,7 +91,19 @@ const PrivateIconContainer = styled.div`
  * To display the preview of a file uploaded on Open Collective.
  * Supports images and PDFs.
  */
-const UploadedFilePreview = ({ isPrivate, isLoading, isDownloading, url, size, alt, hasLink, ...props }) => {
+const UploadedFilePreview = ({
+  isPrivate,
+  isLoading,
+  isDownloading,
+  url,
+  size,
+  alt,
+  hasLink,
+  fileName,
+  showFileName,
+  border,
+  ...props
+}) => {
   let content = null;
   const isText = endsWith(url, 'csv') || endsWith(url, 'txt') || endsWith(url, 'pdf');
 
@@ -123,7 +137,7 @@ const UploadedFilePreview = ({ isPrivate, isLoading, isDownloading, url, size, a
     );
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
-    const img = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt} />;
+    const img = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
     content = !hasLink ? (
       img
     ) : (
@@ -134,9 +148,26 @@ const UploadedFilePreview = ({ isPrivate, isLoading, isDownloading, url, size, a
   }
 
   return (
-    <MainContainer size={size} {...props}>
-      {content}
-    </MainContainer>
+    <Container {...props}>
+      <CardContainer size={size} title={fileName} border={border} hasOnClick={Boolean(props.onClick)}>
+        {content}
+      </CardContainer>
+      {showFileName && (
+        <Box mt="6px" maxWidth={100}>
+          {isLoading ? (
+            <LoadingPlaceholder height={12} />
+          ) : fileName ? (
+            <P fontSize="12px" color="black.600" fontWeight="500">
+              {fileName}
+            </P>
+          ) : (
+            <P fontStyle="italic" fontSize="12px" color="black.600">
+              <FormattedMessage id="File.NoFilename" defaultMessage="No filename" />
+            </P>
+          )}
+        </Box>
+      )}
+    </Container>
   );
 };
 
@@ -145,8 +176,11 @@ UploadedFilePreview.propTypes = {
   isPrivate: PropTypes.bool,
   isLoading: PropTypes.bool,
   isDownloading: PropTypes.bool,
+  showFileName: PropTypes.bool,
   alt: PropTypes.string,
+  fileName: PropTypes.string,
   onClick: PropTypes.func,
+  border: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   maxHeihgt: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** If true, a link to the original file will be added if possible */
