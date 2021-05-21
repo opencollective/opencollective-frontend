@@ -385,7 +385,7 @@ export default class RichTextEditor extends React.Component {
     }
   };
 
-  constructPreviewImageURL = async (service, id) => {
+  constructPreviewImageURL = (service, id) => {
     if (service === 'youtube') {
       return `https://img.youtube.com/vi/${id}/0.jpg`;
       // } else if (service === 'vimeo') {
