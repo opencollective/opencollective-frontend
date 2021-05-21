@@ -325,9 +325,8 @@ export default class RichTextEditor extends React.Component {
     );
     const match = regex.exec(iframe);
     if (match[0].includes('youtube')) {
-      const matchIdRegex = new RegExp(`embed\\/(.+?)(\\/|$)`, 'ig');
-      const videoId = matchIdRegex.exec(match[0])[1];
-      return { videoService: 'youtube', videoId };
+      const { id } = this.parseServiceLink(match[0]);
+      return { videoService: 'youtube', videoId: id };
       // } else if (match[0].includes('vimeo')) {
       //   const matchIdRegex = new RegExp(`video\\/(.+?)(\\/|$)`, 'ig');
       //   const videoId = matchIdRegex.exec(match[0])[1];
@@ -400,7 +399,7 @@ export default class RichTextEditor extends React.Component {
   parseServiceLink = videoLink => {
     const regexps = {
       youtube: new RegExp(
-        '(?:https?://)?(?:www\\.)?youtu(?:\\.be/|be\\.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
+        '(?:https?://)?(?:www\\.)?youtu(?:\\.be/|be(-nocookie)?\\.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
         'i',
       ),
       vimeo: new RegExp(
