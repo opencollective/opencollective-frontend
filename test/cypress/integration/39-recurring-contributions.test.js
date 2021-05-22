@@ -62,6 +62,64 @@ describe('Recurring contributions', () => {
     });
   });
 
+  // it('Can select a fixed recurring contribution tier', () => {
+  //
+  // });
+
+  it('Can change the amount in a flexible contribution tier', () => {
+    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
+      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
+      cy.getByDataCy('recurring-contribution-menu-tier-option').click();
+      cy.getByDataCy('recurring-contribution-order-menu').should('exist');
+      cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
+        cy.getByDataCy('radio-select').check();
+      });
+      cy.get('[data-cy="tier-amount-select"]').click();
+      cy.contains('[data-cy="select-option"]', '$250').click();
+      cy.getByDataCy('recurring-contribution-update-order-button').click();
+      cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
+      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$250.00 USD / month');
+    });
+  });
+
+  it('Can contribute a custom contribution amount', () => {
+    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
+      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
+      cy.getByDataCy('recurring-contribution-menu-tier-option').click();
+      cy.getByDataCy('recurring-contribution-order-menu').should('exist');
+      cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
+        cy.getByDataCy('radio-select').check();
+      });
+      cy.get('[data-cy="tier-amount-select"]').click();
+      cy.contains('[data-cy="select-option"]', 'Other').click();
+      cy.getByDataCy('recurring-contribution-tier-box').contains('Min. amount: $100.00');
+      cy.getByDataCy('recurring-contribution-custom-amount-input').type('150');
+
+      cy.getByDataCy('recurring-contribution-update-order-button').scrollIntoView().click();
+      cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
+      cy.getByDataCy('recurring-contribution-amount-contributed').contains('150.00 USD / month');
+    });
+  });
+
+  it('Cannot contribute a contribution amount less than the minimum allowable amount', () => {
+    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
+      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
+      cy.getByDataCy('recurring-contribution-menu-tier-option').click();
+      cy.getByDataCy('recurring-contribution-order-menu').should('exist');
+      cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
+        cy.getByDataCy('radio-select').check();
+      });
+
+      cy.get('[data-cy="tier-amount-select"]').click();
+      cy.contains('[data-cy="select-option"]', 'Other').click();
+      cy.getByDataCy('recurring-contribution-tier-box').contains('Min. amount: $100.00');
+      cy.getByDataCy('recurring-contribution-custom-amount-input').type('50');
+
+      cy.getByDataCy('recurring-contribution-update-order-button').scrollIntoView().click();
+      cy.getByDataCy('toast-notification').contains('Amount is less than minimum value allowed for this Tier.');
+    });
+  });
+
   it('Can cancel an active contribution', () => {
     cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
