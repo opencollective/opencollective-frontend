@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { isTierExpired } from '../../lib/tier-utils';
 
+import Container from '../Container';
 import { Flex } from '../Grid';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
@@ -50,6 +52,7 @@ const msg = defineMessages({
  * From received params, see if there's anything preventing the contribution
  */
 export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier) => {
+  const paymentMethods = [GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD, GQLV2_PAYMENT_METHOD_TYPES.PAYPAL];
   if (!account.host) {
     return { reason: CONTRIBUTION_BLOCKER.NO_HOST };
   } else if (!account.isActive) {
@@ -67,11 +70,13 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
           </strong>
           <br />
           {loggedInUser?.isHostAdmin(account) && (
-            <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
-              <StyledButton buttonStyle="primary" mt={3}>
-                <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
-              </StyledButton>
-            </Link>
+            <Container textAlign="center">
+              <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
+                <StyledButton buttonStyle="primary" mt={3}>
+                  <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
+                </StyledButton>
+              </Link>
+            </Container>
           )}
         </React.Fragment>
       ),
@@ -85,6 +90,36 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.TIER_EXPIRED, type: 'warning', showOtherWaysToContribute: true };
   } else if (account.settings.disableCustomContributions && !tier) {
     return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
+  } else if (
+    tier &&
+    tier.interval !== null &&
+    !account.host.supportedPaymentMethods.some(paymentMethod => paymentMethods.includes(paymentMethod))
+  ) {
+    return {
+      reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
+      type: 'warning',
+      showOtherWaysToContribute: true,
+      content: (
+        <React.Fragment>
+          <strong>
+            <FormattedMessage
+              id="ContributionFlow.noStripeOrPaypalConfigured"
+              defaultMessage="No payment provider available for accepting recurring contributions. Your host admin need to configure Stripe or PayPal."
+            />
+          </strong>
+          <br />
+          {loggedInUser?.isHostAdmin(account) && (
+            <Container textAlign="center">
+              <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
+                <StyledButton alignItems="center" buttonStyle="primary" mt={3}>
+                  <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
+                </StyledButton>
+              </Link>
+            </Container>
+          )}
+        </React.Fragment>
+      ),
+    };
   } else {
     return null;
   }

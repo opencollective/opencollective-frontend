@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
+import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nInterval } from '../../lib/i18n/interval';
@@ -48,34 +49,37 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
   const currency = tier?.amount.currency || collective.currency;
   const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;
 
+  const paymentMethods = [GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD, GQLV2_PAYMENT_METHOD_TYPES.PAYPAL];
+
   return (
     <Box width={1}>
-      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && (
-        <StyledButtonSet
-          id="interval"
-          justifyContent="center"
-          mt={[4, 0]}
-          mb="30px"
-          items={[null, INTERVALS.month, INTERVALS.year]}
-          selected={selectedInterval || null}
-          buttonProps={{ px: 2, py: '5px' }}
-          role="group"
-          aria-label="Amount types"
-          onChange={interval => {
-            if (tier && tier.interval !== INTERVALS.flexible) {
-              setTemporaryInterval(interval);
-            } else {
-              dispatchChange('interval', interval);
-            }
-          }}
-        >
-          {({ item, isSelected }) => (
-            <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
-              {i18nInterval(intl, item || INTERVALS.oneTime)}
-            </Span>
-          )}
-        </StyledButtonSet>
-      )}
+      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) &&
+        collective.host.supportedPaymentMethods.some(paymentMethod => paymentMethods.includes(paymentMethod)) && (
+          <StyledButtonSet
+            id="interval"
+            justifyContent="center"
+            mt={[4, 0]}
+            mb="30px"
+            items={[null, INTERVALS.month, INTERVALS.year]}
+            selected={selectedInterval || null}
+            buttonProps={{ px: 2, py: '5px' }}
+            role="group"
+            aria-label="Amount types"
+            onChange={interval => {
+              if (tier && tier.interval !== INTERVALS.flexible) {
+                setTemporaryInterval(interval);
+              } else {
+                dispatchChange('interval', interval);
+              }
+            }}
+          >
+            {({ item, isSelected }) => (
+              <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
+                {i18nInterval(intl, item || INTERVALS.oneTime)}
+              </Span>
+            )}
+          </StyledButtonSet>
+        )}
 
       {!isFixedContribution ? (
         <Box mb="30px">
