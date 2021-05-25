@@ -98,7 +98,7 @@ class SectionEvents extends React.PureComponent {
             </Box>
           )}
         </HorizontalScroller>
-        {Boolean(events?.length) && (
+        {Boolean(events?.length > 6) && (
           <ContainerSectionContent>
             <Link href={`/${collective.slug}/events`}>
               <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
