@@ -510,7 +510,6 @@
   "ContributionFlow.highContributionInfoMessage": "While we'll email you a receipt, we are still required to collect a phyisical address for contributions over $5,000 USD.",
   "ContributionFlow.lowContributionInfoMessage": "Every contribution must be linked to an email account for legal reasons. Please provide a valid email.",
   "ContributionFlow.lowestContributionInfoMessage": "Please provide a valid email. We need to send you a receipt for your contribution.",
-  "ContributionFlow.noStripeOrPaypalConfigured": "No payment provider available for accepting recurring contributions. Your host admin need to configure Stripe or PayPal.",
   "ContributionFlow.noSupportedPaymentMethods": "There is no payment provider available",
   "ContributionFlow.OrganizationProfile": "Organization profile",
   "ContributionFlow.Payment": "Payment",

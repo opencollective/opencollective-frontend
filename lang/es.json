@@ -510,7 +510,6 @@
   "ContributionFlow.highContributionInfoMessage": "Aunque te enviaremos un recibo por correo electrónico, necesitamos pedirte una dirección física para contribuciones de más de $5.000 USD.",
   "ContributionFlow.lowContributionInfoMessage": "Por motivos legales cada contribución debe estar vinculada a una cuenta de correo. Por favor proporcione un email válido.",
   "ContributionFlow.lowestContributionInfoMessage": "Por favor proporcione un email válido. Necesitamos enviarle un recibo de su contribución.",
-  "ContributionFlow.noStripeOrPaypalConfigured": "No payment provider available for accepting recurring contributions. Your host admin need to configure Stripe or PayPal.",
   "ContributionFlow.noSupportedPaymentMethods": "No hay ningún proveedor de pago disponible",
   "ContributionFlow.OrganizationProfile": "Perfil de la organización",
   "ContributionFlow.Payment": "Pago",
