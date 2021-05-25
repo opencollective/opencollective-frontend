@@ -17,6 +17,7 @@ stage
 styleguide/index.html
 styleguide/build/
 styleguide/static/fonts
+storybook-static
 .vimrc
 
 # VSCode & VSCode's extensions
