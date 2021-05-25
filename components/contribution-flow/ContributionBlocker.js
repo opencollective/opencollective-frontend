@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { isUserAdminOfCollectiveUnderSameHost } from '../../lib/collective.lib';
 import { ProvidersWithRecurringPaymentSupport } from '../../lib/constants/payment-methods';
 import { isTierExpired } from '../../lib/tier-utils';
 
@@ -75,7 +76,8 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     tier.interval !== null &&
     !account.host.supportedPaymentMethods.some(paymentMethod =>
       ProvidersWithRecurringPaymentSupport.includes(paymentMethod),
-    )
+    ) &&
+    !isUserAdminOfCollectiveUnderSameHost(loggedInUser, account)
   ) {
     return {
       reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,

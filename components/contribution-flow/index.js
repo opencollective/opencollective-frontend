@@ -663,6 +663,7 @@ class ContributionFlow extends React.Component {
                   )}
 
                   <ContributionFlowStepContainer
+                    LoggedInUser={LoggedInUser}
                     collective={collective}
                     tier={tier}
                     mainState={this.state}

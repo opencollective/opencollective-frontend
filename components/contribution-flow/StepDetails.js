@@ -4,7 +4,7 @@ import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
+import { hostIsTaxDeductibeInTheUs, isUserAdminOfCollectiveUnderSameHost } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { ProvidersWithRecurringPaymentSupport } from '../../lib/constants/payment-methods';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
@@ -28,7 +28,7 @@ import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }) => {
+const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, LoggedInUser }) => {
   const intl = useIntl();
   const amount = data?.amount;
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
@@ -52,9 +52,10 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
   return (
     <Box width={1}>
       {(!tier || tier.amountType === AmountTypes.FLEXIBLE) &&
-        collective.host.supportedPaymentMethods.some(paymentMethod =>
+        (collective.host.supportedPaymentMethods.some(paymentMethod =>
           ProvidersWithRecurringPaymentSupport.includes(paymentMethod),
-        ) && (
+        ) ||
+          isUserAdminOfCollectiveUnderSameHost(LoggedInUser, collective)) && (
           <StyledButtonSet
             id="interval"
             justifyContent="center"
@@ -244,6 +245,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
 StepDetails.propTypes = {
   onChange: PropTypes.func,
   showFeesOnTop: PropTypes.bool,
+  LoggedInUser: PropTypes.object,
   data: PropTypes.shape({
     amount: PropTypes.number,
     platformContribution: PropTypes.number,
