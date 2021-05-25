@@ -268,7 +268,7 @@ const ExpenseSummary = ({
         host={host}
         expense={expense}
         collective={collective}
-        isDraft={!isEditing && expense?.status == expenseStatus.DRAFT}
+        isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}
       />
       {Boolean(
         showProcessButtons && !isEditing && existsInAPI && collective && hasProcessButtons(expense?.permissions),
