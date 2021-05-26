@@ -368,6 +368,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
                           <Box>
                             <StyledInputAmount
                               type="number"
+                              data-cy="recurring-contribution-custom-amount-input"
                               currency={currency}
                               value={inputAmountValue}
                               onChange={setInputAmountValue}

@@ -1,4 +1,5 @@
-Display the list of repositories 
+Display the list of repositories
+
 ```js
 const repositories = [
   {
@@ -17,13 +18,13 @@ const repositories = [
     name: 'JobTweets',
     owner: { login: 'flickz', type: 'User' },
     stargazers_count: 103,
-  }
+  },
 ];
 
 <GithubRepositories
   repositories={repositories}
   onCreateCollective={data => {
-    console.log(data)
+    console.log(data);
   }}
-  />
+/>;
 ```

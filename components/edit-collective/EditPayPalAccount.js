@@ -35,7 +35,7 @@ const deleteConnectedAccountMutation = gqlV2/* GraphQL */ `
 `;
 
 const EditPayPalAccount = props => {
-  const isReceiving = props.variation == 'RECEIVING';
+  const isReceiving = props.variation === 'RECEIVING';
   const mutationOptions = {
     context: API_V2_CONTEXT,
     refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: props.collective.slug } }],

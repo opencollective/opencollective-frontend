@@ -1,4 +1,5 @@
 This component has no default opinions about padding or layout internally.
+
 ```js
 <StyledCard>
   <h3>Cool component card</h3>
