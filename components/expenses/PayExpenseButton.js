@@ -8,7 +8,6 @@ import { FormattedMessage } from 'react-intl';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 
 import TransferwiseIcon from '../icons/TransferwiseIcon';
-import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
@@ -38,24 +37,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   } else if (!payoutMethod) {
     return null;
   } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
-    // In some cases, host.plan might not be available (Host Organization account)
-    if (
-      host.plan &&
-      host.plan.transferwisePayoutsLimit !== null &&
-      host.plan.transferwisePayouts >= host.plan.transferwisePayoutsLimit
-    ) {
-      return (
-        <FormattedMessage
-          id="expense.pay.transferwise.planlimit"
-          defaultMessage="You've reached your plan's limit, <Link>upgrade</Link> to continue paying expense with Wise"
-          values={{
-            Link(message) {
-              return <Link href={`/${host.slug}/edit/host-plan`}>{message}</Link>;
-            },
-          }}
-        />
-      );
-    }
+    return null;
   } else if (payoutMethod.type === PayoutMethodType.ACCOUNT_BALANCE) {
     if (!expense.payee.host) {
       return (
@@ -92,7 +74,7 @@ PayoutMethodTypeIcon.propTypes = {
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
-const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, resetError, ...props }) => {
+const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, ...props }) => {
   const [hasModal, showModal] = React.useState(false);
   const disabledMessage = getDisabledMessage(expense, collective, host, expense.payoutMethod);
   const isDisabled = Boolean(disabled || disabledMessage);
@@ -124,7 +106,6 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
           host={host}
           onClose={() => showModal(false)}
           error={error}
-          resetError={resetError}
           onSubmit={async values => {
             const { action, ...data } = values;
             await onSubmit(action, data);
@@ -144,6 +125,11 @@ PayExpenseButton.propTypes = {
     amount: PropTypes.number,
     payoutMethod: PropTypes.shape({
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
+    }),
+    payee: PropTypes.shape({
+      host: PropTypes.shape({
+        id: PropTypes.string,
+      }),
     }),
   }).isRequired,
   collective: PropTypes.shape({
@@ -171,7 +157,6 @@ PayExpenseButton.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   /** If set, will be displayed in the pay modal */
   error: PropTypes.string,
-  resetError: PropTypes.func,
 };
 
 export default PayExpenseButton;

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
@@ -21,7 +22,7 @@ import { withUser } from './UserProvider';
 const messages = defineMessages({
   emailDetails: {
     id: 'MemberInvitation.detailsEmail',
-    defaultMessage: 'If you accept, your email address will be visible to other admins of this Collective.',
+    defaultMessage: 'If you accept, your email address will be visible to other admins.',
   },
   decline: {
     id: 'Decline',
@@ -51,9 +52,10 @@ const replyToMemberInvitationMutation = gql`
  * A card with actions for users to accept or decline an invitation to join the members
  * of a collective.
  */
-const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUser }) => {
+const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUser, redirectOnAccept }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
+  const router = useRouter();
   const [accepted, setAccepted] = React.useState();
   const [isSubmitting, setSubmitting] = React.useState(false);
   const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation);
@@ -65,6 +67,9 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
     setAccepted(accept);
     await sendReplyToInvitation({ variables: { id: invitation.id, accept } });
     await refetchLoggedInUser();
+    if (accept && redirectOnAccept) {
+      await router.push(`/${invitation.collective.slug}`);
+    }
     setSubmitting(false);
   };
 
@@ -140,10 +145,12 @@ ReplyToMemberInvitationCard.propTypes = {
     role: PropTypes.oneOf(Object.values(roles)),
     collective: PropTypes.shape({
       name: PropTypes.string,
+      slug: PropTypes.string,
     }),
   }),
   /** @ignore form withUser */
   refetchLoggedInUser: PropTypes.func,
+  redirectOnAccept: PropTypes.bool,
 };
 
 export default withUser(ReplyToMemberInvitationCard);

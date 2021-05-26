@@ -92,6 +92,7 @@ class SectionContributions extends React.PureComponent {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string,
       type: PropTypes.string.isRequired,
+      isHost: PropTypes.bool,
       stats: PropTypes.shape({
         backers: PropTypes.shape({
           all: PropTypes.number,
@@ -135,10 +136,19 @@ class SectionContributions extends React.PureComponent {
     intl: PropTypes.object,
   };
 
-  state = {
-    nbMemberships: SectionContributions.NB_MEMBERSHIPS_PER_PAGE,
-    selectedFilter: FILTERS.ALL,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      nbMemberships: SectionContributions.NB_MEMBERSHIPS_PER_PAGE,
+      selectedFilter: props.collective?.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL,
+    };
+  }
+
+  componentDidUpdate(oldProps) {
+    if (oldProps.collective?.id !== this.props.collective?.id) {
+      this.setState({ selectedFilter: this.props.collective?.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL });
+    }
+  }
 
   static NB_MEMBERSHIPS_PER_PAGE = 20;
 

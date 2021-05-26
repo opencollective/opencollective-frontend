@@ -116,6 +116,10 @@ const CloseButton = styled.button.attrs({
   border: none;
   padding: 0;
   line-height: inherit;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `;
 
 /** Simple tag to display a short string */

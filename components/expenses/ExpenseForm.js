@@ -129,13 +129,14 @@ export const prepareExpenseForSubmit = expenseData => {
  * Validate the expense
  */
 const validate = expense => {
+  const isCardCharge = expense.type === expenseTypes.CHARGE;
   if (expense.payee?.isInvite) {
     return expense.payee.id
       ? requireFields(expense, ['description', 'payee', 'payee.id'])
       : requireFields(expense, ['description', 'payee', 'payee.name', 'payee.email']);
   }
 
-  const errors = requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
+  const errors = isCardCharge ? {} : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.items.length > 0) {
     const itemsErrors = expense.items.map(item => validateExpenseItem(expense, item));
@@ -145,7 +146,11 @@ const validate = expense => {
     }
   }
 
-  if (expense.payoutMethod) {
+  if (
+    expense.payoutMethod &&
+    // CHARGE expenses have VirtualCard and do not have PayoutMethod
+    isCardCharge
+  ) {
     const payoutMethodErrors = validatePayoutMethod(expense.payoutMethod);
     if (!isEmpty(payoutMethodErrors)) {
       errors.payoutMethod = payoutMethodErrors;
@@ -193,6 +198,7 @@ const ExpenseFormBody = ({
   const { values, handleChange, errors, setValues, dirty, touched, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const isInvite = values.payee?.isInvite;
+  const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
@@ -300,7 +306,7 @@ const ExpenseFormBody = ({
         onNext={() => setStep(STEPS.EXPENSE)}
       />
     );
-  } else if (isOnBehalf === true) {
+  } else if (isOnBehalf === true && isNewUser) {
     payeeForm = (
       <ExpenseFormPayeeInviteNewStep
         collective={collective}
@@ -328,7 +334,8 @@ const ExpenseFormBody = ({
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
         onNext={() => {
-          const validation = validatePayoutMethod(values.payoutMethod);
+          const shouldSkipValidation = isOnBehalf && isEmpty(values.payoutMethod);
+          const validation = !shouldSkipValidation && validatePayoutMethod(values.payoutMethod);
           if (isEmpty(validation)) {
             setStep(STEPS.EXPENSE);
           } else {
@@ -339,6 +346,7 @@ const ExpenseFormBody = ({
           setOnBehalf(isInvite);
           formik.setFieldValue('payeeLocation', {});
           formik.setFieldValue('payee', {});
+          formik.setFieldValue('payoutMethod', {});
         }}
       />
     );

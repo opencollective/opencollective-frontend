@@ -14,7 +14,6 @@ import {
 import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
-export const BRAINTREE_KEY = 'braintree';
 
 export const generatePaymentMethodOptions = (
   paymentMethods,
@@ -29,7 +28,6 @@ export const generatePaymentMethodOptions = (
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL);
   const hostHasStripe = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
-  const hostHasBraintree = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BRAINTREE_PAYPAL);
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const interval = get(stepDetails, 'interval', null);
 
@@ -121,14 +119,6 @@ export const generatePaymentMethodOptions = (
             defaultMessage="Instructions to make a transfer will be given on the next page."
           />
         ),
-      });
-    }
-
-    if (hostHasBraintree && isRoot) {
-      uniquePMs.push({
-        key: 'braintree',
-        title: 'PayPal (Braintree)', // TODO(Braintree): remove (Braintree) for the beta
-        icon: getPaymentMethodIcon({ service: 'paypal', type: 'payment' }, collective),
       });
     }
   }

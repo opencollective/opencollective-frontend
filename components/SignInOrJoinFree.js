@@ -49,6 +49,8 @@ class SignInOrJoinFree extends React.Component {
     email: PropTypes.string,
     /** createUserQuery binding */
     createUser: PropTypes.func,
+    /** Whether user can signup from there */
+    disableSignup: PropTypes.bool,
     /** Use this prop to use this as a controlled component */
     form: PropTypes.oneOf(['signin', 'create-account']),
     /** Set the initial view for the component */
@@ -169,7 +171,7 @@ class SignInOrJoinFree extends React.Component {
     }
   };
 
-  renderBoxes = useRecoveryCodes => {
+  renderTwoFactorAuthBoxes = useRecoveryCodes => {
     const formKey = useRecoveryCodes ? 'recoveryCode' : 'twoFactorAuthenticatorCode';
 
     return (
@@ -308,7 +310,7 @@ class SignInOrJoinFree extends React.Component {
       <Flex flexDirection="column" width={1} alignItems="center">
         {error && <MessageBoxGraphqlError error={error} mb={[3, 4]} />}
         {enforceTwoFactorAuthForLoggedInUser ? (
-          this.renderBoxes(useRecoveryCodes)
+          this.renderTwoFactorAuthBoxes(useRecoveryCodes)
         ) : (
           <Fragment>
             {displayedForm !== 'create-account' ? (
@@ -321,6 +323,7 @@ class SignInOrJoinFree extends React.Component {
                 unknownEmail={unknownEmailError}
                 withShadow={this.props.withShadow}
                 label={this.props.signInLabel}
+                showSecondaryAction={!this.props.disableSignup}
               />
             ) : (
               <Flex flexDirection="column" width={1} alignItems="center">

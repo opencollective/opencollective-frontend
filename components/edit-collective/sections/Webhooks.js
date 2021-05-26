@@ -10,8 +10,9 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import events from '../../../lib/constants/notificationEvents';
+import { WebhookEventsList } from '../../../lib/constants/notificationEvents';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
 import { compose } from '../../../lib/utils';
 
 import { Box, Flex } from '../../Grid';
@@ -117,7 +118,7 @@ class Webhooks extends React.Component {
       removeList.push('collective.apply', 'collective.approved', 'collective.created');
     }
 
-    return difference(events, removeList);
+    return difference(WebhookEventsList, removeList);
   });
 
   editWebhook = (index, fieldname, value) => {
@@ -213,12 +214,13 @@ class Webhooks extends React.Component {
           <Box>
             <Span fontSize="14px">{intl.formatMessage(messages['webhooks.types.label'])}</Span>
             <StyledSelect
+              isSearchable={false}
               inputId="event-type-select"
-              options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(webhook => ({
-                label: webhook,
-                value: webhook,
+              options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(eventType => ({
+                label: i18nWebhookEventType(intl, eventType),
+                value: eventType,
               }))}
-              value={{ label: webhook.type, value: webhook.type }}
+              value={{ label: i18nWebhookEventType(intl, webhook.type), value: webhook.type }}
               onChange={({ value }) => this.editWebhook(index, 'type', value)}
             />
           </Box>
@@ -274,7 +276,7 @@ class Webhooks extends React.Component {
             buttonSize="medium"
             buttonStyle="primary"
             onClick={this.handleSubmit}
-            loading={status == 'loading'}
+            loading={status === 'loading'}
             disabled={data.loading || !this.state.modified || status === 'invalid'}
           >
             {status === 'saved' ? (

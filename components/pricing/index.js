@@ -8,7 +8,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import Container from '../Container';
 import PricingFAQ from '../faqs/PricingFAQ';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink, I18nBold } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -129,7 +129,7 @@ const Pricing = () => {
   }, 100);
 
   React.useEffect(() => {
-    window.addEventListener('scroll', handleOnScroll);
+    window.addEventListener('scroll', handleOnScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleOnScroll);
   });
 
@@ -178,7 +178,12 @@ const Pricing = () => {
         <Card border="1px solid #DCDEE0" borderRadius="8px" mb={['20px', 0]} mr={[null, '10px']} background="white">
           <Flex flexDirection={['column', 'row']} alignItems="center">
             <Box width="144px" height="144px" display={['none', null, 'block']} mr={[null, null, '24px']}>
-              <Illustration src="/static/images/pricing/for-collective-illustration.png" alt="For Collective" />
+              <NextIllustration
+                src="/static/images/pricing/for-collective-illustration.png"
+                alt="For Collective"
+                width={144}
+                height={144}
+              />
             </Box>
             <Box width={[null, null, '228px', null, '246px']}>
               <P
@@ -193,7 +198,12 @@ const Pricing = () => {
               </P>
               <StyledHR />
               <Box width="144px" height="144px" my="8px" display={[null, null, 'none']}>
-                <Illustration src="/static/images/pricing/for-collective-illustration.png" alt="For Collective" />
+                <NextIllustration
+                  src="/static/images/pricing/for-collective-illustration.png"
+                  alt="For Collective"
+                  width={144}
+                  height={144}
+                />
               </Box>
               <Box mt="8px" mb="16px">
                 <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
@@ -270,7 +280,12 @@ const Pricing = () => {
         <Card border="1px solid #DCDEE0" borderRadius="8px" ml={[null, '10px']} background="white">
           <Flex flexDirection={['column', null, 'row']}>
             <Box width="144px" height="144px" display={['none', null, 'block']} mr={[null, null, '24px']}>
-              <Illustration src="/static/images/pricing/for-fiscalHost-illustration.png" alt="For FiscalHost" />
+              <NextIllustration
+                src="/static/images/pricing/for-fiscalHost-illustration.png"
+                alt="For FiscalHost"
+                width={144}
+                height={144}
+              />
             </Box>
 
             <Box width={[null, null, '228px', null, '246px']}>
@@ -286,7 +301,12 @@ const Pricing = () => {
               </P>
               <StyledHR />
               <Box width="144px" height="144px" my="8px" display={[null, null, 'none']}>
-                <Illustration src="/static/images/pricing/for-fiscalHost-illustration.png" alt="For FiscalHost" />
+                <NextIllustration
+                  src="/static/images/pricing/for-fiscalHost-illustration.png"
+                  alt="For FiscalHost"
+                  width={144}
+                  height={144}
+                />
               </Box>
               <Box mt="8px" mb="16px">
                 <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">

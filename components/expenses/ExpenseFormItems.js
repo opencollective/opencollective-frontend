@@ -31,7 +31,7 @@ const newExpenseItem = attrs => ({
 });
 
 /** Converts a list of filenames to expense item objects */
-const filesListToItems = files => files.map(url => newExpenseItem({ url }));
+const filesListToItems = files => files.map(({ url }) => newExpenseItem({ url }));
 
 /** Helper to add a new item to the form */
 export const addNewExpenseItem = (formik, defaultValues) => {
@@ -107,7 +107,7 @@ class ExpenseFormItems extends React.PureComponent {
             />
           </strong>
           <P mt={1} pl={22}>
-            {formatErrorMessage(this.props.intl, uploadErrors[0])}
+            {formatErrorMessage(this.props.intl, uploadErrors[0]?.message)}
           </P>
         </MessageBox>
       );

@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledCheckbox from '../StyledCheckbox';
@@ -18,9 +18,11 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => (
   <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
     <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
       <Box width={'160px'} height={'160px'} mb="24px">
-        <Illustration
+        <NextIllustration
           alt="OCF sponsorship illustration"
           src="/static/images/ocf-host-application/ofc-sponsorship-illustration.png"
+          width={160}
+          height={160}
         />
       </Box>
       <Box textAlign={['center', 'left']} width={['288px', '404px']} mb={4} ml={[null, '24px']}>

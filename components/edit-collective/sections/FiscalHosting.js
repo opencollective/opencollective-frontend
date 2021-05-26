@@ -211,7 +211,7 @@ const FiscalHosting = ({ collective }) => {
           onClick={() => setActivateAsHostModal({ type: 'Activate', show: true })}
           loading={activateAsHostStatus.processing}
           disabled={false}
-          mb={2}
+          my={2}
         >
           <FormattedMessage id="collective.activateAsHost" defaultMessage={'Activate as Host'} />
         </StyledButton>

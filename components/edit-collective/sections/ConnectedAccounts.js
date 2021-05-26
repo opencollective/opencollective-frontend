@@ -9,6 +9,10 @@ import EditConnectedAccount from '../EditConnectedAccount';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
+const TITLE_OVERRIDE = {
+  transferwise: 'Wise',
+};
+
 const ConnectedAccounts = props => {
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
 
@@ -25,7 +29,7 @@ const ConnectedAccounts = props => {
     <div className="EditConnectedAccounts">
       {services.map(service => (
         <Box key={`connect-${service}`} mb={4}>
-          <SettingsSectionTitle>{capitalize(service)}</SettingsSectionTitle>
+          <SettingsSectionTitle>{TITLE_OVERRIDE[service] || capitalize(service)}</SettingsSectionTitle>
           <EditConnectedAccount
             collective={props.collective}
             service={service}

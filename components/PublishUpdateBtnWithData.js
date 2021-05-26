@@ -41,6 +41,7 @@ const updateQuery = gqlV2/* GraphQL */ `
         individuals
         organizations
         collectives
+        coreContributors
       }
       account {
         id

@@ -26,12 +26,12 @@ class ContributionFlowStepContainer extends React.Component {
     showFeesOnTop: PropTypes.bool,
     hasNewPaypal: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
-    setBraintree: PropTypes.func,
     onSignInClick: PropTypes.func,
     defaultProfileSlug: PropTypes.string,
     defaultEmail: PropTypes.string,
     isEmbed: PropTypes.bool,
     defaultName: PropTypes.string,
+    isSubmitting: PropTypes.bool,
     taxes: PropTypes.array,
     step: PropTypes.shape({
       name: PropTypes.string,
@@ -165,8 +165,8 @@ class ContributionFlowStepContainer extends React.Component {
             onChange={this.props.onChange}
             stepPayment={stepPayment}
             onNewCardFormReady={this.props.onNewCardFormReady}
-            setBraintree={this.props.setBraintree}
             hasNewPaypal={this.props.hasNewPaypal}
+            isSubmitting={this.props.isSubmitting}
           />
         );
       case 'summary':

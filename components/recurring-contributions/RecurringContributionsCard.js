@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
 
+import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -63,6 +65,22 @@ const RecurringContributionsCard = ({
         </StyledTag>
       }
     >
+      {Boolean(contribution.fromAccount?.isIncognito) && (
+        <Container position="absolute" right="12px" top="12px">
+          <StyledTooltip
+            content={() => (
+              <FormattedMessage
+                id="RecurringContribution.Incognito"
+                defaultMessage="This is an incognito recurring contribution, only you can see it."
+              />
+            )}
+          >
+            <Container borderRadius="100%" css={{ filter: 'drop-shadow(-1px 1px 2px #dcdcdc)' }}>
+              <Avatar collective={contribution.fromAccount} radius={36} />
+            </Container>
+          </StyledTooltip>
+        </Container>
+      )}
       <Container p={3} pt={0}>
         <Box mb={3}>
           {showPaymentMethod && contribution.paymentMethod && (
@@ -105,7 +123,7 @@ const RecurringContributionsCard = ({
                 currency={contribution.amount.currency}
               />
             </P>
-            {contribution.platformContributionAmount && (
+            {!isNil(contribution.platformContributionAmount?.valueInCents) && (
               <StyledTooltip
                 content={() => (
                   <FormattedMessage
@@ -185,6 +203,7 @@ RecurringContributionsCard.propTypes = {
     frequency: PropTypes.string.isRequired,
     totalDonations: PropTypes.object.isRequired,
     paymentMethod: PropTypes.object,
+    fromAccount: PropTypes.object,
   }),
   status: PropTypes.string.isRequired,
   LoggedInUser: PropTypes.object,

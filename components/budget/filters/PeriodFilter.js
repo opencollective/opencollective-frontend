@@ -1,84 +1,214 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, useIntl } from 'react-intl';
+import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import dayjs from 'dayjs';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { addMonths, addYears } from '../../../lib/date-utils';
 
-import { StyledSelectFilter } from '../../StyledSelectFilter';
+import { Box, Flex } from '../../Grid';
+import PopupMenu from '../../PopupMenu';
+import StyledButton from '../../StyledButton';
+import StyledInput from '../../StyledInput';
+import StyledInputField from '../../StyledInputField';
 
-const OPTION_LABELS = defineMessages({
-  ALL: {
-    id: 'DateRange.All',
-    defaultMessage: 'All',
-  },
-  month: {
-    id: 'DateRange.PastMonths',
-    defaultMessage: 'Past {count,plural, one {month} other {# months}}',
-  },
-  year: {
-    id: 'DateRange.PastYears',
-    defaultMessage: 'Past {count,plural, one {year} other {# years}}',
-  },
-});
-
-/**
- * Parse `strValue` and returns an array like [period, duration] (ie. ['month', 6]) or `null`
- * if not a valid value.
- */
-const parsePeriod = strValue => {
-  const parsedValue = strValue?.match(/((\d+)-)?(month|year)/);
-  if (!parsedValue) {
-    return null;
-  } else {
-    return [parseInt(parsedValue[2]) || 1, parsedValue[3]];
-  }
+const normalizeDate = date => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 };
+
+const formatDate = date => (!date ? '' : dayjs(date).format('YYYY-MM-DD'));
 
 /**
  * Parse `strValue` and returns an array like [dateFrom, dateTo]. Each value in the array
  * will be `undefined` if there's no filter for it.
  */
 export const getDateRangeFromPeriod = strValue => {
-  const period = parsePeriod(strValue);
-  if (!period) {
-    return [];
+  // Use a normalized date (without time) to better handle Apollo caching
+  const now = normalizeDate(new Date());
+
+  // Compatibility with old format ("6-month", "1-year")
+  const legacyParsedValue = strValue?.match(/((\d+)-)?(month|year)/);
+  if (legacyParsedValue) {
+    const value = parseInt(legacyParsedValue[2]) || 1;
+    const interval = legacyParsedValue[3];
+    const dateAddFunc = interval === 'month' ? addMonths : addYears;
+    return [dateAddFunc(now, -value), now];
+  }
+
+  // New format (dateFrom-dateTo)
+  const parsedValue = strValue?.match(/([^→]+)(→(.+))?/);
+  if (parsedValue) {
+    const parseDate = dateStr => (!dateStr || dateStr === 'all' ? undefined : new Date(dateStr));
+    return [parseDate(parsedValue[1]), parseDate(parsedValue[3])];
+  }
+
+  return [];
+};
+
+const encodePeriod = dateInterval => {
+  const stringifyDate = date => (!date ? 'all' : formatDate(date));
+  if (!dateInterval.from && !dateInterval.to) {
+    return '';
   } else {
-    // Use a normalized date (without time) to better handle Apollo caching
-    const nowDateTime = new Date();
-    const now = new Date(nowDateTime.getFullYear(), nowDateTime.getMonth(), nowDateTime.getDate());
-    const dateAddFunc = period[1] === 'month' ? addMonths : addYears;
-    return [dateAddFunc(now, -period[0]), now];
+    return `${stringifyDate(dateInterval.from)}→${stringifyDate(dateInterval.to)}`;
   }
 };
 
-const encodePeriod = (duration, period) => {
-  return duration !== 1 ? `${duration}-${period}` : period;
+const getDefaultDateInterval = () => {
+  return { from: '', to: '' };
 };
 
-const PeriodFilter = ({ onChange, value, ...props }) => {
-  const intl = useIntl();
-  const allPeriodsOption = { label: intl.formatMessage(OPTION_LABELS.ALL), value: 'ALL' };
-  const selected = parsePeriod(value);
-  const getOption = (duration, period) => ({
-    value: encodePeriod(duration, period),
-    label: intl.formatMessage(OPTION_LABELS[period], { count: duration }),
-  });
+const getDefaultState = value => {
+  const defaultInterval = getDefaultDateInterval();
+  const intervalFromValue = getDateRangeFromPeriod(value);
+  return {
+    from: intervalFromValue[0] || defaultInterval.from,
+    to: intervalFromValue[1] || defaultInterval.to,
+  };
+};
+
+const DateRange = ({ from, to }) => {
+  if (!from && !to) {
+    return <FormattedMessage id="DateRange.All" defaultMessage="All" />;
+  } else if (from && to) {
+    return (
+      <FormattedMessage
+        id="Date.DateRange"
+        defaultMessage="{dateFrom, date, short} to {dateTo, date, short}"
+        values={{ dateFrom: from, dateTo: to }}
+      />
+    );
+  } else if (from) {
+    return <FormattedMessage id="Date.SinceShort" defaultMessage="Since {date, date, short}" values={{ date: from }} />;
+  } else {
+    return <FormattedMessage id="Date.BeforeShort" defaultMessage="Before {date, date, short}" values={{ date: to }} />;
+  }
+};
+
+const TriggerContainer = styled(StyledButton)`
+  min-height: 38px;
+  outline: 0;
+  background: #f7f8fa;
+  padding: 0 16px;
+  width: 100%;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  color: hsl(0, 0%, 20%);
+
+  svg {
+    transition: color 0.2s;
+  }
+
+  &:hover svg {
+    color: #999999;
+  }
+
+  &:active,
+  &:focus {
+    background: #f7f8fa;
+    box-shadow: none;
+    color: hsl(0, 0%, 20%);
+  }
+`;
+
+const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
+  const [dateInterval, setDateInterval] = React.useState(() => getDefaultState(value));
+  const setDate = (type, date) => {
+    setDateInterval(value => ({ ...value, [type]: !date ? null : normalizeDate(new Date(date)) }));
+  };
 
   return (
-    <StyledSelectFilter
-      inputId="expenses-period-filter"
-      data-cy="expenses-filter-period"
-      value={selected ? getOption(...selected) : allPeriodsOption}
-      onChange={({ value }) => onChange(value)}
-      options={[allPeriodsOption, getOption(1, 'month'), getOption(6, 'month'), getOption(1, 'year')]}
-      {...props}
-    />
+    <PopupMenu
+      placement="bottom-end"
+      onClose={() => setDateInterval(getDefaultState(value))}
+      Button={({ onClick }) => (
+        <TriggerContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
+          <Flex justifyContent="space-between" alignItems="center">
+            <span>
+              <DateRange from={dateInterval.from} to={dateInterval.to} />
+            </span>
+            <ChevronDown size={25} color="#cccccc" />
+          </Flex>
+        </TriggerContainer>
+      )}
+    >
+      {({ setOpen }) => (
+        <Box mx="8px" my="16px" width="190px">
+          <StyledInputField
+            data-cy="download-csv-start-date"
+            label="Start Date"
+            name="dateFrom"
+            mt="12px"
+            labelFontSize="13px"
+          >
+            {inputProps => (
+              <StyledInput
+                {...inputProps}
+                type="date"
+                width="100%"
+                closeOnSelect
+                lineHeight={1}
+                fontSize="13px"
+                defaultValue={formatDate(dateInterval.from)}
+                onChange={e => setDate('from', e.target.value)}
+              />
+            )}
+          </StyledInputField>
+          <StyledInputField
+            data-cy="download-csv-end-date"
+            label="End Date"
+            name="dateTo"
+            mt="12px"
+            labelFontSize="13px"
+          >
+            {inputProps => (
+              <StyledInput
+                {...inputProps}
+                type="date"
+                width="100%"
+                closeOnSelect
+                lineHeight={1}
+                fontSize="13px"
+                defaultValue={formatDate(dateInterval.to)}
+                onChange={e => setDate('to', e.target.value)}
+              />
+            )}
+          </StyledInputField>
+          <StyledButton
+            buttonSize="tiny"
+            mr={2}
+            onClick={() => {
+              setDateInterval(getDefaultDateInterval());
+              setOpen(false);
+              onChange('');
+            }}
+          >
+            <FormattedMessage id="Reset" defaultMessage="Reset" />
+          </StyledButton>
+          <StyledButton
+            buttonSize="tiny"
+            buttonStyle="primary"
+            mt="12px"
+            data-cy="btn-apply-period-filter"
+            onClick={() => {
+              onChange(encodePeriod(dateInterval));
+              setOpen(false);
+            }}
+          >
+            <FormattedMessage id="Apply" defaultMessage="Apply" />
+          </StyledButton>
+        </Box>
+      )}
+    </PopupMenu>
   );
 };
 
 PeriodFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
+  inputId: PropTypes.string,
 };
 
 export default PeriodFilter;

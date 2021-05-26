@@ -827,7 +827,7 @@
   "Expense.RequestDescription": "Request Description",
   "Expense.RequestDetails": "Szczegóły żądania",
   "Expense.RequestedByOnDate": "Requested by {name} on {date, date, long}",
-  "Expense.SaveChanges": "Save changes",
+  "SaveChanges": "Save changes",
   "expense.scheduledForPayment": "Scheduled for payment",
   "Expense.SendInvite": "Send Invite",
   "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on Open Collective.",

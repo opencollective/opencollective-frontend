@@ -37,6 +37,7 @@ import Host from './sections/Host';
 import HostMetrics from './sections/HostMetrics';
 import HostPlan from './sections/HostPlan';
 import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
+import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
@@ -47,6 +48,7 @@ import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
+import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
@@ -210,7 +212,7 @@ class EditCollectiveForm extends React.Component {
       },
       'currency.warning': {
         id: 'collective.currency.warning',
-        defaultMessage: `Active Collectives and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if this is an issue.`,
+        defaultMessage: `Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if this is an issue.`,
       },
       'address.label': {
         id: 'collective.address.label',
@@ -530,6 +532,12 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
         return <Policies collective={collective} />;
 
+      case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS:
+        return <HostVirtualCards collective={collective} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
+        return <VirtualCards collective={collective} />;
+
       default:
         return null;
     }
@@ -725,8 +733,12 @@ class EditCollectiveForm extends React.Component {
           defaultValue: get(this.state.collective, 'currency'),
           options: currencyOptions,
           description: collective.isHost ? intl.formatMessage(this.messages['currency.warning']) : null,
+          when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective.type),
           disabled:
-            (collective.type === CollectiveType.COLLECTIVE && collective.isActive) || collective.isHost ? true : false,
+            ([CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type) && collective.isActive) ||
+            collective.isHost
+              ? true
+              : false,
         },
         ...this.getApplicableTaxesFields(),
         {

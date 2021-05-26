@@ -35,7 +35,7 @@ const deleteConnectedAccountMutation = gqlV2/* GraphQL */ `
 `;
 
 const EditPayPalAccount = props => {
-  const isReceiving = props.variation == 'RECEIVING';
+  const isReceiving = props.variation === 'RECEIVING';
   const mutationOptions = {
     context: API_V2_CONTEXT,
     refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: props.collective.slug } }],
@@ -54,7 +54,6 @@ const EditPayPalAccount = props => {
     initialValues: {
       token: '',
       clientId: '',
-      webhookId: '',
     },
     async onSubmit(values) {
       const {
@@ -65,7 +64,6 @@ const EditPayPalAccount = props => {
             token: trim(values.token),
             clientId: trim(values.clientId),
             service: 'paypal',
-            settings: { webhookId: trim(values.webhookId) },
           },
           account: { slug: props.collective.slug },
         },
@@ -92,7 +90,7 @@ const EditPayPalAccount = props => {
   if (!connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
-        <P fontSize="12px" color="black.600" fontWeight="normal">
+        <P fontSize="12px" color="black.700" fontWeight="normal" mb={3}>
           {isReceiving ? null : (
             <FormattedMessage
               id="collective.create.connectedAccounts.paypal.description"
@@ -113,7 +111,13 @@ const EditPayPalAccount = props => {
           disabled={isCreating}
         >
           {inputProps => (
-            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.clientId} />
+            <StyledInput
+              type="text"
+              {...inputProps}
+              onChange={formik.handleChange}
+              value={formik.values.clientId}
+              autoComplete="off"
+            />
           )}
         </StyledInputField>
         <StyledInputField
@@ -124,18 +128,17 @@ const EditPayPalAccount = props => {
           disabled={isCreating}
         >
           {inputProps => (
-            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.token} />
+            <StyledInput
+              type="text"
+              {...inputProps}
+              onChange={formik.handleChange}
+              value={formik.values.token}
+              autoComplete="off"
+            />
           )}
         </StyledInputField>
 
-        {isReceiving ? null : (
-          <StyledInputField mt={2} name="webhookId" label="Webhook ID" disabled={isCreating}>
-            {inputProps => (
-              <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.webhookId} />
-            )}
-          </StyledInputField>
-        )}
-        <StyledButton mt={10} type="submit" buttonSize="tiny" loading={isCreating}>
+        <StyledButton type="submit" mt={2} minWidth={150} loading={isCreating}>
           <FormattedMessage id="collective.connectedAccounts.paypal.button" defaultMessage="Connect PayPal" />
         </StyledButton>
       </form>
@@ -153,7 +156,7 @@ const EditPayPalAccount = props => {
           />
         </P>
         <P>
-          <StyledButton type="submit" buttonSize="tiny" loading={isDeleting} onClick={handleDelete}>
+          <StyledButton type="submit" mt={2} loading={isDeleting} onClick={handleDelete}>
             <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
           </StyledButton>
         </P>

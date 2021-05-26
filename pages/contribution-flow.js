@@ -4,7 +4,6 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
 
-import { getBraintree } from '../lib/braintree';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
@@ -68,7 +67,6 @@ class NewContributionFlowPage extends React.Component {
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
-      hasNewPaypal: parseToBoolean(query.hasNewPaypal),
     };
   }
 
@@ -115,9 +113,6 @@ class NewContributionFlowPage extends React.Component {
     if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
       this.props.loadStripe();
     }
-    if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BRAINTREE_PAYPAL)) {
-      getBraintree();
-    }
   }
 
   getPageMetadata() {
@@ -162,7 +157,7 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
-          hasNewPaypal={this.props.hasNewPaypal && LoggedInUser?.isRoot()}
+          hasNewPaypal={!get(account, 'host.settings.useLegacyPayPalPayments', false)}
         />
       );
     }

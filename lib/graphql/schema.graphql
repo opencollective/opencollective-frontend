@@ -198,7 +198,7 @@ type Collective implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -218,7 +218,7 @@ type Collective implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int
+  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -289,7 +289,7 @@ type Collective implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -303,6 +303,7 @@ type Collective implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -488,6 +489,7 @@ interface CollectiveInterface {
   isArchived: Boolean
   isApproved: Boolean
   isDeletable: Boolean
+  hasVirtualCards: Boolean
   host: CollectiveInterface
   hostCollective: CollectiveInterface
 
@@ -532,7 +534,7 @@ interface CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -564,7 +566,7 @@ interface CollectiveInterface {
   List of all notifications for this collective
   """
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int
+  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -632,7 +634,7 @@ interface CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -817,7 +819,6 @@ Input type for CommentType
 """
 input CommentAttributesInputType {
   id: Int
-  markdown: String
   html: String
   UpdateId: Int
 }
@@ -827,7 +828,6 @@ Input type for CommentType
 """
 input CommentInputType {
   id: Int
-  markdown: String
   html: String
 
   """
@@ -939,7 +939,7 @@ type Contributor {
   totalAmountDonated: Int!
 
   """
-  Wether the contributor is an individual, an organization...
+  Whether the contributor is an individual, an organization...
   """
   type: String!
 
@@ -1183,7 +1183,7 @@ type Event implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -1203,7 +1203,7 @@ type Event implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int
+  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -1274,7 +1274,7 @@ type Event implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -1288,6 +1288,7 @@ type Event implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -1555,7 +1556,7 @@ type Fund implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -1575,7 +1576,7 @@ type Fund implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int
+  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -1646,7 +1647,7 @@ type Fund implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -1660,6 +1661,7 @@ type Fund implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -1984,13 +1986,6 @@ type Mutation {
   createOrder(order: OrderInputType!): OrderType
     @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
   confirmOrder(order: ConfirmOrderInputType!): OrderType
-  createUpdate(update: UpdateInputType!): UpdateType
-    @deprecated(reason: "2021-01-29: This endpoint has been moved to GQLV2")
-  editUpdate(update: UpdateAttributesInputType!): UpdateType @deprecated(reason: "2021-01-29: Not used anymore")
-  publishUpdate(id: Int!, notificationAudience: UpdateAudienceTypeEnum!): UpdateType
-    @deprecated(reason: "2021-01-29: Not used anymore")
-  unpublishUpdate(id: Int!): UpdateType @deprecated(reason: "2021-01-29: Not used anymore")
-  deleteUpdate(id: Int!): UpdateType @deprecated(reason: "2021-01-29: Not used anymore")
   createComment(comment: CommentInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   editComment(comment: CommentAttributesInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   deleteComment(id: Int!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
@@ -2148,7 +2143,7 @@ type Mutation {
     invitationId: Int!
 
     """
-    Wether this invitation should be accepted or declined
+    Whether this invitation should be accepted or declined
     """
     accept: Boolean!
   ): Boolean
@@ -2587,7 +2582,7 @@ type Organization implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -2607,7 +2602,7 @@ type Organization implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int
+  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -2678,7 +2673,7 @@ type Organization implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -2692,6 +2687,7 @@ type Organization implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
   email: String
 }
 
@@ -2971,7 +2967,7 @@ type Project implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -2991,7 +2987,7 @@ type Project implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int
+  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -3062,7 +3058,7 @@ type Project implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -3076,6 +3072,7 @@ type Project implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }
 
 """
@@ -3131,8 +3128,6 @@ type Query {
     fetchDataFromLedger: Boolean
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
-  Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
-    @deprecated(reason: "2021-01-29: Not used anymore")
   Application(id: Int): Application
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
   allOrders(
@@ -3289,7 +3284,7 @@ type Query {
     types: [TypeOfCollective]
 
     """
-    Filter on wether account is a host
+    Filter on whether account is a host
     """
     isHost: Boolean
 
@@ -3617,23 +3612,6 @@ enum TypeOfCollective {
 }
 
 """
-Input type for UpdateType
-"""
-input UpdateAttributesInputType {
-  id: Int
-  views: Int
-  slug: String
-  title: String
-  image: String
-  isPrivate: Boolean
-  makePublicOn: IsoDateString
-  markdown: String
-  html: String
-  fromCollective: CollectiveAttributesInputType
-  tier: TierInputType
-}
-
-"""
 Defines targets for an update
 """
 enum UpdateAudienceTypeEnum {
@@ -3651,24 +3629,6 @@ enum UpdateAudienceTypeEnum {
   Will be sent to financial contributors
   """
   FINANCIAL_CONTRIBUTORS
-}
-
-"""
-Input type for UpdateType
-"""
-input UpdateInputType {
-  id: Int
-  views: Int
-  slug: String
-  title: String
-  image: String
-  isPrivate: Boolean
-  makePublicOn: IsoDateString
-  markdown: String
-  html: String
-  fromCollective: CollectiveAttributesInputType
-  collective: CollectiveAttributesInputType!
-  tier: TierInputType
 }
 
 """
@@ -3827,7 +3787,7 @@ type User implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -3847,7 +3807,7 @@ type User implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int
+  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -3918,7 +3878,7 @@ type User implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -3932,6 +3892,7 @@ type User implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
   firstName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   lastName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   email: String
@@ -3956,7 +3917,7 @@ type UserDetails {
     roles: [String]
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -4115,7 +4076,7 @@ type Vendor implements CollectiveInterface {
     onlyActiveCollectives: Boolean = false
 
     """
-    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
   ): [Member]
@@ -4135,7 +4096,7 @@ type Vendor implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int
+  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -4206,7 +4167,7 @@ type Vendor implements CollectiveInterface {
     batch: String
 
     """
-    Wether the gift card has been claimed or not
+    Whether the gift card has been claimed or not
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
@@ -4220,4 +4181,5 @@ type Vendor implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  hasVirtualCards: Boolean!
 }

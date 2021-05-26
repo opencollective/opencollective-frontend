@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { CardElement } from '@stripe/react-stripe-js';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -66,6 +67,7 @@ class UpdatePaymentPage extends React.Component {
     newCreditCardInfo: {},
     error: null,
     stripe: null,
+    stripeElements: null,
     submitting: false,
     success: false,
   };
@@ -88,7 +90,8 @@ class UpdatePaymentPage extends React.Component {
     } else {
       try {
         this.setState({ submitting: true });
-        const { token, error } = await this.state.stripe.createToken();
+        const cardElement = this.state.stripeElements.getElement(CardElement);
+        const { token, error } = await this.state.stripe.createToken(cardElement);
         if (error) {
           this.setState({ error: 'There was a problem with Stripe.', submitting: false, showCreditCardForm: false });
           throw error;
@@ -239,7 +242,7 @@ class UpdatePaymentPage extends React.Component {
                             profileType={get(this.props.collective, 'type')}
                             hasSaveCheckBox={false}
                             onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
-                            onReady={({ stripe }) => this.setState({ stripe })}
+                            onReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                           />
                         </Box>
                       )}

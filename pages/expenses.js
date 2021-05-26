@@ -8,6 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getSuggestedTags } from '../lib/collective.lib';
 import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
@@ -171,6 +172,8 @@ class ExpensePage extends React.Component {
     }
   };
 
+  getSuggestedTags = memoizeOne(getSuggestedTags);
+
   render() {
     const { collectiveSlug, data, query, LoggedInUser } = this.props;
     const hasFilters = this.hasFilter(query);
@@ -251,6 +254,7 @@ class ExpensePage extends React.Component {
                       host={data.account?.isHost ? data.account : data.account?.host}
                       expenses={data.expenses?.nodes}
                       nbPlaceholders={data.variables.limit}
+                      suggestedTags={this.getSuggestedTags(data.account)}
                     />
                     <Flex mt={5} justifyContent="center">
                       <Pagination
@@ -318,6 +322,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
     $dateFrom: ISODateTime
+    $dateTo: ISODateTime
     $searchTerm: String
   ) {
     account(slug: $collectiveSlug) {
@@ -355,8 +360,6 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
           settings
           plan {
             id
-            transferwisePayouts
-            transferwisePayoutsLimit
           }
         }
       }
@@ -396,6 +399,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       maxAmount: $maxAmount
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
+      dateTo: $dateTo
       searchTerm: $searchTerm
     ) {
       totalCount
@@ -414,10 +418,9 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
 const addExpensesPageData = graphql(expensesPageQuery, {
   options: props => {
     const amountRange = parseAmountRange(props.query.amount);
-    const [dateFrom] = getDateRangeFromPeriod(props.query.period);
+    const [dateFrom, dateTo] = getDateRangeFromPeriod(props.query.period);
     return {
       context: API_V2_CONTEXT,
-      fetchPolicy: 'cache-and-network',
       variables: {
         collectiveSlug: props.collectiveSlug,
         offset: props.query.offset || 0,
@@ -429,6 +432,7 @@ const addExpensesPageData = graphql(expensesPageQuery, {
         maxAmount: amountRange[1] && amountRange[1] * 100,
         payoutMethodType: props.query.payout,
         dateFrom,
+        dateTo,
         searchTerm: props.query.searchTerm,
       },
     };

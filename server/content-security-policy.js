@@ -24,7 +24,6 @@ const COMMON_DIRECTIVES = {
   styleSrc: [
     SELF,
     UNSAFE_INLINE, // For styled-components. TODO: Limit for nonce
-    '*.braintreegateway.com',
   ],
   connectSrc: [
     SELF,
@@ -36,25 +35,24 @@ const COMMON_DIRECTIVES = {
     'sentry.io',
     '*.sentry.io',
     'country-service.shopifycloud.com',
-    '*.braintreegateway.com',
-    '*.braintree-api.com',
   ],
   scriptSrc: [
     SELF,
     UNSAFE_INLINE, // Required by current PayPal integration. https://developer.paypal.com/docs/checkout/troubleshoot/support/#browser-features-and-polyfills provides a way to deal with that through nonces.
+    "'nonce-__OC_REQUEST_NONCE__'",
     'maps.googleapis.com',
     'js.stripe.com',
     '*.paypal.com',
     '*.paypalobjects.com',
-    'js.braintreegateway.com',
   ],
   frameSrc: [
     'www.youtube.com',
+    'www.youtube-nocookie.com',
     'opencollective.com',
+    'anchor.fm',
     'js.stripe.com',
     '*.paypal.com',
     '*.openstreetmap.org',
-    'assets.braintreegateway.com',
   ],
   objectSrc: ['opencollective.com'],
 };
@@ -78,7 +76,7 @@ const generateDirectives = customValues => {
 
 /**
  * A adapter inspired by  https://github.com/helmetjs/helmet/blob/master/middlewares/content-security-policy/index.ts
- * to generate the header string. Usefull for plugging to Zeit.
+ * to generate the header string. Useful for plugging to Vercel.
  */
 const getHeaderValueFromDirectives = directives => {
   return Object.entries(directives)
@@ -89,10 +87,7 @@ const getHeaderValueFromDirectives = directives => {
       if (typeof rawDirectiveValue === 'string') {
         directiveValue = ` ${rawDirectiveValue}`;
       } else if (Array.isArray(rawDirectiveValue)) {
-        directiveValue = '';
-        for (const element of rawDirectiveValue) {
-          directiveValue = `${directiveValue} ${element}`;
-        }
+        directiveValue = rawDirectiveValue.join(' ');
       } else if (typeof rawDirectiveValue === 'boolean' && !rawDirectiveValue) {
         return '';
       }
@@ -101,12 +96,15 @@ const getHeaderValueFromDirectives = directives => {
         return directiveName;
       }
 
-      return `${directiveName}${directiveValue}`;
+      return `${directiveName} ${directiveValue}`;
     })
     .filter(Boolean)
-    .join(';');
+    .join('; ');
 };
 
+/**
+ * Get a config compatible with Helmet's format
+ */
 const getContentSecurityPolicyConfig = () => {
   if (env === 'development' || env === 'e2e') {
     return {
@@ -114,14 +112,12 @@ const getContentSecurityPolicyConfig = () => {
       directives: generateDirectives({
         blockAllMixedContent: false,
         scriptSrc: [UNSAFE_INLINE, UNSAFE_EVAL], // For NextJS scripts
-        connectSrc: ['*.sandbox.braintree-api.com'],
       }),
     };
   } else if (env === 'staging') {
     return {
       reportOnly: false,
       directives: generateDirectives({
-        connectSrc: ['*.sandbox.braintree-api.com'],
         imgSrc: [
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',
@@ -154,7 +150,7 @@ const getContentSecurityPolicyConfig = () => {
 
 module.exports = {
   getContentSecurityPolicyConfig,
-  getCSPHeaderForNextJS: () => {
+  getCSPHeader: () => {
     const config = getContentSecurityPolicyConfig();
     if (config) {
       return {

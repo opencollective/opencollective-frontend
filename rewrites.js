@@ -7,6 +7,10 @@ exports.REWRITES = [
     destination: '/become-a-host',
   },
   {
+    source: '/fiscal-hosting',
+    destination: '/fiscal-hosting',
+  },
+  {
     source: '/:pageSlug(widgets|tos|privacypolicy|support|hiring)',
     destination: '/staticPage',
   },
@@ -175,11 +179,12 @@ exports.REWRITES = [
     source: '/:parentCollectiveSlug/projects/:slug',
     destination: '/collective-page',
   },
-  // Tier page
+  // "Ways to contribute" pages
   {
-    source: '/:collectiveSlug/:verb(tiers|contribute)',
+    source: '/:collectiveSlug/:verb(tiers|contribute|events|projects|connected-collectives)',
     destination: '/contribute',
   },
+  // Tier page
   {
     source: '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
     destination: '/tier',
@@ -211,7 +216,7 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:collectiveSlug/:verb(donate|pay|order|events)/:step(${contributionFlowSteps})?`,
+    source: `/:collectiveSlug/:verb(donate|pay|order)/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {
@@ -221,7 +226,7 @@ exports.REWRITES = [
   // Generic Route
   {
     source:
-      '/:collectiveSlug/:verb(donate|pay|order|events)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
+      '/:collectiveSlug/:verb(donate|pay|order)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
     destination: createOrderPage,
   },
   // Events

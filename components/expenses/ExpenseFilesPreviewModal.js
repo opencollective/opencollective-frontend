@@ -8,14 +8,16 @@ import { v4 as uuid } from 'uuid';
 import expenseTypes from '../../lib/constants/expenseTypes';
 
 import Container from '../Container';
+import ExpenseInvoiceDownloadHelper, {
+  generateInvoiceBlob,
+  getExpenseInvoiceFilename,
+} from '../expenses/ExpenseInvoiceDownloadHelper';
 import FilesPreviewModal from '../FilesPreviewModal';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
-
-import { generateInvoiceBlob, getExpenseInvoiceFilename } from './ExpenseInvoiceDownloadHelper';
 
 const FileInfo = ({ collective, expense, item, invoiceBlob }) => (
   <Flex justifyContent="space-between" px={25} mt={2}>
@@ -87,13 +89,19 @@ const ExpenseInvoicePreview = ({ isLoading, fileURL }) => {
 const ExpenseFilesPreviewModal = ({ collective, expense, show, onClose }) => {
   const [invoiceFile, setInvoiceFile] = React.useState(false);
   const [invoiceBlob, setInvoiceBlob] = React.useState(null);
+  const [invoiceError, setInvoiceError] = React.useState(false);
   const files = React.useMemo(() => getFilesFromExpense(collective, expense), [collective, expense]);
 
   React.useEffect(() => {
-    generateInvoiceBlob(expense).then(file => {
-      setInvoiceBlob(file);
-      setInvoiceFile(URL.createObjectURL(file));
-    });
+    generateInvoiceBlob(expense)
+      .then(file => {
+        setInvoiceError(false);
+        setInvoiceBlob(file);
+        setInvoiceFile(URL.createObjectURL(file));
+      })
+      .catch(() => {
+        setInvoiceError(true);
+      });
     return () => {
       if (invoiceFile) {
         URL.revokeObjectURL(invoiceFile);
@@ -116,7 +124,20 @@ const ExpenseFilesPreviewModal = ({ collective, expense, show, onClose }) => {
       )}
       renderItemPreview={({ item }) =>
         item.type === 'EXPENSE_INVOICE' ? (
-          <ExpenseInvoicePreview isLoading={!invoiceFile} fileURL={invoiceFile} />
+          invoiceError ? (
+            <ExpenseInvoiceDownloadHelper expense={expense} collective={collective}>
+              {({ isLoading, downloadInvoice }) => (
+                <UploadedFilePreview
+                  onClick={downloadInvoice}
+                  isDownloading={isLoading}
+                  fileName={getExpenseInvoiceFilename(collective, expense)}
+                  size={350}
+                />
+              )}
+            </ExpenseInvoiceDownloadHelper>
+          ) : (
+            <ExpenseInvoicePreview isLoading={!invoiceFile} fileURL={invoiceFile} />
+          )
         ) : (
           <UploadedFilePreview url={item.url} size={350} hasLink title={item.title} />
         )

@@ -10,17 +10,16 @@ To deploy to staging or production, you need to be a core member of the Open Col
 
 `heroku login`
 
-## (Optional) Configure Slack token
+## (Optional) Configure Slack Deployment Webhook
 
-Setting a Slack token will post a message on `#engineering` with the changes you're
-about to deploy. It is not required, but you can activate it like this:
+Setting a Slack webhook will post a message on `#deployments` channel with the changes you're about to deploy. It is not required, but you can activate it as folows.
 
-1. Go to https://api.slack.com/custom-integrations/legacy-tokens
-2. Generate a token for the OpenCollective workspace
-3. Add this token to your `.env` file:
+Contact another [core team member](https://github.com/orgs/opencollective/teams/core-developers) to ask them for the link or, if you have admins permission on it, go to https://api.slack.com/apps/A017TDR2R61/incoming-webhooks and copy the link for `#deployments` channel.
+
+Finally add this link to your `.env` file:
 
 ```bash
-OC_SLACK_DEPLOY_WEBHOOK=https://hooks.slack.com/services/....
+OC_SLACK_DEPLOY_WEBHOOK=<link-url>
 ```
 
 ## Staging (heroku)

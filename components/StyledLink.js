@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
-import { background, border, color, layout, space, typography } from 'styled-system';
+import { background, border, color, layout, space, system, typography } from 'styled-system';
 
 import { textDecoration, whiteSpace } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
@@ -26,13 +26,8 @@ const StyledLink = styled.a.attrs(props => {
     };
   }
 })`
-  color: ${themeGet(`colors.primary.500`)};
   cursor: pointer;
   text-decoration: none;
-
-  &:hover {
-    color: ${themeGet(`colors.primary.400`)};
-  }
 
   ${border}
   ${color}
@@ -75,7 +70,22 @@ const StyledLink = styled.a.attrs(props => {
       white-space: nowrap;
       overflow: hidden;
     `}
+
+  &:hover {
+    ${system({ hoverColor: { property: 'color', scale: 'colors' } })}
+
+    ${props =>
+      props.underlineOnHover &&
+      css`
+        text-decoration: underline;
+      `}
+  }
 `;
+
+StyledLink.defaultProps = {
+  color: 'colors.primary.500',
+  hoverColor: 'colors.primary.400',
+};
 
 StyledLink.propTypes = {
   /**
@@ -91,6 +101,11 @@ StyledLink.propTypes = {
    * See lib/theme/colors.js for the list of theme colors
    */
   color: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  /**
+   * styled-system prop: accepts any css 'color' value or theme alias
+   * See lib/theme/colors.js for the list of theme colors
+   */
+  hoverColor: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'display' value */
   display: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'font-size' value */
@@ -109,12 +124,14 @@ StyledLink.propTypes = {
   textDecoration: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** Disable the link, make it unclickable */
   disabled: PropTypes.bool,
-  /** Wether text should be truncated if too long */
+  /** Whether text should be truncated if too long */
   truncateOverflow: PropTypes.bool,
   /** If true, the link will open in a new tab when clicked */
   openInNewTab: PropTypes.bool,
   /** If true, the link will open in a new tab and also adds rel=nofollow */
   openInNewTabNoFollow: PropTypes.bool,
+  /** Whether to underline the link on hover */
+  underlineOnHover: PropTypes.bool,
 };
 
 /** @component */

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -70,6 +71,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, accou
                 canEdit={isAdmin && !editingContributionId}
                 onEdit={() => setEditingContributionId(contribution.id)}
                 onCloseEdit={() => setEditingContributionId(null)}
+                showPaymentMethod={isAdmin}
                 data-cy="recurring-contribution-card"
               />
             </CollectiveCardContainer>
@@ -77,7 +79,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, accou
         </Grid>
       ) : (
         <Flex flexDirection="column" alignItems="center" py={4}>
-          <img src={EmptyCollectivesSectionImageSVG} alt="" />
+          <Image src={EmptyCollectivesSectionImageSVG} alt="" width={309} height={200} />
           <P color="black.600" fontSize="16px" mt={5}>
             <FormattedMessage
               id="RecurringContributions.none"

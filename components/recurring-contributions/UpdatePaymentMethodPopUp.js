@@ -1,10 +1,10 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
+import { CardElement } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import themeGet from '@styled-system/theme-get';
 import { first, get, merge, pick, uniqBy } from 'lodash';
-import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -61,8 +61,8 @@ const paymentMethodFragment = gqlV2/* GraphQL */ `
 `;
 
 const paymentMethodsQuery = gqlV2/* GraphQL */ `
-  query UpdatePaymentMethodPopUpPaymentMethod($slug: String!, $orderId: String!) {
-    account(slug: $slug) {
+  query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
+    account(id: $accountId) {
       id
       paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
         ...UpdatePaymentMethodFragment
@@ -230,7 +230,7 @@ const useUpdatePaymentMethod = contribution => {
   };
 };
 
-const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, router, loadStripe, account }) => {
+const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, account }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
 
@@ -239,6 +239,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loadingSelectedPaymentMethod, setLoadingSelectedPaymentMethod] = useState(true);
   const [stripe, setStripe] = useState(null);
+  const [stripeElements, setStripeElements] = useState(null);
   const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
   const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
   const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
@@ -246,7 +247,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
 
   // GraphQL mutations and queries
   const { data, refetch } = useQuery(paymentMethodsQuery, {
-    variables: { slug: router.query.slug, orderId: contribution.id },
+    variables: { accountId: account.id, orderId: contribution.id },
     context: API_V2_CONTEXT,
     fetchPolicy: 'network-only',
   });
@@ -361,7 +362,10 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
             order={contribution}
             isSubmitting={isSubmitting}
             setNewPaymentMethodInfo={setNewPaymentMethodInfo}
-            onStripeReady={({ stripe }) => setStripe(stripe)}
+            onStripeReady={({ stripe, stripeElements }) => {
+              setStripe(stripe);
+              setStripeElements(stripeElements);
+            }}
             onPaypalSuccess={async paypalPaymentMethod => {
               await updatePaymentMethod(paypalPaymentMethod);
               onCloseEdit();
@@ -415,8 +419,8 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
               buttonSize="tiny"
               minWidth={75}
               onClick={() => {
-                setShowAddPaymentMethod(false);
                 setNewPaymentMethodInfo(null);
+                onCloseEdit();
               }}
             >
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
@@ -445,7 +449,8 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
                   setAddingPaymentMethod(false);
                   return false;
                 }
-                const { token, error } = await stripe.createToken();
+                const cardElement = stripeElements.getElement(CardElement);
+                const { token, error } = await stripe.createToken(cardElement);
 
                 if (error) {
                   addToast({ type: TOAST_TYPE.ERROR, message: error.message });
@@ -475,13 +480,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
           </Fragment>
         ) : (
           <Fragment>
-            <StyledButton
-              buttonSize="tiny"
-              minWidth={75}
-              onClick={() => {
-                setMenuState('mainMenu');
-              }}
-            >
+            <StyledButton buttonSize="tiny" minWidth={75} onClick={onCloseEdit}>
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
             <StyledButton
@@ -504,12 +503,10 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, rou
 
 UpdatePaymentMethodPopUp.propTypes = {
   data: PropTypes.object,
-  setMenuState: PropTypes.func,
-  router: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
   onCloseEdit: PropTypes.func,
   loadStripe: PropTypes.func.isRequired,
   account: PropTypes.object.isRequired,
 };
 
-export default withStripeLoader(withRouter(UpdatePaymentMethodPopUp));
+export default withStripeLoader(UpdatePaymentMethodPopUp);

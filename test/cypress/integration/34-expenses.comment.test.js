@@ -53,6 +53,7 @@ describe('New Expense Flow comments', () => {
     cy.login({ redirect: expenseUrl, email: user.email });
     cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
     cy.get('@editor').type('Add emojis here ⬇️⬇️⬇️');
+    cy.wait(2000);
     cy.getByDataCy('submit-comment-btn').click();
     cy.getByDataCy('comment-reaction-picker-trigger').click();
     cy.contains('[data-cy="comment-reaction-picker-popper"] button', '👍️').click({ force: true });

@@ -1,20 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { partition } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { isPastEvent } from '../../../lib/events';
+import { sortEvents } from '../../../lib/events';
 
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeEvent from '../../contribute-cards/ContributeEvent';
 import CreateNew from '../../contribute-cards/CreateNew';
-import { Box, Flex } from '../../Grid';
+import { Box } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
-import { H3 } from '../../Text';
+import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 
@@ -35,9 +34,7 @@ class SectionEvents extends React.PureComponent {
     isAdmin: PropTypes.bool.isRequired,
   };
 
-  triageEvents = memoizeOne(events => {
-    return partition(events, isPastEvent);
-  });
+  sortEvents = memoizeOne(sortEvents);
 
   getContributeCardsScrollDistance = width => {
     const oneCardScrollDistance = CONTRIBUTE_CARD_WIDTH + CONTRIBUTE_CARD_PADDING_X[0] * 2;
@@ -53,63 +50,57 @@ class SectionEvents extends React.PureComponent {
   render() {
     const { collective, events, isAdmin } = this.props;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
-    const [pastEvents, upcomingEvents] = this.triageEvents(events);
 
     if (!events?.length && !isAdmin) {
       return null;
     }
 
     return (
-      <Box pb={4}>
-        <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-          {(ref, Chevrons) => (
-            <div>
-              <ContainerSectionContent pb={3}>
-                <Flex justifyContent="space-between" alignItems="center">
-                  <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
-                    <FormattedMessage id="Events" defaultMessage="Events" />
-                  </H3>
-                  <Box m={2} flex="0 0 50px">
-                    <Chevrons />
-                  </Box>
-                </Flex>
-              </ContainerSectionContent>
-
-              <ContributeCardsContainer ref={ref}>
-                {isAdmin && (
-                  <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
-                    <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
-                      <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
-                    </CreateNew>
-                  </Box>
-                )}
-                {upcomingEvents.map(event => (
-                  <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                    <ContributeEvent
-                      collective={collective}
-                      event={event}
-                      hideContributors={hasNoContributorForEvents}
-                      disableCTA={!collective.isActive || !event.isActive}
-                    />
-                  </Box>
-                ))}
-                {pastEvents.map(event => (
-                  <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                    <ContributeEvent
-                      collective={collective}
-                      event={event}
-                      hideContributors={hasNoContributorForEvents}
-                      disableCTA={!collective.isActive || !event.isActive}
-                    />
-                  </Box>
-                ))}
-              </ContributeCardsContainer>
-            </div>
+      <Box pb={4} mt={2}>
+        <ContainerSectionContent>
+          <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700" mb={2}>
+            <FormattedMessage id="Events" defaultMessage="Events" />
+          </H3>
+          <P color="black.700" mb={4}>
+            {isAdmin ? (
+              <FormattedMessage
+                id="CollectivePage.SectionEvents.AdminDescription"
+                defaultMessage="Set up events for your community and sell tickets that go straight to your budget."
+              />
+            ) : (
+              <FormattedMessage
+                id="CollectivePage.SectionEvents.Description"
+                defaultMessage="{collectiveName} is hosting the following events."
+                values={{ collectiveName: collective.name }}
+              />
+            )}
+          </P>
+        </ContainerSectionContent>
+        <HorizontalScroller
+          container={ContributeCardsContainer}
+          getScrollDistance={this.getContributeCardsScrollDistance}
+        >
+          {this.sortEvents(events).map(event => (
+            <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+              <ContributeEvent
+                collective={collective}
+                event={event}
+                hideContributors={hasNoContributorForEvents}
+                disableCTA={!collective.isActive || !event.isActive}
+              />
+            </Box>
+          ))}
+          {isAdmin && (
+            <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
+              <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
+                <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+              </CreateNew>
+            </Box>
           )}
         </HorizontalScroller>
-        {Boolean(events?.length) && (
+        {Boolean(events?.length > 6) && (
           <ContainerSectionContent>
-            <Link href={`/${collective.slug}/contribute`}>
+            <Link href={`/${collective.slug}/events`}>
               <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
                 <FormattedMessage id="CollectivePage.SectionEvents.ViewAll" defaultMessage="View all events" /> →
               </StyledButton>

@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { pick } from 'lodash';
-import { useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
-import { formatErrorMessage } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
@@ -26,12 +25,9 @@ const expenseModalQuery = gqlV2/* GraphQL */ `
 `;
 
 const ExpenseModal = ({ expense, onDelete, onProcess, onClose, show }) => {
-  const intl = useIntl();
-  const [error, setError] = React.useState(null);
   const { data, loading } = useQuery(expenseModalQuery, {
     variables: { legacyExpenseId: expense.legacyId },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
   });
 
   return (
@@ -46,15 +42,21 @@ const ExpenseModal = ({ expense, onDelete, onProcess, onClose, show }) => {
       trapFocus={!loading}
     >
       <ModalBody maxHeight="calc(80vh - 80px)" overflowY="auto" mb={80} p={20}>
-        <ExpenseSummary
-          isLoading={loading || !data}
-          expense={!loading ? data?.expense : null}
-          host={!loading ? data?.expense?.account?.host : null}
-          collective={!loading ? data?.expense?.account : null}
-          onDelete={onDelete}
-          onClose={onClose}
-          borderless
-        />
+        {loading || data?.expense ? (
+          <ExpenseSummary
+            isLoading={loading || !data}
+            expense={!loading ? data?.expense : null}
+            host={!loading ? data?.expense?.account?.host : null}
+            collective={!loading ? data?.expense?.account : null}
+            onDelete={onDelete}
+            onClose={onClose}
+            borderless
+          />
+        ) : (
+          <MessageBox type="warning" withIcon>
+            <FormattedMessage id="Expense.NotFound" defaultMessage="This expense doesn't exist or has been removed" />
+          </MessageBox>
+        )}
       </ModalBody>
       <ModalFooter
         position="absolute"
@@ -65,13 +67,6 @@ const ExpenseModal = ({ expense, onDelete, onProcess, onClose, show }) => {
         dividerMargin="0"
         minHeight={80}
       >
-        {error && (
-          <Box p={2}>
-            <MessageBox flex="1 0 100%" type="error" withIcon>
-              {formatErrorMessage(intl, error)}
-            </MessageBox>
-          </Box>
-        )}
         {data?.expense && (
           <Flex p={3} justifyContent="space-between" alignItems="flex-end">
             <Box display={['none', 'flex']}>
@@ -96,8 +91,6 @@ const ExpenseModal = ({ expense, onDelete, onProcess, onClose, show }) => {
                 host={data.expense.account.host}
                 permissions={data.expense.permissions}
                 buttonProps={{ buttonSize: 'small', minWidth: 130, m: 1, py: 11 }}
-                showError={false}
-                onError={setError}
                 onSuccess={onProcess}
               />
             </Flex>

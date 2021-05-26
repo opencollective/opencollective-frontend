@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
+import { CardElement } from '@stripe/react-stripe-js';
 import { find, get, intersection, isEmpty, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
@@ -18,7 +19,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
+import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { objectToQueryString } from '../../lib/url_helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
 
@@ -43,7 +44,7 @@ import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
-import { BRAINTREE_KEY, getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
+import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -117,7 +118,7 @@ class ContributionFlow extends React.Component {
     this.state = {
       error: null,
       stripe: null,
-      braintree: null,
+      stripeElements: null,
       isSubmitted: false,
       isSubmitting: false,
       stepProfile: null,
@@ -126,7 +127,7 @@ class ContributionFlow extends React.Component {
       showSignIn: false,
       stepDetails: {
         quantity: 1,
-        interval: props.fixedInterval || props.tier?.interval,
+        interval: props.fixedInterval || getDefaultInterval(props.tier),
         amount: props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
       },
@@ -253,27 +254,15 @@ class ContributionFlow extends React.Component {
   };
 
   getPaymentMethod = async () => {
-    const { stepPayment, stripe } = this.state;
+    const { stepPayment, stripe, stripeElements } = this.state;
 
-    if (stepPayment?.key === BRAINTREE_KEY) {
-      return new Promise((resolve, reject) => {
-        this.state.braintree.requestPaymentMethod((requestPaymentMethodErr, payload) => {
-          if (requestPaymentMethodErr) {
-            reject(requestPaymentMethodErr);
-          } else {
-            return resolve({
-              type: 'BRAINTREE_PAYPAL',
-              braintreeInfo: payload, // TODO(Braintree): Should be sanitized so new keys don't break the mutation
-            });
-          }
-        });
-      });
-    } else if (!stepPayment?.paymentMethod) {
+    if (!stepPayment?.paymentMethod) {
       return null;
     } else if (stepPayment.paymentMethod.id) {
       return pick(stepPayment.paymentMethod, ['id']);
     } else if (stepPayment.key === NEW_CREDIT_CARD_KEY) {
-      const { token } = await stripe.createToken();
+      const cardElement = stripeElements.getElement(CardElement);
+      const { token } = await stripe.createToken(cardElement);
       const pm = stripeTokenToPaymentMethod(token);
       return {
         name: pm.name,
@@ -394,7 +383,6 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
-        'hasNewPaypal',
       ]),
       ...queryParams,
     };
@@ -681,8 +669,7 @@ class ContributionFlow extends React.Component {
                     onChange={data => this.setState(data)}
                     step={currentStep}
                     showFeesOnTop={this.canHaveFeesOnTop()}
-                    onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
-                    setBraintree={braintree => this.setState({ braintree })}
+                    onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     defaultProfileSlug={this.props.contributeAs}
                     defaultEmail={this.props.defaultEmail}
                     defaultName={this.props.defaultName}
@@ -690,6 +677,7 @@ class ContributionFlow extends React.Component {
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
                     hasNewPaypal={this.props.hasNewPaypal}
+                    isSubmitting={isValidating || isSubmitted || isSubmitting}
                   />
 
                   <Box mt={40}>
@@ -700,10 +688,9 @@ class ContributionFlow extends React.Component {
                       prevStep={prevStep}
                       nextStep={nextStep}
                       isValidating={isValidating || isSubmitted || isSubmitting}
-                      paypalButtonProps={this.getPaypalButtonProps({ currency })}
+                      paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
-                      disableNext={stepPayment?.key === 'braintree' && !stepPayment.isReady}
                       hasNewPaypal={this.props.hasNewPaypal}
                     />
                   </Box>

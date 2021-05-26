@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
+import NextIllustration from '../home/HomeNextIllustration';
 import I18nFormatters, { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -17,9 +17,11 @@ const AboutOurFees = () => (
   <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
     <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center" mb={[null, 3]}>
       <Box width={'160px'} height={'160px'} mb="24px">
-        <Illustration
+        <NextIllustration
           alt="About our fees illustration"
           src="/static/images/ocf-host-application/aboutOurFees-illustration.png"
+          width={160}
+          height={160}
         />
       </Box>
       <Box textAlign={['center', 'left']} width={['288px', '404px']} mb={4} ml={[null, '24px']}>

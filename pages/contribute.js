@@ -7,6 +7,9 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { TierTypes } from '../lib/constants/tiers-types';
+import { sortEvents } from '../lib/events';
+import { sortTiersForCollective } from '../lib/tier-utils';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -18,26 +21,43 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-c
 import ContributeCollective from '../components/contribute-cards/ContributeCollective';
 import ContributeCustom from '../components/contribute-cards/ContributeCustom';
 import ContributeEvent from '../components/contribute-cards/ContributeEvent';
+import ContributeProject from '../components/contribute-cards/ContributeProject';
 import ContributeTier from '../components/contribute-cards/ContributeTier';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
+import { Box, Grid } from '../components/Grid';
 import Header from '../components/Header';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import StyledButton from '../components/StyledButton';
 import { H2, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-const ContributeCardContainer = styled.div`
-  margin: 0 20px 20px 0;
+const CardsContainer = styled(Grid).attrs({
+  gridGap: '30px',
+  justifyContent: ['center', 'space-between'],
+  gridTemplateColumns: [
+    'minmax(280px, 400px)',
+    'repeat(2, minmax(280px, 350px))',
+    'repeat(3, minmax(240px, 350px))',
+    'repeat(3, minmax(280px, 350px))',
+    'repeat(4, 280px)',
+  ],
+})`
+  & > * {
+    width: 100%;
+  }
 `;
 
 class TiersPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug } }) {
-    return { slug: collectiveSlug };
+  static getInitialProps({ query: { collectiveSlug, verb } }) {
+    return { slug: collectiveSlug, verb };
   }
 
   static propTypes = {
     slug: PropTypes.string, // from getInitialProps, for addContributePageData
+    verb: PropTypes.string, // from getInitialProps
     query: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
@@ -64,18 +84,165 @@ class TiersPage extends React.Component {
     }
   }
 
+  getWaysToContribute = memoizeOne((collective, verb) => {
+    if (!collective) {
+      return [];
+    }
+
+    const waysToContribute = [];
+    const canContribute = collective.isActive && collective.host;
+    const hasContributors = this.hasContributors(collective.contributors, collective.events);
+    const showAll = verb === 'contribute';
+
+    // Financial contributions
+    if ((showAll || verb === 'tiers') && canContribute) {
+      // Tiers + custom contribution
+      const sortedTiers = sortTiersForCollective(collective, collective.tiers);
+      sortedTiers.forEach(tier => {
+        if (tier === 'custom') {
+          waysToContribute.push({
+            ContributeCardComponent: ContributeCustom,
+            key: 'contribute-tier-custom',
+            props: {
+              hideContributors: !hasContributors,
+              collective: collective,
+              contributors: this.getFinancialContributorsWithoutTier(collective.contributors),
+              stats: collective.stats.backers,
+            },
+          });
+        } else {
+          waysToContribute.push({
+            ContributeCardComponent: ContributeTier,
+            key: `tier-${tier.id}`,
+            props: {
+              collective: collective,
+              tier: tier,
+              hideContributors: !hasContributors,
+              'data-cy': 'contribute-tier',
+            },
+          });
+        }
+      });
+
+      // Tickets
+      const tickets = collective.tiers?.filter(t => t.type === TierTypes.TICKET);
+      tickets?.forEach(ticket => {
+        waysToContribute.push({
+          ContributeCardComponent: ContributeTier,
+          key: `ticket-${ticket.id}`,
+          props: {
+            collective: collective,
+            tier: ticket,
+            hideContributors: !hasContributors,
+            'data-cy': 'contribute-ticket',
+          },
+        });
+      });
+    }
+
+    // Projects
+    if (showAll || verb === 'projects') {
+      collective.projects?.forEach(project => {
+        waysToContribute.push({
+          ContributeCardComponent: ContributeProject,
+          key: `project-${project.id}`,
+          props: {
+            collective: collective,
+            project: project,
+            disableCTA: !project.isActive,
+            hideContributors: !hasContributors,
+          },
+        });
+      });
+    }
+
+    // Events
+    if (showAll || verb === 'events') {
+      sortEvents(collective.events).forEach(event => {
+        waysToContribute.push({
+          ContributeCardComponent: ContributeEvent,
+          key: `event-${event.id}`,
+          props: {
+            collective: collective,
+            event: event,
+            hideContributors: !hasContributors,
+          },
+        });
+      });
+    }
+
+    // Connected collectives
+    if (showAll || verb === 'connected-collectives') {
+      collective.connectedCollectives?.forEach(connectedCollectiveMember => {
+        waysToContribute.push({
+          ContributeCardComponent: ContributeCollective,
+          key: `connected-collective-${connectedCollectiveMember.id}`,
+          props: {
+            collective: connectedCollectiveMember.collective,
+          },
+        });
+      });
+    }
+
+    return waysToContribute;
+  });
+
+  getTitle(verb, collectiveName) {
+    switch (verb) {
+      case 'events':
+        return {
+          title: (
+            <FormattedMessage
+              id="CollectiveEvents"
+              defaultMessage="{collectiveName}'s events"
+              values={{ collectiveName }}
+            />
+          ),
+        };
+      case 'projects':
+        return {
+          title: (
+            <FormattedMessage
+              id="CollectiveProjects"
+              defaultMessage="{collectiveName}'s projects"
+              values={{ collectiveName }}
+            />
+          ),
+        };
+      case 'connected-collectives':
+        return {
+          title: (
+            <FormattedMessage
+              id="CollectiveConnectedCollectives"
+              defaultMessage="{collectiveName}'s connected collectives"
+              values={{ collectiveName }}
+            />
+          ),
+        };
+      default:
+        return {
+          title: <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />,
+          subtitle: (
+            <FormattedMessage
+              id="ContributePage.Description"
+              defaultMessage="These are all the ways you can help make our community sustainable. "
+            />
+          ),
+        };
+    }
+  }
+
   render() {
-    const { LoggedInUser, data = {} } = this.props;
+    const { LoggedInUser, data = {}, verb, slug } = this.props;
 
     if (!data || !data.Collective) {
       return <ErrorPage data={data} />;
     }
 
     const collective = data.Collective;
-    const canContribute = collective.isActive && collective.host;
-    const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(collective.contributors);
-    const hasContributors = this.hasContributors(collective.contributors, collective.events);
-
+    const collectiveName = collective?.name || slug;
+    const waysToContribute = this.getWaysToContribute(collective, verb);
+    const { title, subtitle } = this.getTitle(verb, collectiveName);
     return (
       <div>
         <Header LoggedInUser={LoggedInUser} {...this.getPageMetadata(collective)} />
@@ -91,55 +258,45 @@ class TiersPage extends React.Component {
                   selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE}
                 />
                 <Container maxWidth={1260} my={5} px={[15, 30]} mx="auto">
-                  <H2 fontWeight="normal" my={4}>
-                    <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />
-                  </H2>
-                  <P color="black.700" mb={4}>
-                    <FormattedMessage
-                      id="ContributePage.Description"
-                      defaultMessage="These are all the ways you can help make our community sustainable. "
-                    />
-                  </P>
-                  {canContribute ? (
-                    <Container display="flex" flexWrap="wrap">
-                      {!collective.settings.disableCustomContributions && (
-                        <ContributeCardContainer>
-                          <ContributeCustom
-                            hideContributors={!hasContributors}
-                            collective={collective}
-                            contributors={financialContributorsWithoutTier}
-                            stats={collective.stats.backers}
+                  <Box my={5}>
+                    <H2 fontWeight="normal">{title}</H2>
+                    {subtitle && (
+                      <P color="black.700" mt={3}>
+                        {subtitle}
+                      </P>
+                    )}
+                    {waysToContribute.length > 0 && (
+                      <Link href={`/${slug}`}>
+                        <StyledButton buttonSize="small" mt={3}>
+                          ←&nbsp;
+                          <FormattedMessage
+                            id="goBackToCollectivePage"
+                            defaultMessage="Go back to {name}'s page"
+                            values={{ name: collectiveName }}
                           />
-                        </ContributeCardContainer>
-                      )}
-
-                      {collective.tiers.map(tier => (
-                        <ContributeCardContainer key={`tier-${tier.id}`} data-cy="contribute-tier">
-                          <ContributeTier collective={collective} tier={tier} hideContributors={!hasContributors} />
-                        </ContributeCardContainer>
+                        </StyledButton>
+                      </Link>
+                    )}
+                  </Box>
+                  {waysToContribute.length > 0 ? (
+                    <CardsContainer>
+                      {waysToContribute.map(({ ContributeCardComponent, key, props }) => (
+                        <ContributeCardComponent key={key} {...props} />
                       ))}
-
-                      {collective.connectedCollectives.map(member => {
-                        const childCollective = member.collective;
-                        return (
-                          <ContributeCardContainer key={member.id}>
-                            <ContributeCollective collective={childCollective} />
-                          </ContributeCardContainer>
-                        );
-                      })}
-
-                      {collective.events.map(event => (
-                        <ContributeCardContainer key={`event-${event.id}`}>
-                          <ContributeEvent collective={collective} event={event} hideContributors={!hasContributors} />
-                        </ContributeCardContainer>
-                      ))}
-                    </Container>
+                    </CardsContainer>
                   ) : (
                     <MessageBox type="info" withIcon>
                       <FormattedMessage
-                        id="ContributePage.Inactive"
-                        defaultMessage="This collective can't accept financial contributions at the moment."
-                      />
+                        id="contribute.empty"
+                        defaultMessage="There's nothing to display here at the moment."
+                      />{' '}
+                      <Link href={`/${slug}`}>
+                        <FormattedMessage
+                          id="goBackToCollectivePage"
+                          defaultMessage="Go back to {name}'s page"
+                          values={{ name: collectiveName }}
+                        />
+                      </Link>
                     </MessageBox>
                   )}
                 </Container>
@@ -260,6 +417,31 @@ const contributePageQuery = gql`
           image
           collectiveSlug
           name
+          type
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
+      }
+      projects {
+        id
+        slug
+        name
+        description
+        image
+        isActive
+        backgroundImageUrl(height: 208)
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
+          id
+          name
+          image
+          collectiveSlug
           type
         }
         stats {
