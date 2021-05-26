@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -8,6 +7,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 
 import Container from '../Container';
 import { Flex, Grid } from '../Grid';
+import Image from '../Image';
 import { fadeIn } from '../StyledKeyframes';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';

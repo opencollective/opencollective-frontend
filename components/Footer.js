@@ -6,7 +6,6 @@ import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/octicons/Mail';
 import { truncate } from 'lodash';
-import Image from 'next/image';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -15,6 +14,7 @@ import languages from '../lib/constants/locales';
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Image from './Image';
 import Link from './Link';
 import ListItem from './ListItem';
 import StyledLink from './StyledLink';

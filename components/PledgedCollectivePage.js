@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
-import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex, Grid } from './Grid';
 import I18nFormatters from './I18nFormatters';
+import Image from './Image';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';

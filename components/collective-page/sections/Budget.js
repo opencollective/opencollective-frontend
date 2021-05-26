@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
-import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -13,6 +12,7 @@ import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
 import Container from '../../Container';
 import { expensesListFieldsFragment } from '../../expenses/graphql/fragments';
 import { Box, Flex } from '../../Grid';
+import Image from '../../Image';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledCard from '../../StyledCard';

@@ -12,11 +12,12 @@ const COMMON_DIRECTIVES = {
   imgSrc: [
     SELF,
     process.env.IMAGES_URL,
+    process.env.NEXT_IMAGES_URL,
     'data:',
     '*.paypal.com',
     'opencollective.com', // for widgets on /edit/export
     'blob:', // For upload images previews
-  ],
+  ].filter(Boolean),
   workerSrc: [
     SELF,
     'blob:', // For confettis worker. TODO: Limit for nonce
