@@ -673,7 +673,7 @@
   "createProject.create": "Create a Project",
   "createProject.form.descriptionLabel": "What's the purpose of your Project?",
   "createProject.form.nameLabel": "Project name",
-  "CreditCard": "Targeta de crèdit",
+  "CreditCard": "Credit Card",
   "Currency": "Currency",
   "currency": "divisa",
   "Date.BeforeShort": "Before {date, date, short}",
