@@ -55,7 +55,10 @@ const messages = defineMessages({
 });
 
 const groupHostsIntoSections = hosts =>
-  hosts.reduce((rows, key, index) => (index % 3 == 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows, []);
+  hosts.reduce(
+    (rows, key, index) => (index % 3 === 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows,
+    [],
+  );
 
 const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
   const intl = useIntl();
