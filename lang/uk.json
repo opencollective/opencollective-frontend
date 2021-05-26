@@ -69,7 +69,7 @@
   "AddFundsModal.PlatformFee": "Platform fee",
   "AddFundsModal.platformFees": "Platform fees ({platformFees})",
   "AddFundsModal.platformTipInfo": "Since you are not charging a host fee to the collective, Open Collective is free to use. We rely on your generosity to keep this possible!",
-  "AddFundsModal.source": "Source",
+  "AddFundsModal.source": "Джерело",
   "AddFundsModal.SubHeading": "Add Funds to the Collective",
   "AddFundsModal.Success": "Platform tip successfully added",
   "AddFundsModal.thankYou": "Thank you for supporting us. Platform tip will be deducted from the host budget:",
