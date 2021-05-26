@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { Box, Flex, Grid } from '../../Grid';
+import { getI18nLink } from '../../I18nFormatters';
 import InputField from '../../InputField';
 import Loading from '../../Loading';
 import Pagination from '../../Pagination';
@@ -331,7 +332,13 @@ const HostVirtualCards = props => {
         <P>
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
-            defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier!"
+            defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier! <learnMoreLink>Learn more</learnMoreLink>"
+            values={{
+              learnMoreLink: getI18nLink({
+                href: 'https://docs.opencollective.com/help/fiscal-hosts/virtual-cards',
+                openInNewTabNoFollow: true,
+              }),
+            }}
           />
         </P>
         <Flex mt={3} flexDirection={['row', 'column']}>
