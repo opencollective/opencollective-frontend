@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import Image from 'next/image';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -9,6 +8,7 @@ import StyledTag from '../../components/StyledTag';
 import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H1, H2, H3, P } from '../Text';

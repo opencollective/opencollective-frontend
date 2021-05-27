@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
-import Image from 'next/image';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -20,6 +19,7 @@ import Modal, { ModalBody, ModalFooter, ModalHeader, ModalOverlay } from '../../
 import { H1, P } from '../../components/Text';
 
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 
 import OnboardingContentBox from './OnboardingContentBox';
 import OnboardingNavButtons from './OnboardingNavButtons';

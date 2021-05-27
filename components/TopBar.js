@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
-import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -11,6 +10,7 @@ import theme from '../lib/theme';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
+import Image from './Image';
 import Link from './Link';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
