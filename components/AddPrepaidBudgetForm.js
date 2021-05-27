@@ -15,8 +15,8 @@ import InputField from './InputField';
 import StyledButton from './StyledButton';
 import { H2, Strong } from './Text';
 
-const addFundsHostQuery = gql`
-  query AddFundsHost($CollectiveId: Int) {
+const addPrepaidBudgetHostFeePercentQuery = gql`
+  query AddPrepaidBudgetHostFeePercent($CollectiveId: Int) {
     Collective(id: $CollectiveId) {
       id
       hostFeePercent
@@ -38,7 +38,7 @@ const TableContainer = styled.table`
   }
 `;
 
-class AddFundsForm extends React.Component {
+class AddPrepaidBudgetForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     host: PropTypes.object,
@@ -137,7 +137,7 @@ class AddFundsForm extends React.Component {
   retrieveHostFeePercent = async CollectiveId => {
     try {
       const result = await this.props.client.query({
-        query: addFundsHostQuery,
+        query: addPrepaidBudgetHostFeePercentQuery,
         variables: { CollectiveId },
       });
       const { hostFeePercent } = result.data.Collective;
@@ -295,4 +295,4 @@ class AddFundsForm extends React.Component {
   }
 }
 
-export default injectIntl(withApollo(AddFundsForm));
+export default injectIntl(withApollo(AddPrepaidBudgetForm));
