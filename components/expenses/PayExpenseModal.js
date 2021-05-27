@@ -33,6 +33,8 @@ const getPayoutLabel = (intl, type) => {
 const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return { forceManual: true, action: 'PAY' };
+  } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
+    return { forceManual: true, action: 'PAY' };
   } else if (!isAuto) {
     return { forceManual: true, action: 'PAY' };
   } else {
@@ -113,6 +115,9 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const formik = useFormik({ initialValues, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
+  const hasBankInfoWithoutWise = host => {
+    return payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
+  };
 
   return (
     <StyledModal
@@ -145,6 +150,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             mt={3}
             selected={formik.values.forceManual ? 'MANUAL' : 'AUTO'}
             customBorderRadius="6px"
+            disabled={hasBankInfoWithoutWise(host)}
             onChange={item => {
               formik.setValues({
                 ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
@@ -267,21 +273,24 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             )}
           </StyledInputField>
         )}
-        {!error && formik.values.forceManual && payoutMethodType !== PayoutMethodType.OTHER && (
-          <MessageBox type="warning" withIcon my={3} fontSize="12px">
-            <strong>
-              <FormattedMessage id="Warning.Important" defaultMessage="Important" />
-            </strong>
-            <br />
-            <P mt={2} fontSize="12px" lineHeight="18px">
-              <FormattedMessage
-                id="PayExpenseModal.ManualPayoutWarning"
-                defaultMessage="By clicking below, you acknowledge that this expense has already been paid via {payoutMethod}."
-                values={{ payoutMethod: payoutMethodLabel }}
-              />
-            </P>
-          </MessageBox>
-        )}
+        {!error &&
+          formik.values.forceManual &&
+          payoutMethodType !== PayoutMethodType.OTHER &&
+          !hasBankInfoWithoutWise(host) && (
+            <MessageBox type="warning" withIcon my={3} fontSize="12px">
+              <strong>
+                <FormattedMessage id="Warning.Important" defaultMessage="Important" />
+              </strong>
+              <br />
+              <P mt={2} fontSize="12px" lineHeight="18px">
+                <FormattedMessage
+                  id="PayExpenseModal.ManualPayoutWarning"
+                  defaultMessage="By clicking below, you acknowledge that this expense has already been paid via {payoutMethod}."
+                  values={{ payoutMethod: payoutMethodLabel }}
+                />
+              </P>
+            </MessageBox>
+          )}
         <Flex flexWrap="wrap" justifyContent="space-evenly">
           <StyledButton
             buttonStyle="success"
@@ -329,6 +338,7 @@ PayExpenseModal.propTypes = {
   host: PropTypes.shape({
     plan: PropTypes.object,
     slug: PropTypes.string,
+    transferwise: PropTypes.object,
   }),
   onClose: PropTypes.func.isRequired,
   /** Function called when users click on one of the "Pay" buttons */

@@ -21,6 +21,8 @@ import { P } from '../Text';
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
 
+const { TW_API_COLLECTIVE_SLUG } = process.env;
+
 export const msg = defineMessages({
   currency: {
     id: 'Currency',
@@ -329,8 +331,8 @@ const availableCurrenciesQuery = gqlV2/* GraphQL */ `
 const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: host.slug, ignoreBlockedCurrencies },
-    // Skip fetching/loading if the currency is fixed or avaialbleCurrencies was pre-loaded
+    variables: { slug: host?.transferwise ? host.slug : TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
+    // Skip fetching/loading if the currency is fixed or availableCurrencies was pre-loaded
     skip: Boolean(fixedCurrency || host.transferwise?.availableCurrencies),
   });
   const formik = useFormikContext();
