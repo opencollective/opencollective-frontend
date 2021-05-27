@@ -142,13 +142,6 @@ const nextConfig = {
                 value: 'all',
               },
             ],
-            has: [
-              {
-                type: 'header',
-                key: 'host',
-                value: 'next-images.opencollective.com',
-              },
-            ],
           },
         ]
       : [];
