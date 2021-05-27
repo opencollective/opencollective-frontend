@@ -48,6 +48,8 @@ const msg = defineMessages({
   },
 });
 
+const tierHasFixedInterval = tier => tier?.interval && tier.interval !== 'flexible';
+
 /**
  * From received params, see if there's anything preventing the contribution
  */
@@ -70,7 +72,7 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.TIER_EXPIRED, type: 'warning', showOtherWaysToContribute: true };
   } else if (account.settings.disableCustomContributions && !tier) {
     return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
-  } else if (tier && tier.interval !== null && !canContributeRecurring(account, loggedInUser)) {
+  } else if (tierHasFixedInterval(tier) && !canContributeRecurring(account, loggedInUser)) {
     return {
       reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
       type: 'warning',
