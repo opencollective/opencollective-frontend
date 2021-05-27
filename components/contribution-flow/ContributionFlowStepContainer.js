@@ -121,7 +121,7 @@ class ContributionFlowStepContainer extends React.Component {
   }
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed, LoggedInUser } = this.props;
+    const { collective, mainState, tier, isEmbed } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
@@ -132,7 +132,6 @@ class ContributionFlowStepContainer extends React.Component {
             onChange={this.props.onChange}
             data={stepDetails}
             showFeesOnTop={this.props.showFeesOnTop}
-            LoggedInUser={LoggedInUser}
           />
         );
       case 'profile': {

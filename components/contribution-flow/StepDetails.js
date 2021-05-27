@@ -4,9 +4,8 @@ import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { hostIsTaxDeductibeInTheUs, isUserAdminOfCollectiveUnderSameHost } from '../../lib/collective.lib';
+import { canContributeRecurring, hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
-import { ProvidersWithRecurringPaymentSupport } from '../../lib/constants/payment-methods';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nInterval } from '../../lib/i18n/interval';
@@ -22,13 +21,14 @@ import StyledAmountPicker, { OTHER_AMOUNT_KEY } from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
+import { useUser } from '../UserProvider';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
 import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, LoggedInUser }) => {
+const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }) => {
   const intl = useIntl();
   const amount = data?.amount;
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
@@ -38,6 +38,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
   const minAmount = getTierMinAmount(tier);
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
+  const { LoggedInUser } = useUser();
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
@@ -51,36 +52,32 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
 
   return (
     <Box width={1}>
-      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) &&
-        (collective.host.supportedPaymentMethods.some(paymentMethod =>
-          ProvidersWithRecurringPaymentSupport.includes(paymentMethod),
-        ) ||
-          isUserAdminOfCollectiveUnderSameHost(LoggedInUser, collective)) && (
-          <StyledButtonSet
-            id="interval"
-            justifyContent="center"
-            mt={[4, 0]}
-            mb="30px"
-            items={[null, INTERVALS.month, INTERVALS.year]}
-            selected={selectedInterval || null}
-            buttonProps={{ px: 2, py: '5px' }}
-            role="group"
-            aria-label="Amount types"
-            onChange={interval => {
-              if (tier && tier.interval !== INTERVALS.flexible) {
-                setTemporaryInterval(interval);
-              } else {
-                dispatchChange('interval', interval);
-              }
-            }}
-          >
-            {({ item, isSelected }) => (
-              <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
-                {i18nInterval(intl, item || INTERVALS.oneTime)}
-              </Span>
-            )}
-          </StyledButtonSet>
-        )}
+      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && canContributeRecurring(collective, LoggedInUser) && (
+        <StyledButtonSet
+          id="interval"
+          justifyContent="center"
+          mt={[4, 0]}
+          mb="30px"
+          items={[null, INTERVALS.month, INTERVALS.year]}
+          selected={selectedInterval || null}
+          buttonProps={{ px: 2, py: '5px' }}
+          role="group"
+          aria-label="Amount types"
+          onChange={interval => {
+            if (tier && tier.interval !== INTERVALS.flexible) {
+              setTemporaryInterval(interval);
+            } else {
+              dispatchChange('interval', interval);
+            }
+          }}
+        >
+          {({ item, isSelected }) => (
+            <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
+              {i18nInterval(intl, item || INTERVALS.oneTime)}
+            </Span>
+          )}
+        </StyledButtonSet>
+      )}
 
       {!isFixedContribution ? (
         <Box mb="30px">

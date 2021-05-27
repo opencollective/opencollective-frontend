@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isUserAdminOfCollectiveUnderSameHost } from '../../lib/collective.lib';
-import { ProvidersWithRecurringPaymentSupport } from '../../lib/constants/payment-methods';
+import { canContributeRecurring } from '../../lib/collective.lib';
 import { isTierExpired } from '../../lib/tier-utils';
 
 import Container from '../Container';
@@ -71,14 +70,7 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.TIER_EXPIRED, type: 'warning', showOtherWaysToContribute: true };
   } else if (account.settings.disableCustomContributions && !tier) {
     return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
-  } else if (
-    tier &&
-    tier.interval !== null &&
-    !account.host.supportedPaymentMethods.some(paymentMethod =>
-      ProvidersWithRecurringPaymentSupport.includes(paymentMethod),
-    ) &&
-    !isUserAdminOfCollectiveUnderSameHost(loggedInUser, account)
-  ) {
+  } else if (tier && tier.interval !== null && !canContributeRecurring(account, loggedInUser)) {
     return {
       reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
       type: 'warning',
