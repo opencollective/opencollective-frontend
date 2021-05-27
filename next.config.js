@@ -20,6 +20,7 @@ const nextConfig = {
         PDF_SERVICE_URL: null,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
+        NEXT_IMAGES_URL: null,
         SENTRY_DSN: null,
         ONBOARDING_MODAL: true,
         NEW_HOST_APPLICATION_FLOW: null,
