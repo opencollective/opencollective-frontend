@@ -119,6 +119,39 @@ const nextConfig = {
   async rewrites() {
     return REWRITES;
   },
+  async headers() {
+    return process.env.IS_VERCEL === 'true'
+      ? [
+          // Prevent indexing of our Vercel deployments
+          {
+            source: '/(.*?)',
+            headers: [
+              {
+                key: 'x-robots-tag',
+                value: 'none',
+              },
+            ],
+          },
+          // Exception for "Next images", if on the configured domain
+          {
+            source: '/_next/image(.*?)',
+            headers: [
+              {
+                key: 'x-robots-tag',
+                value: 'all',
+              },
+            ],
+            has: [
+              {
+                type: 'header',
+                key: 'host',
+                value: 'next-images.opencollective.com',
+              },
+            ],
+          },
+        ]
+      : [];
+  },
 };
 
 module.exports = withSourceMaps(nextConfig);
