@@ -6,7 +6,7 @@ import { CardElement } from '@stripe/react-stripe-js';
 import { find, get, intersection, isEmpty, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
@@ -27,6 +27,7 @@ import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Container from '../Container';
 import ContributeFAQ from '../faqs/ContributeFAQ';
 import { Box, Grid } from '../Grid';
+import Link from '../Link';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import Steps from '../Steps';
@@ -694,7 +695,16 @@ class ContributionFlow extends React.Component {
                       hasNewPaypal={this.props.hasNewPaypal}
                     />
                   </Box>
+                  <Box textAlign="center" mt={5}>
+                    <Link href={`/${collective.slug}`}>
+                      <FormattedMessage
+                        id="ContributionFlow.backToCollectivePage"
+                        defaultMessage="Back to Collective Page"
+                      />
+                    </Link>
+                  </Box>
                 </Box>
+
                 <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
                   <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
                     <SafeTransactionMessage />
