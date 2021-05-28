@@ -50,7 +50,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
 
   return (
     <Box width={1}>
-      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && (
+      {(!tier || tier.interval === 'flexible') && (
         <StyledButtonSet
           id="interval"
           justifyContent="center"
