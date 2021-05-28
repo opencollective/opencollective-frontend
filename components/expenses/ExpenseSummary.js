@@ -191,8 +191,7 @@ const ExpenseSummary = ({
                       url={attachment.url}
                       isLoading={isLoading || isLoadingLoggedInUser}
                       isPrivate={!attachment.url && !isLoading}
-                      size={[640, 48]}
-                      maxHeight={48}
+                      size={48}
                     />
                   </Box>
                 )}
