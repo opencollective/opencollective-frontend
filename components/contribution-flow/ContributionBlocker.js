@@ -58,11 +58,6 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.NO_HOST };
   } else if (!account.isActive) {
     return { reason: CONTRIBUTION_BLOCKER.NOT_ACTIVE };
-  } else if (!account.host.supportedPaymentMethods?.length) {
-    return {
-      reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
-      content: hasPaymentMethodAvailable(loggedInUser, account),
-    };
   } else if (tier?.availableQuantity === 0) {
     const intlParams = { type: tier.type, name: <q>{tier.name}</q> };
     return { reason: CONTRIBUTION_BLOCKER.TIER_EMPTY, intlParams, showOtherWaysToContribute: true };
@@ -77,14 +72,14 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
       reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
       type: 'warning',
       showOtherWaysToContribute: true,
-      content: hasPaymentMethodAvailable(loggedInUser, account),
+      content: paymentMethodUnavailableWarning(loggedInUser, account),
     };
   } else {
     return null;
   }
 };
 
-const hasPaymentMethodAvailable = (loggedInUser, account) => {
+const paymentMethodUnavailableWarning = (loggedInUser, account) => {
   return (
     <React.Fragment>
       <strong>
