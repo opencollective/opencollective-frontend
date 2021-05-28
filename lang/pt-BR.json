@@ -1543,7 +1543,7 @@
   "Parameter": "Parâmetro",
   "PayExpense.ProcessorFeesInput": "Taxas do processador de pagamento",
   "PayExpenseModal.HostTwoFactorAuthEnabled": "Por favor vá para suas <SettingsLink>configurações</SettingsLink> para habilitar a autenticação em duas etapas para sua conta.",
-  "PayExpenseModal.ManualPayoutWarning": "Ao clicar abaixo, você reconhece que esta despesa já foi paga através de {payoutMethod}.",
+  "PayExpenseModal.ManualPayoutWarning": "By clicking below, you acknowledge that this expense has already been paid {payoutMethod}.",
   "PayExpenseModal.RefillBalanceError": "Reabasteça seu saldo do painel do Host",
   "PayExpenseModal.TwoFactorAuthCode": "Código de autenticação em duas etapas",
   "PayExpenseTitle": "Pagar despesa",
