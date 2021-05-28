@@ -270,7 +270,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             )}
           </StyledInputField>
         )}
-        {!error && formik.values.forceManual && payoutMethodType !== PayoutMethodType.OTHER && !hasBankInfoWithoutWise && (
+        {!error && formik.values.forceManual && payoutMethodType !== PayoutMethodType.OTHER && (
           <MessageBox type="warning" withIcon my={3} fontSize="12px">
             <strong>
               <FormattedMessage id="Warning.Important" defaultMessage="Important" />
@@ -279,8 +279,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             <P mt={2} fontSize="12px" lineHeight="18px">
               <FormattedMessage
                 id="PayExpenseModal.ManualPayoutWarning"
-                defaultMessage="By clicking below, you acknowledge that this expense has already been paid via {payoutMethod}."
-                values={{ payoutMethod: payoutMethodLabel }}
+                defaultMessage="By clicking below, you acknowledge that this expense has already been paid {payoutMethod}."
+                values={{ payoutMethod: hasBankInfoWithoutWise ? 'manually' : `via ${payoutMethodLabel}` }}
               />
             </P>
           </MessageBox>

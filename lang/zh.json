@@ -1543,7 +1543,7 @@
   "Parameter": "参数",
   "PayExpense.ProcessorFeesInput": "Payment processor fees",
   "PayExpenseModal.HostTwoFactorAuthEnabled": "Please go to your <SettingsLink>settings</SettingsLink> to enable two-factor authentication for your account.",
-  "PayExpenseModal.ManualPayoutWarning": "By clicking below, you acknowledge that this expense has already been paid via {payoutMethod}.",
+  "PayExpenseModal.ManualPayoutWarning": "By clicking below, you acknowledge that this expense has already been paid {payoutMethod}.",
   "PayExpenseModal.RefillBalanceError": "Refill your balance from the Host dashboard",
   "PayExpenseModal.TwoFactorAuthCode": "双因素认证码",
   "PayExpenseTitle": "支付费用",
