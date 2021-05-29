@@ -19,7 +19,7 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.contains('[data-cy="order-success"]', '$4,257.42 USD');
 
     // Open email
-    const expectedEmailSubject = 'Thank you for your $4,257/month contribution to APEX';
+    const expectedEmailSubject = 'Thank you for your $4,257.42/month contribution to APEX';
     cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
     cy.contains('If you need help with this contribution, please do not hesitate to contact');
   });
