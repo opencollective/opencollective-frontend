@@ -10,6 +10,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import Collapse from '../../../Collapse';
 import { Box, Flex, Grid } from '../../../Grid';
 import HTMLContent from '../../../HTMLContent';
+import { getI18nLink } from '../../../I18nFormatters';
 import Loading from '../../../Loading';
 import Pagination from '../../../Pagination';
 import { P } from '../../../Text';
@@ -129,7 +130,13 @@ const VirtualCards = props => {
         <P>
           <FormattedMessage
             id="VirtualCards.Description"
-            defaultMessage="Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them."
+            defaultMessage="Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them. <learnMoreLink>Learn more</learnMoreLink>"
+            values={{
+              learnMoreLink: getI18nLink({
+                href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                openInNewTabNoFollow: true,
+              }),
+            }}
           />
         </P>
         {props.collective.host?.settings?.virtualcards?.policy && (

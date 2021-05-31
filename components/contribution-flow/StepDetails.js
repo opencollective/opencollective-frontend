@@ -52,7 +52,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
 
   return (
     <Box width={1}>
-      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && canContributeRecurring(collective, LoggedInUser) && (
+      {(!tier || tier.interval === 'flexible') && canContributeRecurring(collective, LoggedInUser) && (
         <StyledButtonSet
           id="interval"
           justifyContent="center"

@@ -20,6 +20,7 @@ const nextConfig = {
         PDF_SERVICE_URL: null,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
+        NEXT_IMAGES_URL: null,
         SENTRY_DSN: null,
         ONBOARDING_MODAL: true,
         NEW_HOST_APPLICATION_FLOW: null,
@@ -118,6 +119,32 @@ const nextConfig = {
   },
   async rewrites() {
     return REWRITES;
+  },
+  async headers() {
+    return process.env.IS_VERCEL === 'true'
+      ? [
+          // Prevent indexing of our Vercel deployments
+          {
+            source: '/(.*?)',
+            headers: [
+              {
+                key: 'x-robots-tag',
+                value: 'none',
+              },
+            ],
+          },
+          // Exception for "Next images", if on the configured domain
+          {
+            source: '/_next/image(.*?)',
+            headers: [
+              {
+                key: 'x-robots-tag',
+                value: 'all',
+              },
+            ],
+          },
+        ]
+      : [];
   },
 };
 

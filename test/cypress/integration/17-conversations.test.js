@@ -18,8 +18,11 @@ describe('Conversations', () => {
       // Test rich text formatting
       cy.get('[data-cy="RichTextEditor"] trix-editor', { timeout: 30000 }).as('editor');
       cy.get('@editor').type(
-        'Hello from https://opencollective.com/opencollective 👋👋👋\nLorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.',
+        'Hello from https://opencollective.com/opencollective 👋👋👋{enter}Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.',
       );
+
+      cy.wait(100);
+
       cy.get('@editor').should(
         'have.html',
         '<div><!--block-->Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋<br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.</div>',

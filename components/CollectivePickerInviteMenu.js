@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
-import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
 import { Box, Flex } from './Grid';
+import Image from './Image';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 

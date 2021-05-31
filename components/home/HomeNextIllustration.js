@@ -1,8 +1,8 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import Image from 'next/image';
 
 import { Box } from '../Grid';
+import Image from '../Image';
 
 /*
  * Illustrations that use the next/image component.

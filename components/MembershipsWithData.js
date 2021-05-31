@@ -75,7 +75,7 @@ class MembershipsWithData extends React.Component {
 
     const groupedMemberships = memberships.reduce((_memberships, m) => {
       (_memberships[m.collective.id] = _memberships[m.collective.id] || []).push(m);
-      if (collectiveIds.length == 0 || collectiveIds[collectiveIds.length - 1] != m.collective.id) {
+      if (collectiveIds.length === 0 || collectiveIds[collectiveIds.length - 1] !== m.collective.id) {
         collectiveIds.push(m.collective.id);
       }
       return _memberships;
