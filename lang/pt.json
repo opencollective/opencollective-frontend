@@ -439,6 +439,7 @@
   "connectedAccounts.twitter.updatePublished.toggle.description": "Send a tweet whenever you publish an Update",
   "connectedAccounts.twitter.updatePublished.toggle.label": "Atualização publicada",
   "ConnectedCollectives": "Connected Collectives",
+  "ConnectedCollectives.ViewAll": "View all connected collectives",
   "ConnectPaypal.refill": "Carregar saldo",
   "Contact": "Contato",
   "Contact.Message": "Mensagem",
