@@ -440,6 +440,7 @@
   "connectedAccounts.twitter.updatePublished.toggle.description": "Send a tweet whenever you publish an Update",
   "connectedAccounts.twitter.updatePublished.toggle.label": "변경내역 저장됨",
   "ConnectedCollectives": "Connected Collectives",
+  "ConnectedCollectives.ViewAll": "View all connected collectives",
   "ConnectPaypal.refill": "잔액 충전",
   "Contact": "연락",
   "Contact.Message": "메시지",

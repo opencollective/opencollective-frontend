@@ -440,6 +440,7 @@
   "connectedAccounts.twitter.updatePublished.toggle.description": "Надсилати твіт, коли ви публікуєте оновлення",
   "connectedAccounts.twitter.updatePublished.toggle.label": "Оновлення опубліковано",
   "ConnectedCollectives": "Під’єднані Колективи",
+  "ConnectedCollectives.ViewAll": "View all connected collectives",
   "ConnectPaypal.refill": "Поповнити рахунок",
   "Contact": "Зв'язок",
   "Contact.Message": "Повідомлення",
