@@ -288,7 +288,6 @@
   "collective.edit.host.suggestedHosts.title": "Administradores sugeridos",
   "collective.edit.host.useOwn.description": "Crie ou selecione um administrador fiscal que você gerencia para deter fundos para vários Coletivos. A organização será responsável pela contabilidade, impostos, pagamentos e responsabilidade.",
   "collective.edit.host.viewAllHosts": "Ver todos os Administradores Fiscais",
-  "collective.editHost.continue.btn": "{action}",
   "collective.editHost.header": "Retirar a solicitação para {name}",
   "collective.editHost.remove": "Remover {name}",
   "collective.editHost.removeHost": "Tem certeza de que deseja remover {name}?",

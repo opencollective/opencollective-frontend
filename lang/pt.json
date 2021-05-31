@@ -288,7 +288,6 @@
   "collective.edit.host.suggestedHosts.title": "Suggested Hosts",
   "collective.edit.host.useOwn.description": "Create or select a Fiscal Host that you manage, to hold funds for multiple Collectives. The organization will be responsible for accounting, taxes, payments, and liability.",
   "collective.edit.host.viewAllHosts": "View all Fiscal Hosts",
-  "collective.editHost.continue.btn": "{action}",
   "collective.editHost.header": "Withdraw application to {name}",
   "collective.editHost.remove": "Remover {name}",
   "collective.editHost.removeHost": "Você tem certeza de que deseja remover {name}?",
