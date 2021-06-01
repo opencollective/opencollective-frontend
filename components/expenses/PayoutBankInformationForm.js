@@ -21,7 +21,7 @@ import { P } from '../Text';
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
 
-const { TW_API_COLLECTIVE_SLUG } = process.env;
+const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
 
 export const msg = defineMessages({
   currency: {
