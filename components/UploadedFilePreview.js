@@ -137,7 +137,7 @@ const UploadedFilePreview = ({
     );
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
-    const img = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
+    const img = <img src={imagePreview(url, null, { width: ['100%', resizeWidth] })} alt={alt || fileName} />;
     content = !hasLink ? (
       img
     ) : (
