@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
@@ -96,6 +96,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
       });
     }
   };
+
+  // Cancel edit mode when user navigates out to another collective
+  useEffect(() => {
+    editCover(false);
+    showColorPicker(false);
+  }, [collective.id]);
 
   return (
     <Fragment>
