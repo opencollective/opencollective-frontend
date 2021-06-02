@@ -3640,6 +3640,7 @@ type UpdateType {
   slug: String
   image: String
   isPrivate: Boolean
+  isChangelog: Boolean
   notificationAudience: UpdateAudienceTypeEnum
   makePublicOn: IsoDateString
 

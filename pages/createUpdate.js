@@ -21,6 +21,7 @@ import Header from '../components/Header';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
+import StyledButtonSet from '../components/StyledButtonSet';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
@@ -40,6 +41,8 @@ const CreateUpdateWrapper = styled(Flex)`
   }
 `;
 
+const UPDATE_TYPE = ['Normal Update', 'Changelog Entry'];
+
 class CreateUpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
     return { slug: collectiveSlug, action };
@@ -56,7 +59,7 @@ class CreateUpdatePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { update: {}, status: '', error: '' };
+    this.state = { update: {}, status: '', error: '', updateType: UPDATE_TYPE[1] };
   }
 
   createUpdate = async update => {
@@ -68,6 +71,7 @@ class CreateUpdatePage extends React.Component {
 
     try {
       update.account = { legacyId: Collective.id };
+      update.isChangelog = this.state.updateType === UPDATE_TYPE[1];
       const res = await this.props.createUpdate({ variables: { update } });
       this.setState({ isModified: false });
       return this.props.router.push(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
@@ -80,6 +84,10 @@ class CreateUpdatePage extends React.Component {
     const update = this.state.update;
     update[attr] = value;
     this.setState({ update, isModified: true });
+  };
+
+  isChangelog = () => {
+    return this.state.updateType === UPDATE_TYPE[1];
   };
 
   render() {
@@ -133,7 +141,19 @@ class CreateUpdatePage extends React.Component {
                   </H1>
                 </Container>
               )}
-              {isAdmin && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
+              {collective.slug === 'opencollective' && (
+                <StyledButtonSet
+                  size="medium"
+                  items={UPDATE_TYPE}
+                  selected={this.state.updateType}
+                  onChange={value => this.setState({ updateType: value })}
+                >
+                  {({ item }) => item}
+                </StyledButtonSet>
+              )}
+              {isAdmin && (
+                <EditUpdateForm collective={collective} onSubmit={this.createUpdate} isChangelog={this.isChangelog()} />
+              )}
               {this.state.status === 'error' && (
                 <MessageBox type="error" withIcon>
                   <FormattedMessage
@@ -165,6 +185,7 @@ const createUpdateMutation = gqlV2/* GraphQL */ `
       updatedAt
       tags
       isPrivate
+      isChangelog
       makePublicOn
       account {
         id

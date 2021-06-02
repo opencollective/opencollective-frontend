@@ -99,6 +99,7 @@ const updatesQuery = gql`
       tags
       image
       isPrivate
+      isChangelog
       makePublicOn
       collective {
         id
