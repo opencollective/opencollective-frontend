@@ -137,7 +137,7 @@ const UploadedFilePreview = ({
     );
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
-    const img = <img src={imagePreview(url, null, { width: ['100%', resizeWidth] })} alt={alt || fileName} />;
+    const img = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
     content = !hasLink ? (
       img
     ) : (
@@ -149,7 +149,7 @@ const UploadedFilePreview = ({
 
   return (
     <Container {...props}>
-      <CardContainer size={size} title={fileName} border={border} hasOnClick={Boolean(props.onClick)}>
+      <CardContainer size={['100%', ...size]} title={fileName} border={border} hasOnClick={Boolean(props.onClick)}>
         {content}
       </CardContainer>
       {showFileName && (
