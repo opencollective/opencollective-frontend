@@ -1995,6 +1995,8 @@
   "update.publish.modal.header": "Publish update",
   "update.publish.notify.selection": "Виберіть, кого слід сповістити",
   "update.publishedAtBy": "Опубліковано {date} {author}",
+  "update.type.changelog": "Changelog Entry",
+  "update.type.normal": "Normal Update",
   "update.viewLatestUpdates": "Переглянути останні оновлення",
   "UpdateAudienceBreakdown.Total": "Your Update will be sent to a total of {count} emails",
   "UpdatedOnDate": "Оновлено {date, date, long}",

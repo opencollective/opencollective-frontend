@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular';
+import { mapValues } from 'lodash';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -41,7 +42,14 @@ const CreateUpdateWrapper = styled(Flex)`
   }
 `;
 
-const UPDATE_TYPE = ['Normal Update', 'Changelog Entry'];
+const UPDATE_TYPE_MSGS = defineMessages({
+  normal: {
+    id: 'update.type.normal',
+    defaultMessage: 'Normal Update',
+  },
+  changelog: { id: 'update.type.changelog', defaultMessage: 'Changelog Entry' },
+});
+const UPDATE_TYPE = Object.values(mapValues(UPDATE_TYPE_MSGS, value => value.defaultMessage));
 
 class CreateUpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
@@ -76,7 +84,10 @@ class CreateUpdatePage extends React.Component {
 
     try {
       update.account = { legacyId: Collective.id };
-      update.isChangelog = this.state.updateType === UPDATE_TYPE[1];
+      update.isChangelog = this.isChangelog();
+      if (update.isChangelog) {
+        update.isPrivate = false;
+      }
       const res = await this.props.createUpdate({ variables: { update } });
       this.setState({ isModified: false });
       return this.props.router.push(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);

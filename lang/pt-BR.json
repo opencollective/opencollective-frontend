@@ -1995,6 +1995,8 @@
   "update.publish.modal.header": "Publicar atualização",
   "update.publish.notify.selection": "Selecione quem deve ser notificado",
   "update.publishedAtBy": "Publicado em {date} por {author}",
+  "update.type.changelog": "Changelog Entry",
+  "update.type.normal": "Normal Update",
   "update.viewLatestUpdates": "Ver as últimas atualizações",
   "UpdateAudienceBreakdown.Total": "Your Update will be sent to a total of {count} emails",
   "UpdatedOnDate": "Atualizado em {date, date, long}",
