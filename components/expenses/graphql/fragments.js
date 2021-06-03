@@ -90,7 +90,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
       id
     }
     transferwise {
-      __typename
+      id
     }
   }
 `;
