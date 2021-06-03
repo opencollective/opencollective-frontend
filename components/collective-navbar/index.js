@@ -1,4 +1,4 @@
-import React, { Fragment, useRef } from 'react';
+import React, { useRef } from 'react';
 import { PropTypes } from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
@@ -13,7 +13,7 @@ import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
 import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
@@ -41,6 +41,14 @@ import { useUser } from '../UserProvider';
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
+
+const DisableGlobalScrollOnMobile = createGlobalStyle`
+  @media (max-width: 64em) {
+    body {
+      overflow: hidden;
+    }
+  }
+`;
 
 const NavBarContainer = styled.div`
   position: sticky;
@@ -127,6 +135,17 @@ const CollectiveName = styled(LinkCollective).attrs({
 `;
 
 const CategoriesContainer = styled(Container)`
+  background-color: #ffffff;
+  max-height: calc(100vh - 70px);
+  flex-shrink: 2;
+  flex-grow: 1;
+  overflow: auto;
+
+  @media screen and (max-width: 40em) {
+    max-height: none;
+    flex-shrink: 0;
+  }
+
   @media screen and (min-width: 40em) and (max-width: 64em) {
     border: 1px solid rgba(214, 214, 214, 0.3);
     border-radius: 0px 0px 0px 8px;
@@ -420,6 +439,7 @@ const CollectiveNavbar = ({
   const mainAction = getMainAction(collective, actionsArray);
   const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));
   const navbarRef = useRef();
+  const mainContainerRef = useRef();
 
   /** This is to close the navbar dropdown menus (desktop)/slide-out menu (tablet)/non-collapsible menu (mobile)
    * when we click a category header to scroll down to (i.e. Connect) or sub-section page to open (i.e. Updates) */
@@ -432,7 +452,7 @@ const CollectiveNavbar = ({
   });
 
   return (
-    <NavBarContainer>
+    <NavBarContainer ref={mainContainerRef}>
       <NavbarContentContainer
         flexDirection={['column', 'row']}
         px={[0, 3, null, Dimensions.PADDING_X[1]]}
@@ -493,7 +513,12 @@ const CollectiveNavbar = ({
               {isExpanded ? (
                 <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
               ) : (
-                <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                <ExpandMenuIcon
+                  onClick={() => {
+                    mainContainerRef.current?.scrollIntoView(true);
+                    setExpanded(true);
+                  }}
+                />
               )}
             </Box>
           )}
@@ -501,17 +526,20 @@ const CollectiveNavbar = ({
         {/** Main navbar items */}
 
         {!onlyInfos && (
-          <Fragment>
+          <Container
+            overflowY="auto"
+            display={['block', 'flex']}
+            width="100%"
+            justifyContent="space-between"
+            flexDirection={['column', 'row']}
+          >
+            {isExpanded && <DisableGlobalScrollOnMobile />}
             <CategoriesContainer
               ref={navbarRef}
-              backgroundColor="#fff"
               display={isExpanded ? 'flex' : ['none', 'flex']}
               flexDirection={['column', null, null, 'row']}
-              flexShrink={2}
-              flexGrow={1}
               justifyContent={['space-between', null, 'flex-start']}
               order={[0, 3, 0]}
-              overflowX="auto"
               isExpanded={isExpanded}
             >
               {isLoading ? (
@@ -557,12 +585,17 @@ const CollectiveNavbar = ({
                   {isExpanded ? (
                     <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
                   ) : (
-                    <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                    <ExpandMenuIcon
+                      onClick={() => {
+                        mainContainerRef.current?.scrollIntoView(true);
+                        setExpanded(!isExpanded);
+                      }}
+                    />
                   )}
                 </Container>
               )}
             </Container>
-          </Fragment>
+          </Container>
         )}
       </NavbarContentContainer>
     </NavBarContainer>
