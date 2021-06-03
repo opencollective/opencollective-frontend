@@ -59,7 +59,12 @@ class CreateUpdatePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { update: {}, status: '', error: '', updateType: UPDATE_TYPE[1] };
+    this.state = {
+      update: {},
+      status: '',
+      error: '',
+      updateType: props.data?.Collective?.slug === 'opencollective' ? UPDATE_TYPE[1] : UPDATE_TYPE[0],
+    };
   }
 
   createUpdate = async update => {
