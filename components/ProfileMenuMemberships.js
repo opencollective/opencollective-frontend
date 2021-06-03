@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Plus } from '@styled-icons/boxicons-regular';
 import { Settings } from '@styled-icons/feather/Settings';
-import { get, groupBy, isEmpty, uniqBy } from 'lodash';
+import { groupBy, isEmpty, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -18,7 +18,7 @@ import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
 import StyledLink from './StyledLink';
 import StyledRoundButton from './StyledRoundButton';
-import { P, Span } from './Text';
+import { P } from './Text';
 
 const messages = defineMessages({
   settings: {
@@ -43,41 +43,30 @@ const CollectiveListItem = styled(ListItem)`
 const MembershipLine = ({ user, membership }) => {
   const intl = useIntl();
   return (
-    <CollectiveListItem
-      key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}
-      py={1}
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
-    >
-      <Link href={`/${get(membership, 'collective.slug')}`}>
-        <StyledLink
-          as={Span}
-          color="black.700"
-          fontSize="1.2rem"
-          fontFamily="montserratlight, arial"
-          fontWeight="400"
-          truncateOverflow
-        >
-          <Flex alignItems="center">
-            <Avatar collective={get(membership, 'collective')} radius="32px" mr="12px" />
-            <Flex flexDirection="column" maxWidth="150px">
-              <P fontSize="14px" fontWeight="500" lineHeight="20px" color="black.800" truncateOverflow>
-                {get(membership, 'collective.name')}
-              </P>
-              <P fontSize="12px" lineHeight="18px" truncateOverflow color="black.700">
-                @{get(membership, 'collective.slug')}
-              </P>
-            </Flex>
+    <CollectiveListItem py={1} display="flex" justifyContent="space-between" alignItems="center">
+      <Link href={`/${membership.collective.slug}`} title={membership.collective.name}>
+        <Flex alignItems="center">
+          <Avatar collective={membership.collective} radius="32px" mr="12px" />
+          <Flex flexDirection="column" maxWidth="150px">
+            <P fontSize="14px" fontWeight="500" lineHeight="20px" color="black.800" truncateOverflow>
+              {membership.collective.name}
+            </P>
+            <P fontSize="12px" lineHeight="18px" truncateOverflow color="black.700">
+              @{membership.collective.slug}
+            </P>
           </Flex>
-        </StyledLink>
+        </Flex>
       </Link>
-      {user?.canEditCollective(membership.collective) && (
-        <Link href={`/${membership.collective.slug}/edit`}>
-          <StyledLink as={Span} ml={1} color="black.500" title={intl.formatMessage(messages.settings)}>
-            <Settings opacity="0" size="1.2em" />
-          </StyledLink>
-        </Link>
+      {Boolean(user?.canEditCollective(membership.collective)) && (
+        <StyledLink
+          as={Link}
+          href={`/${membership.collective.slug}/edit`}
+          ml={1}
+          color="black.500"
+          title={intl.formatMessage(messages.settings)}
+        >
+          <Settings opacity="0" size="1.2em" />
+        </StyledLink>
       )}
     </CollectiveListItem>
   );
@@ -105,7 +94,7 @@ const filterMemberships = memberships => {
     } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
       return false;
     } else {
-      return true;
+      return Boolean(m.collective);
     }
   });
 
@@ -161,11 +150,10 @@ const ProfileMenuMemberships = ({ user }) => {
     <React.Fragment>
       <Flex alignItems="center">
         <P
-          color="#4E5052"
-          fontFamily="montserratlight, arial"
-          fontSize="1rem"
-          fontWeight="600"
-          letterSpacing="1px"
+          color="black.700"
+          fontSize="12px"
+          fontWeight="500"
+          letterSpacing="0.06em"
           pr={2}
           textTransform="uppercase"
           whiteSpace="nowrap"
