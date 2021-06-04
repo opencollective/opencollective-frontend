@@ -7,7 +7,7 @@ import Avatar from '../../components/Avatar';
   argTypes={{
     radius: { control: { type: 'number' } },
     animationDuration: { control: { type: 'number' } },
-    src: { control: { type: 'text' }, },
+    src: { control: { type: 'text' } },
   }}
   args={{
     src: 'https://images.opencollective.com/opencollective/logo/256.png',
@@ -28,10 +28,10 @@ export const DefaultStory = props => <Avatar {...props} />;
 
 <Canvas>
   <Story name="Custom radius" parameters={{ controls: { hideNoControlsWarning: true } }}>
-    <Avatar src='https://images.opencollective.com/opencollective/logo/256.png' radius={30} />
-    <Avatar src='https://images.opencollective.com/opencollective/logo/256.png' radius={50} />
-    <Avatar src='https://images.opencollective.com/opencollective/logo/256.png' radius={70} />
-    <Avatar src='https://images.opencollective.com/opencollective/logo/256.png' radius={90} />
-    <Avatar src='https://images.opencollective.com/opencollective/logo/256.png' radius={110} />
+    <Avatar src="https://images.opencollective.com/opencollective/logo/256.png" radius={30} />
+    <Avatar src="https://images.opencollective.com/opencollective/logo/256.png" radius={50} />
+    <Avatar src="https://images.opencollective.com/opencollective/logo/256.png" radius={70} />
+    <Avatar src="https://images.opencollective.com/opencollective/logo/256.png" radius={90} />
+    <Avatar src="https://images.opencollective.com/opencollective/logo/256.png" radius={110} />
   </Story>
 </Canvas>
