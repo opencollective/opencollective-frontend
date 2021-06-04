@@ -20,6 +20,7 @@ import Hide from './Hide';
 import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
+import NewsAndUpdatesModal from './NewsAndUpdatesModal';
 import StyledHr from './StyledHr';
 import StyledLink from './StyledLink';
 import StyledRoundButton from './StyledRoundButton';
@@ -65,7 +66,7 @@ class TopBarProfileMenu extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showProfileMenu: false, loading: true };
+    this.state = { showProfileMenu: false, loading: true, showNewsAndUpdates: false };
     this.messages = defineMessages({
       'menu.transactions': {
         id: 'menu.transactions',
@@ -224,6 +225,17 @@ class TopBarProfileMenu extends React.Component {
               <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
             </P>
             <Box as="ul" p={0} my={2}>
+              <ListItem py={1}>
+                <StyledLink
+                  onClick={() => this.setState({ showNewsAndUpdates: true })}
+                  as={Span}
+                  color="#494D52"
+                  fontSize="1.2rem"
+                  fontFamily="montserratlight, arial"
+                >
+                  <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
+                </StyledLink>
+              </ListItem>
               <ListItem py={1}>
                 <Link href={`/${LoggedInUser.username}`}>
                   <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
@@ -473,25 +485,32 @@ class TopBarProfileMenu extends React.Component {
     }
 
     return (
-      <div className="LoginTopBarProfileButton">
-        {status === 'loading' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
-            <FormattedMessage id="loading" defaultMessage="loading" />
-            &hellip;
-          </P>
-        )}
+      <React.Fragment>
+        <div className="LoginTopBarProfileButton">
+          {status === 'loading' && (
+            <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+              <FormattedMessage id="loading" defaultMessage="loading" />
+              &hellip;
+            </P>
+          )}
 
-        {status === 'loggingout' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
-            <FormattedMessage id="loggingout" defaultMessage="logging out" />
-            &hellip;
-          </P>
-        )}
+          {status === 'loggingout' && (
+            <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+              <FormattedMessage id="loggingout" defaultMessage="logging out" />
+              &hellip;
+            </P>
+          )}
 
-        {status === 'loggedout' && <LoginBtn />}
+          {status === 'loggedout' && <LoginBtn />}
 
-        {status === 'loggedin' && this.renderLoggedInUser()}
-      </div>
+          {status === 'loggedin' && this.renderLoggedInUser()}
+        </div>
+        <NewsAndUpdatesModal
+          show={this.state.showNewsAndUpdates}
+          update={null}
+          onClose={() => this.setState({ showNewsAndUpdates: false })}
+        />
+      </React.Fragment>
     );
   }
 }
