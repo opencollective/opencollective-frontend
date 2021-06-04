@@ -16,11 +16,10 @@ import Hide from './Hide';
 import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
-import ProfileMenuMemberships from './ProfileMenuMemberships';
 import NewsAndUpdatesModal from './NewsAndUpdatesModal';
-import StyledHr from './StyledHr';
+import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledLink from './StyledLink';
-import {P, Span} from './Text';
+import { P, Span } from './Text';
 import { withUser } from './UserProvider';
 
 const memberInvitationsCountQuery = gql`
@@ -131,17 +130,9 @@ class TopBarProfileMenu extends React.Component {
               <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
             </P>
             <Box as="ul" p={0} my={2}>
-              <ListItem py={1}>
-                <StyledLink
-                  onClick={() => this.setState({ showNewsAndUpdates: true })}
-                  as={Span}
-                  color="#494D52"
-                  fontSize="1.2rem"
-                  fontFamily="montserratlight, arial"
-                >
-                  <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
-                </StyledLink>
-              </ListItem>
+              <UserMenuLinkEntry as={Span} onClick={() => this.setState({ showNewsAndUpdates: true })}>
+                <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
+              </UserMenuLinkEntry>
               <UserMenuLinkEntry href={`/${LoggedInUser.username}`}>
                 <FormattedMessage id="menu.profile" defaultMessage="Profile" />
               </UserMenuLinkEntry>

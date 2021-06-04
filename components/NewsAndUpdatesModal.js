@@ -82,7 +82,11 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
       </ModalHeader>
       <hr />
       <ModalBody>
-        <Query query={newsAndUpdatesQuery} variables={{ collectiveSlug: 'opencollective', onlyChangelogUpdates: true }} context={API_V2_CONTEXT}>
+        <Query
+          query={newsAndUpdatesQuery}
+          variables={{ collectiveSlug: 'opencollective', onlyChangelogUpdates: true }}
+          context={API_V2_CONTEXT}
+        >
           {({ data, loading }) =>
             loading === false && data ? (
               <StyledCarousel contentPosition="left">
