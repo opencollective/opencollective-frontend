@@ -7664,6 +7664,10 @@ enum TransactionType {
 TransferWise related properties for bank transfer.
 """
 type TransferWise {
+  """
+  Unique identifier for this Wise object
+  """
+  id: String!
   requiredFields(
     """
     The 3 letter code identifying the currency you want to receive (ie: USD, EUR, BRL, GBP)

@@ -101,15 +101,18 @@ const TriggerContainer = styled(StyledButton)`
     transition: color 0.2s;
   }
 
-  &:hover svg {
-    color: #999999;
+  &:hover {
+    border-color: #c4c7cc;
+    svg {
+      color: #999999;
+    }
   }
 
   &:active,
   &:focus {
-    background: #f7f8fa;
-    box-shadow: none;
+    background: white;
     color: hsl(0, 0%, 20%);
+    box-shadow: 0 0 0 2px black;
   }
 `;
 

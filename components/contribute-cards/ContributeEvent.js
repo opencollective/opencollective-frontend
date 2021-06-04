@@ -44,7 +44,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       {(startsAt || endsAt) && (
         <Box mb={3}>
           <Container display="flex" alignItems="center" fontSize="12px">
-            <Calendar size="1.3em" color="#C4C7CC" />
+            <Calendar size="1.3em" color="#4E5052" />
             <Span ml={2} color="black.700">
               {startsAt && (
                 <time dateTime={startsAt}>
@@ -61,7 +61,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
           </Container>
           {startsAt && (
             <Container display="flex" alignItems="center" fontSize="12px" mt={1}>
-              <Clock size="1.3em" color="#C4C7CC" />
+              <Clock size="1.3em" color="#4E5052" />
               <Span ml={2} color="black.700">
                 <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
               </Span>
