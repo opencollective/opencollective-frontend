@@ -2,15 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Query } from '@apollo/client/react/components';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { fontSize } from 'styled-system';
+import { fontSize, margin } from 'styled-system';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import NextIllustration from './home/HomeNextIllustration';
 import Container from './Container';
 import { Flex } from './Grid';
+import HTMLContent from './HTMLContent';
 import StyledButton from './StyledButton';
 import StyledCarousel from './StyledCarousel';
 import StyledLink from './StyledLink';
@@ -18,49 +19,45 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { Span } from './Text';
 
 const Text = styled.p`
-  position: static;
-  left: 18.24%;
-  right: 0%;
-  top: 5%;
-  bottom: 5%;
-
   font-family: Inter;
   font-style: normal;
   font-weight: 500;
   font-size: 28px;
   line-height: 36px;
-
-  display: flex;
-  align-items: center;
-  letter-spacing: -0.008em;
-
   color: #141414;
-
-  flex: none;
-  order: 1;
-  flex-grow: 0;
   margin: 0px 16px;
+  ${margin}
   ${fontSize}
 `;
 
+const PublishedDate = styled(Container)`
+  font-family: Inter;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 13px;
+  line-height: 20px;
+  color: #4e5052;
+`;
+
 const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
-  query Update($collectiveSlug: String) {
+  query Update($collectiveSlug: String, $onlyChangelogUpdates: Boolean) {
     account(slug: $collectiveSlug) {
-      updates {
+      updates(onlyChangelogUpdates: $onlyChangelogUpdates) {
         nodes {
           id
+          slug
           publishedAt
           title
-          html
+          summary
         }
       }
     }
   }
 `;
 
-const goToUpdatePage = (router, event) => {
+const goToUpdatePage = (router, url, event) => {
   event.preventDefault();
-  return router.push('/opencollective/updates');
+  return router.push(url);
 };
 
 const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
@@ -85,16 +82,56 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
       </ModalHeader>
       <hr />
       <ModalBody>
-        <Query query={newsAndUpdatesQuery} variables={{ collectiveSlug: 'opencollective' }} context={API_V2_CONTEXT}>
+        <Query query={newsAndUpdatesQuery} variables={{ collectiveSlug: 'opencollective', onlyChangelogUpdates: true }} context={API_V2_CONTEXT}>
           {({ data, loading }) =>
             loading === false && data ? (
-              <StyledCarousel>
+              <StyledCarousel contentPosition="left">
                 {data.account.updates.nodes.map(update => (
-                  <Flex width="100%" key={update.id} justifyContent="left">
-                    <Text fontSize="20px">{update.title}</Text>
-                    {/* {update.publishedAt}*/}
-                    {/* {update.html}*/}
-                  </Flex>
+                  <Container key={update.id}>
+                    <PublishedDate>
+                      <FormattedDate value={update.publishedAt} day="numeric" month="long" year="numeric" />
+                    </PublishedDate>
+                    <Flex>
+                      <Span paddingTop="10px">
+                        <NextIllustration
+                          width={12}
+                          height={12}
+                          src="/static/images/news-and-updates-ellipse.svg"
+                          alt="News and Updates Ellipse"
+                        />
+                      </Span>
+                      <Text fontSize="20px" margin="0px 12px">
+                        {update.title}
+                      </Text>
+                    </Flex>
+                    <Flex pt={2} pb={3}>
+                      <StyledLink
+                        onClick={event => goToUpdatePage(router, `/opencollective/updates/${update.slug}`, event)}
+                        color="#1153D6"
+                        fontSize="14px"
+                        display="flex"
+                      >
+                        <FormattedMessage
+                          id="NewsAndUpdates.link.giveFeedback"
+                          defaultMessage="Read more & give Feedback"
+                        />
+                      </StyledLink>
+                    </Flex>
+                    <Flex pb={1}>
+                      <HTMLContent color="#313233" mt={1} fontSize="16px" content={update.summary} />
+                    </Flex>
+                    <Flex pb={3}>
+                      {update.summary.slice(update.summary.length - 3) === '...' && (
+                        <StyledLink
+                          onClick={event => goToUpdatePage(router, `/opencollective/updates/${update.slug}`, event)}
+                          fontSize="14px"
+                          display="flex"
+                        >
+                          <FormattedMessage id="NewsAndUpdates.link.readMore" defaultMessage="Read more" />
+                        </StyledLink>
+                      )}
+                    </Flex>
+                  </Container>
                 ))}
               </StyledCarousel>
             ) : null
@@ -122,7 +159,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
             <StyledButton
               onClick={event => {
                 onClose();
-                goToUpdatePage(router, event);
+                goToUpdatePage(router, '/opencollective/updates', event);
               }}
             >
               <Span fontSize={['11px', '14px']}>
@@ -137,7 +174,6 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
 };
 
 NewsAndUpdatesModal.propTypes = {
-  update: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   router: PropTypes.object,
 };

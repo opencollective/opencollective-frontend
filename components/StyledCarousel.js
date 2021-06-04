@@ -153,12 +153,12 @@ const StyledCarousel = props => {
     );
   };
 
-  const { children, showArrowController, controllerPosition } = props;
+  const { children, showArrowController, controllerPosition, contentPosition } = props;
   const handlers = useSwipeable({ onSwipedLeft: () => handleSwipe(true), onSwipedRight: () => handleSwipe() });
 
   return (
     <Container {...props}>
-      <Flex justifyContent="center" alignItems="center" width={1}>
+      <Flex justifyContent={contentPosition || 'center'} alignItems="center" width={1}>
         {showArrowController && controllerPosition === 'side' && renderLeftController()}
         <Box overflow="hidden" px={2}>
           <Container {...handlers}>
@@ -193,6 +193,7 @@ StyledCarousel.propTypes = {
   activeIndex: PropTypes.number,
   showArrowController: PropTypes.bool,
   controllerPosition: PropTypes.string,
+  contentPosition: PropTypes.string,
   onChange: PropTypes.func,
   display: PropTypes.array,
 };
