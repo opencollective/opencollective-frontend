@@ -28,6 +28,10 @@ const StyledButtonContent = styled.button`
     cursor: not-allowed;
   }
 
+  &:focus {
+    box-shadow: 0px 0px 0px 2px #050505;
+  }
+
   /** Align button icons in the middle */
   svg {
     vertical-align: middle;

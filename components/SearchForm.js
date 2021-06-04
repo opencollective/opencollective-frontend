@@ -57,7 +57,12 @@ class SearchForm extends React.Component {
     } = this.props;
     return (
       <form action="/search" method="GET" onSubmit={onSubmit}>
-        <SearchInputContainer borderRadius={borderRadius} alignItems="center" justifyContent="space-between" p={1}>
+        <SearchInputContainer
+          borderRadius={borderRadius}
+          alignItems="center"
+          justifyContent="space-between"
+          p={this.props.py || 1}
+        >
           <SearchButton as="button" ml={1} p={1}>
             <SearchIcon size={16} fill="#aaaaaa" />
           </SearchButton>
@@ -84,6 +89,7 @@ class SearchForm extends React.Component {
 SearchForm.propTypes = {
   fontSize: PropTypes.string,
   defaultValue: PropTypes.string,
+  py: PropTypes.string,
   value: PropTypes.string,
   onSubmit: PropTypes.func,
   placeholder: PropTypes.string,

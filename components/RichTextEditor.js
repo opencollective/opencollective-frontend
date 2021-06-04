@@ -149,8 +149,8 @@ const TrixEditorContainer = styled.div`
       pointerEvents: 'none',
       cursor: 'not-allowed',
       background: '#f3f3f3',
-      'trix-toolbar': {
-        background: '#f3f3f3',
+      'trix-toolbar,.trix-button-group': {
+        background: '#f3f3f3 !important',
       },
     })}
 `;

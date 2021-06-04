@@ -6,12 +6,11 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { toPx } from '../../lib/theme/helpers';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
-import Container from '../Container';
 import ExpenseFilesPreviewModal from '../expenses/ExpenseFilesPreviewModal';
-import ExpenseModal from '../expenses/ExpenseModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
@@ -19,11 +18,12 @@ import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import ProcessExpenseButtons, { DEFAULT_PROCESS_EXPENSE_BTN_PROPS } from '../expenses/ProcessExpenseButtons';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import LinkCollective from '../LinkCollective';
-import LinkExpense from '../LinkExpense';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
+import StyledTooltip from '../StyledTooltip';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
@@ -74,41 +74,6 @@ const getNbAttachedFiles = expense => {
   }
 };
 
-/**
- * A link that either link to the page or opens the modal
- */
-const ExpenseTitleLink = ({ expense, collective, usePreviewModal, onDelete, onProcess, children }) => {
-  const [showModal, setShowModal] = React.useState(false);
-  const account = expense.account || collective;
-
-  if (!usePreviewModal) {
-    return (
-      <LinkExpense collective={account} expense={expense} data-cy="expense-link">
-        {children}
-      </LinkExpense>
-    );
-  } else {
-    return (
-      <React.Fragment>
-        {showModal && (
-          <ExpenseModal
-            collective={account}
-            expense={expense}
-            show={showModal}
-            onClose={() => setShowModal(false)}
-            permissions={expense.permissions}
-            onDelete={onDelete}
-            onProcess={onProcess}
-          />
-        )}
-        <Container cursor="pointer" onClick={() => setShowModal(true)}>
-          {children}
-        </Container>
-      </React.Fragment>
-    );
-  }
-};
-
 const ExpenseBudgetItem = ({
   isLoading,
   host,
@@ -117,10 +82,8 @@ const ExpenseBudgetItem = ({
   collective,
   expense,
   showProcessActions,
-  usePreviewModal,
   view,
   suggestedTags,
-  onDelete,
   onProcess,
 }) => {
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
@@ -145,34 +108,36 @@ const ExpenseBudgetItem = ({
             <LoadingPlaceholder height={60} />
           ) : (
             <Box>
-              <ExpenseTitleLink
-                collective={expense.account || collective}
-                expense={expense}
-                usePreviewModal={usePreviewModal}
-                onDelete={onDelete}
-                onProcess={onProcess}
+              <StyledTooltip
+                content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
+                delayHide={0}
               >
-                <AutosizeText
-                  value={expense.description}
-                  maxLength={255}
-                  minFontSizeInPx={12}
-                  maxFontSizeInPx={14}
-                  lengthThreshold={72}
-                >
-                  {({ value, fontSize }) => (
-                    <H3
-                      fontWeight="500"
-                      lineHeight="1.5em"
-                      textDecoration="none"
-                      color="black.900"
-                      fontSize={`${fontSize}px`}
-                      data-cy="expense-title"
-                    >
-                      {value}
-                    </H3>
-                  )}
-                </AutosizeText>
-              </ExpenseTitleLink>
+                <StyledLink as={Link} underlineOnHover href={`/${collective.slug}/expenses/${expense.legacyId}`}>
+                  <AutosizeText
+                    value={expense.description}
+                    maxLength={255}
+                    minFontSizeInPx={12}
+                    maxFontSizeInPx={16}
+                    lengthThreshold={72}
+                    mobileRatio={0.875}
+                    valueFormatter={toPx}
+                  >
+                    {({ value, fontSize }) => (
+                      <H3
+                        fontWeight="500"
+                        lineHeight="1.5em"
+                        textDecoration="none"
+                        color="black.900"
+                        fontSize={`${fontSize}px`}
+                        data-cy="expense-title"
+                      >
+                        {value}
+                      </H3>
+                    )}
+                  </AutosizeText>
+                </StyledLink>
+              </StyledTooltip>
+
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
                   <StyledLink as={LinkCollective} collective={collective} />
@@ -329,7 +294,6 @@ ExpenseBudgetItem.propTypes = {
   isLoading: PropTypes.bool,
   /** Set this to true to invert who's displayed (payee or collective) */
   isInverted: PropTypes.bool,
-  usePreviewModal: PropTypes.bool,
   showAmountSign: PropTypes.bool,
   onDelete: PropTypes.func,
   onProcess: PropTypes.func,

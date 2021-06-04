@@ -1,0 +1,47 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import TopBar from '../../components/TopBar';
+import { UserContext } from '../../components/UserProvider';
+import theme from '../../lib/theme';
+import { loggedInUser, newLoggedInUser } from '../mocks/loggedInUser';
+
+<Meta
+  title="Layout/TopBar"
+  component={TopBar}
+  parameters={{
+    actions: {
+      handles: ['mouseover', 'click'],
+    },
+  }}
+/>
+
+# TopBar
+
+## Logged out
+
+export const LoggedOutStory = props => (
+  <UserContext.Provider value={{ LoggedInUser: null, loadingLoggedInUser: false }}>
+    <TopBar {...props} />
+  </UserContext.Provider>
+);
+
+<Story name="Logged out">{LoggedOutStory.bind({})}</Story>
+
+## Logged in (new user)
+
+export const LoggedInStory = props => (
+  <UserContext.Provider value={{ LoggedInUser: newLoggedInUser, loadingLoggedInUser: false }}>
+    <TopBar {...props} />
+  </UserContext.Provider>
+);
+
+<Story name="Logged in (new user)">{LoggedInStory.bind({})}</Story>
+
+## Logged in (power user)
+
+export const LoggedInPowerUserStory = props => (
+  <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+    <TopBar {...props} />
+  </UserContext.Provider>
+);
+
+<Story name="Logged in (power user)">{LoggedInPowerUserStory.bind({})}</Story>
