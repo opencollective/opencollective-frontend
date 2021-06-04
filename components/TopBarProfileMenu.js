@@ -18,7 +18,7 @@ import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledLink from './StyledLink';
-import { P, Span } from './Text';
+import { P } from './Text';
 import { withUser } from './UserProvider';
 
 const memberInvitationsCountQuery = gql`

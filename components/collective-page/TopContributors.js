@@ -11,7 +11,7 @@ import { ContributorAvatar } from '../Avatar';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LinkContributor from '../LinkContributor';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 
 const ContributorsList = styled(Flex)`
   flex-wrap: wrap;
