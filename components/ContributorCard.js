@@ -37,23 +37,17 @@ const CollectiveLogoContainer = styled.div`
 
 const publicMessageStyle = css`
   margin: 4px 0px;
-  font-size: 10px;
-  line-height: 13px;
-  letter-spacing: -0.5px;
+  font-size: 12px;
+  line-height: 16px;
   color: #4e5052;
   text-align: center;
   word-break: break-word;
-  font-style: italic;
 `;
 
 /** User-submitted public message */
-const PublicMessage = styled.p`
+const PublicMessage = styled.q`
+  display: block;
   ${publicMessageStyle}
-`;
-
-const Description = styled.p`
-  ${publicMessageStyle}
-  text-transform: capitalize;
 `;
 
 /** User-submitted public message edit button */
@@ -89,12 +83,13 @@ const getMainContributorRole = contributor => {
 };
 
 const ContributorTag = styled(StyledTag)`
-  margin: 8px 0;
+  margin-bottom: 8px;
   padding: 5px;
   max-width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  font-size: 12px;
 `;
 
 /**
@@ -113,8 +108,8 @@ const ContributorCard = ({
   ...props
 }) => {
   const { collectiveId: fromCollectiveId, publicMessage, description } = contributor;
-  const truncatedPublicMessage = publicMessage && truncate(publicMessage, { length: 140 });
-  const truncatedDescription = description && truncate(description, { length: 140 });
+  const truncatedPublicMessage = publicMessage && truncate(publicMessage, { length: 50 });
+  const truncatedDescription = description && truncate(description, { length: 30 });
   const [showEditMessagePopup, setShowEditMessagePopup] = useState(false);
   const mainContainerRef = useRef();
   return (
@@ -126,12 +121,12 @@ const ContributorCard = ({
           </LinkContributor>
         </Box>
       </CollectiveLogoContainer>
-      <Flex flexDirection="column" alignItems="center" p={2} pt={1}>
+      <Flex flexDirection="column" alignItems="center" p={2} pt={2}>
         <LinkContributor contributor={contributor}>
           <P
             color="black.900"
             fontSize="14px"
-            fontWeight="bold"
+            fontWeight="500"
             textAlign="center"
             lineHeight="18px"
             title={contributor.name}
@@ -139,34 +134,36 @@ const ContributorCard = ({
             {truncate(contributor.name, { length: 16 })}
           </P>
         </LinkContributor>
-        <ContributorTag>{formatMemberRole(intl, getMainContributorRole(contributor))}</ContributorTag>
-        {contributor.totalAmountDonated > 0 && !hideTotalAmountDonated && (
-          <React.Fragment>
-            <P fontSize="10px" lineHeight="18px" color="black.700">
-              <FormattedMessage id="ContributorCard.Total" defaultMessage="Total contributions" />
+        <Box mt={2}>
+          {contributor.isAdmin || contributor.isCore ? (
+            <ContributorTag>{formatMemberRole(intl, getMainContributorRole(contributor))}</ContributorTag>
+          ) : truncatedDescription ? (
+            <P fontSize="12px" fontWeight="700" title={description} mb={1} textAlign="center">
+              {truncatedDescription}
             </P>
-            <P fontSize="12px" fontWeight="bold">
+          ) : null}
+          {contributor.totalAmountDonated > 0 && !hideTotalAmountDonated && (
+            <P fontSize="12px" fontWeight="700" textAlign="center">
               <FormattedMoneyAmount amount={contributor.totalAmountDonated} currency={currency} precision={0} />
             </P>
-          </React.Fragment>
-        )}
-        {!truncatedPublicMessage && truncatedDescription && (
-          <Description title={description}>{truncatedDescription}</Description>
-        )}
-        {isLoggedUser && !showEditMessagePopup ? (
-          <PublicMessageEditButton
-            data-cy="ContributorCard_EditPublicMessageButton"
-            onClick={() => {
-              setShowEditMessagePopup(true);
-            }}
-          >
-            {truncatedPublicMessage || (
-              <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (optional)" />
-            )}
-          </PublicMessageEditButton>
-        ) : (
-          truncatedPublicMessage && <PublicMessage title={publicMessage}>{truncatedPublicMessage}</PublicMessage>
-        )}
+          )}
+        </Box>
+        <Box mt={1}>
+          {isLoggedUser && !showEditMessagePopup ? (
+            <PublicMessageEditButton
+              data-cy="ContributorCard_EditPublicMessageButton"
+              onClick={() => {
+                setShowEditMessagePopup(true);
+              }}
+            >
+              {truncatedPublicMessage || (
+                <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (optional)" />
+              )}
+            </PublicMessageEditButton>
+          ) : (
+            truncatedPublicMessage && <PublicMessage title={publicMessage}>{truncatedPublicMessage}</PublicMessage>
+          )}
+        </Box>
       </Flex>
       {showEditMessagePopup && (
         <EditPublicMessagePopup

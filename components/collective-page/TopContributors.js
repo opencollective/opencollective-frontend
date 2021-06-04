@@ -56,7 +56,7 @@ const AvatarWithRank = styled.div`
 const ContributorName = styled.div`
   font-size: 12px;
   line-height: 18px;
-  font-weight: bold;
+  font-weight: 700;
   color: ${props => props.theme.colors.black[800]};
   letter-spacing: -0.4px;
   text-overflow: ellipsis;
@@ -94,7 +94,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
   return (
     <Box flex="50% 1 3" style={{ flexBasis: getFlexBasisForCol(contributors.length, totalNbContributors) }}>
       {showTitle && (
-        <P fontSize="16px" color="black.700" mb={3}>
+        <P fontSize="20px" lineHeight="28px" fontWeight="500" color="black.700" mb="20px">
           {title}
         </P>
       )}
@@ -125,14 +125,13 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                     values={{
                       date: <FormattedDate value={contributor.since} month="short" year="numeric" />,
                       totalDonated: (
-                        <Span fontWeight="bold">
-                          <FormattedMoneyAmount
-                            amount={contributor.totalAmountDonated}
-                            currency={currency}
-                            precision={0}
-                            abbreviateAmount
-                          />
-                        </Span>
+                        <FormattedMoneyAmount
+                          amountStyles={null}
+                          amount={contributor.totalAmountDonated}
+                          currency={currency}
+                          precision={0}
+                          abbreviateAmount
+                        />
                       ),
                     }}
                   />
