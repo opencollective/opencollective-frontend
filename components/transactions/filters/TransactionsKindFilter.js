@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { size } from 'lodash';
+import { omit, size } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -8,6 +8,14 @@ import { TransactionKind } from '../../../lib/constants/transactions';
 import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
+
+const DISPLAYED_TRANSACTION_KINDS = omit(TransactionKind, [
+  'PLATFORM_FEE',
+  'PREPAID_PAYMENT_METHOD',
+  'PAYMENT_PROCESSOR_FEE',
+  'HOST_FEE',
+  'HOST_FEE_SHARE',
+]);
 
 const optionsToQueryString = options => {
   if (!options || options.length === size(TransactionKind)) {
@@ -50,7 +58,7 @@ const REACT_SELECT_COMPONENT_OVERRIDE = {
 const TransactionsKindFilter = ({ onChange, value, ...props }) => {
   const intl = useIntl();
   const getOption = (value, idx) => ({ label: i18nTransactionKind(intl, value), value, idx });
-  const options = React.useMemo(() => Object.values(TransactionKind).map(getOption), [intl]);
+  const options = React.useMemo(() => Object.values(DISPLAYED_TRANSACTION_KINDS).map(getOption), [intl]);
   const selectedOptions = React.useMemo(() => (!value ? null : parseTransactionKinds(value).map(getOption)), [value]);
   return (
     <MultiKindSelect
