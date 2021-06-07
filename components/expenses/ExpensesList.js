@@ -33,7 +33,6 @@ const FooterLabel = styled.span`
 const ExpensesList = ({
   collective,
   host,
-  usePreviewModal,
   expenses,
   isLoading,
   nbPlaceholders,
@@ -68,7 +67,6 @@ const ExpensesList = ({
                 host={host}
                 showProcessActions
                 view={view}
-                usePreviewModal={usePreviewModal}
                 onDelete={onDelete}
                 onProcess={onProcess}
                 suggestedTags={suggestedTags}
@@ -116,7 +114,6 @@ ExpensesList.propTypes = {
   host: PropTypes.object,
   view: PropTypes.oneOf(['public', 'admin']),
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  usePreviewModal: PropTypes.bool,
   onDelete: PropTypes.func,
   onProcess: PropTypes.func,
   collective: PropTypes.shape({

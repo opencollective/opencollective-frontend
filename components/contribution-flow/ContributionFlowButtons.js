@@ -5,7 +5,6 @@ import { FormattedMessage } from 'react-intl';
 import Currency from '../Currency';
 import { Box, Flex } from '../Grid';
 import PayWithPaypalButton from '../PayWithPaypalButton';
-import PayWithPaypalLegacyButton from '../PayWithPaypalLegacyButton';
 import StyledButton from '../StyledButton';
 
 import { STEPS } from './constants';
@@ -22,7 +21,6 @@ class ContributionFlowButtons extends React.Component {
     paypalButtonProps: PropTypes.object,
     totalAmount: PropTypes.number,
     currency: PropTypes.string,
-    hasNewPaypal: PropTypes.bool,
   };
 
   state = { isLoadingNext: false };
@@ -100,11 +98,7 @@ class ContributionFlowButtons extends React.Component {
             </StyledButton>
           ) : (
             <Box mx={[1, null, 2]} minWidth={200} mt={2}>
-              {this.props.hasNewPaypal ? (
-                <PayWithPaypalButton {...paypalButtonProps} isSubmitting={isValidating || this.state.isLoadingNext} />
-              ) : (
-                <PayWithPaypalLegacyButton {...paypalButtonProps} />
-              )}
+              <PayWithPaypalButton {...paypalButtonProps} isSubmitting={isValidating || this.state.isLoadingNext} />
             </Box>
           )}
         </Fragment>

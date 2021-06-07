@@ -31,7 +31,7 @@ import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
 
 import acceptOrganizationIllustration from '../../public/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png';
 
-const { TW_API_COLLECTIVE_SLUG } = process.env;
+const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
 
 const { ORGANIZATION } = CollectiveType;
 

@@ -95,7 +95,6 @@ class ContributionFlow extends React.Component {
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
-    hasNewPaypal: PropTypes.bool,
     isEmbed: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
@@ -537,21 +536,6 @@ class ContributionFlow extends React.Component {
             this.submitOrder,
           );
         },
-        // Old callback, used by `PayWithPaypalLegacyButton`
-        onAuthorize: pm => {
-          this.setState(
-            state => ({
-              stepPayment: {
-                ...state.stepPayment,
-                paymentMethod: {
-                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
-                  paypalInfo: pm,
-                },
-              },
-            }),
-            this.submitOrder,
-          );
-        },
       };
     }
   }
@@ -676,7 +660,6 @@ class ContributionFlow extends React.Component {
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
-                    hasNewPaypal={this.props.hasNewPaypal}
                     isSubmitting={isValidating || isSubmitted || isSubmitting}
                   />
 
@@ -691,7 +674,6 @@ class ContributionFlow extends React.Component {
                       paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
-                      hasNewPaypal={this.props.hasNewPaypal}
                     />
                   </Box>
                 </Box>

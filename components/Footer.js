@@ -364,19 +364,19 @@ const Footer = () => {
             <Box key={key} width={[0.5, 0.25]} mb={3}>
               <P
                 textAlign={['center', 'left']}
-                fontSize="10px"
-                fontWeight="600"
-                lineHeight="15px"
+                fontSize="14px"
+                fontWeight="500"
+                lineHeight="16px"
                 color="black.800"
                 letterSpacing="0.8px"
                 textTransform="uppercase"
-                mb={[3, '24px']}
+                mb={3}
               >
                 {intl.formatMessage(messages[key])}
               </P>
               <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
                 {Object.keys(navigation[key]).map(item => (
-                  <ListItem key={item} textAlign={['center', 'left']} mb={2}>
+                  <ListItem key={item} textAlign={['center', 'left']} mb={3}>
                     {navigation[key][item][0] === '/' ? (
                       <Link href={navigation[key][item]}>
                         <MenuLink as={Container}>
@@ -397,7 +397,7 @@ const Footer = () => {
         <Container
           width={1}
           color="#6E747A"
-          textAlign={'left'}
+          textAlign={['center', 'left']}
           mt={3}
           mx={3}
           display={['none', 'block', null, null, 'none']}

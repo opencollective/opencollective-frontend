@@ -15,7 +15,7 @@ import { withUser } from './UserProvider';
 export const COLLECTIVE_CARD_MARGIN_X = 32;
 const COLLECTIVE_CARD_MARGIN_Y = 26;
 const COLLECTIVE_CARD_WIDTH = 144;
-const COLLECTIVE_CARD_HEIGHT = 272;
+const COLLECTIVE_CARD_HEIGHT = 220;
 const COLLECTIVE_CARD_FULL_WIDTH = COLLECTIVE_CARD_WIDTH + COLLECTIVE_CARD_MARGIN_X;
 
 /** Adds custom scrollbar for Chrome */

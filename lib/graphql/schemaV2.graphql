@@ -5876,7 +5876,7 @@ type Mutation {
   ): Member!
   createUpdate(update: UpdateCreateInput!): Update!
   editUpdate(update: UpdateUpdateInput!): Update!
-  publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
+  publishUpdate(id: String!, notificationAudience: UpdateAudience!): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
 
@@ -7431,6 +7431,11 @@ type Query {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind]
   ): TransactionCollection
   update(
     """
@@ -7609,6 +7614,18 @@ type TransactionCollection implements Collection {
   nodes: [Transaction]
 }
 
+enum TransactionKind {
+  ADDED_FUNDS
+  CONTRIBUTION
+  EXPENSE
+  HOST_FEE
+  HOST_FEE_SHARE
+  PAYMENT_PROCESSOR_FEE
+  PLATFORM_FEE
+  PLATFORM_TIP
+  PREPAID_PAYMENT_METHOD
+}
+
 """
 Fields for the user permissions on an transaction
 """
@@ -7655,6 +7672,10 @@ enum TransactionType {
 TransferWise related properties for bank transfer.
 """
 type TransferWise {
+  """
+  Unique identifier for this Wise object
+  """
+  id: String!
   requiredFields(
     """
     The 3 letter code identifying the currency you want to receive (ie: USD, EUR, BRL, GBP)
@@ -7723,7 +7744,6 @@ type Update {
   """
   userCanPublishUpdate: Boolean!
   isPrivate: Boolean!
-  isChangelog: Boolean!
   title: String!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -7807,7 +7827,6 @@ Input type for UpdateType
 input UpdateCreateInput {
   title: String!
   isPrivate: Boolean
-  isChangelog: Boolean!
   makePublicOn: IsoDateString
   html: String
   fromAccount: AccountReferenceInput

@@ -20,7 +20,7 @@ import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const { TW_API_COLLECTIVE_SLUG } = process.env;
+const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
 
 const hostQuery = gqlV2/* GraphQL */ `
   query EditCollectiveBankTransferHost($slug: String) {

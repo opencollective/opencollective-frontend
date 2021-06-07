@@ -264,7 +264,6 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
             view="admin"
-            usePreviewModal
             onProcess={(expense, cache) => hasFilters && onExpenseUpdate(expense, cache, query.status)}
           />
           <Flex mt={5} justifyContent="center">

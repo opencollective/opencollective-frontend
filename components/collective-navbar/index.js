@@ -1,4 +1,4 @@
-import React, { Fragment, useRef } from 'react';
+import React, { useRef } from 'react';
 import { PropTypes } from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
@@ -12,9 +12,8 @@ import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import themeGet from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
-import { darken } from 'polished';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
 import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
@@ -23,6 +22,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import { getSettingsRoute } from '../../lib/url_helpers';
 
+import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
 import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
@@ -41,6 +41,14 @@ import { useUser } from '../UserProvider';
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
+
+const DisableGlobalScrollOnMobile = createGlobalStyle`
+  @media (max-width: 64em) {
+    body {
+      overflow: hidden;
+    }
+  }
+`;
 
 const NavBarContainer = styled.div`
   position: sticky;
@@ -127,6 +135,17 @@ const CollectiveName = styled(LinkCollective).attrs({
 `;
 
 const CategoriesContainer = styled(Container)`
+  background-color: #ffffff;
+  max-height: calc(100vh - 70px);
+  flex-shrink: 2;
+  flex-grow: 1;
+  overflow: auto;
+
+  @media screen and (max-width: 40em) {
+    max-height: none;
+    flex-shrink: 0;
+  }
+
   @media screen and (min-width: 40em) and (max-width: 64em) {
     border: 1px solid rgba(214, 214, 214, 0.3);
     border-radius: 0px 0px 0px 8px;
@@ -252,12 +271,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
         <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
               <FormattedMessage id="Settings" defaultMessage="Settings" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -266,12 +285,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
         <Link href={`/${collective.slug}/dashboard`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Dashboard size="1em" />
             <Span ml={2}>
               <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -280,31 +299,31 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
         <Link href={getContributeRoute(collective)}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Planet size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
   } else if (callsToAction.includes('hasApply')) {
     return {
       type: NAVBAR_ACTION_TYPE.APPLY,
-      component: <ApplyToHostBtn hostSlug={collective.slug} buttonRenderer={props => <MainActionBtn {...props} />} />,
+      component: <ApplyToHostBtn hostSlug={collective.slug} buttonRenderer={props => <ActionButton {...props} />} />,
     };
   } else if (callsToAction.includes('hasRequestGrant')) {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
         <Link href={`/${collective.slug}/expenses/new`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -313,12 +332,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
         <Link href={`/${collective.slug}/expenses/new`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -327,12 +346,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
         <Link href={`/${collective.slug}/recurring-contributions`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -341,12 +360,12 @@ const getMainAction = (collective, callsToAction) => {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
         <Link href={`/${collective.slug}/contact`}>
-          <MainActionBtn tabIndex="-1">
+          <ActionButton tabIndex="-1">
             <Envelope size="1em" />
             <Span ml={2}>
               <FormattedMessage id="Contact" defaultMessage="Contact" />
             </Span>
-          </MainActionBtn>
+          </ActionButton>
         </Link>
       ),
     };
@@ -356,12 +375,12 @@ const getMainAction = (collective, callsToAction) => {
       component: (
         <AddFundsBtn collective={collective} host={collective.host}>
           {btnProps => (
-            <MainActionBtn {...btnProps}>
+            <ActionButton {...btnProps}>
               <AttachMoney size="1em" />
               <Span>
                 <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
               </Span>
-            </MainActionBtn>
+            </ActionButton>
           )}
         </AddFundsBtn>
       ),
@@ -372,12 +391,12 @@ const getMainAction = (collective, callsToAction) => {
       component: (
         <AddPrepaidBudgetBtn collective={collective}>
           {btnProps => (
-            <MainActionBtn {...btnProps}>
+            <ActionButton {...btnProps}>
               <AttachMoney size="1em" />
               <Span>
                 <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
               </Span>
-            </MainActionBtn>
+            </ActionButton>
           )}
         </AddPrepaidBudgetBtn>
       ),
@@ -386,39 +405,6 @@ const getMainAction = (collective, callsToAction) => {
     return null;
   }
 };
-
-export const MainActionBtn = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
-  padding: 5px 10px;
-  white-space: nowrap;
-  text-transform: uppercase;
-  background: ${themeGet('colors.primary.100')};
-  border-radius: 8px;
-  color: ${themeGet('colors.primary.700')};
-  border: none;
-
-  &,
-  span {
-    letter-spacing: 0.01em;
-  }
-
-  &:hover {
-    background: ${props => darken(0.025, props.theme.colors.primary[100])};
-  }
-
-  &:active,
-  &:focus {
-    background: ${themeGet('colors.primary.700')};
-    color: ${themeGet('colors.white.full')};
-    box-shadow: none;
-  }
-
-  span {
-    vertical-align: middle;
-  }
-`;
 
 /**
  * The NavBar that displays all the individual sections.
@@ -453,6 +439,7 @@ const CollectiveNavbar = ({
   const mainAction = getMainAction(collective, actionsArray);
   const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));
   const navbarRef = useRef();
+  const mainContainerRef = useRef();
 
   /** This is to close the navbar dropdown menus (desktop)/slide-out menu (tablet)/non-collapsible menu (mobile)
    * when we click a category header to scroll down to (i.e. Connect) or sub-section page to open (i.e. Updates) */
@@ -465,7 +452,7 @@ const CollectiveNavbar = ({
   });
 
   return (
-    <NavBarContainer>
+    <NavBarContainer ref={mainContainerRef}>
       <NavbarContentContainer
         flexDirection={['column', 'row']}
         px={[0, 3, null, Dimensions.PADDING_X[1]]}
@@ -526,7 +513,12 @@ const CollectiveNavbar = ({
               {isExpanded ? (
                 <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
               ) : (
-                <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                <ExpandMenuIcon
+                  onClick={() => {
+                    mainContainerRef.current?.scrollIntoView(true);
+                    setExpanded(true);
+                  }}
+                />
               )}
             </Box>
           )}
@@ -534,17 +526,20 @@ const CollectiveNavbar = ({
         {/** Main navbar items */}
 
         {!onlyInfos && (
-          <Fragment>
+          <Container
+            overflowY="auto"
+            display={['block', 'flex']}
+            width="100%"
+            justifyContent="space-between"
+            flexDirection={['column', 'row']}
+          >
+            {isExpanded && <DisableGlobalScrollOnMobile />}
             <CategoriesContainer
               ref={navbarRef}
-              backgroundColor="#fff"
               display={isExpanded ? 'flex' : ['none', 'flex']}
               flexDirection={['column', null, null, 'row']}
-              flexShrink={2}
-              flexGrow={1}
               justifyContent={['space-between', null, 'flex-start']}
               order={[0, 3, 0]}
-              overflowX="auto"
               isExpanded={isExpanded}
             >
               {isLoading ? (
@@ -590,12 +585,17 @@ const CollectiveNavbar = ({
                   {isExpanded ? (
                     <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
                   ) : (
-                    <ExpandMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                    <ExpandMenuIcon
+                      onClick={() => {
+                        mainContainerRef.current?.scrollIntoView(true);
+                        setExpanded(!isExpanded);
+                      }}
+                    />
                   )}
                 </Container>
               )}
             </Container>
-          </Fragment>
+          </Container>
         )}
       </NavbarContentContainer>
     </NavBarContainer>
