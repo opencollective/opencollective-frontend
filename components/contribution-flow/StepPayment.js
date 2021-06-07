@@ -16,7 +16,6 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import NewCreditCardForm from '../NewCreditCardForm';
 import StyledRadioList from '../StyledRadioList';
 import { P } from '../Text';
-import { useUser } from '../UserProvider';
 
 import BlockedContributorMessage from './BlockedContributorMessage';
 import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
@@ -91,7 +90,6 @@ const StepPayment = ({
   isSubmitting,
   hideCreditCardPostalCode,
   onNewCardFormReady,
-  hasNewPaypal,
 }) => {
   // GraphQL mutations and queries
   const { loading, data, error } = useQuery(paymentMethodsQuery, {
@@ -102,21 +100,9 @@ const StepPayment = ({
   });
 
   // data handling
-  const { LoggedInUser } = useUser();
-  const isRoot = Boolean(LoggedInUser?.isRoot());
   const paymentMethods = get(data, 'account.paymentMethods', null) || [];
-  const paymentOptions = React.useMemo(
-    () =>
-      generatePaymentMethodOptions(
-        paymentMethods,
-        stepProfile,
-        stepDetails,
-        stepSummary,
-        collective,
-        isRoot,
-        hasNewPaypal,
-      ),
-    [paymentMethods, stepProfile, stepDetails, collective, isRoot, hasNewPaypal],
+  const paymentOptions = React.useMemo(() =>
+    generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective),
   );
 
   const setNewPaymentMethod = (key, paymentMethod) => {
@@ -215,7 +201,6 @@ StepPayment.propTypes = {
   onChange: PropTypes.func,
   onNewCardFormReady: PropTypes.func,
   hideCreditCardPostalCode: PropTypes.bool,
-  hasNewPaypal: PropTypes.bool,
   isSubmitting: PropTypes.bool,
 };
 

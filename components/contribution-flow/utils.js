@@ -15,15 +15,7 @@ import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 
-export const generatePaymentMethodOptions = (
-  paymentMethods,
-  stepProfile,
-  stepDetails,
-  stepSummary,
-  collective,
-  isRoot,
-  hasNewPaypal,
-) => {
+export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDetails, stepSummary, collective) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL);
@@ -97,7 +89,7 @@ export const generatePaymentMethodOptions = (
     }
 
     // Paypal
-    if (hostHasPaypal && (!interval || hasNewPaypal)) {
+    if (hostHasPaypal) {
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
