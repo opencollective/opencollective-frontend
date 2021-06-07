@@ -2005,6 +2005,8 @@
   "update.publish.modal.header": "Publish update",
   "update.publish.notify.selection": "Select who should be notified",
   "update.publishedAtBy": "Published on {date} by {author}",
+  "update.type.changelog": "Changelog Entry",
+  "update.type.normal": "Normal Update",
   "update.viewLatestUpdates": "浏览最新更新",
   "UpdateAudienceBreakdown.Total": "Your Update will be sent to a total of {count} emails",
   "UpdatedOnDate": "更新于 {date, date, long}",
