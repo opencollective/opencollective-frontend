@@ -1,0 +1,27 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import Hero from '../../components/collective-page/hero/Hero';
+import { webpackCollective, openSourceHost } from '../mocks/collectives';
+
+<Meta
+  title="Collective Page/Hero"
+  component={Hero}
+  argTypes={{
+    collective: { defaultValue: webpackCollective },
+    host: { defaultValue: openSourceHost },
+  }}
+  parameters={{
+    actions: {
+      handles: ['mouseover', 'click'],
+    },
+  }}
+/>
+
+# Hero
+
+## Default
+
+export const DefaultStory = props => <Hero {...props} />;
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />

@@ -1,0 +1,56 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import StepPayment from '../../components/contribution-flow/StepPayment';
+import paymentMethods from '../mocks/payment_methods';
+import { personalProfile } from '../mocks/profiles';
+import StepProfile from '../../components/contribution-flow/StepProfile';
+import { webpackCollective } from '../mocks/collectives';
+
+<Meta
+  title="Contribution Flow/StepPayment"
+  component={StepPayment}
+  argTypes={{
+    myArg: { defaultValue: 'Click me!' },
+  }}
+  parameters={{
+    actions: {
+      handles: ['mouseover', 'click'],
+    },
+  }}
+/>
+
+export const DefaultStory = props => <StepPayment stepProfile={StepProfile} collective={webpackCollective} {...props} />;
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />
+
+<Canvas>
+  <Story name="With PayPal and Manual">
+    {() => {
+      const [disabled, setDisabled] = React.useState(false);
+      const [values, setValues] = React.useState(null);
+      return(<div>
+        <StepPayment
+          stepProfile={StepProfile}
+          withPaypal
+          collective={personalProfile}
+          disabled={disabled}
+          onChange={setValues}
+          paymentMethods={paymentMethods}
+          manual={{
+            title: 'Bank transfer',
+            instructions:
+              'Please make a bank transfer for the amount of $42.00 to the bank account: IBAN: BE11 4242 4242 4242 with the following communication: "fzappa order 125238". Please note that it will take a few days to process your payment.',
+          }}
+        />
+        <br />
+        <br />
+        <button onClick={() => setDisabled(!disabled)}>{disabled ? 'Enable' : 'Disable'}</button>
+        <hr />
+        <br />
+        <label>State</label>
+        <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(values, null, 2)}</pre>
+      </div>);
+    }}
+  </Story>
+</Canvas>

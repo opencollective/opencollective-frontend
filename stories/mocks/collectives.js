@@ -1,3 +1,5 @@
+import {GQLV2_PAYMENT_METHOD_TYPES} from "../../lib/constants/payment-methods";
+
 export const openSourceHost = {
   id: 11004,
   slug: 'opensource',
@@ -11,6 +13,7 @@ export const openSourceHost = {
     country: 'US',
   },
   __typename: 'Organization',
+  supportedPaymentMethods: [GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD],
 };
 
 export const randomCollectivesList = [
@@ -132,6 +135,7 @@ export const webpackCollective = {
   path: '/webpack',
   name: 'webpack',
   company: null,
+  connectedTo: [],
   tags: ['open source'],
   isApproved: true,
   image: 'https://cl.ly/221T14472V23/icon-big_x6ot1e.png',
