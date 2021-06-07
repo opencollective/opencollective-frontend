@@ -5876,7 +5876,7 @@ type Mutation {
   ): Member!
   createUpdate(update: UpdateCreateInput!): Update!
   editUpdate(update: UpdateUpdateInput!): Update!
-  publishUpdate(id: String!, notificationAudience: UpdateAudience!): Update!
+  publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
 
@@ -7744,6 +7744,7 @@ type Update {
   """
   userCanPublishUpdate: Boolean!
   isPrivate: Boolean!
+  isChangelog: Boolean!
   title: String!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -7827,6 +7828,7 @@ Input type for UpdateType
 input UpdateCreateInput {
   title: String!
   isPrivate: Boolean
+  isChangelog: Boolean
   makePublicOn: IsoDateString
   html: String
   fromAccount: AccountReferenceInput
