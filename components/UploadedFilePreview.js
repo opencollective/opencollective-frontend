@@ -149,7 +149,7 @@ const UploadedFilePreview = ({
 
   return (
     <Container {...props}>
-      <CardContainer size={['100%', ...size]} title={fileName} border={border} hasOnClick={Boolean(props.onClick)}>
+      <CardContainer size={size} title={fileName} border={border} hasOnClick={Boolean(props.onClick)}>
         {content}
       </CardContainer>
       {showFileName && (
