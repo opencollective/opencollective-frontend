@@ -118,7 +118,11 @@ const RecurringContributionsCard = ({
             </P>
             <P fontSize="14px" lineHeight="20px" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
               <FormattedMoneyAmount
-                amount={contribution.amount.valueInCents}
+                amount={
+                  !isNil(contribution.platformContributionAmount?.valueInCents)
+                    ? contribution.amount.valueInCents + contribution.platformContributionAmount.valueInCents
+                    : contribution.amount.valueInCents
+                }
                 interval={contribution.frequency.toLowerCase().slice(0, -2)}
                 currency={contribution.amount.currency}
               />
@@ -135,7 +139,7 @@ const RecurringContributionsCard = ({
                 <P fontSize="12px" lineHeight="20px" color="black.700">
                   (
                   <FormattedMoneyAmount
-                    amount={contribution.amount.valueInCents - contribution.platformContributionAmount.valueInCents}
+                    amount={contribution.amount.valueInCents}
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
                     precision="auto"
