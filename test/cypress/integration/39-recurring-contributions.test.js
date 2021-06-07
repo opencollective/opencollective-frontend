@@ -139,7 +139,7 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('tier-amount-select').click();
       cy.contains('[data-cy="select-option"]', 'Other').click();
       cy.getByDataCy('recurring-contribution-tier-box').contains('Min. amount: $100.00');
-      cy.getByDataCy('recurring-contribution-custom-amount-input').type('50');
+      cy.getByDataCy('recurring-contribution-custom-amount-input').type('{selectall}50');
 
       cy.getByDataCy('recurring-contribution-update-order-button').scrollIntoView().click();
       cy.getByDataCy('toast-notification').contains('Amount is less than minimum value allowed for this Tier.');
