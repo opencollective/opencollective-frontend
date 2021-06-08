@@ -108,6 +108,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
                     </Flex>
                     <Flex pt={2} pb={3}>
                       <StyledLink
+                        onClick={onClose}
                         as={Link}
                         href={`/opencollective/updates/${update.slug}`}
                         color="blue.700"
@@ -126,6 +127,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
                     <Flex pb={3}>
                       {update.summary.slice(update.summary.length - 3) === '...' && (
                         <StyledLink
+                          onClick={onClose}
                           as={Link}
                           href={`/opencollective/updates/${update.slug}`}
                           fontSize="14px"
@@ -157,7 +159,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
             </StyledLink>
           </Flex>
           <Flex width={1 / 2} justifyContent="right">
-            <Link href="/opencollective/updates">
+            <Link onClick={onClose} href="/opencollective/updates">
               <StyledButton>
                 <Span fontSize={['11px', '14px']}>
                   <FormattedMessage id="NewsAndUpdates.button.seeAllUpdates" defaultMessage="See all new updates" />

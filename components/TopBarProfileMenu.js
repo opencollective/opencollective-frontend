@@ -16,7 +16,7 @@ import Hide from './Hide';
 import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
-import NewsAndUpdatesModal from './NewsAndUpdatesModal';
+import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledLink from './StyledLink';
 import { P, Span } from './Text';
@@ -51,11 +51,12 @@ class TopBarProfileMenu extends React.Component {
     LoggedInUser: PropTypes.object,
     logout: PropTypes.func,
     loadingLoggedInUser: PropTypes.bool,
+    setShowNewsAndUpdates: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
-    this.state = { showProfileMenu: false, loading: true, showNewsAndUpdates: false };
+    this.state = { showProfileMenu: false, loading: true };
   }
 
   componentDidMount() {
@@ -97,8 +98,7 @@ class TopBarProfileMenu extends React.Component {
   };
 
   renderProfileMenu() {
-    const { LoggedInUser } = this.props;
-
+    const { LoggedInUser, setShowNewsAndUpdates } = this.props;
     return (
       <Container
         bg="white.full"
@@ -130,7 +130,7 @@ class TopBarProfileMenu extends React.Component {
               <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
             </P>
             <Box as="ul" p={0} my={2}>
-              <UserMenuLinkEntry as={Span} onClick={() => this.setState({ showNewsAndUpdates: true })}>
+              <UserMenuLinkEntry as={Span} onClick={() => setShowNewsAndUpdates(true)}>
                 <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
               </UserMenuLinkEntry>
               <UserMenuLinkEntry href={`/${LoggedInUser.username}`}>
@@ -232,34 +232,27 @@ class TopBarProfileMenu extends React.Component {
     }
 
     return (
-      <React.Fragment>
-        <div className="LoginTopBarProfileButton">
-          {status === 'loading' && (
-            <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
-              <FormattedMessage id="loading" defaultMessage="loading" />
-              &hellip;
-            </P>
-          )}
+      <div className="LoginTopBarProfileButton">
+        {status === 'loading' && (
+          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+            <FormattedMessage id="loading" defaultMessage="loading" />
+            &hellip;
+          </P>
+        )}
 
-          {status === 'loggingout' && (
-            <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
-              <FormattedMessage id="loggingout" defaultMessage="logging out" />
-              &hellip;
-            </P>
-          )}
+        {status === 'loggingout' && (
+          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+            <FormattedMessage id="loggingout" defaultMessage="logging out" />
+            &hellip;
+          </P>
+        )}
 
-          {status === 'loggedout' && <LoginBtn />}
+        {status === 'loggedout' && <LoginBtn />}
 
-          {status === 'loggedin' && this.renderLoggedInUser()}
-        </div>
-        <NewsAndUpdatesModal
-          show={this.state.showNewsAndUpdates}
-          update={null}
-          onClose={() => this.setState({ showNewsAndUpdates: false })}
-        />
-      </React.Fragment>
+        {status === 'loggedin' && this.renderLoggedInUser()}
+      </div>
     );
   }
 }
 
-export default withUser(TopBarProfileMenu);
+export default withNewsAndUpdates(withUser(TopBarProfileMenu));
