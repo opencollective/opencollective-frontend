@@ -7440,6 +7440,11 @@ type Query {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind]
   ): TransactionCollection
   update(
     """
@@ -7616,6 +7621,18 @@ type TransactionCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Transaction]
+}
+
+enum TransactionKind {
+  ADDED_FUNDS
+  CONTRIBUTION
+  EXPENSE
+  HOST_FEE
+  HOST_FEE_SHARE
+  PAYMENT_PROCESSOR_FEE
+  PLATFORM_FEE
+  PLATFORM_TIP
+  PREPAID_PAYMENT_METHOD
 }
 
 """

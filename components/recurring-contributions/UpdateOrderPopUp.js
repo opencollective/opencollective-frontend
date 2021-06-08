@@ -64,30 +64,32 @@ const updateOrderMutation = gqlV2/* GraphQL */ `
 
 const tiersQuery = gqlV2/* GraphQL */ `
   query UpdateOrderPopUpTiers($slug: String!) {
-    collective(slug: $slug) {
+    account(slug: $slug) {
       id
       slug
       name
       type
       currency
       settings
-      tiers {
-        nodes {
-          id
-          name
-          interval
-          amount {
-            value
-            valueInCents
-            currency
+      ... on AccountWithContributions {
+        tiers {
+          nodes {
+            id
+            name
+            interval
+            amount {
+              value
+              valueInCents
+              currency
+            }
+            minimumAmount {
+              value
+              valueInCents
+              currency
+            }
+            amountType
+            presets
           }
-          minimumAmount {
-            value
-            valueInCents
-            currency
-          }
-          amountType
-          presets
         }
       }
     }
@@ -209,12 +211,10 @@ const useContributeOptions = (order, tiers, tiersLoading, disableCustomContribut
     return getContributeOptions(intl, order, tiers, disableCustomContributions);
   }, [intl, order, tiers, disableCustomContributions]);
 
-  useEffect(() => {
-    if (contributeOptions && !selectedContributeOption && !tiersLoading) {
-      setSelectedContributeOption(getDefaultContributeOption(order, contributeOptions));
-      setLoading(false);
-    }
-  }, [contributeOptions]);
+  if (contributeOptions && !selectedContributeOption && !tiersLoading) {
+    setSelectedContributeOption(getDefaultContributeOption(order, contributeOptions));
+    setLoading(false);
+  }
 
   useEffect(() => {
     if (selectedContributeOption !== null) {
@@ -222,7 +222,7 @@ const useContributeOptions = (order, tiers, tiersLoading, disableCustomContribut
       setAmountOptions(options);
 
       let option;
-      if (selectedContributeOption.id !== order.tier?.id) {
+      if ((selectedContributeOption.id || null) !== (order.tier?.id || null)) {
         // Just pick first if tier is different than current one
         option = first(options);
       } else {
@@ -230,7 +230,7 @@ const useContributeOptions = (order, tiers, tiersLoading, disableCustomContribut
         option = options.find(option => option.value === order.amount.valueInCents) || last(options);
       }
       setSelectedAmountOption(option);
-      setInputAmountValue(option.value);
+      setInputAmountValue(option.value || order.amount.valueInCents);
     }
   }, [selectedContributeOption]);
 
@@ -284,8 +284,8 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   // state management
   const { addToast } = useToasts();
   const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution, onSuccess: onCloseEdit });
-  const tiers = get(data, 'collective.tiers.nodes', null);
-  const disableCustomContributions = get(data, 'collective.settings.disableCustomContributions', false);
+  const tiers = get(data, 'account.tiers.nodes', null);
+  const disableCustomContributions = get(data, 'account.settings.disableCustomContributions', false);
   const contributeOptionsState = useContributeOptions(contribution, tiers, tiersLoading, disableCustomContributions);
   const {
     amountOptions,
