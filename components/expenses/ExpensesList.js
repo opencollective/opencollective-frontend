@@ -5,6 +5,8 @@ import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { DISABLE_ANIMATIONS } from '../../lib/animations';
+
 import ExpenseBudgetItem from '../budget/ExpenseBudgetItem';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -57,7 +59,7 @@ const ExpensesList = ({
           </ExpenseContainer>
         ))
       ) : (
-        <FlipMove enterAnimation="fade" leaveAnimation="fade">
+        <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
           {expenses.map((expense, idx) => (
             <ExpenseContainer key={expense.id} isFirst={!idx} data-cy={`expense-${expense.status}`}>
               <ExpenseBudgetItem
