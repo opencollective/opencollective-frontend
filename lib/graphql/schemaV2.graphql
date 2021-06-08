@@ -220,6 +220,7 @@ interface Account {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -764,6 +765,7 @@ type Bot implements Account {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -1020,6 +1022,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -3218,6 +3221,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -4155,6 +4159,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -4488,6 +4493,7 @@ type Host implements Account & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -5043,6 +5049,7 @@ type Individual implements Account {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -6019,12 +6026,16 @@ type Order {
   """
   totalDonations: Amount!
   paymentMethod: PaymentMethod
-  platformFee: Amount @deprecated(reason: "2020-07-31: Please use platformContributionAmount")
 
   """
   Platform contribution attached to the Order.
   """
-  platformContributionAmount: Amount
+  platformContributionAmount: Amount @deprecated(reason: "2021-06-07: Please use platformTipAmount")
+
+  """
+  Platform Tip attached to the Order.
+  """
+  platformTipAmount: Amount
   taxes: [OrderTax]!
 
   """
@@ -6428,6 +6439,7 @@ type Organization implements Account & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -6959,6 +6971,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -8067,6 +8080,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
