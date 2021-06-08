@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import NewsAndUpdatesModal from './NewsAndUpdatesModal';
-import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
+import { useNewsAndUpdates } from './NewsAndUpdatesProvider';
 
-const GlobalNewsAndUpdates = props => {
-  const { showNewsAndUpdates, setShowNewsAndUpdates } = props;
+const GlobalNewsAndUpdates = () => {
+  const { showNewsAndUpdates, setShowNewsAndUpdates } = useNewsAndUpdates();
   return <NewsAndUpdatesModal show={showNewsAndUpdates} onClose={() => setShowNewsAndUpdates(false)} />;
 };
 
@@ -14,4 +14,4 @@ GlobalNewsAndUpdates.propTypes = {
   setShowNewsAndUpdates: PropTypes.func,
 };
 
-export default withNewsAndUpdates(GlobalNewsAndUpdates);
+export default GlobalNewsAndUpdates;

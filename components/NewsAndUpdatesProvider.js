@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
 export const NewsAndUpdatesContext = React.createContext({
-  showNewsAndUpdateModal: () => {},
+  setShowNewsAndUpdates: () => {},
 });
 
 const NewsAndUpdatesProvider = ({ children }) => {
@@ -18,6 +18,10 @@ const NewsAndUpdatesProvider = ({ children }) => {
 
 NewsAndUpdatesProvider.propTypes = {
   children: PropTypes.node,
+};
+
+export const useNewsAndUpdates = () => {
+  return useContext(NewsAndUpdatesContext);
 };
 
 export const withNewsAndUpdates = WrappedComponent => {

@@ -6,7 +6,6 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
-import NextIllustration from './home/HomeNextIllustration';
 import Container from './Container';
 import { Flex } from './Grid';
 import HTMLContent from './HTMLContent';
@@ -20,7 +19,7 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
 
 const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
-  query Update($collectiveSlug: String, $onlyChangelogUpdates: Boolean) {
+  query ChangelogUpdates($collectiveSlug: String, $onlyChangelogUpdates: Boolean) {
     account(slug: $collectiveSlug) {
       updates(onlyChangelogUpdates: $onlyChangelogUpdates) {
         nodes {
@@ -49,16 +48,8 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
                 alt="Updates and News Icon"
               />
             </Span>
-            <P
-              fontSize={['25px', '28px']}
-              fontFamily="Inter"
-              fontStyle="normal"
-              fontWeight="500"
-              lineHeight="36px"
-              color="black.900"
-              margin="0px 16px"
-            >
-              News and Updates
+            <P fontSize={['25px', '28px']} fontWeight="500" lineHeight="36px" color="black.900" margin="0px 16px">
+              <FormattedMessage id="NewsAndUpdates.link.newsAndUpdates" defaultMessage="News and Updates" />
             </P>
           </Flex>
         </Flex>
@@ -75,34 +66,19 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
               <StyledCarousel contentPosition="left">
                 {data.account.updates.nodes.map(update => (
                   <Container key={update.id}>
-                    <Container
-                      fontFamily="Inter"
-                      fontStyle="normal"
-                      fontWeight="normal"
-                      fontSize="13px"
-                      lineHeight="20px"
-                      color="black.700"
-                    >
+                    <Container fontSize="13px" lineHeight="20px" color="black.700">
                       <FormattedDate value={update.publishedAt} day="numeric" month="long" year="numeric" />
                     </Container>
                     <Flex>
                       <Span paddingTop="10px">
-                        <NextIllustration
+                        <Image
                           width={12}
                           height={12}
                           src="/static/images/news-and-updates-ellipse.svg"
                           alt="News and Updates Ellipse"
                         />
                       </Span>
-                      <P
-                        fontSize="20px"
-                        margin="0px 12px"
-                        fontFamily="Inter"
-                        fontStyle="normal"
-                        fontWeight="500"
-                        lineHeight="36px"
-                        color="black.900"
-                      >
+                      <P fontSize="20px" margin="0px 12px" fontWeight="500" lineHeight="36px" color="black.900">
                         {update.title}
                       </P>
                     </Flex>
@@ -125,7 +101,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
                       <HTMLContent color="black.800" mt={1} fontSize="16px" content={update.summary} />
                     </Flex>
                     <Flex pb={3}>
-                      {update.summary.slice(update.summary.length - 3) === '...' && (
+                      {update.summary.endsWith('...') && (
                         <StyledLink
                           onClick={onClose}
                           as={Link}
