@@ -1,5 +1,5 @@
-import INTERVALS from "../../lib/constants/intervals";
-import {AmountTypes, TierTypes} from "../../lib/constants/tiers-types";
+import INTERVALS from '../../lib/constants/intervals';
+import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 
 export const flexibleIntervalTier = {
   amountType: AmountTypes.FLEXIBLE,
@@ -16,7 +16,7 @@ export const flexibleIntervalTier = {
     currency: 'USD',
     valueInCents: 2000,
   },
-}
+};
 
 export const recurringIntervalTier = {
   amountType: AmountTypes.FLEXIBLE,
@@ -33,5 +33,4 @@ export const recurringIntervalTier = {
     currency: 'EUR',
     valueInCents: 6000,
   },
-}
-
+};

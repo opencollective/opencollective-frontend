@@ -1,12 +1,11 @@
 import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import StepProfile from '../../components/contribution-flow/StepProfile';
+import StepDetails from '../../components/contribution-flow/StepDetails';
+import { webpackCollective } from '../mocks/collectives';
 
 <Meta
   title="Contribution Flow/StepProfile"
   component={StepProfile}
-  argTypes={{
-    myArg: { defaultValue: 'Click me!' },
-  }}
   parameters={{
     actions: {
       handles: ['mouseover', 'click'],
@@ -14,31 +13,10 @@ import StepProfile from '../../components/contribution-flow/StepProfile';
   }}
 />
 
-export const DefaultStory = props => <StepProfile {...props} />;
+export const DefaultStory = props => (
+  <StepProfile stepDetails={StepDetails} collective={webpackCollective} {...props} />
+);
 
 <Story name="Default">{DefaultStory.bind({})}</Story>
 
 <ArgsTable story="Default" />
-
-<Canvas>
-  <Story name="With PayPal and Manual">
-    {() => (
-      import profiles, { personalProfile } from '../../mocks/profiles';
-      const [profile, setProfile] = React.useState(null);
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        <StepProfile
-          onProfileChange={setProfile}
-          otherProfiles={profiles}
-          personalProfile={personalProfile}
-          defaultSelectedProfile={profile || personalProfile}
-          id="contribute-as"
-          name="contribute-as"
-        />
-        <div style={{ margin: 24, maxWidth: 300 }}>
-          <strong>State</strong>
-          <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(profile, null, 2)}</pre>
-        </div>
-      </div>;
-    )}
-  </Story>
-</Canvas>
