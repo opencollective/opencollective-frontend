@@ -164,7 +164,7 @@ const StepPayment = ({
                   )}
                 </Flex>
               </Flex>
-              {value.key === NEW_CREDIT_CARD_KEY && (
+              {value.key === NEW_CREDIT_CARD_KEY && checked && (
                 <Box my={3}>
                   <NewCreditCardForm
                     name={NEW_CREDIT_CARD_KEY}

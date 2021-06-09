@@ -3,15 +3,7 @@ import StepProfile from '../../components/contribution-flow/StepProfile';
 import StepDetails from '../../components/contribution-flow/StepDetails';
 import { webpackCollective } from '../mocks/collectives';
 
-<Meta
-  title="Contribution Flow/StepProfile"
-  component={StepProfile}
-  parameters={{
-    actions: {
-      handles: ['mouseover', 'click'],
-    },
-  }}
-/>
+<Meta title="Contribution Flow/StepProfile" component={StepProfile} />
 
 export const DefaultStory = props => (
   <StepProfile stepDetails={StepDetails} collective={webpackCollective} {...props} />
