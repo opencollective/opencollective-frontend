@@ -344,7 +344,7 @@ class ExpensePage extends React.Component {
           account =>
             [USER, ORGANIZATION].includes(account.type) ||
             // Same Host
-            (account.isActive && this.props.data?.account?.host?.id === account.host?.id),
+            (account.isActive && this.props.data?.expense?.account?.host?.id === account.host?.id),
         );
       return [loggedInAccount, ...accountsAdminOf];
     }
