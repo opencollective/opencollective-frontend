@@ -1708,6 +1708,7 @@
   "RecurringContributions.customAmount": "Quantia personalizada",
   "RecurringContributions.minAmount": "Quantidade mínima: {minAmount}",
   "RecurringContributions.none": "Não há contribuições recorrentes para ver aqui! 👀",
+  "RecurringContributions.permissionError": "You need to be logged in as the admin of this account to view this page.",
   "redeem.card.authenticated": "Você está atualmente logado. Faça o logout se você quer resgatar com uma conta diferente.",
   "redeem.card.info": "É fácil! Basta inserir seu nome, endereço de e-mail e código do cartão presente. Nós criaremos uma conta para você, caso você ainda não tenha uma. Então você poderá selecionar o saldo do cartão presente como método de pagamento ao fazer uma contribuição.",
   "redeem.card.success.instructions": "Enviamos um e-mail para {email} com instruções para verificar sua nova conta Open Collective e a creditamos com o valor de seu cartão presente.",

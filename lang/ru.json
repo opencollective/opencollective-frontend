@@ -1708,6 +1708,7 @@
   "RecurringContributions.customAmount": "Произвольная сумма",
   "RecurringContributions.minAmount": "Min. amount: {minAmount}",
   "RecurringContributions.none": "Нет повторяющихся вкладов, чтобы увидеть здесь! 👀",
+  "RecurringContributions.permissionError": "You need to be logged in as the admin of this account to view this page.",
   "redeem.card.authenticated": "You are currently logged in. Sign out if you want to redeem with a different account.",
   "redeem.card.info": "It's easy! Just enter your name, email address, and gift card code. We will create an account for you if you don't already have one. Then you'll be able to select the gift card balance as the payment method when making a contribution.",
   "redeem.card.success.instructions": "Мы отправили письмо на {email} с инструкциями для подтверждения вашего нового аккаунта Open Collective, и подарили вам сумму в размере вашей подарочной открытки.",

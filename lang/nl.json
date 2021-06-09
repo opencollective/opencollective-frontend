@@ -1708,6 +1708,7 @@
   "RecurringContributions.customAmount": "Custom amount",
   "RecurringContributions.minAmount": "Min. amount: {minAmount}",
   "RecurringContributions.none": "No recurring contributions to see here! 👀",
+  "RecurringContributions.permissionError": "You need to be logged in as the admin of this account to view this page.",
   "redeem.card.authenticated": "You are currently logged in. Sign out if you want to redeem with a different account.",
   "redeem.card.info": "It's easy! Just enter your name, email address, and gift card code. We will create an account for you if you don't already have one. Then you'll be able to select the gift card balance as the payment method when making a contribution.",
   "redeem.card.success.instructions": "We hebben een e-mail gestuurd naar {email} met instructies om je nieuwe Open Collectief account te verifiëren en het bedrag van je cadeaubon er aan toe te kennen.",
