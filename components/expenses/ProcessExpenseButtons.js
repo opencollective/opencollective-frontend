@@ -112,7 +112,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
  */
 const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps, onSuccess }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache);
+  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
   const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
