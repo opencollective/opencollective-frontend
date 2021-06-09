@@ -266,6 +266,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       canPay
       canMarkAsUnpaid
       canComment
+      canUnschedulePayment
     }
     activities {
       id
