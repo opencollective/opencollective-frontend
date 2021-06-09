@@ -39,12 +39,13 @@ class Updates extends React.Component {
   constructor(props) {
     super(props);
     this.fetchMore = this.fetchMore.bind(this);
-    this.state = { loading: false, isPayActionLocked: false };
+    this.state = { loading: false, isPayActionLocked: false, prevUpdateCount: 0 };
   }
 
   fetchMore(e) {
     e.target.blur();
     this.setState({ loading: true });
+    this.setState({ prevUpdateCount: this.props.updates.length });
     this.props.fetchMore().then(() => {
       this.setState({ loading: false });
     });
@@ -84,7 +85,7 @@ class Updates extends React.Component {
               <FormattedMessage id="updates.empty" defaultMessage="No Updates" />
             </Container>
           )}
-          {updates.length >= 10 && updates.length % 10 === 0 && (
+          {updates.length >= 10 && updates.length % 10 === 0 && this.state.prevUpdateCount !== updates.length && (
             <Container margin="1rem" textAlign="center">
               <StyledButton onClick={this.fetchMore}>
                 {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
