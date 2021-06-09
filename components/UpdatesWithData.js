@@ -90,6 +90,7 @@ class UpdatesWithData extends React.Component {
 const updatesQuery = gqlV2/* GraphQL */ `
   query Updates($collectiveSlug: String!, $limit: Int, $offset: Int) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
       updates(limit: $limit, offset: $offset) {
         nodes {
           id
