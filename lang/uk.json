@@ -1708,6 +1708,7 @@
   "RecurringContributions.customAmount": "Власна сума",
   "RecurringContributions.minAmount": "Мін. сума: {minAmount}",
   "RecurringContributions.none": "Немає повторюваних внесків! 👀",
+  "RecurringContributions.permissionError": "You need to be logged in as the admin of this account to view this page.",
   "redeem.card.authenticated": "You are currently logged in. Sign out if you want to redeem with a different account.",
   "redeem.card.info": "It's easy! Just enter your name, email address, and gift card code. We will create an account for you if you don't already have one. Then you'll be able to select the gift card balance as the payment method when making a contribution.",
   "redeem.card.success.instructions": "We’ve sent an email to {email} with instructions to verify your new Open Collective account and credit it with the amount of your gift card.",

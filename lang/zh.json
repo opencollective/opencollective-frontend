@@ -1708,6 +1708,7 @@
   "RecurringContributions.customAmount": "自定义金额",
   "RecurringContributions.minAmount": "最低金额：{minAmount}",
   "RecurringContributions.none": "在这里看不到经常性的贡献! 👀",
+  "RecurringContributions.permissionError": "You need to be logged in as the admin of this account to view this page.",
   "redeem.card.authenticated": "您目前已登录。如果您想要使用另一个帐户兑换，请注销当前账号。",
   "redeem.card.info": "It's easy! Just enter your name, email address, and gift card code. We will create an account for you if you don't already have one. Then you'll be able to select the gift card balance as the payment method when making a contribution.",
   "redeem.card.success.instructions": "We’ve sent an email to {email} with instructions to verify your new Open Collective account and credit it with the amount of your gift card.",

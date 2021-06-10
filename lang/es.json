@@ -1708,6 +1708,7 @@
   "RecurringContributions.customAmount": "Monto personalizado",
   "RecurringContributions.minAmount": "Monto mínimo: {minAmount}",
   "RecurringContributions.none": "No recurring contributions to see here! 👀",
+  "RecurringContributions.permissionError": "You need to be logged in as the admin of this account to view this page.",
   "redeem.card.authenticated": "Actualmente estás conectado. Cierra sesión si quieres canjear con una cuenta diferente.",
   "redeem.card.info": "¡Es fácil! Simplemente introduce tu nombre, tu correo electrónico y un código de tarjeta de regalo. Te crearemos una cuenta automáticamente si no tienes una. Luego podrás seleccionar el saldo de la tarjeta de crédito como el método de pago a la hora de hacer una contribución.",
   "redeem.card.success.instructions": "Hemos enviado un correo electrónico a {email} con las instrucciones para verificar tu nueva cuenta de Open Collective y acreditarla con la cantidad de tu tarjeta de regalo.",
