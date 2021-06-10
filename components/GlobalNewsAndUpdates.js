@@ -10,7 +10,7 @@ const GlobalNewsAndUpdates = () => {
 };
 
 GlobalNewsAndUpdates.propTypes = {
-  showNewsAndUpdates: PropTypes.bool.isRequired,
+  showNewsAndUpdates: PropTypes.bool,
   setShowNewsAndUpdates: PropTypes.func,
 };
 
