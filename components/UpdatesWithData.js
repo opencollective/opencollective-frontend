@@ -48,7 +48,7 @@ class UpdatesWithData extends React.Component {
       return <Error message={data.error.message} />;
     }
 
-    const updates = data.account?.updates?.nodes;
+    const updates = data.account?.updates;
     return (
       <div className="UpdatesContainer">
         {!compact && (
@@ -92,6 +92,7 @@ const updatesQuery = gqlV2/* GraphQL */ `
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       updates(limit: $limit, offset: $offset) {
+        totalCount
         nodes {
           id
           slug
