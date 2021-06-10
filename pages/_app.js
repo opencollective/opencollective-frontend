@@ -29,7 +29,9 @@ Router.onRouteChangeError = () => NProgress.done();
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 import sentryLib from '../server/sentry';
 
+import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import GlobalToasts from '../components/GlobalToasts';
+import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import ToastProvider from '../components/ToastProvider';
 
 // Use JSDOM on server-side so that react-intl can render rich messages
@@ -131,10 +133,13 @@ class OpenCollectiveFrontendApp extends App {
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
                 <UserProvider>
-                  <ToastProvider>
-                    <Component {...pageProps} />
-                    <GlobalToasts />
-                  </ToastProvider>
+                  <NewsAndUpdatesProvider>
+                    <ToastProvider>
+                      <Component {...pageProps} />
+                      <GlobalToasts />
+                      <GlobalNewsAndUpdates />
+                    </ToastProvider>
+                  </NewsAndUpdatesProvider>
                 </UserProvider>
               </RawIntlProvider>
             </StripeProviderSSR>

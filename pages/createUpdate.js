@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular';
-import { mapValues } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -49,7 +48,7 @@ const UPDATE_TYPE_MSGS = defineMessages({
   },
   changelog: { id: 'update.type.changelog', defaultMessage: 'Changelog Entry' },
 });
-const UPDATE_TYPE = Object.values(mapValues(UPDATE_TYPE_MSGS, value => value.defaultMessage));
+const UPDATE_TYPES = Object.keys(UPDATE_TYPE_MSGS);
 
 class CreateUpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
@@ -63,6 +62,7 @@ class CreateUpdatePage extends React.Component {
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
     router: PropTypes.object,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -71,7 +71,7 @@ class CreateUpdatePage extends React.Component {
       update: {},
       status: '',
       error: '',
-      updateType: props.data?.Collective?.slug === 'opencollective' ? UPDATE_TYPE[1] : UPDATE_TYPE[0],
+      updateType: props.data?.Collective?.slug === 'opencollective' ? UPDATE_TYPES[1] : UPDATE_TYPES[0],
     };
   }
 
@@ -103,12 +103,11 @@ class CreateUpdatePage extends React.Component {
   };
 
   isChangelog = () => {
-    return this.state.updateType === UPDATE_TYPE[1];
+    return this.state.updateType === UPDATE_TYPES[1];
   };
 
   render() {
-    const { data } = this.props;
-    const { LoggedInUser } = this.props;
+    const { data, LoggedInUser, intl } = this.props;
 
     if (!data.Collective) {
       return <ErrorPage data={data} />;
@@ -160,11 +159,11 @@ class CreateUpdatePage extends React.Component {
               {collective.slug === 'opencollective' && (
                 <StyledButtonSet
                   size="medium"
-                  items={UPDATE_TYPE}
+                  items={UPDATE_TYPES}
                   selected={this.state.updateType}
                   onChange={value => this.setState({ updateType: value })}
                 >
-                  {({ item }) => item}
+                  {({ item }) => intl.formatMessage(UPDATE_TYPE_MSGS[item])}
                 </StyledButtonSet>
               )}
               {isAdmin && (
@@ -226,4 +225,4 @@ const addCreateUpdateMutation = graphql(createUpdateMutation, {
 
 const addGraphql = compose(addCollectiveCoverData, addCreateUpdateMutation);
 
-export default withUser(addGraphql(withRouter(CreateUpdatePage)));
+export default withUser(addGraphql(withRouter(injectIntl(CreateUpdatePage))));
