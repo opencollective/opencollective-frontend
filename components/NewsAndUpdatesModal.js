@@ -21,6 +21,7 @@ import { P, Span } from './Text';
 const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
   query ChangelogUpdates($collectiveSlug: String, $onlyChangelogUpdates: Boolean) {
     account(slug: $collectiveSlug) {
+      id
       updates(onlyChangelogUpdates: $onlyChangelogUpdates) {
         nodes {
           id

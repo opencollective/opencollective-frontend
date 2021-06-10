@@ -6026,12 +6026,16 @@ type Order {
   """
   totalDonations: Amount!
   paymentMethod: PaymentMethod
-  platformFee: Amount @deprecated(reason: "2020-07-31: Please use platformContributionAmount")
 
   """
   Platform contribution attached to the Order.
   """
-  platformContributionAmount: Amount
+  platformContributionAmount: Amount @deprecated(reason: "2021-06-07: Please use platformTipAmount")
+
+  """
+  Platform Tip attached to the Order.
+  """
+  platformTipAmount: Amount
   taxes: [OrderTax]!
 
   """
