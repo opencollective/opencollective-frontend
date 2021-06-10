@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { cloneDeep } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import Error from './Error';
@@ -46,7 +48,7 @@ class UpdatesWithData extends React.Component {
       return <Error message={data.error.message} />;
     }
 
-    const updates = data.allUpdates;
+    const updates = data.account?.updates?.nodes;
     return (
       <div className="UpdatesContainer">
         {!compact && (
@@ -85,32 +87,32 @@ class UpdatesWithData extends React.Component {
   }
 }
 
-const updatesQuery = gql`
-  query Updates($CollectiveId: Int!, $limit: Int, $offset: Int) {
-    allUpdates(CollectiveId: $CollectiveId, limit: $limit, offset: $offset) {
+const updatesQuery = gqlV2/* GraphQL */ `
+  query Updates($collectiveSlug: String!, $limit: Int, $offset: Int) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
       id
-      slug
-      title
-      summary
-      createdAt
-      publishedAt
-      updatedAt
-      userCanSeeUpdate
-      tags
-      image
-      isPrivate
-      isChangelog
-      makePublicOn
-      collective {
-        id
-        slug
-      }
-      fromCollective {
-        id
-        type
-        name
-        slug
-        imageUrl
+      updates(limit: $limit, offset: $offset) {
+        nodes {
+          id
+          slug
+          title
+          summary
+          createdAt
+          publishedAt
+          updatedAt
+          userCanSeeUpdate
+          tags
+          isPrivate
+          isChangelog
+          makePublicOn
+          fromAccount {
+            id
+            type
+            name
+            slug
+            imageUrl
+          }
+        }
       }
     }
   }
@@ -118,7 +120,7 @@ const updatesQuery = gql`
 
 const getUpdatesVariables = props => {
   return {
-    CollectiveId: props.collective.id,
+    collectiveSlug: props.collective.slug,
     offset: 0,
     limit: props.limit || UPDATES_PER_PAGE * 2,
     includeHostedCollectives: props.includeHostedCollectives || false,
@@ -129,6 +131,7 @@ const UPDATES_PER_PAGE = 10;
 
 export const addUpdatesData = graphql(updatesQuery, {
   options: props => ({
+    context: API_V2_CONTEXT,
     variables: getUpdatesVariables(props),
   }),
   props: ({ data }) => ({
@@ -136,17 +139,21 @@ export const addUpdatesData = graphql(updatesQuery, {
     fetchMore: () => {
       return data.fetchMore({
         variables: {
-          offset: data.allUpdates.length,
+          offset: data.account.updates.nodes.length,
           limit: UPDATES_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
             return previousResult;
           }
-          return Object.assign({}, previousResult, {
+          const previousResultNodes = Object.assign({}, previousResult.account.updates, {
             // Append the new posts results to the old one
-            allUpdates: [...previousResult.allUpdates, ...fetchMoreResult.allUpdates],
+            nodes: [...previousResult.account.updates.nodes, ...fetchMoreResult.account.updates.nodes],
           });
+
+          const previousResultClone = cloneDeep(previousResult);
+          previousResultClone.account.updates.nodes = previousResultNodes.nodes;
+          return previousResultClone;
         },
       });
     },

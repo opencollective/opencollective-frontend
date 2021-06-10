@@ -16,9 +16,10 @@ import Hide from './Hide';
 import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
+import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledLink from './StyledLink';
-import { P } from './Text';
+import { P, Span } from './Text';
 import { withUser } from './UserProvider';
 
 const memberInvitationsCountQuery = gql`
@@ -50,6 +51,7 @@ class TopBarProfileMenu extends React.Component {
     LoggedInUser: PropTypes.object,
     logout: PropTypes.func,
     loadingLoggedInUser: PropTypes.bool,
+    setShowNewsAndUpdates: PropTypes.func,
   };
 
   constructor(props) {
@@ -96,8 +98,7 @@ class TopBarProfileMenu extends React.Component {
   };
 
   renderProfileMenu() {
-    const { LoggedInUser } = this.props;
-
+    const { LoggedInUser, setShowNewsAndUpdates } = this.props;
     return (
       <Container
         bg="white.full"
@@ -129,6 +130,9 @@ class TopBarProfileMenu extends React.Component {
               <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
             </P>
             <Box as="ul" p={0} my={2}>
+              <UserMenuLinkEntry as={Span} onClick={() => setShowNewsAndUpdates(true)}>
+                <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
+              </UserMenuLinkEntry>
               <UserMenuLinkEntry href={`/${LoggedInUser.username}`}>
                 <FormattedMessage id="menu.profile" defaultMessage="Profile" />
               </UserMenuLinkEntry>
@@ -251,4 +255,4 @@ class TopBarProfileMenu extends React.Component {
   }
 }
 
-export default withUser(TopBarProfileMenu);
+export default withNewsAndUpdates(withUser(TopBarProfileMenu));
