@@ -221,7 +221,7 @@ const HostVirtualCards = props => {
       </SettingsTitle>
       <Box>
         <SettingsSectionTitle>
-          <FormattedMessage id="Host.VirtualCards.Settings.Title" defaultMessage="Settings" />
+          <FormattedMessage id="Host.VirtualCards.Settings.Title" defaultMessage="Settings and Policy" />
         </SettingsSectionTitle>
         <Flex mt={4} justifyContent="space-between" alignItems="center">
           <Box lineHeight="20px" fontSize="14px" fontWeight="500">
