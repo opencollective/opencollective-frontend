@@ -113,7 +113,7 @@ module.exports = (expressApp, nextApp) => {
     if (req.path) {
       const path = req.path.split('/');
       const slug = path[1];
-      if (trim(slug, '-') != slug) {
+      if (trim(slug, '-') !== slug) {
         path[1] = trim(slug, '-');
         return res.redirect(301, path.join('/'));
       }

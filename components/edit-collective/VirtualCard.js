@@ -39,10 +39,9 @@ const CardContainer = styled(Flex)`
   }
 
   > div {
-    z-index: 100;
+    z-index: 1;
   }
   > div:first-child {
-    z-index: 1;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -164,10 +163,11 @@ const ActionsButton = props => {
     } else {
       await pauseCard({ variables: { virtualCard: { id: props.id } } });
     }
-    if (props.onUpdate) {
-      await props.onUpdate();
+    if (props.onSuccess) {
+      await props.onSuccess();
     }
   };
+  const handleDelete = () => setDeleteModal(true);
 
   return (
     <div ref={wrapperRef}>
@@ -197,7 +197,6 @@ const ActionsButton = props => {
                 ref={ref}
                 style={{
                   ...style,
-                  zIndex: 9999,
                 }}
               >
                 <StyledCard
@@ -205,14 +204,16 @@ const ActionsButton = props => {
                   mb={2}
                   overflow="auto"
                   overflowY="auto"
-                  {...props}
                   padding="12px 15px"
                   width="180px"
                   borderWidth="0px"
                   boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
                 >
                   <Flex flexDirection="column" fontSize="13px" lineHeight="16px" fontWeight="500">
-                    <Action onClick={handlePauseUnpause} disabled={isLoading}>
+                    <Action onClick={props.editHandler}>
+                      <FormattedMessage id="VirtualCards.EditCardDetails" defaultMessage="Edit Card Details" />
+                    </Action>
+                    <Action mt="20px" onClick={handlePauseUnpause} disabled={isLoading}>
                       {isPaused ? (
                         <FormattedMessage id="VirtualCards.ResumeCard" defaultMessage="Resume Card" />
                       ) : (
@@ -220,7 +221,7 @@ const ActionsButton = props => {
                       )}{' '}
                       {isLoading && <StyledSpinner size="0.9em" mb="2px" />}
                     </Action>
-                    <Action color="red" mt="20px" onClick={() => setDeleteModal(true)}>
+                    <Action color="red" mt="20px" onClick={handleDelete}>
                       <FormattedMessage id="VirtualCards.DeleteCard" defaultMessage="Delete Card" />
                     </Action>
                   </Flex>
@@ -241,8 +242,8 @@ const ActionsButton = props => {
         header={<FormattedMessage id="VirtualCards.DeleteCard" defaultMessage="Delete Card" />}
         continueHandler={async () => {
           await deleteCard({ variables: { virtualCard: { id: props.id } } });
-          if (props.onUpdate) {
-            await props.onUpdate();
+          if (props.onSuccess) {
+            await props.onSuccess();
           }
         }}
         continueLabel="Delete"
@@ -262,7 +263,8 @@ const ActionsButton = props => {
 ActionsButton.propTypes = {
   id: PropTypes.string,
   state: PropTypes.string,
-  onUpdate: PropTypes.func,
+  onSuccess: PropTypes.func,
+  editHandler: PropTypes.func,
 };
 
 const getLimitString = ({ spend_limit, spend_limit_duration }) => {
@@ -274,7 +276,7 @@ const getLimitString = ({ spend_limit, spend_limit_duration }) => {
     case 'MONTHLY':
       return (
         <Fragment>
-          <FormattedMessage id="VirtualCards.LimittedTo" defaultMessage="Limitted to" />
+          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
           &nbsp;
           {value}/<FormattedMessage id="Frequency.Monthly.Short" defaultMessage="mo." />
         </Fragment>
@@ -282,7 +284,7 @@ const getLimitString = ({ spend_limit, spend_limit_duration }) => {
     case 'ANNUALLY':
       return (
         <Fragment>
-          <FormattedMessage id="VirtualCards.LimittedTo" defaultMessage="Limitted to" />
+          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
           &nbsp;
           {value}/<FormattedMessage id="Frequency.Yearly.Short" defaultMessage="yr." />
         </Fragment>
@@ -389,7 +391,14 @@ const VirtualCard = props => {
         alignItems="center"
         shrink={0}
       >
-        {props.hasActions && <ActionsButton id={props.id} state={props.data.state} onUpdate={props.onUpdate} />}
+        {props.hasActions && (
+          <ActionsButton
+            id={props.id}
+            state={props.data.state}
+            onSuccess={props.onSuccess}
+            editHandler={props.editHandler}
+          />
+        )}
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
           {displayDetails ? (
             <React.Fragment>
@@ -407,7 +416,8 @@ const VirtualCard = props => {
 
 VirtualCard.propTypes = {
   hasActions: PropTypes.bool,
-  onUpdate: PropTypes.func,
+  onSuccess: PropTypes.func,
+  editHandler: PropTypes.func,
 
   account: PropTypes.shape({
     id: PropTypes.string,

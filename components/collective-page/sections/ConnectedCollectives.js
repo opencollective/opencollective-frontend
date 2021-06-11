@@ -7,6 +7,8 @@ import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCard
 import ContributeCollective from '../../contribute-cards/ContributeCollective';
 import { Box } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
+import Link from '../../Link';
+import StyledButton from '../../StyledButton';
 import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
@@ -39,7 +41,7 @@ class ConnectedCollectives extends React.PureComponent {
   };
 
   render() {
-    const { connectedCollectives } = this.props;
+    const { collective, connectedCollectives } = this.props;
 
     if (!connectedCollectives?.length) {
       return null;
@@ -62,6 +64,15 @@ class ConnectedCollectives extends React.PureComponent {
             </Box>
           ))}
         </HorizontalScroller>
+        {Boolean(connectedCollectives.length > 6) && (
+          <ContainerSectionContent>
+            <Link href={`/${collective.slug}/connected-collectives`}>
+              <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
+                <FormattedMessage id="ConnectedCollectives.ViewAll" defaultMessage="View all connected collectives" /> →
+              </StyledButton>
+            </Link>
+          </ContainerSectionContent>
+        )}
       </Box>
     );
   }

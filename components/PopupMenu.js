@@ -14,14 +14,14 @@ const Popup = styled(Box)`
   border-radius: 8px;
   background: white;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
-  z-index: 1;
+  z-index: 2;
 `;
 
 const PopupMenu = ({ Button, children, placement, onClose }) => {
   const [isOpen, setOpen] = React.useState(false);
   const ref = React.useRef();
   useGlobalBlur(ref, outside => {
-    if (outside) {
+    if (isOpen && outside) {
       setOpen(false);
       onClose?.();
     }
@@ -43,7 +43,9 @@ const PopupMenu = ({ Button, children, placement, onClose }) => {
             },
           ]}
         >
-          {({ style, ref }) => <Popup {...{ style, ref }}>{children}</Popup>}
+          {({ style, ref }) => (
+            <Popup {...{ style, ref }}>{typeof children === 'function' ? children({ setOpen }) : children}</Popup>
+          )}
         </Popper>
       )}
     </Box>
@@ -52,7 +54,7 @@ const PopupMenu = ({ Button, children, placement, onClose }) => {
 
 PopupMenu.propTypes = {
   Button: PropTypes.func.isRequired,
-  children: PropTypes.any.isRequired,
+  children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
   placement: PropTypes.string,
   onClose: PropTypes.func,
 };

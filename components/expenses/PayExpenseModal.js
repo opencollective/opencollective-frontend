@@ -33,6 +33,8 @@ const getPayoutLabel = (intl, type) => {
 const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return { forceManual: true, action: 'PAY' };
+  } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
+    return { forceManual: true, action: 'PAY' };
   } else if (!isAuto) {
     return { forceManual: true, action: 'PAY' };
   } else {
@@ -113,6 +115,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const formik = useFormik({ initialValues, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
+  const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
 
   return (
     <StyledModal
@@ -137,7 +140,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
           <PayoutMethodTypeWithIcon type={payoutMethodType} />
         </Box>
         <PayoutMethodData payoutMethod={expense.payoutMethod} showLabel={false} />
-        {payoutMethodType !== PayoutMethodType.OTHER && (
+        {payoutMethodType !== PayoutMethodType.OTHER && !hasBankInfoWithoutWise && (
           <StyledButtonSet
             items={['AUTO', 'MANUAL']}
             buttonProps={{ width: '50%' }}
@@ -276,8 +279,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             <P mt={2} fontSize="12px" lineHeight="18px">
               <FormattedMessage
                 id="PayExpenseModal.ManualPayoutWarning"
-                defaultMessage="By clicking below, you acknowledge that this expense has already been paid via {payoutMethod}."
-                values={{ payoutMethod: payoutMethodLabel }}
+                defaultMessage="By clicking below, you acknowledge that this expense has already been paid {payoutMethod}."
+                values={{ payoutMethod: hasBankInfoWithoutWise ? 'manually' : `via ${payoutMethodLabel}` }}
               />
             </P>
           </MessageBox>
@@ -329,6 +332,7 @@ PayExpenseModal.propTypes = {
   host: PropTypes.shape({
     plan: PropTypes.object,
     slug: PropTypes.string,
+    transferwise: PropTypes.object,
   }),
   onClose: PropTypes.func.isRequired,
   /** Function called when users click on one of the "Pay" buttons */

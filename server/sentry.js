@@ -56,6 +56,7 @@ const captureException = (err, ctx) => {
 
       if (typeof window !== 'undefined') {
         scope.setTag('ssr', false);
+        scope.setExtra('url', window.location?.href);
         scope.setExtra('query', query);
         scope.setExtra('pathname', pathname);
       } else {

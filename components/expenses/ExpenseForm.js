@@ -334,7 +334,8 @@ const ExpenseFormBody = ({
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
         onNext={() => {
-          const validation = validatePayoutMethod(values.payoutMethod);
+          const shouldSkipValidation = isOnBehalf && isEmpty(values.payoutMethod);
+          const validation = !shouldSkipValidation && validatePayoutMethod(values.payoutMethod);
           if (isEmpty(validation)) {
             setStep(STEPS.EXPENSE);
           } else {
@@ -345,6 +346,7 @@ const ExpenseFormBody = ({
           setOnBehalf(isInvite);
           formik.setFieldValue('payeeLocation', {});
           formik.setFieldValue('payee', {});
+          formik.setFieldValue('payoutMethod', {});
         }}
       />
     );

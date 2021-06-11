@@ -56,12 +56,12 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
 
   return (
     <Container border="none" width={1} py={3}>
-      <Flex justifyContent="space-between">
-        <Box width={1 / 2} mb={3} mr={1}>
+      <Flex flexDirection={['column', 'row']} justifyContent="space-between">
+        <Box mb={3} mr={1} width={[1, 1 / 2]}>
           <StyledInputField
             label={<FormattedMessage id="User.FullName" defaultMessage="Full name" />}
             htmlFor="name"
-            required={totalAmount < 25000 ? false : true}
+            required={totalAmount >= 25000}
           >
             {inputProps => (
               <StyledInput
@@ -74,7 +74,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
             )}
           </StyledInputField>
         </Box>
-        <Box width="50%" minWidth={185} flex="1 1 50%" mb={3} mr={1}>
+        <Box mb={3}>
           <StyledInputField
             label={<FormattedMessage id="Email" defaultMessage="Email" />}
             htmlFor="email"

@@ -58,14 +58,13 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   }
 };
 
-const PayoutMethodTypeIcon = ({ type, ...props }) => {
-  switch (type) {
-    case PayoutMethodType.PAYPAL:
-      return <PaypalIcon {...props} />;
-    case PayoutMethodType.BANK_ACCOUNT:
-      return <TransferwiseIcon {...props} />;
-    default:
-      return <OtherIcon {...props} />;
+const PayoutMethodTypeIcon = ({ type, host, ...props }) => {
+  if (type === PayoutMethodType.PAYPAL) {
+    return <PaypalIcon {...props} />;
+  } else if (type === PayoutMethodType.BANK_ACCOUNT && host?.transferwise) {
+    return <TransferwiseIcon {...props} />;
+  } else {
+    return <OtherIcon {...props} />;
   }
 };
 
@@ -87,7 +86,7 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
       disabled={isDisabled}
       onClick={() => showModal(true)}
     >
-      <PayoutMethodTypeIcon type={expense.payoutMethod?.type} size={12} />
+      <PayoutMethodTypeIcon type={expense.payoutMethod?.type} host={host} size={12} />
       <Span ml="6px">
         <FormattedMessage id="actions.goToPay" defaultMessage="Go to Pay" />
       </Span>

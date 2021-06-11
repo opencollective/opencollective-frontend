@@ -396,7 +396,7 @@ class Tiers extends React.Component {
           {this.fields.map(
             field =>
               (!field.when || field.when(defaultValues, collective)) && (
-                <Box key={field.name}>
+                <Box key={field.name} data-cy={`tier-input-field-${field.name}`}>
                   <InputField
                     className="horizontal"
                     name={field.name}
@@ -491,7 +491,12 @@ class Tiers extends React.Component {
 
         <div className="tiers">{this.state.tiers.map(this.renderTier)}</div>
         <Container textAlign="right" marginTop="-10px">
-          <StyledButton className="addTier" buttonStyle="primary" onClick={() => this.addTier({})}>
+          <StyledButton
+            className="addTier"
+            data-cy="add-tier-button"
+            buttonStyle="primary"
+            onClick={() => this.addTier({})}
+          >
             {intl.formatMessage(this.messages[`${defaultType}.add`])}
           </StyledButton>
         </Container>

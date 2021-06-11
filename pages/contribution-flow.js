@@ -93,7 +93,6 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
-    hasNewPaypal: PropTypes.bool,
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -157,7 +156,6 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
-          hasNewPaypal={!get(account, 'host.settings.useLegacyPayPalPayments', false)}
         />
       );
     }

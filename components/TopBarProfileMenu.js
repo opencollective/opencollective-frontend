@@ -1,17 +1,13 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
-import { Plus } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import { Settings } from '@styled-icons/feather/Settings';
-import { get, uniqBy } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled, { createGlobalStyle } from 'styled-components';
+import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
+import { createGlobalStyle } from 'styled-components';
 
-import { isPastEvent } from '../lib/events';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { capitalize } from '../lib/utils';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -20,9 +16,9 @@ import Hide from './Hide';
 import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
-import StyledHr from './StyledHr';
+import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
+import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledLink from './StyledLink';
-import StyledRoundButton from './StyledRoundButton';
 import { P, Span } from './Text';
 import { withUser } from './UserProvider';
 
@@ -30,19 +26,6 @@ const memberInvitationsCountQuery = gql`
   query MemberInvitationsCount($memberCollectiveId: Int!) {
     memberInvitations(MemberCollectiveId: $memberCollectiveId) {
       id
-    }
-  }
-`;
-
-const CollectiveListItem = styled(ListItem)`
-  @media (hover: hover) {
-    :hover svg {
-      opacity: 1;
-    }
-  }
-  @media (hover: none) {
-    svg {
-      opacity: 1;
     }
   }
 `;
@@ -55,31 +38,25 @@ const HideGlobalScroll = createGlobalStyle`
   }
 `;
 
+const UserMenuLinkEntry = props => {
+  return (
+    <ListItem mb="6px">
+      <StyledLink as={Link} fontWeight="500" fontSize="14px" lineHeight="20px" color="black.800" {...props} />
+    </ListItem>
+  );
+};
+
 class TopBarProfileMenu extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object,
-    intl: PropTypes.object.isRequired,
     logout: PropTypes.func,
     loadingLoggedInUser: PropTypes.bool,
+    setShowNewsAndUpdates: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
     this.state = { showProfileMenu: false, loading: true };
-    this.messages = defineMessages({
-      'menu.transactions': {
-        id: 'menu.transactions',
-        defaultMessage: 'transactions',
-      },
-      'menu.applications': {
-        id: 'menu.applications',
-        defaultMessage: 'applications',
-      },
-      settings: {
-        id: 'Settings',
-        defaultMessage: 'Settings',
-      },
-    });
   }
 
   componentDidMount() {
@@ -120,79 +97,8 @@ class TopBarProfileMenu extends React.Component {
     e.nativeEvent.stopImmediatePropagation();
   };
 
-  renderMembershipLine = membership => {
-    const { intl, LoggedInUser } = this.props;
-    const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(membership.collective);
-
-    return (
-      <CollectiveListItem
-        key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}
-        py={1}
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Link href={`/${get(membership, 'collective.slug')}`}>
-          <StyledLink
-            as={Span}
-            color="black.700"
-            fontSize="1.2rem"
-            fontFamily="montserratlight, arial"
-            fontWeight="400"
-            truncateOverflow
-            maxWidth="90%"
-          >
-            <Flex alignItems="center">
-              <Avatar collective={get(membership, 'collective')} radius="2.8rem" mr={2} />
-              <P fontSize="12px" truncateOverflow>
-                {get(membership, 'collective.name')}
-              </P>
-            </Flex>
-          </StyledLink>
-        </Link>
-        {isAdmin && (
-          <Link href={`/${membership.collective.slug}/edit`}>
-            <StyledLink as={Span} color="black.500" title={intl.formatMessage(this.messages.settings)}>
-              <Settings opacity="0" size="1.2em" />
-            </StyledLink>
-          </Link>
-        )}
-      </CollectiveListItem>
-    );
-  };
-
   renderProfileMenu() {
-    const { LoggedInUser, intl } = this.props;
-
-    const memberships = uniqBy(
-      LoggedInUser.memberOf.filter(m => m.role !== 'BACKER'),
-      m => m.collective.id,
-    );
-
-    const collectives = memberships
-      .filter(m => m.collective.type === 'COLLECTIVE')
-      .sort((a, b) => {
-        return a.collective.slug.localeCompare(b.collective.slug);
-      });
-
-    const orgs = memberships
-      .filter(m => m.collective.type === 'ORGANIZATION')
-      .sort((a, b) => {
-        return a.collective.slug.localeCompare(b.collective.slug);
-      });
-
-    const events = memberships
-      .filter(m => m.collective.type === 'EVENT' && !isPastEvent(m.collective))
-      .sort((a, b) => {
-        return a.collective.slug.localeCompare(b.collective.slug);
-      });
-
-    const funds = memberships
-      .filter(m => m.collective.type === 'FUND')
-      .sort((a, b) => {
-        return a.collective.slug.localeCompare(b.collective.slug);
-      });
-
+    const { LoggedInUser, setShowNewsAndUpdates } = this.props;
     return (
       <Container
         bg="white.full"
@@ -213,24 +119,23 @@ class TopBarProfileMenu extends React.Component {
           <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={3} bg="#F7F8FA">
             <Hide xs>
               <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
-              <P mt={2} color="#313233" fontWeight="500">
+              <P mt={2} color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
                 {LoggedInUser.collective.name}
               </P>
-              <P mt={2} mb={5} wordBreak="break-all" color="#9D9FA3">
+              <P mt="2px" mb={5} wordBreak="break-all" color="black.700" fontSize="13px">
                 {LoggedInUser.email}
               </P>
             </Hide>
-            <P color="#B4BBBF" fontSize="1rem" fontWeight="400" letterSpacing="1px" textTransform="uppercase">
+            <P color="black.900" fontSize="12px" fontWeight="700" letterSpacing="1px" textTransform="uppercase">
               <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
             </P>
             <Box as="ul" p={0} my={2}>
-              <ListItem py={1}>
-                <Link href={`/${LoggedInUser.username}`}>
-                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                    <FormattedMessage id="menu.profile" defaultMessage="Profile" />
-                  </StyledLink>
-                </Link>
-              </ListItem>
+              <UserMenuLinkEntry as={Span} onClick={() => setShowNewsAndUpdates(true)}>
+                <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
+              </UserMenuLinkEntry>
+              <UserMenuLinkEntry href={`/${LoggedInUser.username}`}>
+                <FormattedMessage id="menu.profile" defaultMessage="Profile" />
+              </UserMenuLinkEntry>
               <Query
                 query={memberInvitationsCountQuery}
                 variables={{ memberCollectiveId: LoggedInUser.CollectiveId }}
@@ -238,185 +143,38 @@ class TopBarProfileMenu extends React.Component {
               >
                 {({ data, loading }) =>
                   loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (
-                    <ListItem py={1}>
-                      <Link href="/member-invitations">
-                        <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                          <FormattedMessage
-                            id="menu.pendingInvitations"
-                            defaultMessage="Pending Invitations ({numberOfInvitations})"
-                            values={{ numberOfInvitations: data.memberInvitations.length }}
-                          />
-                        </StyledLink>
-                      </Link>
-                    </ListItem>
+                    <UserMenuLinkEntry href="/member-invitations">
+                      <FormattedMessage
+                        id="menu.pendingInvitations"
+                        defaultMessage="Pending Invitations ({numberOfInvitations})"
+                        values={{ numberOfInvitations: data.memberInvitations.length }}
+                      />
+                    </UserMenuLinkEntry>
                   ) : null
                 }
               </Query>
-              <ListItem py={1}>
-                <Link href={`/${LoggedInUser.collective.slug}/edit`}>
-                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                    <FormattedMessage id="Settings" defaultMessage="Settings" />
-                  </StyledLink>
-                </Link>
-              </ListItem>
-              <ListItem py={1}>
-                <Link href={`/${LoggedInUser.username}/recurring-contributions`}>
-                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                    <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
-                  </StyledLink>
-                </Link>
-              </ListItem>
-              <ListItem py={1}>
-                <Link href={`/${LoggedInUser.username}/transactions`}>
-                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                    {capitalize(intl.formatMessage(this.messages['menu.transactions']))}
-                  </StyledLink>
-                </Link>
-              </ListItem>
-              <ListItem py={1}>
-                <Link href="/applications">
-                  <StyledLink as={Span} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                    {capitalize(intl.formatMessage(this.messages['menu.applications']))}
-                  </StyledLink>
-                </Link>
-              </ListItem>
-              <ListItem py={1}>
-                <StyledLink
-                  color="#494D52"
-                  fontSize="1.2rem"
-                  fontFamily="montserratlight, arial"
-                  href="https://docs.opencollective.com"
-                >
-                  <FormattedMessage id="menu.help" defaultMessage="Help" />
-                </StyledLink>
-              </ListItem>
-              <ListItem py={1}>
-                <StyledLink
-                  data-cy="logout"
-                  color="#494D52"
-                  fontSize="1.2rem"
-                  fontFamily="montserratlight, arial"
-                  onClick={this.logout}
-                >
-                  <FormattedMessage id="menu.logout" defaultMessage="Log out" />
-                </StyledLink>
-              </ListItem>
+              <UserMenuLinkEntry href={`/${LoggedInUser.collective.slug}/edit`}>
+                <FormattedMessage id="Settings" defaultMessage="Settings" />
+              </UserMenuLinkEntry>
+              <UserMenuLinkEntry href={`/${LoggedInUser.username}/recurring-contributions`}>
+                <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+              </UserMenuLinkEntry>
+              <UserMenuLinkEntry href={`/${LoggedInUser.username}/transactions`}>
+                <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
+              </UserMenuLinkEntry>
+              <UserMenuLinkEntry href="/applications">
+                <FormattedMessage id="menu.applications" defaultMessage="Applications" />
+              </UserMenuLinkEntry>
+              <UserMenuLinkEntry as="a" href="https://docs.opencollective.com">
+                <FormattedMessage id="menu.help" defaultMessage="Help" />
+              </UserMenuLinkEntry>
+              <UserMenuLinkEntry as="a" data-cy="logout" onClick={this.logout}>
+                <FormattedMessage id="menu.logout" defaultMessage="Log out" /> →
+              </UserMenuLinkEntry>
             </Box>
           </Box>
           <Box order={[1, 2]} flex="1 1 50%" width={[1, 1, 1 / 2]} p={3} maxHeight="450px" overflowY="auto">
-            <Flex alignItems="center">
-              <P
-                color="#4E5052"
-                fontFamily="montserratlight, arial"
-                fontSize="1rem"
-                fontWeight="600"
-                letterSpacing="1px"
-                pr={2}
-                textTransform="uppercase"
-                whiteSpace="nowrap"
-              >
-                <FormattedMessage id="collective" defaultMessage="My Collectives" />
-              </P>
-              <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <Link href="/create">
-                <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-                  <Plus size={12} color="#76777A" />
-                </StyledRoundButton>
-              </Link>
-            </Flex>
-            <Box as="ul" p={0} my={2}>
-              {collectives.map(this.renderMembershipLine)}
-            </Box>
-            {collectives.length === 0 && (
-              <Box my={2}>
-                <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
-                  <em>
-                    <FormattedMessage id="menu.collective.none" defaultMessage="No Collectives yet" />
-                  </em>
-                </P>
-              </Box>
-            )}
-            {events.length > 0 && (
-              <div>
-                <Flex alignItems="center" mt={3}>
-                  <P
-                    color="#4E5052"
-                    fontFamily="montserratlight, arial"
-                    fontSize="1rem"
-                    fontWeight="600"
-                    letterSpacing="1px"
-                    pr={2}
-                    textTransform="uppercase"
-                    whiteSpace="nowrap"
-                  >
-                    <FormattedMessage id="events" defaultMessage="My Events" />
-                  </P>
-                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-                </Flex>
-                <Box as="ul" p={0} my={2}>
-                  {events.map(this.renderMembershipLine)}
-                </Box>
-              </div>
-            )}
-            {funds.length > 0 && (
-              <Fragment>
-                <Flex alignItems="center" mt={3}>
-                  <P
-                    color="#4E5052"
-                    fontFamily="montserratlight, arial"
-                    fontSize="1rem"
-                    fontWeight="600"
-                    letterSpacing="1px"
-                    pr={2}
-                    textTransform="uppercase"
-                    whiteSpace="nowrap"
-                  >
-                    <FormattedMessage id="funds" defaultMessage="My Funds" />
-                  </P>
-                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-                  <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-                    <Link href="/fund/create">
-                      <Plus size={12} color="#76777A" />
-                    </Link>
-                  </StyledRoundButton>
-                </Flex>
-                <Box as="ul" p={0} my={2}>
-                  {funds.map(this.renderMembershipLine)}
-                </Box>
-              </Fragment>
-            )}
-            <Flex alignItems="center" mt={3}>
-              <P
-                color="#4E5052"
-                fontFamily="montserratlight, arial"
-                fontSize="1rem"
-                fontWeight="600"
-                letterSpacing="1px"
-                pr={2}
-                textTransform="uppercase"
-                whiteSpace="nowrap"
-              >
-                <FormattedMessage id="organization" defaultMessage="My Organizations" />
-              </P>
-              <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <Link href="/organizations/new">
-                <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-                  <Plus size={12} color="#76777A" />
-                </StyledRoundButton>
-              </Link>
-            </Flex>
-            <Box as="ul" p={0} my={2}>
-              {orgs.map(this.renderMembershipLine)}
-            </Box>
-            {orgs.length === 0 && (
-              <Box my={2}>
-                <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
-                  <em>
-                    <FormattedMessage id="menu.organizations.none" defaultMessage="No Organizations yet" />
-                  </em>
-                </P>
-              </Box>
-            )}
+            <ProfileMenuMemberships user={LoggedInUser} />
           </Box>
         </Flex>
       </Container>
@@ -431,9 +189,10 @@ class TopBarProfileMenu extends React.Component {
       <Flex alignItems="center" onClick={this.toggleProfileMenu} data-cy="user-menu-trigger">
         <Hide xs sm>
           <P
-            color="#4E5052"
+            color="black.700"
             display="inline-block"
             fontSize="13px"
+            lineHeight="16px"
             fontWeight="500"
             letterSpacing="1px"
             mx={2}
@@ -443,7 +202,7 @@ class TopBarProfileMenu extends React.Component {
             {LoggedInUser.collective.name || LoggedInUser.username}
           </P>
         </Hide>
-        <Avatar collective={get(LoggedInUser, 'collective')} radius="3rem" mr={2} />
+        <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
         <Hide xs>
           <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
         </Hide>
@@ -496,4 +255,4 @@ class TopBarProfileMenu extends React.Component {
   }
 }
 
-export default injectIntl(withUser(TopBarProfileMenu));
+export default withNewsAndUpdates(withUser(TopBarProfileMenu));

@@ -819,7 +819,6 @@ Input type for CommentType
 """
 input CommentAttributesInputType {
   id: Int
-  markdown: String
   html: String
   UpdateId: Int
 }
@@ -829,7 +828,6 @@ Input type for CommentType
 """
 input CommentInputType {
   id: Int
-  markdown: String
   html: String
 
   """
@@ -1993,6 +1991,7 @@ type Mutation {
   deleteComment(id: Int!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   refundTransaction(id: Int!): Transaction
   addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
+    @deprecated(reason: "2021-06-01: Create a Prepaid Payment Method through a Tier or use a FUND instead.")
   createApplication(application: ApplicationInput!): Application
   deleteApplication(id: Int!): Application
 
@@ -3642,6 +3641,7 @@ type UpdateType {
   slug: String
   image: String
   isPrivate: Boolean
+  isChangelog: Boolean!
   notificationAudience: UpdateAudienceTypeEnum
   makePublicOn: IsoDateString
 

@@ -260,7 +260,11 @@ class StyledUpdate extends Component {
           <LoadingPlaceholder height={300} />
         ) : null}
         {update.userCanPublishUpdate && (
-          <PublishUpdateBtnWithData id={update.id} isHost={Boolean(update.account?.isHost)} />
+          <PublishUpdateBtnWithData
+            id={update.id}
+            isHost={Boolean(update.account?.isHost)}
+            isChangelog={update.isChangelog}
+          />
         )}
       </Container>
     );
@@ -272,7 +276,7 @@ class StyledUpdate extends Component {
     return (
       <Container display="flex" flexDirection="column" flex="1 1" maxWidth={665} flexWrap="wrap">
         {this.renderUpdateMeta(update, true)}
-        <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
+        <EditUpdateForm collective={collective} update={update} onSubmit={this.save} isChangelog={update.isChangelog} />
       </Container>
     );
   }
@@ -327,6 +331,7 @@ const editUpdateMutation = gqlV2/* GraphQL */ `
       title
       html
       isPrivate
+      isChangelog
       makePublicOn
       userCanPublishUpdate
     }

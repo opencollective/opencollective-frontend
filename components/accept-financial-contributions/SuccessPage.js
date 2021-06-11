@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import Image from 'next/image';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -8,6 +7,7 @@ import styled from 'styled-components';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';

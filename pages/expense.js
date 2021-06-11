@@ -6,7 +6,7 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import expenseStatus from '../lib/constants/expense-status';
@@ -175,10 +175,10 @@ class ExpensePage extends React.Component {
 
     const expense = this.props.data?.expense;
     if (
-      expense?.status == expenseStatus.UNVERIFIED &&
+      expense?.status === expenseStatus.UNVERIFIED &&
       expense?.permissions?.canEdit &&
       this.props.LoggedInUser &&
-      expense?.createdByAccount?.slug == this.props.LoggedInUser?.collective?.slug
+      expense?.createdByAccount?.slug === this.props.LoggedInUser?.collective?.slug
     ) {
       this.handleExpenseVerification();
     }
@@ -319,10 +319,7 @@ class ExpensePage extends React.Component {
     return [data, query, variables];
   }
 
-  getSuggestedTags(collective) {
-    const tagsStats = (collective && collective.expensesTags) || null;
-    return tagsStats && tagsStats.map(({ tag }) => tag);
-  }
+  getSuggestedTags = memoizeOne(getSuggestedTags);
 
   onCommentAdded = comment => {
     // Add comment to cache if not already fetched
@@ -347,7 +344,7 @@ class ExpensePage extends React.Component {
           account =>
             [USER, ORGANIZATION].includes(account.type) ||
             // Same Host
-            (account.isActive && this.props.data?.account?.host?.id === account.host?.id),
+            (account.isActive && this.props.data?.expense?.account?.host?.id === account.host?.id),
         );
       return [loggedInAccount, ...accountsAdminOf];
     }
@@ -476,11 +473,13 @@ class ExpensePage extends React.Component {
                   isLoading={!expense}
                   isEditing={status === PAGE_STATUS.EDIT_SUMMARY}
                   isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
-                  permissions={expense?.permissions}
                   collective={collective}
                   onError={error => this.setState({ error })}
                   onEdit={this.onEditBtnClick}
                   onDelete={this.onDelete}
+                  suggestedTags={this.getSuggestedTags(collective)}
+                  canEditTags={get(expense, 'permissions.canEditTags', false)}
+                  showProcessButtons
                 />
                 {status !== PAGE_STATUS.EDIT_SUMMARY && (
                   <React.Fragment>
@@ -599,7 +598,7 @@ class ExpensePage extends React.Component {
                         {isDraft && !loggedInAccount ? (
                           <FormattedMessage id="Expense.JoinAndSubmit" defaultMessage="Join and Submit" />
                         ) : (
-                          <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
+                          <FormattedMessage id="SaveChanges" defaultMessage="Save changes" />
                         )}
                       </StyledButton>
                     </Flex>

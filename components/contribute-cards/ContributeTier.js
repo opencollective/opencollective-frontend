@@ -17,7 +17,8 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 import StyledProgressBar from '../StyledProgressBar';
-import { P } from '../Text';
+import StyledTooltip from '../StyledTooltip';
+import { P, Span } from '../Text';
 
 import Contribute from './Contribute';
 
@@ -48,6 +49,29 @@ const getContributionTypeFromTier = (tier, isPassed) => {
     }
   } else {
     return ContributionTypes.FINANCIAL_ONE_TIME;
+  }
+};
+
+const TierTitle = ({ collective, tier }) => {
+  const name = capitalize(tier.name);
+  if (!tier.useStandalonePage) {
+    return name;
+  } else {
+    return (
+      <StyledTooltip
+        content={() => <FormattedMessage id="ContributeTier.GoToPage" defaultMessage="Go to full details page" />}
+      >
+        <StyledLink
+          as={Link}
+          href={`/${collective.slug}/contribute/${tier.slug}-${tier.id}`}
+          color="black.900"
+          hoverColor="black.900"
+          underlineOnHover
+        >
+          {name}
+        </StyledLink>
+      </StyledTooltip>
+    );
   }
 };
 
@@ -84,7 +108,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
   return (
     <Contribute
       route={route}
-      title={capitalize(tier.name)}
+      title={<TierTitle collective={collective} tier={tier} />}
       type={tierType}
       buttonText={tier.button}
       contributors={tier.contributors}
@@ -125,14 +149,14 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
           </P>
           {tier.goal && (
             <Box mb={1} mt={3}>
-              <P fontSize="11px" color="black.600">
+              <P fontSize="12px" color="black.600" fontWeight="400">
                 <FormattedMessage
                   id="Tier.AmountRaised"
                   defaultMessage="{amount} of {goalWithInterval} raised"
                   values={{
                     amount: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
+                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
                         amount={amountRaised}
                         currency={currency}
                         precision={getPrecisionFromAmount(amountRaised)}
@@ -140,7 +164,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                     ),
                     goalWithInterval: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
+                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
                         amount={tier.goal}
                         currency={currency}
                         interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
@@ -158,22 +182,22 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
           )}
         </Box>
         {!isDisabled && minAmount > 0 && (
-          <Box mt={3}>
+          <P mt={3} color="black.700">
             {isFlexibleAmount && (
-              <P fontSize="10px" color="black.700" textTransform="uppercase" mb={1}>
+              <Span display="block" fontSize="10px" textTransform="uppercase">
                 <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
-              </P>
+              </Span>
             )}
-            <P color="black.700" data-cy="amount">
+            <Span display="block" data-cy="amount">
               <FormattedMoneyAmount
                 amount={minAmount}
                 interval={tier.interval && tier.interval !== INTERVALS.flexible ? tier.interval : null}
                 currency={currency}
-                amountStyles={{ fontSize: '20px', fontWeight: 'bold', color: 'black.900' }}
+                amountStyles={{ fontSize: '24px', lineHeight: '32px', fontWeight: 'bold', color: 'black.900' }}
                 precision={getPrecisionFromAmount(minAmount)}
               />
-            </P>
-          </Box>
+            </Span>
+          </P>
         )}
       </Flex>
     </Contribute>

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { FormattedMessage } from 'react-intl';
 
 import { Box, Flex } from './Grid';
@@ -76,9 +77,12 @@ const StyledInputField = ({
           : children}
       </Flex>
       {error && typeof error === 'string' && (
-        <Span display="block" color="red.500" pt={2} fontSize="10px">
-          {error}
-        </Span>
+        <Box pt={2}>
+          <ExclamationCircle color="#E03F6A" size={16} />
+          <Span ml={1} color="black.700" fontSize="14px" css={{ verticalAlign: 'middle' }}>
+            {error}
+          </Span>
+        </Box>
       )}
     </Box>
   );

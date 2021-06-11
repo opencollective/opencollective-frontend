@@ -205,7 +205,7 @@ const FiscalHost = () => {
               lineHeight="28px"
               letterSpacing="-0.6px"
             >
-              <FormattedMessage id="home.OC.fiscalHosts" defaultMessage="There are our Fiscal Hosts:" />
+              <FormattedMessage id="home.OC.fiscalHosts" defaultMessage="These are our Fiscal Hosts:" />
             </H5>
             <H5
               display={['none', null, null, null, 'block']}

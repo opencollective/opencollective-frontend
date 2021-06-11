@@ -7,6 +7,10 @@ exports.REWRITES = [
     destination: '/become-a-host',
   },
   {
+    source: '/fiscal-hosting',
+    destination: '/fiscal-hosting',
+  },
+  {
     source: '/:pageSlug(widgets|tos|privacypolicy|support|hiring)',
     destination: '/staticPage',
   },

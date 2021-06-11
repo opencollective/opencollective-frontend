@@ -68,7 +68,9 @@ class InputFieldPresets extends React.Component {
     }
     return (
       <InputFieldPresetsContainer>
-        <Container display="flex">{values.map(this.renderSingleInput)}</Container>
+        <Container flexWrap="wrap" display="flex">
+          {values.map(this.renderSingleInput)}
+        </Container>
       </InputFieldPresetsContainer>
     );
   }

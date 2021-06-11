@@ -16,8 +16,8 @@ import { Box } from '../Grid';
 import { P } from '../Text';
 
 const StatTitle = styled(Container)`
-  font-size: 11px;
-  line-height: 12px;
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 500;
   text-transform: uppercase;
   margin-bottom: 8px;

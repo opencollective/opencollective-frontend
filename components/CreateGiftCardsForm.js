@@ -250,7 +250,7 @@ class CreateGiftCardsForm extends Component {
     const { values, errors, deliverType } = this.state;
 
     if (deliverType === 'email') {
-      return values.emails.length > 0 && errors.emails.length == 0;
+      return values.emails.length > 0 && errors.emails.length === 0;
     } else {
       return values.numberOfGiftCards !== 0;
     }
@@ -353,7 +353,6 @@ class CreateGiftCardsForm extends Component {
     return (
       <Box>
         <Flex flexDirection="column" mb="2em">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label style={{ width: '100%' }} htmlFor="gift-cards-recipients">
             <Flex flexDirection="column">
               <FormattedMessage id="giftCards.create.recipients" defaultMessage="Recipients" />
@@ -407,7 +406,6 @@ class CreateGiftCardsForm extends Component {
     return (
       <Container display="flex" flexDirection="column" width={1} justifyContent="center">
         <Flex justifyContent="center" mt={3} mb={4} alignItems="center">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label htmlFor="giftcard-numberOfGiftCards">
             <FormattedMessage id="giftCards.create.number" defaultMessage="Number of gift cards" />
           </label>

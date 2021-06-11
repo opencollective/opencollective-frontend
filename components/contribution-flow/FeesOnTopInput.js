@@ -108,7 +108,7 @@ const FeesOnTopInput = ({ currency, amount, quantity, fees, onChange }) => {
       <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
         <FormattedMessage
           id="platformFee.info"
-          defaultMessage="The Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to make this possible!"
+          defaultMessage="Tips from contributors like you allow us to keep Open Collective free for Collectives. Thanks for any support!"
         />
       </P>
       <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>

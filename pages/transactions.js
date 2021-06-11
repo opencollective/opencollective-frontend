@@ -31,6 +31,7 @@ import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
 import StyledHr from '../components/StyledHr';
 import { H1 } from '../components/Text';
+import { parseTransactionKinds } from '../components/transactions/filters/TransactionsKindFilter';
 import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
 import TransactionsDownloadCSV from '../components/transactions/TransactionsDownloadCSV';
 import TransactionsDownloadInvoices from '../components/transactions/TransactionsDownloadInvoices';
@@ -47,7 +48,9 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
     $minAmount: Int
     $maxAmount: Int
     $dateFrom: ISODateTime
+    $dateTo: ISODateTime
     $searchTerm: String
+    $kinds: [TransactionKind]
   ) {
     transactions(
       account: { slug: $slug }
@@ -57,7 +60,9 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       minAmount: $minAmount
       maxAmount: $maxAmount
       dateFrom: $dateFrom
+      dateTo: $dateTo
       searchTerm: $searchTerm
+      kinds: $kinds
       includeIncognitoTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
@@ -79,7 +84,7 @@ const EXPENSES_PER_PAGE = 15;
 
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom] = getDateRangeFromPeriod(query.period);
+  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
@@ -90,7 +95,9 @@ const getVariablesFromQuery = query => {
     maxAmount: amountRange[1] && amountRange[1] * 100,
     payoutMethodType: query.payout,
     dateFrom,
+    dateTo,
     searchTerm: query.searchTerm,
+    kinds: parseTransactionKinds(query.kinds),
   };
 };
 

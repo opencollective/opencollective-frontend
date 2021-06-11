@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import FlipMove from 'react-flip-move';
 
+import { DISABLE_ANIMATIONS } from '../lib/animations';
+
 import Container from './Container';
 import { Box } from './Grid';
 import Toast from './Toast';
@@ -112,7 +114,7 @@ class GlobalToasts extends PureComponent {
         onMouseLeave={this.startAfterDelay}
         zIndex={100000}
       >
-        <FlipMove>
+        <FlipMove disableAllAnimations={DISABLE_ANIMATIONS}>
           {this.props.toasts.map(toast => (
             <Box key={toast.id} mt={24}>
               <Toast

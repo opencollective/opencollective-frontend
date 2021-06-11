@@ -131,7 +131,6 @@ describe('edit collective', () => {
     cy.get(tierCardSelector).first().find('[data-cy="contribute-btn"]').click();
 
     // Ensure the new tiers are properly displayed on order form
-    cy.get('#interval').contains('Monthly');
     cy.get('#amount > button').should('have.length', 4); // 3 presets + "Other"
 
     cy.visit(`/${collectiveSlug}/edit/tiers`);
