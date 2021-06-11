@@ -46,7 +46,7 @@ describe('event.createOrder page', () => {
     cy.contains('a', 'view event page').click();
 
     // Go to the contribution flow
-    cy.contains('button', 'RVSP').click();
+    cy.contains('button', 'RSVP').click();
 
     cy.get('input[type=number][name=quantity]').type('{selectall}8');
     cy.getByDataCy('cf-next-step').click();
