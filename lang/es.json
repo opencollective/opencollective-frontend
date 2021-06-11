@@ -1074,6 +1074,7 @@
   "getHelp": "Obtener ayuda",
   "GiftCard": "Tarjeta de regalo",
   "GiftCard.definition": "Gift cards empower your employees or community members to support the projects they love. <learn-more-link>Learn more</learn-more-link>.",
+  "GiftCard.Expired": "Expired",
   "Giftcard.learnMore": "Más información sobre Tarjetas de Regalo",
   "GiftCard.Limitations": "Limitaciones",
   "GiftCard.Limitinfo": "Tu cuenta tiene una limitación actual de {limit} tarjetas de regalo por día. Si quieres incrementar este límite por favor contacta con <SupportLink></SupportLink>.",
