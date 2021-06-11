@@ -31,7 +31,7 @@ import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
 import StyledHr from '../components/StyledHr';
 import { H1 } from '../components/Text';
-import { parseTransactionKinds } from '../components/transactions/filters/TransactionsKindFilter';
+import { getDefaultKinds, parseTransactionKinds } from '../components/transactions/filters/TransactionsKindFilter';
 import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
 import TransactionsDownloadCSV from '../components/transactions/TransactionsDownloadCSV';
 import TransactionsDownloadInvoices from '../components/transactions/TransactionsDownloadInvoices';
@@ -97,7 +97,7 @@ const getVariablesFromQuery = query => {
     dateFrom,
     dateTo,
     searchTerm: query.searchTerm,
-    kinds: parseTransactionKinds(query.kinds),
+    kinds: query.kinds ? parseTransactionKinds(query.kinds) : getDefaultKinds(),
   };
 };
 
