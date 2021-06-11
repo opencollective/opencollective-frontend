@@ -70,8 +70,12 @@ class TopBar extends React.Component {
       account: PropTypes.shape({
         latestChangelogPublishDate: PropTypes.string,
       }),
+      loading: PropTypes.bool,
     }),
     setChangelogViewDate: PropTypes.func,
+    viewedNewsAndUpdates: PropTypes.bool,
+    setViewedNewsAndUpdates: PropTypes.func,
+    refetchLoggedInUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -123,10 +127,12 @@ class TopBar extends React.Component {
   handleShowNewUpdates = async () => {
     this.props.setShowNewsAndUpdates(true);
     await this.props.setChangelogViewDate({ variables: { changelogViewDate: new Date() } });
+    this.props.refetchLoggedInUser();
   };
 
   render() {
     const { showSearch, menuItems, LoggedInUser, data } = this.props;
+    const hasSeenNewUpdates = this.hasSeenNewChangelogUpdates(LoggedInUser, data?.account?.latestChangelogPublishDate);
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
@@ -223,22 +229,24 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        <Flex onClick={this.handleShowNewUpdates}>
-          {this.hasSeenNewChangelogUpdates(LoggedInUser, data?.account?.latestChangelogPublishDate) && (
-            <Avatar src="/static/images/flame-default.svg" radius="30px" backgroundSize={10} ml={2} />
-          )}
-          {!this.hasSeenNewChangelogUpdates(LoggedInUser, data?.account?.latestChangelogPublishDate) && (
-            <Container>
-              <Avatar
-                src="/static/images/flame-red.svg"
-                radius="30px"
-                backgroundSize={10}
-                backgroundColor="yellow.100"
-                ml={2}
-              />
-            </Container>
-          )}
-        </Flex>
+        {!data.loading && LoggedInUser && (
+          <Flex onClick={this.handleShowNewUpdates}>
+            {hasSeenNewUpdates && (
+              <Avatar src="/static/images/flame-default.svg" radius="30px" backgroundSize={10} ml={2} />
+            )}
+            {!hasSeenNewUpdates && (
+              <Container>
+                <Avatar
+                  src="/static/images/flame-red.svg"
+                  radius="30px"
+                  backgroundSize={10}
+                  backgroundColor="yellow.100"
+                  ml={2}
+                />
+              </Container>
+            )}
+          </Flex>
+        )}
       </Flex>
     );
   }
@@ -265,6 +273,7 @@ const latestChangelogPublish = graphql(latestChangelogPublishDateQuery, {
   options: {
     context: API_V2_CONTEXT,
     variables: { collectiveSlug: 'opencollective' },
+    fetchPolicy: 'cache-and-network',
   },
 });
 
