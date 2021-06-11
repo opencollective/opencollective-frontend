@@ -19,10 +19,10 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
 
 const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
-  query ChangelogUpdates($collectiveSlug: String, $onlyChangelogUpdates: Boolean) {
+  query ChangelogUpdates($collectiveSlug: String, $onlyChangelogUpdates: Boolean, $onlyPublishedUpdates: Boolean) {
     account(slug: $collectiveSlug) {
       id
-      updates(onlyChangelogUpdates: $onlyChangelogUpdates) {
+      updates(onlyChangelogUpdates: $onlyChangelogUpdates, onlyPublishedUpdates: $onlyPublishedUpdates) {
         nodes {
           id
           slug
@@ -59,7 +59,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
       <ModalBody>
         <Query
           query={newsAndUpdatesQuery}
-          variables={{ collectiveSlug: 'opencollective', onlyChangelogUpdates: true }}
+          variables={{ collectiveSlug: 'opencollective', onlyChangelogUpdates: true, onlyPublishedUpdates: true }}
           context={API_V2_CONTEXT}
         >
           {({ data, loading }) =>
