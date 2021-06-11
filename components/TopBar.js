@@ -1,11 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client/core';
+import { graphql } from '@apollo/client/react/hoc';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { rotateMixin } from '../lib/constants/animations';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import theme from '../lib/theme';
+import { compose } from '../lib/utils';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -16,7 +20,6 @@ import Link from './Link';
 import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
-import { Dropdown, DropdownArrow, DropdownContent } from './StyledDropdown';
 import StyledLink from './StyledLink';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
@@ -63,6 +66,12 @@ class TopBar extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
+    data: PropTypes.shape({
+      account: PropTypes.shape({
+        latestChangelogPublishDate: PropTypes.string,
+      }),
+    }),
+    setChangelogViewDate: PropTypes.func,
   };
 
   static defaultProps = {
@@ -101,18 +110,23 @@ class TopBar extends React.Component {
     this.setState(state => ({ showMobileMenu: !state.showMobileMenu }));
   };
 
-  hasSeenNewChangelogUpdates = user => {
+  hasSeenNewChangelogUpdates = (user, latestChangelogDate) => {
     if (!user) {
       return true;
     } else if (!user.changelogViewDate) {
       return false;
     } else {
-      return new Date(user.changelogViewDate) < new Date();
+      return new Date(latestChangelogDate) < new Date(user.changelogViewDate);
     }
   };
 
+  handleShowNewUpdates = async () => {
+    this.props.setShowNewsAndUpdates(true);
+    await this.props.setChangelogViewDate({ variables: { changelogViewDate: new Date() } });
+  };
+
   render() {
-    const { showSearch, menuItems, setShowNewsAndUpdates, LoggedInUser } = this.props;
+    const { showSearch, menuItems, LoggedInUser, data } = this.props;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
@@ -209,11 +223,11 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        <Flex onClick={() => setShowNewsAndUpdates(true)}>
-          {this.hasSeenNewChangelogUpdates(LoggedInUser) && (
+        <Flex onClick={this.handleShowNewUpdates}>
+          {this.hasSeenNewChangelogUpdates(LoggedInUser, data?.account?.latestChangelogPublishDate) && (
             <Avatar src="/static/images/flame-default.svg" radius="30px" backgroundSize={10} ml={2} />
           )}
-          {!this.hasSeenNewChangelogUpdates(LoggedInUser) && (
+          {!this.hasSeenNewChangelogUpdates(LoggedInUser, data?.account?.latestChangelogPublishDate) && (
             <Container>
               <Avatar
                 src="/static/images/flame-red.svg"
@@ -222,14 +236,6 @@ class TopBar extends React.Component {
                 backgroundColor="yellow.100"
                 ml={2}
               />
-              <Dropdown trigger="click" onClick={() => {}}>
-                <DropdownArrow />
-                <DropdownContent>
-                  <Box as="ul" p={0} m={0} minWidth={184}>
-                    testing
-                  </Box>
-                </DropdownContent>
-              </Dropdown>
             </Container>
           )}
         </Flex>
@@ -238,4 +244,34 @@ class TopBar extends React.Component {
   }
 }
 
-export default withNewsAndUpdates(withUser(TopBar));
+const latestChangelogPublishDateQuery = gqlV2/* GraphQL */ `
+  query LatestChangeLogPublishDate($collectiveSlug: String) {
+    account(slug: $collectiveSlug) {
+      id
+      latestChangelogPublishDate
+    }
+  }
+`;
+
+const setChangelogViewDateMutation = gql`
+  mutation SetChangelogViewDateMutation($changelogViewDate: String!) {
+    setChangelogViewDate(changelogViewDate: $changelogViewDate) {
+      id
+    }
+  }
+`;
+
+const latestChangelogPublish = graphql(latestChangelogPublishDateQuery, {
+  options: {
+    context: API_V2_CONTEXT,
+    variables: { collectiveSlug: 'opencollective' },
+  },
+});
+
+const setChangelogViewDate = graphql(setChangelogViewDateMutation, {
+  name: 'setChangelogViewDate',
+});
+
+const addGraphql = compose(latestChangelogPublish, setChangelogViewDate);
+
+export default withNewsAndUpdates(withUser(addGraphql(TopBar)));
