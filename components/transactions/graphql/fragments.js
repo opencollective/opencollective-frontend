@@ -110,12 +110,15 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
           totalCount
         }
         payoutMethod {
+          id
           type
         }
         account {
+          id
           slug
         }
         createdByAccount {
+          id
           slug
         }
       }
