@@ -54,14 +54,14 @@ const getDisplayedAmount = (transaction, collective) => {
   }
 };
 
-const ItemTitleWrapper = ({ toAccount, expense, children }) => {
+const ItemTitleWrapper = ({ expense, children }) => {
   if (expense) {
     return (
       <StyledTooltip
         content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
         delayHide={0}
       >
-        <StyledLink as={Link} underlineOnHover href={`/${toAccount.slug}/expenses/${expense.legacyId}`}>
+        <StyledLink as={Link} underlineOnHover href={`/${expense.account.slug}/expenses/${expense.legacyId}`}>
           {children}
         </StyledLink>
       </StyledTooltip>
@@ -112,7 +112,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 fontSize={['14px', null, null, '16px']}
                 lineHeight={['20px', null, null, '24px']}
               >
-                <ItemTitleWrapper toAccount={toAccount} expense={expense}>
+                <ItemTitleWrapper expense={expense}>
                   <Span title={description} color={description ? 'black.900' : 'black.600'}>
                     {description ? (
                       truncate(description, { length: 60 })
