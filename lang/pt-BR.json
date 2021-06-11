@@ -1074,6 +1074,7 @@
   "getHelp": "Obter ajuda",
   "GiftCard": "Vale-presente",
   "GiftCard.definition": "Vales presente empoderam seus funcionários ou membros da comunidade para apoiar os projetos que eles amam. <learn-more-link>Saiba mais</learn-more-link>.",
+  "GiftCard.Expired": "Expired",
   "Giftcard.learnMore": "Aprenda mais sobre os vales-presentes",
   "GiftCard.Limitations": "Limitações",
   "GiftCard.Limitinfo": "Sua conta está atualmente limitada a {limit} vales-presentes por dia. Se você quer aumentar esse limite, entre em contato com <SupportLink></SupportLink>.",
