@@ -1923,6 +1923,8 @@
   "To": "To",
   "TodaysCharge": "Сьогоднішня плата",
   "Tooltip.PrivateInfo": "Це приватні відомості",
+  "TopBar.ChangelogNotification.firstLine": "We have new stuff you should check out!",
+  "TopBar.ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "TopContributors.Individuals": "Особи",
   "TopContributors.Organizations": "Організації",
   "tos": "умови користування",

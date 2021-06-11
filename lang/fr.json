@@ -1923,6 +1923,8 @@
   "To": "À",
   "TodaysCharge": "Today's charge",
   "Tooltip.PrivateInfo": "Cette information est privée",
+  "TopBar.ChangelogNotification.firstLine": "We have new stuff you should check out!",
+  "TopBar.ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "TopContributors.Individuals": "Personnes",
   "TopContributors.Organizations": "Organisations",
   "tos": "conditions d'utilisation",

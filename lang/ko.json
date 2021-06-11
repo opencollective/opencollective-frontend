@@ -1923,6 +1923,8 @@
   "To": "수신",
   "TodaysCharge": "Today's charge",
   "Tooltip.PrivateInfo": "This info is private",
+  "TopBar.ChangelogNotification.firstLine": "We have new stuff you should check out!",
+  "TopBar.ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "TopContributors.Individuals": "개인",
   "TopContributors.Organizations": "조직",
   "tos": "이용 약관",

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client/core';
 import { graphql } from '@apollo/client/react/hoc';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
+import { Times } from '@styled-icons/fa-solid/Times';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -20,7 +21,9 @@ import Link from './Link';
 import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
+import { Dropdown, DropdownArrow, DropdownContent } from './StyledDropdown';
 import StyledLink from './StyledLink';
+import { P } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import { withUser } from './UserProvider';
@@ -58,6 +61,30 @@ const NavLink = styled(StyledLink)`
   font-size: 1.4rem;
 `;
 
+const ChangeLogNotificationDropdownArrow = styled(DropdownArrow)`
+  display: block;
+  right: 18px;
+  margin-top: 3px;
+  &::before {
+    border-color: transparent transparent #ffffc2 transparent;
+  }
+`;
+
+const ChangeLogNotificationDropdownContent = styled(DropdownContent)`
+  display: block;
+  right: 13px;
+  margin-top: 10px;
+  background: #ffffc2;
+`;
+
+const CloseIcon = styled(Times)`
+  font-size: 12px;
+  width: 15px;
+  height: 15px;
+  color: #76777a;
+  cursor: pointer;
+`;
+
 class TopBar extends React.Component {
   static propTypes = {
     className: PropTypes.string,
@@ -91,7 +118,7 @@ class TopBar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showMobileMenu: false };
+    this.state = { showMobileMenu: false, showChangelogDropdown: true };
     this.ref = React.createRef();
   }
 
@@ -104,6 +131,7 @@ class TopBar extends React.Component {
   }
 
   onClickOutside = e => {
+    this.setState({ showChangelogDropdown: false });
     const ref = this.ref.current;
     if (this.state.showMobileMenu && ref && !ref.contains(e.target)) {
       this.setState({ showMobileMenu: false });
@@ -216,7 +244,9 @@ class TopBar extends React.Component {
             </NavList>
           </Hide>
         </Flex>
-        <TopBarProfileMenu />
+        <Container onClick={() => this.setState({ showChangelogDropdown: false })}>
+          <TopBarProfileMenu />
+        </Container>
         <Hide sm md lg>
           <TopBarMobileMenu
             showMobileMenu={this.state.showMobileMenu}
@@ -230,20 +260,63 @@ class TopBar extends React.Component {
           </Box>
         </Hide>
         {!data.loading && LoggedInUser && (
-          <Flex onClick={this.handleShowNewUpdates}>
+          <Flex>
             {hasSeenNewUpdates && (
-              <Avatar src="/static/images/flame-default.svg" radius="30px" backgroundSize={10} ml={2} />
+              <Avatar
+                onClick={this.handleShowNewUpdates}
+                src="/static/images/flame-default.svg"
+                radius="30px"
+                backgroundSize={10}
+                ml={2}
+              />
             )}
             {!hasSeenNewUpdates && (
-              <Container>
-                <Avatar
-                  src="/static/images/flame-red.svg"
-                  radius="30px"
-                  backgroundSize={10}
-                  backgroundColor="yellow.100"
-                  ml={2}
-                />
-              </Container>
+              <Dropdown>
+                <React.Fragment>
+                  <Avatar
+                    onClick={this.handleShowNewUpdates}
+                    src="/static/images/flame-red.svg"
+                    radius="30px"
+                    backgroundSize={10}
+                    backgroundColor="yellow.100"
+                    ml={2}
+                  />
+                  {this.state.showChangelogDropdown && (
+                    <Container>
+                      <ChangeLogNotificationDropdownArrow />
+                      <ChangeLogNotificationDropdownContent>
+                        <Box as="ul" p={20} m={0} minWidth={184}>
+                          <Flex>
+                            <P fontSize="14px" fontWeight="700" color="black.800" mb={3}>
+                              <FormattedMessage
+                                id="TopBar.ChangelogNotification.firstLine"
+                                defaultMessage="We have new stuff you should check out!"
+                              />
+                            </P>
+                            <CloseIcon onClick={() => this.setState({ showChangelogDropdown: false })} />
+                          </Flex>
+                          <P fontSize="14px" color="black.800">
+                            <FormattedMessage
+                              id="TopBar.ChangelogNotification.secondLine"
+                              defaultMessage="Click on the {image} to take a look"
+                              values={{
+                                image: (
+                                  <Image
+                                    src="/static/images/flame-red.svg"
+                                    width={10.55}
+                                    height={15}
+                                    alt="Flame Image"
+                                  />
+                                ),
+                              }}
+                            />
+                          </P>
+                        </Box>
+                      </ChangeLogNotificationDropdownContent>
+                    </Container>
+                  )}
+                </React.Fragment>
+              </Dropdown>
             )}
           </Flex>
         )}
