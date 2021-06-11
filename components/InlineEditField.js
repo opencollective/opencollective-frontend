@@ -167,7 +167,7 @@ class InlineEditField extends Component {
     const { draft, isEditing } = this.state;
     const { buttonsMinWidth } = this.props;
     const value = get(values, field);
-    const isValid = draft !== value && draft != '';
+    const isValid = draft !== value && draft !== '';
 
     if (!isEditing) {
       return (

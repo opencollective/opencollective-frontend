@@ -293,11 +293,8 @@ class Host extends React.Component {
                   <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
                 </StyledButton>
                 <StyledButton buttonStyle="primary" onClick={() => this.changeHost()} data-cy="continue">
-                  <FormattedMessage
-                    id="collective.editHost.continue.btn"
-                    values={{ action }}
-                    defaultMessage={'{action}'}
-                  />
+                  {/** TODO(i18n): This should be internationalized */}
+                  {action}
                 </StyledButton>
               </Container>
             </ModalFooter>

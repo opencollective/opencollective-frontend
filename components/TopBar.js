@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
-import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -11,6 +10,7 @@ import theme from '../lib/theme';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
+import Image from './Image';
 import Link from './Link';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
@@ -112,10 +112,10 @@ class TopBar extends React.Component {
       >
         <Link href="/">
           <Flex alignItems="center">
-            <Logo width="24" height="24" />
+            <Logo width="36" height="36" />
             <Hide xs>
               <Box mx={2}>
-                <Image height={16} width={100} src="/static/images/logotype.svg" alt="Open collective" />
+                <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open collective" />
               </Box>
             </Hide>
           </Flex>
@@ -125,7 +125,7 @@ class TopBar extends React.Component {
           <Flex justifyContent="flex-end" flex="1 1 auto">
             <Hide xs sm md>
               <SearchFormContainer p={2}>
-                <SearchForm borderRadius="6px" />
+                <SearchForm borderRadius="6px" fontSize="14px" py="1px" />
               </SearchFormContainer>
             </Hide>
           </Flex>

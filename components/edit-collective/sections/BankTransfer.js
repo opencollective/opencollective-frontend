@@ -4,7 +4,6 @@ import { useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
 import { get } from 'lodash';
-import Image from 'next/image';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../../lib/constants/payout-method';
@@ -13,6 +12,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import Container from '../../Container';
 import PayoutBankInformationForm from '../../expenses/PayoutBankInformationForm';
 import { Box, Flex } from '../../Grid';
+import Image from '../../Image';
 import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
@@ -20,7 +20,7 @@ import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const { TW_API_COLLECTIVE_SLUG } = process.env;
+const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
 
 const hostQuery = gqlV2/* GraphQL */ `
   query EditCollectiveBankTransferHost($slug: String) {

@@ -175,10 +175,10 @@ class ExpensePage extends React.Component {
 
     const expense = this.props.data?.expense;
     if (
-      expense?.status == expenseStatus.UNVERIFIED &&
+      expense?.status === expenseStatus.UNVERIFIED &&
       expense?.permissions?.canEdit &&
       this.props.LoggedInUser &&
-      expense?.createdByAccount?.slug == this.props.LoggedInUser?.collective?.slug
+      expense?.createdByAccount?.slug === this.props.LoggedInUser?.collective?.slug
     ) {
       this.handleExpenseVerification();
     }
@@ -344,7 +344,7 @@ class ExpensePage extends React.Component {
           account =>
             [USER, ORGANIZATION].includes(account.type) ||
             // Same Host
-            (account.isActive && this.props.data?.account?.host?.id === account.host?.id),
+            (account.isActive && this.props.data?.expense?.account?.host?.id === account.host?.id),
         );
       return [loggedInAccount, ...accountsAdminOf];
     }

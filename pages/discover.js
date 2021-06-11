@@ -255,7 +255,7 @@ const DiscoverPage = () => {
                     </NavLinkContainer>
                     <NavLinkContainer>
                       <Link href={{ pathname: '/discover', query: { show: 'other', sort: query.sort } }}>
-                        <NavLink className={query.show == 'other' ? 'selected' : ''}>
+                        <NavLink className={query.show === 'other' ? 'selected' : ''}>
                           <FormattedMessage id="discover.other" defaultMessage="Other" />
                         </NavLink>
                       </Link>

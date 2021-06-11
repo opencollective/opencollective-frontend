@@ -12,15 +12,16 @@ import StyledInput from './StyledInput';
 
 const Pagination = ({ route, limit, offset, total, scrollToTopOnChange, isDisabled, ignoredQueryParams }) => {
   const router = useRouter();
+
+  if (!router) {
+    return null;
+  }
+
   const totalPages = Math.ceil(total / limit);
   const currentPage = offset / limit + 1;
   const queryParams = ignoredQueryParams ? omit(router.query, ignoredQueryParams) : router.query;
   route = route || router.asPath.split('?')[0];
   isDisabled = isDisabled || totalPages <= 1;
-
-  if (!router) {
-    return null;
-  }
 
   const changePage = async ({ target, key }) => {
     if (key && key !== 'Enter') {

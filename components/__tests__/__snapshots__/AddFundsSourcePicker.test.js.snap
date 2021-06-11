@@ -19,6 +19,12 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      aria-atomic="false"
+      aria-live="polite"
+      aria-relevant="additions text"
+      className="css-1f43avz-a11yText-A11yText"
+    />
     <div
       className=" css-1lipood-control"
       onMouseDown={[Function]}
@@ -144,6 +150,12 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      aria-atomic="false"
+      aria-live="polite"
+      aria-relevant="additions text"
+      className="css-1f43avz-a11yText-A11yText"
+    />
     <div
       className=" css-1lipood-control"
       onMouseDown={[Function]}
@@ -269,6 +281,12 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      aria-atomic="false"
+      aria-live="polite"
+      aria-relevant="additions text"
+      className="css-1f43avz-a11yText-A11yText"
+    />
     <div
       className=" css-1lipood-control"
       onMouseDown={[Function]}
@@ -394,6 +412,12 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      aria-atomic="false"
+      aria-live="polite"
+      aria-relevant="additions text"
+      className="css-1f43avz-a11yText-A11yText"
+    />
     <div
       className=" css-1lipood-control"
       onMouseDown={[Function]}
@@ -512,6 +536,12 @@ exports[`AddFundsSourcePickerForUser component render host options 1`] = `
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      aria-atomic="false"
+      aria-live="polite"
+      aria-relevant="additions text"
+      className="css-1f43avz-a11yText-A11yText"
+    />
     <div
       className=" css-sfspwo-control"
       onMouseDown={[Function]}
@@ -527,7 +557,7 @@ exports[`AddFundsSourcePickerForUser component render host options 1`] = `
         </div>
         <input
           aria-autocomplete="list"
-          className="css-62g3xt-dummyInput"
+          className="css-wmatm6-dummyInput-DummyInput"
           disabled={false}
           id="sourcePicker"
           onBlur={[Function]}
@@ -552,7 +582,7 @@ exports[`AddFundsSourcePickerForUser component render host options 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="css-6q0nyr-Svg"
+            className="css-tj5bde-Svg"
             focusable="false"
             height={20}
             viewBox="0 0 20 20"
@@ -581,6 +611,12 @@ exports[`AddFundsSourcePickerForUser component renders default options 1`] = `
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      aria-atomic="false"
+      aria-live="polite"
+      aria-relevant="additions text"
+      className="css-1f43avz-a11yText-A11yText"
+    />
     <div
       className=" css-sfspwo-control"
       onMouseDown={[Function]}
@@ -596,7 +632,7 @@ exports[`AddFundsSourcePickerForUser component renders default options 1`] = `
         </div>
         <input
           aria-autocomplete="list"
-          className="css-62g3xt-dummyInput"
+          className="css-wmatm6-dummyInput-DummyInput"
           disabled={false}
           id="sourcePicker"
           onBlur={[Function]}
@@ -621,7 +657,7 @@ exports[`AddFundsSourcePickerForUser component renders default options 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="css-6q0nyr-Svg"
+            className="css-tj5bde-Svg"
             focusable="false"
             height={20}
             viewBox="0 0 20 20"

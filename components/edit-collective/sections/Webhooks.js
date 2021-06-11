@@ -276,7 +276,7 @@ class Webhooks extends React.Component {
             buttonSize="medium"
             buttonStyle="primary"
             onClick={this.handleSubmit}
-            loading={status == 'loading'}
+            loading={status === 'loading'}
             disabled={data.loading || !this.state.modified || status === 'invalid'}
           >
             {status === 'saved' ? (

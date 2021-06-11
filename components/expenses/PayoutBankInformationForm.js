@@ -21,6 +21,8 @@ import { P } from '../Text';
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
 
+const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
+
 export const msg = defineMessages({
   currency: {
     id: 'Currency',
@@ -74,8 +76,8 @@ const requiredFieldsQuery = gqlV2/* GraphQL */ `
 
 const Input = props => {
   const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
-  const fieldName =
-    input.key === 'accountHolderName' ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
+  const isAccountHolderName = input.key === 'accountHolderName';
+  const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
   let validate = input.required ? value => (value ? undefined : `${input.name} is required`) : undefined;
   if (input.type === 'text') {
     if (input.validationRegexp) {
@@ -85,6 +87,8 @@ const Input = props => {
           return `${input.name} is required`;
         } else if (!matches && value) {
           return input.validationError || `Invalid ${input.name}`;
+        } else if (isAccountHolderName && value.match(/^[^\s]{1}\b/)) {
+          return 'Your full name is required';
         }
       };
     }
@@ -217,7 +221,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   // Some currencies offer different methods for the transaction
   // e.g. USD allows ABA and SWIFT transactions.
   const availableMethods = data.host.transferwise.requiredFields.find(
-    method => method.type == get(formik.values, getFieldName(`data.type`)),
+    method => method.type === get(formik.values, getFieldName(`data.type`)),
   );
   const [addressFields, otherFields] = partition(availableMethods?.fields, field =>
     field.group.every(g => g.key.includes('address.')),
@@ -329,8 +333,8 @@ const availableCurrenciesQuery = gqlV2/* GraphQL */ `
 const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: host.slug, ignoreBlockedCurrencies },
-    // Skip fetching/loading if the currency is fixed or avaialbleCurrencies was pre-loaded
+    variables: { slug: host?.transferwise ? host.slug : TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
+    // Skip fetching/loading if the currency is fixed or availableCurrencies was pre-loaded
     skip: Boolean(fixedCurrency || host.transferwise?.availableCurrencies),
   });
   const formik = useFormikContext();

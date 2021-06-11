@@ -220,6 +220,7 @@ interface Account {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -231,6 +232,16 @@ interface Account {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
@@ -483,6 +494,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
@@ -753,6 +765,7 @@ type Bot implements Account {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -764,6 +777,16 @@ type Bot implements Account {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 }
@@ -999,6 +1022,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -1010,6 +1034,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -2895,6 +2929,11 @@ enum Currency {
   SGD
 
   """
+  Hryvnia
+  """
+  UAH
+
+  """
   US Dollar
   """
   USD
@@ -3182,6 +3221,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -3193,6 +3233,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -4109,6 +4159,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -4120,6 +4171,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -4432,6 +4493,7 @@ type Host implements Account & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -4443,6 +4505,16 @@ type Host implements Account & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -4977,6 +5049,7 @@ type Individual implements Account {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -4988,6 +5061,16 @@ type Individual implements Account {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
   firstName: String @deprecated(reason: "2020-10-12: Use the name field")
@@ -5800,7 +5883,7 @@ type Mutation {
   ): Member!
   createUpdate(update: UpdateCreateInput!): Update!
   editUpdate(update: UpdateUpdateInput!): Update!
-  publishUpdate(id: String!, notificationAudience: UpdateAudience!): Update!
+  publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
 
@@ -5943,12 +6026,16 @@ type Order {
   """
   totalDonations: Amount!
   paymentMethod: PaymentMethod
-  platformFee: Amount @deprecated(reason: "2020-07-31: Please use platformContributionAmount")
 
   """
   Platform contribution attached to the Order.
   """
-  platformContributionAmount: Amount
+  platformContributionAmount: Amount @deprecated(reason: "2021-06-07: Please use platformTipAmount")
+
+  """
+  Platform Tip attached to the Order.
+  """
+  platformTipAmount: Amount
   taxes: [OrderTax]!
 
   """
@@ -6352,6 +6439,7 @@ type Organization implements Account & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -6363,6 +6451,16 @@ type Organization implements Account & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -6643,7 +6741,7 @@ type ProcessHostApplicationResponse {
   """
   The account that applied to the host
   """
-  account: Collective!
+  account: Account!
 
   """
   When sending a public message, this field will have the info about the conversation created
@@ -6873,6 +6971,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -6884,6 +6983,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 
@@ -7306,7 +7415,7 @@ type Query {
     dateFrom: ISODateTime
 
     """
-    Only return expenses that were created after this date
+    Only return expenses that were created before this date
     """
     dateTo: ISODateTime
 
@@ -7330,6 +7439,16 @@ type Query {
     incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind]
   ): TransactionCollection
   update(
     """
@@ -7508,6 +7627,18 @@ type TransactionCollection implements Collection {
   nodes: [Transaction]
 }
 
+enum TransactionKind {
+  ADDED_FUNDS
+  CONTRIBUTION
+  EXPENSE
+  HOST_FEE
+  HOST_FEE_SHARE
+  PAYMENT_PROCESSOR_FEE
+  PLATFORM_FEE
+  PLATFORM_TIP
+  PREPAID_PAYMENT_METHOD
+}
+
 """
 Fields for the user permissions on an transaction
 """
@@ -7554,6 +7685,10 @@ enum TransactionType {
 TransferWise related properties for bank transfer.
 """
 type TransferWise {
+  """
+  Unique identifier for this Wise object
+  """
+  id: String!
   requiredFields(
     """
     The 3 letter code identifying the currency you want to receive (ie: USD, EUR, BRL, GBP)
@@ -7567,7 +7702,7 @@ type TransferWise {
   ): [TransferWiseRequiredField]
   availableCurrencies(
     """
-    Ignores blocklisted currencies, used to generate the bank information form for manual payments
+    Ignores blocked currencies, used to generate the bank information form for manual payments
     """
     ignoreBlockedCurrencies: Boolean
   ): [JSONObject]
@@ -7622,6 +7757,7 @@ type Update {
   """
   userCanPublishUpdate: Boolean!
   isPrivate: Boolean!
+  isChangelog: Boolean!
   title: String!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -7705,6 +7841,7 @@ Input type for UpdateType
 input UpdateCreateInput {
   title: String!
   isPrivate: Boolean
+  isChangelog: Boolean
   makePublicOn: IsoDateString
   html: String
   fromAccount: AccountReferenceInput
@@ -7943,6 +8080,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     offset: Int = 0
     onlyPublishedUpdates: Boolean
+    onlyChangelogUpdates: Boolean
   ): UpdateCollection!
 
   """
@@ -7954,6 +8092,16 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: ISODateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
 

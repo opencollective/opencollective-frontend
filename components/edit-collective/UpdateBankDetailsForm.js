@@ -85,7 +85,7 @@ class UpdateBankDetailsForm extends React.Component {
               <P>
                 <FormattedMessage
                   id="bankaccount.instructions.variables"
-                  defaultMessage="This is the email that payers will automatically receive when they make a bank transfer contribution. Include the details they need to complete their payment, including reference info so you can match the pending transaction. A variable is like a blank that gets filled in automatically. You can use the following variables in the instructions:"
+                  defaultMessage="Financial contributors will receive these instructions when they select bank transfer as the payment method. You can use the following variables (like blanks that gets filled in):"
                 />
               </P>
 

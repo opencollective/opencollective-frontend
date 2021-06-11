@@ -65,7 +65,7 @@ class HorizontalScroller extends React.PureComponent {
 
   componentDidMount() {
     if (this.ref.current) {
-      this.ref.current.addEventListener('scroll', this.updateScrollInfo);
+      this.ref.current.addEventListener('scroll', this.updateScrollInfo, { passive: true });
       this.updateScrollInfo();
     }
   }

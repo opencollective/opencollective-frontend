@@ -47,7 +47,7 @@ class UpdatesPage extends React.Component {
           />
 
           <div className="content">
-            <UpdatesWithData collective={collective} defaultAction={action} LoggedInUser={LoggedInUser} />
+            <UpdatesWithData collective={collective} defaultAction={action} LoggedInUser={LoggedInUser} limit={10} />
           </div>
         </Body>
 

@@ -28,6 +28,10 @@ const StyledButtonContent = styled.button`
     cursor: not-allowed;
   }
 
+  &:focus {
+    box-shadow: 0px 0px 0px 2px #050505;
+  }
+
   /** Align button icons in the middle */
   svg {
     vertical-align: middle;
@@ -97,7 +101,7 @@ StyledButton.propTypes = {
   /**
    * From styled-system: accepts any css 'display' value
    */
-  display: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  display: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   /**
    * From styled-system: accepts any css 'font-weight' value
    */
@@ -136,6 +140,7 @@ StyledButton.propTypes = {
    * If true, will display a link instead of a button
    */
   isBorderless: PropTypes.bool,
+  children: PropTypes.node,
 };
 
 StyledButton.defaultProps = {

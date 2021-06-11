@@ -29,6 +29,7 @@ class EditUpdateForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     update: PropTypes.object,
+    isChangelog: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     onSubmit: PropTypes.func,
     onChange: PropTypes.func,
@@ -141,7 +142,7 @@ class EditUpdateForm extends React.Component {
               data-cy="update-content-editor"
             />
           </Container>
-          {(!collective.isHost || update.isPrivate) && (
+          {(!collective.isHost || update.isPrivate) && !this.props.isChangelog && (
             <Container
               mt={3}
               mb={2}

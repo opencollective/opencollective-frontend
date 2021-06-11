@@ -5,6 +5,8 @@ import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { DISABLE_ANIMATIONS } from '../../lib/animations';
+
 import ExpenseBudgetItem from '../budget/ExpenseBudgetItem';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -33,7 +35,6 @@ const FooterLabel = styled.span`
 const ExpensesList = ({
   collective,
   host,
-  usePreviewModal,
   expenses,
   isLoading,
   nbPlaceholders,
@@ -58,7 +59,7 @@ const ExpensesList = ({
           </ExpenseContainer>
         ))
       ) : (
-        <FlipMove enterAnimation="fade" leaveAnimation="fade">
+        <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
           {expenses.map((expense, idx) => (
             <ExpenseContainer key={expense.id} isFirst={!idx} data-cy={`expense-${expense.status}`}>
               <ExpenseBudgetItem
@@ -68,7 +69,6 @@ const ExpensesList = ({
                 host={host}
                 showProcessActions
                 view={view}
-                usePreviewModal={usePreviewModal}
                 onDelete={onDelete}
                 onProcess={onProcess}
                 suggestedTags={suggestedTags}
@@ -116,7 +116,6 @@ ExpensesList.propTypes = {
   host: PropTypes.object,
   view: PropTypes.oneOf(['public', 'admin']),
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  usePreviewModal: PropTypes.bool,
   onDelete: PropTypes.func,
   onProcess: PropTypes.func,
   collective: PropTypes.shape({

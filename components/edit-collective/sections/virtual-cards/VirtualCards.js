@@ -7,7 +7,10 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 
+import Collapse from '../../../Collapse';
 import { Box, Flex, Grid } from '../../../Grid';
+import HTMLContent from '../../../HTMLContent';
+import { getI18nLink } from '../../../I18nFormatters';
 import Loading from '../../../Loading';
 import Pagination from '../../../Pagination';
 import { P } from '../../../Text';
@@ -23,6 +26,8 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
     $offset: Int!
     $state: String
     $merchantAccount: AccountReferenceInput
+    $dateFrom: ISODateTime
+    $dateTo: ISODateTime
   ) {
     collective(slug: $slug) {
       id
@@ -40,7 +45,14 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
         imageUrl
         settings
       }
-      virtualCards(limit: $limit, offset: $offset, state: $state, merchantAccount: $merchantAccount) {
+      virtualCards(
+        limit: $limit
+        offset: $offset
+        state: $state
+        merchantAccount: $merchantAccount
+        dateFrom: $dateFrom
+        dateTo: $dateTo
+      ) {
         totalCount
         limit
         offset
@@ -82,7 +94,7 @@ const VirtualCards = props => {
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { state, merchant } = routerQuery;
+  const { state, merchant, period } = routerQuery;
 
   const { loading, data } = useQuery(virtualCardsQuery, {
     context: API_V2_CONTEXT,
@@ -92,6 +104,8 @@ const VirtualCards = props => {
       offset,
       state,
       merchantAccount: { slug: merchant },
+      dateFrom: period?.split('→')[0],
+      dateTo: period?.split('→')[1] !== 'all' ? period?.split('→')[1] : null,
     },
   });
 
@@ -116,9 +130,32 @@ const VirtualCards = props => {
         <P>
           <FormattedMessage
             id="VirtualCards.Description"
-            defaultMessage="Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them."
+            defaultMessage="Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them. <learnMoreLink>Learn more</learnMoreLink>"
+            values={{
+              learnMoreLink: getI18nLink({
+                href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                openInNewTabNoFollow: true,
+              }),
+            }}
           />
         </P>
+        {props.collective.host?.settings?.virtualcards?.policy && (
+          <P mt={3}>
+            <Collapse
+              title={
+                <FormattedMessage
+                  id="VirtualCards.Policy.Reminder"
+                  defaultMessage="{hostName} Virtual Card use Policy"
+                  values={{
+                    hostName: props.collective.host.name,
+                  }}
+                />
+              }
+            >
+              <HTMLContent content={props.collective.host?.settings?.virtualcards?.policy} />
+            </Collapse>
+          </P>
+        )}
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             filters={routerQuery}
@@ -126,6 +163,7 @@ const VirtualCards = props => {
             host={props.collective.host}
             virtualCardMerchants={data.collective.virtualCardMerchants.nodes}
             onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
+            displayPeriodFilter
           />
         </Flex>
       </Box>

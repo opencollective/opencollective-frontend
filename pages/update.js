@@ -158,6 +158,7 @@ const updateQuery = gqlV2/* GraphQL */ `
       html
       summary
       isPrivate
+      isChangelog
       makePublicOn
       userCanSeeUpdate
       userCanPublishUpdate
