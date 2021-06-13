@@ -79,7 +79,7 @@ class recurringContributionsPage extends React.Component {
 
     const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
 
-    if (!data?.loading && !loadingLoggedInUser && LoggedInUser) {
+    if (!data?.loading && !loadingLoggedInUser) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
@@ -142,7 +142,6 @@ class recurringContributionsPage extends React.Component {
 }
 
 const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
-  skip: props => !props.LoggedInUser,
   options: {
     context: API_V2_CONTEXT,
   },
