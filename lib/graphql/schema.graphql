@@ -1953,7 +1953,7 @@ type Mutation {
   """
   Update the time which the user viewed the changelog updates
   """
-  setChangelogViewDate(changelogViewDate: String!): UserDetails
+  setChangelogViewDate(changelogViewDate: IsoDateString!): UserDetails!
 
   """
   Confirm the new user email from confirmation token
@@ -3933,7 +3933,7 @@ type UserDetails {
   Returns true if user account is limited (user can't use any feature)
   """
   isLimited: Boolean
-  changelogViewDate: DateString
+  changelogViewDate: IsoDateString
 }
 
 """
