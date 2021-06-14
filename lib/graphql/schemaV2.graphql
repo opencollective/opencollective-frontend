@@ -7483,12 +7483,7 @@ type Query {
     """
     tier: TierReferenceInput
   ): PaypalPlan!
-  latestChangelogPublishDate(
-    """
-    The slug identifying the collective that requested the changelog publish date
-    """
-    collectiveSlug: String!
-  ): DateTime
+  latestChangelogPublishDate: DateTime
   loggedInAccount: Account
 }
 

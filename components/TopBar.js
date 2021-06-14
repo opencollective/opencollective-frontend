@@ -324,8 +324,8 @@ class TopBar extends React.Component {
 }
 
 const latestChangelogPublishDateQuery = gqlV2/* GraphQL */ `
-  query LatestChangeLogPublishDate($collectiveSlug: String!) {
-    latestChangelogPublishDate(collectiveSlug: $collectiveSlug)
+  query LatestChangeLogPublishDate {
+    latestChangelogPublishDate
   }
 `;
 
@@ -340,7 +340,6 @@ const setChangelogViewDateMutation = gql`
 const latestChangelogPublish = graphql(latestChangelogPublishDateQuery, {
   options: {
     context: API_V2_CONTEXT,
-    variables: { collectiveSlug: 'opencollective' },
     fetchPolicy: 'cache-and-network',
   },
 });
