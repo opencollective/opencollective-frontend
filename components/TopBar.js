@@ -94,9 +94,7 @@ class TopBar extends React.Component {
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
     data: PropTypes.shape({
-      account: PropTypes.shape({
-        latestChangelogPublishDate: PropTypes.string,
-      }),
+      latestChangelogPublishDate: PropTypes.string,
       loading: PropTypes.bool,
     }),
     setChangelogViewDate: PropTypes.func,
@@ -160,7 +158,7 @@ class TopBar extends React.Component {
 
   render() {
     const { showSearch, menuItems, LoggedInUser, data } = this.props;
-    const hasSeenNewUpdates = this.hasSeenNewChangelogUpdates(LoggedInUser, data?.account?.latestChangelogPublishDate);
+    const hasSeenNewUpdates = this.hasSeenNewChangelogUpdates(LoggedInUser, data?.latestChangelogPublishDate);
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
@@ -326,16 +324,13 @@ class TopBar extends React.Component {
 }
 
 const latestChangelogPublishDateQuery = gqlV2/* GraphQL */ `
-  query LatestChangeLogPublishDate($collectiveSlug: String) {
-    account(slug: $collectiveSlug) {
-      id
-      latestChangelogPublishDate
-    }
+  query LatestChangeLogPublishDate($collectiveSlug: String!) {
+    latestChangelogPublishDate(collectiveSlug: $collectiveSlug)
   }
 `;
 
 const setChangelogViewDateMutation = gql`
-  mutation SetChangelogViewDateMutation($changelogViewDate: String!) {
+  mutation SetChangelogViewDateMutation($changelogViewDate: IsoDateString!) {
     setChangelogViewDate(changelogViewDate: $changelogViewDate) {
       id
     }
