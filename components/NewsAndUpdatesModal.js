@@ -12,6 +12,7 @@ import HTMLContent from './HTMLContent';
 import Image from './Image';
 import Link from './Link';
 import Loading from './Loading';
+import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCarousel from './StyledCarousel';
 import StyledLink from './StyledLink';
@@ -34,6 +35,73 @@ const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
     }
   }
 `;
+
+const renderStyledCarousel = (data, loading, error, onClose) => {
+  if (loading === false && data) {
+    return (
+      <StyledCarousel contentPosition="left">
+        {data.account.updates.nodes.map(update => (
+          <Container key={update.id}>
+            <Container fontSize="13px" lineHeight="20px" color="black.700">
+              <FormattedDate value={update.publishedAt} day="numeric" month="long" year="numeric" />
+            </Container>
+            <Flex>
+              <Span paddingTop="10px">
+                <Image
+                  width={12}
+                  height={12}
+                  src="/static/images/news-and-updates-ellipse.svg"
+                  alt="News and Updates Ellipse"
+                />
+              </Span>
+              <P fontSize="20px" margin="0px 12px" fontWeight="500" lineHeight="36px" color="black.900">
+                {update.title}
+              </P>
+            </Flex>
+            <Flex pt={2} pb={3}>
+              <StyledLink
+                onClick={onClose}
+                as={Link}
+                href={`/opencollective/updates/${update.slug}`}
+                color="blue.700"
+                fontSize="14px"
+                display="flex"
+              >
+                <FormattedMessage id="NewsAndUpdates.link.giveFeedback" defaultMessage="Read more & give Feedback" />
+              </StyledLink>
+            </Flex>
+            <Flex pb={1}>
+              <HTMLContent color="black.800" mt={1} fontSize="16px" content={update.summary} />
+            </Flex>
+            <Flex pb={3}>
+              {update.summary.endsWith('...') && (
+                <StyledLink
+                  onClick={onClose}
+                  as={Link}
+                  href={`/opencollective/updates/${update.slug}`}
+                  fontSize="14px"
+                  display="flex"
+                >
+                  <FormattedMessage id="NewsAndUpdates.link.readMore" defaultMessage="Read more" />
+                </StyledLink>
+              )}
+            </Flex>
+          </Container>
+        ))}
+      </StyledCarousel>
+    );
+  } else if (error) {
+    return (
+      <Flex flexDirection="column" alignItems="center" px={2} py={6}>
+        <MessageBox type="error" withIcon mb={5}>
+          {error.message}
+        </MessageBox>
+      </Flex>
+    );
+  } else {
+    return <Loading />;
+  }
+};
 
 const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
   return (
@@ -62,65 +130,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
           variables={{ collectiveSlug: 'opencollective', onlyChangelogUpdates: true, onlyPublishedUpdates: true }}
           context={API_V2_CONTEXT}
         >
-          {({ data, loading }) =>
-            loading === false && data ? (
-              <StyledCarousel contentPosition="left">
-                {data.account.updates.nodes.map(update => (
-                  <Container key={update.id}>
-                    <Container fontSize="13px" lineHeight="20px" color="black.700">
-                      <FormattedDate value={update.publishedAt} day="numeric" month="long" year="numeric" />
-                    </Container>
-                    <Flex>
-                      <Span paddingTop="10px">
-                        <Image
-                          width={12}
-                          height={12}
-                          src="/static/images/news-and-updates-ellipse.svg"
-                          alt="News and Updates Ellipse"
-                        />
-                      </Span>
-                      <P fontSize="20px" margin="0px 12px" fontWeight="500" lineHeight="36px" color="black.900">
-                        {update.title}
-                      </P>
-                    </Flex>
-                    <Flex pt={2} pb={3}>
-                      <StyledLink
-                        onClick={onClose}
-                        as={Link}
-                        href={`/opencollective/updates/${update.slug}`}
-                        color="blue.700"
-                        fontSize="14px"
-                        display="flex"
-                      >
-                        <FormattedMessage
-                          id="NewsAndUpdates.link.giveFeedback"
-                          defaultMessage="Read more & give Feedback"
-                        />
-                      </StyledLink>
-                    </Flex>
-                    <Flex pb={1}>
-                      <HTMLContent color="black.800" mt={1} fontSize="16px" content={update.summary} />
-                    </Flex>
-                    <Flex pb={3}>
-                      {update.summary.endsWith('...') && (
-                        <StyledLink
-                          onClick={onClose}
-                          as={Link}
-                          href={`/opencollective/updates/${update.slug}`}
-                          fontSize="14px"
-                          display="flex"
-                        >
-                          <FormattedMessage id="NewsAndUpdates.link.readMore" defaultMessage="Read more" />
-                        </StyledLink>
-                      )}
-                    </Flex>
-                  </Container>
-                ))}
-              </StyledCarousel>
-            ) : (
-              <Loading />
-            )
-          }
+          {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
         </Query>
       </ModalBody>
       <ModalFooter isFullWidth>

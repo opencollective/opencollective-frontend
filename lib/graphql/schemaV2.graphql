@@ -222,6 +222,7 @@ interface Account {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -767,6 +768,7 @@ type Bot implements Account {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -1024,6 +1026,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -3223,6 +3226,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -4161,6 +4165,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -4495,6 +4500,7 @@ type Host implements Account & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -5051,6 +5057,7 @@ type Individual implements Account {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -6441,6 +6448,7 @@ type Organization implements Account & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -6973,6 +6981,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -8088,6 +8097,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
+  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective

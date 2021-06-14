@@ -129,7 +129,7 @@ const I18nContributionType = defineMessages({
 const getContributeCTA = type => {
   switch (type) {
     case ContributionTypes.TICKET:
-      return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="RVSP" />;
+      return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="RSVP" />;
     case ContributionTypes.EVENT_PARTICIPATE:
     case ContributionTypes.EVENT_PASSED:
       return <FormattedMessage id="ContributeCard.BtnViewEvent" defaultMessage="View Event" />;
