@@ -22,6 +22,8 @@ import StyledLink from './StyledLink';
 import { P, Span } from './Text';
 import { withUser } from './UserProvider';
 
+const CHANGE_LOG_UPDATES_ENABLED = process.env.CHANGE_LOG_UPDATES_ENABLED;
+
 const memberInvitationsCountQuery = gql`
   query MemberInvitationsCount($memberCollectiveId: Int!) {
     memberInvitations(MemberCollectiveId: $memberCollectiveId) {
@@ -130,9 +132,11 @@ class TopBarProfileMenu extends React.Component {
               <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
             </P>
             <Box as="ul" p={0} my={2}>
-              <UserMenuLinkEntry as={Span} onClick={() => setShowNewsAndUpdates(true)}>
-                <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
-              </UserMenuLinkEntry>
+              {CHANGE_LOG_UPDATES_ENABLED && (
+                <UserMenuLinkEntry as={Span} onClick={() => setShowNewsAndUpdates(true)}>
+                  <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
+                </UserMenuLinkEntry>
+              )}
               <UserMenuLinkEntry href={`/${LoggedInUser.username}`}>
                 <FormattedMessage id="menu.profile" defaultMessage="Profile" />
               </UserMenuLinkEntry>
