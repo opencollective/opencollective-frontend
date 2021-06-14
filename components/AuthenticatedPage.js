@@ -73,12 +73,7 @@ class AuthenticatedPage extends React.Component {
 
     return (
       <Page noRobots {...pageProps}>
-        {LoggedInUser && this.renderContent(loadingLoggedInUser, LoggedInUser)}
-        {!LoggedInUser && (
-          <Container p={4}>
-            <SignInOrJoinFree form="signin" disableSignup={this.props.disableSignup} />
-          </Container>
-        )}
+        {this.renderContent(loadingLoggedInUser, LoggedInUser)}
       </Page>
     );
   }
