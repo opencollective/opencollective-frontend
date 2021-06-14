@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { createGlobalStyle } from 'styled-components';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { parseToBoolean } from '../lib/utils';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -22,7 +23,7 @@ import StyledLink from './StyledLink';
 import { P, Span } from './Text';
 import { withUser } from './UserProvider';
 
-const CHANGE_LOG_UPDATES_ENABLED = process.env.CHANGE_LOG_UPDATES_ENABLED;
+const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES_ENABLED);
 
 const memberInvitationsCountQuery = gql`
   query MemberInvitationsCount($memberCollectiveId: Int!) {
