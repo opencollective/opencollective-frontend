@@ -2,6 +2,10 @@ import { defaultTestUserEmail } from '../support/data';
 import { randomEmail } from '../support/faker';
 
 describe('Contribution Flow: Guest contributions', () => {
+  before(() => {
+    cy.clearInbox();
+  });
+
   it('Makes a contribution as an existing user', () => {
     cy.visit('/apex/donate');
     cy.contains('[data-cy="amount-picker"] button', 'Other').click();
