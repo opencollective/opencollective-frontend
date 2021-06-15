@@ -142,7 +142,7 @@ class TopBar extends React.Component {
   hasSeenNewChangelogUpdates = (user, latestChangelogDate) => {
     if (!user) {
       return true;
-    } else if (!user.changelogViewDate) {
+    } else if (!user.changelogViewDate && latestChangelogDate) {
       return false;
     } else {
       return new Date(latestChangelogDate) < new Date(user.changelogViewDate);
