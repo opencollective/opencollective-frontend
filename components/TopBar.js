@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client/core';
 import { graphql } from '@apollo/client/react/hoc';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { Times } from '@styled-icons/fa-solid/Times';
@@ -329,8 +328,8 @@ const latestChangelogPublishDateQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const setChangelogViewDateMutation = gql`
-  mutation SetChangelogViewDateMutation($changelogViewDate: IsoDateString!) {
+const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
+  mutation SetChangelogViewDateMutation($changelogViewDate: DateTime!) {
     setChangelogViewDate(changelogViewDate: $changelogViewDate) {
       id
     }
@@ -346,6 +345,9 @@ const latestChangelogPublish = graphql(latestChangelogPublishDateQuery, {
 
 const setChangelogViewDate = graphql(setChangelogViewDateMutation, {
   name: 'setChangelogViewDate',
+  options: {
+    context: API_V2_CONTEXT,
+  },
 });
 
 const addGraphql = compose(latestChangelogPublish, setChangelogViewDate);

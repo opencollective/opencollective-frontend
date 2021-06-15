@@ -5888,6 +5888,11 @@ type Mutation {
   deleteUpdate(id: String!): Update!
 
   """
+  Update the time which the user viewed the changelog updates
+  """
+  setChangelogViewDate(changelogViewDate: DateTime!): UserDetails!
+
+  """
   Assign new Virtual Card information to existing hosted collective
   """
   assignNewVirtualCard(
@@ -7873,6 +7878,36 @@ input UpdateUpdateInput {
 A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
 """
 scalar URL
+
+"""
+This represents the details of a User
+"""
+type UserDetails {
+  id: Int
+  CollectiveId: Int
+  collective: Collective
+  username: String
+  firstName: String
+  lastName: String
+  name: String
+  image: String
+  email: String
+  emailWaitingForValidation: String
+  memberOf(
+    roles: [String]
+
+    """
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): [Member]
+
+  """
+  Returns true if user account is limited (user can't use any feature)
+  """
+  isLimited: Boolean
+  changelogViewDate: DateTime
+}
 
 """
 This represents a Vendor account
