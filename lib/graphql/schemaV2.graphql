@@ -5084,6 +5084,7 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
+  changelogViewDate: DateTime
 }
 
 input IndividualCreateInput {
@@ -5890,7 +5891,7 @@ type Mutation {
   """
   Update the time which the user viewed the changelog updates
   """
-  setChangelogViewDate(changelogViewDate: DateTime!): UserDetails!
+  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
 
   """
   Assign new Virtual Card information to existing hosted collective
@@ -7878,14 +7879,6 @@ input UpdateUpdateInput {
 A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
 """
 scalar URL
-
-"""
-This represents the details of a User
-"""
-type UserDetails {
-  id: Int
-  changelogViewDate: DateTime
-}
 
 """
 This represents a Vendor account
