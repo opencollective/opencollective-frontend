@@ -252,7 +252,7 @@ class ContributionFlowSuccess extends React.Component {
                     />
                   </P>
                 </Box>
-                <Link href={{ pathname: order.toAccount.name }}>
+                <Link href={{ pathname: order.toAccount.slug }}>
                   <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={!isEmbed} />
                 </Link>
                 {!isEmbed && (
