@@ -7884,28 +7884,6 @@ This represents the details of a User
 """
 type UserDetails {
   id: Int
-  CollectiveId: Int
-  collective: Collective
-  username: String
-  firstName: String
-  lastName: String
-  name: String
-  image: String
-  email: String
-  emailWaitingForValidation: String
-  memberOf(
-    roles: [String]
-
-    """
-    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
-    """
-    includeIncognito: Boolean = true
-  ): [Member]
-
-  """
-  Returns true if user account is limited (user can't use any feature)
-  """
-  isLimited: Boolean
   changelogViewDate: DateTime
 }
 
