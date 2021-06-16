@@ -83,6 +83,7 @@ const Input = props => {
     if (input.validationRegexp) {
       validate = value => {
         const matches = new RegExp(input.validationRegexp).test(value);
+        // TODO(intl): This should be internationalized, ideally with `formatFormErrorMessage`
         if (!value && input.required) {
           return `${input.name} is required`;
         } else if (!matches && value) {
@@ -231,7 +232,15 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     <Flex flexDirection="column">
       <Field name={getFieldName('data.type')}>
         {({ field }) => (
-          <StyledInputField name={field.name} label="Transaction Method" labelFontSize="13px" mt={3} mb={2}>
+          <StyledInputField
+            name={field.name}
+            label={
+              <FormattedMessage id="PayoutBankInformationForm.TransactionMethod" defaultMessage="Transaction Method" />
+            }
+            labelFontSize="13px"
+            mt={3}
+            mb={2}
+          >
             {({ id }) => (
               <StyledSelect
                 inputId={id}
@@ -251,7 +260,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
       </Field>
       <Box mt={3} flex="1">
         <P fontSize="14px" fontWeight="bold">
-          Account Information
+          <FormattedMessage id="PayoutBankInformationForm.AccountInfo" defaultMessage="Account Information" />
         </P>
       </Box>
       {
@@ -283,8 +292,15 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
         />
       ))}
       <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
-        Recipient&apos;s Address&nbsp;
-        <StyledTooltip content="Bank account holder address (not the bank address)">
+        <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
+        <StyledTooltip
+          content={
+            <FormattedMessage
+              id="PayoutBankInformationForm.HolderAddress"
+              defaultMessage="Bank account holder address (not the bank address)"
+            />
+          }
+        >
           <Info size={16} />
         </StyledTooltip>
       </Box>
