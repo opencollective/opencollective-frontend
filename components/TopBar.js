@@ -86,7 +86,6 @@ const CloseIcon = styled(Times)`
 
 class TopBar extends React.Component {
   static propTypes = {
-    className: PropTypes.string,
     LoggedInUser: PropTypes.object,
     setShowNewsAndUpdates: PropTypes.func,
     loadingLoggedInUser: PropTypes.bool,
@@ -97,13 +96,10 @@ class TopBar extends React.Component {
       loading: PropTypes.bool,
     }),
     setChangelogViewDate: PropTypes.func,
-    viewedNewsAndUpdates: PropTypes.bool,
-    setViewedNewsAndUpdates: PropTypes.func,
     refetchLoggedInUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    className: '',
     showSearch: true,
     menuItems: {
       discover: true,
