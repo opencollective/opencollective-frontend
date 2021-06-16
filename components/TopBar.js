@@ -284,10 +284,10 @@ class TopBar extends React.Component {
                       <ChangeLogNotificationDropdownContent>
                         <Box as="ul" p={20} m={0} minWidth={184}>
                           <Flex>
-                            <P fontSize="14px" fontWeight="700" color="black.800" mb={3}>
+                            <P fontSize="14px" fontWeight="700" color="black.800" mb={3} mr={3}>
                               <FormattedMessage
                                 id="TopBar.ChangelogNotification.firstLine"
-                                defaultMessage="We have new stuff you should check out!"
+                                defaultMessage="We have new stuff for you!"
                               />
                             </P>
                             <CloseIcon onClick={() => this.setState({ showChangelogDropdown: false })} />
