@@ -93,7 +93,9 @@ class TopBar extends React.Component {
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
     data: PropTypes.shape({
-      latestChangelogPublishDate: PropTypes.string,
+      individual: PropTypes.shape({
+        hasSeenLatestChangelogEntry: PropTypes.bool,
+      }),
       loading: PropTypes.bool,
     }),
     setChangelogViewDate: PropTypes.func,
@@ -157,7 +159,7 @@ class TopBar extends React.Component {
 
   render() {
     const { showSearch, menuItems, LoggedInUser, data } = this.props;
-    const hasSeenNewUpdates = this.hasSeenNewChangelogUpdates(LoggedInUser, data?.latestChangelogPublishDate);
+    const hasSeenNewUpdates = data?.individual?.hasSeenLatestChangelogEntry;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
@@ -256,7 +258,7 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        {!data.loading && LoggedInUser && (
+        {data?.loading && LoggedInUser && (
           <Flex>
             {hasSeenNewUpdates && (
               <Avatar
@@ -322,9 +324,12 @@ class TopBar extends React.Component {
   }
 }
 
-const latestChangelogPublishDateQuery = gqlV2/* GraphQL */ `
-  query LatestChangeLogPublishDate {
-    latestChangelogPublishDate
+const hasSeenLatestChangelogEntryQuery = gqlV2/* GraphQL */ `
+  query HasSeenLatestChangelogEntry($slug: String) {
+    individual(slug: $slug) {
+      id
+      hasSeenLatestChangelogEntry
+    }
   }
 `;
 
@@ -336,11 +341,13 @@ const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const latestChangelogPublish = graphql(latestChangelogPublishDateQuery, {
-  options: {
+const latestChangelogPublish = graphql(hasSeenLatestChangelogEntryQuery, {
+  options: props => ({
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
-  },
+    variables: { slug: props.LoggedInUser.collective.slug },
+  }),
+  skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
 });
 
 const setChangelogViewDate = graphql(setChangelogViewDateMutation, {

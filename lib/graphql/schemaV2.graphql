@@ -5084,7 +5084,7 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
-  changelogViewDate: DateTime
+  hasSeenLatestChangelogEntry: Boolean
 }
 
 input IndividualCreateInput {
@@ -7489,7 +7489,6 @@ type Query {
     """
     tier: TierReferenceInput
   ): PaypalPlan!
-  latestChangelogPublishDate: DateTime
   loggedInAccount: Account
 }
 
