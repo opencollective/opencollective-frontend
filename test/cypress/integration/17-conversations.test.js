@@ -21,11 +21,9 @@ describe('Conversations', () => {
         'Hello from https://opencollective.com/opencollective 👋👋👋{enter}Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.',
       );
 
-      cy.wait(100);
-
       cy.get('@editor').should(
-        'have.html',
-        '<div><!--block-->Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋<br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.</div>',
+        'contain.html',
+        'Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋',
       );
 
       // Add tags
