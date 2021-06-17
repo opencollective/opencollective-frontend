@@ -98,6 +98,15 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
       });
     }
 
+    if (!interval && supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.ALIPAY)) {
+      uniquePMs.push({
+        key: 'alipay',
+        paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.ALIPAY },
+        title: <FormattedMessage id="contribute.alipay" defaultMessage="Alipay" />,
+        icon: getPaymentMethodIcon({ type: 'alipay' }, collective),
+      });
+    }
+
     // Manual (bank transfer)
     if (hostHasManual && !interval) {
       uniquePMs.push({
