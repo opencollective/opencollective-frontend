@@ -258,7 +258,7 @@ class ContributionFlowSuccess extends React.Component {
                 {isEmbed ? (
                   <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                 ) : (
-                  <StyledLink as={Link} color="black.600" href={{ pathname: order.toAccount.slug }}>
+                  <StyledLink as={Link} color="black.800" href={{ pathname: order.toAccount.slug }}>
                     <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                   </StyledLink>
                 )}
