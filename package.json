@@ -180,6 +180,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "enzyme": "^3.11.0",
     "eslint": "^7.26.0",
+    "eslint-config-next": "^11.0.0",
     "eslint-config-opencollective": "^3.0.0",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-cypress": "^2.11.3",
@@ -263,6 +264,7 @@
   "depcheck": {
     "ignores": [
       "@formatjs/intl-relativetimeformat",
+      "eslint-config-next",
       "imagemin",
       "imagemin-optipng",
       "imagemin-pngquant",
