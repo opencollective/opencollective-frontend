@@ -102,7 +102,7 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
       uniquePMs.push({
         key: 'alipay',
         paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.ALIPAY },
-        title: <FormattedMessage id="contribute.alipay" defaultMessage="Alipay" />,
+        title: <FormattedMessage id="Alipay" defaultMessage="Alipay" />,
         icon: getPaymentMethodIcon({ type: 'alipay' }, collective),
       });
     }
