@@ -247,12 +247,21 @@ class ContributionFlowSuccess extends React.Component {
                   <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
                     <FormattedMessage
                       id="NewContributionFlow.Success.NowSupporting"
-                      defaultMessage="You are now supporting {collective}."
-                      values={{ collective: order.toAccount.name }}
+                      defaultMessage="You are now supporting <link>{collective}</link>."
+                      values={{
+                        collective: order.toAccount.name,
+                        link: value => <Link href={{ pathname: order.toAccount.slug }}>{value}</Link>,
+                      }}
                     />
                   </P>
                 </Box>
-                <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={!isEmbed} />
+                {isEmbed ? (
+                  <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
+                ) : (
+                  <StyledLink as={Link} color="black.800" href={{ pathname: order.toAccount.slug }}>
+                    <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
+                  </StyledLink>
+                )}
                 {!isEmbed && (
                   <Box my={4}>
                     <Link href={{ pathname: '/discover', query: { show: getMainTag(order.toAccount) } }}>
