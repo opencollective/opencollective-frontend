@@ -92,7 +92,9 @@ class TopBar extends React.Component {
 
   componentDidMount() {
     document.addEventListener('click', this.onClickOutside);
-    this.props.refetchLoggedInUser();
+    if (this.props.LoggedInUser) {
+      this.props.refetchLoggedInUser();
+    }
   }
 
   componentWillUnmount() {
