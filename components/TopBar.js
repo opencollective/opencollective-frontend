@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
-import { Times } from '@styled-icons/fa-solid/Times';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -11,6 +10,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import theme from '../lib/theme';
 
 import Avatar from './Avatar';
+import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
@@ -19,9 +19,8 @@ import Link from './Link';
 import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
-import { Dropdown, DropdownArrow, DropdownContent } from './StyledDropdown';
+import { Dropdown } from './StyledDropdown';
 import StyledLink from './StyledLink';
-import { P } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import { withUser } from './UserProvider';
@@ -57,30 +56,6 @@ const NavLink = styled(StyledLink)`
   color: #313233;
   font-weight: 500;
   font-size: 1.4rem;
-`;
-
-const ChangeLogNotificationDropdownArrow = styled(DropdownArrow)`
-  display: block;
-  right: 18px;
-  margin-top: 3px;
-  &::before {
-    border-color: transparent transparent #ffffc2 transparent;
-  }
-`;
-
-const ChangeLogNotificationDropdownContent = styled(DropdownContent)`
-  display: block;
-  right: 13px;
-  margin-top: 10px;
-  background: #ffffc2;
-`;
-
-const CloseIcon = styled(Times)`
-  font-size: 12px;
-  width: 15px;
-  height: 15px;
-  color: #76777a;
-  cursor: pointer;
 `;
 
 class TopBar extends React.Component {
@@ -264,36 +239,7 @@ class TopBar extends React.Component {
                   />
                   {this.state.showChangelogDropdown && (
                     <Container>
-                      <ChangeLogNotificationDropdownArrow />
-                      <ChangeLogNotificationDropdownContent>
-                        <Box as="ul" p={20} m={0} minWidth={184}>
-                          <Flex>
-                            <P fontSize="14px" fontWeight="700" color="black.800" mb={3} mr={3}>
-                              <FormattedMessage
-                                id="TopBar.ChangelogNotification.firstLine"
-                                defaultMessage="We have new stuff for you!"
-                              />
-                            </P>
-                            <CloseIcon onClick={() => this.setState({ showChangelogDropdown: false })} />
-                          </Flex>
-                          <P fontSize="14px" color="black.800">
-                            <FormattedMessage
-                              id="TopBar.ChangelogNotification.secondLine"
-                              defaultMessage="Click on the {image} to take a look"
-                              values={{
-                                image: (
-                                  <Image
-                                    src="/static/images/flame-red.svg"
-                                    width={10.55}
-                                    height={15}
-                                    alt="Flame Image"
-                                  />
-                                ),
-                              }}
-                            />
-                          </P>
-                        </Box>
-                      </ChangeLogNotificationDropdownContent>
+                      <ChangelogNotificationDropdown onClose={() => this.setState({ showChangelogDropdown: false })} />
                     </Container>
                   )}
                 </React.Fragment>
