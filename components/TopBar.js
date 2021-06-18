@@ -9,7 +9,6 @@ import styled from 'styled-components';
 import { rotateMixin } from '../lib/constants/animations';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import theme from '../lib/theme';
-import { compose } from '../lib/utils';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -86,26 +85,19 @@ const CloseIcon = styled(Times)`
 
 class TopBar extends React.Component {
   static propTypes = {
-    className: PropTypes.string,
     LoggedInUser: PropTypes.object,
     setShowNewsAndUpdates: PropTypes.func,
     loadingLoggedInUser: PropTypes.bool,
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
     data: PropTypes.shape({
-      individual: PropTypes.shape({
-        hasSeenLatestChangelogEntry: PropTypes.bool,
-      }),
       loading: PropTypes.bool,
     }),
     setChangelogViewDate: PropTypes.func,
-    viewedNewsAndUpdates: PropTypes.bool,
-    setViewedNewsAndUpdates: PropTypes.func,
     refetchLoggedInUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    className: '',
     showSearch: true,
     menuItems: {
       discover: true,
@@ -123,6 +115,7 @@ class TopBar extends React.Component {
 
   componentDidMount() {
     document.addEventListener('click', this.onClickOutside);
+    this.props.refetchLoggedInUser();
   }
 
   componentWillUnmount() {
@@ -141,16 +134,6 @@ class TopBar extends React.Component {
     this.setState(state => ({ showMobileMenu: !state.showMobileMenu }));
   };
 
-  hasSeenNewChangelogUpdates = (user, latestChangelogDate) => {
-    if (!user) {
-      return true;
-    } else if (!user.changelogViewDate && latestChangelogDate) {
-      return false;
-    } else {
-      return new Date(latestChangelogDate) < new Date(user.changelogViewDate);
-    }
-  };
-
   handleShowNewUpdates = async () => {
     this.props.setShowNewsAndUpdates(true);
     await this.props.setChangelogViewDate({ variables: { changelogViewDate: new Date() } });
@@ -158,8 +141,8 @@ class TopBar extends React.Component {
   };
 
   render() {
-    const { showSearch, menuItems, LoggedInUser, data } = this.props;
-    const hasSeenNewUpdates = data?.individual?.hasSeenLatestChangelogEntry;
+    const { showSearch, menuItems, LoggedInUser, loadingLoggedInUser } = this.props;
+    const hasSeenNewUpdates = !loadingLoggedInUser && LoggedInUser?.hasSeenLatestChangelogEntry;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
@@ -258,7 +241,7 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        {data?.loading && LoggedInUser && (
+        {LoggedInUser && (
           <Flex>
             {hasSeenNewUpdates && (
               <Avatar
@@ -324,15 +307,6 @@ class TopBar extends React.Component {
   }
 }
 
-const hasSeenLatestChangelogEntryQuery = gqlV2/* GraphQL */ `
-  query HasSeenLatestChangelogEntry($slug: String) {
-    individual(slug: $slug) {
-      id
-      hasSeenLatestChangelogEntry
-    }
-  }
-`;
-
 const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
   mutation SetChangelogViewDateMutation($changelogViewDate: DateTime!) {
     setChangelogViewDate(changelogViewDate: $changelogViewDate) {
@@ -341,15 +315,6 @@ const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const latestChangelogPublish = graphql(hasSeenLatestChangelogEntryQuery, {
-  options: props => ({
-    context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
-    variables: { slug: props.LoggedInUser.collective.slug },
-  }),
-  skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
-});
-
 const setChangelogViewDate = graphql(setChangelogViewDateMutation, {
   name: 'setChangelogViewDate',
   options: {
@@ -357,6 +322,4 @@ const setChangelogViewDate = graphql(setChangelogViewDateMutation, {
   },
 });
 
-const addGraphql = compose(latestChangelogPublish, setChangelogViewDate);
-
-export default withNewsAndUpdates(withUser(addGraphql(TopBar)));
+export default withNewsAndUpdates(withUser(setChangelogViewDate(TopBar)));
