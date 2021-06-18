@@ -61,7 +61,7 @@
     "glob": "7.1.7",
     "graphql": "15.5.0",
     "helmet": "4.6.0",
-    "i18n-iso-countries": "6.7.0",
+    "i18n-iso-countries": "6.8.0",
     "jsdom": "16.5.3",
     "jsonwebtoken": "8.5.1",
     "load-script": "1.0.0",
