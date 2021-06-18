@@ -222,7 +222,6 @@ interface Account {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -768,7 +767,6 @@ type Bot implements Account {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -1026,7 +1024,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -3226,7 +3223,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -4165,7 +4161,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -4500,7 +4495,6 @@ type Host implements Account & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -5057,7 +5051,6 @@ type Individual implements Account {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -5091,6 +5084,7 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
+  hasSeenLatestChangelogEntry: Boolean
 }
 
 input IndividualCreateInput {
@@ -5895,6 +5889,11 @@ type Mutation {
   deleteUpdate(id: String!): Update!
 
   """
+  Update the time which the user viewed the changelog updates
+  """
+  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
+
+  """
   Assign new Virtual Card information to existing hosted collective
   """
   assignNewVirtualCard(
@@ -6448,7 +6447,6 @@ type Organization implements Account & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -6981,7 +6979,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
@@ -8091,7 +8088,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
   ): UpdateCollection!
-  latestChangelogPublishDate: DateTime
 
   """
   Describes the features enabled and available for this collective
