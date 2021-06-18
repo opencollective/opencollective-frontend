@@ -87,7 +87,6 @@ class TopBar extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object,
     setShowNewsAndUpdates: PropTypes.func,
-    loadingLoggedInUser: PropTypes.bool,
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
     data: PropTypes.shape({
@@ -141,8 +140,8 @@ class TopBar extends React.Component {
   };
 
   render() {
-    const { showSearch, menuItems, LoggedInUser, loadingLoggedInUser } = this.props;
-    const hasSeenNewUpdates = !loadingLoggedInUser && LoggedInUser?.hasSeenLatestChangelogEntry;
+    const { showSearch, menuItems, LoggedInUser } = this.props;
+    const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
