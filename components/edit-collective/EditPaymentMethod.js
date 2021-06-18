@@ -99,7 +99,7 @@ class EditPaymentMethod extends React.Component {
               <FormattedMessage
                 id="paymentMethod.typeSelect"
                 values={{ type }}
-                defaultMessage="{type, select, giftcard {Gift card} creditcard {Credit card} prepaid {Prepaid}}"
+                defaultMessage="{type, select, giftcard {Gift card} creditcard {Credit card} prepaid {Prepaid} other {}}"
               />
             </Box>
             <Box>

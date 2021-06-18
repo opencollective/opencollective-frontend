@@ -148,7 +148,7 @@ const PledgedCollectivePage = ({ collective }) => {
                 />
               ),
             }}
-            defaultMessage="{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }} already pledged a total of {amount} {currency}"
+            defaultMessage="{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and } other {}} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }} already pledged a total of {amount} {currency}"
           />
         </H3>
 

@@ -546,7 +546,7 @@ class CreatePledgePage extends React.Component {
                         totalCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE + pledgeStats.USER,
                       }}
                       defaultMessage={
-                        'by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# backer } other {# backers }}'
+                        'by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and } other {}} {userCount, plural, =0 {} one {# backer } other {# backers }}'
                       }
                     />
                   </P>

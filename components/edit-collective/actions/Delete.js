@@ -125,7 +125,7 @@ const DeleteCollective = ({ collective, ...props }) => {
             <FormattedMessage
               id="collective.event.delete.isNotDeletable-message"
               defaultMessage={
-                '{type, select, EVENT {Events} PROJECT {Projects}} with transactions, orders or paid expenses cannot be deleted. Please archive it instead.'
+                '{type, select, EVENT {Events} PROJECT {Projects} other {}} with transactions, orders or paid expenses cannot be deleted. Please archive it instead.'
               }
               values={{ type: collective.type }}
             />

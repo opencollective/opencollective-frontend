@@ -102,7 +102,7 @@ class Host extends React.Component {
           <p>
             <FormattedMessage
               id="editCollective.selfHost.label"
-              defaultMessage="{type, select, COLLECTIVE {Your Collective} FUND {Your Fund}} hold its own funds; it doesn't use a Fiscal Host."
+              defaultMessage="{type, select, COLLECTIVE {Your Collective} FUND {Your Fund} other {}} hold its own funds; it doesn't use a Fiscal Host."
               values={{
                 type: collective.type,
               }}
@@ -121,7 +121,7 @@ class Host extends React.Component {
                 />{' '}
                 <FormattedMessage
                   id="editCollective.selfHost.change.balanceNotEmpty"
-                  defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}} by submitting and paying expenses."
+                  defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {}} by submitting and paying expenses."
                   values={{
                     type: collective.type,
                   }}
@@ -201,7 +201,7 @@ class Host extends React.Component {
                     <p>
                       <FormattedMessage
                         id="editCollective.host.balance"
-                        defaultMessage="It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund}}."
+                        defaultMessage="It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {}}."
                         values={{
                           balance: formatCurrency(collective.stats.balance, collective.currency),
                           type: collective.type,
@@ -213,7 +213,7 @@ class Host extends React.Component {
                     <p>
                       <FormattedMessage
                         id="editCollective.host.change.balanceNotEmpty"
-                        defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}}. You can do this by submitting expenses, making financial contributions, or sending the balance to your Fiscal Host using the {emptyBalanceLink} feature."
+                        defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {}}. You can do this by submitting expenses, making financial contributions, or sending the balance to your Fiscal Host using the {emptyBalanceLink} feature."
                         values={{
                           type: collective.type,
                           emptyBalanceLink: (
