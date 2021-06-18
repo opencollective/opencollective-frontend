@@ -198,7 +198,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
           <FormattedMessage
             id="ContributionSummary.NextCharge"
-            defaultMessage="If you select PayPal, you will be charged on the same day each month. Otherwise the next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year}}. You can cancel or edit this contribution by going to 'Manage Contributions'."
+            defaultMessage="If you select PayPal, you will be charged on the same day each month. Otherwise the next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year} other {}}. You can cancel or edit this contribution by going to 'Manage Contributions'."
             values={{
               date: (
                 <FormattedDate
