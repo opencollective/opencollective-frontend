@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { rotateMixin } from '../lib/constants/animations';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import theme from '../lib/theme';
+import { parseToBoolean } from '../lib/utils';
 
 import Avatar from './Avatar';
 import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
@@ -57,6 +58,8 @@ const NavLink = styled(StyledLink)`
   font-weight: 500;
   font-size: 1.4rem;
 `;
+
+const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES_ENABLED);
 
 class TopBar extends React.Component {
   static propTypes = {
@@ -215,7 +218,7 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        {LoggedInUser && (
+        {LoggedInUser && CHANGE_LOG_UPDATES_ENABLED && (
           <Flex>
             {hasSeenNewUpdates && (
               <Avatar
