@@ -1409,7 +1409,7 @@
   "NewContributionFlow.Success.CTA.SignIn.Content": "Inicia sesión con tu cuenta de Open Collective para editar tu perfil y administrar tus contribuciones.",
   "NewContributionFlow.Success.DiscoverMore": "Descúbre más Colectivos como {collective} →",
   "NewContributionFlow.Success.Header": "¡Gracias! 🎉",
-  "NewContributionFlow.Success.NowSupporting": "Ahora estás apoyando a {collective}.",
+  "NewContributionFlow.Success.NowSupporting": "You are now supporting <link>{collective}</link>.",
   "NewCreditCardForm.PostalCode": "Credit card ZIP code and CVC are required",
   "NewOrganization.Admin.Email": "Dirección de correo electrónico del administrador",
   "NewOrganization.Admin.Name": "Nombre del administrador",
