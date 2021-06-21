@@ -1,30 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { rotateMixin } from '../lib/constants/animations';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import theme from '../lib/theme';
-import { parseToBoolean } from '../lib/utils';
 
-import Avatar from './Avatar';
-import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
+import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
 import Image from './Image';
 import Link from './Link';
-import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
-import { Dropdown } from './StyledDropdown';
 import StyledLink from './StyledLink';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
-import { withUser } from './UserProvider';
 
 const Logo = styled.img.attrs({
   src: '/static/images/opencollective-icon.svg',
@@ -59,19 +52,10 @@ const NavLink = styled(StyledLink)`
   font-size: 1.4rem;
 `;
 
-const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES_ENABLED);
-
 class TopBar extends React.Component {
   static propTypes = {
-    LoggedInUser: PropTypes.object,
-    setShowNewsAndUpdates: PropTypes.func,
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-    }),
-    setChangelogViewDate: PropTypes.func,
-    refetchLoggedInUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -86,15 +70,12 @@ class TopBar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showMobileMenu: false, showChangelogDropdown: true };
+    this.state = { showMobileMenu: false };
     this.ref = React.createRef();
   }
 
   componentDidMount() {
     document.addEventListener('click', this.onClickOutside);
-    if (this.props.LoggedInUser) {
-      this.props.refetchLoggedInUser();
-    }
   }
 
   componentWillUnmount() {
@@ -113,15 +94,8 @@ class TopBar extends React.Component {
     this.setState(state => ({ showMobileMenu: !state.showMobileMenu }));
   };
 
-  handleShowNewUpdates = async () => {
-    this.props.setShowNewsAndUpdates(true);
-    await this.props.setChangelogViewDate({ variables: { changelogViewDate: new Date() } });
-    this.props.refetchLoggedInUser();
-  };
-
   render() {
-    const { showSearch, menuItems, LoggedInUser } = this.props;
-    const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
+    const { showSearch, menuItems } = this.props;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
@@ -220,56 +194,10 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        {LoggedInUser && CHANGE_LOG_UPDATES_ENABLED && (
-          <Flex>
-            {hasSeenNewUpdates && (
-              <Avatar
-                onClick={this.handleShowNewUpdates}
-                src="/static/images/flame-default.svg"
-                radius="30px"
-                backgroundSize={10}
-                ml={2}
-              />
-            )}
-            {!hasSeenNewUpdates && (
-              <Dropdown>
-                <React.Fragment>
-                  <Avatar
-                    onClick={this.handleShowNewUpdates}
-                    src="/static/images/flame-red.svg"
-                    radius="30px"
-                    backgroundSize={10}
-                    backgroundColor="yellow.100"
-                    ml={2}
-                  />
-                  {this.state.showChangelogDropdown && (
-                    <Container>
-                      <ChangelogNotificationDropdown onClose={() => this.setState({ showChangelogDropdown: false })} />
-                    </Container>
-                  )}
-                </React.Fragment>
-              </Dropdown>
-            )}
-          </Flex>
-        )}
+        <ChangelogTrigger />
       </Flex>
     );
   }
 }
 
-const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
-  mutation SetChangelogViewDateMutation($changelogViewDate: DateTime!) {
-    setChangelogViewDate(changelogViewDate: $changelogViewDate) {
-      id
-    }
-  }
-`;
-
-const setChangelogViewDate = graphql(setChangelogViewDateMutation, {
-  name: 'setChangelogViewDate',
-  options: {
-    context: API_V2_CONTEXT,
-  },
-});
-
-export default withNewsAndUpdates(withUser(setChangelogViewDate(TopBar)));
+export default TopBar;

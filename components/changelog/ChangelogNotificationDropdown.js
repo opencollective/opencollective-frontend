@@ -4,10 +4,10 @@ import { Times } from '@styled-icons/fa-solid/Times';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { Box, Flex } from './Grid';
-import Image from './Image';
-import { DropdownArrow, DropdownContent } from './StyledDropdown';
-import { P } from './Text';
+import { Box, Flex } from '../Grid';
+import Image from '../Image';
+import { DropdownArrow, DropdownContent } from '../StyledDropdown';
+import { P } from '../Text';
 
 const ChangeLogNotificationDropdownArrow = styled(DropdownArrow)`
   display: block;
