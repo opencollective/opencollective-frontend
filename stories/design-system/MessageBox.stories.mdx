@@ -1,0 +1,100 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import MessageBox from '../../components/MessageBox';
+import { Flex } from '../../components/Grid';
+
+<Meta
+  title="Design system/MessageBox"
+  component={MessageBox}
+  argTypes={{
+    type: { options: ['white', 'dark', 'info', 'success', 'warning', 'error'], control: { type: 'radio' } },
+    withIcon: { control: { type: 'boolean' } },
+    isLoading: { control: { type: 'boolean' } },
+  }}
+/>
+
+# MessageBox
+
+## Default
+
+export const DefaultStory = props => (
+  <MessageBox {...props}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</MessageBox>
+);
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />
+
+## Types
+
+<Canvas>
+  <Story name="Types" parameters={{ controls: { hideNoControlsWarning: true } }}>
+    <Flex>
+      <MessageBox m={3} withIcon type="dark">
+        Dark
+      </MessageBox>
+      <MessageBox m={3} type="white">
+        White (default)
+      </MessageBox>
+      <MessageBox m={3} type="info">
+        Info
+      </MessageBox>
+      <MessageBox m={3} type="success">
+        Success
+      </MessageBox>
+      <MessageBox m={3} type="warning">
+        Warning
+      </MessageBox>
+      <MessageBox m={3} type="error">
+        Error
+      </MessageBox>
+    </Flex>
+  </Story>
+</Canvas>
+
+## With loading spinner
+
+<Canvas>
+  <Story name="With loading spinner" parameters={{ controls: { hideNoControlsWarning: true } }}>
+    <Flex>
+      <MessageBox m={3} isLoading type="dark">
+        Dark
+      </MessageBox>
+      <MessageBox m={3} isLoading type="white">
+        White
+      </MessageBox>
+      <MessageBox m={3} isLoading type="info">
+        Info
+      </MessageBox>
+      <MessageBox m={3} isLoading type="success">
+        Success
+      </MessageBox>
+      <MessageBox m={3} isLoading type="warning">
+        Warning
+      </MessageBox>
+      <MessageBox m={3} isLoading type="error">
+        Error
+      </MessageBox>
+    </Flex>
+  </Story>
+</Canvas>
+
+## With icons
+
+<Canvas>
+  <Story name="With icons" parameters={{ controls: { hideNoControlsWarning: true } }}>
+    <Flex flexDirection="colunm">
+      <MessageBox withIcon m={3} type="info">
+        Info
+      </MessageBox>
+      <MessageBox withIcon m={3} type="success">
+        Success
+      </MessageBox>
+      <MessageBox withIcon m={3} type="warning">
+        Warning
+      </MessageBox>
+      <MessageBox withIcon m={3} type="error">
+        Error
+      </MessageBox>
+    </Flex>
+  </Story>
+</Canvas>
