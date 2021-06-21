@@ -158,7 +158,7 @@ const EntryContainer = styled.div`
 `;
 
 /**
- * A small FAQ with expendable contents. You don't actually have
+ * A small FAQ with expendable contents.
  */
 export default class FAQ extends Component {
   static propTypes = {
