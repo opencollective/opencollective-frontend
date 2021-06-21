@@ -13,9 +13,16 @@ const DISPLAYED_TRANSACTION_KINDS = omit(TransactionKind, [
   'PLATFORM_FEE',
   'PREPAID_PAYMENT_METHOD',
   'PAYMENT_PROCESSOR_FEE',
-  'HOST_FEE',
-  'HOST_FEE_SHARE',
 ]);
+
+export const getDefaultKinds = () => {
+  return [
+    TransactionKind.ADDED_FUNDS,
+    TransactionKind.CONTRIBUTION,
+    TransactionKind.EXPENSE,
+    TransactionKind.PLATFORM_TIP,
+  ];
+};
 
 const optionsToQueryString = options => {
   if (!options || options.length === size(TransactionKind)) {
@@ -59,7 +66,10 @@ const TransactionsKindFilter = ({ onChange, value, ...props }) => {
   const intl = useIntl();
   const getOption = (value, idx) => ({ label: i18nTransactionKind(intl, value), value, idx });
   const options = React.useMemo(() => Object.values(DISPLAYED_TRANSACTION_KINDS).map(getOption), [intl]);
-  const selectedOptions = React.useMemo(() => (!value ? null : parseTransactionKinds(value).map(getOption)), [value]);
+  const selectedOptions = React.useMemo(
+    () => (!value ? getDefaultKinds() : parseTransactionKinds(value)).map(getOption),
+    [value],
+  );
   return (
     <MultiKindSelect
       isSearchable={false}
