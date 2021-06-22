@@ -33,7 +33,7 @@ const CloseIcon = styled(Times)`
   cursor: pointer;
 `;
 
-const ChangelogNotificationDropdown = onClose => {
+const ChangelogNotificationDropdown = ({ onClose }) => {
   return (
     <React.Fragment>
       <ChangeLogNotificationDropdownArrow />
