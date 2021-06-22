@@ -33,6 +33,28 @@ const removeCommentReactionMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const addUpdateReactionMutation = gqlV2/* GraphQL */ `
+  mutation AddEmojiReaction($emoji: String!, $update: UpdateReferenceInput!) {
+    addEmojiReaction(emoji: $emoji, update: $update) {
+      update {
+        id
+        reactions
+      }
+    }
+  }
+`;
+
+const removeUpdateReactionMutation = gqlV2/* GraphQL */ `
+  mutation RemoveEmojiReaction($emoji: String!, $update: UpdateReferenceInput!) {
+    removeEmojiReaction(emoji: $emoji, update: $update) {
+      update {
+        id
+        reactions
+      }
+    }
+  }
+`;
+
 const Emoji = styled.div`
   font-size: 15px;
 `;
@@ -96,13 +118,15 @@ const mutationOptions = { context: API_V2_CONTEXT };
 /**
  * A component to render the reaction picker on comments.
  */
-const CommentReactionPicker = ({ comment }) => {
+const CommentReactionPicker = ({ comment, update }) => {
   const emojiFirstRow = ['👍️', '👎', '😀', '🎉'];
   const emojiSecondRow = ['😕', '❤️', '🚀', '👀'];
   const [open, setOpen] = React.useState(false);
   const wrapperRef = React.useRef();
   const [addCommentReaction] = useMutation(addCommentReactionMutation, mutationOptions);
   const [removeCommentReaction] = useMutation(removeCommentReactionMutation, mutationOptions);
+  const [addUpdateReaction] = useMutation(addUpdateReactionMutation, mutationOptions);
+  const [removeUpdateReaction] = useMutation(removeUpdateReactionMutation, mutationOptions);
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {
@@ -111,17 +135,30 @@ const CommentReactionPicker = ({ comment }) => {
   });
 
   const getReactionBtnProps = emoji => {
-    const isSelected = comment.userReactions?.includes(emoji);
+    let isSelected;
+    if (comment) {
+      isSelected = comment.userReactions?.includes(emoji);
+    } else if (update) {
+      isSelected = update.userReactions?.includes(emoji);
+    }
     return {
       children: <Emoji>{emoji}</Emoji>,
       isSelected,
       onClick: () => {
         setOpen(false);
-        const action = isSelected ? removeCommentReaction : addCommentReaction;
-        return action({
-          variables: { emoji: emoji, comment: { id: comment.id } },
-          optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected),
-        });
+        if (comment) {
+          const action = isSelected ? removeCommentReaction : addCommentReaction;
+          return action({
+            variables: { emoji: emoji, comment: { id: comment.id } },
+            optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected),
+          });
+        } else if (update) {
+          const action = isSelected ? removeUpdateReaction : addUpdateReaction;
+          return action({
+            variables: { emoji: emoji, update: { id: update.id } },
+            optimisticResponse: getOptimisticResponse(update, emoji, !isSelected),
+          });
+        }
       },
     };
   };
@@ -184,7 +221,17 @@ CommentReactionPicker.propTypes = {
       name: PropTypes.string,
     }),
     userReactions: PropTypes.array,
-  }).isRequired,
+  }),
+  update: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    html: PropTypes.string,
+    createdAt: PropTypes.string,
+    fromAccount: PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+    }),
+    userReactions: PropTypes.array,
+  }),
 };
 
 export default CommentReactionPicker;
