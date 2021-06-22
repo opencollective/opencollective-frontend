@@ -1,14 +1,20 @@
-#### Responsive props
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { getViewportFromWidth } from '../../lib/withViewport';
+import breakpoints from '../../lib/theme/breakpoints';
+import { emToPx } from '../../lib/theme/helpers';
+import { BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS } from '../../lib/withViewport';
+
+<Meta title="Pages/Responsiveness" />
+
+## Responsiveness
+
+### Responsive props
 
 The main way to deal with responsiveness in our codebase is through
 the [responsive props or styled-system](https://styled-system.com/responsive-styles).
 
 We use the following breakpoints:
 
-```jsx
-import { getViewportFromWidth } from '../../lib/withViewport';
-import breakpoints from '../../lib/theme/breakpoints';
-import { emToPx } from '../../lib/theme/helpers';
 <table style={{ maxWidth: 350, width: '100%' }}>
   <thead>
     <th align="left">Name</th>
@@ -24,13 +30,10 @@ import { emToPx } from '../../lib/theme/helpers';
       </tr>
     ))}
   </tbody>
-</table>;
-```
+</table>
 
 Based on that, the following props will be applied:
 
-```jsx
-import { BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS } from '../../lib/withViewport';
 <pre>{`
   <Box
     height={[
@@ -41,8 +44,7 @@ import { BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS } from '../../lib/withViewport';
       50, // Applied above ${BREAKPOINTS_NAMES[3]} (${BREAKPOINTS_WIDTHS[3]}px)
     ]}
   />
-`}</pre>;
-```
+`}</pre>
 
 Which will translate to the following CSS:
 
@@ -85,5 +87,5 @@ Which will translate to the following CSS:
 - We don't have any info on the screen resolution during SSR
 
 That being said there are legit use cases for it, for example when the layout for a component
-is completly different between mobile and desktop and cannot be reconciliated with flex and
+is completely different between mobile and desktop and cannot be reconciled with flex and
 responsive props.

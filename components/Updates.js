@@ -29,7 +29,7 @@ const LoadingContainer = styled.div`
 class Updates extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
-    updates: PropTypes.array,
+    updates: PropTypes.object,
     fetchMore: PropTypes.func,
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,

@@ -94,6 +94,7 @@ class ContributionFlow extends React.Component {
     fixedAmount: PropTypes.number,
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
+    hideHeader: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
     isEmbed: PropTypes.bool,
     step: PropTypes.string,
@@ -382,6 +383,7 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
+        'hideHeader',
       ]),
       ...queryParams,
     };
@@ -598,9 +600,11 @@ class ContributionFlow extends React.Component {
             data-cy="cf-content"
             ref={this.mainContainerRef}
           >
-            <Box px={[2, 3]} mb={4}>
-              <ContributionFlowHeader collective={collective} />
-            </Box>
+            {!this.props.hideHeader && (
+              <Box px={[2, 3]} mb={4}>
+                <ContributionFlowHeader collective={collective} />
+              </Box>
+            )}
             <StepsProgressBox mb={3} width={[1.0, 0.8]}>
               <ContributionFlowStepsProgress
                 steps={steps}

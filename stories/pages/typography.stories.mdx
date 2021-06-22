@@ -1,3 +1,10 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { P } from '../../components/Text';
+
+<Meta title="Pages/Typography" />
+
+## Typography
+
 The main way to deal with typography is through the components in `components/Text.js`.
 
 ### Typeface & fonts
@@ -6,8 +13,6 @@ The main way to deal with typography is through the components in `components/Te
 
 The main font on Open Collective is [Inter](https://rsms.me/inter/). The colors can vary from `black.50` to `black.900` (the darkest).
 
-```jsx
-import { P } from 'components/Text';
 <div>
   <P color="black.50">50: We are on a mission to help collaborative groups collect and spend money transparently.</P>
   <P color="black.100">100: We are on a mission to help collaborative groups collect and spend money transparently.</P>
@@ -19,15 +24,12 @@ import { P } from 'components/Text';
   <P color="black.700">700: We are on a mission to help collaborative groups collect and spend money transparently.</P>
   <P color="black.800">800: We are on a mission to help collaborative groups collect and spend money transparently.</P>
   <P color="black.900">900: We are on a mission to help collaborative groups collect and spend money transparently.</P>
-</div>;
-```
+</div>
 
 ### Type scale
 
 You can configure the scale through `fontSize` and `lineHeight` props.
 
-```jsx
-import { P } from 'components/Text';
 <div>
   <P fontSize="52px">H1: We are on a mission to help collaborative groups collect and spend money transparently.</P>
   <P fontSize="40px">H2: We are on a mission to help collaborative groups collect and spend money transparently.</P>
@@ -51,5 +53,4 @@ import { P } from 'components/Text';
     SmallCaption: We are on a mission to help collaborative groups collect and spend money transparently.
   </P>
   <P fontSize="10px">Tiny: We are on a mission to help collaborative groups collect and spend money transparently.</P>
-</div>;
-```
+</div>

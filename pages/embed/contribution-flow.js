@@ -73,6 +73,7 @@ class NewContributionFlowPage extends React.Component {
       defaultEmail: query.defaultEmail && isEmail(query.defaultEmail) ? query.defaultEmail : null,
       defaultName: query.defaultName,
       useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
+      hideHeader: query.hideHeader ? parseToBoolean(query.hideHeader) : false,
     };
   }
 
@@ -102,6 +103,7 @@ class NewContributionFlowPage extends React.Component {
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     useTheme: PropTypes.bool,
+    hideHeader: PropTypes.bool,
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -154,6 +156,7 @@ class NewContributionFlowPage extends React.Component {
           <ContributionFlowContainer
             isEmbed
             useTheme={this.props.useTheme}
+            hideHeader={this.props.hideHeader}
             collective={account}
             host={account.host}
             tier={tier}

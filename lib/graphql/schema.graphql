@@ -3121,6 +3121,7 @@ type Query {
     offset: Int
     dateFrom: String
     dateTo: String
+    kinds: [String]
 
     """
     If false, only the transactions not linked to an expense (orders/refunds) will be returned
