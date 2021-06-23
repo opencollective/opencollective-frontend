@@ -110,8 +110,6 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton }) => {
           />
         }
         onClose={() => setConfirmationModalDisplay(false)}
-        cancelLabel={<FormattedMessage id="actions.cancel" defaultMessage="Cancel" />}
-        cancelHandler={() => setConfirmationModalDisplay(false)}
         continueLabel={
           <FormattedMessage
             id="expense.pay.btn"

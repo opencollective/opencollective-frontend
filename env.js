@@ -28,7 +28,7 @@ const defaults = {
   OC_APPLICATION: 'frontend',
   OC_ENV: process.env.NODE_ENV || 'development',
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
-  WISE_ENVIRONMENT: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
+  WISE_ENVIRONMENT: process.env.OC_ENV === 'production' ? 'production' : 'sandbox',
 };
 
 if (['production', 'staging'].includes(process.env.OC_ENV)) {
