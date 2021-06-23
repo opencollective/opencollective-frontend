@@ -266,7 +266,8 @@
       "imagemin",
       "imagemin-optipng",
       "imagemin-pngquant",
-      "@storybook/*"
+      "@storybook/*",
+      "@shopify/address"
     ]
   }
 }
