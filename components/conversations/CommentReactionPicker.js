@@ -126,9 +126,9 @@ const getOptimisticResponseForUpdates = (update, emoji, isAdding) => {
         update: {
           __typename: 'Update',
           id: update.id,
-          reactions: {...update.reactions, [emoji]: newCount},
+          reactions: { ...update.reactions, [emoji]: newCount },
           userReactions: [...userReactions, emoji],
-        }
+        },
       },
     };
   } else {
@@ -148,7 +148,7 @@ const getOptimisticResponseForUpdates = (update, emoji, isAdding) => {
           id: update.id,
           reactions,
           userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
-        }
+        },
       },
     };
   }
