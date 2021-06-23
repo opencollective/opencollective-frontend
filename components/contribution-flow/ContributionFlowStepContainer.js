@@ -165,6 +165,7 @@ class ContributionFlowStepContainer extends React.Component {
             stepPayment={stepPayment}
             onNewCardFormReady={this.props.onNewCardFormReady}
             isSubmitting={this.props.isSubmitting}
+            isEmbed={isEmbed}
           />
         );
       case 'summary':

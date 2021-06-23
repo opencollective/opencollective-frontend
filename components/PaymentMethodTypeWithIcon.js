@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Alipay } from '@styled-icons/fa-brands/Alipay';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
@@ -34,6 +35,13 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
       return (
         <Flex alignItems="center">
           <CreditCard size={iconSize} color="#9D9FA3" />
+          <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
+        </Flex>
+      );
+    case PaymentMethodType.ALIPAY:
+      return (
+        <Flex alignItems="center">
+          <Alipay size={iconSize} color="#9D9FA3" />
           <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
         </Flex>
       );
