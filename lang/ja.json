@@ -1918,7 +1918,7 @@
   "TierPage.AddTitle": "Add a title",
   "TierPage.AmountGoal": "{amountWithInterval} 目標",
   "TierPage.AmountRaised": "{amountWithInterval} 調達済み",
-  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} one {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
+  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
   "TierPage.ContributorsDescription": "Join us in contributing to this tier!",
   "TierPage.Share.title": "Help {collective} reach their goal!",
   "tiers.about": "Set up contribution tiers",

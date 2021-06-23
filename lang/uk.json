@@ -1918,7 +1918,7 @@
   "TierPage.AddTitle": "Додати заголовок",
   "TierPage.AmountGoal": "мета — {amountWithInterval}",
   "TierPage.AmountRaised": "зібрано — {amountWithInterval}",
-  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# особа } other {# осіб }} {both, plural, =0 {} one {та }}{orgCount, plural, =0 {} one {# організація} other {# організацій}} {totalCount, plural, one {зробила } other {зробили }} внесок для досягнення цієї мети",
+  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
   "TierPage.ContributorsDescription": "Join us in contributing to this tier!",
   "TierPage.Share.title": "Допоможіть {collective} досягти їхньої мети!",
   "tiers.about": "Set up contribution tiers",

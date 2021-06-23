@@ -1918,7 +1918,7 @@
   "TierPage.AddTitle": "Adicione um título",
   "TierPage.AmountGoal": "meta de {amountWithInterval}",
   "TierPage.AmountRaised": "{amountWithInterval} arrecadado",
-  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# indivíduo} other {# indivíduos }} {both, plural, =0 {} other {e }}{orgCount, plural, =0 {} one {# organização} other {# organizações}} {totalCount, plural, one {contribuiu} other {contribuíram}} para esta meta",
+  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
   "TierPage.ContributorsDescription": "Junte-se a nós e contribua para este nível!",
   "TierPage.Share.title": "Ajude {collective} a alcançar a meta deles!",
   "tiers.about": "Set up contribution tiers",

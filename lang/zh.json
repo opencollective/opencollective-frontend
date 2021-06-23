@@ -1918,7 +1918,7 @@
   "TierPage.AddTitle": "该等级名称",
   "TierPage.AmountGoal": "{amountWithInterval} 目标",
   "TierPage.AmountRaised": "{amountWithInterval} raised",
-  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} one {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
+  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
   "TierPage.ContributorsDescription": "加入我们来为这一层级做出贡献！",
   "TierPage.Share.title": "帮助 {collective} 到达他们的目标！",
   "tiers.about": "Set up contribution tiers",
