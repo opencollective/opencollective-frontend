@@ -16,11 +16,11 @@ const CollectiveFilter = ({ onChange, virtualCardCollectives }) => {
   const collectiveFilters = [
     intl.formatMessage({
       id: 'VirtualCards.CollectiveFilter.AllCollectives',
-      defaultMessage: 'All hosted collectives',
+      defaultMessage: 'All Collectives',
     }),
     intl.formatMessage({
       id: 'VirtualCards.CollectiveFilter.SpecificCollectives',
-      defaultMessage: 'Specific collectives',
+      defaultMessage: 'Specific Collective(s)',
     }),
   ];
 

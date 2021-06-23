@@ -2,6 +2,10 @@ import { defaultTestUserEmail } from '../support/data';
 import { randomEmail } from '../support/faker';
 
 describe('Contribution Flow: Guest contributions', () => {
+  before(() => {
+    cy.clearInbox();
+  });
+
   it('Makes a contribution as an existing user', () => {
     cy.visit('/apex/donate');
     cy.contains('[data-cy="amount-picker"] button', 'Other').click();
@@ -19,9 +23,9 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.contains('[data-cy="order-success"]', '$4,257.42 USD');
 
     // Open email
-    const expectedEmailSubject = 'Thank you for your $4,257/month contribution to APEX';
+    const expectedEmailSubject = 'Thank you for your contribution to APEX';
     cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('If you need help with this contribution, please do not hesitate to contact');
+    cy.contains('If you need help, contact');
   });
 
   it('Joins after a single contribution', () => {

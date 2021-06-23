@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { pick } from 'lodash';
 import NextLink from 'next/link';
-import Scrollchor from 'react-scrollchor';
+import { Scrollchor } from 'react-scrollchor';
 
 class Link extends React.Component {
   static propTypes = {

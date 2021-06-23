@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import propTypes from '@styled-system/prop-types';
-import { truncate } from 'lodash';
+import { isNil, omitBy, truncate } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
-import Select, { components } from 'react-select';
+import Select, { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
 import { layout, space, typography } from 'styled-system';
 
@@ -30,13 +30,16 @@ const Messages = defineMessages({
 
 // eslint-disable-next-line react/prop-types
 const Option = ({ innerProps, ...props }) => (
-  // eslint-disable-next-line react/prop-types
-  <components.Option {...props} innerProps={{ ...innerProps, 'data-cy': 'select-option', title: props.data.title }} />
+  <ReactSelectComponents.Option
+    {...props}
+    // eslint-disable-next-line react/prop-types
+    innerProps={{ ...innerProps, 'data-cy': 'select-option', title: props.data.title }}
+  />
 );
 
 // eslint-disable-next-line react/prop-types
 const SelectContainer = ({ innerProps, ...props }) => (
-  <components.SelectContainer
+  <ReactSelectComponents.SelectContainer
     {...props}
     innerProps={{ ...innerProps, 'data-cy': props.selectProps['data-cy'] || 'select' }} // eslint-disable-line react/prop-types
   />
@@ -62,9 +65,9 @@ const STYLES_DISPLAY_NONE = { display: 'none' };
  */
 const DropdownSearchIndicator = props => {
   return props.isDisabled ? null : (
-    <components.DropdownIndicator {...props}>
+    <ReactSelectComponents.DropdownIndicator {...props}>
       <SearchIcon size={16} fill="#aaaaaa" />
-    </components.DropdownIndicator>
+    </ReactSelectComponents.DropdownIndicator>
   );
 };
 
@@ -74,7 +77,7 @@ DropdownSearchIndicator.propTypes = {
 
 // eslint-disable-next-line react/prop-types
 const GroupHeading = ({ children, ...props }) => (
-  <components.GroupHeading {...props}>
+  <ReactSelectComponents.GroupHeading {...props}>
     <Flex justifyContent="space-between" alignItems="center" mr={2}>
       <P
         fontWeight="600"
@@ -89,7 +92,7 @@ const GroupHeading = ({ children, ...props }) => (
       </P>
       <StyledHr flex="1" borderStyle="solid" borderColor="black.300" />
     </Flex>
-  </components.GroupHeading>
+  </ReactSelectComponents.GroupHeading>
 );
 
 /**
@@ -97,6 +100,15 @@ const GroupHeading = ({ children, ...props }) => (
  */
 export const customComponents = { SelectContainer, Option, MultiValue, GroupHeading };
 export const searchableCustomComponents = { ...customComponents, DropdownIndicator: DropdownSearchIndicator };
+
+const getComponents = (components, useSearchIcon) => {
+  const baseComponents = useSearchIcon ? searchableCustomComponents : customComponents;
+  if (!components) {
+    return baseComponents;
+  } else {
+    return omitBy({ ...baseComponents, ...components }, isNil);
+  }
+};
 
 /**
  * Binds our custom theme and wordings to a regular `react-select`'s `Select`.
@@ -116,6 +128,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     hideMenu,
     error,
     styles,
+    components,
     isSearchable,
     menuPortalTarget,
   }) => ({
@@ -124,7 +137,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     placeholder: placeholder || intl.formatMessage(Messages.placeholder),
     loadingMessage: () => intl.formatMessage(Messages.loading),
     noOptionsMessage: () => intl.formatMessage(Messages.noOptions),
-    components: useSearchIcon ? searchableCustomComponents : customComponents,
+    components: getComponents(components, useSearchIcon),
     instanceId: instanceId ? instanceId : inputId,
     styles: {
       control: (baseStyles, state) => {
@@ -148,7 +161,11 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           customStyles.cursor = 'pointer';
         }
 
-        return { ...baseStyles, ...customStyles, ...styles?.control };
+        if (typeof styles?.control === 'function') {
+          return styles.control({ ...baseStyles, ...customStyles }, state);
+        } else {
+          return { ...baseStyles, ...customStyles, ...styles?.control };
+        }
       },
       option: (baseStyles, state) => {
         const customStyles = { cursor: 'pointer' };
@@ -212,6 +229,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
 const StyledSelect = makeStyledSelect(Select);
 
 StyledSelect.propTypes = {
+  // Styled-system
+  ...propTypes.typography,
+  ...propTypes.layout,
+  ...propTypes.space,
   /** The id of the search input */
   inputId: PropTypes.string.isRequired,
   /** Define an id prefix for the select components e.g. {your-id}-value */
@@ -241,10 +262,6 @@ StyledSelect.propTypes = {
   styles: PropTypes.object,
   /** To render menu in a portal */
   menuPortalTarget: PropTypes.any,
-  // Styled-system
-  ...propTypes.typography,
-  ...propTypes.layout,
-  ...propTypes.space,
 };
 
 StyledSelect.defaultProps = {

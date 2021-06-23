@@ -95,8 +95,8 @@ class ContributionFlow extends React.Component {
     fixedAmount: PropTypes.number,
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
+    hideHeader: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
-    hasNewPaypal: PropTypes.bool,
     isEmbed: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
@@ -384,6 +384,7 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
+        'hideHeader',
       ]),
       ...queryParams,
     };
@@ -538,21 +539,6 @@ class ContributionFlow extends React.Component {
             this.submitOrder,
           );
         },
-        // Old callback, used by `PayWithPaypalLegacyButton`
-        onAuthorize: pm => {
-          this.setState(
-            state => ({
-              stepPayment: {
-                ...state.stepPayment,
-                paymentMethod: {
-                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
-                  paypalInfo: pm,
-                },
-              },
-            }),
-            this.submitOrder,
-          );
-        },
       };
     }
   }
@@ -615,9 +601,11 @@ class ContributionFlow extends React.Component {
             data-cy="cf-content"
             ref={this.mainContainerRef}
           >
-            <Box px={[2, 3]} mb={4}>
-              <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
-            </Box>
+            {!this.props.hideHeader && (
+              <Box px={[2, 3]} mb={4}>
+                <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
+              </Box>
+            )}
             <StepsProgressBox mb={3} width={[1.0, 0.8]}>
               <ContributionFlowStepsProgress
                 steps={steps}
@@ -677,7 +665,6 @@ class ContributionFlow extends React.Component {
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
-                    hasNewPaypal={this.props.hasNewPaypal}
                     isSubmitting={isValidating || isSubmitted || isSubmitting}
                   />
 
@@ -692,7 +679,6 @@ class ContributionFlow extends React.Component {
                       paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
-                      hasNewPaypal={this.props.hasNewPaypal}
                     />
                   </Box>
                   <Box textAlign="center" mt={5}>

@@ -13,14 +13,15 @@ import Avatar from '../Avatar';
 import { CreditItem, DebitItem } from '../budget/DebitCreditList';
 import Container from '../Container';
 import DefinedTerm, { Terms } from '../DefinedTerm';
-import ExpenseModal from '../expenses/ExpenseModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
+import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 import TransactionStatusTag from '../TransactionStatusTag';
@@ -53,6 +54,23 @@ const getDisplayedAmount = (transaction, collective) => {
   }
 };
 
+const ItemTitleWrapper = ({ expense, children }) => {
+  if (expense) {
+    return (
+      <StyledTooltip
+        content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
+        delayHide={0}
+      >
+        <StyledLink as={Link} underlineOnHover href={`/${expense.account.slug}/expenses/${expense.legacyId}`}>
+          {children}
+        </StyledLink>
+      </StyledTooltip>
+    );
+  } else {
+    return <React.Fragment>{children}</React.Fragment>;
+  }
+};
+
 const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
   const {
     toAccount,
@@ -74,14 +92,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const isCredit = type === TransactionTypes.CREDIT;
   const Item = isCredit ? CreditItem : DebitItem;
   const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === collective.id;
-
   const avatarCollective = hasOrder ? (isCredit ? fromAccount : toAccount) : isCredit ? fromAccount : toAccount;
-
-  const isRoot = LoggedInUser && LoggedInUser.isRoot();
-  const isHostAdmin = LoggedInUser && LoggedInUser.isHostAdmin(fromAccount);
-  const isFromCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(fromAccount);
-  const isToCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(toAccount);
-  const canDownloadInvoice = isRoot || isHostAdmin || isFromCollectiveAdmin || isToCollectiveAdmin;
   const displayedAmount = getDisplayedAmount(transaction, collective);
 
   return (
@@ -95,22 +106,21 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               </LinkCollective>
             </Box>
             <Box>
-              <P
+              <Container
                 data-cy="transaction-description"
                 fontWeight="500"
-                fontSize="14px"
-                lineHeight="21px"
-                color={description ? 'black.900' : 'black.500'}
-                cursor={!hasOrder ? 'pointer' : 'initial'}
-                onClick={() => !hasOrder && setExpanded(true)}
+                fontSize={['14px', null, null, '16px']}
+                lineHeight={['20px', null, null, '24px']}
               >
-                <Span title={description}>
-                  {description ? (
-                    truncate(description, { length: 60 })
-                  ) : (
-                    <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
-                  )}
-                </Span>
+                <ItemTitleWrapper expense={expense}>
+                  <Span title={description} color={description ? 'black.900' : 'black.600'}>
+                    {description ? (
+                      truncate(description, { length: 60 })
+                    ) : (
+                      <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
+                    )}
+                  </Span>
+                </ItemTitleWrapper>
                 {isOwnUserProfile && transaction.fromAccount?.isIncognito && (
                   <Span ml={1} css={{ verticalAlign: 'text-bottom' }}>
                     <PrivateInfoIcon color="#969BA3">
@@ -121,8 +131,8 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                     </PrivateInfoIcon>
                   </Span>
                 )}
-              </P>
-              <P mt="5px" fontSize="12px" lineHeight="16px" color="black.700" data-cy="transaction-details">
+              </Container>
+              <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
                 {hasOrder ? (
                   <FormattedMessage
                     id="Transaction.from"
@@ -240,14 +250,6 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
           displayActions={displayActions}
           transaction={transaction}
           onMutationSuccess={onMutationSuccess}
-        />
-      )}
-      {isExpanded && hasExpense && (
-        <ExpenseModal
-          expense={transaction.expense}
-          permissions={{ canSeeInvoiceInfo: canDownloadInvoice }}
-          onClose={() => setExpanded(false)}
-          show={true}
         />
       )}
     </Item>

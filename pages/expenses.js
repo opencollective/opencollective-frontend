@@ -77,7 +77,7 @@ class ExpensePage extends React.Component {
         offset: parseInt(offset) || undefined,
         limit: parseInt(limit) || undefined,
         type: has(expenseTypes, type) ? type : undefined,
-        status: has(expenseStatus, status) ? status : undefined,
+        status: has(expenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
         payout: has(PayoutMethodType, payout) ? payout : undefined,
         period,
         amount,

@@ -18,7 +18,7 @@ import { Label } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const publishUpdateMutation = gqlV2/* GraphQL */ `
-  mutation PublishUpdate($id: String!, $audience: UpdateAudience!) {
+  mutation PublishUpdate($id: String!, $audience: UpdateAudience) {
     publishUpdate(id: $id, notificationAudience: $audience) {
       id
       publishedAt
@@ -29,7 +29,7 @@ const publishUpdateMutation = gqlV2/* GraphQL */ `
 `;
 
 const updateQuery = gqlV2/* GraphQL */ `
-  query Update($id: String!, $audience: UpdateAudience!) {
+  query Update($id: String!, $audience: UpdateAudience) {
     update(id: $id) {
       id
       userCanPublishUpdate
@@ -79,7 +79,7 @@ const selectOptions = [
   },
 ];
 
-const PublishUpdateBtn = ({ id, isHost }) => {
+const PublishUpdateBtn = ({ id, isHost, isChangelog }) => {
   const intl = useIntl();
   const [audience, setAudience] = React.useState('ALL');
   const [showModal, setShowModal] = React.useState(false);
@@ -107,9 +107,11 @@ const PublishUpdateBtn = ({ id, isHost }) => {
             />
           </Box>
         )}
-        <Notice>
-          <UpdateAudienceBreakdown audienceStats={update?.audienceStats} isLoading={loading} />
-        </Notice>
+        {!isChangelog && (
+          <Notice>
+            <UpdateAudienceBreakdown audienceStats={update?.audienceStats} isLoading={loading} />
+          </Notice>
+        )}
         {showModal ? (
           <ConfirmationModal
             show
@@ -131,7 +133,9 @@ const PublishUpdateBtn = ({ id, isHost }) => {
           <Container mt="3" display="flex" alignItems="center">
             <StyledButton
               buttonStyle="primary"
-              onClick={() => setShowModal(true)}
+              onClick={() =>
+                isChangelog ? callPublishUpdate({ variables: { id, audience: null } }) : setShowModal(true)
+              }
               disabled={loading}
               loading={isSubmitting}
               minWidth={100}
@@ -149,6 +153,7 @@ const PublishUpdateBtn = ({ id, isHost }) => {
 PublishUpdateBtn.propTypes = {
   id: PropTypes.string.isRequired,
   isHost: PropTypes.bool,
+  isChangelog: PropTypes.bool,
 };
 
 export default PublishUpdateBtn;

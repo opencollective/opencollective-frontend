@@ -59,7 +59,7 @@ const FormattedMoneyAmount = ({
     return (
       <FormattedMessage
         id="AmountInterval"
-        defaultMessage="{amount} {currencyCode} / {interval, select, month {mo.} year {yr.}}"
+        defaultMessage="{amount} {currencyCode} / {interval, select, month {mo.} year {yr.} other{}}"
         values={{ amount: formattedAmount, interval: interval, currencyCode }}
       />
     );
@@ -67,7 +67,7 @@ const FormattedMoneyAmount = ({
     return (
       <FormattedMessage
         id="AmountIntervalLong"
-        defaultMessage="{amount} {currencyCode} / {interval, select, month {month} year {year}}"
+        defaultMessage="{amount} {currencyCode} / {interval, select, month {month} year {year} other {}}"
         values={{ amount: formattedAmount, interval: interval, currencyCode }}
       />
     );

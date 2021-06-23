@@ -17,7 +17,9 @@ import { Box } from '../components/Grid';
 import Loading from '../components/Loading';
 import { recurringContributionsQuery } from '../components/recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../components/recurring-contributions/RecurringContributionsContainer';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledFilters from '../components/StyledFilters';
+import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 const MainContainer = styled(Container)`
@@ -58,6 +60,7 @@ class recurringContributionsPage extends React.Component {
   static propTypes = {
     slug: PropTypes.string.isRequired,
     loadingLoggedInUser: PropTypes.bool,
+    LoggedInUser: PropTypes.object,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -72,11 +75,11 @@ class recurringContributionsPage extends React.Component {
   }
 
   render() {
-    const { slug, data, intl, loadingLoggedInUser } = this.props;
+    const { slug, data, intl, loadingLoggedInUser, LoggedInUser } = this.props;
 
     const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
 
-    if (!data?.loading && !loadingLoggedInUser) {
+    if (!data?.loading && !loadingLoggedInUser && LoggedInUser) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
@@ -85,6 +88,7 @@ class recurringContributionsPage extends React.Component {
     }
 
     const collective = data && data.account;
+    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const recurringContributions = collective && collective.orders;
     return (
       <AuthenticatedPage>
@@ -94,27 +98,42 @@ class recurringContributionsPage extends React.Component {
           </Container>
         ) : (
           <Fragment>
-            <CollectiveNavbar collective={collective} />
-            <MainContainer py={[3, 4]} px={[2, 3, 4]}>
-              <SectionTitle textAlign="left" mb={1}>
-                <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
-              </SectionTitle>
-              <Box mt={4} mx="auto">
-                <StyledFilters
-                  filters={filters}
-                  getLabel={key => intl.formatMessage(I18nFilters[key])}
-                  selected={this.state.filter}
-                  justifyContent="left"
-                  minButtonWidth={175}
-                  onChange={filter => this.setState({ filter: filter })}
-                />
-              </Box>
-              <RecurringContributionsContainer
-                recurringContributions={recurringContributions}
-                account={collective}
-                filter={this.state.filter}
-              />
-            </MainContainer>
+            {!canEditCollective && (
+              <Container p={4}>
+                <P p={2} fontSize="16px" textAlign="center">
+                  <FormattedMessage
+                    id="RecurringContributions.permissionError"
+                    defaultMessage="You need to be logged in as the admin of this account to view this page."
+                  />
+                </P>
+                <SignInOrJoinFree />
+              </Container>
+            )}
+            {canEditCollective && (
+              <Container>
+                <CollectiveNavbar collective={collective} />
+                <MainContainer py={[3, 4]} px={[2, 3, 4]}>
+                  <SectionTitle textAlign="left" mb={1}>
+                    <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
+                  </SectionTitle>
+                  <Box mt={4} mx="auto">
+                    <StyledFilters
+                      filters={filters}
+                      getLabel={key => intl.formatMessage(I18nFilters[key])}
+                      selected={this.state.filter}
+                      justifyContent="left"
+                      minButtonWidth={175}
+                      onChange={filter => this.setState({ filter: filter })}
+                    />
+                  </Box>
+                  <RecurringContributionsContainer
+                    recurringContributions={recurringContributions}
+                    account={collective}
+                    filter={this.state.filter}
+                  />
+                </MainContainer>
+              </Container>
+            )}
           </Fragment>
         )}
       </AuthenticatedPage>

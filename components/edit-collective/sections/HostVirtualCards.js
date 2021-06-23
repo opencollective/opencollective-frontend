@@ -118,8 +118,7 @@ const updateAccountSettingsMutation = gqlV2/* GraphQL */ `
 const messages = defineMessages({
   'policy.placeholder': {
     id: 'Host.VirtualCards.Policy.Placeholder',
-    defaultMessage:
-      'Provide specific rules for your Collectives to follow while using the Virtual Cards regarding terms of use, transactions etc.',
+    defaultMessage: 'E.g. deadlines to submit receipts, allowed charges, limits, or who to contact with questions.',
   },
 });
 
@@ -224,13 +223,6 @@ const HostVirtualCards = props => {
         <SettingsSectionTitle>
           <FormattedMessage id="Host.VirtualCards.Settings.Title" defaultMessage="Settings and Policy" />
         </SettingsSectionTitle>
-        <P>
-          <FormattedMessage
-            id="Host.VirtualCards.Settings.Description"
-            defaultMessage="You can setup a specific and clear Card Policy for your collectives. This could include deadlines to submit documents, what type of expenses are approved, any limitations on amounts, what documentation is required, and who to contact with questions."
-          />
-        </P>
-
         <Flex mt={4} justifyContent="space-between" alignItems="center">
           <Box lineHeight="20px" fontSize="14px" fontWeight="500">
             <FormattedMessage
@@ -240,7 +232,7 @@ const HostVirtualCards = props => {
             <P fontSize="11px" fontWeight="400" color="black.600">
               <FormattedMessage
                 id="Host.VirtualCards.AutoPause.Description"
-                defaultMessage="Automatically pause cards that have incomplete charge expenses and resume after all pending expenses are up-to-date."
+                defaultMessage="Freeze cards associated with incomplete expenses and resume after required info and receipts are up to date."
               />
             </P>
           </Box>
@@ -261,14 +253,11 @@ const HostVirtualCards = props => {
 
         <Flex mt={4} justifyContent="space-between" alignItems="center">
           <Box lineHeight="20px" fontSize="14px" fontWeight="500">
-            <FormattedMessage
-              id="Host.VirtualCards.RequestCard.Title"
-              defaultMessage="Allow collectives to request a card"
-            />
+            <FormattedMessage id="Host.VirtualCards.RequestCard.Title" defaultMessage="Enable card requests" />
             <P fontSize="11px" fontWeight="400" color="black.600">
               <FormattedMessage
                 id="Host.VirtualCards.RequestCard.Description"
-                defaultMessage="Collectives can request to recieve a card."
+                defaultMessage="Collectives can request a card to be linked to their budget."
               />
             </P>
           </Box>
@@ -294,7 +283,7 @@ const HostVirtualCards = props => {
           mt={4}
           label={
             <Box lineHeight="20px" fontSize="14px" fontWeight="500">
-              <FormattedMessage id="Host.VirtualCards.Policy.Title" defaultMessage="Virtual Card Policy Information" />
+              <FormattedMessage id="Host.VirtualCards.Policy.Title" defaultMessage="Virtual Card Policy" />
             </Box>
           }
         >
@@ -332,7 +321,7 @@ const HostVirtualCards = props => {
         <P>
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
-            defaultMessage="You can now manage and distribute Virtual Cards created on Privacy.com directly on Open Collective. You can assign multiple virtual cards to one collective. Virtual Cards enable quicker transactions, making disbursing money a lot easier! <learnMoreLink>Learn more</learnMoreLink>"
+            defaultMessage="Make payments easier by creating virtual cards on Privacy.com and linking them to Collectives. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
             values={{
               learnMoreLink: getI18nLink({
                 href: 'https://docs.opencollective.com/help/fiscal-hosts/virtual-cards',

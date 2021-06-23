@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -21,6 +21,7 @@ import Header from '../components/Header';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
+import StyledButtonSet from '../components/StyledButtonSet';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
@@ -40,6 +41,15 @@ const CreateUpdateWrapper = styled(Flex)`
   }
 `;
 
+const UPDATE_TYPE_MSGS = defineMessages({
+  normal: {
+    id: 'update.type.normal',
+    defaultMessage: 'Normal Update',
+  },
+  changelog: { id: 'update.type.changelog', defaultMessage: 'Changelog Entry' },
+});
+const UPDATE_TYPES = Object.keys(UPDATE_TYPE_MSGS);
+
 class CreateUpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
     return { slug: collectiveSlug, action };
@@ -52,11 +62,17 @@ class CreateUpdatePage extends React.Component {
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
     router: PropTypes.object,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.state = { update: {}, status: '', error: '' };
+    this.state = {
+      update: {},
+      status: '',
+      error: '',
+      updateType: props.data?.Collective?.slug === 'opencollective' ? UPDATE_TYPES[1] : UPDATE_TYPES[0],
+    };
   }
 
   createUpdate = async update => {
@@ -68,6 +84,10 @@ class CreateUpdatePage extends React.Component {
 
     try {
       update.account = { legacyId: Collective.id };
+      update.isChangelog = this.isChangelog();
+      if (update.isChangelog) {
+        update.isPrivate = false;
+      }
       const res = await this.props.createUpdate({ variables: { update } });
       this.setState({ isModified: false });
       return this.props.router.push(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
@@ -82,9 +102,12 @@ class CreateUpdatePage extends React.Component {
     this.setState({ update, isModified: true });
   };
 
+  isChangelog = () => {
+    return this.state.updateType === UPDATE_TYPES[1];
+  };
+
   render() {
-    const { data } = this.props;
-    const { LoggedInUser } = this.props;
+    const { data, LoggedInUser, intl } = this.props;
 
     if (!data.Collective) {
       return <ErrorPage data={data} />;
@@ -133,7 +156,19 @@ class CreateUpdatePage extends React.Component {
                   </H1>
                 </Container>
               )}
-              {isAdmin && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
+              {collective.slug === 'opencollective' && (
+                <StyledButtonSet
+                  size="medium"
+                  items={UPDATE_TYPES}
+                  selected={this.state.updateType}
+                  onChange={value => this.setState({ updateType: value })}
+                >
+                  {({ item }) => intl.formatMessage(UPDATE_TYPE_MSGS[item])}
+                </StyledButtonSet>
+              )}
+              {isAdmin && (
+                <EditUpdateForm collective={collective} onSubmit={this.createUpdate} isChangelog={this.isChangelog()} />
+              )}
               {this.state.status === 'error' && (
                 <MessageBox type="error" withIcon>
                   <FormattedMessage
@@ -165,6 +200,7 @@ const createUpdateMutation = gqlV2/* GraphQL */ `
       updatedAt
       tags
       isPrivate
+      isChangelog
       makePublicOn
       account {
         id
@@ -189,4 +225,4 @@ const addCreateUpdateMutation = graphql(createUpdateMutation, {
 
 const addGraphql = compose(addCollectiveCoverData, addCreateUpdateMutation);
 
-export default withUser(addGraphql(withRouter(CreateUpdatePage)));
+export default withUser(addGraphql(withRouter(injectIntl(CreateUpdatePage))));
