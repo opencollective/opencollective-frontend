@@ -86,7 +86,7 @@
     "react-geosuggest": "2.14.1",
     "react-intl": "5.20.3",
     "react-popper": "2.2.5",
-    "react-scrollchor": "6.0.0",
+    "react-scrollchor": "7.0.0",
     "react-select": "4.3.1",
     "react-swipeable": "6.1.2",
     "react-text-mask": "^5.4.3",
