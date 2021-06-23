@@ -250,12 +250,12 @@ class StyledUpdate extends Component {
     return (
       <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]} maxWidth={676}>
         <StyledHr mt={3} mb={4} borderColor="black.100" />
-        {update.html ? (
+        {update.html && update.publishedAt ? (
           <React.Fragment>
             <HTMLContent content={update.html} />
             <Flex mt={3} flexWrap="wrap" data-cy="update-reactions">
-              {reactions && update.publishedAt && <CommentReactions reactions={reactions} />}
-              {update.publishedAt && <CommentReactionPicker update={update} />}
+              {reactions && <CommentReactions reactions={reactions} />}
+              <CommentReactionPicker update={update} />
             </Flex>
           </React.Fragment>
         ) : !update.userCanSeeUpdate && !isReloadingData ? (

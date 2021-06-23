@@ -13,30 +13,15 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledRoundButton from '../StyledRoundButton';
 
-const addCommentReactionMutation = gqlV2/* GraphQL */ `
-  mutation AddCommentReaction($emoji: String!, $comment: CommentReferenceInput!) {
-    addCommentReaction(emoji: $emoji, comment: $comment) {
-      id
-      reactions
-      userReactions
-    }
-  }
-`;
-
-const removeCommentReactionMutation = gqlV2/* GraphQL */ `
-  mutation RemoveCommentReaction($emoji: String!, $comment: CommentReferenceInput!) {
-    removeCommentReaction(emoji: $emoji, comment: $comment) {
-      id
-      reactions
-      userReactions
-    }
-  }
-`;
-
 const addReactionMutation = gqlV2/* GraphQL */ `
-  mutation AddEmojiReaction($emoji: String!, $update: UpdateReferenceInput!) {
-    addEmojiReaction(emoji: $emoji, update: $update) {
+  mutation AddEmojiReaction($emoji: String!, $update: UpdateReferenceInput, $comment: CommentReferenceInput) {
+    addEmojiReaction(emoji: $emoji, update: $update, comment: $comment) {
       update {
+        id
+        reactions
+        userReactions
+      }
+      comment {
         id
         reactions
         userReactions
@@ -46,9 +31,14 @@ const addReactionMutation = gqlV2/* GraphQL */ `
 `;
 
 const removeReactionMutation = gqlV2/* GraphQL */ `
-  mutation RemoveEmojiReaction($emoji: String!, $update: UpdateReferenceInput!) {
-    removeEmojiReaction(emoji: $emoji, update: $update) {
+  mutation RemoveEmojiReaction($emoji: String!, $update: UpdateReferenceInput, $comment: CommentReferenceInput) {
+    removeEmojiReaction(emoji: $emoji, update: $update, comment: $comment) {
       update {
+        id
+        reactions
+        userReactions
+      }
+      comment {
         id
         reactions
         userReactions
@@ -82,73 +72,73 @@ const ReactionButton = styled(StyledRoundButton).attrs({ isBorderless: true, but
     `}
 `;
 
-const getOptimisticResponseForComments = (comment, emoji, isAdding) => {
-  const userReactions = comment.userReactions || [];
+const getOptimisticResponse = (entity, emoji, isAdding, isComment) => {
+  const userReactions = entity.userReactions || [];
   if (isAdding) {
-    const newCount = (comment.reactions[emoji] || 0) + 1;
+    const newCount = (entity.reactions[emoji] || 0) + 1;
+
+    let entityObj;
+    if (isComment) {
+      entityObj = {
+        comment: {
+          __typename: entity.__typename,
+          id: entity.id,
+          reactions: { ...entity.reactions, [emoji]: newCount },
+          userReactions: [...userReactions, emoji],
+        },
+      };
+    } else {
+      entityObj = {
+        update: {
+          __typename: entity.__typename,
+          id: entity.id,
+          reactions: { ...entity.reactions, [emoji]: newCount },
+          userReactions: [...userReactions, emoji],
+        },
+      };
+    }
+
     return {
       __typename: 'Mutation',
-      addCommentReaction: {
-        __typename: 'Comment',
-        id: comment.id,
-        reactions: { ...comment.reactions, [emoji]: newCount },
-        userReactions: [...userReactions, emoji],
+      addEmojiReaction: {
+        __typename: 'addEmojiReaction',
+        ...entityObj,
       },
     };
   } else {
-    const newCount = (comment.reactions[emoji] || 0) - 1;
-    const reactions = { ...comment.reactions, [emoji]: newCount };
+    const newCount = (entity.reactions[emoji] || 0) - 1;
+    const reactions = { ...entity.reactions, [emoji]: newCount };
 
     if (!reactions[emoji]) {
       delete reactions[emoji];
     }
 
-    return {
-      __typename: 'Mutation',
-      removeCommentReaction: {
-        __typename: 'Comment',
-        id: comment.id,
-        reactions,
-        userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
-      },
-    };
-  }
-};
-
-const getOptimisticResponseForUpdates = (update, emoji, isAdding) => {
-  const userReactions = update.userReactions || [];
-  if (isAdding) {
-    const newCount = (update.reactions[emoji] || 0) + 1;
-    return {
-      __typename: 'Mutation',
-      addEmojiReaction: {
-        __typename: 'addEmojiReaction',
-        update: {
-          __typename: 'Update',
-          id: update.id,
-          reactions: { ...update.reactions, [emoji]: newCount },
-          userReactions: [...userReactions, emoji],
+    let entityObj;
+    if (isComment) {
+      entityObj = {
+        comment: {
+          __typename: entity.__typename,
+          id: entity.id,
+          reactions,
+          userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
         },
-      },
-    };
-  } else {
-    const newCount = (update.reactions[emoji] || 0) - 1;
-    const reactions = { ...update.reactions, [emoji]: newCount };
-
-    if (!reactions[emoji]) {
-      delete reactions[emoji];
+      };
+    } else {
+      entityObj = {
+        update: {
+          __typename: entity.__typename,
+          id: entity.id,
+          reactions,
+          userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
+        },
+      };
     }
 
     return {
       __typename: 'Mutation',
       removeEmojiReaction: {
         __typename: 'removeEmojiReaction',
-        update: {
-          __typename: 'Update',
-          id: update.id,
-          reactions,
-          userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
-        },
+        ...entityObj,
       },
     };
   }
@@ -164,10 +154,8 @@ const CommentReactionPicker = ({ comment, update }) => {
   const emojiSecondRow = ['😕', '❤️', '🚀', '👀'];
   const [open, setOpen] = React.useState(false);
   const wrapperRef = React.useRef();
-  const [addCommentReaction] = useMutation(addCommentReactionMutation, mutationOptions);
-  const [removeCommentReaction] = useMutation(removeCommentReactionMutation, mutationOptions);
-  const [addUpdateReaction] = useMutation(addReactionMutation, mutationOptions);
-  const [removeUpdateReaction] = useMutation(removeReactionMutation, mutationOptions);
+  const [addReaction] = useMutation(addReactionMutation, mutationOptions);
+  const [removeReaction] = useMutation(removeReactionMutation, mutationOptions);
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {
@@ -187,17 +175,16 @@ const CommentReactionPicker = ({ comment, update }) => {
       isSelected,
       onClick: () => {
         setOpen(false);
+        const action = isSelected ? removeReaction : addReaction;
         if (comment) {
-          const action = isSelected ? removeCommentReaction : addCommentReaction;
           return action({
             variables: { emoji: emoji, comment: { id: comment.id } },
-            optimisticResponse: getOptimisticResponseForComments(comment, emoji, !isSelected),
+            optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected, true),
           });
         } else if (update) {
-          const action = isSelected ? removeUpdateReaction : addUpdateReaction;
           return action({
             variables: { emoji: emoji, update: { id: update.id } },
-            optimisticResponse: getOptimisticResponseForUpdates(update, emoji, !isSelected),
+            optimisticResponse: getOptimisticResponse(update, emoji, !isSelected, false),
           });
         }
       },
