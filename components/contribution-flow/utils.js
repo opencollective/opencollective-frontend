@@ -15,7 +15,14 @@ import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 
-export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDetails, stepSummary, collective) => {
+export const generatePaymentMethodOptions = (
+  paymentMethods,
+  stepProfile,
+  stepDetails,
+  stepSummary,
+  collective,
+  isEmbed,
+) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL);
@@ -98,7 +105,7 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
       });
     }
 
-    if (!interval && supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.ALIPAY)) {
+    if (!interval && !isEmbed && supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.ALIPAY)) {
       uniquePMs.push({
         key: 'alipay',
         paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.ALIPAY },
