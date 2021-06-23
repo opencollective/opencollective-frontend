@@ -33,23 +33,25 @@ const removeCommentReactionMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const addUpdateReactionMutation = gqlV2/* GraphQL */ `
+const addReactionMutation = gqlV2/* GraphQL */ `
   mutation AddEmojiReaction($emoji: String!, $update: UpdateReferenceInput!) {
     addEmojiReaction(emoji: $emoji, update: $update) {
       update {
         id
         reactions
+        userReactions
       }
     }
   }
 `;
 
-const removeUpdateReactionMutation = gqlV2/* GraphQL */ `
+const removeReactionMutation = gqlV2/* GraphQL */ `
   mutation RemoveEmojiReaction($emoji: String!, $update: UpdateReferenceInput!) {
     removeEmojiReaction(emoji: $emoji, update: $update) {
       update {
         id
         reactions
+        userReactions
       }
     }
   }
@@ -80,7 +82,7 @@ const ReactionButton = styled(StyledRoundButton).attrs({ isBorderless: true, but
     `}
 `;
 
-const getOptimisticResponse = (comment, emoji, isAdding) => {
+const getOptimisticResponseForComments = (comment, emoji, isAdding) => {
   const userReactions = comment.userReactions || [];
   if (isAdding) {
     const newCount = (comment.reactions[emoji] || 0) + 1;
@@ -113,6 +115,45 @@ const getOptimisticResponse = (comment, emoji, isAdding) => {
   }
 };
 
+const getOptimisticResponseForUpdates = (update, emoji, isAdding) => {
+  const userReactions = update.userReactions || [];
+  if (isAdding) {
+    const newCount = (update.reactions[emoji] || 0) + 1;
+    return {
+      __typename: 'Mutation',
+      addEmojiReaction: {
+        __typename: 'addEmojiReaction',
+        update: {
+          __typename: 'Update',
+          id: update.id,
+          reactions: {...update.reactions, [emoji]: newCount},
+          userReactions: [...userReactions, emoji],
+        }
+      },
+    };
+  } else {
+    const newCount = (update.reactions[emoji] || 0) - 1;
+    const reactions = { ...update.reactions, [emoji]: newCount };
+
+    if (!reactions[emoji]) {
+      delete reactions[emoji];
+    }
+
+    return {
+      __typename: 'Mutation',
+      removeEmojiReaction: {
+        __typename: 'removeEmojiReaction',
+        update: {
+          __typename: 'Update',
+          id: update.id,
+          reactions,
+          userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
+        }
+      },
+    };
+  }
+};
+
 const mutationOptions = { context: API_V2_CONTEXT };
 
 /**
@@ -125,8 +166,8 @@ const CommentReactionPicker = ({ comment, update }) => {
   const wrapperRef = React.useRef();
   const [addCommentReaction] = useMutation(addCommentReactionMutation, mutationOptions);
   const [removeCommentReaction] = useMutation(removeCommentReactionMutation, mutationOptions);
-  const [addUpdateReaction] = useMutation(addUpdateReactionMutation, mutationOptions);
-  const [removeUpdateReaction] = useMutation(removeUpdateReactionMutation, mutationOptions);
+  const [addUpdateReaction] = useMutation(addReactionMutation, mutationOptions);
+  const [removeUpdateReaction] = useMutation(removeReactionMutation, mutationOptions);
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {
@@ -150,13 +191,13 @@ const CommentReactionPicker = ({ comment, update }) => {
           const action = isSelected ? removeCommentReaction : addCommentReaction;
           return action({
             variables: { emoji: emoji, comment: { id: comment.id } },
-            optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected),
+            optimisticResponse: getOptimisticResponseForComments(comment, emoji, !isSelected),
           });
         } else if (update) {
           const action = isSelected ? removeUpdateReaction : addUpdateReaction;
           return action({
             variables: { emoji: emoji, update: { id: update.id } },
-            optimisticResponse: getOptimisticResponse(update, emoji, !isSelected),
+            optimisticResponse: getOptimisticResponseForUpdates(update, emoji, !isSelected),
           });
         }
       },

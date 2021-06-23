@@ -164,6 +164,7 @@ const updateQuery = gqlV2/* GraphQL */ `
       userCanSeeUpdate
       userCanPublishUpdate
       reactions
+      userReactions
       account {
         id
         slug
