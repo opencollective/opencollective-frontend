@@ -16,7 +16,7 @@ import StyledButton from '../StyledButton';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const scheduledExpensesQuery = gqlV2/* GraphQL */ `
-  query HostDashboardScheduledExpenses(
+  query ScheduledExpensesBanner(
     $hostId: String!
     $limit: Int!
     $status: ExpenseStatusFilter
@@ -27,8 +27,7 @@ const scheduledExpensesQuery = gqlV2/* GraphQL */ `
       offset
       limit
       nodes {
-        ...ExpensesListFieldsFragment
-        ...ExpensesListAdminFieldsFragment
+        id
       }
     }
   }
