@@ -11,8 +11,8 @@ import { borders } from 'styled-system';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose, formatDate } from '../lib/utils';
 
-import CommentReactionPicker from './conversations/CommentReactionPicker';
-import CommentReactions from './conversations/CommentReactions';
+import EmojiReactionPicker from './conversations/EmojiReactionPicker';
+import CommentReactions from './conversations/EmojiReactions';
 import Avatar from './Avatar';
 import Container from './Container';
 import EditUpdateForm from './EditUpdateForm';
@@ -255,7 +255,7 @@ class StyledUpdate extends Component {
             <HTMLContent content={update.html} />
             <Flex mt={3} flexWrap="wrap" data-cy="update-reactions">
               {reactions && <CommentReactions reactions={reactions} />}
-              <CommentReactionPicker update={update} />
+              <EmojiReactionPicker update={update} />
             </Flex>
           </React.Fragment>
         ) : !update.userCanSeeUpdate && !isReloadingData ? (

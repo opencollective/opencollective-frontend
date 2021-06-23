@@ -149,7 +149,7 @@ const mutationOptions = { context: API_V2_CONTEXT };
 /**
  * A component to render the reaction picker on comments.
  */
-const CommentReactionPicker = ({ comment, update }) => {
+const EmojiReactionPicker = ({ comment, update }) => {
   const emojiFirstRow = ['👍️', '👎', '😀', '🎉'];
   const emojiSecondRow = ['😕', '❤️', '🚀', '👀'];
   const [open, setOpen] = React.useState(false);
@@ -239,7 +239,7 @@ const CommentReactionPicker = ({ comment, update }) => {
   );
 };
 
-CommentReactionPicker.propTypes = {
+EmojiReactionPicker.propTypes = {
   comment: PropTypes.shape({
     id: PropTypes.string.isRequired,
     html: PropTypes.string,
@@ -262,4 +262,4 @@ CommentReactionPicker.propTypes = {
   }),
 };
 
-export default CommentReactionPicker;
+export default EmojiReactionPicker;

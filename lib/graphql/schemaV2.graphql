@@ -5369,6 +5369,10 @@ type Mutation {
   editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreateInput!): Comment
+
+  """
+  @deprecated: Please use the new emojiReactionMutations
+  """
   addCommentReaction(
     """
     The emoji associated with the reaction
@@ -5380,6 +5384,10 @@ type Mutation {
     """
     comment: CommentReferenceInput!
   ): Comment!
+
+  """
+  @deprecated: Please use the new emojiReactionMutations
+  """
   removeCommentReaction(comment: CommentReferenceInput!, emoji: String!): Comment!
 
   """
@@ -7677,6 +7685,7 @@ enum TransactionKind {
   PAYMENT_PROCESSOR_FEE
   PLATFORM_FEE
   PLATFORM_TIP
+  PLATFORM_TIP_DEBT
   PREPAID_PAYMENT_METHOD
 }
 
