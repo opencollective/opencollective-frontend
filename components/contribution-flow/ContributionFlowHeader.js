@@ -2,16 +2,24 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import Avatar, { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
+
+const CollectiveTitleLink = styled(Link)`
+  color: #333;
+  cursor: pointer;
+`;
 
 class NewContributionFlowHeader extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
+      slug: PropTypes.string,
       currency: PropTypes.string,
       name: PropTypes.string,
       contributors: PropTypes.shape({
@@ -26,11 +34,14 @@ class NewContributionFlowHeader extends React.Component {
     }).isRequired,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
+    isEmbed: PropTypes.bool,
   };
 
   render() {
-    const { collective } = this.props;
+    const { collective, isEmbed } = this.props;
     const contributors = collective.contributors?.nodes;
+
+    const CollectiveTitleContainer = !isEmbed ? CollectiveTitleLink : Container;
 
     return (
       <Flex flexDirection={['column', null, 'row']} alignItems="center" maxWidth={500}>
@@ -38,19 +49,21 @@ class NewContributionFlowHeader extends React.Component {
           <Avatar collective={collective} radius={[65, null, 96]} />
         </Box>
         <Flex flexDirection="column" alignItems="center">
-          <H1
-            textAlign="center"
-            fontSize={['28px', null, '32px']}
-            lineHeight="40px"
-            fontWeight={500}
-            title={collective.name}
-          >
-            <FormattedMessage
-              id="CreateOrder.Title"
-              defaultMessage="Contribute to {collective}"
-              values={{ collective: truncate(collective.name, { length: 60 }) }}
-            />
-          </H1>
+          <CollectiveTitleContainer href={`/${collective.slug}`}>
+            <H1
+              textAlign="center"
+              fontSize={['28px', null, '32px']}
+              lineHeight="40px"
+              fontWeight={500}
+              title={collective.name}
+            >
+              <FormattedMessage
+                id="CreateOrder.Title"
+                defaultMessage="Contribute to {collective}"
+                values={{ collective: truncate(collective.name, { length: 60 }) }}
+              />
+            </H1>
+          </CollectiveTitleContainer>
           {contributors?.length > 0 && (
             <Fragment>
               <P fontSize="16px" lineHeight="24px" fontWeight={400} color="black.500" py={2}>

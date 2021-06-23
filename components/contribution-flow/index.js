@@ -616,7 +616,7 @@ class ContributionFlow extends React.Component {
             ref={this.mainContainerRef}
           >
             <Box px={[2, 3]} mb={4}>
-              <ContributionFlowHeader collective={collective} />
+              <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
             </Box>
             <StepsProgressBox mb={3} width={[1.0, 0.8]}>
               <ContributionFlowStepsProgress
