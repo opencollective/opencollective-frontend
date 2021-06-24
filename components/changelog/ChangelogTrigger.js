@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
+import { gql } from '@apollo/client';
+import { graphql, withApollo } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
+import { cloneDeep } from 'lodash';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -33,12 +35,15 @@ const ChangelogTrigger = props => {
   const { setShowNewsAndUpdates, setChangelogViewDate } = props;
   const [showChangelogDropdown, setShowChangelogDropdown] = useState(true);
   const { LoggedInUser } = useUser();
-  const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
+  const LoggedInUserFromCache = props.client.readQuery({ query })?.LoggedInUser || LoggedInUser;
+  const hasSeenNewUpdates = LoggedInUserFromCache?.hasSeenLatestChangelogEntry;
 
   const handleShowNewUpdates = async () => {
     setShowNewsAndUpdates(true);
     await setChangelogViewDate({ variables: { changelogViewDate: new Date() } });
-    LoggedInUser.hasSeenLatestChangelogEntry = true;
+    const data = cloneDeep(props.client.readQuery({ query }));
+    data.LoggedInUser.hasSeenLatestChangelogEntry = true;
+    props.client.writeQuery({ query, data });
   };
 
   if (!LoggedInUser || !CHANGE_LOG_UPDATES_ENABLED) {
@@ -68,12 +73,21 @@ const ChangelogTrigger = props => {
 ChangelogTrigger.propTypes = {
   setShowNewsAndUpdates: PropTypes.func,
   setChangelogViewDate: PropTypes.func,
+  client: PropTypes.object.isRequired,
 };
 
 const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
   mutation SetChangelogViewDateMutation($changelogViewDate: DateTime!) {
     setChangelogViewDate(changelogViewDate: $changelogViewDate) {
       id
+      hasSeenLatestChangelogEntry
+    }
+  }
+`;
+
+const query = gql`
+  query LoggedInUser {
+    LoggedInUser {
       hasSeenLatestChangelogEntry
     }
   }
@@ -86,4 +100,4 @@ const setChangelogViewDate = graphql(setChangelogViewDateMutation, {
   },
 });
 
-export default withNewsAndUpdates(setChangelogViewDate(ChangelogTrigger));
+export default withNewsAndUpdates(setChangelogViewDate(withApollo(ChangelogTrigger)));
