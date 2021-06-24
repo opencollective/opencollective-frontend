@@ -28,7 +28,7 @@ class UpdatePage extends React.Component {
   }
 
   static propTypes = {
-    collectiveSlug: PropTypes.string, // for addCollectiveCoverData
+    collectiveSlug: PropTypes.string, // for addCollectiveNavbarData
     updateSlug: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
     client: PropTypes.object, // from withApollo

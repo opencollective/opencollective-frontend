@@ -91,7 +91,8 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const hasExpense = expense !== null;
   const isCredit = type === TransactionTypes.CREDIT;
   const Item = isCredit ? CreditItem : DebitItem;
-  const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === collective.id;
+  const legacyCollectiveId = collective.legacyId || collective.id;
+  const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === legacyCollectiveId;
   const avatarCollective = hasOrder ? (isCredit ? fromAccount : toAccount) : isCredit ? fromAccount : toAccount;
   const displayedAmount = getDisplayedAmount(transaction, collective);
 
@@ -323,7 +324,8 @@ TransactionItem.propTypes = {
     usingGiftCardFromCollective: PropTypes.object,
   }),
   collective: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
     slug: PropTypes.string.isRequired,
   }).isRequired,
   onMutationSuccess: PropTypes.func,
