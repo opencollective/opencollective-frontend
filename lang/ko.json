@@ -929,6 +929,7 @@
   "Expenses.AllShort": "모두",
   "expenses.countMore": "+ {count} more",
   "expenses.empty": "경비 없음",
+  "expenses.list": "List Expenses",
   "expenses.ready": "Ready to pay",
   "expenses.scheduled.confirmation.body": "Are you sure you want to batch and pay {count, plural, one {# expense} other {# expenses}} scheduled for payment?",
   "expenses.scheduled.confirmation.title": "Pay Expenses Batch",

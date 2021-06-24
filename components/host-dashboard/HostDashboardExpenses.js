@@ -242,7 +242,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                   });
                 }}
               >
-                List Expenses
+                <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
               </StyledButton>
             ) : null
           }

@@ -929,6 +929,7 @@
   "Expenses.AllShort": "Всі",
   "expenses.countMore": "+ ще {count}",
   "expenses.empty": "Немає витрат",
+  "expenses.list": "List Expenses",
   "expenses.ready": "Ready to pay",
   "expenses.scheduled.confirmation.body": "Are you sure you want to batch and pay {count, plural, one {# expense} other {# expenses}} scheduled for payment?",
   "expenses.scheduled.confirmation.title": "Pay Expenses Batch",

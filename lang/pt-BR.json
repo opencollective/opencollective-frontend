@@ -929,6 +929,7 @@
   "Expenses.AllShort": "Todos",
   "expenses.countMore": "+ {count} mais",
   "expenses.empty": "Sem despesas",
+  "expenses.list": "List Expenses",
   "expenses.ready": "Pronto para pagar",
   "expenses.scheduled.confirmation.body": "Are you sure you want to batch and pay {count, plural, one {# expense} other {# expenses}} scheduled for payment?",
   "expenses.scheduled.confirmation.title": "Pay Expenses Batch",
