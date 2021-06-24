@@ -89,7 +89,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             ) : (
               <Avatar collective={payee} radius={24} />
             )}
-            <Flex flexDirection="column" ml={2}>
+            <Flex flexDirection="column" ml={2} css={{ overflow: 'hidden' }}>
               <Span color="black.900" fontWeight="bold" truncateOverflow>
                 {payee.organization?.name || payee.name}
               </Span>
