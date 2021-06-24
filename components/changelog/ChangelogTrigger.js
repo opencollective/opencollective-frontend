@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
@@ -9,11 +9,9 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { parseToBoolean } from '../../lib/utils';
 
-import Container from '../Container';
 import { Flex } from '../Grid';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Dropdown } from '../StyledDropdown';
-import { Span } from '../Text';
 import { useUser } from '../UserProvider';
 
 import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
@@ -33,7 +31,6 @@ const FlameIcon = styled(Flex)`
 
 const ChangelogTrigger = props => {
   const { setShowNewsAndUpdates, setChangelogViewDate } = props;
-  const [showChangelogDropdown, setShowChangelogDropdown] = useState(true);
   const { LoggedInUser } = useUser();
   const LoggedInUserFromCache = props.client.readQuery({ query: loggedInUserQuery })?.LoggedInUser || LoggedInUser;
   const hasSeenNewUpdates = LoggedInUserFromCache?.hasSeenLatestChangelogEntry;
@@ -46,24 +43,18 @@ const ChangelogTrigger = props => {
     await props.client.writeQuery({ query: loggedInUserQuery, data });
   };
 
-  if (!LoggedInUserFromCache || !CHANGE_LOG_UPDATES_ENABLED) {
+  if (!LoggedInUser || !CHANGE_LOG_UPDATES_ENABLED) {
     return null;
   }
 
   return (
-    <Flex onClick={handleShowNewUpdates}>
+    <Flex>
       {hasSeenNewUpdates ? (
-        <FlameIcon backgroundColor="black.100" url="/static/images/flame-default.svg" />
+        <FlameIcon onClick={handleShowNewUpdates} backgroundColor="black.100" url="/static/images/flame-default.svg" />
       ) : (
         <Dropdown>
-          <Span>
-            <FlameIcon backgroundColor="yellow.100" url="/static/images/flame-red.svg" />
-            {showChangelogDropdown && props.showDropdown && (
-              <Container>
-                <ChangelogNotificationDropdown onClose={() => setShowChangelogDropdown(false)} />
-              </Container>
-            )}
-          </Span>
+          <FlameIcon onClick={handleShowNewUpdates} backgroundColor="yellow.100" url="/static/images/flame-red.svg" />
+          <ChangelogNotificationDropdown />
         </Dropdown>
       )}
     </Flex>

@@ -70,7 +70,7 @@ class TopBar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showMobileMenu: false, showChangelogDropdown: true };
+    this.state = { showMobileMenu: false };
     this.ref = React.createRef();
   }
 
@@ -83,7 +83,6 @@ class TopBar extends React.Component {
   }
 
   onClickOutside = e => {
-    this.setState({ showChangelogDropdown: false });
     const ref = this.ref.current;
     if (this.state.showMobileMenu && ref && !ref.contains(e.target)) {
       this.setState({ showMobileMenu: false });
@@ -179,9 +178,7 @@ class TopBar extends React.Component {
             </NavList>
           </Hide>
         </Flex>
-        <Container onClick={() => this.setState({ showChangelogDropdown: false })}>
-          <TopBarProfileMenu />
-        </Container>
+        <TopBarProfileMenu />
         <Hide sm md lg>
           <TopBarMobileMenu
             showMobileMenu={this.state.showMobileMenu}
@@ -194,7 +191,7 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        <ChangelogTrigger showDropdown={this.state.showChangelogDropdown} />
+        <ChangelogTrigger />
       </Flex>
     );
   }
