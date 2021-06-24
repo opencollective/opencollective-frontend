@@ -35,18 +35,18 @@ const ChangelogTrigger = props => {
   const { setShowNewsAndUpdates, setChangelogViewDate } = props;
   const [showChangelogDropdown, setShowChangelogDropdown] = useState(true);
   const { LoggedInUser } = useUser();
-  const LoggedInUserFromCache = props.client.readQuery({ query })?.LoggedInUser || LoggedInUser;
+  const LoggedInUserFromCache = props.client.readQuery({ query: loggedInUserQuery })?.LoggedInUser || LoggedInUser;
   const hasSeenNewUpdates = LoggedInUserFromCache?.hasSeenLatestChangelogEntry;
 
   const handleShowNewUpdates = async () => {
     setShowNewsAndUpdates(true);
     await setChangelogViewDate({ variables: { changelogViewDate: new Date() } });
-    const data = cloneDeep(props.client.readQuery({ query }));
+    const data = cloneDeep(props.client.readQuery({ query: loggedInUserQuery }));
     data.LoggedInUser.hasSeenLatestChangelogEntry = true;
-    props.client.writeQuery({ query, data });
+    await props.client.writeQuery({ query: loggedInUserQuery, data });
   };
 
-  if (!LoggedInUser || !CHANGE_LOG_UPDATES_ENABLED) {
+  if (!LoggedInUserFromCache || !CHANGE_LOG_UPDATES_ENABLED) {
     return null;
   }
 
@@ -58,7 +58,7 @@ const ChangelogTrigger = props => {
         <Dropdown>
           <Span>
             <FlameIcon backgroundColor="yellow.100" url="/static/images/flame-red.svg" />
-            {showChangelogDropdown && (
+            {showChangelogDropdown && props.showDropdown && (
               <Container>
                 <ChangelogNotificationDropdown onClose={() => setShowChangelogDropdown(false)} />
               </Container>
@@ -74,6 +74,7 @@ ChangelogTrigger.propTypes = {
   setShowNewsAndUpdates: PropTypes.func,
   setChangelogViewDate: PropTypes.func,
   client: PropTypes.object.isRequired,
+  showDropdown: PropTypes.bool,
 };
 
 const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
@@ -85,7 +86,7 @@ const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const query = gql`
+const loggedInUserQuery = gql`
   query LoggedInUser {
     LoggedInUser {
       hasSeenLatestChangelogEntry

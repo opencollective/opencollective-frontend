@@ -70,7 +70,7 @@ class TopBar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showMobileMenu: false };
+    this.state = { showMobileMenu: false, showChangelogDropdown: true };
     this.ref = React.createRef();
   }
 
@@ -194,7 +194,7 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        <ChangelogTrigger />
+        <ChangelogTrigger showDropdown={this.state.showChangelogDropdown} />
       </Flex>
     );
   }
