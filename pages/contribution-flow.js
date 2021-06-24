@@ -67,6 +67,7 @@ class NewContributionFlowPage extends React.Component {
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
+      error: query.error,
     };
   }
 
@@ -81,6 +82,7 @@ class NewContributionFlowPage extends React.Component {
     interval: PropTypes.string,
     tierId: PropTypes.number,
     customData: PropTypes.object,
+    error: PropTypes.string,
     contributeAs: PropTypes.string,
     skipStepDetails: PropTypes.bool,
     data: PropTypes.shape({
@@ -120,7 +122,7 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, LoggedInUser } = this.props;
+    const { data = {}, step, LoggedInUser, error } = this.props;
     const { account, tier } = data;
 
     if (data.loading) {
@@ -156,6 +158,7 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
+          error={error}
         />
       );
     }
