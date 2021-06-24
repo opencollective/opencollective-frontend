@@ -8,7 +8,6 @@ import { addAuthTokenToHeader } from '../../lib/api';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
-import { expensesListAdminFieldsFragment, expensesListFieldsFragment } from '../expenses/graphql/fragments';
 import { Box, Flex } from '../Grid';
 import TransferwiseIcon from '../icons/TransferwiseIcon';
 import MessageBox from '../MessageBox';
@@ -31,9 +30,6 @@ const scheduledExpensesQuery = gqlV2/* GraphQL */ `
       }
     }
   }
-
-  ${expensesListFieldsFragment}
-  ${expensesListAdminFieldsFragment}
 `;
 
 const ScheduledExpensesBanner = ({ host, onSubmit, secondButton }) => {
