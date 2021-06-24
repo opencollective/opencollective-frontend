@@ -90,7 +90,7 @@ const TransactionsDownloadCSV = ({ collective, client }) => {
       query: transactionsQuery,
       variables: {
         ...dateInterval,
-        CollectiveId: collective.id,
+        CollectiveId: collective.legacyId,
         kinds: Object.values(
           omit(TransactionKind, [
             'PLATFORM_FEE',
@@ -211,7 +211,7 @@ TransactionsDownloadCSV.propTypes = {
   filters: PropTypes.object,
   collective: PropTypes.shape({
     slug: PropTypes.string,
-    id: PropTypes.number.isRequired,
+    legacyId: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
   }).isRequired,
   client: PropTypes.object,

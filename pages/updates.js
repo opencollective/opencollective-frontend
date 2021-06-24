@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
-import { addCollectiveCoverData } from '../lib/graphql/queries';
+import { addCollectiveNavbarData } from '../lib/graphql/queries';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -19,20 +19,20 @@ class UpdatesPage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveCoverData
+    slug: PropTypes.string, // for addCollectiveNavbarData
     action: PropTypes.string, // not clear whre it's coming from, not in the route
-    data: PropTypes.object.isRequired, // from withData
+    data: PropTypes.shape({ account: PropTypes.object }).isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
   };
 
   render() {
     const { data, action, LoggedInUser } = this.props;
 
-    if (!data.Collective) {
+    if (!data.account) {
       return <ErrorPage data={data} />;
     }
 
-    const collective = data.Collective;
+    const collective = data.account;
 
     return (
       <div className="UpdatesPage">
@@ -57,4 +57,4 @@ class UpdatesPage extends React.Component {
   }
 }
 
-export default withUser(addCollectiveCoverData(UpdatesPage));
+export default withUser(addCollectiveNavbarData(UpdatesPage));
