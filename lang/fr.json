@@ -1927,7 +1927,7 @@
   "TierPage.AddTitle": "Ajouter un titre",
   "TierPage.AmountGoal": "Objectif {amountWithInterval}",
   "TierPage.AmountRaised": "{amountWithInterval} collectés",
-  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# personne } other {# personnes }} {both, plural, =0 {} one {et }}{orgCount, plural, =0 {} one {# organisation} other {# organisations}} {totalCount, plural, one {a } other {ont }} contribué à cet objectif",
+  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
   "TierPage.ContributorsDescription": "Rejoignez-nous, contribuez !",
   "TierPage.Share.title": "Aidez {collective} à atteindre leur objectif !",
   "tiers.about": "Set up contribution tiers",
