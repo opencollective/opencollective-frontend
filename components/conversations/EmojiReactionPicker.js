@@ -82,7 +82,7 @@ const getOptimisticResponse = (entity, emoji, isAdding) => {
     return {
       __typename: 'Mutation',
       addEmojiReaction: {
-        __typename: 'EmojiReactionsOutput',
+        __typename: 'EmojiReactionsResponse',
         [fieldName]: {
           __typename,
           id: entity.id,
@@ -102,7 +102,7 @@ const getOptimisticResponse = (entity, emoji, isAdding) => {
     return {
       __typename: 'Mutation',
       removeEmojiReaction: {
-        __typename: 'EmojiReactionsOutput',
+        __typename: 'EmojiReactionsResponse',
         [fieldName]: {
           __typename,
           id: entity.id,
