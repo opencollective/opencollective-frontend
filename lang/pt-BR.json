@@ -1927,7 +1927,7 @@
   "TierPage.AddTitle": "Adicionar um título",
   "TierPage.AmountGoal": "{amountWithInterval} meta",
   "TierPage.AmountRaised": "{amountWithInterval} levantado",
-  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} one {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contribuíram para este objetivo",
+  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
   "TierPage.ContributorsDescription": "Junte-se a nós em contribuir para este nível!",
   "TierPage.Share.title": "Ajude {collective} a alcançar sua meta!",
   "tiers.about": "Configure os níveis de contribuição",
