@@ -664,7 +664,7 @@ class ContributionFlow extends React.Component {
                 <Box />
                 <Box as="form" ref={this.formRef} onSubmit={e => e.preventDefault()} maxWidth="100%">
                   {(error || backendError) && (
-                    <MessageBox type="error" withIcon mb={3}>
+                    <MessageBox type="error" withIcon mb={3} data-cy="contribution-flow-error">
                       {formatErrorMessage(this.props.intl, error) || backendError}
                     </MessageBox>
                   )}
