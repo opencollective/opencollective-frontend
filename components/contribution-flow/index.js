@@ -27,13 +27,13 @@ import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Container from '../Container';
 import ContributeFAQ from '../faqs/ContributeFAQ';
 import { Box, Grid } from '../Grid';
-import Link from '../Link';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import Steps from '../Steps';
 import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
+import CollectiveTitleContainer from './CollectiveTitleContainer';
 import { STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
@@ -682,12 +682,12 @@ class ContributionFlow extends React.Component {
                     />
                   </Box>
                   <Box textAlign="center" mt={5}>
-                    <Link href={`/${collective.slug}`}>
+                    <CollectiveTitleContainer useLink={!isEmbed} collective={collective}>
                       <FormattedMessage
                         id="ContributionFlow.backToCollectivePage"
                         defaultMessage="Back to Collective Page"
                       />
-                    </Link>
+                    </CollectiveTitleContainer>
                   </Box>
                 </Box>
 

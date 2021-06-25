@@ -2,19 +2,14 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import Avatar, { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
 
-const CollectiveTitleLink = styled(Link)`
-  color: #333;
-  cursor: pointer;
-`;
+import CollectiveTitleContainer from './CollectiveTitleContainer';
 
 class NewContributionFlowHeader extends React.Component {
   static propTypes = {
@@ -41,15 +36,13 @@ class NewContributionFlowHeader extends React.Component {
     const { collective, isEmbed } = this.props;
     const contributors = collective.contributors?.nodes;
 
-    const CollectiveTitleContainer = !isEmbed ? CollectiveTitleLink : Container;
-
     return (
       <Flex flexDirection={['column', null, 'row']} alignItems="center" maxWidth={500}>
         <Box mx={3}>
           <Avatar collective={collective} radius={[65, null, 96]} />
         </Box>
         <Flex flexDirection="column" alignItems="center">
-          <CollectiveTitleContainer href={`/${collective.slug}`}>
+          <CollectiveTitleContainer useLink={!isEmbed} collective={collective} linkColor="#333">
             <H1
               textAlign="center"
               fontSize={['28px', null, '32px']}
