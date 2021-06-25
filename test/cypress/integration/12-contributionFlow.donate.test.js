@@ -1,5 +1,6 @@
 import { CreditCards } from '../../stripe-helpers';
 import mockRecaptcha from '../mocks/recaptcha';
+import { defaultTestUserEmail } from '../support/data';
 
 const donateRoute = '/apex/donate';
 const visitParams = { onBeforeLoad: mockRecaptcha };
@@ -162,5 +163,16 @@ describe('Contribution Flow: Donate', () => {
     cy.complete3dSecure(true);
     cy.getByDataCy('order-success', { timeout: 20000 });
     cy.contains('You are now supporting APEX.');
+  });
+
+  it('Shows Stripe errors in the frontend', () => {
+    cy.visit(donateRoute);
+    cy.get('button[data-cy="cf-next-step"]').click();
+    cy.get('input[name=email]').type(defaultTestUserEmail);
+    cy.get('button[data-cy="cf-next-step"]').click();
+    cy.wait(3000); // Wait for stripe to be loaded
+    cy.fillStripeInput({ card: CreditCards.CARD_DECLINED });
+    cy.getByDataCy('cf-next-step').click();
+    cy.contains('[data-cy="contribution-flow-error"]', 'Your card was declined.');
   });
 });
