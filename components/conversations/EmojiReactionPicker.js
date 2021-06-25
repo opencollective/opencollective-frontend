@@ -72,37 +72,23 @@ const ReactionButton = styled(StyledRoundButton).attrs({ isBorderless: true, but
     `}
 `;
 
-const getOptimisticResponse = (entity, emoji, isAdding, isComment) => {
+const getOptimisticResponse = (entity, emoji, isAdding) => {
   const userReactions = entity.userReactions || [];
+  const { __typename } = entity;
+  const fieldName = __typename === 'Update' ? 'update' : 'comment';
   if (isAdding) {
     const newCount = (entity.reactions[emoji] || 0) + 1;
-
-    let entityObj;
-    if (isComment) {
-      entityObj = {
-        comment: {
-          __typename: entity.__typename,
-          id: entity.id,
-          reactions: { ...entity.reactions, [emoji]: newCount },
-          userReactions: [...userReactions, emoji],
-        },
-      };
-    } else {
-      entityObj = {
-        update: {
-          __typename: entity.__typename,
-          id: entity.id,
-          reactions: { ...entity.reactions, [emoji]: newCount },
-          userReactions: [...userReactions, emoji],
-        },
-      };
-    }
 
     return {
       __typename: 'Mutation',
       addEmojiReaction: {
         __typename: 'addEmojiReaction',
-        ...entityObj,
+        [fieldName]: {
+          __typename,
+          id: entity.id,
+          reactions: { ...entity.reactions, [emoji]: newCount },
+          userReactions: [...userReactions, emoji],
+        },
       },
     };
   } else {
@@ -113,32 +99,16 @@ const getOptimisticResponse = (entity, emoji, isAdding, isComment) => {
       delete reactions[emoji];
     }
 
-    let entityObj;
-    if (isComment) {
-      entityObj = {
-        comment: {
-          __typename: entity.__typename,
-          id: entity.id,
-          reactions,
-          userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
-        },
-      };
-    } else {
-      entityObj = {
-        update: {
-          __typename: entity.__typename,
-          id: entity.id,
-          reactions,
-          userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
-        },
-      };
-    }
-
     return {
       __typename: 'Mutation',
       removeEmojiReaction: {
         __typename: 'removeEmojiReaction',
-        ...entityObj,
+        [fieldName]: {
+          __typename,
+          id: entity.id,
+          reactions,
+          userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
+        },
       },
     };
   }

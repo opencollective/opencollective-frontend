@@ -245,12 +245,12 @@ class StyledUpdate extends Component {
   }
 
   renderFullContent() {
-    const { update, collective, isReloadingData, reactions } = this.props;
+    const { update, collective, isReloadingData, reactions, LoggedInUser } = this.props;
 
     return (
       <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]} maxWidth={676}>
         <StyledHr mt={3} mb={4} borderColor="black.100" />
-        {update.html && update.publishedAt ? (
+        {update.html && update.publishedAt && LoggedInUser ? (
           <React.Fragment>
             <HTMLContent content={update.html} />
             <Flex mt={3} flexWrap="wrap" data-cy="update-reactions">
