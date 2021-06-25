@@ -157,7 +157,7 @@ class CreateUpdatePage extends React.Component {
                   </H1>
                 </Container>
               )}
-              {collective.slug === 'opencollective' && (
+              {collective.slug === 'opencollective' && LoggedInUser && (
                 <StyledButtonSet
                   size="medium"
                   items={UPDATE_TYPES}
