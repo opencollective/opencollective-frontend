@@ -1927,7 +1927,7 @@
   "TierPage.AddTitle": "הוספת כותרת",
   "TierPage.AmountGoal": "{amountWithInterval} goal",
   "TierPage.AmountRaised": "{amountWithInterval} raised",
-  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} one {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
+  "TierPage.ContributorsCountGoal": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal",
   "TierPage.ContributorsDescription": "עזרו לנו בתרומה לדרגה הזו!",
   "TierPage.Share.title": "עזרו ל־{collective} להגיע ליעד!",
   "tiers.about": "Set up contribution tiers",
