@@ -255,7 +255,7 @@ class StyledUpdate extends Component {
             <HTMLContent content={update.html} />
             <Flex mt={3} flexWrap="wrap" data-cy="update-reactions">
               {reactions && <CommentReactions reactions={reactions} />}
-              <EmojiReactionPicker update={update} />
+              {LoggedInUser && <EmojiReactionPicker update={update} />}
             </Flex>
           </React.Fragment>
         ) : !update.userCanSeeUpdate && !isReloadingData ? (
