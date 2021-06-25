@@ -35,15 +35,15 @@ const ChangelogTrigger = props => {
   const LoggedInUserFromCache = props.client.readQuery({ query: loggedInUserQuery })?.LoggedInUser || LoggedInUser;
   const hasSeenNewUpdates = LoggedInUserFromCache?.hasSeenLatestChangelogEntry;
 
-  const handleShowNewUpdates = async () => {
+  const handleShowNewUpdates = () => {
     setShowNewsAndUpdates(true);
-    await setChangelogViewDate({ variables: { changelogViewDate: new Date() } });
+    setChangelogViewDate({ variables: { changelogViewDate: new Date() } });
     const data = cloneDeep(props.client.readQuery({ query: loggedInUserQuery }));
     data.LoggedInUser.hasSeenLatestChangelogEntry = true;
-    await props.client.writeQuery({ query: loggedInUserQuery, data });
+    props.client.writeQuery({ query: loggedInUserQuery, data });
   };
 
-  if (!LoggedInUser || !CHANGE_LOG_UPDATES_ENABLED) {
+  if (!LoggedInUserFromCache || !CHANGE_LOG_UPDATES_ENABLED) {
     return null;
   }
 
