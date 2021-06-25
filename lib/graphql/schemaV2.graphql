@@ -3766,6 +3766,11 @@ type ExpensePermissions {
   Whether the current user can comment and see comments for this expense
   """
   canComment: Boolean!
+
+  """
+  Whether the current user can unschedule this expense payment
+  """
+  canUnschedulePayment: Boolean!
 }
 
 """
@@ -3796,6 +3801,11 @@ enum ExpenseProcessAction {
   To schedule the expense for payment
   """
   SCHEDULE_FOR_PAYMENT
+
+  """
+  To uschedule the expense payment
+  """
+  UNSCHEDULE_PAYMENT
 
   """
   To trigger the payment

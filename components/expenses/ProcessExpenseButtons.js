@@ -112,7 +112,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
  */
 const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps, onSuccess }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache);
+  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
   const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
@@ -190,6 +190,18 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
           </ButtonLabel>
         </StyledButton>
       )}
+      {permissions.canUnschedulePayment && (
+        <StyledButton
+          {...getButtonProps('UNSCHEDULE_PAYMENT')}
+          buttonStyle="dangerSecondary"
+          data-cy="unapprove-button"
+        >
+          <UnapproveIcon size={12} />
+          <ButtonLabel>
+            <FormattedMessage id="expense.unschedulePayment.btn" defaultMessage="Unschedule Payment" />
+          </ButtonLabel>
+        </StyledButton>
+      )}
       {permissions.canMarkAsUnpaid && (
         <MarkExpenseAsUnpaidButton
           data-cy="mark-as-unpaid-button"
@@ -213,6 +225,7 @@ ProcessExpenseButtons.propTypes = {
     canMarkAsSpam: PropTypes.bool,
     canPay: PropTypes.bool,
     canMarkAsUnpaid: PropTypes.bool,
+    canUnschedulePayment: PropTypes.bool,
   }).isRequired,
   expense: PropTypes.shape({
     id: PropTypes.string,
