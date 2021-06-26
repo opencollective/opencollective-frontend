@@ -50,7 +50,7 @@
   "addfunds.organization.label": "组织",
   "addfunds.platformFees": "平台费用（{platformFees}）",
   "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fee and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
-  "AddFundsModal.addFunds": "Add Funds",
+  "AddFundsModal.addFunds": "添加资金",
   "AddFundsModal.amount": "Amount",
   "AddFundsModal.cancel": "取消",
   "AddFundsModal.description": "描述",
