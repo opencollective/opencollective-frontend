@@ -7,12 +7,12 @@ import { cloneDeep } from 'lodash';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../../lib/local-storage';
 import { parseToBoolean } from '../../lib/utils';
 
 import { Flex } from '../Grid';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Dropdown } from '../StyledDropdown';
-import { useUser } from '../UserProvider';
 
 import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
 
@@ -31,7 +31,10 @@ const FlameIcon = styled(Flex)`
 
 const ChangelogTrigger = props => {
   const { setShowNewsAndUpdates, setChangelogViewDate } = props;
-  const { LoggedInUser } = useUser();
+  let LoggedInUser;
+  if (typeof window !== 'undefined' && localStorage.getItem(LOCAL_STORAGE_KEYS.LOGGED_IN_USER)) {
+    LoggedInUser = JSON.parse(getFromLocalStorage(LOCAL_STORAGE_KEYS.LOGGED_IN_USER)).value;
+  }
   const LoggedInUserFromCache = props.client.readQuery({ query: loggedInUserQuery })?.LoggedInUser || LoggedInUser;
   const hasSeenNewUpdates = LoggedInUserFromCache?.hasSeenLatestChangelogEntry;
 
@@ -41,6 +44,8 @@ const ChangelogTrigger = props => {
     const data = cloneDeep(props.client.readQuery({ query: loggedInUserQuery }));
     data.LoggedInUser.hasSeenLatestChangelogEntry = true;
     props.client.writeQuery({ query: loggedInUserQuery, data });
+    LoggedInUserFromCache.hasSeenLatestChangelogEntry = true;
+    setLocalStorage(LOCAL_STORAGE_KEYS.LOGGED_IN_USER, JSON.stringify(LoggedInUserFromCache));
   };
 
   if (!LoggedInUserFromCache || !CHANGE_LOG_UPDATES_ENABLED) {
