@@ -1,0 +1,42 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import ProcessExpenseButtons from '../../components/expenses/ProcessExpenseButtons';
+import { webpackCollective } from '../mocks/collectives';
+
+<Meta title="Expenses/ProcessExpenseButtons" component={ProcessExpenseButtons} />
+
+<Canvas>
+  <Story name="All buttons">
+    {() => {
+      return (
+        <ProcessExpenseButtons
+          expense={{ legacyId: 42, amount: 4200 }}
+          collective={webpackCollective}
+          permissions={{
+            canApprove: true,
+            canUnapprove: true,
+            canReject: true,
+            canPay: true,
+            canMarkAsUnpaid: true,
+          }}
+        />
+      );
+    }}
+  </Story>
+</Canvas>
+
+<Canvas>
+  <Story name="Displayed buttons is based on the permissions">
+    {() => {
+      return (
+        <ProcessExpenseButtons
+          expense={{ legacyId: 42, amount: 4200 }}
+          collective={webpackCollective}
+          permissions={{
+            canApprove: true,
+            canReject: true,
+          }}
+        />
+      );
+    }}
+  </Story>
+</Canvas>
