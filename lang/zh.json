@@ -504,6 +504,7 @@
   "contribution.quantity": "数量",
   "contribution.total": "总计",
   "contribution.your": "你的捐款",
+  "ContributionFlow.backToCollectivePage": "Back to Collective Page",
   "ContributionFlow.CollectiveProfile": "Collective profile",
   "ContributionFlow.Contribution": "Contribution",
   "ContributionFlow.CreateOrganizationLabel": "作为一个组织进行捐款",
