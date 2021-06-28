@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
@@ -12,7 +12,6 @@ import { parseToBoolean } from '../../lib/utils';
 import { Flex } from '../Grid';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Dropdown } from '../StyledDropdown';
-import { useUser } from '../UserProvider';
 
 import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
 
@@ -30,24 +29,27 @@ const FlameIcon = styled(Flex)`
 `;
 
 const ChangelogTrigger = props => {
-  const { setShowNewsAndUpdates, setChangelogViewDate } = props;
-  const { LoggedInUser } = useUser();
-  const LoggedInUserFromCache = props.client.readQuery({ query: loggedInUserQuery })?.LoggedInUser || LoggedInUser;
-  const hasSeenNewUpdates = LoggedInUserFromCache?.hasSeenLatestChangelogEntry;
+  const { setShowNewsAndUpdates, setChangelogViewDate, LoggedInUser } = props;
+  const [hasSeenNewUpdates, setHasSeenNewUpdates] = useState(LoggedInUser.hasSeenLatestChangelogEntry);
 
   const handleShowNewUpdates = () => {
     setShowNewsAndUpdates(true);
-    setChangelogViewDate({
-      variables: { changelogViewDate: new Date() },
-      update: (store) => {
-        const data = cloneDeep(store.readQuery({ query: loggedInUserQuery }));
-        data.LoggedInUser.hasSeenLatestChangelogEntry = true;
-        store.writeQuery({ query: loggedInUserQuery, data });
-      },
-    });
+    try {
+      setHasSeenNewUpdates(true);
+      setChangelogViewDate({
+        variables: { changelogViewDate: new Date() },
+        update: store => {
+          const data = cloneDeep(store.readQuery({ query: loggedInUserQuery }));
+          data.LoggedInUser.hasSeenLatestChangelogEntry = true;
+          store.writeQuery({ query: loggedInUserQuery, data });
+        },
+      });
+    } catch (e) {
+      setHasSeenNewUpdates(false);
+    }
   };
 
-  if (!LoggedInUserFromCache || !CHANGE_LOG_UPDATES_ENABLED) {
+  if (!LoggedInUser || !CHANGE_LOG_UPDATES_ENABLED) {
     return null;
   }
 
@@ -70,6 +72,7 @@ ChangelogTrigger.propTypes = {
   setChangelogViewDate: PropTypes.func,
   client: PropTypes.object.isRequired,
   showDropdown: PropTypes.bool,
+  LoggedInUser: PropTypes.object,
 };
 
 const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
