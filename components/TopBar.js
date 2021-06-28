@@ -18,7 +18,6 @@ import SearchIcon from './SearchIcon';
 import StyledLink from './StyledLink';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
-import { withUser } from './UserProvider';
 
 const Logo = styled.img.attrs({
   src: '/static/images/opencollective-icon.svg',
@@ -57,8 +56,6 @@ class TopBar extends React.Component {
   static propTypes = {
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
-    LoggedInUser: PropTypes.object,
   };
 
   static defaultProps = {
@@ -97,7 +94,7 @@ class TopBar extends React.Component {
   };
 
   render() {
-    const { showSearch, menuItems, loadingLoggedInUser, LoggedInUser } = this.props;
+    const { showSearch, menuItems } = this.props;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
@@ -181,11 +178,9 @@ class TopBar extends React.Component {
             </NavList>
           </Hide>
         </Flex>
-        {!loadingLoggedInUser && (
-          <Container mr={3}>
-            <ChangelogTrigger LoggedInUser={LoggedInUser} />
-          </Container>
-        )}
+        <Container mr={3}>
+          <ChangelogTrigger />
+        </Container>
         <TopBarProfileMenu />
         <Hide sm md lg>
           <TopBarMobileMenu
@@ -204,4 +199,4 @@ class TopBar extends React.Component {
   }
 }
 
-export default withUser(TopBar);
+export default TopBar;
