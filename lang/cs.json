@@ -504,6 +504,7 @@
   "contribution.quantity": "Množství",
   "contribution.total": "CELKEM",
   "contribution.your": "Your contribution",
+  "ContributionFlow.backToCollectivePage": "Back to Collective Page",
   "ContributionFlow.CollectiveProfile": "Collective profile",
   "ContributionFlow.Contribution": "Contribution",
   "ContributionFlow.CreateOrganizationLabel": "Contribute as an organization",
