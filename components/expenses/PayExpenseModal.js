@@ -38,14 +38,17 @@ const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
   } else if (!isAuto) {
     return { forceManual: true, action: 'PAY' };
   } else {
+    const isPaypalPayouts =
+      hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
+      payoutMethodType === PayoutMethodType.PAYPAL &&
+      host.supportedPayoutMethods?.includes(PayoutMethodType.PAYPAL);
+    const isWiseOTT =
+      payoutMethodType === PayoutMethodType.BANK_ACCOUNT &&
+      host.supportedPayoutMethods?.includes(PayoutMethodType.BANK_ACCOUNT) &&
+      hasFeature(host, FEATURES.TRANSFERWISE_OTT);
     return {
       forceManual: false,
-      action:
-        hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
-        payoutMethodType === PayoutMethodType.PAYPAL &&
-        host.supportedPayoutMethods?.includes('PAYPAL')
-          ? 'SCHEDULE_FOR_PAYMENT'
-          : 'PAY',
+      action: isPaypalPayouts || isWiseOTT ? 'SCHEDULE_FOR_PAYMENT' : 'PAY',
     };
   }
 };
@@ -116,6 +119,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
+  const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
 
   return (
     <StyledModal
@@ -301,6 +305,12 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                   <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
                 </Span>
               </React.Fragment>
+            ) : isScheduling ? (
+              <FormattedMessage
+                id="expense.schedule.btn"
+                defaultMessage="Schedule to Pay with {paymentMethod}"
+                values={{ paymentMethod: payoutMethodLabel }}
+              />
             ) : (
               <FormattedMessage
                 id="expense.pay.btn"

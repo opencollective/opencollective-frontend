@@ -1152,7 +1152,6 @@ type CollectiveFeatures {
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
-  ALIPAY: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -3017,6 +3016,18 @@ specified in RFC822: https://www.w3.org/Protocols/rfc822/.
 """
 scalar EmailAddress
 
+type EmojiReactionResponse {
+  """
+  Reference to the update corresponding to the emojis
+  """
+  update: Update
+
+  """
+  Reference to the comment corresponding to the emojis
+  """
+  comment: Comment
+}
+
 """
 This represents an Event account
 """
@@ -3769,6 +3780,11 @@ type ExpensePermissions {
   Whether the current user can comment and see comments for this expense
   """
   canComment: Boolean!
+
+  """
+  Whether the current user can unschedule this expense payment
+  """
+  canUnschedulePayment: Boolean!
 }
 
 """
@@ -3799,6 +3815,11 @@ enum ExpenseProcessAction {
   To schedule the expense for payment
   """
   SCHEDULE_FOR_PAYMENT
+
+  """
+  To uschedule the expense payment
+  """
+  UNSCHEDULE_PAYMENT
 
   """
   To trigger the payment
@@ -5092,7 +5113,6 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
-  hasSeenLatestChangelogEntry: Boolean!
 }
 
 input IndividualCreateInput {
@@ -5359,6 +5379,10 @@ type Mutation {
   editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreateInput!): Comment
+
+  """
+  @deprecated: Please use the new emojiReactionMutations
+  """
   addCommentReaction(
     """
     The emoji associated with the reaction
@@ -5370,6 +5394,10 @@ type Mutation {
     """
     comment: CommentReferenceInput!
   ): Comment!
+
+  """
+  @deprecated: Please use the new emojiReactionMutations
+  """
   removeCommentReaction(comment: CommentReferenceInput!, emoji: String!): Comment!
 
   """
@@ -5552,6 +5580,27 @@ type Mutation {
     """
     draftKey: String
   ): Expense!
+  addEmojiReaction(
+    """
+    The emoji associated with the reaction
+    """
+    emoji: String!
+
+    """
+    A unique identifier for the comment id associated with this reaction
+    """
+    comment: CommentReferenceInput
+
+    """
+    A unique identifier for the update id associated with this reaction
+    """
+    update: UpdateReferenceInput
+  ): EmojiReactionResponse!
+  removeEmojiReaction(
+    comment: CommentReferenceInput
+    update: UpdateReferenceInput
+    emoji: String!
+  ): EmojiReactionResponse!
 
   """
   Apply to an host with a collective
@@ -5854,7 +5903,7 @@ type Mutation {
     Reference of the transaction to refund
     """
     transaction: TransactionReferenceInput!
-  ): Transaction
+  ): Transaction!
 
   """
   Rejects transaction, removes member from Collective, and sends a message to the contributor
@@ -5895,11 +5944,6 @@ type Mutation {
   publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
-
-  """
-  Update the time which the user viewed the changelog updates
-  """
-  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
 
   """
   Assign new Virtual Card information to existing hosted collective
@@ -6610,7 +6654,6 @@ input PaymentMethodInput {
 }
 
 enum PaymentMethodLegacyType {
-  ALIPAY
   CREDIT_CARD
   GIFT_CARD
   PREPAID_BUDGET
@@ -6635,7 +6678,6 @@ enum PaymentMethodService {
 }
 
 enum PaymentMethodType {
-  alipay
   creditcard
   prepaid
   payment
@@ -7650,7 +7692,6 @@ enum TransactionKind {
   EXPENSE
   HOST_FEE
   HOST_FEE_SHARE
-  HOST_FEE_SHARE_DEBT
   PAYMENT_PROCESSOR_FEE
   PLATFORM_FEE
   PLATFORM_TIP
@@ -7802,6 +7843,16 @@ type Update {
   account: Account
 
   """
+  Returns a map of reactions counts for this update
+  """
+  reactions: JSON
+
+  """
+  Returns the list of reactions added to this update by logged in user
+  """
+  userReactions: [String]
+
+  """
   List the comments for this update. Not backed by a loader, don't use this in lists.
   """
   comments(limit: Int, offset: Int): CommentCollection
@@ -7862,7 +7913,7 @@ input UpdateCreateInput {
   isPrivate: Boolean
   isChangelog: Boolean
   makePublicOn: IsoDateString
-  html: String!
+  html: String
   fromAccount: AccountReferenceInput
   account: AccountReferenceInput!
 }

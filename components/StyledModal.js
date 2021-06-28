@@ -21,7 +21,7 @@ const Wrapper = styled(Flex)`
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 3000;
+  z-index: ${props => props.zindex || 3000};
 
   justify-content: center;
   align-items: center;
@@ -209,7 +209,7 @@ const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }
     return createPortal(
       <React.Fragment>
         <GlobalModalStyle />
-        <Wrapper>
+        <Wrapper zindex={props.zindex}>
           <TrapContainer focusTrapOptions={{ clickOutsideDeactivates: true }}>
             <Modal {...props}>
               {React.Children.map(children, child => {
@@ -255,6 +255,8 @@ StyledModal.propTypes = {
   minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** height of the modal component */
   minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** zindex of the modal component */
+  zindex: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
   /** whether to render the modal at the root with a portal */

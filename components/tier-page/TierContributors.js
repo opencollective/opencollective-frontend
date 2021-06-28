@@ -61,7 +61,7 @@ export default class TierContributors extends React.Component {
           <H2 mb={3} px={3}>
             <FormattedMessage
               id="TierPage.ContributorsCountGoal"
-              defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} one {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal"
+              defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal"
               values={{
                 orgCount: contributorsStats.organizations,
                 userCount: contributorsStats.users,

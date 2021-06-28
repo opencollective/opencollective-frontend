@@ -26,10 +26,12 @@ import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
+import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
+import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
 const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   query HostDashboardExpenses(
@@ -150,21 +152,22 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   const query = router.query;
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
-  const variables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
-  const context = API_V2_CONTEXT;
-  const gqlQuery = useQuery(hostDashboardExpensesQuery, { variables, context });
-  const paginatedExpenses = useLazyGraphQLPaginatedResults(gqlQuery, 'expenses');
-  const { data, error, loading } = gqlQuery;
-  const getQueryParams = newParams => {
-    return omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
-  };
-
+  const expenses = useQuery(hostDashboardExpensesQuery, {
+    variables: { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) },
+    context: API_V2_CONTEXT,
+  });
+  const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
       setPaypalPreApprovalError(query.paypalApprovalError);
       router.replace(`/${hostSlug}/dashboard/expenses`, omit(query, 'paypalApprovalError'), { shallow: true });
     }
   }, [query.paypalApprovalError]);
+
+  const { data, error, loading } = expenses;
+  const getQueryParams = newParams => {
+    return omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+  };
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
@@ -220,6 +223,31 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <HostInfoCard host={data.host} />
         )}
       </Box>
+      {!expenses.loading && data?.host && (
+        <ScheduledExpensesBanner
+          host={data.host}
+          onSubmit={() => {
+            expenses.refetch();
+          }}
+          secondButton={
+            !(query.status === 'SCHEDULED_FOR_PAYMENT' && query.payout === 'BANK_ACCOUNT') ? (
+              <StyledButton
+                buttonSize="tiny"
+                buttonStyle="successSecondary"
+                mr={1}
+                onClick={() => {
+                  router.push({
+                    pathname: `/${hostSlug}/dashboard/expenses`,
+                    query: getQueryParams({ status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', offset: null }),
+                  });
+                }}
+              >
+                <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
+              </StyledButton>
+            ) : null
+          }
+        />
+      )}
       <Box mb={34}>
         {data?.host ? (
           <ExpensesFilters
@@ -264,7 +292,9 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
             view="admin"
-            onProcess={(expense, cache) => hasFilters && onExpenseUpdate(expense, cache, query.status)}
+            onProcess={(expense, cache) => {
+              hasFilters && onExpenseUpdate(expense, cache, query.status);
+            }}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

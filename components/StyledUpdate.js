@@ -11,6 +11,8 @@ import { borders } from 'styled-system';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose, formatDate } from '../lib/utils';
 
+import EmojiReactionPicker from './conversations/EmojiReactionPicker';
+import CommentReactions from './conversations/EmojiReactions';
 import Avatar from './Avatar';
 import Container from './Container';
 import EditUpdateForm from './EditUpdateForm';
@@ -70,6 +72,8 @@ class StyledUpdate extends Component {
     deleteUpdate: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
     router: PropTypes.object,
+    /** Reactions associated with this update **/
+    reactions: PropTypes.object,
   };
 
   constructor(props) {
@@ -241,13 +245,21 @@ class StyledUpdate extends Component {
   }
 
   renderFullContent() {
-    const { update, collective, isReloadingData } = this.props;
+    const { update, collective, isReloadingData, reactions, LoggedInUser } = this.props;
 
     return (
       <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]} maxWidth={676}>
         <StyledHr mt={3} mb={4} borderColor="black.100" />
         {update.html ? (
-          <HTMLContent content={update.html} />
+          <React.Fragment>
+            <HTMLContent content={update.html} />
+            {update.publishedAt && (
+              <Flex mt={3} flexWrap="wrap" data-cy="update-reactions">
+                {reactions && <CommentReactions reactions={reactions} />}
+                {LoggedInUser && <EmojiReactionPicker update={update} />}
+              </Flex>
+            )}
+          </React.Fragment>
         ) : !update.userCanSeeUpdate && !isReloadingData ? (
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
@@ -312,7 +324,7 @@ class StyledUpdate extends Component {
           {mode === 'edit' && this.renderEditUpdateForm()}
         </UpdateWrapper>
         {update.publishedAt && mode === 'details' && (
-          <Flex my={4} justifyContent={['center', 'flex-start']}>
+          <Flex my={3} justifyContent={['center', 'flex-start']}>
             <Link href={`/${collective.slug}/updates`}>
               <StyledButton ml={[0, 5]}>{intl.formatMessage(this.messages['viewLatestUpdates'])}</StyledButton>
             </Link>

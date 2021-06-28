@@ -17,7 +17,7 @@ const EmojiLabel = styled(Span)`
   margin: 4px 8px 4px 0;
 `;
 
-const CommentReactions = ({ reactions }) => {
+const EmojiReactions = ({ reactions }) => {
   return Object.keys(reactions)
     .sort()
     .map(emoji => {
@@ -29,9 +29,9 @@ const CommentReactions = ({ reactions }) => {
     });
 };
 
-CommentReactions.propTypes = {
+EmojiReactions.propTypes = {
   /** Reactions associated with this comment */
   reactions: PropTypes.object,
 };
 
-export default React.memo(CommentReactions);
+export default React.memo(EmojiReactions);

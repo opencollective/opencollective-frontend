@@ -212,6 +212,9 @@ export const webpackCollective = {
     events: 0,
     totalAmountSpent: 46426248,
     totalAmountReceived: 55220436,
+    balanceWithBlockedFunds: {
+      valueInCents: 10000,
+    },
     __typename: 'CollectiveStatsType',
   },
   tiers: [

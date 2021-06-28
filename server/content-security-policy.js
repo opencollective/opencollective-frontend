@@ -36,6 +36,8 @@ const COMMON_DIRECTIVES = {
     'sentry.io',
     '*.sentry.io',
     'country-service.shopifycloud.com',
+    'https://transferwise.com',
+    'https://sandbox.transferwise.tech',
   ],
   scriptSrc: [
     SELF,
@@ -54,6 +56,8 @@ const COMMON_DIRECTIVES = {
     'js.stripe.com',
     '*.paypal.com',
     '*.openstreetmap.org',
+    'https://transferwise.com',
+    'https://sandbox.transferwise.tech',
   ],
   objectSrc: ['opencollective.com'],
 };
