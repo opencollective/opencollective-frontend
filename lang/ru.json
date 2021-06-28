@@ -504,6 +504,7 @@
   "contribution.quantity": "Количество",
   "contribution.total": "ИТОГО",
   "contribution.your": "Ваш вклад",
+  "ContributionFlow.backToCollectivePage": "Back to Collective Page",
   "ContributionFlow.CollectiveProfile": "Профиль коллектива",
   "ContributionFlow.Contribution": "Вклад",
   "ContributionFlow.CreateOrganizationLabel": "Внести вклад как организация",
