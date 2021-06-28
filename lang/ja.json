@@ -504,6 +504,7 @@
   "contribution.quantity": "数量",
   "contribution.total": "合計",
   "contribution.your": "あなたのコントリビュート",
+  "ContributionFlow.backToCollectivePage": "Back to Collective Page",
   "ContributionFlow.CollectiveProfile": "Collective profile",
   "ContributionFlow.Contribution": "コントリビューション",
   "ContributionFlow.CreateOrganizationLabel": "組織として貢献する",

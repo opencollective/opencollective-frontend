@@ -6,7 +6,7 @@ import { CardElement } from '@stripe/react-stripe-js';
 import { find, get, intersection, isEmpty, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
@@ -33,6 +33,7 @@ import Steps from '../Steps';
 import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
+import CollectiveTitleContainer from './CollectiveTitleContainer';
 import { STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
@@ -621,7 +622,7 @@ class ContributionFlow extends React.Component {
           >
             {!this.props.hideHeader && (
               <Box px={[2, 3]} mb={4}>
-                <ContributionFlowHeader collective={collective} />
+                <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
               </Box>
             )}
             <StepsProgressBox mb={3} width={[1.0, 0.8]}>
@@ -699,7 +700,16 @@ class ContributionFlow extends React.Component {
                       currency={currency}
                     />
                   </Box>
+                  <Box textAlign="center" mt={5}>
+                    <CollectiveTitleContainer useLink={!isEmbed} collective={collective}>
+                      <FormattedMessage
+                        id="ContributionFlow.backToCollectivePage"
+                        defaultMessage="Back to Collective Page"
+                      />
+                    </CollectiveTitleContainer>
+                  </Box>
                 </Box>
+
                 <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
                   <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
                     <SafeTransactionMessage />
