@@ -10,7 +10,7 @@ import { P } from '../Text';
 
 const ChangeLogNotificationDropdownArrow = styled(DropdownArrow)`
   display: block;
-  right: 105px;
+  right: 18px;
   margin-top: 3px;
   &::before {
     border-color: transparent transparent #ffffc2 transparent;
@@ -19,7 +19,7 @@ const ChangeLogNotificationDropdownArrow = styled(DropdownArrow)`
 
 const ChangeLogNotificationDropdownContent = styled(DropdownContent)`
   display: block;
-  right: 95px;
+  right: 13px;
   margin-top: 10px;
   background: #ffffc2;
 `;

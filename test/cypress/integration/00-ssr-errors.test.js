@@ -33,3 +33,13 @@ describe('the NotFound page when logged out', () => {
     });
   });
 });
+
+describe('the NotFound page when logged in', () => {
+  before(() => {
+    cy.login({ redirect: notFoundURL });
+  });
+
+  it('has the user properly logged in', () => {
+    cy.getByDataCy('topbar-login-username').should('contain', 'Test User Admin');
+  });
+});

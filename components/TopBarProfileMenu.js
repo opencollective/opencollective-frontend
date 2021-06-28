@@ -192,6 +192,21 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <Flex alignItems="center" onClick={this.toggleProfileMenu} data-cy="user-menu-trigger">
+        <Hide xs sm>
+          <P
+            color="black.700"
+            display="inline-block"
+            fontSize="13px"
+            lineHeight="16px"
+            fontWeight="500"
+            letterSpacing="1px"
+            mx={2}
+            cursor="pointer"
+            data-cy="topbar-login-username"
+          >
+            {LoggedInUser.collective.name || LoggedInUser.username}
+          </P>
+        </Hide>
         <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
         <Hide xs>
           <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
