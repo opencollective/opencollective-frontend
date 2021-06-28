@@ -101,6 +101,7 @@ class UpdatePage extends React.Component {
             editable={Boolean(LoggedInUser?.canEditCollective(account))}
             LoggedInUser={LoggedInUser}
             compact={false}
+            reactions={update.reactions}
             isReloadingData={this.state.isReloadingData}
           />
           {update.userCanSeeUpdate && (
@@ -162,6 +163,8 @@ const updateQuery = gqlV2/* GraphQL */ `
       makePublicOn
       userCanSeeUpdate
       userCanPublishUpdate
+      reactions
+      userReactions
       account {
         id
         slug

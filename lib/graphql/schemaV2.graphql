@@ -2734,6 +2734,7 @@ type Credit implements Transaction {
   legacyId: Int!
   uuid: String
   type: TransactionType
+  kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
@@ -2976,6 +2977,7 @@ type Debit implements Transaction {
   legacyId: Int!
   uuid: String
   type: TransactionType
+  kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
@@ -3013,6 +3015,18 @@ A field whose value conforms to the standard internet email address format as
 specified in RFC822: https://www.w3.org/Protocols/rfc822/.
 """
 scalar EmailAddress
+
+type EmojiReactionResponse {
+  """
+  Reference to the update corresponding to the emojis
+  """
+  update: Update
+
+  """
+  Reference to the comment corresponding to the emojis
+  """
+  comment: Comment
+}
 
 """
 This represents an Event account
@@ -4752,6 +4766,11 @@ type HostMetrics {
   pendingHostFeeShare: Amount
 
   """
+  Amount in host fee shared not requiring settlement
+  """
+  settledHostFeeShare: Amount
+
+  """
   Total amount managed on behalf of hosted collectives
   """
   totalMoneyManaged: Amount
@@ -5094,7 +5113,6 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
-  hasSeenLatestChangelogEntry: Boolean
 }
 
 input IndividualCreateInput {
@@ -5361,6 +5379,10 @@ type Mutation {
   editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreateInput!): Comment
+
+  """
+  @deprecated: Please use the new emojiReactionMutations
+  """
   addCommentReaction(
     """
     The emoji associated with the reaction
@@ -5372,6 +5394,10 @@ type Mutation {
     """
     comment: CommentReferenceInput!
   ): Comment!
+
+  """
+  @deprecated: Please use the new emojiReactionMutations
+  """
   removeCommentReaction(comment: CommentReferenceInput!, emoji: String!): Comment!
 
   """
@@ -5554,6 +5580,27 @@ type Mutation {
     """
     draftKey: String
   ): Expense!
+  addEmojiReaction(
+    """
+    The emoji associated with the reaction
+    """
+    emoji: String!
+
+    """
+    A unique identifier for the comment id associated with this reaction
+    """
+    comment: CommentReferenceInput
+
+    """
+    A unique identifier for the update id associated with this reaction
+    """
+    update: UpdateReferenceInput
+  ): EmojiReactionResponse!
+  removeEmojiReaction(
+    comment: CommentReferenceInput
+    update: UpdateReferenceInput
+    emoji: String!
+  ): EmojiReactionResponse!
 
   """
   Apply to an host with a collective
@@ -5897,11 +5944,6 @@ type Mutation {
   publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
-
-  """
-  Update the time which the user viewed the changelog updates
-  """
-  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
 
   """
   Assign new Virtual Card information to existing hosted collective
@@ -7609,6 +7651,7 @@ interface Transaction {
   legacyId: Int!
   uuid: String
   type: TransactionType
+  kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
@@ -7652,6 +7695,7 @@ enum TransactionKind {
   PAYMENT_PROCESSOR_FEE
   PLATFORM_FEE
   PLATFORM_TIP
+  PLATFORM_TIP_DEBT
   PREPAID_PAYMENT_METHOD
 }
 
@@ -7797,6 +7841,16 @@ type Update {
   tags: [String]
   fromAccount: Account
   account: Account
+
+  """
+  Returns a map of reactions counts for this update
+  """
+  reactions: JSON
+
+  """
+  Returns the list of reactions added to this update by logged in user
+  """
+  userReactions: [String]
 
   """
   List the comments for this update. Not backed by a loader, don't use this in lists.

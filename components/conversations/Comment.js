@@ -14,8 +14,8 @@ import RichTextEditor from '../RichTextEditor';
 import { P } from '../Text';
 
 import CommentActions from './CommentActions';
-import CommentReactionPicker from './CommentReactionPicker';
-import CommentReactions from './CommentReactions';
+import EmojiReactionPicker from './EmojiReactionPicker';
+import CommentReactions from './EmojiReactions';
 import { commentFieldsFragment } from './graphql';
 
 const editCommentMutation = gqlV2/* GraphQL */ `
@@ -115,7 +115,7 @@ const Comment = ({
         {(reactions || hasReactionsPicker) && (
           <Flex mt={3} flexWrap="wrap" data-cy="comment-reactions">
             {reactions && <CommentReactions reactions={reactions} />}
-            {hasReactionsPicker && <CommentReactionPicker comment={comment} reactions={reactions} />}
+            {hasReactionsPicker && <EmojiReactionPicker comment={comment} reactions={reactions} />}
           </Flex>
         )}
       </Box>

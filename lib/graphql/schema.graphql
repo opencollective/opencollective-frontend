@@ -3929,7 +3929,6 @@ type UserDetails {
   Returns true if user account is limited (user can't use any feature)
   """
   isLimited: Boolean
-  hasSeenLatestChangelogEntry: Boolean
 }
 
 """
