@@ -30,7 +30,7 @@ const FlameIcon = styled(Flex)`
 
 const ChangelogTrigger = props => {
   const { setShowNewsAndUpdates, setChangelogViewDate, LoggedInUser } = props;
-  const [hasSeenNewUpdates, setHasSeenNewUpdates] = useState(LoggedInUser.hasSeenLatestChangelogEntry);
+  const [hasSeenNewUpdates, setHasSeenNewUpdates] = useState(LoggedInUser?.hasSeenLatestChangelogEntry);
 
   const handleShowNewUpdates = () => {
     setShowNewsAndUpdates(true);
