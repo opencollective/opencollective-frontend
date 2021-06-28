@@ -1152,6 +1152,7 @@ type CollectiveFeatures {
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
+  ALIPAY: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -3817,7 +3818,7 @@ enum ExpenseProcessAction {
   SCHEDULE_FOR_PAYMENT
 
   """
-  To uschedule the expense payment
+  To unschedule the expense payment
   """
   UNSCHEDULE_PAYMENT
 
@@ -5113,6 +5114,7 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
+  hasSeenLatestChangelogEntry: Boolean!
 }
 
 input IndividualCreateInput {
@@ -5903,7 +5905,7 @@ type Mutation {
     Reference of the transaction to refund
     """
     transaction: TransactionReferenceInput!
-  ): Transaction!
+  ): Transaction
 
   """
   Rejects transaction, removes member from Collective, and sends a message to the contributor
@@ -5944,6 +5946,11 @@ type Mutation {
   publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
+
+  """
+  Update the time which the user viewed the changelog updates
+  """
+  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
 
   """
   Assign new Virtual Card information to existing hosted collective
@@ -6654,6 +6661,7 @@ input PaymentMethodInput {
 }
 
 enum PaymentMethodLegacyType {
+  ALIPAY
   CREDIT_CARD
   GIFT_CARD
   PREPAID_BUDGET
@@ -6678,6 +6686,7 @@ enum PaymentMethodService {
 }
 
 enum PaymentMethodType {
+  alipay
   creditcard
   prepaid
   payment
@@ -7692,6 +7701,7 @@ enum TransactionKind {
   EXPENSE
   HOST_FEE
   HOST_FEE_SHARE
+  HOST_FEE_SHARE_DEBT
   PAYMENT_PROCESSOR_FEE
   PLATFORM_FEE
   PLATFORM_TIP
@@ -7913,7 +7923,7 @@ input UpdateCreateInput {
   isPrivate: Boolean
   isChangelog: Boolean
   makePublicOn: IsoDateString
-  html: String
+  html: String!
   fromAccount: AccountReferenceInput
   account: AccountReferenceInput!
 }
