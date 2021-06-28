@@ -1152,6 +1152,7 @@ type CollectiveFeatures {
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
+  ALIPAY: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -2734,6 +2735,7 @@ type Credit implements Transaction {
   legacyId: Int!
   uuid: String
   type: TransactionType
+  kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
@@ -2976,6 +2978,7 @@ type Debit implements Transaction {
   legacyId: Int!
   uuid: String
   type: TransactionType
+  kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
@@ -4742,6 +4745,11 @@ type HostMetrics {
   pendingHostFeeShare: Amount
 
   """
+  Amount in host fee shared not requiring settlement
+  """
+  settledHostFeeShare: Amount
+
+  """
   Total amount managed on behalf of hosted collectives
   """
   totalMoneyManaged: Amount
@@ -5084,7 +5092,7 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
-  hasSeenLatestChangelogEntry: Boolean
+  hasSeenLatestChangelogEntry: Boolean!
 }
 
 input IndividualCreateInput {
@@ -5846,7 +5854,7 @@ type Mutation {
     Reference of the transaction to refund
     """
     transaction: TransactionReferenceInput!
-  ): Transaction!
+  ): Transaction
 
   """
   Rejects transaction, removes member from Collective, and sends a message to the contributor
@@ -6602,6 +6610,7 @@ input PaymentMethodInput {
 }
 
 enum PaymentMethodLegacyType {
+  ALIPAY
   CREDIT_CARD
   GIFT_CARD
   PREPAID_BUDGET
@@ -6626,6 +6635,7 @@ enum PaymentMethodService {
 }
 
 enum PaymentMethodType {
+  alipay
   creditcard
   prepaid
   payment
@@ -7599,6 +7609,7 @@ interface Transaction {
   legacyId: Int!
   uuid: String
   type: TransactionType
+  kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
@@ -7639,9 +7650,11 @@ enum TransactionKind {
   EXPENSE
   HOST_FEE
   HOST_FEE_SHARE
+  HOST_FEE_SHARE_DEBT
   PAYMENT_PROCESSOR_FEE
   PLATFORM_FEE
   PLATFORM_TIP
+  PLATFORM_TIP_DEBT
   PREPAID_PAYMENT_METHOD
 }
 
@@ -7849,7 +7862,7 @@ input UpdateCreateInput {
   isPrivate: Boolean
   isChangelog: Boolean
   makePublicOn: IsoDateString
-  html: String
+  html: String!
   fromAccount: AccountReferenceInput
   account: AccountReferenceInput!
 }
