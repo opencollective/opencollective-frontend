@@ -178,6 +178,9 @@ class TopBar extends React.Component {
             </NavList>
           </Hide>
         </Flex>
+        <Container mr={3}>
+          <ChangelogTrigger />
+        </Container>
         <TopBarProfileMenu />
         <Hide sm md lg>
           <TopBarMobileMenu
@@ -191,7 +194,6 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        <ChangelogTrigger />
       </Flex>
     );
   }

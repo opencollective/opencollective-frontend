@@ -40,6 +40,7 @@ describe('the NotFound page when logged in', () => {
   });
 
   it('has the user properly logged in', () => {
-    cy.getByDataCy('topbar-login-username').should('contain', 'Test User Admin');
+    cy.getByDataCy('user-menu-trigger').click();
+    cy.getByDataCy('user-menu').should('contain', 'Test User Admin');
   });
 });

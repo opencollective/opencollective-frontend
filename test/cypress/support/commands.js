@@ -307,7 +307,8 @@ Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => 
  */
 Cypress.Commands.add('assertLoggedIn', params => {
   cy.log('Ensure user is logged in');
-  cy.getByDataCy('topbar-login-username', params);
+  cy.getByDataCy('user-menu-trigger').click();
+  cy.getByDataCy('user-menu').should('contain', params);
 });
 
 /**
