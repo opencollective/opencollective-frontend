@@ -47,12 +47,6 @@ const ChangelogTrigger = props => {
     setShowNewsAndUpdates(true);
     setChangelogViewDate({
       variables: { changelogViewDate: new Date() },
-      optimisticResponse: {
-        setChangelogViewDate: {
-          __typename: 'Individual',
-          hasSeenLatestChangelogEntry: true,
-        },
-      },
       update: store => {
         const data = cloneDeep(store.readQuery({ query: loggedInUserQuery }));
         data.LoggedInUser.hasSeenLatestChangelogEntry = true;
