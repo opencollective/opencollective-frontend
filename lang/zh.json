@@ -201,6 +201,8 @@
   "button.submit": "提交",
   "ByUser": "由 {userName}",
   "CancelEdit": "取消编辑",
+  "ChangelogNotification.firstLine": "We have new stuff for you!",
+  "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "checkingBrowser": "您的浏览器正在验证中。如果此消息没有消失，请尝试移动您的鼠标或触摸您的屏幕以移动设备。",
   "clickHere": "单击此处",
   "Clipboard.Copied": "已复制！",
