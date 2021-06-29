@@ -201,6 +201,8 @@
   "button.submit": "Enviar",
   "ByUser": "Por {userName}",
   "CancelEdit": "Cancelar edición",
+  "ChangelogNotification.firstLine": "We have new stuff for you!",
+  "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "checkingBrowser": "Tu navegador está siendo verificado. Si este mensaje no desaparece, intenta mover el ratón o tocar la pantalla si estas en un móvil.",
   "clickHere": "Haga clic aquí",
   "Clipboard.Copied": "¡Copiado!",

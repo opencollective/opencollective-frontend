@@ -201,6 +201,8 @@
   "button.submit": "Absenden",
   "ByUser": "Von {userName}",
   "CancelEdit": "Bearbeitung abbrechen",
+  "ChangelogNotification.firstLine": "We have new stuff for you!",
+  "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "checkingBrowser": "Ihr Browser wird überprüft. Wenn diese Nachricht nicht verschwindet, versuchen Sie die Maus zu bewegen oder den Bildschirm auf dem Handy zu berühren.",
   "clickHere": "Klick hier",
   "Clipboard.Copied": "Kopiert!",

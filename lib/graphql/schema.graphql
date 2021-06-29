@@ -362,6 +362,7 @@ type CollectiveFeatures {
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
+  ALIPAY: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -3929,6 +3930,7 @@ type UserDetails {
   Returns true if user account is limited (user can't use any feature)
   """
   isLimited: Boolean
+  hasSeenLatestChangelogEntry: Boolean!
 }
 
 """

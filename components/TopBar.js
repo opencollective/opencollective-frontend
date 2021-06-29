@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { rotateMixin } from '../lib/constants/animations';
 import theme from '../lib/theme';
 
+import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
@@ -17,7 +18,6 @@ import SearchIcon from './SearchIcon';
 import StyledLink from './StyledLink';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
-import { withUser } from './UserProvider';
 
 const Logo = styled.img.attrs({
   src: '/static/images/opencollective-icon.svg',
@@ -54,14 +54,11 @@ const NavLink = styled(StyledLink)`
 
 class TopBar extends React.Component {
   static propTypes = {
-    className: PropTypes.string,
-    loadingLoggedInUser: PropTypes.bool,
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
   };
 
   static defaultProps = {
-    className: '',
     showSearch: true,
     menuItems: {
       discover: true,
@@ -194,9 +191,10 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
+        <ChangelogTrigger />
       </Flex>
     );
   }
 }
 
-export default withUser(TopBar);
+export default TopBar;

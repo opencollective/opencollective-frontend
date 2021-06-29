@@ -201,6 +201,8 @@
   "button.submit": "Envia",
   "ByUser": "By {userName}",
   "CancelEdit": "Cancel·la la modificació",
+  "ChangelogNotification.firstLine": "We have new stuff for you!",
+  "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "checkingBrowser": "Your browser is being verified. If this message doesn't disappear, try to move your mouse or to touch your screen for mobile.",
   "clickHere": "Clica aquí",
   "Clipboard.Copied": "S'ha copiat!",

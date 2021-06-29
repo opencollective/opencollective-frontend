@@ -201,6 +201,8 @@
   "button.submit": "제출",
   "ByUser": "By {userName}",
   "CancelEdit": "변경 취소",
+  "ChangelogNotification.firstLine": "We have new stuff for you!",
+  "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "checkingBrowser": "Your browser is being verified. If this message doesn't disappear, try to move your mouse or to touch your screen for mobile.",
   "clickHere": "더 알아보기",
   "Clipboard.Copied": "복사되었습니다!",
