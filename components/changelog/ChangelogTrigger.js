@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
 import { cloneDeep } from 'lodash';
@@ -31,14 +31,20 @@ const FlameIcon = styled(Flex)`
 
 const ChangelogTrigger = props => {
   const { setShowNewsAndUpdates, setChangelogViewDate } = props;
-  const { LoggedInUser } = useUser();
-  const LoggedInUserFromCache = props.client.readQuery({ query: loggedInUserQuery })?.LoggedInUser || LoggedInUser;
-  const hasSeenNewUpdates = LoggedInUserFromCache?.hasSeenLatestChangelogEntry;
+  const { data } = useQuery(loggedInUserQuery, { fetchPolicy: 'cache-only' });
+  const LoggedInUser = data?.LoggedInUser;
+  const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
 
   const handleShowNewUpdates = () => {
     setShowNewsAndUpdates(true);
     setChangelogViewDate({
       variables: { changelogViewDate: new Date() },
+      optimisticResponse: {
+        setChangelogViewDate: {
+          hasSeenLatestChangelogEntry: true,
+          __typename: 'Individual',
+        },
+      },
       update: store => {
         const data = cloneDeep(store.readQuery({ query: loggedInUserQuery }));
         data.LoggedInUser.hasSeenLatestChangelogEntry = true;
@@ -47,7 +53,7 @@ const ChangelogTrigger = props => {
     });
   };
 
-  if (!LoggedInUserFromCache || !CHANGE_LOG_UPDATES_ENABLED) {
+  if (!LoggedInUser || !CHANGE_LOG_UPDATES_ENABLED) {
     return null;
   }
 
