@@ -12,21 +12,30 @@ import { parseToBoolean } from '../../lib/utils';
 import { Flex } from '../Grid';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Dropdown } from '../StyledDropdown';
+import StyledRoundButton from '../StyledRoundButton';
 import { useUser } from '../UserProvider';
 
 import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
 
 const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES_ENABLED);
 
-const FlameIcon = styled(Flex)`
+const FlameIcon = styled(StyledRoundButton)`
   border-radius: 50%;
-  background-color: ${props => themeGet(props.backgroundColor)};
-  background-image: ${props => `url(${props.url})`};
-  background-repeat: no-repeat;
-  background-position: center center;
   height: 30px;
   width: 30px;
   margin-left: 2px;
+
+  &,
+  &:active {
+    background: ${props => themeGet(props.backgroundColor)};
+    background-image: ${props => `url(${props.url})`};
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+
+  &:active {
+    background-color: transparent;
+  }
 `;
 
 const ChangelogTrigger = props => {
