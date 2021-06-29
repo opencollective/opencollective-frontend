@@ -93,9 +93,11 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <Span color="black.900" fontWeight="bold" truncateOverflow>
                 {payee.organization?.name || payee.name}
               </Span>
-              <Span color="black.900" fontSize="11px" truncateOverflow>
-                @{payee.organization?.slug || payee.slug}
-              </Span>
+              {payee.type !== 'VENDOR' && (
+                <Span color="black.900" fontSize="11px" truncateOverflow>
+                  @{payee.organization?.slug || payee.slug}
+                </Span>
+              )}
             </Flex>
           </Flex>
         </LinkCollective>
