@@ -194,7 +194,6 @@ class TopBar extends React.Component {
             </Flex>
           </Box>
         </Hide>
-        <ChangelogTrigger />
       </Flex>
     );
   }

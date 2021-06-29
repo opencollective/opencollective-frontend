@@ -305,10 +305,9 @@ Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => 
 /**
  * Check if user is logged in by searching for its username in navbar
  */
-Cypress.Commands.add('assertLoggedIn', params => {
+Cypress.Commands.add('assertLoggedIn', () => {
   cy.log('Ensure user is logged in');
-  cy.getByDataCy('user-menu-trigger').click();
-  cy.getByDataCy('user-menu').should('contain', params);
+  cy.getByDataCy('user-menu-trigger').should('be.visible');
 });
 
 /**
