@@ -9,6 +9,7 @@ describe('signin', () => {
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');
     cy.get('button[type=submit]').click();
     cy.getByDataCy('collective-title').should('be.visible').contains('Test User Admin', { timeout: 15000 });
+    cy.assertLoggedIn();
   });
 
   it('can signin with a valid token and is redirected', () => {
