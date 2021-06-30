@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
@@ -23,10 +24,11 @@ class UpdatesPage extends React.Component {
     action: PropTypes.string, // not clear whre it's coming from, not in the route
     data: PropTypes.shape({ account: PropTypes.object }).isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
+    router: PropTypes.object,
   };
 
   render() {
-    const { data, action, LoggedInUser } = this.props;
+    const { data, action, LoggedInUser, router } = this.props;
 
     if (!data.account) {
       return <ErrorPage data={data} />;
@@ -47,7 +49,13 @@ class UpdatesPage extends React.Component {
           />
 
           <div className="content">
-            <UpdatesWithData collective={collective} defaultAction={action} LoggedInUser={LoggedInUser} limit={10} />
+            <UpdatesWithData
+              collective={collective}
+              defaultAction={action}
+              LoggedInUser={LoggedInUser}
+              limit={10}
+              router={router}
+            />
           </div>
         </Body>
 
@@ -57,4 +65,4 @@ class UpdatesPage extends React.Component {
   }
 }
 
-export default withUser(addCollectiveNavbarData(UpdatesPage));
+export default withUser(withRouter(addCollectiveNavbarData(UpdatesPage)));

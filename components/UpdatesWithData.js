@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, omitBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
+import UpdateFilters from './updates/UpdateFilters';
 import Container from './Container';
 import Error from './Error';
 import { Box, Flex } from './Grid';
@@ -13,6 +14,8 @@ import Link from './Link';
 import StyledButton from './StyledButton';
 import { H1, P } from './Text';
 import Updates from './Updates';
+
+const ROUTE_PARAMS = ['collectiveSlug', 'offset'];
 
 class UpdatesWithData extends React.Component {
   static propTypes = {
@@ -23,6 +26,7 @@ class UpdatesWithData extends React.Component {
     LoggedInUser: PropTypes.object,
     data: PropTypes.object,
     fetchMore: PropTypes.func,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -41,8 +45,15 @@ class UpdatesWithData extends React.Component {
     }
   }
 
+  updateQuery = (router, newParams) => {
+    const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+    const pathname = router.asPath.split('?')[0];
+    return router.push({ pathname, query });
+  };
+
   render() {
-    const { data, LoggedInUser, collective, compact } = this.props;
+    const { data, LoggedInUser, collective, compact, router } = this.props;
+    const query = router.query;
 
     if (data.error) {
       return <Error message={data.error.message} />;
@@ -73,6 +84,15 @@ class UpdatesWithData extends React.Component {
             )}
           </Flex>
         )}
+        <UpdateFilters
+          values={query}
+          onChange={queryParams =>
+            this.updateQuery(router, {
+              ...queryParams,
+              offset: null,
+            })
+          }
+        />
         <Box mt={4} mb={5}>
           <Updates
             collective={collective}
@@ -88,10 +108,10 @@ class UpdatesWithData extends React.Component {
 }
 
 const updatesQuery = gqlV2/* GraphQL */ `
-  query Updates($collectiveSlug: String!, $limit: Int, $offset: Int) {
+  query Updates($collectiveSlug: String!, $limit: Int, $offset: Int, $searchTerm: String, $sortBy: String) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
-      updates(limit: $limit, offset: $offset) {
+      updates(limit: $limit, offset: $offset, searchTerm: $searchTerm, sortBy: $sortBy) {
         totalCount
         nodes {
           id
@@ -125,6 +145,8 @@ const getUpdatesVariables = props => {
     offset: 0,
     limit: props.limit || UPDATES_PER_PAGE * 2,
     includeHostedCollectives: props.includeHostedCollectives || false,
+    sortBy: props.router.query?.sortBy,
+    searchTerm: props.router.query?.searchTerm,
   };
 };
 
