@@ -709,7 +709,7 @@
   "editCollective.host.balance": "It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {your Account}}.",
   "editCollective.host.cancelApplicationBtn": "申請を取り下げる",
   "editCollective.host.change.balanceNotEmpty": "To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {your balance}}. You can do this by submitting expenses, making financial contributions, or sending the balance to your Fiscal Host using the {emptyBalanceLink} feature.",
-  "editCollective.host.change.removeFirst": "Without a Fiscal Host, {type, select, COLLECTIVE {your Collective} FUND {your Fund}} won't be able to accept financial contributions. You will be able to apply to another Fiscal Host.",
+  "editCollective.host.change.removeFirst": "Without a Fiscal Host, {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {}} won't be able to accept financial contributions. You will be able to apply to another Fiscal Host.",
   "editCollective.host.label": "Your Fiscal Host is {host}.",
   "editCollective.host.pending": "You applied to be hosted by {host} on {date}. Your application is being reviewed.",
   "editCollective.host.removeBtn": "ホストを削除",
