@@ -4,6 +4,7 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
@@ -93,9 +94,11 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <Span color="black.900" fontWeight="bold" truncateOverflow>
                 {payee.organization?.name || payee.name}
               </Span>
-              <Span color="black.900" fontSize="11px" truncateOverflow>
-                @{payee.organization?.slug || payee.slug}
-              </Span>
+              {payee.type !== CollectiveType.VENDOR && (
+                <Span color="black.900" fontSize="11px" truncateOverflow>
+                  @{payee.organization?.slug || payee.slug}
+                </Span>
+              )}
             </Flex>
           </Flex>
         </LinkCollective>
