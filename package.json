@@ -159,7 +159,7 @@
     "@cypress/code-coverage": "^3.9.7",
     "@storybook/addon-actions": "^6.1.15",
     "@storybook/addon-docs": "^6.1.15",
-    "@storybook/addon-essentials": "^6.1.15",
+    "@storybook/addon-essentials": "^6.3.1",
     "@storybook/addon-links": "^6.3.0",
     "@storybook/react": "^6.1.15",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.2",
