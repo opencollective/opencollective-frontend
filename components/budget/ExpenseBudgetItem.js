@@ -90,7 +90,7 @@ const ExpenseBudgetItem = ({
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
   const featuredProfile = isInverted ? collective : expense?.payee;
   const isAdminView = view === 'admin';
-  const isCharge = expense?.type === 'CHARGE';
+  const isCharge = expense?.type === expenseTypes.CHARGE;
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
   const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
 
