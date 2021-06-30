@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { omitBy } from 'lodash';
-import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -24,18 +22,7 @@ const SearchFormContainer = styled(Box)`
   min-width: 10rem;
 `;
 
-const ROUTE_PARAMS = ['collectiveSlug', 'offset'];
-
-const UpdateSearchFilter = () => {
-  const router = useRouter() || {};
-  const { collectiveSlug, searchTerm } = router.query;
-  const updateFilters = queryParams => {
-    return router.push({
-      pathname: `/${collectiveSlug}/updates`,
-      query: omitBy({ ...router.query, ...queryParams }, (value, key) => !value || ROUTE_PARAMS.includes(key)),
-    });
-  };
-
+const UpdateSearchFilter = ({ searchTerm, onChange }) => {
   return (
     <Container>
       <FilterLabel htmlFor="update-filter-search">
@@ -47,7 +34,7 @@ const UpdateSearchFilter = () => {
           placeholder="Search by user, title, html..."
           height="38px"
           defaultValue={searchTerm}
-          onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
+          onSubmit={onChange}
         />
       </SearchFormContainer>
     </Container>
@@ -55,8 +42,8 @@ const UpdateSearchFilter = () => {
 };
 
 UpdateSearchFilter.propTypes = {
-  slug: PropTypes.string,
-  query: PropTypes.object,
+  searchTerm: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 export default React.memo(UpdateSearchFilter);

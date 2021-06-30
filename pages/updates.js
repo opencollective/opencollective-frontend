@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
@@ -14,6 +15,8 @@ import Header from '../components/Header';
 import UpdatesWithData from '../components/UpdatesWithData';
 import { withUser } from '../components/UserProvider';
 
+const ROUTE_PARAMS = ['collectiveSlug', 'offset'];
+
 class UpdatesPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
     return { slug: collectiveSlug, action };
@@ -25,6 +28,12 @@ class UpdatesPage extends React.Component {
     data: PropTypes.shape({ account: PropTypes.object }).isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
     router: PropTypes.object,
+  };
+
+  updateQuery = (router, newParams) => {
+    const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+    const pathname = router.asPath.split('?')[0];
+    return router.push({ pathname, query });
   };
 
   render() {
@@ -54,7 +63,13 @@ class UpdatesPage extends React.Component {
               defaultAction={action}
               LoggedInUser={LoggedInUser}
               limit={10}
-              router={router}
+              query={router.query}
+              onChange={queryParams =>
+                this.updateQuery(router, {
+                  ...queryParams,
+                  offset: null,
+                })
+              }
             />
           </div>
         </Body>
