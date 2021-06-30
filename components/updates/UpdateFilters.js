@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import { Box, Flex } from '../Grid';
 
+import UpdateOrderByFilter from './filters/UpdateOrderByFilter';
 import UpdateSearchFilter from './filters/UpdateSearchFilter';
-import UpdateSortByFilter from './filters/UpdateSortByFilter';
 
 const UpdateFilters = ({ values, onChange }) => {
   const getFilterProps = name => ({
@@ -18,7 +18,7 @@ const UpdateFilters = ({ values, onChange }) => {
   return (
     <Flex flexWrap="wrap">
       <Box width={[1, 1, 2 / 12]} mr={['none', '15px']}>
-        <UpdateSortByFilter {...getFilterProps('sortBy')} />
+        <UpdateOrderByFilter {...getFilterProps('orderBy')} />
       </Box>
       <Box width={[1, 1, '82%']}>
         <UpdateSearchFilter {...getFilterProps('searchTerm')} />

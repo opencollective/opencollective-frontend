@@ -108,10 +108,16 @@ class UpdatesWithData extends React.Component {
 }
 
 const updatesQuery = gqlV2/* GraphQL */ `
-  query Updates($collectiveSlug: String!, $limit: Int, $offset: Int, $searchTerm: String, $sortBy: String) {
+  query Updates(
+    $collectiveSlug: String!
+    $limit: Int
+    $offset: Int
+    $searchTerm: String
+    $orderBy: ChronologicalOrderInput
+  ) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
-      updates(limit: $limit, offset: $offset, searchTerm: $searchTerm, sortBy: $sortBy) {
+      updates(limit: $limit, offset: $offset, searchTerm: $searchTerm, orderBy: $orderBy) {
         totalCount
         nodes {
           id
@@ -145,7 +151,7 @@ const getUpdatesVariables = props => {
     offset: 0,
     limit: props.limit || UPDATES_PER_PAGE * 2,
     includeHostedCollectives: props.includeHostedCollectives || false,
-    sortBy: props.router.query?.sortBy,
+    orderBy: { field: 'CREATED_AT', direction: props.router.query?.orderBy === 'oldest' ? 'ASC' : 'DESC' },
     searchTerm: props.router.query?.searchTerm,
   };
 };

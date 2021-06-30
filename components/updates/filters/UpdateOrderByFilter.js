@@ -27,7 +27,7 @@ const labels = defineMessages({
   },
 });
 
-const UpdateSortByFilter = ({ value, onChange, ...props }) => {
+const UpdateOrderByFilter = ({ value, onChange, ...props }) => {
   const intl = useIntl();
   const getOption = value => ({ label: intl.formatMessage(labels[value]), value });
   const options = [getOption('most-recent'), getOption('oldest')];
@@ -48,9 +48,9 @@ const UpdateSortByFilter = ({ value, onChange, ...props }) => {
   );
 };
 
-UpdateSortByFilter.propTypes = {
+UpdateOrderByFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
 };
 
-export default React.memo(UpdateSortByFilter);
+export default React.memo(UpdateOrderByFilter);
