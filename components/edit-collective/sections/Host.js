@@ -240,7 +240,7 @@ class Host extends React.Component {
                       <Fineprint>
                         <FormattedMessage
                           id="editCollective.host.change.removeFirst"
-                          defaultMessage="Without a Fiscal Host, {type, select, COLLECTIVE {your Collective} FUND {your Fund}} won't be able to accept financial contributions. You will be able to apply to another Fiscal Host."
+                          defaultMessage="Without a Fiscal Host, {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {}} won't be able to accept financial contributions. You will be able to apply to another Fiscal Host."
                           values={{ type: collective.type }}
                         />
                       </Fineprint>
