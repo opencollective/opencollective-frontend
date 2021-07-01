@@ -5,6 +5,7 @@ import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { TransactionKind } from '../../../lib/constants/transactions';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
@@ -25,8 +26,8 @@ import BudgetStats from '../BudgetStats';
 import ContainerSectionContent from '../ContainerSectionContent';
 
 export const budgetSectionQuery = gqlV2/* GraphQL */ `
-  query BudgetSection($slug: String!, $limit: Int!) {
-    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false) {
+  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kinds: $kind) {
       ...TransactionsQueryCollectionFragment
     }
     expenses(account: { slug: $slug }, limit: $limit) {
@@ -40,8 +41,16 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
   ${expensesListFieldsFragment}
 `;
 
+const DEFAULT_KINDS = [
+  TransactionKind.ADDED_FUNDS,
+  TransactionKind.CONTRIBUTION,
+  TransactionKind.EXPENSE,
+  TransactionKind.PLATFORM_TIP,
+];
+
+// Any change here should be reflected in API's `server/graphql/cache.js`
 export const getBudgetSectionQueryVariables = slug => {
-  return { slug, limit: 3 };
+  return { slug, limit: 3, kind: DEFAULT_KINDS };
 };
 
 const BudgetItemContainer = styled.div`
