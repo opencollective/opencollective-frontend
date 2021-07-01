@@ -226,6 +226,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
       {!expenses.loading && data?.host && (
         <ScheduledExpensesBanner
           host={data.host}
+          expenses={paginatedExpenses.nodes}
           onSubmit={() => {
             expenses.refetch();
           }}

@@ -32,11 +32,14 @@ const scheduledExpensesQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const ScheduledExpensesBanner = ({ host, onSubmit, secondButton }) => {
+const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => {
   const scheduledExpenses = useQuery(scheduledExpensesQuery, {
     variables: { hostId: host.id, limit: 100, status: 'SCHEDULED_FOR_PAYMENT', payoutMethodType: 'BANK_ACCOUNT' },
     context: API_V2_CONTEXT,
   });
+  React.useEffect(() => {
+    scheduledExpenses.refetch();
+  }, [expenses]);
   const { addToast } = useToasts();
   const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
 
@@ -123,6 +126,7 @@ ScheduledExpensesBanner.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.string,
   }).isRequired,
+  expenses: PropTypes.array,
   onSubmit: PropTypes.function,
   secondButton: PropTypes.node,
 };
