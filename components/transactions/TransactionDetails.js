@@ -155,6 +155,8 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               hasOrder,
               toAccount,
               fromAccount,
+              taxAmount: transaction.taxAmount,
+              taxInfo: transaction.taxInfo,
               intl,
             })}
           </DetailDescription>
@@ -234,7 +236,8 @@ TransactionDetails.propTypes = {
     currency: PropTypes.string,
     description: PropTypes.string,
     createdAt: PropTypes.string,
-    taxAmount: PropTypes.number,
+    taxAmount: PropTypes.object,
+    taxInfo: PropTypes.object,
     paymentMethod: PropTypes.shape({
       type: PropTypes.string,
     }),

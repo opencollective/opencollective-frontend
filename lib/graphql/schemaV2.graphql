@@ -2741,6 +2741,11 @@ type Credit implements Transaction {
   amountInHostCurrency: Amount!
   netAmount: Amount!
   taxAmount: Amount!
+
+  """
+  If taxAmount is set, this field will contain more info about the tax
+  """
+  taxInfo: TaxInfo
   platformFee: Amount!
   hostFee: Amount!
   paymentProcessorFee: Amount!
@@ -2984,6 +2989,11 @@ type Debit implements Transaction {
   amountInHostCurrency: Amount!
   netAmount: Amount!
   taxAmount: Amount!
+
+  """
+  If taxAmount is set, this field will contain more info about the tax
+  """
+  taxInfo: TaxInfo
   platformFee: Amount!
   hostFee: Amount!
   paymentProcessorFee: Amount!
@@ -7580,6 +7590,21 @@ type TagStat {
 }
 
 """
+Information about a tax
+"""
+type TaxInfo {
+  """
+  An unique identifier for this tax (GST, VAT, etc)
+  """
+  id: String!
+
+  """
+  Percentage applied, between 0-100
+  """
+  percentage: Int!
+}
+
+"""
 Tier model
 """
 type Tier {
@@ -7666,6 +7691,11 @@ interface Transaction {
   amountInHostCurrency: Amount!
   netAmount: Amount!
   taxAmount: Amount!
+
+  """
+  If taxAmount is set, this field will contain more info about the tax
+  """
+  taxInfo: TaxInfo
   platformFee: Amount!
   hostFee: Amount
   paymentProcessorFee: Amount
