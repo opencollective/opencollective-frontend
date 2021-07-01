@@ -192,8 +192,13 @@ class PayWithPaypalButton extends Component {
   }
 }
 
-const paypalPlanQuery = gqlV2`
-  query PaypalPlanQuery($account: AccountReferenceInput!, $tier: TierReferenceInput, $amount: AmountInput!, $frequency: ContributionFrequency!) {
+const paypalPlanQuery = gqlV2/* GraphQL */ `
+  query PaypalPlanQuery(
+    $account: AccountReferenceInput!
+    $tier: TierReferenceInput
+    $amount: AmountInput!
+    $frequency: ContributionFrequency!
+  ) {
     paypalPlan(account: $account, tier: $tier, amount: $amount, frequency: $frequency) {
       id
     }

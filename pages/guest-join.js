@@ -37,7 +37,7 @@ const MESSAGES = defineMessages({
   },
 });
 
-const confirmGuestAccountMutation = gqlV2`
+const confirmGuestAccountMutation = gqlV2/* GraphQL */ `
   mutation SendGuestConfirmationEmail($email: EmailAddress!) {
     sendGuestConfirmationEmail(email: $email)
   }
