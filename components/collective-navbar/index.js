@@ -56,6 +56,15 @@ const NavBarContainer = styled.div`
   z-index: 999;
   background: white;
   box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
+
+  /*
+  ** CSS hack to target only Safari, hotfix for https://github.com/opencollective/opencollective/issues/4403
+  */
+  @media not all and (min-resolution: 0.001dpcm) {
+    @supports (-webkit-appearance: none) {
+      position: relative;
+    }
+  }
 `;
 
 const NavbarContentContainer = styled(Container)`
