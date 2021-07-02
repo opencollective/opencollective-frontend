@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../../Container';
@@ -22,7 +22,12 @@ const SearchFormContainer = styled(Box)`
   min-width: 10rem;
 `;
 
+const messages = defineMessages({
+  searchFilterPlaceholder: { id: 'UpdateSearchFilter.placeholder', defaultMessage: 'Search by user, title, html...' },
+});
+
 const UpdateSearchFilter = ({ searchTerm, onChange }) => {
+  const { formatMessage } = useIntl();
   return (
     <Container>
       <FilterLabel htmlFor="update-filter-search">
@@ -31,7 +36,7 @@ const UpdateSearchFilter = ({ searchTerm, onChange }) => {
       <SearchFormContainer>
         <SearchBar
           id="update-filter-search"
-          placeholder="Search by user, title, html..."
+          placeholder={formatMessage(messages.searchFilterPlaceholder)}
           height="38px"
           defaultValue={searchTerm}
           onSubmit={onChange}

@@ -2049,6 +2049,7 @@
   "updates.new.error": "Update failed: {err}",
   "updates.new.title": "Nová aktualizace",
   "Updates.Oldest": "Oldest",
+  "UpdateSearchFilter.placeholder": "Search by user, title, html...",
   "Upload": "Nahrát",
   "UploadDocumentation": "Upload documentation",
   "UploadDocumentationDescription": "If you want to include any documentation, you can upload it here.",

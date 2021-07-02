@@ -2049,6 +2049,7 @@
   "updates.new.error": "Atualização falhou: {err}",
   "updates.new.title": "Nova atualização",
   "Updates.Oldest": "Oldest",
+  "UpdateSearchFilter.placeholder": "Search by user, title, html...",
   "Upload": "Carregar",
   "UploadDocumentation": "Carregar documentação",
   "UploadDocumentationDescription": "Se você deseja incluir qualquer documentação, você pode enviá-la aqui.",
