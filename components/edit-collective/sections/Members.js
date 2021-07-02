@@ -16,8 +16,8 @@ import { compose } from '../../../lib/utils';
 import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
-// import Hide from '../../Hide';
-// import HorizontalScroller from '../../HorizontalScroller';
+import Hide from '../../Hide';
+import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
@@ -37,6 +37,7 @@ const MemberContainer = styled(Container)`
   display: block;
   height: 100%;
   min-height: 232px;
+  min-width: 164px;
   background: white;
   width: 170px;
   border-radius: 8px;
@@ -46,6 +47,12 @@ const MemberContainer = styled(Container)`
 const AllCardsContainerMobile = styled.div`
   display: flex;
   padding: 16px;
+  margin: 10px;
+`;
+
+const TagContainer = styled(Box)`
+  position: absolute;
+  bottom: 10%;
 `;
 
 const InviteNewCard = styled(MemberContainer)`
@@ -84,61 +91,20 @@ class Members extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl } = props;
+
     this.state = {
       currentMember: null,
       members: this.getMembersFromProps(props),
       showInviteModal: false,
       showEditModal: false,
     };
+
     this.messages = defineMessages({
-      roleLabel: { id: 'members.role.label', defaultMessage: 'role' },
-      addMember: { id: 'members.add', defaultMessage: 'Add Team Member' },
-      removeMember: { id: 'members.remove', defaultMessage: 'Remove Team Member' },
-      descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
-      sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },
       memberPendingDetails: {
         id: 'members.pending.details',
         defaultMessage: 'This person has not accepted their invitation yet',
       },
-      cantRemoveLast: {
-        id: 'members.remove.cantRemoveLast',
-        defaultMessage: 'The last admin cannot be removed. Please add another admin first.',
-      },
-      removeConfirm: {
-        id: 'members.remove.confirm',
-        defaultMessage: `Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?`,
-      },
     });
-
-    const getOptions = arr => {
-      return arr.map(key => {
-        const obj = {};
-        obj[key] = formatMemberRole(intl, key);
-        return obj;
-      });
-    };
-
-    this.fields = [
-      {
-        name: 'role',
-        type: 'select',
-        options: getOptions([roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT]),
-        defaultValue: roles.ADMIN,
-        label: intl.formatMessage(this.messages.roleLabel),
-      },
-      {
-        name: 'description',
-        maxLength: 255,
-        label: intl.formatMessage(this.messages.descriptionLabel),
-      },
-      {
-        name: 'since',
-        type: 'date',
-        defaultValue: new Date(),
-        label: intl.formatMessage(this.messages.sinceLabel),
-      },
-    ];
   }
 
   componentDidUpdate(oldProps) {
@@ -186,7 +152,13 @@ class Members extends React.Component {
       nbAdmins === 1 && this.state.currentMember?.role === roles.ADMIN && this.state.currentMember?.id;
 
     return (
-      <MemberContainer mt={2} key={`member-new-${index}-${memberKey}`} data-cy={`member-${index}`}>
+      <MemberContainer
+        position="relative"
+        mt={2}
+        mx={2}
+        key={`member-new-${index}-${memberKey}`}
+        data-cy={`member-${index}`}
+      >
         <Container position="absolute" top="1rem" right="1rem">
           {this.state.showEditModal ? (
             <EditMemberModal
@@ -220,23 +192,18 @@ class Members extends React.Component {
           <P fontSize="10px" lineHeight="14px" fontWeight={400} color="#9D9FA3" mb={2}>
             Since: <FormattedDate value={get(member, 'since')} />
           </P>
-          <P fontSize="11px" lineHeight="16px" fontWeight={400} mb={isInvitation ? 2 : 4}>
+          <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400} mb={5}>
             {get(member, 'description')}
           </P>
-          {isInvitation && (
-            <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
-              <StyledTag
-                mt={3}
-                mb={3}
-                data-cy="member-pending-tag"
-                textTransform="uppercase"
-                display="block"
-                type="info"
-              >
-                <FormattedMessage id="Pending" defaultMessage="Pending" />
-              </StyledTag>
-            </StyledTooltip>
-          )}
+          <TagContainer>
+            {isInvitation && (
+              <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
+                <StyledTag data-cy="member-pending-tag" textTransform="uppercase" display="block" type="info">
+                  <FormattedMessage id="Pending" defaultMessage="Pending" />
+                </StyledTag>
+              </StyledTooltip>
+            )}
+          </TagContainer>
         </Flex>
       </MemberContainer>
     );
@@ -249,21 +216,47 @@ class Members extends React.Component {
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
 
     return (
-      <React.Fragment>
-        <div className="EditMembers">
-          <div className="members">
-            <SettingsTitle
-              subtitle={
-                collective.type === 'COLLECTIVE' && (
-                  <FormattedMessage
-                    id="members.edit.description"
-                    defaultMessage="Note: Only Collective Admins can edit this Collective and approve expenses."
-                  />
-                )
-              }
-            >
-              <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Team" />
-            </SettingsTitle>
+      <React.Fragment className="EditMembers">
+        <Box className="members">
+          <SettingsTitle
+            subtitle={
+              collective.type === 'COLLECTIVE' && (
+                <FormattedMessage
+                  id="members.edit.description"
+                  defaultMessage="Note: Only Collective Admins can edit this Collective and approve expenses."
+                />
+              )
+            }
+          >
+            <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Team" />
+          </SettingsTitle>
+          <Hide md lg>
+            <Grid>
+              <HorizontalScroller container={AllCardsContainerMobile}>
+                <Flex mx={2}>
+                  <InviteNewCard mt={2} mx={2}>
+                    <Flex
+                      alignItems="center"
+                      justifyContent="center"
+                      height="100%"
+                      onClick={() => this.handleShowModalChange('invite', true)}
+                    >
+                      <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
+                        <StyledRoundButton buttonStyle="dark" fontSize={25}>
+                          +
+                        </StyledRoundButton>
+                        <P mt={3} color="black.700">
+                          <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
+                        </P>
+                      </Flex>
+                    </Flex>
+                  </InviteNewCard>
+                  {members.map((m, idx) => this.renderMember(m, idx, nbAdmins))}
+                </Flex>
+              </HorizontalScroller>
+            </Grid>
+          </Hide>
+          <Hide xs sm>
             <Grid gridGap={20} gridTemplateColumns={['1fr 1fr', '1fr 1fr 1fr 1fr']}>
               {this.state.showInviteModal ? (
                 <InviteMemberModal
@@ -275,7 +268,7 @@ class Members extends React.Component {
                   continueHandler={this.onClick}
                 />
               ) : (
-                <InviteNewCard mt={2}>
+                <InviteNewCard mt={2} mx={2}>
                   <Flex
                     alignItems="center"
                     justifyContent="center"
@@ -295,20 +288,20 @@ class Members extends React.Component {
               )}
               {members.map((m, idx) => this.renderMember(m, idx, nbAdmins))}
             </Grid>
-          </div>
-          {error && (
-            <MessageBox type="error" withIcon my={3}>
-              {error.message}
-            </MessageBox>
-          )}
-          <Flex justifyContent="center" flexWrap="wrap" mt={5}>
-            <Link href={`/${collective.slug}`}>
-              <StyledButton mx={2} minWidth={200}>
-                <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
-              </StyledButton>
-            </Link>
-          </Flex>
-        </div>
+          </Hide>
+        </Box>
+        {error && (
+          <MessageBox type="error" withIcon my={3}>
+            {error.message}
+          </MessageBox>
+        )}
+        <Flex justifyContent="center" flexWrap="wrap" mt={5}>
+          <Link href={`/${collective.slug}`}>
+            <StyledButton mx={2} minWidth={200}>
+              <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
+            </StyledButton>
+          </Link>
+        </Flex>
       </React.Fragment>
     );
   }

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
@@ -15,6 +16,13 @@ import InputField from '../../InputField';
 import MemberRoleDescription, { hasRoleDescription } from '../../MemberRoleDescription';
 import { P } from '../../Text';
 
+const MemberContainer = styled(Container)`
+  border: 1px solid #dcdee0;
+  border-radius: 10px;
+  max-width: 250px;
+  padding: 16px;
+`;
+
 const memberFormMessages = defineMessages({
   roleLabel: { id: 'members.role.label', defaultMessage: 'Role' },
   sinceLabel: { id: 'user.since.label', defaultMessage: 'Since' },
@@ -25,6 +33,7 @@ const MemberForm = props => {
   const { intl, member, collectiveImg, bindSubmitForm, triggerSubmit } = props;
 
   const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const [memberRole, setMemberRole] = React.useState(roles.ADMIN);
 
   const memberCollective = member?.member;
 
@@ -73,12 +82,12 @@ const MemberForm = props => {
   return (
     <Flex flexDirection="column" justifyContent="center">
       {member && (
-        <Container>
+        <MemberContainer mb={2} mt={2}>
           <Flex>
             <Container position="relative">
-              <Avatar src={get(memberCollective, 'imageUrl')} radius={66} />
-              <Container mt={13} position="absolute" bottom="-1rem" right="-1rem">
-                <Avatar type={CollectiveType.COLLECTIVE} backgroundColor="#ffffff" src={collectiveImg} radius={30} />
+              <Avatar src={get(memberCollective, 'imageUrl')} radius={48} />
+              <Container mt={13} position="absolute" bottom="-10%" right="-10%">
+                <Avatar type={CollectiveType.COLLECTIVE} backgroundColor="#ffffff" src={collectiveImg} radius={20} />
               </Container>
             </Container>
             <Box mx={10}>
@@ -90,7 +99,7 @@ const MemberForm = props => {
               </P>
             </Box>
           </Flex>
-        </Container>
+        </MemberContainer>
       )}
       <Formik initialValues={initialValues} onSubmit={submit}>
         {formik => {
@@ -112,12 +121,13 @@ const MemberForm = props => {
                     options={field.options}
                     onChange={value => {
                       setFieldValue(field.name, value);
+                      setMemberRole(value);
                     }}
                   />
-                  {field.name === 'role' && hasRoleDescription(member?.role) && (
+                  {field.name === 'role' && hasRoleDescription(member?.role || memberRole) && (
                     <Flex mb={3}>
                       <Box mx={1} mt={1} fontSize="12px" color="black.600" fontStyle="italic">
-                        <MemberRoleDescription role={member?.role} />
+                        <MemberRoleDescription role={member?.role || memberRole} />
                       </Box>
                     </Flex>
                   )}
@@ -132,11 +142,11 @@ const MemberForm = props => {
 };
 
 MemberForm.propTypes = {
+  bindSubmitForm: PropTypes.func,
   collectiveImg: PropTypes.string,
-  onSubmit: PropTypes.func,
-  member: PropTypes.object,
-  memberIds: PropTypes.array,
   intl: PropTypes.object.isRequired,
+  member: PropTypes.object,
+  triggerSubmit: PropTypes.func,
 };
 
 export default injectIntl(MemberForm);

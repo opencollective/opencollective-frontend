@@ -3,16 +3,17 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Delete } from '@styled-icons/material/Delete';
 import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import roles from '../../../lib/constants/roles';
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import StyledTooltip from '../../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 import MemberForm from './MemberForm';
@@ -52,11 +53,22 @@ const removeMemberMutation = gqlV2/* GraphQL */ `
 `;
 
 const EditMemberModal = props => {
-  const { intl, member, index, editMember, show, collective, membersIds, isLastAdmin, cancelHandler } = props;
+  const { intl, member, show, collective, isLastAdmin, cancelHandler } = props;
 
   const { addToast } = useToasts();
 
   const isInvitation = get(member, '__typename') === 'MemberInvitation';
+
+  const messages = defineMessages({
+    cantRemoveLast: {
+      id: 'members.remove.cantRemoveLast',
+      defaultMessage: 'The last admin cannot be removed. Please add another admin first.',
+    },
+    removeConfirm: {
+      id: 'members.remove.confirm',
+      defaultMessage: `Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?`,
+    },
+  });
 
   const mutationOptions = {
     context: API_V2_CONTEXT,
@@ -108,30 +120,45 @@ const EditMemberModal = props => {
     }
   };
 
+  const confirmRemoveMember = memberEntry => {
+    return window.confirm(
+      intl.formatMessage(messages.removeConfirm, {
+        ...memberEntry.member,
+        hasEmail: Number(memberEntry.member.email),
+      }),
+    );
+  };
+
   const handleRemoveMemberMutation = async () => {
-    try {
-      await removeMemberAccount({
-        variables: {
-          memberAccount: {
-            slug: get(member.member, 'slug'),
+    if (confirmRemoveMember(member)) {
+      try {
+        await removeMemberAccount({
+          variables: {
+            memberAccount: {
+              slug: get(member.member, 'slug'),
+            },
+            account: { slug: get(collective, 'slug') },
+            role: get(member, 'role'),
+            isInvitation,
           },
-          account: { slug: get(collective, 'slug') },
-          role: get(member, 'role'),
-          isInvitation,
-        },
-      });
+        });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
-        message: <FormattedMessage id="editTeam.member.remove.success" defaultMessage="Member removed successfully." />,
-      });
+        addToast({
+          type: TOAST_TYPE.SUCCESS,
+          message: (
+            <FormattedMessage id="editTeam.member.remove.success" defaultMessage="Member removed successfully." />
+          ),
+        });
 
+        cancelHandler();
+      } catch (error) {
+        addToast({
+          type: TOAST_TYPE.ERROR,
+          message: <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />,
+        });
+      }
+    } else {
       cancelHandler();
-    } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
-        message: <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />,
-      });
     }
   };
 
@@ -165,30 +192,45 @@ const EditMemberModal = props => {
           <MemberForm
             intl={intl}
             collectiveImg={get(collective, 'imageUrl')}
-            membersIds={membersIds}
             member={member}
-            index={index}
-            editMember={editMember}
             bindSubmitForm={bindSubmitForm}
             triggerSubmit={handleEditMemberMutation}
           />
           <Flex justifyContent="flex-end">
-            <StyledButton
-              mt={4}
-              minWidth={140}
-              disabled={isLastAdmin && member.role === roles.ADMIN}
-              buttonStyle="dangerSecondary"
-              data-cy="remove-member"
-              onClick={handleRemoveMemberMutation}
-            >
-              <Flex alignItems="center">
-                <Delete height={25} />
-                <FormattedMessage id="as" defaultMessage="Delete Member" />
-              </Flex>
-            </StyledButton>
+            {isLastAdmin && member.role === roles.ADMIN ? (
+              <StyledTooltip place="bottom" content={() => intl.formatMessage(messages.cantRemoveLast)}>
+                <StyledButton
+                  mt={4}
+                  minWidth={140}
+                  disabled={true}
+                  buttonStyle="dangerSecondary"
+                  data-cy="remove-member"
+                  onClick={handleRemoveMemberMutation}
+                >
+                  <Flex alignItems="center">
+                    <Delete height={25} />
+                    <FormattedMessage id="as" defaultMessage="Delete Member" />
+                  </Flex>
+                </StyledButton>
+              </StyledTooltip>
+            ) : (
+              <StyledButton
+                mt={4}
+                minWidth={140}
+                disabled={isLastAdmin && member.role === roles.ADMIN}
+                buttonStyle="dangerSecondary"
+                data-cy="remove-member"
+                onClick={handleRemoveMemberMutation}
+              >
+                <Flex alignItems="center">
+                  <Delete height={25} />
+                  <FormattedMessage id="as" defaultMessage="Delete Member" />
+                </Flex>
+              </StyledButton>
+            )}
           </Flex>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter mt={5}>
           <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
             <StyledButton
               mx={20}
@@ -199,7 +241,7 @@ const EditMemberModal = props => {
               disabled={isEditing}
               data-cy="confirmation-modal-cancel"
             >
-              <FormattedMessage id="no" defaultMessage="No" />
+              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
             <StyledButton
               my={1}
@@ -209,13 +251,22 @@ const EditMemberModal = props => {
               loading={isEditing}
               onClick={handleSubmitForm}
             >
-              <FormattedMessage id="yes" defaultMessage="Yes" />
+              <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>
           </Container>
         </ModalFooter>
       </Modal>
     </Container>
   );
+};
+
+EditMemberModal.propTypes = {
+  collective: PropTypes.object,
+  cancelHandler: PropTypes.func,
+  intl: PropTypes.object.isRequired,
+  isLastAdmin: PropTypes.bool,
+  member: PropTypes.object,
+  show: PropTypes.bool,
 };
 
 export default EditMemberModal;
