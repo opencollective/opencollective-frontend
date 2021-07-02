@@ -69,7 +69,11 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
       });
       onSubmit?.();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+      addToast({
+        type: TOAST_TYPE.ERROR,
+        // @transferwise request function is swalling the error we get from the backend, adding a generic one
+        message: 'There was an error trying to process this batch, please contact support@opencollective.com',
+      });
     }
   };
 
@@ -97,27 +101,29 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
           </Box>
         </Flex>
       </MessageBox>
-      <ConfirmationModal
-        zindex={1000}
-        show={showConfirmationModal}
-        header={<FormattedMessage id="expenses.scheduled.confirmation.title" defaultMessage="Pay Expenses Batch" />}
-        body={
-          <FormattedMessage
-            id="expenses.scheduled.confirmation.body"
-            defaultMessage="Are you sure you want to batch and pay {count, plural, one {# expense} other {# expenses}} scheduled for payment?"
-            values={{ count: scheduledExpenses.data.expenses.totalCount }}
-          />
-        }
-        onClose={() => setConfirmationModalDisplay(false)}
-        continueLabel={
-          <FormattedMessage
-            id="expense.pay.btn"
-            defaultMessage="Pay with {paymentMethod}"
-            values={{ paymentMethod: 'Wise' }}
-          />
-        }
-        continueHandler={handlePayBatch}
-      />
+      {showConfirmationModal && (
+        <ConfirmationModal
+          zindex={1000}
+          header={<FormattedMessage id="expenses.scheduled.confirmation.title" defaultMessage="Pay Expenses Batch" />}
+          body={
+            <FormattedMessage
+              id="expenses.scheduled.confirmation.body"
+              defaultMessage="Are you sure you want to batch and pay {count, plural, one {# expense} other {# expenses}} scheduled for payment?"
+              values={{ count: scheduledExpenses.data.expenses.totalCount }}
+            />
+          }
+          onClose={() => setConfirmationModalDisplay(false)}
+          continueLabel={
+            <FormattedMessage
+              id="expense.pay.btn"
+              defaultMessage="Pay with {paymentMethod}"
+              values={{ paymentMethod: 'Wise' }}
+            />
+          }
+          continueHandler={handlePayBatch}
+          show
+        />
+      )}
     </React.Fragment>
   );
 };
