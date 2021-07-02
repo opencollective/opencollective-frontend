@@ -15,6 +15,7 @@ const StyledInputField = ({
   htmlFor,
   name,
   error,
+  hint,
   success,
   disabled,
   required,
@@ -84,6 +85,13 @@ const StyledInputField = ({
           </Span>
         </Box>
       )}
+      {hint && !error && (
+        <Box pt={0}>
+          <Span ml={1} fontSize="12px" color="black.500" css={{ verticalAlign: 'middle' }}>
+            {hint}
+          </Span>
+        </Box>
+      )}
     </Box>
   );
 };
@@ -95,6 +103,8 @@ StyledInputField.propTypes = {
   disabled: PropTypes.bool,
   /** text to display below the input or error status */
   error: PropTypes.any,
+  /** text to display below the input when there's no error */
+  hint: PropTypes.any,
   /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
   htmlFor: PropTypes.string,
   /** By default name is equal to htmlFor, but you can use this prop to override it */
