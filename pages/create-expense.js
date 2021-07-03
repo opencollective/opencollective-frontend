@@ -242,6 +242,7 @@ class CreateExpensePage extends React.Component {
       window.scrollTo(0, 0);
     } catch (e) {
       this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });
+      this.setState({ isSubmitting: false });
     }
   };
 
