@@ -99,7 +99,6 @@
   "appRejectionReason.placeholder": "为什么申请被拒绝？",
   "archive.account.confirmation": "是否要删除{type, select, EVENT {this Event} PROJECT { this Project}FUND {this Fund} COLLECTIVE {this Collective}ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "归档 {name}",
-  "as": "Delete Member",
   "Attachment.Private": "此附件是私密的",
   "AttachReceipt": "呈交收据",
   "AttachReceiptInstructions": "这笔费用是通过收取与账户相连接的信用卡自动创建的。要完成这一过程，添加描述并上传收据。所有费用必须持有收据。",

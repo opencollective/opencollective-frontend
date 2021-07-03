@@ -156,7 +156,7 @@ class Members extends React.Component {
         position="relative"
         mt={2}
         mx={2}
-        key={`member-new-${index}-${memberKey}`}
+        key={`member-${index}-${memberKey}`}
         data-cy={`member-${index}`}
       >
         <Container position="absolute" top="1rem" right="1rem">
@@ -190,7 +190,8 @@ class Members extends React.Component {
             {formatMemberRole(intl, get(member, 'role'))}
           </StyledTag>
           <P fontSize="10px" lineHeight="14px" fontWeight={400} color="#9D9FA3" mb={2}>
-            Since: <FormattedDate value={get(member, 'since')} />
+            <FormattedMessage id="user.since.label" defaultMessage="Since" />:{' '}
+            <FormattedDate value={get(member, 'since')} />
           </P>
           <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400} mb={5}>
             {get(member, 'description')}
@@ -276,7 +277,7 @@ class Members extends React.Component {
                     onClick={() => this.handleShowModalChange('invite', true)}
                   >
                     <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
-                      <StyledRoundButton buttonStyle="dark" fontSize={25}>
+                      <StyledRoundButton data-cy="invite-member-btn" buttonStyle="dark" fontSize={25}>
                         +
                       </StyledRoundButton>
                       <P mt={3} color="black.700">

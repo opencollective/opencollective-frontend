@@ -99,7 +99,6 @@
   "appRejectionReason.placeholder": "Perché questa richiesta è stata respinta?",
   "archive.account.confirmation": "Sei sicuro di voler archiviare {type, select, EVENT {questo evento} PROJECT {questo progetto} FUND {questo finanziamento} COLLECTIVE {questo collettivo} ORGANIZATION {questa organizzazione} other {questo account}}?",
   "archive.modal.header": "Archivia {name}",
-  "as": "Delete Member",
   "Attachment.Private": "Questo allegato è privato",
   "AttachReceipt": "Submit receipt",
   "AttachReceiptInstructions": "This expense was automatically created by charging a linked credit card. To complete the process, add a description and upload the receipt. All charges must have receipts.",

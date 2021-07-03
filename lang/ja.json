@@ -99,7 +99,6 @@
   "appRejectionReason.placeholder": "Why is this application being rejected?",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "{name}をアーカイブ",
-  "as": "Delete Member",
   "Attachment.Private": "この添付ファイルは非公開です",
   "AttachReceipt": "Submit receipt",
   "AttachReceiptInstructions": "This expense was automatically created by charging a linked credit card. To complete the process, add a description and upload the receipt. All charges must have receipts.",

@@ -99,7 +99,6 @@
   "appRejectionReason.placeholder": "Почему это заявление отклоняется?",
   "archive.account.confirmation": "Вы действительно хотите заархивировать {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Архивировать {name}",
-  "as": "Delete Member",
   "Attachment.Private": "Это вложение приватное",
   "AttachReceipt": "Отправить расходы",
   "AttachReceiptInstructions": "Этот расход был автоматически создан путем списания средств с привязанной кредитной карты. Чтобы завершить процесс, добавьте описание и загрузите квитанцию. Все расходы должны иметь квитанции.",
