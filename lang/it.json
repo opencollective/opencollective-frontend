@@ -203,6 +203,7 @@
   "CancelEdit": "Annulla modifica",
   "ChangelogNotification.firstLine": "We have new stuff for you!",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
+  "ChangelogTrigger.tooltip.content": "What's new with Open Collective",
   "checkingBrowser": "Il tuo browser è in fase di verifica. Se questo messaggio non scompare, prova a spostare il mouse o a toccare lo schermo del tuo cellulare.",
   "clickHere": "Clicca qui",
   "Clipboard.Copied": "Copiato!",

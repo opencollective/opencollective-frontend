@@ -4,6 +4,7 @@ import { gql, useQuery } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
 import { cloneDeep } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -13,6 +14,7 @@ import { Flex } from '../Grid';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Dropdown } from '../StyledDropdown';
 import StyledRoundButton from '../StyledRoundButton';
+import StyledTooltip from '../StyledTooltip';
 
 import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
 
@@ -55,6 +57,10 @@ const ChangelogTrigger = props => {
     });
   };
 
+  const TooltipContent = (
+    <FormattedMessage id="ChangelogTrigger.tooltip.content" defaultMessage="What's new with Open Collective" />
+  );
+
   if (!LoggedInUser || !CHANGE_LOG_UPDATES_ENABLED) {
     return null;
   }
@@ -62,10 +68,18 @@ const ChangelogTrigger = props => {
   return (
     <Flex>
       {hasSeenNewUpdates ? (
-        <FlameIcon onClick={handleShowNewUpdates} backgroundColor="black.100" url="/static/images/flame-default.svg" />
+        <StyledTooltip content={TooltipContent}>
+          <FlameIcon
+            onClick={handleShowNewUpdates}
+            backgroundColor="black.100"
+            url="/static/images/flame-default.svg"
+          />
+        </StyledTooltip>
       ) : (
         <Dropdown>
-          <FlameIcon onClick={handleShowNewUpdates} backgroundColor="yellow.100" url="/static/images/flame-red.svg" />
+          <StyledTooltip content={TooltipContent}>
+            <FlameIcon onClick={handleShowNewUpdates} backgroundColor="yellow.100" url="/static/images/flame-red.svg" />
+          </StyledTooltip>
           <ChangelogNotificationDropdown />
         </Dropdown>
       )}
