@@ -79,8 +79,6 @@ class Members extends React.Component {
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
-    editCoreContributors: PropTypes.func.isRequired,
-    /** @ignore from Apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
