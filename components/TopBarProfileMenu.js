@@ -5,13 +5,13 @@ import { Query } from '@apollo/client/react/components';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled, { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { parseToBoolean } from '../lib/utils';
 
-import Avatar from './Avatar';
 import ChangelogTrigger from './changelog/ChangelogTrigger';
+import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
