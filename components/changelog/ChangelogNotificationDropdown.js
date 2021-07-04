@@ -15,13 +15,21 @@ const ChangeLogNotificationDropdownArrow = styled(DropdownArrow)`
   &::before {
     border-color: transparent transparent #ffffc2 transparent;
   }
+  @media screen and (max-width: 40em) {
+    right: 90px;
+    top: 55px;
+  }
 `;
 
 const ChangeLogNotificationDropdownContent = styled(DropdownContent)`
   display: block;
-  right: 105px;
+  right: 100px;
   margin-top: 10px;
   background: #ffffc2;
+  @media screen and (max-width: 40em) {
+    right: 75px;
+    top: 55px;
+  }
 `;
 
 const CloseIcon = styled(Times)`

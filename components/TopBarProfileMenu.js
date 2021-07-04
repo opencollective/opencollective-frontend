@@ -5,7 +5,7 @@ import { Query } from '@apollo/client/react/components';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { parseToBoolean } from '../lib/utils';
@@ -196,8 +196,8 @@ class TopBarProfileMenu extends React.Component {
         <Flex>
           <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
           <Hide sm md lg>
-            <Container mx={-25} my={-10}>
-              <ChangelogTrigger />
+            <Container mx={-20} my={-1}>
+              <ChangelogTrigger height="24px" width="24px" />
             </Container>
           </Hide>
         </Flex>
