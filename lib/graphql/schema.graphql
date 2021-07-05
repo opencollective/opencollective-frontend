@@ -1301,6 +1301,7 @@ type Expense implements Transaction {
   refundTransaction: Transaction
   uuid: String
   type: String
+  kind: String
   amount: Int
   currency: String
   hostCurrency: String
@@ -2237,6 +2238,7 @@ type Order implements Transaction {
   refundTransaction: Transaction
   uuid: String
   type: String
+  kind: String
   amount: Int
   currency: String
   hostCurrency: String
@@ -3579,6 +3581,7 @@ interface Transaction {
   usingGiftCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
   type: String
+  kind: String
   description: String
   createdAt: DateString
   updatedAt: DateString

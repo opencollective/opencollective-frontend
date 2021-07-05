@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { omitBy } from 'lodash';
+import { withRouter } from 'next/router';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
@@ -13,6 +15,8 @@ import Header from '../components/Header';
 import UpdatesWithData from '../components/UpdatesWithData';
 import { withUser } from '../components/UserProvider';
 
+const ROUTE_PARAMS = ['collectiveSlug', 'offset'];
+
 class UpdatesPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
     return { slug: collectiveSlug, action };
@@ -23,10 +27,17 @@ class UpdatesPage extends React.Component {
     action: PropTypes.string, // not clear whre it's coming from, not in the route
     data: PropTypes.shape({ account: PropTypes.object }).isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
+    router: PropTypes.object,
+  };
+
+  updateQuery = (router, newParams) => {
+    const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+    const pathname = router.asPath.split('?')[0];
+    return router.push({ pathname, query });
   };
 
   render() {
-    const { data, action, LoggedInUser } = this.props;
+    const { data, action, LoggedInUser, router } = this.props;
 
     if (!data.account) {
       return <ErrorPage data={data} />;
@@ -47,7 +58,19 @@ class UpdatesPage extends React.Component {
           />
 
           <div className="content">
-            <UpdatesWithData collective={collective} defaultAction={action} LoggedInUser={LoggedInUser} limit={10} />
+            <UpdatesWithData
+              collective={collective}
+              defaultAction={action}
+              LoggedInUser={LoggedInUser}
+              limit={10}
+              query={router.query}
+              onChange={queryParams =>
+                this.updateQuery(router, {
+                  ...queryParams,
+                  offset: null,
+                })
+              }
+            />
           </div>
         </Body>
 
@@ -57,4 +80,4 @@ class UpdatesPage extends React.Component {
   }
 }
 
-export default withUser(addCollectiveNavbarData(UpdatesPage));
+export default withUser(withRouter(addCollectiveNavbarData(UpdatesPage)));

@@ -221,6 +221,8 @@ interface Account {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -766,6 +768,8 @@ type Bot implements Account {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -1023,6 +1027,8 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -3247,6 +3253,8 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -4195,6 +4203,8 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -4529,6 +4539,8 @@ type Host implements Account & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -5090,6 +5102,8 @@ type Individual implements Account {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -6515,6 +6529,8 @@ type Organization implements Account & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -7049,6 +7065,8 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -8191,6 +8209,8 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """

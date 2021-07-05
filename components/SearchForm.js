@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import styled from 'styled-components';
-import { borderRadius, fontSize } from 'styled-system';
+import { borderRadius, fontSize, height } from 'styled-system';
 
 import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
@@ -11,6 +11,7 @@ import StyledInput from './StyledInput';
 const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
   ${borderRadius};
+  ${height};
   background-color: white;
 `;
 
@@ -54,11 +55,13 @@ class SearchForm extends React.Component {
       value,
       onChange,
       borderRadius = '20px',
+      height = '46px',
     } = this.props;
     return (
       <form action="/search" method="GET" onSubmit={onSubmit}>
         <SearchInputContainer
           borderRadius={borderRadius}
+          height={height}
           alignItems="center"
           justifyContent="space-between"
           p={this.props.py || 1}
@@ -97,6 +100,7 @@ SearchForm.propTypes = {
   width: PropTypes.number,
   onChange: PropTypes.func,
   borderRadius: PropTypes.string,
+  height: PropTypes.string,
   router: PropTypes.object,
 };
 
