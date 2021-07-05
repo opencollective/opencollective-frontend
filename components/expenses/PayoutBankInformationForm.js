@@ -39,6 +39,7 @@ const accountHolderFieldOptions = {
       name: 'Account Holder Name',
       type: 'text',
       example: 'Jane Doe',
+      hint: 'Full name, no abbreviations and without titles.',
       validationRegexp: '^[^!@#$%&*+]+$',
       validationError: 'Special characters are not allowed. (!@#$%&*+)',
     },
@@ -102,6 +103,7 @@ const Input = props => {
               labelFontSize="13px"
               required={input.required}
               error={(meta.touched || disabled) && meta.error}
+              hint={input.hint}
             >
               {() => (
                 <StyledInput
