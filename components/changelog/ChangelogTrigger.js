@@ -77,9 +77,7 @@ const ChangelogTrigger = props => {
         </StyledTooltip>
       ) : (
         <Dropdown>
-          <StyledTooltip content={TooltipContent}>
-            <FlameIcon onClick={handleShowNewUpdates} backgroundColor="yellow.100" url="/static/images/flame-red.svg" />
-          </StyledTooltip>
+          <FlameIcon onClick={handleShowNewUpdates} backgroundColor="yellow.100" url="/static/images/flame-red.svg" />
           <ChangelogNotificationDropdown />
         </Dropdown>
       )}
