@@ -111,14 +111,14 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
           <Flex>
             <Span pt={1}>
               <Image
-                width={41}
-                height={28}
+                width={70}
+                height={70}
                 src="/static/images/updates-and-news-modal-icon.svg"
                 alt="Updates and News Icon"
               />
             </Span>
-            <P fontSize={['25px', '28px']} fontWeight="500" lineHeight="36px" color="black.900" margin="0px 16px">
-              <FormattedMessage id="NewsAndUpdates.link.newsAndUpdates" defaultMessage="News and Updates" />
+            <P fontSize={['25px', '28px']} fontWeight="500" lineHeight="36px" color="black.900" ml={16} mt={25}>
+              <FormattedMessage id="NewsAndUpdates.link.whatsNew" defaultMessage="What's new" />
             </P>
           </Flex>
         </Flex>
