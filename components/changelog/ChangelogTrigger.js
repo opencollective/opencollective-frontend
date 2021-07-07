@@ -10,9 +10,10 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { parseToBoolean } from '../../lib/utils';
 
+import Container from '../Container';
+import DismissibleMessage from '../DismissibleMessage';
 import { Flex } from '../Grid';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
-import { Dropdown } from '../StyledDropdown';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
 
@@ -79,7 +80,7 @@ const ChangelogTrigger = props => {
           />
         </StyledTooltip>
       ) : (
-        <Dropdown>
+        <Container>
           <FlameIcon
             height={height}
             width={width}
@@ -88,8 +89,10 @@ const ChangelogTrigger = props => {
             backgroundSize={backgroundSize}
             url="/static/images/flame-red.svg"
           />
-          <ChangelogNotificationDropdown />
-        </Dropdown>
+          <DismissibleMessage messageId="ChangelogTrigger.dropdownNotification">
+            {({ dismiss }) => <ChangelogNotificationDropdown onClose={dismiss} />}
+          </DismissibleMessage>
+        </Container>
       )}
     </Flex>
   );
