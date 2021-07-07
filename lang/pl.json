@@ -203,6 +203,7 @@
   "CancelEdit": "Anuluj edycję",
   "ChangelogNotification.firstLine": "We have new stuff for you!",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
+  "ChangelogTrigger.tooltip.content": "What's new with Open Collective",
   "checkingBrowser": "Twoja przeglądarka jest weryfikowana. Jeśli ta wiadomość nie zniknie, spróbuj przenieść swoją myszkę lub dotknąć ekranu dla urządzeń mobilnych.",
   "clickHere": "Kliknij tutaj",
   "Clipboard.Copied": "Skopiowane!",
