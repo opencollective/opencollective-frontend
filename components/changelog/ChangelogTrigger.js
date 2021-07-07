@@ -40,7 +40,7 @@ const FlameIcon = styled(StyledRoundButton)`
 `;
 
 const ChangelogTrigger = props => {
-  const { height, width, setShowNewsAndUpdates, setChangelogViewDate } = props;
+  const { height, width, backgroundSize, setShowNewsAndUpdates, setChangelogViewDate } = props;
   const { data } = useQuery(loggedInUserQuery, { fetchPolicy: 'cache-only' });
   const LoggedInUser = data?.LoggedInUser;
   const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
@@ -74,6 +74,7 @@ const ChangelogTrigger = props => {
             width={width}
             onClick={handleShowNewUpdates}
             backgroundColor="black.100"
+            backgroundSize={backgroundSize}
             url="/static/images/flame-default.svg"
           />
         </StyledTooltip>
@@ -84,6 +85,7 @@ const ChangelogTrigger = props => {
             width={width}
             onClick={handleShowNewUpdates}
             backgroundColor="yellow.100"
+            backgroundSize={backgroundSize}
             url="/static/images/flame-red.svg"
           />
           <ChangelogNotificationDropdown />
@@ -96,6 +98,7 @@ const ChangelogTrigger = props => {
 ChangelogTrigger.propTypes = {
   height: PropTypes.string,
   width: PropTypes.string,
+  backgroundSize: PropTypes.string,
   setShowNewsAndUpdates: PropTypes.func,
   setChangelogViewDate: PropTypes.func,
   client: PropTypes.object.isRequired,

@@ -197,7 +197,7 @@ class TopBarProfileMenu extends React.Component {
           <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
           <Hide sm md lg>
             <Container mx={-20} my={-1}>
-              <ChangelogTrigger height="24px" width="24px" />
+              <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
             </Container>
           </Hide>
         </Flex>
