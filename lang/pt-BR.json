@@ -765,6 +765,8 @@
   "editTeam.member.invite.success": "Member invited successfully.",
   "editTeam.member.remove.error": "Failed to remove member.",
   "editTeam.member.remove.success": "Member removed successfully.",
+  "editTeam.memberInvitation.edit.error": "Failed to update member invitation.",
+  "editTeam.memberInvitation.edit.success": "Member invitation updated successfully.",
   "EditUserEmailForm.reSend": "Reenviar confirmação",
   "EditUserEmailForm.submit": "Confirme o novo email",
   "EditUserEmailForm.success": "Um e-mail com um link de confirmação foi enviado para {email}. Por favor, clique no link para validar seu endereço de e-mail.",
