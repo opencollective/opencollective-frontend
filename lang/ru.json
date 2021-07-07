@@ -203,6 +203,7 @@
   "CancelEdit": "Отменить изменения",
   "ChangelogNotification.firstLine": "We have new stuff for you!",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
+  "ChangelogTrigger.tooltip.content": "What's new with Open Collective",
   "checkingBrowser": "Ваш браузер проверяется. Если это сообщение не исчезло, попробуйте переместить мышку или прикоснуться к экрану телефона.",
   "clickHere": "Нажмите здесь",
   "Clipboard.Copied": "Скопировано!",
