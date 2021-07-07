@@ -203,6 +203,7 @@
   "CancelEdit": "ביטול עריכה",
   "ChangelogNotification.firstLine": "We have new stuff for you!",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
+  "ChangelogTrigger.tooltip.content": "What's new with Open Collective",
   "checkingBrowser": "הדפדפן שלך בתהליך אימות. אם הודעה זאת לא נעלמת, כדאי לנסות להזיז את העכבר או להקיש על המסך אם יש לך מכשיר נייד.",
   "clickHere": "נא ללחוץ כאן",
   "Clipboard.Copied": "הועתק!",
