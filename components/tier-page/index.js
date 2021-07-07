@@ -17,6 +17,7 @@ import { Sections } from '../collective-page/_constants';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import Hide from '../Hide';
 import InlineEditField from '../InlineEditField';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -244,9 +245,11 @@ class TierPage extends Component {
                   <div>
                     <TierLongDescription tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </div>
-                  <Container position="relative" width="100%" mb={5} mt={4}>
-                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
-                  </Container>
+                  <Hide lg md>
+                    <Container position="relative" width="100%" mb={5} mt={4}>
+                      <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
+                    </Container>
+                  </Hide>
                 </Container>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
                   {shareBlock}
@@ -363,6 +366,9 @@ class TierPage extends Component {
               </Flex>
               {/** Share buttons (desktop only) */}
               <Container display={['none', null, null, 'block']}>{shareBlock}</Container>
+              <Container position="relative" mt="170px" ml={-30} mr={-30}>
+                <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
+              </Container>
             </Container>
           </Flex>
         </Flex>
