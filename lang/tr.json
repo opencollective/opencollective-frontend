@@ -203,6 +203,7 @@
   "CancelEdit": "Düzenlemeyi iptal et",
   "ChangelogNotification.firstLine": "We have new stuff for you!",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
+  "ChangelogTrigger.tooltip.content": "What's new with Open Collective",
   "checkingBrowser": "Your browser is being verified. If this message doesn't disappear, try to move your mouse or to touch your screen for mobile.",
   "clickHere": "Buraya tıklayın",
   "Clipboard.Copied": "Kopyalandı!",
