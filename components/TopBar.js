@@ -179,7 +179,9 @@ class TopBar extends React.Component {
           </Hide>
         </Flex>
         <Container mr={3}>
-          <ChangelogTrigger />
+          <Hide xs>
+            <ChangelogTrigger />
+          </Hide>
         </Container>
         <TopBarProfileMenu />
         <Hide sm md lg>

@@ -10,6 +10,7 @@ import { createGlobalStyle } from 'styled-components';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { parseToBoolean } from '../lib/utils';
 
+import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -192,7 +193,14 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <Flex alignItems="center" onClick={this.toggleProfileMenu} data-cy="user-menu-trigger">
-        <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
+        <Flex>
+          <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
+          <Hide sm md lg>
+            <Container mx={-20} my={-1}>
+              <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
+            </Container>
+          </Hide>
+        </Flex>
         <Hide xs>
           <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
         </Hide>

@@ -22,8 +22,8 @@ const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES
 
 const FlameIcon = styled(StyledRoundButton)`
   border-radius: 50%;
-  height: 30px;
-  width: 30px;
+  height: ${props => props.height || '30px'};
+  width: ${props => props.width || '30px'};
   margin-left: 2px;
 
   &,
@@ -40,7 +40,7 @@ const FlameIcon = styled(StyledRoundButton)`
 `;
 
 const ChangelogTrigger = props => {
-  const { setShowNewsAndUpdates, setChangelogViewDate } = props;
+  const { height, width, backgroundSize, setShowNewsAndUpdates, setChangelogViewDate } = props;
   const { data } = useQuery(loggedInUserQuery, { fetchPolicy: 'cache-only' });
   const LoggedInUser = data?.LoggedInUser;
   const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
@@ -70,14 +70,24 @@ const ChangelogTrigger = props => {
       {hasSeenNewUpdates ? (
         <StyledTooltip content={TooltipContent}>
           <FlameIcon
+            height={height}
+            width={width}
             onClick={handleShowNewUpdates}
             backgroundColor="black.100"
+            backgroundSize={backgroundSize}
             url="/static/images/flame-default.svg"
           />
         </StyledTooltip>
       ) : (
         <Dropdown>
-          <FlameIcon onClick={handleShowNewUpdates} backgroundColor="yellow.100" url="/static/images/flame-red.svg" />
+          <FlameIcon
+            height={height}
+            width={width}
+            onClick={handleShowNewUpdates}
+            backgroundColor="yellow.100"
+            backgroundSize={backgroundSize}
+            url="/static/images/flame-red.svg"
+          />
           <ChangelogNotificationDropdown />
         </Dropdown>
       )}
@@ -86,6 +96,9 @@ const ChangelogTrigger = props => {
 };
 
 ChangelogTrigger.propTypes = {
+  height: PropTypes.string,
+  width: PropTypes.string,
+  backgroundSize: PropTypes.string,
   setShowNewsAndUpdates: PropTypes.func,
   setChangelogViewDate: PropTypes.func,
   client: PropTypes.object.isRequired,
