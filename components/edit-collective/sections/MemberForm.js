@@ -33,7 +33,7 @@ const MemberForm = props => {
   const { intl, member, collectiveImg, bindSubmitForm, triggerSubmit } = props;
 
   const [isSubmitted, setIsSubmitted] = React.useState(false);
-  const [memberRole, setMemberRole] = React.useState(roles.ADMIN);
+  const [memberRole, setMemberRole] = React.useState(member?.role || roles.ADMIN);
 
   const memberCollective = member?.member;
 
@@ -126,10 +126,10 @@ const MemberForm = props => {
                       }
                     }}
                   />
-                  {field.name === 'role' && hasRoleDescription(member?.role || memberRole) && (
+                  {field.name === 'role' && hasRoleDescription(memberRole) && (
                     <Flex mb={3}>
                       <Box mx={1} mt={1} fontSize="12px" color="black.600" fontStyle="italic">
-                        <MemberRoleDescription role={member?.role || memberRole} />
+                        <MemberRoleDescription role={memberRole} />
                       </Box>
                     </Flex>
                   )}

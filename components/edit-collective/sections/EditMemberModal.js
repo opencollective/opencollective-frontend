@@ -230,7 +230,7 @@ const EditMemberModal = props => {
 
   return (
     <Container>
-      <Modal show={show} onClose={cancelHandler}>
+      <Modal width={688} show={show} onClose={cancelHandler}>
         <ModalHeader>
           <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
         </ModalHeader>
