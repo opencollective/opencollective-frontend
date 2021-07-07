@@ -26,7 +26,6 @@ const editMemberMutation = gqlV2/* GraphQL */ `
     $role: MemberRole
     $description: String
     $since: ISODateTime
-    $isInvitation: Boolean
   ) {
     editMember(
       memberAccount: $memberAccount
@@ -34,7 +33,26 @@ const editMemberMutation = gqlV2/* GraphQL */ `
       role: $role
       description: $description
       since: $since
-      isInvitation: $isInvitation
+    ) {
+      id
+    }
+  }
+`;
+
+const editMemberInvitationMutation = gqlV2/* GraphQL */ `
+  mutation EditMemberInvitation(
+    $memberAccount: AccountReferenceInput!
+    $account: AccountReferenceInput!
+    $role: MemberRole
+    $description: String
+    $since: ISODateTime
+  ) {
+    editMemberInvitation(
+      memberAccount: $memberAccount
+      account: $account
+      role: $role
+      description: $description
+      since: $since
     ) {
       id
     }
@@ -45,7 +63,7 @@ const removeMemberMutation = gqlV2/* GraphQL */ `
   mutation RemoveMember(
     $memberAccount: AccountReferenceInput!
     $account: AccountReferenceInput!
-    $role: MemberRole
+    $role: MemberRole!
     $isInvitation: Boolean
   ) {
     removeMember(memberAccount: $memberAccount, account: $account, role: $role, isInvitation: $isInvitation)
@@ -76,10 +94,13 @@ const EditMemberModal = props => {
     awaitRefetchQueries: true,
   };
 
-  const [editMemberAccount, { loading: isEditing, error: editError }] = useMutation(
+  const [editMemberAccount, { loading: isEditingMember, error: editError }] = useMutation(
     editMemberMutation,
     mutationOptions,
   );
+
+  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation, error: editMemberInvitationError }] =
+    useMutation(editMemberInvitationMutation, mutationOptions);
 
   const [removeMemberAccount, { error: removeError }] = useMutation(removeMemberMutation, mutationOptions);
 
@@ -102,7 +123,6 @@ const EditMemberModal = props => {
           description,
           role,
           since,
-          isInvitation,
         },
       });
 
@@ -116,6 +136,46 @@ const EditMemberModal = props => {
       addToast({
         type: TOAST_TYPE.ERROR,
         message: <FormattedMessage id="editTeam.member.edit.error" defaultMessage="Failed to update member." />,
+      });
+    }
+  };
+
+  const handleEditMemberInvitationMutation = async values => {
+    const { description, role, since } = values;
+
+    try {
+      await editMemberInvitationAccount({
+        variables: {
+          memberAccount: {
+            slug: get(member.member, 'slug'),
+          },
+          account: { slug: get(collective, 'slug') },
+          description,
+          role,
+          since,
+        },
+      });
+
+      addToast({
+        type: TOAST_TYPE.SUCCESS,
+        message: (
+          <FormattedMessage
+            id="editTeam.memberInvitation.edit.success"
+            defaultMessage="Member invitation updated successfully."
+          />
+        ),
+      });
+
+      cancelHandler();
+    } catch (error) {
+      addToast({
+        type: TOAST_TYPE.ERROR,
+        message: (
+          <FormattedMessage
+            id="editTeam.memberInvitation.edit.error"
+            defaultMessage="Failed to update member invitation."
+          />
+        ),
       });
     }
   };
@@ -182,6 +242,13 @@ const EditMemberModal = props => {
               </MessageBox>
             </Flex>
           )}
+          {editMemberInvitationError && (
+            <Flex alignItems="center" justifyContent="center">
+              <MessageBox type="error" withIcon m={[1, 3]} data-cy="cof-error-message">
+                {editMemberInvitationError.message}
+              </MessageBox>
+            </Flex>
+          )}
           {removeError && (
             <Flex alignItems="center" justifyContent="center">
               <MessageBox type="error" withIcon m={[1, 3]} data-cy="cof-error-message">
@@ -194,7 +261,7 @@ const EditMemberModal = props => {
             collectiveImg={get(collective, 'imageUrl')}
             member={member}
             bindSubmitForm={bindSubmitForm}
-            triggerSubmit={handleEditMemberMutation}
+            triggerSubmit={isInvitation ? handleEditMemberInvitationMutation : handleEditMemberMutation}
           />
           <Flex justifyContent="flex-end">
             {isLastAdmin && member.role === roles.ADMIN ? (
@@ -238,7 +305,7 @@ const EditMemberModal = props => {
               autoFocus
               minWidth={140}
               onClick={cancelHandler}
-              disabled={isEditing}
+              disabled={isEditingMember || isEditingMemberInvitation}
               data-cy="confirmation-modal-cancel"
             >
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
@@ -248,7 +315,7 @@ const EditMemberModal = props => {
               minWidth={140}
               buttonStyle="primary"
               data-cy="confirmation-modal-continue"
-              loading={isEditing}
+              loading={isEditingMember || isEditingMemberInvitation}
               onClick={handleSubmitForm}
             >
               <FormattedMessage id="save" defaultMessage="Save" />

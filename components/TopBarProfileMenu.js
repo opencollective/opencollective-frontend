@@ -27,8 +27,8 @@ import { withUser } from './UserProvider';
 const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES_ENABLED);
 
 const memberInvitationsCountQuery = gqlV2`
-  query MemberInvitationsCount($memberCollectiveId: Int!) {
-    memberInvitations(MemberCollectiveId: $memberCollectiveId) {
+  query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {
+    memberInvitations(memberAccount: $memberAccount) {
       id
     }
   }
@@ -144,7 +144,7 @@ class TopBarProfileMenu extends React.Component {
               </UserMenuLinkEntry>
               <Query
                 query={memberInvitationsCountQuery}
-                variables={{ memberCollectiveId: LoggedInUser.CollectiveId }}
+                variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
                 fetchPolicy="network-only"
                 context={API_V2_CONTEXT}
               >

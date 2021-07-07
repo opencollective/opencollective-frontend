@@ -13,13 +13,13 @@ import MessageBox from '../components/MessageBox';
 import { H1 } from '../components/Text';
 
 const memberInvitationsPageQuery = gqlV2`
-  query MemberInvitationsPage($memberCollectiveId: Int!) {
-    memberInvitations(MemberCollectiveId: $memberCollectiveId) {
+  query MemberInvitationsPage($memberAccount: AccountReferenceInput!) {
+    memberInvitations(memberAccount: $memberAccount) {
       id
       createdAt
       role
       description
-      collective {
+      account {
         id
         slug
         name
@@ -53,7 +53,7 @@ class MemberInvitationsPage extends React.Component {
         {LoggedInUser => (
           <Query
             query={memberInvitationsPageQuery}
-            variables={{ memberCollectiveId: LoggedInUser.CollectiveId }}
+            variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
             fetchPolicy="network-only"
             context={API_V2_CONTEXT}
           >

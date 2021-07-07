@@ -121,7 +121,9 @@ const MemberForm = props => {
                     options={field.options}
                     onChange={value => {
                       setFieldValue(field.name, value);
-                      setMemberRole(value);
+                      if (field.name === 'role') {
+                        setMemberRole(value);
+                      }
                     }}
                   />
                   {field.name === 'role' && hasRoleDescription(member?.role || memberRole) && (

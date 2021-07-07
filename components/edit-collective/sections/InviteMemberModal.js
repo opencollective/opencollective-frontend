@@ -23,7 +23,7 @@ const inviteMemberMutation = gqlV2/* GraphQL */ `
   mutation InviteMember(
     $memberAccount: AccountReferenceInput!
     $account: AccountReferenceInput!
-    $role: MemberRole
+    $role: MemberRole!
     $description: String
     $since: ISODateTime
   ) {
