@@ -245,12 +245,12 @@ class TierPage extends Component {
                   <div>
                     <TierLongDescription tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </div>
-                  <Hide lg md>
-                    <Container position="relative" width="100%" mb={5} mt={4}>
-                      <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
-                    </Container>
-                  </Hide>
                 </Container>
+                <Hide lg md>
+                  <Container position="relative" width="100%" mb={5} mt={5}>
+                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
+                  </Container>
+                </Hide>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
                   {shareBlock}
                 </Container>
