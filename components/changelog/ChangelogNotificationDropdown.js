@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -40,9 +41,8 @@ const CloseIcon = styled(Times)`
   cursor: pointer;
 `;
 
-const ChangelogNotificationDropdown = () => {
-  const [showDropdown, setShowDropdown] = useState(true);
-  return showDropdown ? (
+const ChangelogNotificationDropdown = ({ onClose }) => {
+  return (
     <React.Fragment>
       <ChangeLogNotificationDropdownArrow />
       <ChangeLogNotificationDropdownContent>
@@ -51,7 +51,7 @@ const ChangelogNotificationDropdown = () => {
             <P fontSize="14px" fontWeight="700" color="black.800" mb={3} mr={3}>
               <FormattedMessage id="ChangelogNotification.firstLine" defaultMessage="We have new stuff for you!" />
             </P>
-            <CloseIcon onClick={() => setShowDropdown(false)} />
+            <CloseIcon onClick={onClose} />
           </Flex>
           <P fontSize="14px" color="black.800">
             <FormattedMessage
@@ -65,7 +65,11 @@ const ChangelogNotificationDropdown = () => {
         </Box>
       </ChangeLogNotificationDropdownContent>
     </React.Fragment>
-  ) : null;
+  );
+};
+
+ChangelogNotificationDropdown.propTypes = {
+  onClose: PropTypes.func,
 };
 
 export default ChangelogNotificationDropdown;
