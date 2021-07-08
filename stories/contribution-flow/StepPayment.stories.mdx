@@ -10,7 +10,7 @@ const stripePromise = loadStripe('storybookStripeId');
 
 export const DefaultStory = props => (
   <Elements stripe={stripePromise}>
-    <StepPayment stepProfile={StepProfile} collective={webpackCollective} {...props} />
+    <StepPayment stepProfile={StepProfile} collective={webpackCollective} onChange={console.log} {...props} />
   </Elements>
 );
 

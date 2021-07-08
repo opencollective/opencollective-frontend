@@ -792,14 +792,14 @@ export const loggedInUser = new LoggedInUser({
       collective: {
         __typename: 'Collective',
         id: 12022,
-        slug: 'styleguidist',
+        slug: 'storybook',
         type: 'COLLECTIVE',
         isIncognito: false,
-        name: 'React Styleguidist',
+        name: 'Storybook',
         currency: 'USD',
         isHost: false,
         endsAt: null,
-        imageUrl: 'https://images-staging.opencollective.com/styleguidist/7bb2ebe/logo.png',
+        imageUrl: 'https://images-staging.opencollective.com/storybook/7bb2ebe/logo.png',
         categories: [],
         host: {
           __typename: 'Organization',
@@ -807,7 +807,7 @@ export const loggedInUser = new LoggedInUser({
         },
         settings: {
           editor: 'markdown',
-          githubRepo: 'styleguidist/react-styleguidist',
+          githubRepo: 'storybookjs/storybook',
         },
       },
     },
