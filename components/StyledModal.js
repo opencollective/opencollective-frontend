@@ -118,7 +118,7 @@ const CloseIcon = styled(Times)`
 export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
   <Header {...props}>
     {children || <div />}
-    {!hideCloseIcon && <CloseIcon onClick={onClose} />}
+    {!hideCloseIcon && <CloseIcon className="closeIcon" onClick={onClose} />}
   </Header>
 );
 

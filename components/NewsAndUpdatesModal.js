@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Query } from '@apollo/client/react/components';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { FormattedDate, FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
@@ -18,6 +19,25 @@ import StyledCarousel from './StyledCarousel';
 import StyledLink from './StyledLink';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
+
+const ModalHeaderWrapper = styled(ModalHeader)`
+  height: 58px;
+  .closeIcon {
+    margin-top: 30px;
+    height: 20px;
+    width: 20px;
+    color: #76777a;
+  }
+`;
+
+const ModalWrapper = styled(Modal)`
+  padding-top: 8px;
+  padding-bottom: 0px;
+`;
+
+const ModalFooterWrapper = styled(ModalFooter)`
+  height: 65px;
+`;
 
 const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
   query ChangelogUpdates($collectiveSlug: String, $onlyChangelogUpdates: Boolean, $onlyPublishedUpdates: Boolean) {
@@ -105,24 +125,24 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
 
 const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
   return (
-    <Modal onClose={onClose} width="576px" {...modalProps}>
-      <ModalHeader>
+    <ModalWrapper onClose={onClose} width="576px" {...modalProps}>
+      <ModalHeaderWrapper>
         <Flex width="100%">
           <Flex>
-            <Span pt={1}>
+            <Span>
               <Image
-                width={70}
-                height={70}
+                width={72}
+                height={72}
                 src="/static/images/updates-and-news-modal-icon.svg"
                 alt="Updates and News Icon"
               />
             </Span>
-            <P fontSize={['25px', '28px']} fontWeight="500" lineHeight="36px" color="black.900" ml={16} mt={25}>
+            <P fontSize={['25px', '28px']} fontWeight="500" lineHeight="36px" color="black.900" ml={16} mt="18px">
               <FormattedMessage id="NewsAndUpdates.link.whatsNew" defaultMessage="What's new" />
             </P>
           </Flex>
         </Flex>
-      </ModalHeader>
+      </ModalHeaderWrapper>
       <hr />
       <ModalBody>
         <Query
@@ -133,21 +153,21 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
           {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
         </Query>
       </ModalBody>
-      <ModalFooter isFullWidth>
+      <ModalFooterWrapper isFullWidth>
         <Container display="flex">
-          <Flex pt={1} width={1 / 2}>
-            <StyledLink href="https://twitter.com/opencollect" openInNewTab color="black.700" display="flex" pt={3}>
+          <Flex width={1 / 2}>
+            <StyledLink href="https://twitter.com/opencollect" openInNewTab color="black.500" display="flex" mt={1}>
               <Span pr={2}>
                 <FormattedMessage id="NewsAndUpdates.link.twitterFollow" defaultMessage="Follow us" />
               </Span>
-              <Span pt={0.5}>
+              <Span>
                 <Twitter size={17} color="#1153D6" />
               </Span>
             </StyledLink>
           </Flex>
-          <Flex width={1 / 2} justifyContent="right">
+          <Flex width={1 / 2} justifyContent="right" mb="16px">
             <Link onClick={onClose} href="/opencollective/updates">
-              <StyledButton>
+              <StyledButton buttonSize="tiny">
                 <Span fontSize={['11px', '14px']}>
                   <FormattedMessage id="NewsAndUpdates.button.seeAllUpdates" defaultMessage="See all new updates" />
                 </Span>
@@ -155,8 +175,8 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
             </Link>
           </Flex>
         </Container>
-      </ModalFooter>
-    </Modal>
+      </ModalFooterWrapper>
+    </ModalWrapper>
   );
 };
 
