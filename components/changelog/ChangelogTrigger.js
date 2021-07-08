@@ -7,6 +7,7 @@ import { cloneDeep } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { HELP_MESSAGE } from '../../lib/constants/dismissable-help-message';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { parseToBoolean } from '../../lib/utils';
 
@@ -89,7 +90,7 @@ const ChangelogTrigger = props => {
             backgroundSize={backgroundSize}
             url="/static/images/flame-red.svg"
           />
-          <DismissibleMessage messageId="ChangelogTrigger.dropdownNotification">
+          <DismissibleMessage messageId={HELP_MESSAGE.CHANGELOG_NOTIFICATION_DROPDOWN}>
             {({ dismiss }) => <ChangelogNotificationDropdown onClose={dismiss} />}
           </DismissibleMessage>
         </Container>
