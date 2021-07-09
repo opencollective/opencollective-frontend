@@ -24,8 +24,8 @@ const ModalHeaderWrapper = styled(ModalHeader)`
   height: 58px;
   ${CloseIcon} {
     margin-top: 30px;
-    height: 20px;
-    width: 20px;
+    height: 12px;
+    width: 12px;
     color: #76777a;
   }
 `;
