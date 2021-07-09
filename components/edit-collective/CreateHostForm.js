@@ -82,7 +82,7 @@ class CreateHostForm extends React.Component {
 
     organizationsOptions.push({
       label: this.props.intl.formatMessage({
-        id: 'organization.create',
+        id: 'host.organization.create',
         defaultMessage: 'Create an Organization',
       }),
       value: 0,

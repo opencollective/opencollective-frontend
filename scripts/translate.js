@@ -1,12 +1,11 @@
 import * as fs from 'fs';
 
-import { sync as globSync } from 'glob';
-import { difference, has, invertBy, orderBy } from 'lodash';
+import { difference, has, invertBy, mapValues, orderBy } from 'lodash';
 import { sync as mkdirpSync } from 'mkdirp';
 
 import locales from '../lib/constants/locales';
 
-const MESSAGES_PATTERN = './dist/messages/**/*.json';
+const MESSAGES_FILE = './dist/messages/messages.json';
 const LANG_DIR = './lang/';
 const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
 const DUPLICATED_IGNORED_IDS = new Set([
@@ -27,32 +26,9 @@ const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', '
 // React components via the React Intl Babel plugin. An error will be thrown if
 // there are messages in different components that use the same `id`. The result
 // is a flat collection of `id: message` pairs for the app's default locale.
-const duplicates = [];
-const defaultMessages = globSync(MESSAGES_PATTERN)
-  .map(filename => fs.readFileSync(filename, 'utf8'))
-  .map(file => JSON.parse(file))
-  .reduce((collection, descriptors) => {
-    descriptors.forEach(({ id, defaultMessage }) => {
-      if (Object.prototype.hasOwnProperty.call(collection, id)) {
-        if (collection[id] !== defaultMessage) {
-          duplicates.push({ id, base: collection[id], other: defaultMessage });
-        }
-      } else {
-        collection[id] = defaultMessage;
-      }
-    });
-
-    return collection;
-  }, {});
-
-if (duplicates.length > 0) {
-  duplicates.forEach(({ id, base, other }) => {
-    console.error(`🛑 [Error] Duplicate message id with different messages for "${id}"`);
-    console.error(`--- Base:  "${base}"`);
-    console.error(`--- Other: "${other}"`);
-  });
-  throw new Error('The strings include duplicate IDs with different messages');
-}
+const messagesFile = fs.readFileSync(MESSAGES_FILE, 'utf8');
+const jsonMessages = JSON.parse(messagesFile);
+const defaultMessages = mapValues(jsonMessages, message => message.defaultMessage);
 
 /**
  * Store new keys in translation file without overwritting the existing ones.
