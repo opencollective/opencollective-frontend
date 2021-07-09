@@ -107,7 +107,7 @@ const Divider = styled.div`
     `}
 `;
 
-const CloseIcon = styled(Times)`
+export const CloseIcon = styled(Times)`
   font-size: 12px;
   width: 15px;
   height: 15px;
@@ -118,7 +118,7 @@ const CloseIcon = styled(Times)`
 export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
   <Header {...props}>
     {children || <div />}
-    {!hideCloseIcon && <CloseIcon className="closeIcon" onClick={onClose} />}
+    {!hideCloseIcon && <CloseIcon onClick={onClose} />}
   </Header>
 );
 

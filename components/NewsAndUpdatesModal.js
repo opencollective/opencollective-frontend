@@ -17,12 +17,12 @@ import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCarousel from './StyledCarousel';
 import StyledLink from './StyledLink';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import Modal, { CloseIcon, ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
 
 const ModalHeaderWrapper = styled(ModalHeader)`
   height: 58px;
-  .closeIcon {
+  ${CloseIcon} {
     margin-top: 30px;
     height: 20px;
     width: 20px;
@@ -126,7 +126,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
 const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
   return (
     <ModalWrapper onClose={onClose} width="576px" {...modalProps}>
-      <ModalHeaderWrapper>
+      <ModalHeaderWrapper onClose={onClose}>
         <Flex width="100%">
           <Flex>
             <Span>
