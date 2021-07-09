@@ -76,7 +76,6 @@ const RequestVirtualCardModal = props => {
   });
 
   const handleClose = () => {
-    formik.resetForm(initialValues);
     formik.setErrors({});
     props.onClose?.();
   };
