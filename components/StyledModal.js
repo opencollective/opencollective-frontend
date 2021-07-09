@@ -107,7 +107,7 @@ const Divider = styled.div`
     `}
 `;
 
-const CloseIcon = styled(Times)`
+export const CloseIcon = styled(Times)`
   font-size: 12px;
   width: 15px;
   height: 15px;
