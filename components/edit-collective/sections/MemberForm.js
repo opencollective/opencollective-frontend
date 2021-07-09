@@ -40,7 +40,7 @@ const MemberForm = props => {
   const initialValues = {
     description: get(member, 'description') || '',
     role: get(member, 'role') || roles.ADMIN,
-    since: get(member, 'since') || new Date(),
+    since: get(member, 'since') ? new Date(get(member, 'since')).toISOString() : new Date(),
   };
 
   const submit = values => {

@@ -25,7 +25,7 @@ const editMemberMutation = gqlV2/* GraphQL */ `
     $account: AccountReferenceInput!
     $role: MemberRole
     $description: String
-    $since: ISODateTime
+    $since: DateTime
   ) {
     editMember(
       memberAccount: $memberAccount
@@ -45,7 +45,7 @@ const editMemberInvitationMutation = gqlV2/* GraphQL */ `
     $account: AccountReferenceInput!
     $role: MemberRole
     $description: String
-    $since: ISODateTime
+    $since: DateTime
   ) {
     editMemberInvitation(
       memberAccount: $memberAccount
