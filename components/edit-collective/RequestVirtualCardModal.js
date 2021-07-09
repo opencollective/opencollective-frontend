@@ -13,6 +13,8 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
+import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
@@ -22,11 +24,13 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 const initialValues = {
   agreement: false,
   notes: undefined,
+  budget: undefined,
+  purpose: undefined,
 };
 
 const requestVirtualCardMutation = gqlV2/* GraphQL */ `
-  mutation requestVirtualCard($notes: String!, $account: AccountReferenceInput!) {
-    requestVirtualCard(notes: $notes, account: $account)
+  mutation requestVirtualCard($notes: String, $purpose: String, $budget: Int, $account: AccountReferenceInput!) {
+    requestVirtualCard(notes: $notes, purpose: $purpose, budget: $budget, account: $account)
   }
 `;
 
@@ -40,10 +44,12 @@ const RequestVirtualCardModal = props => {
   const formik = useFormik({
     initialValues: { ...initialValues, collective: props.collective },
     async onSubmit(values) {
-      const { collective, notes } = values;
+      const { collective, notes, purpose, budget } = values;
       await requestNewVirtualCard({
         variables: {
           notes,
+          purpose,
+          budget,
           account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
         },
       });
@@ -58,6 +64,12 @@ const RequestVirtualCardModal = props => {
       const errors = {};
       if (!values.agreement) {
         errors.agreement = 'Required';
+      }
+      if (!values.purpose) {
+        errors.purpose = 'Required';
+      }
+      if (!values.notes && values.notes?.lenght > 10) {
+        errors.notes = 'Required';
       }
       return errors;
     },
@@ -98,6 +110,53 @@ const RequestVirtualCardModal = props => {
             labelFontSize="13px"
             label={
               <FormattedMessage
+                id="Collective.VirtualCards.RequestCard.MonthlyBudget"
+                defaultMessage="Monthly Budget"
+              />
+            }
+            htmlFor="budget"
+            error={formik.touched.budget && formik.errors.budget}
+            labelFontWeight="500"
+          >
+            {inputProps => (
+              <StyledInputAmount
+                {...inputProps}
+                currency="USD"
+                name="budget"
+                id="budget"
+                onChange={value => formik.setFieldValue('budget', value)}
+                value={formik.values.budget}
+                disabled={isCreating}
+              />
+            )}
+          </StyledInputField>
+          <StyledInputField
+            mt={3}
+            labelFontSize="13px"
+            label={<FormattedMessage id="Collective.VirtualCards.RequestCard.Purpose" defaultMessage="Purpose" />}
+            htmlFor="purpose"
+            error={formik.touched.purpose && formik.errors.purpose}
+            labelFontWeight="500"
+            useRequiredLabel
+            required
+          >
+            {inputProps => (
+              <StyledInput
+                {...inputProps}
+                name="purpose"
+                id="purpose"
+                onChange={formik.handleChange}
+                value={formik.values.purpose}
+                type="text"
+                disabled={isCreating}
+              />
+            )}
+          </StyledInputField>
+          <StyledInputField
+            mt={3}
+            labelFontSize="13px"
+            label={
+              <FormattedMessage
                 id="PrivateNotesToAdministrators"
                 defaultMessage="Private notes to the administrators"
               />
@@ -105,6 +164,7 @@ const RequestVirtualCardModal = props => {
             htmlFor="notes"
             error={formik.touched.notes && formik.errors.notes}
             labelFontWeight="500"
+            useRequiredLabel
             required
           >
             {inputProps => (
@@ -128,6 +188,7 @@ const RequestVirtualCardModal = props => {
                     defaultMessage="I agree to all the terms and conditions set by{linebreak} the host and Open Collective"
                     values={{ lineBreak: <br /> }}
                   />
+                  <Span color="black.500"> *</Span>
                 </Span>
               }
               required
@@ -153,7 +214,7 @@ const RequestVirtualCardModal = props => {
               data-cy="confirmation-modal-continue"
               loading={isCreating}
               type="submit"
-              disabled={!formik.values.agreement || formik.values.notes?.length < 10}
+              disabled={!formik.isValid}
             >
               <FormattedMessage id="RequestCard" defaultMessage="Request Card" />
             </StyledButton>

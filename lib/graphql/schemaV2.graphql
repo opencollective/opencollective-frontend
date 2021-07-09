@@ -6025,6 +6025,16 @@ type Mutation {
     notes: String
 
     """
+    Purpose for this Virtual Card
+    """
+    purpose: String
+
+    """
+    Monthly budget you want for this Virtual Card
+    """
+    budget: Int
+
+    """
     Account where the virtual card will be associated
     """
     account: AccountReferenceInput!
