@@ -130,9 +130,11 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
     try {
       const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
       await processExpense({ variables });
+      return true;
     } catch (e) {
       // Display a toast with light variant since we're in a modal
       addToast({ type: TOAST_TYPE.ERROR, variant: 'light', ...getErrorContent(intl, e, host, LoggedInUser) });
+      return false;
     }
   };
 
