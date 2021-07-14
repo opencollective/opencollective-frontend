@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
+import { Info } from '@styled-icons/feather/Info';
 import { get, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -16,7 +17,8 @@ import Pagination from '../../Pagination';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledInputField from '../../StyledInputField';
-import { P } from '../../Text';
+import StyledTooltip from '../../StyledTooltip';
+import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import AssignVirtualCardModal from '../AssignVirtualCardModal';
 import SettingsTitle from '../SettingsTitle';
@@ -283,7 +285,19 @@ const HostVirtualCards = props => {
           mt={4}
           label={
             <Box lineHeight="20px" fontSize="14px" fontWeight="500">
-              <FormattedMessage id="Host.VirtualCards.Policy.Title" defaultMessage="Virtual Card Policy" />
+              <Span mr={1}>
+                <FormattedMessage id="Host.VirtualCards.Policy.Title" defaultMessage="Virtual Card Policy" />
+              </Span>
+              <StyledTooltip
+                content={
+                  <FormattedMessage
+                    id="Host.VirtualCards.Policy.ToolTip"
+                    defaultMessage="This policy text will appear in a pop up when someone 'Requests a Virtual Card' from the Action menu on the collective's page."
+                  />
+                }
+              >
+                <Info size={16} />
+              </StyledTooltip>
             </Box>
           }
         >
