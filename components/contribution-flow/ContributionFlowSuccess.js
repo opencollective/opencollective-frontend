@@ -270,9 +270,10 @@ class ContributionFlowSuccess extends React.Component {
                       <P color="black.800" fontWeight={500}>
                         <FormattedMessage
                           id="NewContributionFlow.Success.DiscoverMore"
-                          defaultMessage="Discover more Collectives like {collective} &rarr;"
+                          defaultMessage="Discover more Collectives like {collective}"
                           values={{ collective: order.toAccount.name }}
                         />
+                        &nbsp;&rarr;
                       </P>
                     </Link>
                   </Box>
