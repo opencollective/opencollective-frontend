@@ -125,8 +125,8 @@ const RequestVirtualCardModal = props => {
                 <Span fontSize="12px" fontWeight="400" lineHeight="16px">
                   <FormattedMessage
                     id="Collective.VirtualCards.RequestCard.Agreement"
-                    defaultMessage="I agree to all the terms and conditions set by
-the host and Open Collective"
+                    defaultMessage="I agree to all the terms and conditions set by{linebreak} the host and Open Collective"
+                    values={{ lineBreak: <br /> }}
                   />
                 </Span>
               }

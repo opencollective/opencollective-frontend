@@ -172,8 +172,10 @@ class InputTypeLocation extends React.Component {
           <MessageBox withIcon type="warning">
             <FormattedMessage
               id="location.googleAutocompleteService.unavailable"
-              values={{ service: 'Google Autocomplete Service', domain: 'maps.googleapis.com' }}
-              defaultMessage={'Location field requires "{service}" to function.\n Make sure "{domain}" is not blocked.'}
+              values={{ service: 'Google Autocomplete Service', domain: 'maps.googleapis.com', lineBreak: <br /> }}
+              defaultMessage={
+                'Location field requires "{service}" to function.{lineBreak} Make sure "{domain}" is not blocked.'
+              }
             />
           </MessageBox>
         ) : (
