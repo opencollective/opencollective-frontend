@@ -2045,7 +2045,7 @@
   "updatePaymentMethod.subtitle.line": "Please add a new payment method for the following subscriptions before your current one expires.",
   "updatePaymentMethod.title": "更新付款方式",
   "updates": "更新",
-  "updates.create.login": "You need to be logged in as a core contributor of this collective to be able to create an update.",
+  "updates.create.login": "You need to be logged in as an admin of this collective to be able to create an update.",
   "updates.empty": "No Updates",
   "Updates.MostRecent": "Most recent",
   "updates.new.error": "更新失败：{err}",

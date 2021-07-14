@@ -2045,7 +2045,7 @@
   "updatePaymentMethod.subtitle.line": "Please add a new payment method for the following subscriptions before your current one expires.",
   "updatePaymentMethod.title": "Update Payment Method",
   "updates": "Updates",
-  "updates.create.login": "コアメンバーとしてアップデートを作成するためにはログインする必要があります。",
+  "updates.create.login": "You need to be logged in as an admin of this collective to be able to create an update.",
   "updates.empty": "No Updates",
   "Updates.MostRecent": "Most recent",
   "updates.new.error": "Update failed: {err}",

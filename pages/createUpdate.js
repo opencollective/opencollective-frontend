@@ -140,7 +140,7 @@ class CreateUpdatePage extends React.Component {
                   <p>
                     <FormattedMessage
                       id="updates.create.login"
-                      defaultMessage="You need to be logged in as a core contributor of this collective to be able to create an update."
+                      defaultMessage="You need to be logged in as an admin of this collective to be able to create an update."
                     />
                   </p>
                   <p>
@@ -157,7 +157,7 @@ class CreateUpdatePage extends React.Component {
                   </H1>
                 </Container>
               )}
-              {collective.slug === 'opencollective' && LoggedInUser && (
+              {collective.slug === 'opencollective' && isAdmin && (
                 <StyledButtonSet
                   size="medium"
                   items={UPDATE_TYPES}

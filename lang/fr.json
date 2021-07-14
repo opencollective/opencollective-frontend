@@ -2045,7 +2045,7 @@
   "updatePaymentMethod.subtitle.line": "Veuillez ajouter un nouveau mode de paiement pour les abonnements suivants avant que votre abonnement actuel n'expire.",
   "updatePaymentMethod.title": "Mettre à jour le moyen de paiement",
   "updates": "Actualités",
-  "updates.create.login": "Vous devez vous identifier en tant qu'administrateur de ce collectif pour pouvoir créer une nouvelle actualité.",
+  "updates.create.login": "You need to be logged in as an admin of this collective to be able to create an update.",
   "updates.empty": "No Updates",
   "Updates.MostRecent": "Most recent",
   "updates.new.error": "Erreur lors de la publication : {err}",

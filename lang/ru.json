@@ -2045,7 +2045,7 @@
   "updatePaymentMethod.subtitle.line": "Пожалуйста, добавьте новый способ оплаты для следующих подписок до истечения вашего текущего срока оплаты.",
   "updatePaymentMethod.title": "Обновить способ оплаты",
   "updates": "Обновления",
-  "updates.create.login": "Вы должны быть авторизованы как основной вкладчик этого коллектива, чтобы иметь возможность создать обновление.",
+  "updates.create.login": "You need to be logged in as an admin of this collective to be able to create an update.",
   "updates.empty": "No Updates",
   "Updates.MostRecent": "Most recent",
   "updates.new.error": "Не удалось обновить: {err}",
