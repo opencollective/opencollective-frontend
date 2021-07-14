@@ -2045,7 +2045,7 @@
   "updatePaymentMethod.subtitle.line": "Por favor, añade un nuevo método de pago para las siguientes suscripciones antes de que caduque tu método de pago actual.",
   "updatePaymentMethod.title": "Actualizar Método de Pago",
   "updates": "Actualizaciones",
-  "updates.create.login": "You need to be logged in as a core contributor of this collective to be able to create an update.",
+  "updates.create.login": "You need to be logged in as an admin of this collective to be able to create an update.",
   "updates.empty": "No hay actualizaciones",
   "Updates.MostRecent": "Most recent",
   "updates.new.error": "Actualización fallida: {err}",
