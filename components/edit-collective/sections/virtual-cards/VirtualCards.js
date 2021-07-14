@@ -20,7 +20,7 @@ import VirtualCard from '../../VirtualCard';
 import VirtualCardFilters from './VirtualCardFilters';
 
 const virtualCardsQuery = gqlV2/* GraphQL */ `
-  query CollectiveVirtualCards(
+  query AccountVirtualCards(
     $slug: String
     $limit: Int!
     $offset: Int!
@@ -29,21 +29,23 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
     $dateFrom: ISODateTime
     $dateTo: ISODateTime
   ) {
-    collective(slug: $slug) {
+    account(slug: $slug) {
       id
       legacyId
       slug
       type
       name
       imageUrl
-      host {
-        legacyId
-        slug
-        id
-        type
-        name
-        imageUrl
-        settings
+      ... on AccountWithHost {
+        host {
+          legacyId
+          slug
+          id
+          type
+          name
+          imageUrl
+          settings
+        }
       }
       virtualCards(
         limit: $limit
