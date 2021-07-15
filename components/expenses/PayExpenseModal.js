@@ -120,6 +120,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
   const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
+  console.log(host);
 
   return (
     <StyledModal

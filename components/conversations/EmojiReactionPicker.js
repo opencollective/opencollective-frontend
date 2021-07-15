@@ -76,6 +76,7 @@ const getOptimisticResponse = (entity, emoji, isAdding) => {
   const userReactions = entity.userReactions || [];
   const { __typename } = entity;
   const fieldName = __typename === 'Update' ? 'update' : 'comment';
+  const fieldNameOpposite = __typename === 'Update' ? 'comment' : 'update';
   if (isAdding) {
     const newCount = (entity.reactions[emoji] || 0) + 1;
 
@@ -89,6 +90,7 @@ const getOptimisticResponse = (entity, emoji, isAdding) => {
           reactions: { ...entity.reactions, [emoji]: newCount },
           userReactions: [...userReactions, emoji],
         },
+        [fieldNameOpposite]: null,
       },
     };
   } else {
@@ -109,6 +111,7 @@ const getOptimisticResponse = (entity, emoji, isAdding) => {
           reactions,
           userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
         },
+        [fieldNameOpposite]: null,
       },
     };
   }
