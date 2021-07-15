@@ -156,7 +156,7 @@
     "@babel/core": "^7.13.10",
     "@babel/node": "^7.12.17",
     "@cypress/code-coverage": "^3.9.9",
-    "@formatjs/cli": "^4.2.24",
+    "@formatjs/cli": "^4.2.27",
     "@storybook/addon-actions": "^6.1.15",
     "@storybook/addon-docs": "^6.3.2",
     "@storybook/addon-essentials": "^6.3.4",
