@@ -23,6 +23,7 @@ export const getDefaultKinds = () => {
     TransactionKind.ADDED_FUNDS,
     TransactionKind.CONTRIBUTION,
     TransactionKind.EXPENSE,
+    TransactionKind.HOST_FEE,
     TransactionKind.PLATFORM_TIP,
   ];
 };
