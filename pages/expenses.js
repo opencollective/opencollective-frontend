@@ -27,7 +27,7 @@ import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
-import { expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
+import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
@@ -356,11 +356,11 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
           name
           slug
           type
-          supportedPayoutMethods
           settings
           plan {
             id
           }
+          ...ExpenseHostFields
         }
       }
 
@@ -413,6 +413,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
 
   ${expensesListFieldsFragment}
   ${collectiveNavbarFieldsFragment}
+  ${expenseHostFields}
 `;
 
 const addExpensesPageData = graphql(expensesPageQuery, {

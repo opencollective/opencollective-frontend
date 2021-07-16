@@ -24,8 +24,9 @@ import TransactionItem from '../../transactions/TransactionItem';
 import { withUser } from '../../UserProvider';
 import BudgetStats from '../BudgetStats';
 import ContainerSectionContent from '../ContainerSectionContent';
+import { budgetSectionQuery } from '../graphql/queries';
 
-export const budgetSectionQuery = gqlV2/* GraphQL */ `
+export const budgetSectionQueryWithHost = gqlV2/* GraphQL */ `
   query BudgetSection($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
     host(slug: $hostSlug) {
       ...ExpenseHostFields
@@ -127,7 +128,8 @@ ViewAllLink.propTypes = {
  */
 const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
-  const budgetQueryResult = useQuery(budgetSectionQuery, {
+  const budgetQuery = collective.host ? budgetSectionQueryWithHost : budgetSectionQuery;
+  const budgetQueryResult = useQuery(budgetQuery, {
     variables: getBudgetSectionQueryVariables(collective.slug, collective.host?.slug),
     context: API_V2_CONTEXT,
   });
