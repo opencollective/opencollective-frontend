@@ -10,12 +10,15 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
+import {
+  budgetSectionQuery,
+  collectivePageQuery,
+  getCollectivePageQueryVariables,
+} from '../collective-page/graphql/queries';
 import { getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
-import { expensesListFieldsFragment } from '../expenses/graphql/fragments';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -31,7 +34,6 @@ import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { transactionsQueryCollectionFragment } from '../transactions/graphql/fragments';
 import { useUser } from '../UserProvider';
 
 import illustration from '../contribution-flow/fees-on-top-illustration.png';
@@ -109,22 +111,6 @@ const addPlatformTipMutation = gqlV2/* GraphQL */ `
       id
     }
   }
-`;
-
-export const budgetSectionQuery = gqlV2/* GraphQL */ `
-  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
-    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kinds: $kind) {
-      ...TransactionsQueryCollectionFragment
-    }
-    expenses(account: { slug: $slug }, limit: $limit) {
-      totalCount
-      nodes {
-        ...ExpensesListFieldsFragment
-      }
-    }
-  }
-  ${transactionsQueryCollectionFragment}
-  ${expensesListFieldsFragment}
 `;
 
 const getInitialValues = values => ({

@@ -1,10 +1,8 @@
 import { getFilteredSectionsForCollective, getSectionsNames } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
-import { expensesListFieldsFragment } from '../../expenses/graphql/fragments';
 import { recurringContributionsQuery } from '../../recurring-contributions/graphql/queries';
-import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import {
   getTotalCollectiveContributionsQueryVariables,
   totalCollectiveContributionsQuery,
@@ -16,23 +14,7 @@ import { getRecurringContributionsSectionQueryVariables } from '../sections/Recu
 import { getTransactionsSectionQueryVariables, transactionsSectionQuery } from '../sections/Transactions';
 import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../sections/Updates';
 
-import { collectivePageQuery, getCollectivePageQueryVariables } from './queries';
-
-export const budgetSectionQuery = gqlV2/* GraphQL */ `
-  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
-    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kinds: $kind) {
-      ...TransactionsQueryCollectionFragment
-    }
-    expenses(account: { slug: $slug }, limit: $limit) {
-      totalCount
-      nodes {
-        ...ExpensesListFieldsFragment
-      }
-    }
-  }
-  ${transactionsQueryCollectionFragment}
-  ${expensesListFieldsFragment}
-`;
+import { budgetSectionQuery, collectivePageQuery, getCollectivePageQueryVariables } from './queries';
 
 export const preloadCollectivePageGraphlQueries = async (slug, client) => {
   const result = await client.query({
