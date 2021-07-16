@@ -11,7 +11,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { DebitItem } from '../../budget/DebitCreditList';
 import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
 import Container from '../../Container';
-import { expensesListFieldsFragment } from '../../expenses/graphql/fragments';
+import { expenseHostFields, expensesListFieldsFragment } from '../../expenses/graphql/fragments';
 import { Box, Flex } from '../../Grid';
 import Image from '../../Image';
 import Link from '../../Link';
@@ -26,7 +26,10 @@ import BudgetStats from '../BudgetStats';
 import ContainerSectionContent from '../ContainerSectionContent';
 
 export const budgetSectionQuery = gqlV2/* GraphQL */ `
-  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+  query BudgetSection($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
+    host(slug: $hostSlug) {
+      ...ExpenseHostFields
+    }
     transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kinds: $kind) {
       ...TransactionsQueryCollectionFragment
     }
@@ -39,6 +42,7 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
 `;
 
 const DEFAULT_KINDS = [
@@ -49,8 +53,8 @@ const DEFAULT_KINDS = [
 ];
 
 // Any change here should be reflected in API's `server/graphql/cache.js`
-export const getBudgetSectionQueryVariables = slug => {
-  return { slug, limit: 3, kind: DEFAULT_KINDS };
+export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug) => {
+  return { slug: collectiveSlug, hostSlug, limit: 3, kind: DEFAULT_KINDS };
 };
 
 const BudgetItemContainer = styled.div`
@@ -124,7 +128,7 @@ ViewAllLink.propTypes = {
 const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
   const budgetQueryResult = useQuery(budgetSectionQuery, {
-    variables: getBudgetSectionQueryVariables(collective.slug),
+    variables: getBudgetSectionQueryVariables(collective.slug, collective.host?.slug),
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;
@@ -188,7 +192,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
                         <ExpenseBudgetItem
                           expense={item}
                           collective={collective}
-                          host={collective.host}
+                          host={data?.host}
                           showAmountSign
                           showProcessActions
                         />

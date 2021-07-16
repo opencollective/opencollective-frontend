@@ -7,14 +7,14 @@ import {
   getTotalCollectiveContributionsQueryVariables,
   totalCollectiveContributionsQuery,
 } from '../hero/HeroTotalCollectiveContributionsWithData';
-import { budgetSectionQuery, getBudgetSectionQueryVariables } from '../sections/Budget';
+import { getBudgetSectionQueryVariables } from '../sections/Budget';
 import { contributionsSectionQuery, getContributionsSectionQueryVariables } from '../sections/Contributions';
 import { conversationsSectionQuery, getConversationsSectionQueryVariables } from '../sections/Conversations';
 import { getRecurringContributionsSectionQueryVariables } from '../sections/RecurringContributions';
 import { getTransactionsSectionQueryVariables, transactionsSectionQuery } from '../sections/Transactions';
 import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../sections/Updates';
 
-import { collectivePageQuery, getCollectivePageQueryVariables } from './queries';
+import { budgetSectionQuery, collectivePageQuery, getCollectivePageQueryVariables } from './queries';
 
 export const preloadCollectivePageGraphlQueries = async (slug, client) => {
   const result = await client.query({

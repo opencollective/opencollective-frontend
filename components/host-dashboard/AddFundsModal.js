@@ -10,8 +10,12 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
-import { budgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
+import {
+  budgetSectionQuery,
+  collectivePageQuery,
+  getCollectivePageQueryVariables,
+} from '../collective-page/graphql/queries';
+import { getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
