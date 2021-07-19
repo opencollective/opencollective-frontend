@@ -352,14 +352,6 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
-          id
-          name
-          slug
-          type
-          settings
-          plan {
-            id
-          }
           ...ExpenseHostFields
         }
       }
