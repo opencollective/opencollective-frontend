@@ -46,6 +46,10 @@ const rejectAndRefundTooltipContent = (showRefundHelp, showRejectHelp) => (
   </Box>
 );
 
+const isInternalTransfer = (fromAccount, toAccount) => {
+  return fromAccount.parentCollective?.id === toAccount.id || fromAccount.parent?.id === toAccount.id;
+};
+
 const DetailTitle = styled.p`
   margin: 8px 8px 4px 8px;
   color: #76777a;
@@ -110,7 +114,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     parseToBoolean(getEnvVar('REJECT_CONTRIBUTION')) || collectiveHasRejectContributionFeature;
   const showRefundButton = permissions?.canRefund && !isRefunded;
   const showRejectButton = permissions?.canReject && !isOrderRejected && showRejectContribution;
-  const showDownloadInvoiceButton = permissions?.canDownloadInvoice;
+  const showDownloadInvoiceButton = permissions?.canDownloadInvoice && !isInternalTransfer(fromAccount, toAccount);
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
