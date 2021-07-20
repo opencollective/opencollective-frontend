@@ -631,7 +631,7 @@ class ExpensePage extends React.Component {
                   <ExpenseForm
                     collective={collective}
                     loading={data.loading || loadingLoggedInUser || isRefetchingDataForUser}
-                    expense={editedExpense}
+                    expense={editedExpense || expense}
                     expensesTags={this.getSuggestedTags(collective)}
                     payoutProfiles={payoutProfiles}
                     loggedInAccount={loggedInAccount}
