@@ -24,8 +24,8 @@ const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES
 
 const FlameIcon = styled(StyledRoundButton)`
   border-radius: 50%;
-  height: ${props => props.height || '30px'};
-  width: ${props => props.width || '30px'};
+  height: ${props => props.height || '40px'};
+  width: ${props => props.width || '40px'};
   margin-left: 2px;
 
   &,
