@@ -18,7 +18,7 @@ export const DEFAULT_AMOUNT_STYLES = { letterSpacing: 0, fontWeight: 'bold', col
  * internationalization support.
  */
 const FormattedMoneyAmount = ({
-  abbreviateAmount,
+  formatWithSeparators,
   abbreviateInterval,
   currency,
   precision,
@@ -37,7 +37,7 @@ const FormattedMoneyAmount = ({
         value={amount}
         currency={currency}
         precision={precision}
-        abbreviate={abbreviateAmount}
+        formatWithSeparators={formatWithSeparators}
         {...amountStyles}
       />
     );
@@ -79,8 +79,6 @@ FormattedMoneyAmount.propTypes = {
   amount: PropTypes.number,
   /** The currency (eg. `USD`, `EUR`...etc) */
   currency: PropTypes.string.isRequired,
-  /** Abbreviate the name to display 100k instead of 100.000 */
-  abbreviateAmount: PropTypes.bool,
   /** Abbreviate the interval (eg. year => yr.) */
   abbreviateInterval: PropTypes.bool,
   /** Whether to show the full currency code (ie. USD) */
