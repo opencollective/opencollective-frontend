@@ -40,6 +40,7 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
       id
       type
       isActive
+      isHost
       settings
     }
   }
