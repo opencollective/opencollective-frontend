@@ -45,3 +45,34 @@ npm run deploy:production
 ```
 
 URL: https://opencollective.com/
+
+## Rollback Deployment to Previous State
+
+If something goes wrong, you can easily rollback the deployment with the following commands. 
+
+```bash
+heroku releases --app oc-prod-frontend
+```
+
+**Note:** For staging it will be, `heroku releases --app oc-staging-frontend`
+
+This will give an output of all the Heroku releases. Something like,
+
+```bash
+=== opencollective-prod-api Releases - Current: v1574
+v1574  Dep…         abc@opencollective.com        2021/07/21 11:09:08 -0700 (~ 26m ago)
+v1573  Dep…         def@opencollective.com        2021/07/16 10:11:50 -0700
+v1572  Dep…         ghi@opencollective.com        2021/07/15 08:23:19 -0700
+v1571  Dep…         jkl@opencollective.com        2021/07/14 09:27:05 -0700
+v1570  Dep…         mno@opencollective.com        2021/07/13 18:08:05 -0700
+```
+
+Now to rollback the latest deployment all you got to do is, 
+
+```bash
+heroku rollback v1574 --app oc-prod-frontend
+```
+
+**Note:** For staging it will be, `heroku rollback v1574 --app oc-staging-frontend`
+
+For more info refer to: https://blog.heroku.com/releases-and-rollbacks and https://devcenter.heroku.com/articles/releases#rollback
