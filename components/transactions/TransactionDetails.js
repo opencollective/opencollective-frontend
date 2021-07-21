@@ -47,7 +47,7 @@ const rejectAndRefundTooltipContent = (showRefundHelp, showRejectHelp) => (
 );
 
 const isInternalTransfer = (fromAccount, toAccount) => {
-  return fromAccount.parentCollective?.id === toAccount.id || fromAccount.parent?.id === toAccount.id;
+  return fromAccount.parent?.id === toAccount.id;
 };
 
 const DetailTitle = styled.p`

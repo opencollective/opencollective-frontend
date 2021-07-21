@@ -73,7 +73,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         imageUrl
         isIncognito
         ... on Event {
-          parentCollective {
+          parent {
             id
           }
         }
