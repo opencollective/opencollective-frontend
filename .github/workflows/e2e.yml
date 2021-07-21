@@ -216,7 +216,7 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test screenshots
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: screenshots
           path: test/cypress/screenshots
