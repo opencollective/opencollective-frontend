@@ -629,6 +629,7 @@
   "createFund.tos.label": "Прочитайте {toslink} Open Collective.",
   "CreateGiftCardsSuccess.Download": "Download cards",
   "CreateGiftCardsSuccess.RedeemLinks": "Copy links",
+  "createNewEventButton": "Create an Event",
   "createOrder.backToTier": "Посмотреть все способы внести свой вклад",
   "createOrder.inactiveCollective": "This collective is not active and can't accept financial contributions",
   "createOrder.missingHost": "Этот коллектив не имеет представителя и не может принимать финансовые вклады",

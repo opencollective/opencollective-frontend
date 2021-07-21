@@ -629,6 +629,7 @@
   "createFund.tos.label": "阅读 Open Collective 的 {toslink}。",
   "CreateGiftCardsSuccess.Download": "下载卡片",
   "CreateGiftCardsSuccess.RedeemLinks": "复制链接",
+  "createNewEventButton": "Create an Event",
   "createOrder.backToTier": "查看所有其他贡献方式",
   "createOrder.inactiveCollective": "此 collective 未激活，不能接受财政捐款",
   "createOrder.missingHost": "此 collective 没有主体，不能接受财政捐款",
