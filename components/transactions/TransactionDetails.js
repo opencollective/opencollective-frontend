@@ -46,8 +46,9 @@ const rejectAndRefundTooltipContent = (showRefundHelp, showRejectHelp) => (
   </Box>
 );
 
+// Check whether transfer is child collective to parent or if the transfer is from host to one of its collectives
 const isInternalTransfer = (fromAccount, toAccount) => {
-  return fromAccount.parent?.id === toAccount.id;
+  return fromAccount.parent?.id === toAccount.id || fromAccount.id === toAccount.host?.id;
 };
 
 const DetailTitle = styled.p`
