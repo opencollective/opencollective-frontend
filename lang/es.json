@@ -225,7 +225,7 @@
   "collective.archive.subscriptions": "Las donaciones recurrentes serán automáticamente canceladas.",
   "collective.archive.title": "¿Estás seguro que quieres archivar {type, select, EVENT {este Evento} PROJECT {este Proyecto} FUND {este Fondo} COLLECTIVE {este Colectivo} ORGANIZATION {esta Organización} other {esta Cuenta}}",
   "collective.backgroundImage.label": "Imagen de portada",
-  "collective.balance.description": "Transfiera el saldo remanente al anfitrión fiscal. El saldo del{type, select, EVENT {Evento} PROJECT {Proyecto} FUND {fondo} COLLECTIVE {Colectivo} other {cuenta}} deberá estar en cero para ser archivado o cambiar de anfitrión. Como alternativa, podrá enviar o donar a otro Colectivo.",
+  "collective.balance.description": "Transfer remaining balance to {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive {type, select, EVENT {the Event} PROJECT {the Project} other {or change Hosts}}. {type, select, EVENT {} PROJECT {} other {Alternatively, you can submit an expense or donate to another Collective to zero the balance.}}",
   "collective.balance.notAvailable": "El Anfitrión no soporta esta función. Envía un gasto, dona a otro Colectivo o ponte en contacto con el soporte si estás bloqueado.",
   "collective.balance.title": "¡Vaciado de {type, select, EVENT {Evento} PROJECT {Proyecto} FUND {¡Fondo} COLLECTIVE {¡colectivo} other {cuenta}} balance",
   "collective.card.collectives.count": "Hospedando {n, plural, one {Colectivo} other {Colectivos}}",

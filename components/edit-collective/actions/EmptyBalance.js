@@ -2,6 +2,7 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 
 import Container from '../../Container';
@@ -39,7 +40,7 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
         <FormattedMessage
           id="collective.balance.description"
           defaultMessage={
-            'Transfer remaining balance to the Fiscal Host. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive or change Hosts. Alternatively, you can submit an expense or donate to another Collective to zero the balance.'
+            'Transfer remaining balance to {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive {type, select, EVENT {the Event} PROJECT {the Project} other {or change Hosts}}. {type, select, EVENT {} PROJECT {} other {Alternatively, you can submit an expense or donate to another Collective to zero the balance.}}'
           }
           values={{ type: collective.type }}
         />
@@ -54,65 +55,127 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
           />
         </P>
       )}
-      {collective.host.hostCollective && (
-        <Fragment>
-          {collective.stats.balance > 0 && (
-            <SendMoneyToCollectiveBtn
-              fromCollective={collective}
-              toCollective={collective.host.hostCollective}
-              LoggedInUser={LoggedInUser}
-              amount={collective.stats.balance}
-              currency={collective.currency}
-              confirmTransfer={confirmTransfer}
-              isTransferApproved={modal.isApproved}
-            />
-          )}
-          {collective.stats.balance === 0 && (
-            <StyledButton disabled={true}>
-              <FormattedMessage
-                id="SendMoneyToCollective.btn"
-                defaultMessage="Send {amount} to {collective}"
-                values={{
-                  amount: formatCurrency(0, collective.currency),
-                  collective: collective.host.hostCollective.name,
-                }}
+      {(collective.type === CollectiveType.FUND || collective.type === CollectiveType.COLLECTIVE) &&
+        collective.host.hostCollective && (
+          <Fragment>
+            {collective.stats.balance > 0 && (
+              <SendMoneyToCollectiveBtn
+                fromCollective={collective}
+                toCollective={collective.host.hostCollective}
+                LoggedInUser={LoggedInUser}
+                amount={collective.stats.balance}
+                currency={collective.currency}
+                confirmTransfer={confirmTransfer}
+                isTransferApproved={modal.isApproved}
               />
-            </StyledButton>
-          )}
-          <Modal show={modal.show} width="570px" onClose={closeModal}>
-            <ModalHeader onClose={closeModal}>
-              <FormattedMessage
-                id="collective.emptyBalance.header"
-                values={{ action: modal.type }}
-                defaultMessage={'{action} Balance'}
-              />
-            </ModalHeader>
-            <ModalBody>
-              <P>
+            )}
+            {collective.stats.balance === 0 && (
+              <StyledButton disabled={true}>
                 <FormattedMessage
-                  id="collective.emptyBalance.body"
-                  values={{ collective: collective.host.hostCollective.name, action: modal.type.toLowerCase() }}
-                  defaultMessage={'Are you sure you want to {action} to {collective}?'}
+                  id="SendMoneyToCollective.btn"
+                  defaultMessage="Send {amount} to {collective}"
+                  values={{
+                    amount: formatCurrency(0, collective.currency),
+                    collective: collective.host.hostCollective.name,
+                  }}
                 />
-              </P>
-            </ModalBody>
-            <ModalFooter>
-              <Container display="flex" justifyContent="flex-end">
-                <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
-                  <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
-                </StyledButton>
-                <StyledButton
-                  buttonStyle="primary"
-                  data-cy="action"
-                  onClick={() => setModal({ ...modal, show: false, isApproved: true })}
-                >
-                  <FormattedMessage id="confirm" defaultMessage={'Confirm'} />
-                </StyledButton>
-              </Container>
-            </ModalFooter>
-          </Modal>
-        </Fragment>
-      )}
+              </StyledButton>
+            )}
+            <Modal show={modal.show} width="570px" onClose={closeModal}>
+              <ModalHeader onClose={closeModal}>
+                <FormattedMessage
+                  id="collective.emptyBalance.header"
+                  values={{ action: modal.type }}
+                  defaultMessage={'{action} Balance'}
+                />
+              </ModalHeader>
+              <ModalBody>
+                <P>
+                  <FormattedMessage
+                    id="collective.emptyBalance.body"
+                    values={{ collective: collective.host.hostCollective.name, action: modal.type.toLowerCase() }}
+                    defaultMessage={'Are you sure you want to {action} to {collective}?'}
+                  />
+                </P>
+              </ModalBody>
+              <ModalFooter>
+                <Container display="flex" justifyContent="flex-end">
+                  <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
+                    <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+                  </StyledButton>
+                  <StyledButton
+                    buttonStyle="primary"
+                    data-cy="action"
+                    onClick={() => setModal({ ...modal, show: false, isApproved: true })}
+                  >
+                    <FormattedMessage id="confirm" defaultMessage={'Confirm'} />
+                  </StyledButton>
+                </Container>
+              </ModalFooter>
+            </Modal>
+          </Fragment>
+        )}
+      {console.log(collective)}
+      {(collective.type === CollectiveType.PROJECT || collective.type === CollectiveType.EVENT) &&
+        collective.parentCollective && (
+          <Fragment>
+            {collective.stats.balance > 0 && (
+              <SendMoneyToCollectiveBtn
+                fromCollective={collective}
+                toCollective={collective.parentCollective}
+                LoggedInUser={LoggedInUser}
+                amount={collective.stats.balance}
+                currency={collective.currency}
+                confirmTransfer={confirmTransfer}
+                isTransferApproved={modal.isApproved}
+              />
+            )}
+            {collective.stats.balance === 0 && (
+              <StyledButton disabled={true}>
+                <FormattedMessage
+                  id="SendMoneyToCollective.btn"
+                  defaultMessage="Send {amount} to {collective}"
+                  values={{
+                    amount: formatCurrency(0, collective.currency),
+                    collective: collective.parentCollective.name,
+                  }}
+                />
+              </StyledButton>
+            )}
+            <Modal show={modal.show} width="570px" onClose={closeModal}>
+              <ModalHeader onClose={closeModal}>
+                <FormattedMessage
+                  id="collective.emptyBalance.header"
+                  values={{ action: modal.type }}
+                  defaultMessage={'{action} Balance'}
+                />
+              </ModalHeader>
+              <ModalBody>
+                <P>
+                  <FormattedMessage
+                    id="collective.emptyBalance.body"
+                    values={{ collective: collective.parentCollective.name, action: modal.type.toLowerCase() }}
+                    defaultMessage={'Are you sure you want to {action} to {collective}?'}
+                  />
+                </P>
+              </ModalBody>
+              <ModalFooter>
+                <Container display="flex" justifyContent="flex-end">
+                  <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
+                    <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+                  </StyledButton>
+                  <StyledButton
+                    buttonStyle="primary"
+                    data-cy="action"
+                    onClick={() => setModal({ ...modal, show: false, isApproved: true })}
+                  >
+                    <FormattedMessage id="confirm" defaultMessage={'Confirm'} />
+                  </StyledButton>
+                </Container>
+              </ModalFooter>
+            </Modal>
+          </Fragment>
+        )}
     </Container>
   );
 };
