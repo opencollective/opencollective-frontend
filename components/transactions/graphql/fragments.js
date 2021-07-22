@@ -139,6 +139,15 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
           slug
         }
       }
+      relatedTransactions(kind: [HOST_FEE]) {
+        id
+        type
+        kind
+        netAmount {
+          currency
+          valueInCents
+        }
+      }
     }
   }
 `;
