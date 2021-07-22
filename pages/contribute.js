@@ -25,7 +25,7 @@ import ContributeProject from '../components/contribute-cards/ContributeProject'
 import ContributeTier from '../components/contribute-cards/ContributeTier';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
-import { Box, Grid } from '../components/Grid';
+import { Box, Flex, Grid } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
@@ -259,7 +259,18 @@ class TiersPage extends React.Component {
                 />
                 <Container maxWidth={1260} my={5} px={[15, 30]} mx="auto">
                   <Box my={5}>
-                    <H2 fontWeight="normal">{title}</H2>
+                    <Flex flexWrap="wrap" justifyContent="space-between">
+                      <H2 fontWeight="normal" mb={2}>
+                        {title}
+                      </H2>
+                      {LoggedInUser?.canEditCollective(collective) && verb === 'events' && (
+                        <Link href={`/${collective.slug}/events/new`}>
+                          <StyledButton buttonStyle="primary">
+                            <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+                          </StyledButton>
+                        </Link>
+                      )}
+                    </Flex>
                     {subtitle && (
                       <P color="black.700" mt={3}>
                         {subtitle}
