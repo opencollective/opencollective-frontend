@@ -145,6 +145,7 @@ const UPDATES_PER_PAGE = 10;
 export const addUpdatesData = graphql(updatesQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
+    fetchPolicy: 'cache-and-network',
     variables: getUpdatesVariables(props),
   }),
   props: ({ data }) => ({
