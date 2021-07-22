@@ -67,7 +67,7 @@ v1571  Dep…         jkl@opencollective.com        2021/07/14 09:27:05 -0700
 v1570  Dep…         mno@opencollective.com        2021/07/13 18:08:05 -0700
 ```
 
-Now to rollback the latest deployment all you got to do is, 
+Now to rollback the latest deployment all you got to do is:
 
 ```bash
 heroku rollback v1574 --app oc-prod-frontend
