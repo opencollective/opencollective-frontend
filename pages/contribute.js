@@ -263,10 +263,10 @@ class TiersPage extends React.Component {
                       <H2 fontWeight="normal" mb={2}>
                         {title}
                       </H2>
-                      {LoggedInUser?.canEditCollective(collective) && (
+                      {LoggedInUser?.canEditCollective(collective) && verb === 'events' && (
                         <Link href={`/${collective.slug}/events/new`}>
                           <StyledButton buttonStyle="primary">
-                            <FormattedMessage id="createNewEventButton" defaultMessage="Create an Event" />
+                            <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
                           </StyledButton>
                         </Link>
                       )}

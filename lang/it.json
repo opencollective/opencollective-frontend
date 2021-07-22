@@ -629,7 +629,6 @@
   "createFund.tos.label": "Read the {toslink} of Open Collective.",
   "CreateGiftCardsSuccess.Download": "Download cards",
   "CreateGiftCardsSuccess.RedeemLinks": "Copy links",
-  "createNewEventButton": "Create an Event",
   "createOrder.backToTier": "Vedi tutte gli altri modi di contribuire",
   "createOrder.inactiveCollective": "Questo collettivo non è attivo e non può accettare contributi finanziari",
   "createOrder.missingHost": "Questo collettivo non ha un host e non può accettare contributi finanziari",
