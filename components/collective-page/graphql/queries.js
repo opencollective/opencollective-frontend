@@ -281,7 +281,7 @@ export const collectivePageQuery = gql`
 
 export const budgetSectionQuery = gqlV2/* GraphQL */ `
   query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
-    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kinds: $kind) {
+    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kind: $kind) {
       ...TransactionsQueryCollectionFragment
     }
     expenses(account: { slug: $slug }, limit: $limit) {

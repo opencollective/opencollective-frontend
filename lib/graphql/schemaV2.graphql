@@ -5419,26 +5419,6 @@ type Mutation {
   createComment(comment: CommentCreateInput!): Comment
 
   """
-  @deprecated: Please use the new emojiReactionMutations
-  """
-  addCommentReaction(
-    """
-    The emoji associated with the reaction
-    """
-    emoji: String!
-
-    """
-    A unique identifier for the comment id associated with this comment reaction
-    """
-    comment: CommentReferenceInput!
-  ): Comment!
-
-  """
-  @deprecated: Please use the new emojiReactionMutations
-  """
-  removeCommentReaction(comment: CommentReferenceInput!, emoji: String!): Comment!
-
-  """
   Connect external account to Open Collective Account
   """
   createConnectedAccount(
@@ -7321,6 +7301,11 @@ type Query {
     tags: [String]
 
     """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
@@ -7386,6 +7371,11 @@ type Query {
     Filter hosts by tags (multiple = OR)
     """
     tags: [String]
+
+    """
+    Filter hosts by tags (multiple = OR)
+    """
+    tag: [String]
   ): HostCollection
   order(
     """
@@ -7556,6 +7546,11 @@ type Query {
     To filter by transaction kind
     """
     kinds: [TransactionKind]
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection
   update(
     """
