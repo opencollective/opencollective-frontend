@@ -166,7 +166,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               taxInfo: transaction.taxInfo,
               intl,
             })}
-            {hostFeeTransaction && (
+            {transaction.kind !== 'HOST_FEE' && hostFeeTransaction && (
               <React.Fragment>
                 <br />
                 <FormattedMessage
@@ -232,6 +232,7 @@ TransactionDetails.propTypes = {
   displayActions: PropTypes.bool,
   transaction: PropTypes.shape({
     isRefunded: PropTypes.bool,
+    kind: PropTypes.string,
     isOrderRejected: PropTypes.bool,
     fromAccount: PropTypes.shape({
       id: PropTypes.string,
