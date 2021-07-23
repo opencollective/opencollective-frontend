@@ -8,6 +8,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
     nodes {
       id
       uuid
+      kind
       amount {
         currency
         valueInCents
