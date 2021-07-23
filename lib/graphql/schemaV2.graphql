@@ -2775,6 +2775,12 @@ type Credit implements Transaction {
   giftCardEmitterAccount: Account
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+  relatedTransactions(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+  ): [Transaction]!
   fromAccount: Account
   toAccount: Account
 }
@@ -3023,6 +3029,12 @@ type Debit implements Transaction {
   giftCardEmitterAccount: Account
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+  relatedTransactions(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+  ): [Transaction]!
   fromAccount: Account
   toAccount: Account
 }
@@ -7731,6 +7743,12 @@ interface Transaction {
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+  relatedTransactions(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+  ): [Transaction]!
 }
 
 """
