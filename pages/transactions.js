@@ -50,7 +50,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
     $dateFrom: ISODateTime
     $dateTo: ISODateTime
     $searchTerm: String
-    $kinds: [TransactionKind]
+    $kind: [TransactionKind]
   ) {
     account(slug: $slug) {
       id
@@ -74,7 +74,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       dateFrom: $dateFrom
       dateTo: $dateTo
       searchTerm: $searchTerm
-      kinds: $kinds
+      kind: $kind
       includeIncognitoTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
@@ -110,7 +110,7 @@ const getVariablesFromQuery = query => {
     dateFrom,
     dateTo,
     searchTerm: query.searchTerm,
-    kinds: query.kinds ? parseTransactionKinds(query.kinds) : getDefaultKinds(),
+    kind: query.kind ? parseTransactionKinds(query.kind) : getDefaultKinds(),
   };
 };
 
