@@ -14,7 +14,7 @@
     "@apollo/client": "3.3.21",
     "@formatjs/intl-relativetimeformat": "9.1.7",
     "@hyperwatch/hyperwatch": "3.8.1",
-    "@material-ui/core": "4.12.1",
+    "@material-ui/core": "4.12.2",
     "@opencollective/taxes": "3.1.0",
     "@popperjs/core": "2.9.2",
     "@sentry/browser": "6.10.0",
