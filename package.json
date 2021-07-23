@@ -175,7 +175,7 @@
     "codecov": "^3.8.2",
     "commitizen": "^4.2.4",
     "cross-env": "^7.0.3",
-    "css-loader": "^5.2.6",
+    "css-loader": "^6.0.0",
     "cypress": "^8.0.0",
     "cypress-file-upload": "^3.5.3",
     "cz-conventional-changelog": "^3.3.0",
