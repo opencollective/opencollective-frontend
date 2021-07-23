@@ -479,12 +479,9 @@ class EditCollectiveForm extends React.Component {
               <FormattedMessage id="Account.AdvancedSettings" defaultMessage="Advanced settings" />
             </SettingsTitle>
             {collective.type === CollectiveType.USER && <EditUserEmailForm />}
-            {(collective.type === CollectiveType.COLLECTIVE ||
-              collective.type === CollectiveType.FUND ||
-              collective.type === CollectiveType.PROJECT ||
-              collective.type === CollectiveType.EVENT) && (
-              <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
-            )}
+            {[CollectiveType.FUND, CollectiveType.COLLECTIVE, CollectiveType.PROJECT, CollectiveType.EVENT].includes(
+              collective.type,
+            ) && <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />}
             <Archive collective={collective} />
             <Delete collective={collective} />
           </Box>
