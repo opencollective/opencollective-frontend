@@ -53,10 +53,10 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
         <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
       </FilterContainer>
       <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
-        <FilterLabel htmlFor="transactions-filter-kinds">
+        <FilterLabel htmlFor="transactions-filter-kind">
           <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />
         </FilterLabel>
-        <TransactionsKindFilter {...getFilterProps('kinds')} />
+        <TransactionsKindFilter {...getFilterProps('kind')} />
       </FilterContainer>
     </Flex>
   );
