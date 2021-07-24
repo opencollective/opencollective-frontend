@@ -144,24 +144,6 @@ const sendMoneyToCollectiveMutation = gqlV2/* GraphQL */ `
     createOrder(order: $order) {
       order {
         id
-        fromAccount {
-          id
-          stats {
-            balance {
-              currency
-              valueInCents
-            }
-          }
-        }
-        toAccount {
-          id
-          stats {
-            balance {
-              currency
-              valueInCents
-            }
-          }
-        }
       }
     }
   }
