@@ -8,6 +8,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
     nodes {
       id
       uuid
+      kind
       amount {
         currency
         valueInCents
@@ -137,6 +138,15 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         createdByAccount {
           id
           slug
+        }
+      }
+      relatedTransactions(kind: [HOST_FEE]) {
+        id
+        type
+        kind
+        netAmount {
+          currency
+          valueInCents
         }
       }
     }

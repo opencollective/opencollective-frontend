@@ -310,7 +310,7 @@ TransactionItem.propTypes = {
     hostFeeInHostCurrency: PropTypes.number,
     platformFeeInHostCurrency: PropTypes.number,
     paymentProcessorFeeInHostCurrency: PropTypes.number,
-    taxAmount: PropTypes.number,
+    taxAmount: PropTypes.object,
     amount: PropTypes.shape({
       valueInCents: PropTypes.number,
       currency: PropTypes.string,
