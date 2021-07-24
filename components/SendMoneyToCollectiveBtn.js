@@ -107,7 +107,7 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query SendMoneyToCollectivePaymentMethods($slug: String) {
     account(slug: $slug) {
       id
-      paymentMethods(service: "opencollective") {
+      paymentMethods(service: "opencollective", types: ["collective"]) {
         id
         service
         name

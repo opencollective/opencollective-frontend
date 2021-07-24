@@ -351,6 +351,7 @@ type CollectiveFeatures {
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
   CONVERSATIONS: CollectiveFeatureStatus
   UPDATES: CollectiveFeatureStatus
+  ABOUT: CollectiveFeatureStatus
   TEAM: CollectiveFeatureStatus
   ORDER: CollectiveFeatureStatus
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
