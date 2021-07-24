@@ -225,7 +225,7 @@
   "collective.archive.subscriptions": "As contribuições financeiras recorrentes serão canceladas automaticmente.",
   "collective.archive.title": "Arquivar {type, select, EVENT {este Evento} PROJECT {esse Projeto} FUND {esse Fundo} COLLECTIVE {esse Coletivo} ORGANIZATION {essa Organização} other {essa conta}}",
   "collective.backgroundImage.label": "Imagem de capa",
-  "collective.balance.description": "Transferir saldo restante para o administrador fiscal. {type, select, EVENT {Evento} PROJECT {Projeto} FUND {Financie} COLLECTIVE {Coletivo} other {conta}} O saldo deve ser zero para arquivar ou mudar administradores. Como alternativa, você pode enviar uma despesa ou doar para outro Coletivo para zerar o saldo.",
+  "collective.balance.description": "Transfer remaining balance to {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive {type, select, EVENT {the Event} PROJECT {the Project} other {or change Hosts}}. {type, select, EVENT {} PROJECT {} other {Alternatively, you can submit an expense or donate to another Collective to zero the balance.}}",
   "collective.balance.notAvailable": "O administrador não suporta este recurso. Envie uma despesa, doe para outro Coletivo ou contate o suporte se você estiver bloqueado.",
   "collective.balance.title": "Vazio {type, select, EVENT {Evento} PROJECT {Projeto} FUND {Financiamento} COLLECTIVE {Coletivo} other {conta}} saldo",
   "collective.card.collectives.count": "Hospedando {n, plural, one {Coletivo} other {Coletivos}}",

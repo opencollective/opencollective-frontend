@@ -225,7 +225,7 @@
   "collective.archive.subscriptions": "Повторные финансовые вклады будут автоматически отменены.",
   "collective.archive.title": "Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}",
   "collective.backgroundImage.label": "Обложка",
-  "collective.balance.description": "Transfer remaining balance to the Fiscal Host. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive or change Hosts. Alternatively, you can submit an expense or donate to another Collective to zero the balance.",
+  "collective.balance.description": "Transfer remaining balance to {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive {type, select, EVENT {the Event} PROJECT {the Project} other {or change Hosts}}. {type, select, EVENT {} PROJECT {} other {Alternatively, you can submit an expense or donate to another Collective to zero the balance.}}",
   "collective.balance.notAvailable": "The Host doesn't support this feature. Submit an expense, donate to another Collective, or contact support if you're blocked.",
   "collective.balance.title": "Пустой баланс {type, select, EVENT {события} PROJECT {проекта} FUND {представителя} COLLECTIVE {коллектива} other {аккаунта}}",
   "collective.card.collectives.count": "Hosting {n, plural, one {Collective} other {Collectives}}",
