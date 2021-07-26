@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, get, pick } from 'lodash';
+import { get, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
@@ -63,12 +63,13 @@ class SendMoneyToCollectiveBtn extends React.Component {
       await this.props.sendMoneyToCollective({
         variables: { order },
         // We need to update the store manually because the response comes from API V2
-        update: store => {
-          const data = cloneDeep(
-            store.readQuery({ query: collectiveBalanceQuery, variables: { slug: fromCollective.slug } }),
-          );
-          data.Collective.stats.balance = 0;
-          store.writeQuery({ query: collectiveBalanceQuery, data });
+        update: (store, { data: { createOrder } }) => {
+          const balance = createOrder.order.fromAccount.stats.balance.valueInCents;
+          store.writeFragment({
+            fragment: collectiveBalanceFragment,
+            id: `CollectiveStatsType:${fromCollective.id}`,
+            data: { balance },
+          });
         },
       });
       this.setState({ loading: false });
@@ -128,14 +129,9 @@ const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   },
 });
 
-const collectiveBalanceQuery = gql`
-  query CollectivePage($slug: String!) {
-    Collective(slug: $slug) {
-      id
-      stats {
-        balance
-      }
-    }
+const collectiveBalanceFragment = gql`
+  fragment StatFieldsFragment on CollectiveStatsType {
+    balance
   }
 `;
 
@@ -144,6 +140,13 @@ const sendMoneyToCollectiveMutation = gqlV2/* GraphQL */ `
     createOrder(order: $order) {
       order {
         id
+        fromAccount {
+          stats {
+            balance {
+              valueInCents
+            }
+          }
+        }
       }
     }
   }
