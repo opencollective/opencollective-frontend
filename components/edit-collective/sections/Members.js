@@ -124,10 +124,13 @@ class Members extends React.Component {
     return all.length === 0 ? EMPTY_MEMBERS : all;
   }
 
-  handleShowModalChange(modal, value, memberIdx) {
+  handleShowModalChange(modal, value, memberIdx, currentModalKey) {
     if (modal === 'edit') {
       const currentMember = this.state.members[memberIdx];
-      this.setState({ showEditModal: value, currentMember });
+      const collectiveId = get(currentMember, 'member.id');
+      const currentMemberKey = currentMember.id ? `member-${currentMember.id}` : `collective-${collectiveId}`;
+
+      this.setState({ showEditModal: value, currentMember, currentMemberKey, currentModalKey });
     }
     if (modal === 'invite') {
       this.setState({ showInviteModal: value });
@@ -138,7 +141,7 @@ class Members extends React.Component {
     return members.map(member => member.member && member.member.id);
   });
 
-  renderMember = (member, index, nbAdmins) => {
+  renderMember = (member, index, nbAdmins, memberModalKey) => {
     const { intl, collective } = this.props;
 
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
@@ -158,21 +161,26 @@ class Members extends React.Component {
         data-cy={`member-${index}`}
       >
         <Container position="absolute" top="1rem" right="1rem">
-          {this.state.showEditModal ? (
+          {this.state.showEditModal &&
+          memberKey === this.state.currentMemberKey &&
+          memberModalKey === this.state.currentModalKey ? (
             <EditMemberModal
-              key={`member-new-a-${index}-${memberKey}`}
+              key={`member-edit-modal-${index}-${memberKey}`}
               show={this.state.showEditModal}
               intl={intl}
               member={this.state.currentMember}
               collective={collective}
               membersIds={membersCollectiveIds}
               index={index}
-              cancelHandler={() => this.handleShowModalChange('edit', false, index)}
+              cancelHandler={() => this.handleShowModalChange('edit', false, index, memberModalKey)}
               continueHandler={this.onClick}
               isLastAdmin={isLastAdmin}
             />
           ) : (
-            <StyledRoundButton onClick={() => this.handleShowModalChange('edit', true, index)} size={26}>
+            <StyledRoundButton
+              onClick={() => this.handleShowModalChange('edit', true, index, memberModalKey)}
+              size={26}
+            >
               <Edit height={16} />
             </StyledRoundButton>
           )}
@@ -250,7 +258,7 @@ class Members extends React.Component {
                       </Flex>
                     </Flex>
                   </InviteNewCard>
-                  {members.map((m, idx) => this.renderMember(m, idx, nbAdmins))}
+                  {members.map((m, idx) => this.renderMember(m, idx, nbAdmins, 'hide-md-lg'))}
                 </Flex>
               </HorizontalScroller>
             </Grid>
@@ -285,7 +293,7 @@ class Members extends React.Component {
                   </Flex>
                 </InviteNewCard>
               )}
-              {members.map((m, idx) => this.renderMember(m, idx, nbAdmins))}
+              {members.map((m, idx) => this.renderMember(m, idx, nbAdmins, 'hide-xs-sm'))}
             </Grid>
           </Hide>
         </Box>
