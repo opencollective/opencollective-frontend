@@ -11,7 +11,6 @@ import styled from 'styled-components';
 import roles from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import formatMemberRole from '../../../lib/i18n/member-role';
-import { compose } from '../../../lib/utils';
 
 import Avatar from '../../Avatar';
 import Container from '../../Container';
@@ -405,22 +404,4 @@ const addCoreContributorsData = graphql(coreContributorsQuery, {
   }),
 });
 
-const editCoreContributorsMutation = gql`
-  mutation EditCoreContributors($collectiveId: Int!, $members: [MemberInputType!]!) {
-    editCoreContributors(collectiveId: $collectiveId, members: $members) {
-      id
-      members(roles: ["ADMIN", "MEMBER"]) {
-        ...MemberFields
-      }
-    }
-  }
-  ${memberFieldsFragment}
-`;
-
-const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
-  name: 'editCoreContributors',
-});
-
-const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation);
-
-export default injectIntl(addGraphql(withUser(Members)));
+export default injectIntl(addCoreContributorsData(withUser(Members)));

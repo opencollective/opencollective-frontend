@@ -35,6 +35,9 @@ const editMemberMutation = gqlV2/* GraphQL */ `
       since: $since
     ) {
       id
+      role
+      description
+      since
     }
   }
 `;
@@ -55,6 +58,9 @@ const editMemberInvitationMutation = gqlV2/* GraphQL */ `
       since: $since
     ) {
       id
+      role
+      description
+      since
     }
   }
 `;
@@ -88,20 +94,20 @@ const EditMemberModal = props => {
     },
   });
 
-  const mutationOptions = {
+  const [editMemberAccount, { loading: isEditingMember }] = useMutation(editMemberMutation, {
     context: API_V2_CONTEXT,
-    refetchQueries: [{ query: coreContributorsQuery, variables: { collectiveId: get(collective, 'id') } }],
-    awaitRefetchQueries: true,
-  };
-
-  const [editMemberAccount, { loading: isEditingMember }] = useMutation(editMemberMutation, mutationOptions);
+  });
 
   const [editMemberInvitationAccount, { loading: isEditingMemberInvitation }] = useMutation(
     editMemberInvitationMutation,
-    mutationOptions,
+    { context: API_V2_CONTEXT },
   );
 
-  const [removeMemberAccount] = useMutation(removeMemberMutation, mutationOptions);
+  const [removeMemberAccount] = useMutation(removeMemberMutation, {
+    context: API_V2_CONTEXT,
+    refetchQueries: [{ query: coreContributorsQuery, variables: { collectiveId: get(collective, 'id') } }],
+    awaitRefetchQueries: true,
+  });
 
   let submitMemberForm = null;
 

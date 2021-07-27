@@ -5299,6 +5299,11 @@ type Member {
   Custom user message from member to the collective
   """
   publicMessage: String
+
+  """
+  Custom user description
+  """
+  description: String
   account: Account
 }
 
@@ -5358,6 +5363,11 @@ type MemberOf {
   Custom user message from member to the collective
   """
   publicMessage: String
+
+  """
+  Custom user description
+  """
+  description: String
   account: Account
 }
 
