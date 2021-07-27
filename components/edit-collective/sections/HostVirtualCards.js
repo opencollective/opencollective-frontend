@@ -344,7 +344,7 @@ const HostVirtualCards = props => {
           />
         ))}
       </Grid>
-      <Flex mt={5} justifyContent="center">
+      <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
         <Pagination
           route={`/${props.collective.slug}/edit/host-virtual-cards`}
           total={data.host.hostedVirtualCards.totalCount}
@@ -352,6 +352,9 @@ const HostVirtualCards = props => {
           offset={offset}
           ignoredQueryParams={['slug', 'section']}
         />
+        <P mt={1} fontSize="12px">
+          <FormattedMessage id="TotalItems" defaultMessage="Total Items" />: {data.host.hostedVirtualCards.totalCount}
+        </P>
       </Flex>
       {(displayAssignCardModal || editingVirtualCard) && (
         <AssignVirtualCardModal
