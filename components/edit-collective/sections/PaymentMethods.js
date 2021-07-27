@@ -342,7 +342,7 @@ const paymentMethodsQuery = gql`
         manualPayments
         name
       }
-      paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
+      paymentMethods(type: ["creditcard", "giftcard", "prepaid"]) {
         id
         uuid
         name
