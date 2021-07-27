@@ -101,6 +101,9 @@ export const collectivePageQuery = gql`
           hostFees
           hostFeeSharePercent
         }
+        features {
+          VIRTUAL_CARDS
+        }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
         ...ContributorsFields

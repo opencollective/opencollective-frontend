@@ -71,5 +71,6 @@ export const collectiveNavbarFieldsFragment = gql`
     RECEIVE_HOST_APPLICATIONS
     HOST_DASHBOARD
     TRANSACTIONS
+    REQUEST_VIRTUAL_CARDS
   }
 `;
