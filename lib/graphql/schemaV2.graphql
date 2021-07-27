@@ -194,6 +194,11 @@ interface Account {
     type: [String]
 
     """
+    Filter on the given service types (opencollective, stripe, paypal...)
+    """
+    service: [String]
+
+    """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
     """
     includeExpired: Boolean
@@ -744,6 +749,7 @@ type Bot implements Account {
   paymentMethods(
     types: [String]
     type: [String]
+    service: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -1004,6 +1010,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   paymentMethods(
     types: [String]
     type: [String]
+    service: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -3244,6 +3251,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   paymentMethods(
     types: [String]
     type: [String]
+    service: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -4195,6 +4203,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   paymentMethods(
     types: [String]
     type: [String]
+    service: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -4532,6 +4541,7 @@ type Host implements Account & AccountWithContributions {
   paymentMethods(
     types: [String]
     type: [String]
+    service: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -5094,6 +5104,7 @@ type Individual implements Account {
   paymentMethods(
     types: [String]
     type: [String]
+    service: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -6502,6 +6513,7 @@ type Organization implements Account & AccountWithContributions {
   paymentMethods(
     types: [String]
     type: [String]
+    service: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -7041,6 +7053,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   paymentMethods(
     types: [String]
     type: [String]
+    service: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -8207,6 +8220,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   paymentMethods(
     types: [String]
     type: [String]
+    service: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
