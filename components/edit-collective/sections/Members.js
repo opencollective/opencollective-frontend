@@ -189,7 +189,7 @@ class Members extends React.Component {
           <MemberLogoContainer mt={50}>
             <Avatar mt={-28} src={get(memberCollective, 'imageUrl')} radius={56} />
           </MemberLogoContainer>
-          <P fontSize="14px" lineHeight="20px" mt={2} mb={2}>
+          <P fontSize="14px" lineHeight="20px" m={2} textAlign="center">
             {get(memberCollective, 'name')}
           </P>
           <StyledTag textTransform="uppercase" display="block" mb={2}>
