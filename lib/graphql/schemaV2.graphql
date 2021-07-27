@@ -186,12 +186,7 @@ interface Account {
     """
     Filter on given types (creditcard, giftcard...)
     """
-    types: [String]
-
-    """
-    Filter on the given service type (opencollective, stripe, paypal...)
-    """
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -742,8 +737,7 @@ type Bot implements Account {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -1002,8 +996,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -3242,8 +3235,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -4193,8 +4185,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -4530,8 +4521,7 @@ type Host implements Account & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -5092,8 +5082,7 @@ type Individual implements Account {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -6500,8 +6489,7 @@ type Organization implements Account & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -7039,8 +7027,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
@@ -8205,8 +8192,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
-    service: String
+    type: [String]
 
     """
     Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
