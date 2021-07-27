@@ -19,6 +19,7 @@ import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
 import ContributeCollective from '../components/contribute-cards/ContributeCollective';
+import ContributeCrypto from '../components/contribute-cards/ContributeCrypto';
 import ContributeCustom from '../components/contribute-cards/ContributeCustom';
 import ContributeEvent from '../components/contribute-cards/ContributeEvent';
 import ContributeProject from '../components/contribute-cards/ContributeProject';
@@ -108,6 +109,15 @@ class TiersPage extends React.Component {
               collective: collective,
               contributors: this.getFinancialContributorsWithoutTier(collective.contributors),
               stats: collective.stats.backers,
+            },
+          });
+        } else if (tier === 'crypto') {
+          waysToContribute.push({
+            ContributeCardComponent: ContributeCrypto,
+            key: 'contribute-tier-crypto',
+            props: {
+              hideContributors: true,
+              collective: collective,
             },
           });
         } else {

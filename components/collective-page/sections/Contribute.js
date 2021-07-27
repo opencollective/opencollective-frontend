@@ -17,6 +17,7 @@ import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import ContributeCardContainer, { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
+import ContributeCrypto from '../../contribute-cards/ContributeCrypto';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import CreateNew from '../../contribute-cards/CreateNew';
@@ -164,6 +165,7 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributor = !this.hasContributors(contributors);
     const canContribute = collective.isActive && !isPastEvent(collective);
     const hasCustomContribution = !collective.settings?.disableCustomContributions;
+    const hasCryptoContribution = collective.settings?.disableCryptoContributions === false;
     const waysToContribute = [];
 
     sortedTiers.forEach(tier => {
@@ -177,6 +179,17 @@ class SectionContribute extends React.PureComponent {
               contributors: this.getFinancialContributorsWithoutTier(contributors),
               stats: contributorsStats,
               hideContributors: hasNoContributor,
+              disableCTA: !canContribute,
+            },
+          });
+        }
+        if (hasCryptoContribution) {
+          waysToContribute.push({
+            key: 'crypto',
+            Component: ContributeCrypto,
+            componentProps: {
+              collective,
+              hideContributors: true, // for the MVP we shall not display the financial contributors for crypto
               disableCTA: !canContribute,
             },
           });
@@ -210,7 +223,9 @@ class SectionContribute extends React.PureComponent {
     const isProject = collective.type === CollectiveType.PROJECT;
     const isFund = collective.type === CollectiveType.FUND;
     const hasCustomContribution = !collective.settings?.disableCustomContributions;
-    const hasContribute = isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution));
+    const hasCryptoContribution = !collective.settings?.disableCryptoContributions;
+    const hasContribute =
+      isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution || hasCryptoContribution));
     const hasOtherWaysToContribute =
       !isEvent && !isProject && !isFund && (isAdmin || events.length > 0 || connectedCollectives.length > 0);
     const isActive = collective.isActive;
