@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { find, uniqBy } from 'lodash';
+import { find, sortBy, uniqBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
@@ -25,7 +25,7 @@ const CollectiveFilter = ({ onChange, virtualCardCollectives }) => {
   ];
 
   const getAllCollectives = () => {
-    return uniqBy(virtualCardCollectives, 'legacyId').map(collective => {
+    return sortBy(uniqBy(virtualCardCollectives, 'legacyId'), 'name').map(collective => {
       return {
         label: collective.name,
         value: String(collective.legacyId),
