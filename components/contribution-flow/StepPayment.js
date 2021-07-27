@@ -37,7 +37,7 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query ContributionFlowPaymentMethods($slug: String) {
     account(slug: $slug) {
       id
-      paymentMethods(types: ["creditcard", "giftcard", "prepaid", "collective"], includeExpired: true) {
+      paymentMethods(type: ["creditcard", "giftcard", "prepaid", "collective"], includeExpired: true) {
         id
         name
         data

@@ -644,7 +644,7 @@ export const collectiveSourcePaymentMethodsQuery = gql`
         name
         count
       }
-      paymentMethods(types: ["creditcard", "prepaid"], hasBalanceAboveZero: true) {
+      paymentMethods(type: ["creditcard", "prepaid"], hasBalanceAboveZero: true) {
         id
         uuid
         name
