@@ -80,6 +80,10 @@ const I18nContributionType = defineMessages({
     id: 'ContributionType.Custom',
     defaultMessage: 'Custom contribution',
   },
+  [ContributionTypes.FINANCIAL_CRYPTO]: {
+    id: 'ContributionType.Crypto',
+    defaultMessage: 'Crypto contribution',
+  },
   [ContributionTypes.FINANCIAL_ONE_TIME]: {
     id: 'ContributionType.OneTime',
     defaultMessage: 'One-time contribution',
