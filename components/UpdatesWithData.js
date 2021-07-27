@@ -90,7 +90,7 @@ class UpdatesWithData extends React.Component {
   }
 }
 
-const updatesQuery = gqlV2/* GraphQL */ `
+export const updatesQuery = gqlV2/* GraphQL */ `
   query Updates(
     $collectiveSlug: String!
     $limit: Int
@@ -144,7 +144,6 @@ const UPDATES_PER_PAGE = 10;
 export const addUpdatesData = graphql(updatesQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
-    fetchPolicy: props.LoggedInUser?.canEditCollective(props.collective) ? 'cache-and-network' : 'cache-only',
     variables: getUpdatesVariables(props),
   }),
   props: ({ data }) => ({
