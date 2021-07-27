@@ -225,34 +225,6 @@ const HostVirtualCards = props => {
         </SettingsSectionTitle>
         <Flex mt={4} justifyContent="space-between" alignItems="center">
           <Box lineHeight="20px" fontSize="14px" fontWeight="500">
-            <FormattedMessage
-              id="Host.VirtualCards.AutoPause.Title"
-              defaultMessage="Automatically pause and resume cards"
-            />
-            <P fontSize="11px" fontWeight="400" color="black.600">
-              <FormattedMessage
-                id="Host.VirtualCards.AutoPause.Description"
-                defaultMessage="Freeze cards associated with incomplete expenses and resume after required info and receipts are up to date."
-              />
-            </P>
-          </Box>
-          <StyledInputField name="virtualcards.autopause" htmlFor="virtualcards.autopause" disabled={updateLoading}>
-            {inputProps => (
-              <InputField
-                name="application"
-                className="horizontal"
-                type="switch"
-                id={inputProps.id}
-                inputName={inputProps.name}
-                onChange={handleSettingsUpdate(inputProps.name)}
-                defaultValue={get(props.collective, `settings.${inputProps.name}`)}
-              />
-            )}
-          </StyledInputField>
-        </Flex>
-
-        <Flex mt={4} justifyContent="space-between" alignItems="center">
-          <Box lineHeight="20px" fontSize="14px" fontWeight="500">
             <FormattedMessage id="Host.VirtualCards.RequestCard.Title" defaultMessage="Enable card requests" />
             <P fontSize="11px" fontWeight="400" color="black.600">
               <FormattedMessage
