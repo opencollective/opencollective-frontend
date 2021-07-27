@@ -6,11 +6,11 @@ import { get } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import roles from '../../../lib/constants/roles';
+import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
-import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledTooltip from '../../StyledTooltip';
@@ -94,15 +94,14 @@ const EditMemberModal = props => {
     awaitRefetchQueries: true,
   };
 
-  const [editMemberAccount, { loading: isEditingMember, error: editError }] = useMutation(
-    editMemberMutation,
+  const [editMemberAccount, { loading: isEditingMember }] = useMutation(editMemberMutation, mutationOptions);
+
+  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation }] = useMutation(
+    editMemberInvitationMutation,
     mutationOptions,
   );
 
-  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation, error: editMemberInvitationError }] =
-    useMutation(editMemberInvitationMutation, mutationOptions);
-
-  const [removeMemberAccount, { error: removeError }] = useMutation(removeMemberMutation, mutationOptions);
+  const [removeMemberAccount] = useMutation(removeMemberMutation, mutationOptions);
 
   let submitMemberForm = null;
 
@@ -112,7 +111,6 @@ const EditMemberModal = props => {
 
   const handleEditMemberMutation = async values => {
     const { description, role, since } = values;
-
     try {
       await editMemberAccount({
         variables: {
@@ -128,14 +126,16 @@ const EditMemberModal = props => {
 
       addToast({
         type: TOAST_TYPE.SUCCESS,
-        message: <FormattedMessage id="editTeam.member.edit.success" defaultMessage="Member updated successfully." />,
+        title: <FormattedMessage id="editTeam.member.edit.success" defaultMessage="Member updated successfully." />,
       });
 
       cancelHandler();
     } catch (error) {
       addToast({
         type: TOAST_TYPE.ERROR,
-        message: <FormattedMessage id="editTeam.member.edit.error" defaultMessage="Failed to update member." />,
+        title: <FormattedMessage id="editTeam.member.edit.error" defaultMessage="Failed to update member." />,
+        message: i18nGraphqlException(intl, error),
+        variant: 'light',
       });
     }
   };
@@ -170,12 +170,13 @@ const EditMemberModal = props => {
     } catch (error) {
       addToast({
         type: TOAST_TYPE.ERROR,
-        message: (
+        title: (
           <FormattedMessage
             id="editTeam.memberInvitation.edit.error"
             defaultMessage="Failed to update member invitation."
           />
         ),
+        message: i18nGraphqlException(intl, error),
       });
     }
   };
@@ -214,7 +215,8 @@ const EditMemberModal = props => {
       } catch (error) {
         addToast({
           type: TOAST_TYPE.ERROR,
-          message: <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />,
+          title: <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />,
+          message: i18nGraphqlException(intl, error),
         });
       }
     } else {
@@ -235,27 +237,6 @@ const EditMemberModal = props => {
           <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
         </ModalHeader>
         <ModalBody>
-          {editError && (
-            <Flex alignItems="center" justifyContent="center">
-              <MessageBox type="error" withIcon m={[1, 3]} data-cy="cof-error-message">
-                {editError.message}
-              </MessageBox>
-            </Flex>
-          )}
-          {editMemberInvitationError && (
-            <Flex alignItems="center" justifyContent="center">
-              <MessageBox type="error" withIcon m={[1, 3]} data-cy="cof-error-message">
-                {editMemberInvitationError.message}
-              </MessageBox>
-            </Flex>
-          )}
-          {removeError && (
-            <Flex alignItems="center" justifyContent="center">
-              <MessageBox type="error" withIcon m={[1, 3]} data-cy="cof-error-message">
-                {removeError.message}
-              </MessageBox>
-            </Flex>
-          )}
           <MemberForm
             intl={intl}
             collectiveImg={get(collective, 'imageUrl')}
