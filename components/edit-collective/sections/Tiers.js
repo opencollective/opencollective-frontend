@@ -11,9 +11,10 @@ import intervals from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getCurrencySymbol } from '../../../lib/currency-utils';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
-import { capitalize } from '../../../lib/utils';
+import { capitalize, parseToBoolean } from '../../../lib/utils';
 
 import Container from '../../Container';
+import ContributeCrypto from '../../contribute-cards/ContributeCrypto';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
@@ -33,6 +34,8 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 const { FUND, PROJECT, EVENT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
+
+const CRYPTO_CONTRIBUTIONS_ENABLED = parseToBoolean(process.env.CRYPTO_CONTRIBUTIONS_ENABLED);
 
 class Tiers extends React.Component {
   static propTypes = {
@@ -174,6 +177,10 @@ class Tiers extends React.Component {
       'customContributions.label': {
         id: 'tier.customContributions.label',
         defaultMessage: 'Enable flexible contributions',
+      },
+      'cryptoContributions.label': {
+        id: 'tier.cryptoContributions.label',
+        defaultMessage: 'Enable Crypto contributions',
       },
       standalonePage: {
         id: 'tier.standalonePage',
@@ -440,12 +447,13 @@ class Tiers extends React.Component {
   render() {
     const { intl, collective, defaultType = TICKET } = this.props;
     const hasCustomContributionsDisabled = get(collective, 'settings.disableCustomContributions', false);
-    const displayCustomContributionsSettings = collective.id && defaultType !== TICKET;
+    const hasCryptoContributionsDisabled = get(collective, 'settings.disableCryptoContributions', true);
+    const displayContributionSettings = collective.id && defaultType !== TICKET;
 
     return (
       <div className="EditTiers">
         <SettingsTitle mb={50}>{this.props.title}</SettingsTitle>
-        {displayCustomContributionsSettings && (
+        {displayContributionSettings && (
           <React.Fragment>
             <SettingsSectionTitle>
               <FormattedMessage id="ContributionsType.Flexible" defaultMessage="Flexible Contributions" />
@@ -457,10 +465,10 @@ class Tiers extends React.Component {
                     <ContributeCustom collective={collective} hideContributors />
                   </Box>
                   <Flex flexDirection="column" minWidth={200} maxWidth={600} mt={2}>
-                    <P>
+                    <P mb={2}>
                       <FormattedMessage
                         id="Tiers.CustomTierDescription"
-                        defaultMessage="A default tier that enables freely customizable contributions, so people can set thier own amount and frequency without limitations. You cannot change the settings or description of this tier, but you can disable it."
+                        defaultMessage="A default tier that enables freely customizable contributions, so people can set their own amount and frequency without limitations. You cannot change the settings or description of this tier, but you can disable it."
                       />
                     </P>
                     <StyledCheckbox
@@ -483,6 +491,49 @@ class Tiers extends React.Component {
                 </Flex>
               )}
             </Mutation>
+            {CRYPTO_CONTRIBUTIONS_ENABLED && (
+              <React.Fragment>
+                <SettingsSectionTitle mt={3}>
+                  <FormattedMessage id="ContributionsType.Crypto" defaultMessage="Crypto Contributions" />
+                </SettingsSectionTitle>
+                <Mutation mutation={editCollectiveSettingsMutation}>
+                  {(editSettings, { loading }) => (
+                    <Flex flexWrap="wrap">
+                      <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>
+                        <ContributeCrypto collective={collective} hideContributors />
+                      </Box>
+                      <Flex flexDirection="column" minWidth={200} maxWidth={600} mt={2}>
+                        <P mb={2}>
+                          <FormattedMessage
+                            id="Tiers.CryptoTierDescription"
+                            defaultMessage="Enabling this will add a tier to accept Crypto donations through {theGivingBlockLink}."
+                            values={{
+                              theGivingBlockLink: <a href="https://www.thegivingblock.com/">The Giving Block</a>,
+                            }}
+                          />
+                        </P>
+                        <StyledCheckbox
+                          name="crypto-contributions"
+                          label={intl.formatMessage(this.messages['cryptoContributions.label'])}
+                          defaultChecked={!hasCryptoContributionsDisabled}
+                          width="auto"
+                          isLoading={loading}
+                          onChange={({ target }) => {
+                            const updatedCollective = cloneDeep(this.props.collective);
+                            editSettings({
+                              variables: {
+                                id: this.props.collective.id,
+                                settings: set(updatedCollective.settings, 'disableCryptoContributions', !target.value),
+                              },
+                            });
+                          }}
+                        />
+                      </Flex>
+                    </Flex>
+                  )}
+                </Mutation>
+              </React.Fragment>
+            )}
             <SettingsSectionTitle mt={50}>
               <FormattedMessage id="createCustomTiers" defaultMessage="Create your own tiers" />
             </SettingsSectionTitle>

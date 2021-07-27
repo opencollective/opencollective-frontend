@@ -29,6 +29,7 @@ const nextConfig = {
         REJECT_CONTRIBUTION: false,
         REJECTED_CATEGORIES: false,
         CHANGE_LOG_UPDATES_ENABLED: false,
+        CRYPTO_CONTRIBUTIONS_ENABLED: false,
         WISE_ENVIRONMENT: 'sandbox',
       }),
     );

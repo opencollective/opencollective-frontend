@@ -43,8 +43,12 @@ const msg = defineMessages({
     defaultMessage: 'There are no more {type, select, TICKET {tickets} other {units}} for {name}',
   },
   [CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION]: {
-    id: 'Tier.disableCustomContirbution',
+    id: 'Tier.disableCustomContribution',
     defaultMessage: 'This collective requires you to select a tier to contribute.',
+  },
+  [CONTRIBUTION_BLOCKER.NO_CRYPTO_CONTRIBUTION]: {
+    id: 'Tier.disableCryptoContribution',
+    defaultMessage: 'This collective does not allow crypto contributions. Please select another tier.',
   },
 });
 
