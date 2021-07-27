@@ -64,7 +64,7 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
     account(id: $accountId) {
       id
-      paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
+      paymentMethods(type: ["creditcard", "giftcard", "prepaid"]) {
         ...UpdatePaymentMethodFragment
       }
     }

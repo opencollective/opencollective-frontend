@@ -262,6 +262,7 @@ type Collective implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -351,6 +352,7 @@ type CollectiveFeatures {
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
   CONVERSATIONS: CollectiveFeatureStatus
   UPDATES: CollectiveFeatureStatus
+  ABOUT: CollectiveFeatureStatus
   TEAM: CollectiveFeatureStatus
   ORDER: CollectiveFeatureStatus
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
@@ -608,6 +610,11 @@ interface CollectiveInterface {
     Filter on given types  (creditcard, giftcard, etc.)
     """
     types: [String]
+
+    """
+    Filter on given types  (creditcard, giftcard, etc.)
+    """
+    type: [String]
 
     """
     Order entries based on given column. Set to null for no ordering.
@@ -1248,6 +1255,7 @@ type Event implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -1622,6 +1630,7 @@ type Fund implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -2650,6 +2659,7 @@ type Organization implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -3035,6 +3045,7 @@ type Project implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -3858,6 +3869,7 @@ type User implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -4148,6 +4160,7 @@ type Vendor implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
