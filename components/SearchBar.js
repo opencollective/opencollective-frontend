@@ -15,7 +15,7 @@ const messages = defineMessages({
  * A wrapper arround `SearchForm` that holds state and interacts with parent
  * through `onSubmit`, rather than `onChange`.
  */
-const SearchBar = ({ onSubmit, defaultValue }) => {
+const SearchBar = ({ onSubmit, defaultValue, ...props }) => {
   const [value, setValue] = React.useState(defaultValue || '');
   const intl = useIntl();
 
@@ -34,6 +34,7 @@ const SearchBar = ({ onSubmit, defaultValue }) => {
         const searchInput = event.target.elements.q;
         onSubmit(searchInput.value || null);
       }}
+      {...props}
     />
   );
 };

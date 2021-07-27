@@ -37,7 +37,7 @@ const MESSAGES = defineMessages({
   },
 });
 
-const confirmGuestAccountMutation = gqlV2`
+const confirmGuestAccountMutation = gqlV2/* GraphQL */ `
   mutation SendGuestConfirmationEmail($email: EmailAddress!) {
     sendGuestConfirmationEmail(email: $email)
   }
@@ -210,7 +210,7 @@ const JoinGuestPage = () => {
           <MessageBox type="warning" withIcon maxWidth={550}>
             <FormattedMessage
               id="createAccount.alreadyLoggedIn"
-              defaultMessage='It seems like you&apos;re already signed in as "{email}". If you want to create a new account, please log out first.'
+              defaultMessage={`It seems like you're already signed in as "{email}". If you want to create a new account, please log out first.`}
               values={{ email: LoggedInUser.email }}
             />
           </MessageBox>

@@ -1,0 +1,14 @@
+import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
+import PrivateInfoIcon from '../../components/icons/PrivateInfoIcon';
+
+<Meta title="Icons/PrivateInfoIcon" component={PrivateInfoIcon} />
+
+# PrivateInfoIcon
+
+## Default
+
+export const DefaultStory = props => <PrivateInfoIcon {...props} />;
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />

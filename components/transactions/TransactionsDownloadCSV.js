@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import dayjs from 'dayjs';
+import { omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { TransactionKind } from '../../lib/constants/transactions';
 import { exportFile } from '../../lib/export_file';
 import { transactionsQuery } from '../../lib/graphql/queries';
 
@@ -88,7 +90,16 @@ const TransactionsDownloadCSV = ({ collective, client }) => {
       query: transactionsQuery,
       variables: {
         ...dateInterval,
-        CollectiveId: collective.id,
+        CollectiveId: collective.legacyId,
+        kinds: Object.values(
+          omit(TransactionKind, [
+            'PLATFORM_FEE',
+            'PREPAID_PAYMENT_METHOD',
+            'PAYMENT_PROCESSOR_FEE',
+            'HOST_FEE',
+            'HOST_FEE_SHARE',
+          ]),
+        ),
       },
     });
     const csv = transformResultInCSV(result.data.allTransactions);
@@ -200,7 +211,7 @@ TransactionsDownloadCSV.propTypes = {
   filters: PropTypes.object,
   collective: PropTypes.shape({
     slug: PropTypes.string,
-    id: PropTypes.number.isRequired,
+    legacyId: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
   }).isRequired,
   client: PropTypes.object,

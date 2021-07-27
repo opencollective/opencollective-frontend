@@ -28,7 +28,7 @@ class UpdatePage extends React.Component {
   }
 
   static propTypes = {
-    collectiveSlug: PropTypes.string, // for addCollectiveCoverData
+    collectiveSlug: PropTypes.string, // for addCollectiveNavbarData
     updateSlug: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
     client: PropTypes.object, // from withApollo
@@ -101,6 +101,7 @@ class UpdatePage extends React.Component {
             editable={Boolean(LoggedInUser?.canEditCollective(account))}
             LoggedInUser={LoggedInUser}
             compact={false}
+            reactions={update.reactions}
             isReloadingData={this.state.isReloadingData}
           />
           {update.userCanSeeUpdate && (
@@ -162,6 +163,8 @@ const updateQuery = gqlV2/* GraphQL */ `
       makePublicOn
       userCanSeeUpdate
       userCanPublishUpdate
+      reactions
+      userReactions
       account {
         id
         slug

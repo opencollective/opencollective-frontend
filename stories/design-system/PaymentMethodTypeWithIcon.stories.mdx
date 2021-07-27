@@ -1,0 +1,64 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import PaymentMethodTypeWithIcon from '../../components/PaymentMethodTypeWithIcon';
+
+<Meta title="Design system/PaymentMethodTypeWithIcon" component={PaymentMethodTypeWithIcon} />
+
+- Prepaid
+
+<Canvas>
+  <Story name="Prepaid">
+    {() => {
+      return <PaymentMethodTypeWithIcon type="prepaid" />;
+    }}
+  </Story>
+</Canvas>
+
+- Payment
+
+<Canvas>
+  <Story name="Payment">
+    {() => {
+      return <PaymentMethodTypeWithIcon type="payment" />;
+    }}
+  </Story>
+</Canvas>
+
+- Adaptive
+
+<Canvas>
+  <Story name="Adaptive">
+    {() => {
+      return <PaymentMethodTypeWithIcon type="adaptive" />;
+    }}
+  </Story>
+</Canvas>
+
+- Credit Card
+
+<Canvas>
+  <Story name="Credit Card">
+    {() => {
+      return <PaymentMethodTypeWithIcon type="creditcard" />;
+    }}
+  </Story>
+</Canvas>
+
+- Virtual Card
+
+<Canvas>
+  <Story name="Virtual Card">
+    {() => {
+      return <PaymentMethodTypeWithIcon type="virtualcard" />;
+    }}
+  </Story>
+</Canvas>
+
+- collective
+
+<Canvas>
+  <Story name="Collective">
+    {() => {
+      return <PaymentMethodTypeWithIcon type="collective" />;
+    }}
+  </Story>
+</Canvas>

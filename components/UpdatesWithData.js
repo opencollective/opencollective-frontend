@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
+import UpdateFilters from './updates/UpdateFilters';
 import Container from './Container';
 import Error from './Error';
 import { Box, Flex } from './Grid';
@@ -23,6 +24,8 @@ class UpdatesWithData extends React.Component {
     LoggedInUser: PropTypes.object,
     data: PropTypes.object,
     fetchMore: PropTypes.func,
+    onChange: PropTypes.func,
+    query: PropTypes.object,
   };
 
   constructor(props) {
@@ -42,7 +45,7 @@ class UpdatesWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective, compact } = this.props;
+    const { data, LoggedInUser, collective, compact, onChange, query } = this.props;
 
     if (data.error) {
       return <Error message={data.error.message} />;
@@ -73,6 +76,7 @@ class UpdatesWithData extends React.Component {
             )}
           </Flex>
         )}
+        <UpdateFilters values={query} onChange={onChange} />
         <Box mt={4} mb={5}>
           <Updates
             collective={collective}
@@ -88,10 +92,16 @@ class UpdatesWithData extends React.Component {
 }
 
 const updatesQuery = gqlV2/* GraphQL */ `
-  query Updates($collectiveSlug: String!, $limit: Int, $offset: Int) {
+  query Updates(
+    $collectiveSlug: String!
+    $limit: Int
+    $offset: Int
+    $searchTerm: String
+    $orderBy: ChronologicalOrderInput
+  ) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
-      updates(limit: $limit, offset: $offset) {
+      updates(limit: $limit, offset: $offset, searchTerm: $searchTerm, orderBy: $orderBy) {
         totalCount
         nodes {
           id
@@ -125,6 +135,8 @@ const getUpdatesVariables = props => {
     offset: 0,
     limit: props.limit || UPDATES_PER_PAGE * 2,
     includeHostedCollectives: props.includeHostedCollectives || false,
+    orderBy: { field: 'CREATED_AT', direction: props.query?.orderBy === 'oldest' ? 'ASC' : 'DESC' },
+    searchTerm: props.query?.searchTerm,
   };
 };
 

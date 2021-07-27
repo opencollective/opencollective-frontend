@@ -20,6 +20,7 @@ const TierVideo = ({ tier, editMutation, canEdit }) => {
       mutation={editMutation}
       canEdit={canEdit}
       showEditIcon={Boolean(tier.videoUrl)}
+      buttonsMinWidth={170}
     >
       {({ isEditing, value, setValue, enableEditor, disableEditor }) => {
         if (isEditing || (!value && canEdit)) {

@@ -27,7 +27,7 @@ import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
-import { expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
+import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
@@ -77,7 +77,7 @@ class ExpensePage extends React.Component {
         offset: parseInt(offset) || undefined,
         limit: parseInt(limit) || undefined,
         type: has(expenseTypes, type) ? type : undefined,
-        status: has(expenseStatus, status) ? status : undefined,
+        status: has(expenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
         payout: has(PayoutMethodType, payout) ? payout : undefined,
         period,
         amount,
@@ -352,15 +352,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
-          id
-          name
-          slug
-          type
-          supportedPayoutMethods
-          settings
-          plan {
-            id
-          }
+          ...ExpenseHostFields
         }
       }
 
@@ -413,6 +405,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
 
   ${expensesListFieldsFragment}
   ${collectiveNavbarFieldsFragment}
+  ${expenseHostFields}
 `;
 
 const addExpensesPageData = graphql(expensesPageQuery, {

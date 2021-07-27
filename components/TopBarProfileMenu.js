@@ -8,7 +8,9 @@ import { FormattedMessage } from 'react-intl';
 import { createGlobalStyle } from 'styled-components';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { parseToBoolean } from '../lib/utils';
 
+import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -21,6 +23,8 @@ import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledLink from './StyledLink';
 import { P, Span } from './Text';
 import { withUser } from './UserProvider';
+
+const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES_ENABLED);
 
 const memberInvitationsCountQuery = gql`
   query MemberInvitationsCount($memberCollectiveId: Int!) {
@@ -130,9 +134,11 @@ class TopBarProfileMenu extends React.Component {
               <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
             </P>
             <Box as="ul" p={0} my={2}>
-              <UserMenuLinkEntry as={Span} onClick={() => setShowNewsAndUpdates(true)}>
-                <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
-              </UserMenuLinkEntry>
+              {CHANGE_LOG_UPDATES_ENABLED && (
+                <UserMenuLinkEntry as={Span} onClick={() => setShowNewsAndUpdates(true)}>
+                  <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
+                </UserMenuLinkEntry>
+              )}
               <UserMenuLinkEntry href={`/${LoggedInUser.username}`}>
                 <FormattedMessage id="menu.profile" defaultMessage="Profile" />
               </UserMenuLinkEntry>
@@ -187,22 +193,14 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <Flex alignItems="center" onClick={this.toggleProfileMenu} data-cy="user-menu-trigger">
-        <Hide xs sm>
-          <P
-            color="black.700"
-            display="inline-block"
-            fontSize="13px"
-            lineHeight="16px"
-            fontWeight="500"
-            letterSpacing="1px"
-            mx={2}
-            cursor="pointer"
-            data-cy="topbar-login-username"
-          >
-            {LoggedInUser.collective.name || LoggedInUser.username}
-          </P>
-        </Hide>
-        <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
+        <Flex>
+          <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
+          <Hide sm md lg>
+            <Container mx={-20} my={-1}>
+              <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
+            </Container>
+          </Hide>
+        </Flex>
         <Hide xs>
           <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
         </Hide>

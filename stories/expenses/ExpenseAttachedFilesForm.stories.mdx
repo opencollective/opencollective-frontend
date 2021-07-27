@@ -1,0 +1,28 @@
+import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
+import ExpenseAttachedFilesForm from '../../components/expenses/ExpenseAttachedFilesForm';
+
+<Meta
+  title="Expenses/ExpenseAttachedFilesForm"
+  component={ExpenseAttachedFilesForm}
+  argTypes={{
+    title: {
+      defaultValue: 'Default Title',
+    },
+    description: {
+      defaultValue: 'Default Description',
+    },
+  }}
+  parameters={{
+    actions: {
+      handles: ['onChange'],
+    },
+  }}
+/>
+
+## Default
+
+export const DefaultStory = props => <ExpenseAttachedFilesForm {...props} />;
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />

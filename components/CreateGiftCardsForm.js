@@ -589,7 +589,7 @@ class CreateGiftCardsForm extends Component {
               checked={deliverType === 'email'}
               onClick={() => this.changeDeliverType('email')}
             >
-              <FormattedMessage id="giftCards.create.sendEmails" defaultMessage="Send the cards by&#160;email" />
+              <FormattedMessage id="giftCards.create.sendEmails" defaultMessage="Send the cards by email" />
             </RadioButtonWithLabel>
             <RadioButtonWithLabel
               name="manual"

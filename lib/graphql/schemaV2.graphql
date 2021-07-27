@@ -221,6 +221,8 @@ interface Account {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -766,6 +768,8 @@ type Bot implements Account {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -1023,6 +1027,8 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -1152,6 +1158,7 @@ type CollectiveFeatures {
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
+  ALIPAY: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -2734,11 +2741,17 @@ type Credit implements Transaction {
   legacyId: Int!
   uuid: String
   type: TransactionType
+  kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount: Amount!
   taxAmount: Amount!
+
+  """
+  If taxAmount is set, this field will contain more info about the tax
+  """
+  taxInfo: TaxInfo
   platformFee: Amount!
   hostFee: Amount!
   paymentProcessorFee: Amount!
@@ -2762,6 +2775,12 @@ type Credit implements Transaction {
   giftCardEmitterAccount: Account
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+  relatedTransactions(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+  ): [Transaction]!
   fromAccount: Account
   toAccount: Account
 }
@@ -2976,11 +2995,17 @@ type Debit implements Transaction {
   legacyId: Int!
   uuid: String
   type: TransactionType
+  kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount: Amount!
   taxAmount: Amount!
+
+  """
+  If taxAmount is set, this field will contain more info about the tax
+  """
+  taxInfo: TaxInfo
   platformFee: Amount!
   hostFee: Amount!
   paymentProcessorFee: Amount!
@@ -3004,6 +3029,12 @@ type Debit implements Transaction {
   giftCardEmitterAccount: Account
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+  relatedTransactions(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+  ): [Transaction]!
   fromAccount: Account
   toAccount: Account
 }
@@ -3013,6 +3044,18 @@ A field whose value conforms to the standard internet email address format as
 specified in RFC822: https://www.w3.org/Protocols/rfc822/.
 """
 scalar EmailAddress
+
+type EmojiReactionResponse {
+  """
+  Reference to the update corresponding to the emojis
+  """
+  update: Update
+
+  """
+  Reference to the comment corresponding to the emojis
+  """
+  comment: Comment
+}
 
 """
 This represents an Event account
@@ -3222,6 +3265,8 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -3766,6 +3811,11 @@ type ExpensePermissions {
   Whether the current user can comment and see comments for this expense
   """
   canComment: Boolean!
+
+  """
+  Whether the current user can unschedule this expense payment
+  """
+  canUnschedulePayment: Boolean!
 }
 
 """
@@ -3796,6 +3846,11 @@ enum ExpenseProcessAction {
   To schedule the expense for payment
   """
   SCHEDULE_FOR_PAYMENT
+
+  """
+  To unschedule the expense payment
+  """
+  UNSCHEDULE_PAYMENT
 
   """
   To trigger the payment
@@ -4160,6 +4215,8 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -4494,6 +4551,8 @@ type Host implements Account & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -4740,6 +4799,11 @@ type HostMetrics {
   Amount in host fee shared  requiring settlement
   """
   pendingHostFeeShare: Amount
+
+  """
+  Amount in host fee shared not requiring settlement
+  """
+  settledHostFeeShare: Amount
 
   """
   Total amount managed on behalf of hosted collectives
@@ -5050,6 +5114,8 @@ type Individual implements Account {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -5084,6 +5150,7 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
+  hasSeenLatestChangelogEntry: Boolean!
 }
 
 input IndividualCreateInput {
@@ -5350,18 +5417,6 @@ type Mutation {
   editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreateInput!): Comment
-  addCommentReaction(
-    """
-    The emoji associated with the reaction
-    """
-    emoji: String!
-
-    """
-    A unique identifier for the comment id associated with this comment reaction
-    """
-    comment: CommentReferenceInput!
-  ): Comment!
-  removeCommentReaction(comment: CommentReferenceInput!, emoji: String!): Comment!
 
   """
   Connect external account to Open Collective Account
@@ -5543,6 +5598,27 @@ type Mutation {
     """
     draftKey: String
   ): Expense!
+  addEmojiReaction(
+    """
+    The emoji associated with the reaction
+    """
+    emoji: String!
+
+    """
+    A unique identifier for the comment id associated with this reaction
+    """
+    comment: CommentReferenceInput
+
+    """
+    A unique identifier for the update id associated with this reaction
+    """
+    update: UpdateReferenceInput
+  ): EmojiReactionResponse!
+  removeEmojiReaction(
+    comment: CommentReferenceInput
+    update: UpdateReferenceInput
+    emoji: String!
+  ): EmojiReactionResponse!
 
   """
   Apply to an host with a collective
@@ -5845,7 +5921,7 @@ type Mutation {
     Reference of the transaction to refund
     """
     transaction: TransactionReferenceInput!
-  ): Transaction!
+  ): Transaction
 
   """
   Rejects transaction, removes member from Collective, and sends a message to the contributor
@@ -5886,6 +5962,11 @@ type Mutation {
   publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
+
+  """
+  Update the time which the user viewed the changelog updates
+  """
+  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
 
   """
   Assign new Virtual Card information to existing hosted collective
@@ -6440,6 +6521,8 @@ type Organization implements Account & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -6596,6 +6679,7 @@ input PaymentMethodInput {
 }
 
 enum PaymentMethodLegacyType {
+  ALIPAY
   CREDIT_CARD
   GIFT_CARD
   PREPAID_BUDGET
@@ -6620,6 +6704,7 @@ enum PaymentMethodService {
 }
 
 enum PaymentMethodType {
+  alipay
   creditcard
   prepaid
   payment
@@ -6972,6 +7057,8 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """
@@ -7214,6 +7301,11 @@ type Query {
     tags: [String]
 
     """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
@@ -7279,6 +7371,11 @@ type Query {
     Filter hosts by tags (multiple = OR)
     """
     tags: [String]
+
+    """
+    Filter hosts by tags (multiple = OR)
+    """
+    tag: [String]
   ): HostCollection
   order(
     """
@@ -7449,6 +7546,11 @@ type Query {
     To filter by transaction kind
     """
     kinds: [TransactionKind]
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection
   update(
     """
@@ -7510,6 +7612,21 @@ type TagStat {
   Number of entries for this tag
   """
   count: Int!
+}
+
+"""
+Information about a tax
+"""
+type TaxInfo {
+  """
+  An unique identifier for this tax (GST, VAT, etc)
+  """
+  id: String!
+
+  """
+  Percentage applied, between 0-100
+  """
+  percentage: Int!
 }
 
 """
@@ -7593,11 +7710,17 @@ interface Transaction {
   legacyId: Int!
   uuid: String
   type: TransactionType
+  kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount: Amount!
   taxAmount: Amount!
+
+  """
+  If taxAmount is set, this field will contain more info about the tax
+  """
+  taxInfo: TaxInfo
   platformFee: Amount!
   hostFee: Amount
   paymentProcessorFee: Amount
@@ -7615,6 +7738,12 @@ interface Transaction {
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+  relatedTransactions(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+  ): [Transaction]!
 }
 
 """
@@ -7633,9 +7762,11 @@ enum TransactionKind {
   EXPENSE
   HOST_FEE
   HOST_FEE_SHARE
+  HOST_FEE_SHARE_DEBT
   PAYMENT_PROCESSOR_FEE
   PLATFORM_FEE
   PLATFORM_TIP
+  PLATFORM_TIP_DEBT
   PREPAID_PAYMENT_METHOD
 }
 
@@ -7783,6 +7914,16 @@ type Update {
   account: Account
 
   """
+  Returns a map of reactions counts for this update
+  """
+  reactions: JSON
+
+  """
+  Returns the list of reactions added to this update by logged in user
+  """
+  userReactions: [String]
+
+  """
   List the comments for this update. Not backed by a loader, don't use this in lists.
   """
   comments(limit: Int, offset: Int): CommentCollection
@@ -7843,7 +7984,7 @@ input UpdateCreateInput {
   isPrivate: Boolean
   isChangelog: Boolean
   makePublicOn: IsoDateString
-  html: String
+  html: String!
   fromAccount: AccountReferenceInput
   account: AccountReferenceInput!
 }
@@ -8081,6 +8222,8 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     onlyPublishedUpdates: Boolean
     onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
   ): UpdateCollection!
 
   """

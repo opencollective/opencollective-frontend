@@ -362,6 +362,7 @@ type CollectiveFeatures {
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
+  ALIPAY: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -1300,6 +1301,7 @@ type Expense implements Transaction {
   refundTransaction: Transaction
   uuid: String
   type: String
+  kind: String
   amount: Int
   currency: String
   hostCurrency: String
@@ -2236,6 +2238,7 @@ type Order implements Transaction {
   refundTransaction: Transaction
   uuid: String
   type: String
+  kind: String
   amount: Int
   currency: String
   hostCurrency: String
@@ -3121,6 +3124,7 @@ type Query {
     offset: Int
     dateFrom: String
     dateTo: String
+    kinds: [String]
 
     """
     If false, only the transactions not linked to an expense (orders/refunds) will be returned
@@ -3577,6 +3581,7 @@ interface Transaction {
   usingGiftCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
   type: String
+  kind: String
   description: String
   createdAt: DateString
   updatedAt: DateString
@@ -3928,6 +3933,7 @@ type UserDetails {
   Returns true if user account is limited (user can't use any feature)
   """
   isLimited: Boolean
+  hasSeenLatestChangelogEntry: Boolean!
 }
 
 """

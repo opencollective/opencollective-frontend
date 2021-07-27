@@ -113,6 +113,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
     frequency
     amount {
       value
+      valueInCents
       currency
     }
     paymentMethod {
@@ -122,6 +123,8 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
     }
     platformContributionAmount {
       value
+      valueInCents
+      currency
     }
     tier {
       id

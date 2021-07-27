@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
 import { get, includes, size } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
@@ -89,6 +90,8 @@ const ExpenseBudgetItem = ({
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
   const featuredProfile = isInverted ? collective : expense?.payee;
   const isAdminView = view === 'admin';
+  const isCharge = expense?.type === expenseTypes.CHARGE;
+  const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
   const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
 
   return (
@@ -193,6 +196,17 @@ const ExpenseBudgetItem = ({
             <LoadingPlaceholder height={20} width={140} />
           ) : (
             <Flex>
+              {isAdminView && pendingReceipt && (
+                <Box mr="1px">
+                  <StyledTooltip
+                    content={
+                      <FormattedMessage id="Expense.MissingReceipt" defaultMessage="Expense is missing its Receipt" />
+                    }
+                  >
+                    <AlertTriangle size={18} />
+                  </StyledTooltip>
+                </Box>
+              )}
               {isAdminView && (
                 <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
               )}

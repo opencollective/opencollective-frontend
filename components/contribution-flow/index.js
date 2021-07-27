@@ -6,7 +6,7 @@ import { CardElement } from '@stripe/react-stripe-js';
 import { find, get, intersection, isEmpty, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
@@ -33,6 +33,7 @@ import Steps from '../Steps';
 import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
+import CollectiveTitleContainer from './CollectiveTitleContainer';
 import { STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
@@ -94,11 +95,13 @@ class ContributionFlow extends React.Component {
     fixedAmount: PropTypes.number,
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
+    hideHeader: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
     isEmbed: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
     verb: PropTypes.string,
+    error: PropTypes.string,
     contributeAs: PropTypes.string,
     defaultEmail: PropTypes.string,
     defaultName: PropTypes.string,
@@ -202,8 +205,13 @@ class ContributionFlow extends React.Component {
     if (!response) {
       this.setState({ isSubmitting: false, error: message });
     } else if (response.paymentIntent) {
+      const isAlipay = response.paymentIntent.allowed_source_types[0] === 'alipay';
       const stripe = await getStripe(null, account);
-      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
+      const result = isAlipay
+        ? await stripe.confirmAlipayPayment(response.paymentIntent.client_secret, {
+            return_url: `${window.location.origin}/api/services/stripe/alipay/callback?OrderId=${order.id}`,
+          })
+        : await stripe.handleCardAction(response.paymentIntent.client_secret);
       if (result.error) {
         this.setState({ isSubmitting: false, error: result.error.message });
       } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
@@ -277,8 +285,12 @@ class ContributionFlow extends React.Component {
         'paypalInfo.orderId',
         'paypalInfo.subscriptionId',
       ]);
-    } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER) {
-      return pick(stepPayment.paymentMethod, ['type']);
+    } else if (
+      [GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER, GQLV2_PAYMENT_METHOD_TYPES.ALIPAY].includes(
+        stepPayment.paymentMethod.type,
+      )
+    ) {
+      return pick(stepPayment.paymentMethod, ['type', 'service']);
     }
   };
 
@@ -382,6 +394,7 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
+        'hideHeader',
       ]),
       ...queryParams,
     };
@@ -564,7 +577,16 @@ class ContributionFlow extends React.Component {
   };
 
   render() {
-    const { collective, host, tier, LoggedInUser, loadingLoggedInUser, skipStepDetails, isEmbed } = this.props;
+    const {
+      collective,
+      host,
+      tier,
+      LoggedInUser,
+      loadingLoggedInUser,
+      skipStepDetails,
+      isEmbed,
+      error: backendError,
+    } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
     const currency = tier?.amount.currency || collective.currency;
 
@@ -598,9 +620,11 @@ class ContributionFlow extends React.Component {
             data-cy="cf-content"
             ref={this.mainContainerRef}
           >
-            <Box px={[2, 3]} mb={4}>
-              <ContributionFlowHeader collective={collective} />
-            </Box>
+            {!this.props.hideHeader && (
+              <Box px={[2, 3]} mb={4}>
+                <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
+              </Box>
+            )}
             <StepsProgressBox mb={3} width={[1.0, 0.8]}>
               <ContributionFlowStepsProgress
                 steps={steps}
@@ -640,9 +664,9 @@ class ContributionFlow extends React.Component {
               >
                 <Box />
                 <Box as="form" ref={this.formRef} onSubmit={e => e.preventDefault()} maxWidth="100%">
-                  {error && (
-                    <MessageBox type="error" withIcon mb={3}>
-                      {formatErrorMessage(this.props.intl, error)}
+                  {(error || backendError) && (
+                    <MessageBox type="error" withIcon mb={3} data-cy="contribution-flow-error">
+                      {formatErrorMessage(this.props.intl, error) || backendError}
                     </MessageBox>
                   )}
 
@@ -676,7 +700,16 @@ class ContributionFlow extends React.Component {
                       currency={currency}
                     />
                   </Box>
+                  <Box textAlign="center" mt={5}>
+                    <CollectiveTitleContainer useLink={!isEmbed} collective={collective}>
+                      <FormattedMessage
+                        id="ContributionFlow.backToCollectivePage"
+                        defaultMessage="Back to Collective Page"
+                      />
+                    </CollectiveTitleContainer>
+                  </Box>
                 </Box>
+
                 <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
                   <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
                     <SafeTransactionMessage />

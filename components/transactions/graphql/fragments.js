@@ -8,6 +8,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
     nodes {
       id
       uuid
+      kind
       amount {
         currency
         valueInCents
@@ -15,6 +16,13 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
       netAmount {
         currency
         valueInCents
+      }
+      taxAmount {
+        valueInCents
+        currency
+      }
+      taxInfo {
+        id
       }
       platformFee {
         currency
@@ -65,6 +73,16 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         type
         imageUrl
         isIncognito
+        ... on Event {
+          parent {
+            id
+          }
+        }
+        ... on Project {
+          parent {
+            id
+          }
+        }
         ... on Individual {
           isGuest
         }
@@ -120,6 +138,15 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         createdByAccount {
           id
           slug
+        }
+      }
+      relatedTransactions(kind: [HOST_FEE]) {
+        id
+        type
+        kind
+        netAmount {
+          currency
+          valueInCents
         }
       }
     }

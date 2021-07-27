@@ -107,10 +107,11 @@ const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
 const { USER, ORGANIZATION } = CollectiveType;
 
 class ExpensePage extends React.Component {
-  static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, key } }) {
+  static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, key, edit } }) {
     return {
       parentCollectiveSlug,
       collectiveSlug,
+      edit,
       draftKey: key,
       legacyExpenseId: parseInt(ExpenseId),
     };
@@ -121,6 +122,7 @@ class ExpensePage extends React.Component {
     parentCollectiveSlug: PropTypes.string,
     legacyExpenseId: PropTypes.number,
     draftKey: PropTypes.string,
+    edit: PropTypes.string,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     /** @ignore from withApollo */
@@ -165,7 +167,8 @@ class ExpensePage extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey) {
+    const shouldEditDraft = this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey;
+    if (shouldEditDraft) {
       this.setState(() => ({
         status: PAGE_STATUS.EDIT,
         editedExpense: this.props.data.expense,
@@ -191,6 +194,18 @@ class ExpensePage extends React.Component {
     // Refetch data when users are logged in to make sure they can see the private info
     if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
       this.refetchDataForUser();
+    }
+
+    // Automatically edit expense if missing receipt
+    const expense = this.props.data?.expense;
+    const isMissingReceipt =
+      expense?.status === expenseStatus.PAID &&
+      expense?.type === expenseTypes.CHARGE &&
+      expense?.permissions?.canEdit &&
+      expense?.items?.every(item => !item.url);
+    if (this.props.edit && isMissingReceipt && this.state.status !== PAGE_STATUS.EDIT) {
+      this.onEditBtnClick();
+      this.props.router.replace(document.location.pathname);
     }
 
     // Scroll to expense's top when changing status
@@ -391,11 +406,11 @@ class ExpensePage extends React.Component {
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
     const isMissingReceipt =
-      status === PAGE_STATUS.VIEW &&
       expense?.status === expenseStatus.PAID &&
       expense?.type === expenseTypes.CHARGE &&
       expense?.permissions?.canEdit &&
       expense?.items?.every(item => !item.url);
+    const skipSummary = isMissingReceipt && status === PAGE_STATUS.EDIT;
 
     const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
 
@@ -464,7 +479,9 @@ class ExpensePage extends React.Component {
               ((expense?.status === expenseStatus.UNVERIFIED && this.state.createdUser) || isDraft) && (
                 <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
               )}
-            {isMissingReceipt && <ExpenseMissingReceiptNotificationBanner onEdit={this.onEditBtnClick} />}
+            {isMissingReceipt && (
+              <ExpenseMissingReceiptNotificationBanner onEdit={status !== PAGE_STATUS.EDIT && this.onEditBtnClick} />
+            )}
             {status !== PAGE_STATUS.EDIT && (
               <Box mb={3}>
                 <ExpenseSummary
@@ -614,17 +631,24 @@ class ExpensePage extends React.Component {
                   <ExpenseForm
                     collective={collective}
                     loading={data.loading || loadingLoggedInUser || isRefetchingDataForUser}
-                    expense={editedExpense}
+                    expense={editedExpense || expense}
                     expensesTags={this.getSuggestedTags(collective)}
                     payoutProfiles={payoutProfiles}
                     loggedInAccount={loggedInAccount}
                     onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
-                    onSubmit={editedExpense =>
-                      this.setState({
-                        editedExpense,
-                        status: PAGE_STATUS.EDIT_SUMMARY,
-                      })
-                    }
+                    onSubmit={editedExpense => {
+                      if (skipSummary) {
+                        this.setState({
+                          editedExpense,
+                        });
+                        return this.onSummarySubmit();
+                      } else {
+                        this.setState({
+                          editedExpense,
+                          status: PAGE_STATUS.EDIT_SUMMARY,
+                        });
+                      }
+                    }}
                     validateOnChange
                     disableSubmitIfUntouched
                   />

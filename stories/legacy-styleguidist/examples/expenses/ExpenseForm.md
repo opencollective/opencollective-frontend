@@ -1,3 +1,5 @@
+// TODO: Serialization issue needs to be solved before migrating this story to Storybook; https://github.com/storybookjs/storybook/issues/15181
+
 ## Base
 
 Hello

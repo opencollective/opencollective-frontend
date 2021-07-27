@@ -559,7 +559,7 @@ const ExpenseFormBody = ({
                   {isInvite && !isDraft ? (
                     <FormattedMessage id="Expense.SendInvite" defaultMessage="Send Invite" />
                   ) : isCreditCardCharge ? (
-                    <FormattedMessage id="Expense.AttachReceipt" defaultMessage="Attach Receipt" />
+                    <FormattedMessage id="Expense.SaveReceipt" defaultMessage="Save Receipt" />
                   ) : (
                     <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
                   )}

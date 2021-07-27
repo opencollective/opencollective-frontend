@@ -406,7 +406,10 @@ const VirtualCard = props => {
               <DismissIcon height="12px" width="12px" ml={2} mb="2px" />
             </React.Fragment>
           ) : (
-            <FormattedMessage id="VirtualCards.DisplayDetails" defaultMessage="View Card Details &rarr;" />
+            <React.Fragment>
+              <FormattedMessage id="VirtualCards.DisplayDetails" defaultMessage="View Card Details" />
+              &nbsp;&rarr;
+            </React.Fragment>
           )}
         </Action>
       </Flex>

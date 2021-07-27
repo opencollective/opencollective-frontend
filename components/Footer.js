@@ -11,6 +11,8 @@ import styled from 'styled-components';
 
 import languages from '../lib/constants/locales';
 
+import { useUser } from '../components/UserProvider';
+
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -226,7 +228,7 @@ const Footer = () => {
   const intl = useIntl();
   const languageOptions = React.useMemo(generateLanguageOptions);
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
-
+  const { LoggedInUser } = useUser();
   return (
     <FooterContainer>
       <Container
@@ -375,21 +377,23 @@ const Footer = () => {
                 {intl.formatMessage(messages[key])}
               </P>
               <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
-                {Object.keys(navigation[key]).map(item => (
-                  <ListItem key={item} textAlign={['center', 'left']} mb={3}>
-                    {navigation[key][item][0] === '/' ? (
-                      <Link href={navigation[key][item]}>
-                        <MenuLink as={Container}>
+                {Object.keys(navigation[key]).map(item =>
+                  !LoggedInUser || (LoggedInUser && !(item === 'signup' || item === 'login')) ? (
+                    <ListItem key={item} textAlign={['center', 'left']} mb={2}>
+                      {navigation[key][item][0] === '/' ? (
+                        <Link href={navigation[key][item]}>
+                          <MenuLink as={Container}>
+                            {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}
+                          </MenuLink>
+                        </Link>
+                      ) : (
+                        <MenuLink href={navigation[key][item]}>
                           {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}
                         </MenuLink>
-                      </Link>
-                    ) : (
-                      <MenuLink href={navigation[key][item]}>
-                        {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}
-                      </MenuLink>
-                    )}
-                  </ListItem>
-                ))}
+                      )}
+                    </ListItem>
+                  ) : null,
+                )}
               </FlexList>
             </Box>
           ))}

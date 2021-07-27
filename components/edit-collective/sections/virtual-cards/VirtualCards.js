@@ -20,7 +20,7 @@ import VirtualCard from '../../VirtualCard';
 import VirtualCardFilters from './VirtualCardFilters';
 
 const virtualCardsQuery = gqlV2/* GraphQL */ `
-  query CollectiveVirtualCards(
+  query AccountVirtualCards(
     $slug: String
     $limit: Int!
     $offset: Int!
@@ -29,21 +29,23 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
     $dateFrom: ISODateTime
     $dateTo: ISODateTime
   ) {
-    collective(slug: $slug) {
+    account(slug: $slug) {
       id
       legacyId
       slug
       type
       name
       imageUrl
-      host {
-        legacyId
-        slug
-        id
-        type
-        name
-        imageUrl
-        settings
+      ... on AccountWithHost {
+        host {
+          legacyId
+          slug
+          id
+          type
+          name
+          imageUrl
+          settings
+        }
       }
       virtualCards(
         limit: $limit
@@ -161,21 +163,21 @@ const VirtualCards = props => {
             filters={routerQuery}
             collective={props.collective}
             host={props.collective.host}
-            virtualCardMerchants={data.collective.virtualCardMerchants.nodes}
+            virtualCardMerchants={data.account.virtualCardMerchants.nodes}
             onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
             displayPeriodFilter
           />
         </Flex>
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
-        {data.collective.virtualCards.nodes.map(vc => (
+        {data.account.virtualCards.nodes.map(vc => (
           <VirtualCard key={vc.id} {...vc} />
         ))}
       </Grid>
       <Flex mt={5} justifyContent="center">
         <Pagination
           route={`/${props.collective.slug}/edit/virtual-cards`}
-          total={data.collective.virtualCards.totalCount}
+          total={data.account.virtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
           ignoredQueryParams={['slug', 'section']}

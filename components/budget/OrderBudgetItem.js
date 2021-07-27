@@ -129,9 +129,9 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                       currency={order.amount.currency}
                       precision={2}
                       amount={
-                        showPlatformTip
-                          ? order.amount.valueInCents
-                          : order.amount.valueInCents - (order.platformContributionAmount?.valueInCents || 0)
+                        showPlatformTip && order.platformContributionAmount?.valueInCents
+                          ? order.amount.valueInCents + order.platformContributionAmount.valueInCents
+                          : order.amount.valueInCents
                       }
                     />
                   </Span>

@@ -88,6 +88,7 @@ const StepPayment = ({
   collective,
   onChange,
   isSubmitting,
+  isEmbed,
   hideCreditCardPostalCode,
   onNewCardFormReady,
 }) => {
@@ -102,7 +103,7 @@ const StepPayment = ({
   // data handling
   const paymentMethods = get(data, 'account.paymentMethods', null) || [];
   const paymentOptions = React.useMemo(() =>
-    generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective),
+    generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective, isEmbed),
   );
 
   const setNewPaymentMethod = (key, paymentMethod) => {
@@ -202,6 +203,7 @@ StepPayment.propTypes = {
   onNewCardFormReady: PropTypes.func,
   hideCreditCardPostalCode: PropTypes.bool,
   isSubmitting: PropTypes.bool,
+  isEmbed: PropTypes.bool,
 };
 
 StepPayment.defaultProps = {

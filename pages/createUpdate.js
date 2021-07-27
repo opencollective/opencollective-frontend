@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { addCollectiveCoverData } from '../lib/graphql/queries';
+import { addCollectiveNavbarData } from '../lib/graphql/queries';
 import { compose } from '../lib/utils';
 
 import Body from '../components/Body';
@@ -56,10 +56,12 @@ class CreateUpdatePage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveCoverData
+    slug: PropTypes.string, // for addCollectiveNavbarData
     action: PropTypes.string, // not used atm, not clear where it's coming from, not in the route
     createUpdate: PropTypes.func, // from addMutation/createUpdateQuery
-    data: PropTypes.object.isRequired, // from withData
+    data: PropTypes.shape({
+      account: PropTypes.object,
+    }).isRequired, // from withData
     LoggedInUser: PropTypes.object,
     router: PropTypes.object,
     intl: PropTypes.object.isRequired,
@@ -71,26 +73,25 @@ class CreateUpdatePage extends React.Component {
       update: {},
       status: '',
       error: '',
-      updateType: props.data?.Collective?.slug === 'opencollective' ? UPDATE_TYPES[1] : UPDATE_TYPES[0],
+      updateType: props.data?.account?.slug === 'opencollective' ? UPDATE_TYPES[1] : UPDATE_TYPES[0],
     };
   }
 
   createUpdate = async update => {
-    const {
-      data: { Collective },
-    } = this.props;
+    const { data } = this.props;
+    const { account } = data;
 
     this.setState({ error: '', status: 'submitting' });
 
     try {
-      update.account = { legacyId: Collective.id };
+      update.account = { id: account.id };
       update.isChangelog = this.isChangelog();
       if (update.isChangelog) {
         update.isPrivate = false;
       }
       const res = await this.props.createUpdate({ variables: { update } });
       this.setState({ isModified: false });
-      return this.props.router.push(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
+      return this.props.router.push(`/${account.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
       this.setState({ status: 'error', error: e.message });
     }
@@ -109,11 +110,11 @@ class CreateUpdatePage extends React.Component {
   render() {
     const { data, LoggedInUser, intl } = this.props;
 
-    if (!data.Collective) {
+    if (!data.account) {
       return <ErrorPage data={data} />;
     }
 
-    const collective = data.Collective;
+    const collective = data.account;
     const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
@@ -139,7 +140,7 @@ class CreateUpdatePage extends React.Component {
                   <p>
                     <FormattedMessage
                       id="updates.create.login"
-                      defaultMessage="You need to be logged in as a core contributor of this collective to be able to create an update."
+                      defaultMessage="You need to be logged in as an admin of this collective to be able to create an update."
                     />
                   </p>
                   <p>
@@ -156,7 +157,7 @@ class CreateUpdatePage extends React.Component {
                   </H1>
                 </Container>
               )}
-              {collective.slug === 'opencollective' && (
+              {collective.slug === 'opencollective' && isAdmin && (
                 <StyledButtonSet
                   size="medium"
                   items={UPDATE_TYPES}
@@ -223,6 +224,6 @@ const addCreateUpdateMutation = graphql(createUpdateMutation, {
   },
 });
 
-const addGraphql = compose(addCollectiveCoverData, addCreateUpdateMutation);
+const addGraphql = compose(addCollectiveNavbarData, addCreateUpdateMutation);
 
 export default withUser(addGraphql(withRouter(injectIntl(CreateUpdatePage))));
