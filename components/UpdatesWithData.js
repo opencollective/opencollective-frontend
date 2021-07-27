@@ -36,8 +36,7 @@ class UpdatesWithData extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { data, collective } = this.props;
-    const { LoggedInUser } = this.props;
+    const { data, collective, LoggedInUser } = this.props;
     if (!prevProps.LoggedInUser && LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       // We refetch the data to get the updates that are not published yet
       data.refetch({ options: { fetchPolicy: 'network-only' } });
@@ -145,7 +144,7 @@ const UPDATES_PER_PAGE = 10;
 export const addUpdatesData = graphql(updatesQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: props.LoggedInUser?.canEditCollective(props.collective) ? 'cache-and-network' : 'cache-only',
     variables: getUpdatesVariables(props),
   }),
   props: ({ data }) => ({
