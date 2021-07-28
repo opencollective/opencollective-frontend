@@ -216,7 +216,7 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:collectiveSlug/:verb(donate|pay|order)/:step(${contributionFlowSteps})?`,
+    source: `/:collectiveSlug/:verb(donate|pay|order|crypto)/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {

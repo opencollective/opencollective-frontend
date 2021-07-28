@@ -42,6 +42,7 @@ import ContributionFlowStepContainer from './ContributionFlowStepContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
+import CryptoFlowStepContainer from './CryptoFlowStepContainer';
 import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
@@ -607,6 +608,7 @@ class ContributionFlow extends React.Component {
       loadingLoggedInUser,
       skipStepDetails,
       isEmbed,
+      verb,
       error: backendError,
     } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
@@ -644,7 +646,7 @@ class ContributionFlow extends React.Component {
           >
             {!this.props.hideHeader && (
               <Box px={[2, 3]} mb={4}>
-                <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
+                <ContributionFlowHeader collective={collective} isEmbed={isEmbed} verb={verb} />
               </Box>
             )}
             <StepsProgressBox mb={3} width={[1.0, 0.8]}>
@@ -657,6 +659,7 @@ class ContributionFlow extends React.Component {
                 stepDetails={stepDetails}
                 stepPayment={stepPayment}
                 stepSummary={stepSummary}
+                verb={verb}
                 isSubmitted={this.state.isSubmitted}
                 loading={isValidating || isSubmitted || isSubmitting}
                 currency={currency}
@@ -692,22 +695,42 @@ class ContributionFlow extends React.Component {
                     </MessageBox>
                   )}
 
-                  <ContributionFlowStepContainer
-                    collective={collective}
-                    tier={tier}
-                    mainState={this.state}
-                    onChange={data => this.setState(data)}
-                    step={currentStep}
-                    showFeesOnTop={this.canHaveFeesOnTop()}
-                    onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
-                    defaultProfileSlug={this.props.contributeAs}
-                    defaultEmail={this.props.defaultEmail}
-                    defaultName={this.props.defaultName}
-                    taxes={this.getApplicableTaxes(collective, host, tier?.type)}
-                    onSignInClick={() => this.setState({ showSignIn: true })}
-                    isEmbed={isEmbed}
-                    isSubmitting={isValidating || isSubmitted || isSubmitting}
-                  />
+                  {verb !== 'crypto' && (
+                    <ContributionFlowStepContainer
+                      collective={collective}
+                      tier={tier}
+                      mainState={this.state}
+                      onChange={data => this.setState(data)}
+                      step={currentStep}
+                      showFeesOnTop={this.canHaveFeesOnTop()}
+                      onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
+                      defaultProfileSlug={this.props.contributeAs}
+                      defaultEmail={this.props.defaultEmail}
+                      defaultName={this.props.defaultName}
+                      taxes={this.getApplicableTaxes(collective, host, tier?.type)}
+                      onSignInClick={() => this.setState({ showSignIn: true })}
+                      isEmbed={isEmbed}
+                      isSubmitting={isValidating || isSubmitted || isSubmitting}
+                    />
+                  )}
+                  {verb === 'crypto' && (
+                    <CryptoFlowStepContainer
+                      collective={collective}
+                      tier={tier}
+                      mainState={this.state}
+                      onChange={data => this.setState(data)}
+                      step={currentStep}
+                      showFeesOnTop={this.canHaveFeesOnTop()}
+                      onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
+                      defaultProfileSlug={this.props.contributeAs}
+                      defaultEmail={this.props.defaultEmail}
+                      defaultName={this.props.defaultName}
+                      taxes={this.getApplicableTaxes(collective, host, tier?.type)}
+                      onSignInClick={() => this.setState({ showSignIn: true })}
+                      isEmbed={isEmbed}
+                      isSubmitting={isValidating || isSubmitted || isSubmitting}
+                    />
+                  )}
 
                   <Box mt={40}>
                     <ContributionFlowButtons

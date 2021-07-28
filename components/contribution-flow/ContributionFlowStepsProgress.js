@@ -46,7 +46,7 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
   }
 };
 
-const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency }) => {
+const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency, verb }) => {
   if (step.name === STEPS.PROFILE) {
     if (stepProfile) {
       const mainInfo = (stepProfile.id && stepProfile.name) || (stepProfile.email ?? stepProfile.name);
@@ -61,7 +61,9 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
     if (stepDetails) {
       return (
         <React.Fragment>
-          <PrettyAmountFromStepDetails stepDetails={stepDetails} currency={currency} isFreeTier={isFreeTier} />
+          {verb !== 'crypto' && (
+            <PrettyAmountFromStepDetails stepDetails={stepDetails} currency={currency} isFreeTier={isFreeTier} />
+          )}
           {!isNaN(stepDetails.quantity) && stepDetails.quantity > 1 && ` x ${stepDetails.quantity}`}
         </React.Fragment>
       );
@@ -87,6 +89,7 @@ StepInfo.propTypes = {
   stepSummary: PropTypes.object,
   isFreeTier: PropTypes.bool,
   currency: PropTypes.string,
+  verb: PropTypes.string,
 };
 
 const ContributionFlowStepsProgress = ({
@@ -102,6 +105,7 @@ const ContributionFlowStepsProgress = ({
   goToStep,
   currency,
   isFreeTier,
+  verb,
 }) => {
   return (
     <StepsProgress
@@ -127,6 +131,7 @@ const ContributionFlowStepsProgress = ({
                 stepSummary={stepSummary}
                 isFreeTier={isFreeTier}
                 currency={currency}
+                verb={verb}
               />
             )}
           </Container>
@@ -149,6 +154,7 @@ ContributionFlowStepsProgress.propTypes = {
   lastVisitedStep: PropTypes.object,
   currency: PropTypes.string,
   isFreeTier: PropTypes.bool,
+  verb: PropTypes.string,
 };
 
 export default ContributionFlowStepsProgress;
