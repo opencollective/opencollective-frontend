@@ -253,7 +253,6 @@ class SectionUpdates extends React.PureComponent {
 const addUpdatesSectionData = graphql(updatesSectionQuery, {
   options: props => ({
     variables: getUpdatesSectionQueryVariables(props.collective.slug, props.isAdmin),
-    fetchPolicy: props.isAdmin ? 'cache-and-network' : 'cache-only',
   }),
 });
 

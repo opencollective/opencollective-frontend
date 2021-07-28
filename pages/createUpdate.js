@@ -12,6 +12,7 @@ import { compose } from '../lib/utils';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
+import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../components/collective-page/sections/Updates';
 import Container from '../components/Container';
 import EditUpdateForm from '../components/EditUpdateForm';
 import ErrorPage from '../components/ErrorPage';
@@ -23,6 +24,7 @@ import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
 import StyledButtonSet from '../components/StyledButtonSet';
 import { H1 } from '../components/Text';
+import { UPDATES_PER_PAGE, updatesQuery } from '../components/UpdatesWithData';
 import { withUser } from '../components/UserProvider';
 
 const BackButtonWrapper = styled(Container)`
@@ -89,7 +91,23 @@ class CreateUpdatePage extends React.Component {
       if (update.isChangelog) {
         update.isPrivate = false;
       }
-      const res = await this.props.createUpdate({ variables: { update } });
+      const res = await this.props.createUpdate({
+        variables: { update },
+        refetchQueries: [
+          {
+            query: updatesQuery,
+            context: API_V2_CONTEXT,
+            variables: {
+              collectiveSlug: this.props.slug,
+              offset: 0,
+              limit: UPDATES_PER_PAGE,
+              includeHostedCollectives: true,
+              orderBy: { field: 'CREATED_AT', direction: 'DESC' },
+            },
+          },
+          { query: updatesSectionQuery, variables: getUpdatesSectionQueryVariables(this.props.slug, true) },
+        ],
+      });
       this.setState({ isModified: false });
       return this.props.router.push(`/${account.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
