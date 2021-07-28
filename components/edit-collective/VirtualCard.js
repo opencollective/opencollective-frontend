@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
 import { FormattedMessage } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
@@ -9,15 +8,12 @@ import styled from 'styled-components';
 import { margin } from 'styled-system';
 
 import { formatCurrency } from '../../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import Avatar from '../Avatar';
-import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
-import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -107,67 +103,16 @@ const StateLabel = styled(Box)`
   line-height: 12px;
 `;
 
-const pauseCardMutation = gqlV2/* GraphQL */ `
-  mutation PauseVirtualCard($virtualCard: VirtualCardReferenceInput!) {
-    pauseVirtualCard(virtualCard: $virtualCard) {
-      id
-      data
-    }
-  }
-`;
-
-const resumeCardMutation = gqlV2/* GraphQL */ `
-  mutation ResumeVirtualCard($virtualCard: VirtualCardReferenceInput!) {
-    resumeVirtualCard(virtualCard: $virtualCard) {
-      id
-      data
-    }
-  }
-`;
-
-const deleteCardMutation = gqlV2/* GraphQL */ `
-  mutation DeleteVirtualCard($virtualCard: VirtualCardReferenceInput!) {
-    deleteVirtualCard(virtualCard: $virtualCard)
-  }
-`;
-
 const ActionsButton = props => {
   const wrapperRef = React.useRef();
   const arrowRef = React.useRef();
   const [displayActions, setDisplayActions] = React.useState(false);
-  const [displayDeleteModal, setDeleteModal] = React.useState(false);
-
-  const [pauseCard, { loading: pauseLoading }] = useMutation(pauseCardMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [resumeCard, { loading: resumeLoading }] = useMutation(resumeCardMutation, {
-    context: API_V2_CONTEXT,
-  });
-
-  const [deleteCard] = useMutation(deleteCardMutation, {
-    context: API_V2_CONTEXT,
-  });
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {
       setDisplayActions(false);
     }
   });
-
-  const isPaused = props.state !== 'OPEN';
-  const isLoading = pauseLoading || resumeLoading;
-
-  const handlePauseUnpause = async () => {
-    if (isPaused) {
-      await resumeCard({ variables: { virtualCard: { id: props.id } } });
-    } else {
-      await pauseCard({ variables: { virtualCard: { id: props.id } } });
-    }
-    if (props.onSuccess) {
-      await props.onSuccess();
-    }
-  };
-  const handleDelete = () => setDeleteModal(true);
 
   return (
     <div ref={wrapperRef}>
@@ -213,17 +158,6 @@ const ActionsButton = props => {
                     <Action onClick={props.editHandler}>
                       <FormattedMessage id="VirtualCards.EditCardDetails" defaultMessage="Edit Card Details" />
                     </Action>
-                    <Action mt="20px" onClick={handlePauseUnpause} disabled={isLoading}>
-                      {isPaused ? (
-                        <FormattedMessage id="VirtualCards.ResumeCard" defaultMessage="Resume Card" />
-                      ) : (
-                        <FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />
-                      )}{' '}
-                      {isLoading && <StyledSpinner size="0.9em" mb="2px" />}
-                    </Action>
-                    <Action color="red" mt="20px" onClick={handleDelete}>
-                      <FormattedMessage id="VirtualCards.DeleteCard" defaultMessage="Delete Card" />
-                    </Action>
                   </Flex>
                   <Arrow ref={arrowRef} {...arrowProps} />
                 </StyledCard>
@@ -232,30 +166,6 @@ const ActionsButton = props => {
           </Popper>
         )}
       </Manager>
-      <ConfirmationModal
-        show={displayDeleteModal}
-        width="100%"
-        maxWidth="570px"
-        onClose={() => {
-          setDeleteModal(false);
-        }}
-        header={<FormattedMessage id="VirtualCards.DeleteCard" defaultMessage="Delete Card" />}
-        continueHandler={async () => {
-          await deleteCard({ variables: { virtualCard: { id: props.id } } });
-          if (props.onSuccess) {
-            await props.onSuccess();
-          }
-        }}
-        continueLabel="Delete"
-        isDanger
-      >
-        <P fontSize="14px" lineHeight="18px" mt={2}>
-          <FormattedMessage
-            id="VirtualCards.DeleteCard.Description"
-            defaultMessage="Deleting a card is permanent both in the platform and in your provider, you won't be able to restore it later."
-          />
-        </P>
-      </ConfirmationModal>
     </div>
   );
 };

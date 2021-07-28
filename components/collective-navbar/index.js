@@ -260,8 +260,8 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
       (isFund || get(settings, 'fundingRequest') === true) && expenseSubmissionAllowed(collective, LoggedInUser),
     addPrepaidBudget: LoggedInUser?.isRoot() && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
-    assignVirtualCard: isHostAdmin && get(host, 'settings.features.privacyVcc'),
-    requestVirtualCard: isAdmin && get(host, 'settings.virtualcards.requestcard'),
+    assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
+    requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
     hasSettings: isAdmin,
   };
 };

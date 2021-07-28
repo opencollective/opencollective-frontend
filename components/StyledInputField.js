@@ -25,6 +25,7 @@ const StyledInputField = ({
   labelColor,
   labelProps,
   hideOptionalLabel,
+  useRequiredLabel,
   ...props
 }) => {
   const labelContent = label && <Span color={labelColor}>{label}</Span>;
@@ -32,7 +33,7 @@ const StyledInputField = ({
   htmlFor = htmlFor || (name ? `input-${name}` : undefined);
 
   const displayOptionalLabel = hideOptionalLabel ? false : required === false;
-  const displayRequiredLabel = hideOptionalLabel ? required === true : false;
+  const displayRequiredLabel = useRequiredLabel ? required === true : false;
 
   return (
     <Box {...props}>
@@ -117,7 +118,7 @@ StyledInputField.propTypes = {
   success: PropTypes.bool,
   /** If set to false, the field will be marked as optional */
   required: PropTypes.bool,
-  /** If set to true, will hide the (optional) label tag even if required is false and display * if required */
+  /** If set to true, will hide the (optional) label tag even if required is false and display "*" if required */
   useRequiredLabel: PropTypes.bool,
   /** Font size for the label */
   labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
