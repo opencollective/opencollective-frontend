@@ -30,7 +30,7 @@ const TrixEditorContainer = styled.div`
     margin-top: 8px;
     padding-top: 8px;
     outline-offset: 0.5em;
-    overflow-y: auto;
+    overflow-y: scroll;
 
     // Outline (only when there's no border)
     ${props =>
