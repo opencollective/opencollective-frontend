@@ -32,7 +32,6 @@ const memberFormMessages = defineMessages({
 const MemberForm = props => {
   const { intl, member, collectiveImg, bindSubmitForm, triggerSubmit } = props;
 
-  const [isSubmitted, setIsSubmitted] = React.useState(false);
   const [memberRole, setMemberRole] = React.useState(member?.role || roles.ADMIN);
 
   const memberCollective = member?.member;
@@ -44,10 +43,7 @@ const MemberForm = props => {
   };
 
   const submit = values => {
-    if (!isSubmitted) {
-      triggerSubmit(values);
-      setIsSubmitted(true);
-    }
+    triggerSubmit(values);
   };
 
   const getOptions = arr => {
