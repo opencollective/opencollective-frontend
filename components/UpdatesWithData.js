@@ -128,14 +128,14 @@ export const updatesQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const getUpdatesVariables = props => {
+export const getUpdatesVariables = (slug, limit, includeHostedCollectives, orderBy, searchTerm) => {
   return {
-    collectiveSlug: props.collective.slug,
+    collectiveSlug: slug,
     offset: 0,
-    limit: props.limit || UPDATES_PER_PAGE * 2,
-    includeHostedCollectives: props.includeHostedCollectives || false,
-    orderBy: { field: 'CREATED_AT', direction: props.query?.orderBy === 'oldest' ? 'ASC' : 'DESC' },
-    searchTerm: props.query?.searchTerm,
+    limit: limit || UPDATES_PER_PAGE * 2,
+    includeHostedCollectives: includeHostedCollectives || false,
+    orderBy: { field: 'CREATED_AT', direction: orderBy === 'oldest' ? 'ASC' : 'DESC' },
+    searchTerm: searchTerm,
   };
 };
 
@@ -144,7 +144,13 @@ export const UPDATES_PER_PAGE = 10;
 export const addUpdatesData = graphql(updatesQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
-    variables: getUpdatesVariables(props),
+    variables: getUpdatesVariables(
+      props.collective.slug,
+      props.limit,
+      props.includeHostedCollectives,
+      props.query?.orderBy,
+      props.query?.searchTerm,
+    ),
   }),
   props: ({ data }) => ({
     data,

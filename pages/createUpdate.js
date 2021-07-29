@@ -24,7 +24,7 @@ import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
 import StyledButtonSet from '../components/StyledButtonSet';
 import { H1 } from '../components/Text';
-import { UPDATES_PER_PAGE, updatesQuery } from '../components/UpdatesWithData';
+import { getUpdatesVariables, UPDATES_PER_PAGE, updatesQuery } from '../components/UpdatesWithData';
 import { withUser } from '../components/UserProvider';
 
 const BackButtonWrapper = styled(Container)`
@@ -97,13 +97,7 @@ class CreateUpdatePage extends React.Component {
           {
             query: updatesQuery,
             context: API_V2_CONTEXT,
-            variables: {
-              collectiveSlug: this.props.slug,
-              offset: 0,
-              limit: UPDATES_PER_PAGE,
-              includeHostedCollectives: true,
-              orderBy: { field: 'CREATED_AT', direction: 'DESC' },
-            },
+            variables: getUpdatesVariables(this.props.slug, UPDATES_PER_PAGE, true),
           },
           { query: updatesSectionQuery, variables: getUpdatesSectionQueryVariables(this.props.slug, true) },
         ],
