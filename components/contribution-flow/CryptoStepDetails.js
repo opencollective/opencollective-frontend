@@ -1,16 +1,11 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { TierTypes } from '../../lib/constants/tiers-types';
-
 import { Box } from '../Grid';
-
-import { Label } from '../Text';
-
+import StyledInputGroup from '../StyledInputGroup';
 import StyledSelect from '../StyledSelect';
-import StyledInputGroup from "../StyledInputGroup";
+import { Label } from '../Text';
 
 const messages = defineMessages({
   cryptoCurrency: {
@@ -21,9 +16,13 @@ const messages = defineMessages({
     id: `CryptoStepDetails.donationAmount`,
     defaultMessage: 'Enter donation amount',
   },
+  invalidAmount: {
+    id: `CryptoStepDetails.invalidAmount`,
+    defaultMessage: 'Please select a valid currency amount',
+  },
 });
 
-const options = [
+export const cryptoCurrencies = [
   {
     label: 'BTC',
     value: 'BTC',
@@ -74,10 +73,13 @@ const options = [
   },
 ];
 
-const CryptoStepDetails = ({ data, collective, tier }) => {
+const CryptoStepDetails = ({ onChange, data }) => {
   const intl = useIntl();
-  const [currency, setCurrency] = useState(options[0].label);
-  const [amount, setAmount] = useState(0);
+  const [currencyType, setCurrencyType] = useState(data.currency);
+  const [amount, setAmount] = useState(data.amount);
+  const dispatchChange = (field, value) => {
+    onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
+  };
   return (
     <Box width={1}>
       <Label htmlFor="crypto-currency" mb={2}>
@@ -85,22 +87,29 @@ const CryptoStepDetails = ({ data, collective, tier }) => {
       </Label>
       <StyledSelect
         inputId="crypto-currency"
-        options={options}
-        defaultValue={options[0]}
-        onChange={({value}) => setCurrency(value)}
+        options={cryptoCurrencies}
+        defaultValue={currencyType}
+        onChange={value => {
+          setCurrencyType(value);
+          dispatchChange('currency', value);
+        }}
         isSearchable={false}
-        maxWidth={"100%"}
+        maxWidth={'100%'}
         mb={3}
       />
       <Label htmlFor="donation-amount" mb={2}>
         {intl.formatMessage(messages['donationAmount'])}
       </Label>
       <StyledInputGroup
-        prepend={currency}
+        prepend={currencyType.label}
         type="number"
         inputMode="decimal"
-        onChange={({value}) => setAmount(value)}
-        error={amount < 0}
+        defaultValue={amount}
+        onChange={({ target }) => {
+          setAmount(target.value);
+          dispatchChange('amount', target.value);
+        }}
+        error={amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
       />
     </Box>
   );
@@ -108,38 +117,10 @@ const CryptoStepDetails = ({ data, collective, tier }) => {
 
 CryptoStepDetails.propTypes = {
   onChange: PropTypes.func,
-  showFeesOnTop: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
   data: PropTypes.shape({
-    amount: PropTypes.number,
-    platformContribution: PropTypes.number,
-    quantity: PropTypes.number,
-    interval: PropTypes.string,
-    customData: PropTypes.object,
+    amount: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    currency: PropTypes.object,
   }),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    type: PropTypes.string,
-    host: PropTypes.object,
-  }).isRequired,
-  tier: PropTypes.shape({
-    amountType: PropTypes.string,
-    interval: PropTypes.string,
-    name: PropTypes.string,
-    maxQuantity: PropTypes.number,
-    availableQuantity: PropTypes.number,
-    type: PropTypes.oneOf(Object.values(TierTypes)),
-    customFields: PropTypes.array,
-    amount: PropTypes.shape({
-      currency: PropTypes.string,
-      valueInCents: PropTypes.number,
-    }),
-    minAmount: PropTypes.shape({
-      valueInCents: PropTypes.number,
-    }),
-  }),
-  router: PropTypes.object,
 };
 
-export default withRouter(CryptoStepDetails);
+export default CryptoStepDetails;

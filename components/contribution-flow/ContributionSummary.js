@@ -48,7 +48,7 @@ const Amount = styled(Span)`
   text-align: right;
 `;
 
-const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment, currency }) => {
+const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment, currency, isCrypto }) => {
   const intl = useIntl();
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
@@ -78,11 +78,18 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               />
             </Label>
             <Amount>
-              <FormattedMoneyAmount
-                amount={stepDetails.amount}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
+              {!isCrypto && (
+                <FormattedMoneyAmount
+                  amount={stepDetails.amount}
+                  currency={currency}
+                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
+                />
+              )}
+              {isCrypto && (
+                <Span
+                  style={{ color: 'black.700', fontWeight: 400 }}
+                >{`${stepDetails.amount} ${stepDetails.currency.label}`}</Span>
+              )}
             </Amount>
           </AmountLine>
           {Boolean(stepSummary?.amount) && (
@@ -172,7 +179,11 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700">
-          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
+          {isCrypto ? (
+            <Span style={{ fontWeight: 700 }}>{`${stepDetails.amount} ${stepDetails.currency.label}`}</Span>
+          ) : (
+            <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
+          )}
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && (
@@ -223,6 +234,7 @@ ContributionSummary.propTypes = {
   stepSummary: PropTypes.object,
   stepPayment: PropTypes.object,
   currency: PropTypes.string,
+  isCrypto: PropTypes.bool,
 };
 
 export default ContributionSummary;

@@ -43,6 +43,7 @@ import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
 import CryptoFlowStepContainer from './CryptoFlowStepContainer';
+import { cryptoCurrencies } from './CryptoStepDetails';
 import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
@@ -141,8 +142,9 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
-        amount: props.fixedAmount || getDefaultTierAmount(props.tier),
+        amount: this.props.verb === 'crypto' ? 5 : props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
+        currency: cryptoCurrencies[0],
       },
     };
   }
@@ -469,7 +471,7 @@ class ContributionFlow extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
-    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser } = this.props;
+    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser, verb } = this.props;
     const { stepDetails, stepProfile, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
@@ -482,7 +484,14 @@ class ContributionFlow extends React.Component {
         label: intl.formatMessage(STEP_LABELS.details),
         isCompleted: Boolean(stepDetails),
         validate: () => {
-          if (!this.checkFormValidity() || !stepDetails || stepDetails.amount < minAmount || !stepDetails.quantity) {
+          if (verb === 'crypto') {
+            return true;
+          } else if (
+            !this.checkFormValidity() ||
+            !stepDetails ||
+            stepDetails.amount < minAmount ||
+            !stepDetails.quantity
+          ) {
             return false;
           } else if (!isNil(tier?.availableQuantity) && stepDetails.quantity > tier.availableQuantity) {
             return false;
@@ -765,6 +774,7 @@ class ContributionFlow extends React.Component {
                         stepSummary={stepSummary}
                         stepPayment={stepPayment}
                         currency={currency}
+                        isCrypto={verb === 'crypto'}
                       />
                     </Box>
                     <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />

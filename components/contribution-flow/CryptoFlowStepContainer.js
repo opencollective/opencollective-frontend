@@ -124,15 +124,7 @@ class CryptoFlowStepContainer extends React.Component {
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
-        return (
-          <CryptoStepDetails
-            collective={collective}
-            tier={tier}
-            onChange={this.props.onChange}
-            data={stepDetails}
-            showFeesOnTop={this.props.showFeesOnTop}
-          />
-        );
+        return <CryptoStepDetails onChange={this.props.onChange} data={stepDetails} />;
       case 'profile': {
         const personalProfile = this.getPersonalProfile();
         const otherProfiles = this.getOtherProfiles();
