@@ -13,7 +13,7 @@ const messages = defineMessages({
   },
   description: {
     id: 'CollectivePage.Contribute.Crypto.Description',
-    defaultMessage: 'Make a crypto contribution through The Giving Block.',
+    defaultMessage: 'Make a crypto contribution.',
   },
 });
 

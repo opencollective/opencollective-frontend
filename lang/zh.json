@@ -353,7 +353,7 @@
   "CollectiveFeesForm.Title": "Set fee structure",
   "CollectivePage.AddLongDescription": "添加描述",
   "CollectivePage.AllOfUs": "{collectiveName} 就是我们所有人",
-  "CollectivePage.Contribute.Crypto.Description": "Make a crypto contribution through The Giving Block.",
+  "CollectivePage.Contribute.Crypto.Description": "Make a crypto contribution.",
   "CollectivePage.Contribute.Custom.Description": "自定义金额，一次性或定期捐款",
   "CollectivePage.ContributorsDescription": "感谢您对 {collectiveName} 的支持。",
   "CollectivePage.NavBar.ActionMenu.Actions": "操作",
