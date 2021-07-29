@@ -2111,6 +2111,7 @@
   "warning.discardUnsavedChanges": "¿Está seguro de que desea descartar los cambios no guardados?",
   "Warning.Important": "Importante",
   "warning.limitedAccount": "Tu cuenta está actualmente limitada. Si crees que esto es un error, ponte en contacto con support@opencollective.com.",
+  "Warning.TipLargerThanContribution": "You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. This means the tip is larger than the contribution, when usually the reverse is intended.{newLine}{newLine}Are you sure you want to do this?",
   "WarningUnsavedChanges": "Tienes cambios sin guardar, ¿estás seguro que quieres salir de esta página?",
   "WebhookEvents.All": "All",
   "WebhookEvents.COLLECTIVE_APPLY": "New collective application",
