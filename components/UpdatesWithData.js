@@ -36,8 +36,7 @@ class UpdatesWithData extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { data, collective } = this.props;
-    const { LoggedInUser } = this.props;
+    const { data, collective, LoggedInUser } = this.props;
     if (!prevProps.LoggedInUser && LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       // We refetch the data to get the updates that are not published yet
       data.refetch({ options: { fetchPolicy: 'network-only' } });
@@ -91,7 +90,7 @@ class UpdatesWithData extends React.Component {
   }
 }
 
-const updatesQuery = gqlV2/* GraphQL */ `
+export const updatesQuery = gqlV2/* GraphQL */ `
   query Updates(
     $collectiveSlug: String!
     $limit: Int
@@ -129,23 +128,29 @@ const updatesQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const getUpdatesVariables = props => {
+export const getUpdatesVariables = (slug, limit, includeHostedCollectives, orderBy, searchTerm) => {
   return {
-    collectiveSlug: props.collective.slug,
+    collectiveSlug: slug,
     offset: 0,
-    limit: props.limit || UPDATES_PER_PAGE * 2,
-    includeHostedCollectives: props.includeHostedCollectives || false,
-    orderBy: { field: 'CREATED_AT', direction: props.query?.orderBy === 'oldest' ? 'ASC' : 'DESC' },
-    searchTerm: props.query?.searchTerm,
+    limit: limit || UPDATES_PER_PAGE * 2,
+    includeHostedCollectives: includeHostedCollectives || false,
+    orderBy: { field: 'CREATED_AT', direction: orderBy === 'oldest' ? 'ASC' : 'DESC' },
+    searchTerm: searchTerm,
   };
 };
 
-const UPDATES_PER_PAGE = 10;
+export const UPDATES_PER_PAGE = 10;
 
 export const addUpdatesData = graphql(updatesQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
-    variables: getUpdatesVariables(props),
+    variables: getUpdatesVariables(
+      props.collective.slug,
+      props.limit,
+      props.includeHostedCollectives,
+      props.query?.orderBy,
+      props.query?.searchTerm,
+    ),
   }),
   props: ({ data }) => ({
     data,
