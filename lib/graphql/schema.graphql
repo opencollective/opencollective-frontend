@@ -337,9 +337,13 @@ input CollectiveAttributesInputType {
 }
 
 """
-Describes the features enabled and available for this collective
+Describes the features enabled and available for this account
 """
 type CollectiveFeatures {
+  """
+  The id of the account
+  """
+  id: String!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
   TRANSACTIONS: CollectiveFeatureStatus
