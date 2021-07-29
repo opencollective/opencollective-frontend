@@ -353,7 +353,7 @@
   "CollectiveFeesForm.Title": "Set fee structure",
   "CollectivePage.AddLongDescription": "Add description",
   "CollectivePage.AllOfUs": "{collectiveName}, c'est nous tous",
-  "CollectivePage.Contribute.Crypto.Description": "Make a crypto contribution through The Giving Block.",
+  "CollectivePage.Contribute.Crypto.Description": "Make a crypto contribution.",
   "CollectivePage.Contribute.Custom.Description": "Make a custom one-time or recurring contribution.",
   "CollectivePage.ContributorsDescription": "Thank you for supporting {collectiveName}.",
   "CollectivePage.NavBar.ActionMenu.Actions": "Actions",
