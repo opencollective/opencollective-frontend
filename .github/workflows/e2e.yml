@@ -70,7 +70,7 @@ jobs:
         run: sudo apt-get install -y graphicsmagick
 
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: '14.x'
 
@@ -216,7 +216,7 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test screenshots
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: screenshots
           path: test/cypress/screenshots

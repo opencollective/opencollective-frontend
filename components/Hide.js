@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { bottom, height, left, position, right, top } from 'styled-system';
+import { bottom, flex, height, left, position, right, top } from 'styled-system';
 
 import { pointerEvents } from '../lib/styled-system-custom-properties';
 
@@ -40,6 +40,7 @@ const Hide = styled(Box)`
   ${position}
   ${right}
   ${top}
+  ${flex}
 `;
 
 Hide.propTypes = {

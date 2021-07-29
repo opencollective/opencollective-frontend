@@ -53,6 +53,7 @@ export const contributorsFieldsFragment = gql`
  */
 export const collectiveNavbarFieldsFragment = gql`
   fragment NavbarFields on CollectiveFeatures {
+    ABOUT
     CONNECTED_ACCOUNTS
     RECEIVE_FINANCIAL_CONTRIBUTIONS
     RECURRING_CONTRIBUTIONS
@@ -70,5 +71,6 @@ export const collectiveNavbarFieldsFragment = gql`
     RECEIVE_HOST_APPLICATIONS
     HOST_DASHBOARD
     TRANSACTIONS
+    REQUEST_VIRTUAL_CARDS
   }
 `;
