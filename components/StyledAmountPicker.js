@@ -103,7 +103,7 @@ const StyledAmountPicker = ({ presets, currency, value, otherAmountDisplay, onCh
               default:
                 return (
                   <ButtonText isSelected={isSelected}>
-                    <Currency value={item} currency={currency} abbreviate precision="auto" />
+                    <Currency value={item} currency={currency} formatWithSeparators precision="auto" />
                   </ButtonText>
                 );
             }

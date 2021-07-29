@@ -276,7 +276,7 @@ class TierPage extends Component {
                                   amount={tier.goal}
                                   currency={tier.currency}
                                   interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                                  abbreviateAmount={tier.goal > 1000000}
+                                  formatWithSeparators={tier.goal > 1000000}
                                   abbreviateInterval
                                   amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
                                   precision={0}
@@ -424,7 +424,7 @@ class TierPage extends Component {
                           amount={tier.goal}
                           currency={tier.currency}
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                          abbreviateAmount={tier.goal > 1000000}
+                          formatWithSeparators={tier.goal > 1000000}
                           abbreviateInterval
                           amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
                           precision={0}
@@ -453,7 +453,7 @@ class TierPage extends Component {
                           currency={tier.currency}
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                           amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
-                          abbreviateAmount={amountRaised > 1000000}
+                          formatWithSeparators={amountRaised > 1000000}
                           precision={0}
                           abbreviateInterval
                         />
