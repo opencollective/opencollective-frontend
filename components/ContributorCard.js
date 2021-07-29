@@ -188,7 +188,7 @@ ContributorCard.propTypes = {
     description: PropTypes.string,
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
-    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'FUND', 'CHAPTER', 'ANONYMOUS']),
+    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'EVENT', 'FUND', 'CHAPTER', 'ANONYMOUS']),
     totalAmountDonated: PropTypes.number,
     image: PropTypes.string,
     publicMessage: PropTypes.string,

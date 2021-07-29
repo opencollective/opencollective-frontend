@@ -112,7 +112,7 @@ ContributorAvatar.propTypes = {
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
     isGuest: PropTypes.bool,
-    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'EVENT', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   }).isRequired,
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 };
