@@ -231,7 +231,7 @@ interface Account {
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
@@ -779,7 +779,7 @@ type Bot implements Account {
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
@@ -1039,7 +1039,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
@@ -1139,9 +1139,13 @@ input CollectiveCreateInput {
 }
 
 """
-Describes the features enabled and available for this collective
+Describes the features enabled and available for this account
 """
 type CollectiveFeatures {
+  """
+  The id of the account
+  """
+  id: String!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
   TRANSACTIONS: CollectiveFeatureStatus
@@ -3281,7 +3285,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
@@ -4232,7 +4236,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
@@ -4569,7 +4573,7 @@ type Host implements Account & AccountWithContributions {
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
@@ -5133,7 +5137,7 @@ type Individual implements Account {
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
@@ -6551,7 +6555,7 @@ type Organization implements Account & AccountWithContributions {
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
@@ -7088,7 +7092,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
@@ -8254,7 +8258,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   ): UpdateCollection!
 
   """
-  Describes the features enabled and available for this collective
+  Describes the features enabled and available for this account
   """
   features: CollectiveFeatures!
   virtualCards(
