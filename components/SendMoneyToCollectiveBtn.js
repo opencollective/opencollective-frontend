@@ -6,6 +6,7 @@ import { get, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
 import Container from './Container';
@@ -40,10 +41,10 @@ class SendMoneyToCollectiveBtn extends React.Component {
 
   async onClick() {
     const { currency, amount, fromCollective, toCollective, description, data, LoggedInUser } = this.props;
-    if (!LoggedInUser || !LoggedInUser.canEditCollective(fromCollective) || !get(data, 'Collective')) {
+    if (!LoggedInUser || !LoggedInUser.canEditCollective(fromCollective) || !get(data, 'account')) {
       return;
     }
-    const paymentMethods = get(data, 'Collective.paymentMethods');
+    const paymentMethods = get(data, 'account.paymentMethods');
     if (!paymentMethods || paymentMethods.length === 0) {
       const error = "We couldn't find a payment method to make this transaction";
       this.setState({ error });
@@ -51,15 +52,26 @@ class SendMoneyToCollectiveBtn extends React.Component {
     }
     this.setState({ loading: true });
     const order = {
-      totalAmount: amount,
-      currency,
-      collective: pick(toCollective, ['id']),
-      fromCollective: pick(fromCollective, ['id']),
+      amount: { valueInCents: amount, currency },
+      toAccount: pick(toCollective, ['slug']),
+      fromAccount: pick(fromCollective, ['slug']),
       description,
-      paymentMethod: { uuid: paymentMethods[0].uuid },
+      paymentMethod: { id: paymentMethods[0].id },
+      frequency: 'ONETIME',
     };
     try {
-      await this.props.sendMoneyToCollective({ variables: { order } });
+      await this.props.sendMoneyToCollective({
+        variables: { order },
+        // We need to update the store manually because the response comes from API V2
+        update: (store, { data: { createOrder } }) => {
+          const balance = createOrder.order.fromAccount.stats.balance.valueInCents;
+          store.writeFragment({
+            fragment: collectiveBalanceFragment,
+            id: `CollectiveStatsType:${fromCollective.id}`,
+            data: { balance },
+          });
+        },
+      });
       this.setState({ loading: false });
     } catch (e) {
       const error = e.message;
@@ -92,15 +104,14 @@ class SendMoneyToCollectiveBtn extends React.Component {
   }
 }
 
-const paymentMethodsQuery = gql`
+const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query SendMoneyToCollectivePaymentMethods($slug: String) {
-    Collective(slug: $slug) {
+    account(slug: $slug) {
       id
-      paymentMethods(service: "opencollective") {
+      paymentMethods(service: OPENCOLLECTIVE, type: "collective") {
         id
         service
         name
-        uuid
       }
     }
   }
@@ -108,6 +119,7 @@ const paymentMethodsQuery = gql`
 
 const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   options: props => ({
+    context: API_V2_CONTEXT,
     variables: {
       slug: get(props, 'fromCollective.slug'),
     },
@@ -117,22 +129,23 @@ const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   },
 });
 
-const sendMoneyToCollectiveMutation = gql`
-  mutation SendMoneyToCollective($order: OrderInputType!) {
+const collectiveBalanceFragment = gql`
+  fragment StatFieldsFragment on CollectiveStatsType {
+    balance
+  }
+`;
+
+const sendMoneyToCollectiveMutation = gqlV2/* GraphQL */ `
+  mutation SendMoneyToCollective($order: OrderCreateInput!) {
     createOrder(order: $order) {
-      id
-      fromCollective {
+      order {
         id
-        stats {
-          id
-          balance
-        }
-      }
-      collective {
-        id
-        stats {
-          id
-          balance
+        fromAccount {
+          stats {
+            balance {
+              valueInCents
+            }
+          }
         }
       }
     }
@@ -141,6 +154,7 @@ const sendMoneyToCollectiveMutation = gql`
 
 const addSendMoneyToCollectiveMutation = graphql(sendMoneyToCollectiveMutation, {
   name: 'sendMoneyToCollective',
+  options: { context: API_V2_CONTEXT },
 });
 
 const addGraphql = compose(addPaymentMethodsData, addSendMoneyToCollectiveMutation);
