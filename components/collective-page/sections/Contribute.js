@@ -166,7 +166,7 @@ class SectionContribute extends React.PureComponent {
     const canContribute = collective.isActive && !isPastEvent(collective);
     const hasCustomContribution = !collective.settings?.disableCustomContributions;
     const hasCryptoContribution =
-      collective.settings?.disableCryptoContributions === false && collective?.host.slug === 'opencollective';
+      collective.settings?.disableCryptoContributions === false && collective?.host?.settings?.cryptoEnabled;
     const waysToContribute = [];
 
     sortedTiers.forEach(tier => {
