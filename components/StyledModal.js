@@ -13,7 +13,7 @@ import Avatar from './Avatar';
 import Container from './Container';
 import { Flex } from './Grid';
 import { fadeIn } from './StyledKeyframes';
-import { P } from './Text';
+import { P, Span } from './Text';
 
 const Wrapper = styled(Flex)`
   position: fixed;
@@ -108,17 +108,21 @@ const Divider = styled.div`
 `;
 
 export const CloseIcon = styled(Times)`
-  font-size: 12px;
-  width: 15px;
-  height: 15px;
-  color: #dadada;
+  height: 12px;
+  width: 12px;
+  color: #76777a;
+  vertical-align: middle;
   cursor: pointer;
 `;
 
 export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
   <Header {...props}>
     {children || <div />}
-    {!hideCloseIcon && <CloseIcon onClick={onClose} />}
+    {!hideCloseIcon && (
+      <Span style={{ alignItems: 'center', display: 'flex' }}>
+        <CloseIcon onClick={onClose} />
+      </Span>
+    )}
   </Header>
 );
 
