@@ -1,15 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { VideoPlus } from '@styled-icons/boxicons-regular/VideoPlus';
-import { ArrowUpCircle } from '@styled-icons/feather/ArrowUpCircle';
+import { ArrowDownCircle } from '@styled-icons/feather/ArrowDownCircle';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import Container from './Container';
 import { Box } from './Grid';
 import StyledInput from './StyledInput';
-import { fadeInUp } from './StyledKeyframes';
 import { P } from './Text';
 import VideoPlayer, { supportedVideoProviders } from './VideoPlayer';
 
@@ -53,9 +51,9 @@ const VideoPlaceholder = styled(({ children, ...props }) => (
 
 /** A container for the form used to animate the different inputs */
 const MainFormContainer = styled.div`
+  position: relative;
   input {
     box-shadow: 0px 2px 7px -6px #696969;
-    animation: ${fadeInUp} 0.3s;
   }
 `;
 
@@ -77,27 +75,16 @@ const VideoLinkerBox = ({ url, onChange, isEditing, setEditing }) => {
     </VideoPlaceholder>
   ) : (
     <MainFormContainer>
-      <Container position="absolute" width={1} top={-45}>
-        <StyledInput
-          type="url"
-          placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-          value={url || ''}
-          onChange={e => onChange(e.target.value)}
-          width={1}
-          mb={2}
-          autoFocus
-        />
-      </Container>
       <Box width={1} maxHeight={400} mb={2}>
         <VideoPlayer
           url={url}
           placeholder={
             <VideoPlaceholder>
-              <ArrowUpCircle size="50%" />
+              <ArrowDownCircle size="50%" />
               <P fontWeight="bold" fontSize="16px" textAlign="center" color="black.400" mt={2}>
                 <FormattedMessage
                   id="VideoLinkerBox.SetUrl"
-                  defaultMessage="Set the video URL above. We support the following platforms: {supportedVideoProviders}"
+                  defaultMessage="Set the video URL below. We support the following platforms: {supportedVideoProviders}"
                   values={{ supportedVideoProviders: supportedVideoProviders.join(', ') }}
                 />
               </P>
@@ -105,6 +92,14 @@ const VideoLinkerBox = ({ url, onChange, isEditing, setEditing }) => {
           }
         />
       </Box>
+      <StyledInput
+        type="url"
+        placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        value={url || ''}
+        onChange={e => onChange(e.target.value)}
+        width={1}
+        autoFocus
+      />
     </MainFormContainer>
   );
 };

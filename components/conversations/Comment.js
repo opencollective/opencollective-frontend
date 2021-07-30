@@ -98,6 +98,7 @@ const Comment = ({
           prepareVariables={(comment, html) => ({ comment: { id: comment.id, html } })}
           disableEditor={() => setEditing(false)}
           warnIfUnsavedChanges
+          required
         >
           {({ isEditing, setValue }) =>
             !isEditing ? (

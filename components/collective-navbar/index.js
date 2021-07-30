@@ -397,6 +397,8 @@ const getMainAction = (collective, callsToAction) => {
   }
 };
 
+export const NAVBAR_HEIGHT = [56, 64];
+
 /**
  * The NavBar that displays all the individual sections.
  */
@@ -450,7 +452,7 @@ const CollectiveNavbar = ({
         mx="auto"
         maxWidth={Dimensions.MAX_SECTION_WIDTH}
         maxHeight="100vh"
-        minHeight={[56, 64]}
+        minHeight={NAVBAR_HEIGHT}
       >
         {/** Collective info */}
         <InfosContainer px={[3, 0]} py={[2, 1]}>

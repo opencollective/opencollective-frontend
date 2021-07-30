@@ -2065,7 +2065,7 @@
   "VerifyEmailAddress": "이메일 주소 인증",
   "VerifyEmailInstructions": "A verification email has been sent to {email}. Click the link to complete submitting this expense. If you have not received the email, please check your spam.",
   "VideoLinkerBox.AddVideo": "동영상 추가",
-  "VideoLinkerBox.SetUrl": "Set the video URL above. We support the following platforms: {supportedVideoProviders}",
+  "VideoLinkerBox.SetUrl": "Set the video URL below. We support the following platforms: {supportedVideoProviders}",
   "ViewCollectivePage": "View Collective page",
   "viewDetails": "자세히 보기",
   "VirtualCard.AllTypes": "All",

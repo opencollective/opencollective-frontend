@@ -2065,7 +2065,7 @@
   "VerifyEmailAddress": "Verificar tu dirección de correo electrónico",
   "VerifyEmailInstructions": "Se ha enviado un correo electrónico de verificación a {email}. Haz clic en el enlace para completar el envío de este gasto. Si no te aparece el correo electrónico en tu bandeja de entrada revisa tu bandeja de Spam.",
   "VideoLinkerBox.AddVideo": "Añadir un vídeo",
-  "VideoLinkerBox.SetUrl": "Establezca la URL del video. Actualmente soportamos las siguientes plataformas: {supportedVideoProviders}",
+  "VideoLinkerBox.SetUrl": "Set the video URL below. We support the following platforms: {supportedVideoProviders}",
   "ViewCollectivePage": "Ver perfil",
   "viewDetails": "Ver Detalles",
   "VirtualCard.AllTypes": "All",
