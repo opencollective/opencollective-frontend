@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { NAVBAR_HEIGHT } from '../collective-navbar';
 import HTMLContent, { isEmptyValue } from '../HTMLContent';
 import InlineEditField from '../InlineEditField';
 import RichTextEditor from '../RichTextEditor';
@@ -21,7 +22,7 @@ const TierLongDescription = ({ tier, editMutation, canEdit }) => {
               defaultValue={value}
               onChange={e => setValue(e.target.value)}
               withStickyToolbar
-              toolbarTop={[60, null, 119]}
+              toolbarTop={NAVBAR_HEIGHT}
               toolbarOffsetY={-30}
             />
           );
