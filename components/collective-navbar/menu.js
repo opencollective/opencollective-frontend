@@ -11,7 +11,6 @@ export const NAVBAR_ACTION_TYPE = {
   DASHBOARD: 'hasDashboard',
   APPLY: 'hasApply',
   CONTACT: 'hasContact',
-  ADD_PREPAID_BUDGET: 'addPrepaidBudget',
   ADD_FUNDS: 'addFunds',
   ASSIGN_CARD: 'assignCard',
   REQUEST_CARD: 'requestCard',

@@ -19,7 +19,6 @@ import { getSettingsRoute } from '../../lib/url_helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
-import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
 import Container from '../Container';
@@ -290,23 +289,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         )}
                       </AddFundsBtn>
                     )}
-                    {callsToAction.addPrepaidBudget && (
-                      <AddPrepaidBudgetBtn collective={collective}>
-                        {btnProps => (
-                          <MenuItem
-                            py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET}
-                          >
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
-                              <AttachMoney size="20px" />
-                              <Span>
-                                <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
-                              </Span>
-                            </StyledButton>
-                          </MenuItem>
-                        )}
-                      </AddPrepaidBudgetBtn>
-                    )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
                         <StyledLink as={Link} href={`/${collective.slug}/contact`}>
@@ -403,8 +385,6 @@ CollectiveNavbarActionsMenu.propTypes = {
     hasContribute: PropTypes.bool,
     /** Add funds to a collective */
     addFunds: PropTypes.bool,
-    /** Add prepaid budget to an organization */
-    addPrepaidBudget: PropTypes.bool,
     /** Add new card to Collective */
     assignVirtualCard: PropTypes.bool,
     /** Request card to Collective */

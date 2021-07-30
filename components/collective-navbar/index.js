@@ -24,7 +24,6 @@ import { getSettingsRoute } from '../../lib/url_helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
-import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Avatar from '../Avatar';
 import { Dimensions, Sections } from '../collective-page/_constants';
@@ -247,7 +246,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
   }
 
   const isFund = collective.type === CollectiveType.FUND;
-  const { type, features, settings, host } = collective;
+  const { features, settings, host } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
     hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
@@ -258,7 +257,6 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
       (isFund || get(settings, 'fundingRequest') === true) && expenseSubmissionAllowed(collective, LoggedInUser),
-    addPrepaidBudget: LoggedInUser?.isRoot() && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
@@ -392,22 +390,6 @@ const getMainAction = (collective, callsToAction) => {
             </ActionButton>
           )}
         </AddFundsBtn>
-      ),
-    };
-  } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET)) {
-    return {
-      type: NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET,
-      component: (
-        <AddPrepaidBudgetBtn collective={collective}>
-          {btnProps => (
-            <ActionButton {...btnProps}>
-              <AttachMoney size="1em" />
-              <Span>
-                <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
-              </Span>
-            </ActionButton>
-          )}
-        </AddPrepaidBudgetBtn>
       ),
     };
   } else {
