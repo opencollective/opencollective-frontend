@@ -13,11 +13,15 @@ import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 
-const normalizeDate = date => {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+const normalizeDate = (date, type) => {
+  if (type === 'from') {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
 };
 
-const formatDate = date => (!date ? '' : dayjs(date).format('YYYY-MM-DD'));
+const formatDate = date => (!date ? '' : dayjs(date).format('YYYY-MM-DDTHH:mm:ss'));
 
 /**
  * Parse `strValue` and returns an array like [dateFrom, dateTo]. Each value in the array
@@ -119,7 +123,7 @@ const TriggerContainer = styled(StyledButton)`
 const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
   const [dateInterval, setDateInterval] = React.useState(() => getDefaultState(value));
   const setDate = (type, date) => {
-    setDateInterval(value => ({ ...value, [type]: !date ? null : normalizeDate(new Date(date)) }));
+    setDateInterval(value => ({ ...value, [type]: !date ? null : normalizeDate(new Date(date), type) }));
   };
 
   return (
