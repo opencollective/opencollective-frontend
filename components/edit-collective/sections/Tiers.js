@@ -11,7 +11,7 @@ import intervals from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getCurrencySymbol } from '../../../lib/currency-utils';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
-import { capitalize, parseToBoolean } from '../../../lib/utils';
+import { capitalize } from '../../../lib/utils';
 
 import Container from '../../Container';
 import ContributeCrypto from '../../contribute-cards/ContributeCrypto';
@@ -34,8 +34,6 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 const { FUND, PROJECT, EVENT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
-
-const CRYPTO_CONTRIBUTIONS_ENABLED = parseToBoolean(process.env.CRYPTO_CONTRIBUTIONS_ENABLED);
 
 class Tiers extends React.Component {
   static propTypes = {
@@ -448,6 +446,7 @@ class Tiers extends React.Component {
     const { intl, collective, defaultType = TICKET } = this.props;
     const hasCustomContributionsDisabled = get(collective, 'settings.disableCustomContributions', false);
     const hasCryptoContributionsDisabled = get(collective, 'settings.disableCryptoContributions', true);
+    const cryptoContributionsEnabledByHost = get(collective, 'host.settings.cryptoEnabled', false);
     const displayContributionSettings = collective.id && defaultType !== TICKET;
 
     return (
@@ -491,7 +490,7 @@ class Tiers extends React.Component {
                 </Flex>
               )}
             </Mutation>
-            {CRYPTO_CONTRIBUTIONS_ENABLED && (
+            {cryptoContributionsEnabledByHost && (
               <React.Fragment>
                 <SettingsSectionTitle mt={3}>
                   <FormattedMessage id="ContributionsType.Crypto" defaultMessage="Crypto Contributions" />
