@@ -1286,6 +1286,7 @@
   "Host.VirtualCards.Policy.Placeholder": "E.g. deadlines to submit receipts, allowed charges, limits, or who to contact with questions.",
   "Host.VirtualCards.Policy.Save": "Зберегти правила",
   "Host.VirtualCards.Policy.Title": "Правила віртуальних карток",
+  "Host.VirtualCards.Policy.ToolTip": "This policy text will appear in a pop up when someone 'Requests a Virtual Card' from the Action menu on the collective's page.",
   "Host.VirtualCards.RequestCard.Description": "Колективи можуть надіслати запит на пов'язування картки з їхнім бюджетом.",
   "Host.VirtualCards.RequestCard.Title": "Увімкнути запити картки",
   "Host.VirtualCards.Settings.Error": "Помилка оновлення налаштування: {error}",
