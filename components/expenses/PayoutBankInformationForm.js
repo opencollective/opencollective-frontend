@@ -293,32 +293,36 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           refetch={refetch}
         />
       ))}
-      <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
-        <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
-        <StyledTooltip
-          content={
-            <FormattedMessage
-              id="PayoutBankInformationForm.HolderAddress"
-              defaultMessage="Bank account holder address (not the bank address)"
+      {Boolean(addressFields.length) && (
+        <React.Fragment>
+          <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
+            <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
+            <StyledTooltip
+              content={
+                <FormattedMessage
+                  id="PayoutBankInformationForm.HolderAddress"
+                  defaultMessage="Bank account holder address (not the bank address)"
+                />
+              }
+            >
+              <Info size={16} />
+            </StyledTooltip>
+          </Box>
+          {addressFields.map(field => (
+            <FieldGroup
+              currency={currency}
+              disabled={disabled}
+              field={field}
+              formik={formik}
+              getFieldName={getFieldName}
+              host={host}
+              key={kebabCase(field.name)}
+              loading={loading}
+              refetch={refetch}
             />
-          }
-        >
-          <Info size={16} />
-        </StyledTooltip>
-      </Box>
-      {addressFields.map(field => (
-        <FieldGroup
-          currency={currency}
-          disabled={disabled}
-          field={field}
-          formik={formik}
-          getFieldName={getFieldName}
-          host={host}
-          key={kebabCase(field.name)}
-          loading={loading}
-          refetch={refetch}
-        />
-      ))}
+          ))}
+        </React.Fragment>
+      )}
     </Flex>
   );
 };
