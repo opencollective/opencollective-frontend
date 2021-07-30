@@ -332,7 +332,7 @@
   "Collective.URL": "URL-адреса Колективу",
   "collective.user.orderProcessing.manual": "<strong>Ваш внесок очікує на розгляд.</strong> Будь ласка, дотримуйтесь настанов щодо оплати в електронному листі, щоб завершити транзакцію.",
   "Collective.VirtualCards.RequestCard": "Надіслати запит на отримання картки",
-  "Collective.VirtualCards.RequestCard.Agreement": "Я згоден з усіма умовами вказаними {linebreak} скарбником та Open Collective",
+  "Collective.VirtualCards.RequestCard.Agreement": "Я згоден з усіма умовами вказаними скарбником та Open Collective",
   "Collective.VirtualCards.RequestCard.Description": "Ви можете попросити вашого скарбника випустити для вас кредитну картку для ваших витрат.",
   "Collective.VirtualCards.RequestCard.MonthlyBudget": "Monthly Budget",
   "Collective.VirtualCards.RequestCard.Policy": "Умови користування карткою",

@@ -90,7 +90,7 @@ const RequestVirtualCardModal = props => {
           <P>
             <FormattedMessage
               id="Collective.VirtualCards.RequestCard.Description"
-              defaultMessage="You can request your fiscal host to assign a you a credit card for your expenses."
+              defaultMessage="You can request your fiscal host to assign you a credit card for your expenses."
             />
           </P>
           {hasPolicy && (
@@ -184,8 +184,7 @@ const RequestVirtualCardModal = props => {
                 <Span fontSize="12px" fontWeight="400" lineHeight="16px">
                   <FormattedMessage
                     id="Collective.VirtualCards.RequestCard.Agreement"
-                    defaultMessage="I agree to all the terms and conditions set by{linebreak} the host and Open Collective"
-                    values={{ lineBreak: <br /> }}
+                    defaultMessage="I agree to all the terms and conditions set by the host and Open Collective"
                   />
                   <Span color="black.500"> *</Span>
                 </Span>
