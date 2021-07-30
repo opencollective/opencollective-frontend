@@ -11,6 +11,7 @@ import StyledHr from '../StyledHr';
 import { H4 } from '../Text';
 import { withUser } from '../UserProvider';
 
+import CryptoStepDetails from './CryptoStepDetails';
 import StepDetails from './StepDetails';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
@@ -35,6 +36,7 @@ class ContributionFlowStepContainer extends React.Component {
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
+    verb: PropTypes.string,
     mainState: PropTypes.shape({
       stepDetails: PropTypes.object,
       stepProfile: PropTypes.shape({
@@ -120,11 +122,11 @@ class ContributionFlowStepContainer extends React.Component {
   }
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed } = this.props;
+    const { collective, mainState, tier, isEmbed, verb } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
-        return (
+        return verb !== 'crypto' ? (
           <StepDetails
             collective={collective}
             tier={tier}
@@ -132,6 +134,8 @@ class ContributionFlowStepContainer extends React.Component {
             data={stepDetails}
             showFeesOnTop={this.props.showFeesOnTop}
           />
+        ) : (
+          <CryptoStepDetails onChange={this.props.onChange} data={stepDetails} />
         );
       case 'profile': {
         const personalProfile = this.getPersonalProfile();
