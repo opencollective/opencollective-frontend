@@ -14,6 +14,7 @@ import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-ca
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { TransactionTypes } from '../../lib/constants/transactions';
+import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
@@ -76,10 +77,19 @@ const STEP_LABELS = defineMessages({
   },
 });
 
+const OTHER_MESSAGES = defineMessages({
+  tipLargerThanContributionWarning: {
+    id: 'Warning.TipLargerThanContribution',
+    defaultMessage:
+      'You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. This means the tip is larger than the contribution, when usually the reverse is intended.{newLine}{newLine}Are you sure you want to do this?',
+  },
+});
+
 class ContributionFlow extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
       platformContributionAvailable: PropTypes.bool,
       parent: PropTypes.shape({
@@ -473,8 +483,20 @@ class ContributionFlow extends React.Component {
         validate: () => {
           if (!this.checkFormValidity() || !stepDetails || stepDetails.amount < minAmount || !stepDetails.quantity) {
             return false;
+          } else if (!isNil(tier?.availableQuantity) && stepDetails.quantity > tier.availableQuantity) {
+            return false;
+          } else if (stepDetails.platformContribution && stepDetails.platformContribution > stepDetails.amount) {
+            const currency = tier?.amount.currency || collective.currency;
+            return confirm(
+              intl.formatMessage(OTHER_MESSAGES.tipLargerThanContributionWarning, {
+                contributionAmount: formatCurrency(stepDetails.amount, currency),
+                tipAmount: formatCurrency(stepDetails.platformContribution, currency),
+                accountName: collective.name,
+                newLine: '\n',
+              }),
+            );
           } else {
-            return isNil(tier?.availableQuantity) || stepDetails.quantity <= tier.availableQuantity;
+            return true;
           }
         },
       },
