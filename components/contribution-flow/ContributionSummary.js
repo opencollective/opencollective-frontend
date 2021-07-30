@@ -88,7 +88,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               {isCrypto && (
                 <Span
                   style={{ color: 'black.700', fontWeight: 400 }}
-                >{`${stepDetails.amount} ${stepDetails.currency.label}`}</Span>
+                >{`${stepDetails.amount} ${stepDetails.currency.value}`}</Span>
               )}
             </Amount>
           </AmountLine>
@@ -180,7 +180,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         </Label>
         <Amount fontWeight="700">
           {isCrypto ? (
-            <Span style={{ fontWeight: 700 }}>{`${stepDetails.amount} ${stepDetails.currency.label}`}</Span>
+            <Span style={{ fontWeight: 700 }}>{`${stepDetails.amount} ${stepDetails.currency.value}`}</Span>
           ) : (
             <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
           )}

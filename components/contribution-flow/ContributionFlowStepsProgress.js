@@ -27,10 +27,10 @@ const StepLabel = styled(Span)`
   margin-bottom: 4px;
 `;
 
-const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
+const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, verb }) => {
   if (stepDetails.amount) {
     const totalAmount = stepDetails.amount + (stepDetails.platformContribution || 0);
-    return (
+    return verb !== 'crypto' ? (
       <FormattedMoneyAmount
         interval={stepDetails.interval !== INTERVALS.flexible ? stepDetails.interval : null}
         currency={currency}
@@ -38,6 +38,8 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
         abbreviateInterval
         amountStyles={null}
       />
+    ) : (
+      <Span>{`${stepDetails.amount} ${stepDetails.currency.value}`}</Span>
     );
   } else if (stepDetails.amount === 0 && isFreeTier) {
     return <FormattedMessage id="Amount.Free" defaultMessage="Free" />;
@@ -61,9 +63,12 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
     if (stepDetails) {
       return (
         <React.Fragment>
-          {verb !== 'crypto' && (
-            <PrettyAmountFromStepDetails stepDetails={stepDetails} currency={currency} isFreeTier={isFreeTier} />
-          )}
+          <PrettyAmountFromStepDetails
+            stepDetails={stepDetails}
+            currency={currency}
+            isFreeTier={isFreeTier}
+            verb={verb}
+          />
           {!isNaN(stepDetails.quantity) && stepDetails.quantity > 1 && ` x ${stepDetails.quantity}`}
         </React.Fragment>
       );

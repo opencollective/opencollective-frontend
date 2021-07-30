@@ -24,51 +24,51 @@ const messages = defineMessages({
 
 export const cryptoCurrencies = [
   {
-    label: 'BTC',
+    label: 'BTC (Bitcoin)',
     value: 'BTC',
   },
   {
-    label: 'ETH',
+    label: 'ETH (Ethereum)',
     value: 'ETH',
   },
   {
-    label: 'BCH',
+    label: 'BCH (Bitcoin Cash)',
     value: 'BCH',
   },
   {
-    label: 'LTC',
+    label: 'LTC (Litecoin)',
     value: 'LTC',
   },
   {
-    label: 'ZEC',
+    label: 'ZEC (Zcash)',
     value: 'ZEC',
   },
   {
-    label: 'LINK',
+    label: 'LINK (Chainlink)',
     value: 'LINK',
   },
   {
-    label: 'BAT',
+    label: 'BAT (Basic Attention Token)',
     value: 'BAT',
   },
   {
-    label: 'DAI',
+    label: 'DAI (Dai)',
     value: 'DAI',
   },
   {
-    label: 'OXT',
+    label: 'OXT (Orchid)',
     value: 'OXT',
   },
   {
-    label: 'STORJ',
+    label: 'STORJ (Storj)',
     value: 'STORJ',
   },
   {
-    label: 'AMP',
+    label: 'AMP (Amp)',
     value: 'AMP',
   },
   {
-    label: 'ZRX',
+    label: 'ZRX (Ox)',
     value: 'ZRX',
   },
 ];
