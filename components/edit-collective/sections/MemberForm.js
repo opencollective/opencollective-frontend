@@ -34,7 +34,7 @@ const MemberForm = props => {
 
   const [memberRole, setMemberRole] = React.useState(member?.role || roles.ADMIN);
 
-  const memberCollective = member?.member;
+  const memberCollective = member && (member.account || member.memberAccount);
 
   const initialValues = {
     description: get(member, 'description') || '',

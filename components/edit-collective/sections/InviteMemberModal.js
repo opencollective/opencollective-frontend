@@ -35,6 +35,9 @@ const inviteMemberMutation = gqlV2/* GraphQL */ `
       since: $since
     ) {
       id
+      role
+      description
+      since
     }
   }
 `;
@@ -47,7 +50,16 @@ const InviteMemberModal = props => {
   const [member, setMember] = React.useState(null);
   const mutationOptions = {
     context: API_V2_CONTEXT,
-    refetchQueries: [{ query: coreContributorsQuery, variables: { collectiveId: get(collective, 'id') } }],
+    refetchQueries: [
+      {
+        query: coreContributorsQuery,
+        context: API_V2_CONTEXT,
+        variables: {
+          collectiveSlug: get(collective, 'slug'),
+          account: { slug: get(collective, 'slug') },
+        },
+      },
+    ],
     awaitRefetchQueries: true,
   };
 

@@ -105,7 +105,16 @@ const EditMemberModal = props => {
 
   const [removeMemberAccount] = useMutation(removeMemberMutation, {
     context: API_V2_CONTEXT,
-    refetchQueries: [{ query: coreContributorsQuery, variables: { collectiveId: get(collective, 'id') } }],
+    refetchQueries: [
+      {
+        query: coreContributorsQuery,
+        context: API_V2_CONTEXT,
+        variables: {
+          collectiveSlug: get(collective, 'slug'),
+          account: { slug: get(collective, 'slug') },
+        },
+      },
+    ],
     awaitRefetchQueries: true,
   });
 
@@ -121,7 +130,7 @@ const EditMemberModal = props => {
       await editMemberAccount({
         variables: {
           memberAccount: {
-            slug: get(member.member, 'slug'),
+            slug: get(member.account, 'slug'),
           },
           account: { slug: get(collective, 'slug') },
           description,
@@ -153,7 +162,7 @@ const EditMemberModal = props => {
       await editMemberInvitationAccount({
         variables: {
           memberAccount: {
-            slug: get(member.member, 'slug'),
+            slug: get(member, 'memberAccount.slug'),
           },
           account: { slug: get(collective, 'slug') },
           description,
@@ -188,10 +197,11 @@ const EditMemberModal = props => {
   };
 
   const confirmRemoveMember = memberEntry => {
+    const account = memberEntry.account || memberEntry.memberAccount;
     return window.confirm(
       intl.formatMessage(messages.removeConfirm, {
-        ...memberEntry.member,
-        hasEmail: Number(memberEntry.member.email),
+        ...account,
+        hasEmail: Number(account.email),
       }),
     );
   };
@@ -202,7 +212,7 @@ const EditMemberModal = props => {
         await removeMemberAccount({
           variables: {
             memberAccount: {
-              slug: get(member.member, 'slug'),
+              slug: get(member, 'account.slug') || get(member, 'memberAccount.slug'),
             },
             account: { slug: get(collective, 'slug') },
             role: get(member, 'role'),
@@ -271,7 +281,7 @@ const EditMemberModal = props => {
               <StyledButton
                 mt={4}
                 minWidth={140}
-                disabled={isLastAdmin && member.role === roles.ADMIN}
+                disabled={false}
                 buttonStyle="dangerSecondary"
                 data-cy="remove-member"
                 onClick={handleRemoveMemberMutation}

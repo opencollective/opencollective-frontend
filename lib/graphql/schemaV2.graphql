@@ -77,6 +77,20 @@ interface Account {
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
   members(
     limit: Int = 100
     offset: Int = 0
@@ -624,6 +638,20 @@ type Bot implements Account {
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -885,6 +913,20 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -3132,6 +3174,20 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -4084,6 +4140,20 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -4422,6 +4492,20 @@ type Host implements Account & AccountWithContributions {
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -4985,6 +5069,20 @@ type Individual implements Account {
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -6537,6 +6635,20 @@ type Organization implements Account & AccountWithContributions {
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -7077,6 +7189,20 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -7559,7 +7685,7 @@ type Query {
   """
   memberInvitations(
     """
-    Reference to an account of member to remove
+    Reference to an account of member
     """
     memberAccount: AccountReferenceInput
 
@@ -8259,6 +8385,20 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all the members of this account (admins, members, accountants etc.)
+  """
+  accountMembers(
+    limit: Int
+    offset: Int
+    accountType: [AccountType]
+    role: MemberRole
+    roles: [MemberRole]
+    TierId: Int
+    tierSlug: String
+  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)

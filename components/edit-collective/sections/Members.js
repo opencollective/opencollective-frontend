@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Edit } from '@styled-icons/material/Edit';
 import { get, omit } from 'lodash';
@@ -10,6 +9,7 @@ import styled from 'styled-components';
 
 import roles from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import formatMemberRole from '../../../lib/i18n/member-role';
 
 import Avatar from '../../Avatar';
@@ -82,7 +82,7 @@ class Members extends React.Component {
       loading: PropTypes.bool,
       error: PropTypes.any,
       refetch: PropTypes.func.isRequired,
-      Collective: PropTypes.object,
+      account: PropTypes.object,
     }),
   };
 
@@ -107,8 +107,8 @@ class Members extends React.Component {
   componentDidUpdate(oldProps) {
     const invitations = get(this.props.data, 'memberInvitations', null);
     const oldInvitations = get(oldProps.data, 'memberInvitations', null);
-    const members = get(this.props.data, 'Collective.members', null);
-    const oldMembers = get(oldProps.data, 'Collective.members', null);
+    const members = get(this.props.data, 'account.accountMembers', null);
+    const oldMembers = get(oldProps.data, 'account.accountMembers', null);
 
     if (invitations !== oldInvitations || members !== oldMembers) {
       this.setState({ members: this.getMembersFromProps(this.props) });
@@ -118,7 +118,7 @@ class Members extends React.Component {
   getMembersFromProps(props) {
     const pendingInvitations = get(props.data, 'memberInvitations', EMPTY_MEMBERS);
     const pendingInvitationsMembersData = pendingInvitations.map(i => omit(i, ['id']));
-    const members = get(props.data, 'Collective.members', EMPTY_MEMBERS);
+    const members = get(props.data, 'account.accountMembers', EMPTY_MEMBERS);
     const all = [...members, ...pendingInvitationsMembersData];
     return all.length === 0 ? EMPTY_MEMBERS : all;
   }
@@ -126,7 +126,7 @@ class Members extends React.Component {
   handleShowModalChange(modal, value, memberIdx, currentModalKey) {
     if (modal === 'edit') {
       const currentMember = this.state.members[memberIdx];
-      const collectiveId = get(currentMember, 'member.id');
+      const collectiveId = get(currentMember, 'memberAccount.id');
       const currentMemberKey = currentMember.id ? `member-${currentMember.id}` : `collective-${collectiveId}`;
 
       this.setState({ showEditModal: value, currentMember, currentMemberKey, currentModalKey });
@@ -145,8 +145,8 @@ class Members extends React.Component {
 
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
-    const collectiveId = get(member, 'member.id');
-    const memberCollective = member.member;
+    const collectiveId = get(member, 'memberAccount.id');
+    const memberCollective = member.account || member.memberAccount;
     const memberKey = member.id ? `member-${member.id}` : `collective-${collectiveId}`;
     const isLastAdmin =
       nbAdmins === 1 && this.state.currentMember?.role === roles.ADMIN && this.state.currentMember?.id;
@@ -323,8 +323,8 @@ class Members extends React.Component {
           {getErrorFromGraphqlException(data.error).message}
         </MessageBox>
       );
-    } else if (data.Collective?.parentCollective) {
-      const parent = data.Collective.parentCollective;
+    } else if (data.account?.parentAccount) {
+      const parent = data.account.parentAccount;
       return (
         <MessageBox type="info" withIcon>
           <FormattedMessage
@@ -342,53 +342,53 @@ class Members extends React.Component {
   }
 }
 
-const memberFieldsFragment = gql`
+const memberFieldsFragment = gqlV2/* GraphQL */ `
   fragment MemberFields on Member {
     id
     role
     since
     createdAt
     description
-    member {
+    account {
       id
       name
       slug
       type
       imageUrl(height: 64)
-      ... on User {
+      ... on Individual {
         email
       }
     }
   }
 `;
 
-export const coreContributorsQuery = gql`
-  query CoreContributors($collectiveId: Int!) {
-    Collective(id: $collectiveId) {
+export const coreContributorsQuery = gqlV2/* GraphQL */ `
+  query CoreContributors($collectiveSlug: String!, $account: AccountReferenceInput!) {
+    account(slug: $collectiveSlug) {
       id
-      parentCollective {
+      parentAccount {
         id
         slug
         type
         name
       }
-      members(roles: ["ADMIN", "MEMBER", "ACCOUNTANT"]) {
+      accountMembers(roles: [ADMIN, MEMBER, ACCOUNTANT]) {
         ...MemberFields
       }
     }
-    memberInvitations(CollectiveId: $collectiveId) {
+    memberInvitations(account: $account) {
       id
       role
       since
       createdAt
       description
-      member {
+      memberAccount {
         id
         name
         slug
         type
         imageUrl(height: 64)
-        ... on User {
+        ... on Individual {
           email
         }
       }
@@ -400,7 +400,8 @@ export const coreContributorsQuery = gql`
 const addCoreContributorsData = graphql(coreContributorsQuery, {
   options: props => ({
     fetchPolicy: 'network-only',
-    variables: { collectiveId: props.collective.id },
+    variables: { collectiveSlug: props.collective.slug, account: { slug: props.collective.slug } },
+    context: API_V2_CONTEXT,
   }),
 });
 
