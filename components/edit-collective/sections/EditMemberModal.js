@@ -77,7 +77,7 @@ const removeMemberMutation = gqlV2/* GraphQL */ `
 `;
 
 const EditMemberModal = props => {
-  const { intl, member, show, collective, isLastAdmin, cancelHandler } = props;
+  const { intl, member, show, collective, isLastAdmin, cancelHandler, LoggedInUser, refetchLoggedInUser } = props;
 
   const { addToast } = useToasts();
 
@@ -143,6 +143,10 @@ const EditMemberModal = props => {
         type: TOAST_TYPE.SUCCESS,
         title: <FormattedMessage id="editTeam.member.edit.success" defaultMessage="Member updated successfully." />,
       });
+
+      if (get(member, 'account.slug') === get(LoggedInUser, 'collective.slug')) {
+        await refetchLoggedInUser();
+      }
 
       cancelHandler();
     } catch (error) {
@@ -226,6 +230,10 @@ const EditMemberModal = props => {
             <FormattedMessage id="editTeam.member.remove.success" defaultMessage="Member removed successfully." />
           ),
         });
+
+        if (get(member, 'account.slug') === get(LoggedInUser, 'collective.slug')) {
+          await refetchLoggedInUser();
+        }
 
         cancelHandler();
       } catch (error) {
@@ -330,6 +338,8 @@ EditMemberModal.propTypes = {
   intl: PropTypes.object.isRequired,
   isLastAdmin: PropTypes.bool,
   member: PropTypes.object,
+  LoggedInUser: PropTypes.object.isRequired,
+  refetchLoggedInUser: PropTypes.func.isRequired,
   show: PropTypes.bool,
 };
 

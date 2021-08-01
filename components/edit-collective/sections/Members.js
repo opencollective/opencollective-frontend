@@ -126,10 +126,15 @@ class Members extends React.Component {
   handleShowModalChange(modal, value, memberIdx, currentModalKey) {
     if (modal === 'edit') {
       const currentMember = this.state.members[memberIdx];
-      const collectiveId = get(currentMember, 'memberAccount.id');
-      const currentMemberKey = currentMember.id ? `member-${currentMember.id}` : `collective-${collectiveId}`;
 
-      this.setState({ showEditModal: value, currentMember, currentMemberKey, currentModalKey });
+      if (currentMember) {
+        const collectiveId = get(currentMember, 'memberAccount.id');
+        const currentMemberKey = currentMember.id ? `member-${currentMember.id}` : `collective-${collectiveId}`;
+
+        this.setState({ showEditModal: value, currentMember, currentMemberKey, currentModalKey });
+      } else {
+        this.setState({ showEditModal: value });
+      }
     }
     if (modal === 'invite') {
       this.setState({ showInviteModal: value });
@@ -141,7 +146,7 @@ class Members extends React.Component {
   });
 
   renderMember = (member, index, nbAdmins, memberModalKey) => {
-    const { intl, collective } = this.props;
+    const { intl, collective, LoggedInUser, refetchLoggedInUser } = this.props;
 
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
@@ -174,6 +179,8 @@ class Members extends React.Component {
               cancelHandler={() => this.handleShowModalChange('edit', false, index, memberModalKey)}
               continueHandler={this.onClick}
               isLastAdmin={isLastAdmin}
+              LoggedInUser={LoggedInUser}
+              refetchLoggedInUser={refetchLoggedInUser}
             />
           ) : (
             <StyledRoundButton
