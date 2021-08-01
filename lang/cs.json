@@ -2,7 +2,7 @@
   "2FA.PleaseEnterCode": "Dvoufaktorové ověření povoleno: zadejte prosím svůj kód.",
   "Accept": "Přijato",
   "acceptContributions.addBankAccount": "Přidat bankovní účet",
-  "acceptContributions.bankAccount.info": "Accept contributions via bank transfer. The budget will update when you confirm receipt of funds.",
+  "acceptContributions.bankAccount.info": "Přijímat příspěvky prostřednictvím bankovního převodu. Rozpočet se aktualizuje, když potvrdíte příjem prostředků.",
   "acceptContributions.bankAccountSetUp": "Nastavení bankovního účtu",
   "acceptContributions.FAQ.howDoesItWorkDetails": "Payment instructions are automatically sent to contributors via email. Once the funds are received, the admin can confirm the transaction and the amount will be credited to the budget.",
   "acceptContributions.FAQ.idNotIncluded": "Co se stane, pokud není zahrnuto referenční ID?",
