@@ -862,7 +862,7 @@
   "expense.RemoveReceipt": "Удалить квитанцию",
   "Expense.RequestDescription": "Описание запроса",
   "Expense.RequestDetails": "Request Details",
-  "Expense.RequestedByOnDate": "Запрошено {name} {date, date, long}",
+  "Expense.RequestedByOnDate": "Invited by {name} on {date, date, long}",
   "Expense.SaveReceipt": "Save Receipt",
   "expense.schedule.btn": "Schedule to Pay with {paymentMethod}",
   "expense.scheduledForPayment": "Запланированный платеж",

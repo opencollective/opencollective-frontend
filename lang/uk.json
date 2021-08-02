@@ -862,7 +862,7 @@
   "expense.RemoveReceipt": "Вилучити квитанцію",
   "Expense.RequestDescription": "Опис запиту",
   "Expense.RequestDetails": "Деталі запиту",
-  "Expense.RequestedByOnDate": "Отримано запит від {name} {date, date, long}",
+  "Expense.RequestedByOnDate": "Invited by {name} on {date, date, long}",
   "Expense.SaveReceipt": "Зберегти квитанцію",
   "expense.schedule.btn": "Розклад оплати за допомогою {paymentMethod}",
   "expense.scheduledForPayment": "Заплановано на оплату",

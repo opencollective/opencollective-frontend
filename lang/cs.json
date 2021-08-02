@@ -862,7 +862,7 @@
   "expense.RemoveReceipt": "Odstranit účtenku",
   "Expense.RequestDescription": "Request Description",
   "Expense.RequestDetails": "Request Details",
-  "Expense.RequestedByOnDate": "Requested by {name} on {date, date, long}",
+  "Expense.RequestedByOnDate": "Invited by {name} on {date, date, long}",
   "Expense.SaveReceipt": "Save Receipt",
   "expense.schedule.btn": "Schedule to Pay with {paymentMethod}",
   "expense.scheduledForPayment": "Scheduled for payment",

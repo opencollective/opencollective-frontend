@@ -131,7 +131,7 @@ const ExpenseSummary = ({
               {expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedByOnDate"
-                  defaultMessage="Requested by {name} on {date, date, long}"
+                  defaultMessage="Invited by {name} on {date, date, long}"
                   values={{
                     name: <CreatedByUserLink account={createdByAccount} />,
                     date: new Date(expense.createdAt),
