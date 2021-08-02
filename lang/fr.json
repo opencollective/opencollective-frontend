@@ -809,6 +809,7 @@
   "ExpandDescription": "Voir la description complète",
   "Expense.Activity.Approved": "Dépense approuvée",
   "Expense.Activity.Error": "Erreur lors du traitement",
+  "Expense.Activity.Invite.Drafted": "Expense invited",
   "Expense.Activity.MarkedAsSpam": "Expense marked as spam",
   "Expense.Activity.MarkedAsUnpaid": "Dépense marquée comme impayée",
   "Expense.Activity.Paid": "Dépense payée",

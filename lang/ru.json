@@ -809,6 +809,7 @@
   "ExpandDescription": "Посмотреть полное описание",
   "Expense.Activity.Approved": "Расход принят",
   "Expense.Activity.Error": "Ошибка расхода",
+  "Expense.Activity.Invite.Drafted": "Expense invited",
   "Expense.Activity.MarkedAsSpam": "Expense marked as spam",
   "Expense.Activity.MarkedAsUnpaid": "Расходы, помеченные как неоплаченные",
   "Expense.Activity.Paid": "Расход выплачен",

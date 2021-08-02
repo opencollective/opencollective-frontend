@@ -809,6 +809,7 @@
   "ExpandDescription": "Read full description",
   "Expense.Activity.Approved": "Výdaj schválen",
   "Expense.Activity.Error": "Chyba výdaje",
+  "Expense.Activity.Invite.Drafted": "Expense invited",
   "Expense.Activity.MarkedAsSpam": "Expense marked as spam",
   "Expense.Activity.MarkedAsUnpaid": "Výdaj označen jako nezaplacený",
   "Expense.Activity.Paid": "Výdaj uhrazen",

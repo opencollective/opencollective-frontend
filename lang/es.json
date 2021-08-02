@@ -809,6 +809,7 @@
   "ExpandDescription": "Leer descripción completa",
   "Expense.Activity.Approved": "Gasto aprobado",
   "Expense.Activity.Error": "Error de gasto",
+  "Expense.Activity.Invite.Drafted": "Expense invited",
   "Expense.Activity.MarkedAsSpam": "Gasto marcado como spam",
   "Expense.Activity.MarkedAsUnpaid": "Gasto marcado como no pagado",
   "Expense.Activity.Paid": "Gasto pagado",
