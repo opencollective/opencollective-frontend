@@ -793,7 +793,6 @@
   "event.longDescription.label": "Докладний опис",
   "event.over.sendMoneyToParent.description": "Spend it by submitting event expenses, or transfer the remaining balance to the main budget.",
   "event.over.sendMoneyToParent.title": "Ця подія має позитивний баланс.",
-  "event.over.sendMoneyToParent.transaction.description": "Баланс {event}",
   "event.privateInstructions.description": "These instructions will be provided by email to the participants.",
   "event.privateInstructions.label": "Приватні інструкції",
   "event.responses.title.going": "{n} {n, plural, one {особа відвідає} few {особи відвідає} many {осіб відвідає} other {осіб відвідає}}",
