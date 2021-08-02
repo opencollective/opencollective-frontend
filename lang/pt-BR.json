@@ -793,7 +793,6 @@
   "event.longDescription.label": "Descrição detalhada",
   "event.over.sendMoneyToParent.description": "Gaste isto enviando despesas para o evento, ou transferindo o saldo restante para o orçamento principal.",
   "event.over.sendMoneyToParent.title": "Este evento possui saldo positivo.",
-  "event.over.sendMoneyToParent.transaction.description": "Saldo do {event}",
   "event.privateInstructions.description": "Estas instruções serão fornecidas por e-mail aos participantes.",
   "event.privateInstructions.label": "Instruções privadas",
   "event.responses.title.going": "{n}{n, plural, one {pessoa indo} other {pessoas indo}}",
