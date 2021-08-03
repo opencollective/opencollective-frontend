@@ -21,6 +21,7 @@ class ContributionFlowButtons extends React.Component {
     paypalButtonProps: PropTypes.object,
     totalAmount: PropTypes.number,
     currency: PropTypes.string,
+    isCrypto: PropTypes.bool,
   };
 
   state = { isLoadingNext: false };
@@ -40,14 +41,18 @@ class ContributionFlowButtons extends React.Component {
       case STEPS.PROFILE:
         return <FormattedMessage id="ContributionFlow.YourInfo" defaultMessage="Your info" />;
       case STEPS.PAYMENT:
-        return <FormattedMessage id="ContributionFlow.Payment" defaultMessage="Payment" />;
+        return this.props.isCrypto ? (
+          <FormattedMessage id="ContributionFlow.Checkout" defaultMessage="Checkout" />
+        ) : (
+          <FormattedMessage id="ContributionFlow.Payment" defaultMessage="Payment" />
+        );
       case STEPS.DETAILS:
         return <FormattedMessage id="ContributionFlow.Contribution" defaultMessage="Contribution" />;
     }
   }
 
   render() {
-    const { goBack, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency } = this.props;
+    const { goBack, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency, isCrypto } = this.props;
     return (
       <Flex flexWrap="wrap" justifyContent="center">
         <Fragment>
@@ -73,6 +78,7 @@ class ContributionFlowButtons extends React.Component {
               minWidth={!nextStep ? 185 : 145}
               buttonStyle="primary"
               onClick={this.goNext}
+              disabled={isCrypto && totalAmount <= 0}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
               type="submit"
@@ -85,13 +91,17 @@ class ContributionFlowButtons extends React.Component {
                   &rarr;
                 </React.Fragment>
               ) : totalAmount ? (
-                <FormattedMessage
-                  id="contribute.amount"
-                  defaultMessage="Contribute {amount}"
-                  values={{
-                    amount: <Currency value={totalAmount} currency={currency} precision="auto" />,
-                  }}
-                />
+                isCrypto ? (
+                  <FormattedMessage id="contribute.finish" defaultMessage="Finish" />
+                ) : (
+                  <FormattedMessage
+                    id="contribute.amount"
+                    defaultMessage="Contribute {amount}"
+                    values={{
+                      amount: <Currency value={totalAmount} currency={currency} precision="auto" />,
+                    }}
+                  />
+                )
               ) : (
                 <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />
               )}

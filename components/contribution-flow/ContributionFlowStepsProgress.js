@@ -77,7 +77,7 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
     if (isFreeTier && getTotalAmount(stepDetails, stepSummary) === 0) {
       return <FormattedMessage id="noPaymentRequired" defaultMessage="No payment required" />;
     } else {
-      return (stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
+      return (!isCrypto && stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
     }
   } else if (step.name === STEPS.SUMMARY) {
     return stepSummary?.countryISO || null;
