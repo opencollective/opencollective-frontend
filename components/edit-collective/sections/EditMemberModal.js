@@ -273,8 +273,8 @@ const EditMemberModal = props => {
               <StyledTooltip place="bottom" content={() => intl.formatMessage(messages.cantRemoveLast)}>
                 <StyledButton
                   mt={4}
-                  minWidth={140}
                   disabled={true}
+                  buttonSize="tiny"
                   buttonStyle="dangerSecondary"
                   data-cy="remove-member"
                   onClick={handleRemoveMemberMutation}
@@ -288,8 +288,8 @@ const EditMemberModal = props => {
             ) : (
               <StyledButton
                 mt={4}
-                minWidth={140}
                 disabled={false}
+                buttonSize="tiny"
                 buttonStyle="dangerSecondary"
                 data-cy="remove-member"
                 onClick={handleRemoveMemberMutation}
@@ -308,7 +308,6 @@ const EditMemberModal = props => {
               mx={20}
               my={1}
               autoFocus
-              minWidth={140}
               onClick={cancelHandler}
               disabled={isEditingMember || isEditingMemberInvitation}
               data-cy="confirmation-modal-cancel"
@@ -317,7 +316,6 @@ const EditMemberModal = props => {
             </StyledButton>
             <StyledButton
               my={1}
-              minWidth={140}
               buttonStyle="primary"
               data-cy="confirmation-modal-continue"
               loading={isEditingMember || isEditingMemberInvitation}

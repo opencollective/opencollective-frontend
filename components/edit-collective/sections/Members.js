@@ -270,7 +270,7 @@ class Members extends React.Component {
             </Grid>
           </Hide>
           <Hide xs sm>
-            <Grid gridGap={20} gridTemplateColumns={['1fr 1fr', '1fr 1fr 1fr 1fr']}>
+            <Grid gridGap={20} gridTemplateColumns="repeat(auto-fill, 164px)">
               {this.state.showInviteModal ? (
                 <InviteMemberModal
                   show={this.state.showInviteModal}

@@ -134,7 +134,6 @@ const InviteMemberModal = props => {
               creatable
               width="100%"
               minWidth={325}
-              maxWidth={450}
               onChange={option => setMember(option.value)}
               isDisabled={Boolean(member)}
               types={[CollectiveType.USER]}
