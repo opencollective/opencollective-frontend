@@ -1,12 +1,12 @@
 require('./env');
 
-const withSourceMaps = require('@zeit/next-source-maps')();
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   webpack5: true,
   useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true',
+  productionBrowserSourceMaps: true,
   webpack: (config, { webpack, isServer, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
@@ -152,4 +152,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withSourceMaps(nextConfig);
+module.exports = nextConfig;

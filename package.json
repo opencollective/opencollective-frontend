@@ -36,7 +36,6 @@
     "@styled-system/prop-types": "5.1.5",
     "@styled-system/theme-get": "5.1.2",
     "@transferwise/approve-api-action-helpers": "^0.9.0",
-    "@zeit/next-source-maps": "0.0.4-canary.1",
     "accepts": "1.3.7",
     "bluebird": "3.7.2",
     "canvas-confetti": "1.4.0",
