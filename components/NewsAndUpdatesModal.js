@@ -17,17 +17,11 @@ import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCarousel from './StyledCarousel';
 import StyledLink from './StyledLink';
-import Modal, { CloseIcon, ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
 
 const ModalHeaderWrapper = styled(ModalHeader)`
   height: 58px;
-  ${CloseIcon} {
-    margin-top: 30px;
-    height: 12px;
-    width: 12px;
-    color: #76777a;
-  }
 `;
 
 const ModalWrapper = styled(Modal)`
