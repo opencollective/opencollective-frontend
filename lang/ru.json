@@ -1401,6 +1401,8 @@
   "NavBar.ThisIsCollective": "This is {collectiveName}'s page",
   "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
   "NetAmountFor": "Сумма для {name} после вычета налогов",
+  "NewContribute.crypto.donationDescription": "Use the address below to donate {amount} from your wallet",
+  "NewContribute.crypto.QRCodeCopyButton": "Click to copy wallet address",
   "NewContribute.noPaymentMethodsAvailable": "No payment methods available.",
   "NewContributionFlow.bankInstructions": "Instructions to make a transfer will be given on the next page.",
   "NewContributionFlow.BlockedContributor.ContributionPolicy": "Их политика вкладов заключается в следующем: {contributionPolicy}",

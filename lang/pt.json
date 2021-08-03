@@ -1401,6 +1401,8 @@
   "NavBar.ThisIsCollective": "This is {collectiveName}'s page",
   "NCP.SectionFetchError": "Encontramos um erro ao procurar dados para esta seção.",
   "NetAmountFor": "Net amount for {name}",
+  "NewContribute.crypto.donationDescription": "Use the address below to donate {amount} from your wallet",
+  "NewContribute.crypto.QRCodeCopyButton": "Click to copy wallet address",
   "NewContribute.noPaymentMethodsAvailable": "No payment methods available.",
   "NewContributionFlow.bankInstructions": "Instructions to make a transfer will be given on the next page.",
   "NewContributionFlow.BlockedContributor.ContributionPolicy": "Their contribution policy is as follows: {contributionPolicy}",

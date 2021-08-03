@@ -1401,6 +1401,8 @@
   "NavBar.ThisIsCollective": "Це сторінка {collectiveName}",
   "NCP.SectionFetchError": "Ми зіткнулися з помилкою під час отримання даних для цього розділу.",
   "NetAmountFor": "Чиста сума для {name}",
+  "NewContribute.crypto.donationDescription": "Use the address below to donate {amount} from your wallet",
+  "NewContribute.crypto.QRCodeCopyButton": "Click to copy wallet address",
   "NewContribute.noPaymentMethodsAvailable": "Немає доступних способів оплати.",
   "NewContributionFlow.bankInstructions": "Інструкції для здійснення переказу будуть надані на наступній сторінці.",
   "NewContributionFlow.BlockedContributor.ContributionPolicy": "Їхня політика надання внесків така: {contributionPolicy}",
