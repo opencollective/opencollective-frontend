@@ -158,7 +158,7 @@ const getContributeOptions = (intl, contribution, tiers, disableCustomContributi
     .map(tier => ({
       key: `${contribution.id}-tier-${tier.id}`,
       title: tier.name,
-      flexible: tier.amountType === AmountTypes.FLEXIBLE ? true : false,
+      flexible: tier.amountType === AmountTypes.FLEXIBLE,
       amount: tier.amountType === AmountTypes.FLEXIBLE ? tier.minimumAmount.valueInCents : tier.amount.valueInCents,
       id: tier.id,
       currency: tier.amount.currency,
