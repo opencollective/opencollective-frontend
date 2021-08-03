@@ -122,7 +122,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               </Amount>
             </AmountLine>
           )}
-          {Boolean(pmFeeInfo.fee) && (
+          {Boolean(pmFeeInfo.fee) && !isCrypto && (
             <AmountLine color="black.700">
               <Label>
                 <FormattedMessage
@@ -186,7 +186,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           )}
         </Amount>
       </AmountLine>
-      {Boolean(pmFeeInfo.fee) && (
+      {Boolean(pmFeeInfo.fee) && !isCrypto && (
         <AmountLine color="black.700">
           <Label>
             <FormattedMessage
