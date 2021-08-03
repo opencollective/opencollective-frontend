@@ -144,7 +144,7 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
-        amount: this.props.verb === 'crypto' ? 5 : props.fixedAmount || getDefaultTierAmount(props.tier),
+        amount: props.verb === 'crypto' ? 5 : props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
         currency: CRYPTO_CURRENCIES[0],
       },
