@@ -6,17 +6,18 @@ on:
       - 'i18n/crowdin'
 
 env:
-  CI: true
   TZ: UTC
-  E2E_TEST: 1
   OC_ENV: ci
-  NODE_ENV: ci # TODO: should be ideally development, test or production
-  PGHOST: localhost
-  PGUSER: postgres
+  NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
-  IMAGES_URL: http://localhost:3001
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
+  CI: true
+
+  E2E_TEST: 1
+  PGHOST: localhost
+  PGUSER: postgres
+  IMAGES_URL: http://localhost:3001
   CYPRESS_RECORD: false
   CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false

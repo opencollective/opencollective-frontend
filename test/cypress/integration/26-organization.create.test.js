@@ -4,6 +4,7 @@ describe('create an organization', () => {
   });
 
   it('Creates an organization successfully without co-admin', () => {
+    cy.contains('Create Organization');
     cy.get('[data-cy="cof-form-name"]').type('testorganization12');
     cy.getByDataCy('cof-form-slug')
       .first()
@@ -14,9 +15,13 @@ describe('create an organization', () => {
     cy.get('[data-cy="cof-org-website"]').type('ww.com');
     cy.get('[data-cy="custom-checkbox"]').click();
     cy.get('[data-cy="cof-form-submit"]').click();
+    cy.contains('Your Organization has been created.');
+    cy.wait(300);
   });
 
   it('Shows an Error if Authorization is not checked', () => {
+    cy.contains('Create Organization');
+    cy.wait(300);
     cy.get('[data-cy="cof-form-name"]').type('testOrganization10');
     cy.get('[data-cy="cof-org-description"]').type('short description for new org');
     cy.get('[data-cy="cof-org-website"]').type('ww.com');

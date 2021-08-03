@@ -9,4 +9,5 @@ next build || exit 1
 
 echo "> Copying .next to dist folder"
 
-cp -R .next $DIST
+shx rm -rf .next/cache
+shx cp -R .next $DIST
