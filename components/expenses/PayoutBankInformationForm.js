@@ -30,22 +30,6 @@ export const msg = defineMessages({
   },
 });
 
-const accountHolderFieldOptions = {
-  name: 'Account Holder Name',
-  group: [
-    {
-      required: true,
-      key: 'accountHolderName',
-      name: 'Account Holder Name',
-      type: 'text',
-      example: 'Jane Doe',
-      hint: 'Full name, no abbreviations and without titles.',
-      validationRegexp: '^[^!@#$%&*+]+$',
-      validationError: 'Special characters are not allowed. (!@#$%&*+)',
-    },
-  ],
-};
-
 const requiredFieldsQuery = gqlV2/* GraphQL */ `
   query PayoutBankInformationRequiredFields($slug: String, $currency: String!, $accountDetails: JSON) {
     host(slug: $slug) {
@@ -292,21 +276,6 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           <FormattedMessage id="PayoutBankInformationForm.AccountInfo" defaultMessage="Account Information" />
         </P>
       </Box>
-      {
-        // Displays the account holder field only if the other fields are also loaded
-        Boolean(availableMethods?.fields.length) && (
-          <FieldGroup
-            currency={currency}
-            disabled={disabled}
-            field={accountHolderFieldOptions}
-            formik={formik}
-            getFieldName={getFieldName}
-            host={host}
-            key={kebabCase(accountHolderFieldOptions.name)}
-            refetch={refetch}
-          />
-        )
-      }
       {otherFields.map(field => (
         <FieldGroup
           currency={currency}
