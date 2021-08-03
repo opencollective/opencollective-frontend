@@ -199,7 +199,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
           <StyledHr borderColor="black.300" mt={16} mb={32} />
         </React.Fragment>
       )}
-      {showFeesOnTop && (
+      {showFeesOnTop && data?.amount > 0 && (
         <Box mt={28}>
           <FeesOnTopInput
             currency={currency}
