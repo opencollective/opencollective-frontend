@@ -120,6 +120,33 @@ const Input = props => {
         </Field>
       </Box>
     );
+  } else if (input.type === 'date') {
+    return (
+      <Box key={input.key} mt={2} flex="1">
+        <Field name={fieldName} validate={validate}>
+          {({ field, meta }) => (
+            <StyledInputField
+              label={input.name}
+              labelFontSize="13px"
+              required={input.required}
+              error={(meta.touched || disabled) && meta.error}
+              hint={input.hint}
+            >
+              {() => (
+                <StyledInput
+                  {...field}
+                  type="date"
+                  error={(meta.touched || disabled) && meta.error}
+                  disabled={disabled}
+                  width="100%"
+                  value={get(formik.values, field.name) || ''}
+                />
+              )}
+            </StyledInputField>
+          )}
+        </Field>
+      </Box>
+    );
   } else if (input.type === 'radio' || input.type === 'select') {
     const options = formatTransferWiseSelectOptions(input.valuesAllowed || []);
     return (
