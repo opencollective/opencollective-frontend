@@ -1,4 +1,4 @@
-/* eslint-disable import/no-unresolved,node/no-missing-import,node/no-extraneous-import */
+/* eslint-disable no-console,import/no-unresolved,node/no-missing-import,node/no-extraneous-import */
 import Path from 'path';
 
 import imagemin from 'imagemin';

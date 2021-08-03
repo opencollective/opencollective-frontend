@@ -136,6 +136,7 @@ const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange, 
         setFields(addressFields);
         onCountryChange(getAddressFieldDifferences(value, addressFields));
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.warn('Call to Shopify API failed. Falling back to plain address form. Error: ', e.message);
       } finally {
         setLoading(false);

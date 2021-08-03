@@ -1,5 +1,10 @@
 {
   "extends": ["opencollective", "plugin:styled-components-a11y/recommended"],
+  "parserOptions": {
+    "babelOptions": {
+      "configFile": "./.babelrc.js"
+    }
+  },
   "env": { "jest": true },
   "plugins": ["graphql", "react-hooks", "simple-import-sort", "formatjs", "styled-components-a11y"],
   "rules": {

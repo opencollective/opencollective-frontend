@@ -1,0 +1,54 @@
+module.exports = {
+  presets: [
+    [
+      'next/babel',
+      {
+        'preset-env': {
+          modules: 'auto',
+        },
+        'transform-runtime': {
+          useESModules: false,
+        },
+      },
+    ],
+  ],
+  plugins: [
+    'babel-plugin-react-docgen',
+    'babel-plugin-styled-components',
+    'lodash',
+    [
+      'babel-plugin-formatjs',
+      {
+        ast: true,
+        idInterpolationPattern: '[sha512:contenthash:base64:6]',
+      },
+    ],
+  ],
+  env: {
+    development: {
+      compact: false,
+    },
+    e2e: {
+      plugins: ['istanbul'],
+    },
+    ci: {
+      plugins: ['istanbul'],
+    },
+    production: {
+      plugins: [
+        [
+          'transform-react-remove-prop-types',
+          {
+            removeImport: true,
+          },
+        ],
+        [
+          'react-remove-properties',
+          {
+            properties: ['data-cy'],
+          },
+        ],
+      ],
+    },
+  },
+};
