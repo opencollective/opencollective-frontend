@@ -4,7 +4,7 @@ const withSourceMaps = require('@zeit/next-source-maps')();
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
-  webpack5: false,
+  webpack5: true,
   useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true',
   webpack: (config, { webpack, isServer, buildId }) => {
     config.plugins.push(
