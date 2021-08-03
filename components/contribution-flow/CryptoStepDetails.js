@@ -7,6 +7,8 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledSelect from '../StyledSelect';
 import { Label } from '../Text';
 
+import { CRYPTO_CURRENCIES } from './constants';
+
 const messages = defineMessages({
   cryptoCurrency: {
     id: `CryptoStepDetails.cryptoCurrency`,
@@ -22,57 +24,6 @@ const messages = defineMessages({
   },
 });
 
-export const cryptoCurrencies = [
-  {
-    label: 'BTC (Bitcoin)',
-    value: 'BTC',
-  },
-  {
-    label: 'ETH (Ethereum)',
-    value: 'ETH',
-  },
-  {
-    label: 'BCH (Bitcoin Cash)',
-    value: 'BCH',
-  },
-  {
-    label: 'LTC (Litecoin)',
-    value: 'LTC',
-  },
-  {
-    label: 'ZEC (Zcash)',
-    value: 'ZEC',
-  },
-  {
-    label: 'LINK (Chainlink)',
-    value: 'LINK',
-  },
-  {
-    label: 'BAT (Basic Attention Token)',
-    value: 'BAT',
-  },
-  {
-    label: 'DAI (Dai)',
-    value: 'DAI',
-  },
-  {
-    label: 'OXT (Orchid)',
-    value: 'OXT',
-  },
-  {
-    label: 'STORJ (Storj)',
-    value: 'STORJ',
-  },
-  {
-    label: 'AMP (Amp)',
-    value: 'AMP',
-  },
-  {
-    label: 'ZRX (Ox)',
-    value: 'ZRX',
-  },
-];
-
 const CryptoStepDetails = ({ onChange, data }) => {
   const intl = useIntl();
   const [currencyType, setCurrencyType] = useState(data.currency);
@@ -87,7 +38,7 @@ const CryptoStepDetails = ({ onChange, data }) => {
       </Label>
       <StyledSelect
         inputId="crypto-currency"
-        options={cryptoCurrencies}
+        options={CRYPTO_CURRENCIES}
         defaultValue={currencyType}
         onChange={value => {
           setCurrencyType(value);

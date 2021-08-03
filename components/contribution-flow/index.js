@@ -35,14 +35,13 @@ import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
 import CollectiveTitleContainer from './CollectiveTitleContainer';
-import { STEPS } from './constants';
+import { CRYPTO_CURRENCIES, STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowStepContainer from './ContributionFlowStepContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
-import { cryptoCurrencies } from './CryptoStepDetails';
 import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
@@ -143,7 +142,7 @@ class ContributionFlow extends React.Component {
         interval: props.fixedInterval || getDefaultInterval(props.tier),
         amount: this.props.verb === 'crypto' ? 5 : props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
-        currency: cryptoCurrencies[0],
+        currency: CRYPTO_CURRENCIES[0],
       },
     };
   }
@@ -621,6 +620,7 @@ class ContributionFlow extends React.Component {
     } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
     const currency = tier?.amount.currency || collective.currency;
+    const isCrypto = verb === 'crypto';
 
     return (
       <Steps
@@ -654,7 +654,7 @@ class ContributionFlow extends React.Component {
           >
             {!this.props.hideHeader && (
               <Box px={[2, 3]} mb={4}>
-                <ContributionFlowHeader collective={collective} isEmbed={isEmbed} verb={verb} />
+                <ContributionFlowHeader collective={collective} isEmbed={isEmbed} isCrypto={isCrypto} />
               </Box>
             )}
             <StepsProgressBox mb={3} width={[1.0, 0.8]}>
@@ -667,7 +667,7 @@ class ContributionFlow extends React.Component {
                 stepDetails={stepDetails}
                 stepPayment={stepPayment}
                 stepSummary={stepSummary}
-                verb={verb}
+                isCrypto={isCrypto}
                 isSubmitted={this.state.isSubmitted}
                 loading={isValidating || isSubmitted || isSubmitting}
                 currency={currency}
@@ -708,7 +708,7 @@ class ContributionFlow extends React.Component {
                     mainState={this.state}
                     onChange={data => this.setState(data)}
                     step={currentStep}
-                    verb={verb}
+                    isCrypto={isCrypto}
                     showFeesOnTop={this.canHaveFeesOnTop()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     defaultProfileSlug={this.props.contributeAs}
@@ -752,7 +752,7 @@ class ContributionFlow extends React.Component {
                         stepSummary={stepSummary}
                         stepPayment={stepPayment}
                         currency={currency}
-                        isCrypto={verb === 'crypto'}
+                        isCrypto={isCrypto}
                       />
                     </Box>
                     <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />

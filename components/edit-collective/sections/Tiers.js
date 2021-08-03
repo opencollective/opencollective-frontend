@@ -11,7 +11,7 @@ import intervals from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getCurrencySymbol } from '../../../lib/currency-utils';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
-import { capitalize, parseToBoolean } from '../../../lib/utils';
+import { capitalize } from '../../../lib/utils';
 
 import Container from '../../Container';
 import ContributeCrypto from '../../contribute-cards/ContributeCrypto';
@@ -34,8 +34,6 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 const { FUND, PROJECT, EVENT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
-
-const CRYPTO_CONTRIBUTIONS_ENABLED = parseToBoolean(process.env.CRYPTO_CONTRIBUTIONS_ENABLED);
 
 class Tiers extends React.Component {
   static propTypes = {

@@ -27,10 +27,10 @@ const StepLabel = styled(Span)`
   margin-bottom: 4px;
 `;
 
-const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, verb }) => {
+const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCrypto }) => {
   if (stepDetails.amount) {
     const totalAmount = stepDetails.amount + (stepDetails.platformContribution || 0);
-    return verb !== 'crypto' ? (
+    return !isCrypto ? (
       <FormattedMoneyAmount
         interval={stepDetails.interval !== INTERVALS.flexible ? stepDetails.interval : null}
         currency={currency}
@@ -48,7 +48,7 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, verb }
   }
 };
 
-const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency, verb }) => {
+const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency, isCrypto }) => {
   if (step.name === STEPS.PROFILE) {
     if (stepProfile) {
       const mainInfo = (stepProfile.id && stepProfile.name) || (stepProfile.email ?? stepProfile.name);
@@ -67,7 +67,7 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
             stepDetails={stepDetails}
             currency={currency}
             isFreeTier={isFreeTier}
-            verb={verb}
+            isCrypto={isCrypto}
           />
           {!isNaN(stepDetails.quantity) && stepDetails.quantity > 1 && ` x ${stepDetails.quantity}`}
         </React.Fragment>
@@ -94,7 +94,7 @@ StepInfo.propTypes = {
   stepSummary: PropTypes.object,
   isFreeTier: PropTypes.bool,
   currency: PropTypes.string,
-  verb: PropTypes.string,
+  isCrypto: PropTypes.bool,
 };
 
 const ContributionFlowStepsProgress = ({
@@ -110,7 +110,7 @@ const ContributionFlowStepsProgress = ({
   goToStep,
   currency,
   isFreeTier,
-  verb,
+  isCrypto,
 }) => {
   return (
     <StepsProgress
@@ -136,7 +136,7 @@ const ContributionFlowStepsProgress = ({
                 stepSummary={stepSummary}
                 isFreeTier={isFreeTier}
                 currency={currency}
-                verb={verb}
+                isCrypto={isCrypto}
               />
             )}
           </Container>
@@ -159,7 +159,7 @@ ContributionFlowStepsProgress.propTypes = {
   lastVisitedStep: PropTypes.object,
   currency: PropTypes.string,
   isFreeTier: PropTypes.bool,
-  verb: PropTypes.string,
+  isCrypto: PropTypes.bool,
 };
 
 export default ContributionFlowStepsProgress;

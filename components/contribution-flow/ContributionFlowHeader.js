@@ -30,11 +30,11 @@ class NewContributionFlowHeader extends React.Component {
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
     isEmbed: PropTypes.bool,
-    verb: PropTypes.string,
+    isCrypto: PropTypes.bool,
   };
 
   render() {
-    const { collective, isEmbed, verb } = this.props;
+    const { collective, isEmbed, isCrypto } = this.props;
     const contributors = collective.contributors?.nodes;
 
     return (
@@ -58,7 +58,7 @@ class NewContributionFlowHeader extends React.Component {
               />
             </H1>
           </CollectiveTitleContainer>
-          {contributors?.length > 0 && verb !== 'crypto' && (
+          {contributors?.length > 0 && !isCrypto && (
             <Fragment>
               <P fontSize="16px" lineHeight="24px" fontWeight={400} color="black.500" py={2}>
                 <FormattedMessage

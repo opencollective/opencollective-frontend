@@ -36,7 +36,7 @@ class ContributionFlowStepContainer extends React.Component {
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
-    verb: PropTypes.string,
+    isCrypto: PropTypes.bool,
     mainState: PropTypes.shape({
       stepDetails: PropTypes.object,
       stepProfile: PropTypes.shape({
@@ -122,11 +122,11 @@ class ContributionFlowStepContainer extends React.Component {
   }
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed, verb } = this.props;
+    const { collective, mainState, tier, isEmbed, isCrypto } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
-        return verb !== 'crypto' ? (
+        return !isCrypto ? (
           <StepDetails
             collective={collective}
             tier={tier}
