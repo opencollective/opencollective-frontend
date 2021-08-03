@@ -4,6 +4,7 @@ import { truncate } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import formatMemberRole from '../lib/i18n/member-role';
 
@@ -188,7 +189,7 @@ ContributorCard.propTypes = {
     description: PropTypes.string,
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
-    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'FUND', 'CHAPTER', 'ANONYMOUS']),
+    type: PropTypes.oneOf(Object.keys(CollectiveType)),
     totalAmountDonated: PropTypes.number,
     image: PropTypes.string,
     publicMessage: PropTypes.string,

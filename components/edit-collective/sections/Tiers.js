@@ -447,7 +447,8 @@ class Tiers extends React.Component {
   render() {
     const { intl, collective, defaultType = TICKET } = this.props;
     const hasCustomContributionsDisabled = get(collective, 'settings.disableCustomContributions', false);
-    const hasCryptoContributionsDisabled = get(collective, 'settings.disableCryptoContributions', false);
+    const hasCryptoContributionsDisabled = get(collective, 'settings.disableCryptoContributions', true);
+    const cryptoContributionsEnabledByHost = get(collective, 'host.settings.cryptoEnabled', false);
     const displayContributionSettings = collective.id && defaultType !== TICKET;
 
     return (
@@ -491,7 +492,7 @@ class Tiers extends React.Component {
                 </Flex>
               )}
             </Mutation>
-            {CRYPTO_CONTRIBUTIONS_ENABLED && (
+            {cryptoContributionsEnabledByHost && (
               <React.Fragment>
                 <SettingsSectionTitle mt={3}>
                   <FormattedMessage id="ContributionsType.Crypto" defaultMessage="Crypto Contributions" />

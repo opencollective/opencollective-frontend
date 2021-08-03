@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, orderBy, set } from 'lodash';
+import { cloneDeep, get, orderBy, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
@@ -164,9 +164,10 @@ class SectionContribute extends React.PureComponent {
     const { collective, contributors, contributorsStats } = this.props;
     const hasNoContributor = !this.hasContributors(contributors);
     const canContribute = collective.isActive && !isPastEvent(collective);
-    const hasCustomContribution = !collective.settings?.disableCustomContributions;
+    const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
     const hasCryptoContribution =
-      collective.settings?.disableCryptoContributions === false && collective?.host?.settings?.cryptoEnabled;
+      !get(collective, 'settings.disableCryptoContributions', true) &&
+      get(collective, 'host.settings.cryptoEnabled', false);
     const waysToContribute = [];
 
     sortedTiers.forEach(tier => {
@@ -223,8 +224,10 @@ class SectionContribute extends React.PureComponent {
     const isEvent = collective.type === CollectiveType.EVENT;
     const isProject = collective.type === CollectiveType.PROJECT;
     const isFund = collective.type === CollectiveType.FUND;
-    const hasCustomContribution = !collective.settings?.disableCustomContributions;
-    const hasCryptoContribution = !collective.settings?.disableCryptoContributions;
+    const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
+    const hasCryptoContribution =
+      !get(collective, 'settings.disableCryptoContributions', true) &&
+      get(collective, 'host.settings.cryptoEnabled', false);
     const hasContribute =
       isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution || hasCryptoContribution));
     const hasOtherWaysToContribute =
