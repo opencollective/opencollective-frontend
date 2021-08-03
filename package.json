@@ -105,7 +105,7 @@
     "winston": "3.3.3"
   },
   "scripts": {
-    "build": "npm-run-all build:updates build:next build:server",
+    "build": "cross-env NODE_OPTIONS=\"--max_old_space_size=4096\" npm-run-all build:updates build:next build:server",
     "build:e2e": "cross-env NODE_ENV=development OC_ENV=e2e npm run build",
     "build:clean": "shx rm -rf dist .next",
     "build:langs": "npm run langs:update",
