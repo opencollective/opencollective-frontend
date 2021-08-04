@@ -195,14 +195,13 @@ class SignInOrJoinFree extends React.Component {
               twoFactorAuthenticatorCode: '',
               recoveryCode: '',
             }}
-            onSubmit={values => {
+            onSubmit={async values => {
               const { twoFactorAuthenticatorCode, recoveryCode } = values;
               if (recoveryCode) {
-                return this.props.submitRecoveryCode(recoveryCode).then(user => {
-                  return this.props.router.replace({
-                    pathname: '/[slug]/edit/two-factor-auth',
-                    query: { slug: user.collective.slug },
-                  });
+                const user = await this.props.submitRecoveryCode(recoveryCode);
+                return this.props.router.replace({
+                  pathname: '/[slug]/edit/two-factor-auth',
+                  query: { slug: user.collective.slug },
                 });
               } else {
                 return this.props.submitTwoFactorAuthenticatorCode(twoFactorAuthenticatorCode);
