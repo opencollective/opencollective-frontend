@@ -1,15 +1,12 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { Link as IconLink } from '@styled-icons/feather/Link';
 import themeGet from '@styled-system/theme-get';
 import { get, isEmpty } from 'lodash';
-import QRCode from 'qrcode.react';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import useClipboard from '../../lib/hooks/useClipboard';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -17,9 +14,8 @@ import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import NewCreditCardForm from '../NewCreditCardForm';
-import StyledButton from '../StyledButton';
 import StyledRadioList from '../StyledRadioList';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 
 import BlockedContributorMessage from './BlockedContributorMessage';
 import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
@@ -95,7 +91,6 @@ const StepPayment = ({
   isEmbed,
   hideCreditCardPostalCode,
   onNewCardFormReady,
-  isCrypto,
 }) => {
   // GraphQL mutations and queries
   const { loading, data, error } = useQuery(paymentMethodsQuery, {
@@ -115,8 +110,6 @@ const StepPayment = ({
     onChange({ stepPayment: { key, paymentMethod } });
   };
 
-  const { isCopied, copy } = useClipboard();
-
   // Set default payment method
   useEffect(() => {
     if (!loading && !stepPayment && !isEmpty(paymentOptions)) {
@@ -127,49 +120,7 @@ const StepPayment = ({
     }
   }, [paymentOptions, stepPayment, loading]);
 
-  return isCrypto ? (
-    <Container width={1}>
-      <Box textAlign={['center']}>
-        <FormattedMessage
-          id="NewContribute.crypto.donationDescription"
-          defaultMessage="Use the address below to donate {amount} from your wallet"
-          values={{
-            amount: (
-              <span style={{ color: 'black.900' }}>
-                <b>
-                  {stepDetails.amount} {stepDetails.currency.value}
-                </b>
-              </span>
-            ),
-          }}
-        />
-        <QRCode
-          value={'1LxPL1EkdseTGgei5Vkt83SwEe5TXHpmT'} // TODO: need to change this to deposit address returned by The Giving Block
-          imageSettings={{
-            src: `/static/images/crypto-logos/${stepDetails.currency.value}.svg`,
-            height: 40,
-            width: 40,
-            excavate: true,
-          }}
-          renderAs="svg"
-          size={256}
-          level="L"
-          includeMargin
-          data-cy="qr-code"
-        />
-        <P mb="16px">1LxPL1EkdseTGgei5Vkt83SwEe5TXHpmT</P>
-        <StyledButton onClick={() => copy(window.location.href)} disabled={isCopied}>
-          <Span mr={1}>
-            <FormattedMessage
-              id="NewContribute.crypto.QRCodeCopyButton"
-              defaultMessage="Click to copy wallet address"
-            />
-          </Span>
-          <IconLink size="20px" />
-        </StyledButton>
-      </Box>
-    </Container>
-  ) : (
+  return (
     <Container width={1} border={['1px solid #DCDEE0', 'none']} borderRadius={15}>
       {stepProfile.contributorRejectedCategories ? (
         <BlockedContributorMessage categories={stepProfile.contributorRejectedCategories} collective={collective} />
@@ -253,7 +204,6 @@ StepPayment.propTypes = {
   hideCreditCardPostalCode: PropTypes.bool,
   isSubmitting: PropTypes.bool,
   isEmbed: PropTypes.bool,
-  isCrypto: PropTypes.bool,
 };
 
 StepPayment.defaultProps = {

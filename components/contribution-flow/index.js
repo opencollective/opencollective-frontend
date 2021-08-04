@@ -531,10 +531,10 @@ class ContributionFlow extends React.Component {
     }
 
     // Hide step payment if using a free tier with fixed price
-    if (!noPaymentRequired) {
+    if (!noPaymentRequired && !isCrypto) {
       steps.push({
         name: 'payment',
-        label: isCrypto ? intl.formatMessage(STEP_LABELS.checkout) : intl.formatMessage(STEP_LABELS.payment),
+        label: intl.formatMessage(STEP_LABELS.payment),
         isCompleted: !stepProfile?.contributorRejectedCategories,
         validate: action => {
           if (action === 'prev') {
@@ -548,6 +548,14 @@ class ContributionFlow extends React.Component {
             }
           }
         },
+      });
+    }
+
+    if (isCrypto) {
+      steps.push({
+        name: 'checkout',
+        label: intl.formatMessage(STEP_LABELS.checkout),
+        isCompleted: !stepProfile?.contributorRejectedCategories,
       });
     }
 
