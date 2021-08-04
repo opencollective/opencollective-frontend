@@ -198,7 +198,12 @@ class SignInOrJoinFree extends React.Component {
             onSubmit={values => {
               const { twoFactorAuthenticatorCode, recoveryCode } = values;
               if (recoveryCode) {
-                return this.props.submitRecoveryCode(recoveryCode);
+                return this.props.submitRecoveryCode(recoveryCode).then(user => {
+                  return this.props.router.replace({
+                    pathname: '/[slug]/edit/two-factor-auth',
+                    query: { slug: user.collective.slug },
+                  });
+                });
               } else {
                 return this.props.submitTwoFactorAuthenticatorCode(twoFactorAuthenticatorCode);
               }
@@ -248,7 +253,11 @@ class SignInOrJoinFree extends React.Component {
                       onSubmit={handleSubmit}
                       data-cy={useRecoveryCodes ? null : 'signin-two-factor-auth-button'}
                     >
-                      <FormattedMessage id="VerifyButton" defaultMessage="Verify" />
+                      {useRecoveryCodes ? (
+                        <FormattedMessage id="login.twoFactorAuth.reset" defaultMessage="Reset 2FA" />
+                      ) : (
+                        <FormattedMessage id="VerifyButton" defaultMessage="Verify" />
+                      )}
                     </StyledButton>
                   </Flex>
                 </Form>

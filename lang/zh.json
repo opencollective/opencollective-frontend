@@ -1335,6 +1335,7 @@
   "login.askAnother": "You can ask for a new sign in link using the form below.",
   "login.failed": "登录失败： {message}",
   "login.twoFactorAuth.havingTrouble": "遇到问题？",
+  "login.twoFactorAuth.reset": "Reset 2FA",
   "login.twoFactorAuth.support": "If you can't login with 2FA or recovery codes, please contact <SupportLink></SupportLink>.",
   "login.twoFactorAuth.useRecoveryCodes": "使用 2FA 恢复码。",
   "ManagedFunds": "托管的基金",

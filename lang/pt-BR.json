@@ -1335,6 +1335,7 @@
   "login.askAnother": "Você pode pedir um novo link de sign in usando o formulário abaixo.",
   "login.failed": "O sign in falhou: {message}.",
   "login.twoFactorAuth.havingTrouble": "Está com problemas?",
+  "login.twoFactorAuth.reset": "Reset 2FA",
   "login.twoFactorAuth.support": "Se está conseguindo fazer login com 2FA ou códigos de recuperação, por favor, contate <SupportLink></SupportLink>.",
   "login.twoFactorAuth.useRecoveryCodes": "Use códigos de recuperação 2FA.",
   "ManagedFunds": "Fundos gerenciados",
