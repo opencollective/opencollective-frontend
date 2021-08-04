@@ -145,6 +145,12 @@ const StepPayment = ({
         />
         <QRCode
           value={'1LxPL1EkdseTGgei5Vkt83SwEe5TXHpmT'} // TODO: need to change this to deposit address returned by The Giving Block
+          imageSettings={{
+            src: `/static/images/crypto-logos/${stepDetails.currency.value}.svg`,
+            height: 40,
+            width: 40,
+            excavate: true,
+          }}
           renderAs="svg"
           size={256}
           level="L"

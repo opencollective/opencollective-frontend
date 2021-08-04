@@ -52,7 +52,7 @@ const CryptoStepDetails = ({ onChange, data }) => {
         {intl.formatMessage(messages['donationAmount'])}
       </Label>
       <StyledInputGroup
-        prepend={currencyType.label}
+        prepend={currencyType.labelWithoutImage}
         type="number"
         inputMode="decimal"
         defaultValue={amount}
