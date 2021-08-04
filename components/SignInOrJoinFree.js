@@ -31,7 +31,7 @@ const messages = defineMessages({
   },
   recoveryCodeInputLabel: {
     id: 'TwoFactorAuth.RecoveryCodes.Form.InputLabel',
-    defaultMessage: 'Please enter your alphanumeric recovery code.',
+    defaultMessage: 'Please enter one of your alphanumeric recovery codes.',
   },
 });
 
@@ -181,13 +181,10 @@ class SignInOrJoinFree extends React.Component {
             {useRecoveryCodes ? (
               <FormattedMessage
                 id="TwoFactorAuth.SignIn.RecoveryCodes"
-                defaultMessage="Please enter one of your 2FA recovery codes:"
+                defaultMessage="Reset 2FA using a recovery code:"
               />
             ) : (
-              <FormattedMessage
-                id="TwoFactorAuth.SignIn"
-                defaultMessage="Please verify your login using the 2FA code:"
-              />
+              <FormattedMessage id="TwoFactorAuth.SignIn" defaultMessage="Verify login using the 2FA code:" />
             )}
           </H5>
           <Formik
