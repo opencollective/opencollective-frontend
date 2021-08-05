@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import ApplyToHostModal from './ApplyToHostModal';
@@ -13,6 +14,7 @@ class ApplyToHostBtn extends React.Component {
     withoutIcon: PropTypes.bool,
     buttonProps: PropTypes.object,
     buttonRenderer: PropTypes.func,
+    router: PropTypes.object,
   };
 
   constructor(props) {
@@ -20,12 +22,25 @@ class ApplyToHostBtn extends React.Component {
     this.state = { showModal: false };
   }
 
+  componentDidMount() {
+    const { router } = this.props;
+
+    if (router.query.action === 'apply') {
+      this.setState({ showModal: true });
+    }
+  }
+
+  showApplyToHostModal(router, slug) {
+    router.push(`${slug}/apply`);
+    return this.setState({ showModal: true });
+  }
+
   renderButton() {
-    const { buttonRenderer, withoutIcon, buttonProps, minWidth } = this.props;
+    const { buttonRenderer, withoutIcon, buttonProps, minWidth, hostSlug, router } = this.props;
 
     if (buttonRenderer) {
       return buttonRenderer({
-        onClick: () => this.setState({ showModal: true }),
+        onClick: () => this.showApplyToHostModal(router, hostSlug),
         'data-cy': 'host-apply-btn',
         ...buttonProps,
         children: (
@@ -44,7 +59,7 @@ class ApplyToHostBtn extends React.Component {
       <StyledButton
         buttonStyle="secondary"
         buttonSize="small"
-        onClick={() => this.setState({ showModal: true })}
+        onClick={() => this.showApplyToHostModal(router, hostSlug)}
         minWidth={minWidth}
         data-cy="host-apply-btn"
         {...buttonProps}
@@ -70,4 +85,4 @@ class ApplyToHostBtn extends React.Component {
   }
 }
 
-export default ApplyToHostBtn;
+export default withRouter(ApplyToHostBtn);

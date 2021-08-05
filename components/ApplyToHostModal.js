@@ -341,7 +341,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                               creatable
                               renderNewCollectiveOption={() => (
                                 <Link
-                                  href={isOCFHost ? `/foundation/apply/intro` : `/${host.slug}/apply`}
+                                  href={isOCFHost ? `/foundation/apply/intro` : `/${host.slug}/apply-new`}
                                   data-cy="host-apply-new-collective-link"
                                 >
                                   <StyledButton borderRadius="14px" width="100%">
