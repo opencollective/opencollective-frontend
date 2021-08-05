@@ -8,6 +8,7 @@ import useClipboard from '../../lib/hooks/useClipboard';
 
 import Container from '../Container';
 import { Box } from '../Grid';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import { P, Span } from '../Text';
 
@@ -30,20 +31,32 @@ const StepCheckout = ({ stepDetails, order }) => {
             ),
           }}
         />
-        <QRCode
-          value={order.paymentMethod.data.depositAddress} // TODO: need to change this to deposit address returned by The Giving Block
-          imageSettings={{
-            src: `/static/images/crypto-logos/${stepDetails.currency.value}.svg`,
-            height: 40,
-            width: 40,
-            excavate: true,
-          }}
-          renderAs="svg"
-          size={256}
-          level="L"
-          includeMargin
-        />
-        <P mb="16px">{order.paymentMethod.data.depositAddress}</P>
+        {order?.paymentMethod?.data?.depositAddress && (
+          <React.Fragment>
+            <QRCode
+              value={order.paymentMethod.data.depositAddress}
+              imageSettings={{
+                src: `/static/images/crypto-logos/${stepDetails.currency.value}.svg`,
+                height: 40,
+                width: 40,
+                excavate: true,
+              }}
+              renderAs="svg"
+              size={256}
+              level="L"
+              includeMargin
+            />
+            <P mb="16px">{order.paymentMethod.data.depositAddress}</P>
+          </React.Fragment>
+        )}
+        {!order?.paymentMethod?.data?.depositAddress && (
+          <MessageBox m={3} type="error" withIcon>
+            <FormattedMessage
+              id="StepCheckout.noDepositAddress"
+              defaultMessage="No deposit address returned. Please contact support@opencollective.com."
+            />
+          </MessageBox>
+        )}
         <StyledButton onClick={() => copy(window.location.href)} disabled={isCopied}>
           <Span mr={1}>
             <FormattedMessage

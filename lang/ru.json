@@ -1839,6 +1839,7 @@
   "SortBy": "Сортировать по",
   "SpteProfile.EmailNoSpam": "We won't send any spam or advertising, pinky promise.",
   "startDateAndTime": "дата и время начала",
+  "StepCheckout.noDepositAddress": "No deposit address returned. Please contact support@opencollective.com.",
   "StepsProgress.mobile.next": "Далее: {stepName}",
   "StepsProgress.mobile.status": "{from} из {to}",
   "Stripe.Initialization.Error": "There was a problem initializing the payment form. Please reload the page and try again.",
