@@ -11,7 +11,7 @@ import { Box } from '../Grid';
 import StyledButton from '../StyledButton';
 import { P, Span } from '../Text';
 
-const StepPayment = ({ stepDetails }) => {
+const StepCheckout = ({ stepDetails }) => {
   const { isCopied, copy } = useClipboard();
 
   return (
@@ -58,8 +58,8 @@ const StepPayment = ({ stepDetails }) => {
   );
 };
 
-StepPayment.propTypes = {
+StepCheckout.propTypes = {
   stepDetails: PropTypes.object,
 };
 
-export default StepPayment;
+export default StepCheckout;
