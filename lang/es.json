@@ -330,6 +330,7 @@
   "collective.unarchive.button": "¿Estás seguro que quieres archivar {type, select, EVENT {este Evento} PROJECT {este Proyecto} FUND {este Fondo} COLLECTIVE {este Colectivo} ORGANIZATION {esta Organización} other {esta Cuenta}}",
   "collective.unarchive.confirm.btn": "Desarchivar",
   "Collective.URL": "URL del Colectivo",
+  "collective.user.orderProcessing.crypto": "<strong>Your contribution is pending.</strong> Once the transaction is completed you will receive a confirmation email with the details.",
   "collective.user.orderProcessing.manual": "<strong>Su contribución está pendiente.</strong> Por favor, sigue las instrucciones de pago en el correo electrónico de confirmación para completar su transacción.",
   "Collective.VirtualCards.RequestCard": "Request a Card",
   "Collective.VirtualCards.RequestCard.Agreement": "I agree to all the terms and conditions set by the host and Open Collective",

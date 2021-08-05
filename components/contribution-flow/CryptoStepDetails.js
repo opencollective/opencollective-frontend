@@ -58,7 +58,7 @@ const CryptoStepDetails = ({ onChange, data }) => {
         defaultValue={amount}
         onChange={({ target }) => {
           setAmount(target.value);
-          dispatchChange('amount', target.value);
+          dispatchChange('amount', parseInt(target.value));
         }}
         error={amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
       />

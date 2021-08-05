@@ -179,7 +179,13 @@ class ContributionFlow extends React.Component {
             guestInfo,
             fromAccount,
             toAccount: pick(this.props.collective, ['id']),
-            customData: stepDetails.customData,
+            customData:
+              this.props.verb === 'crypto'
+                ? {
+                    pledgeAmount: stepDetails.amount,
+                    pledgeCurrency: stepDetails.currency.value,
+                  }
+                : stepDetails.customData,
             paymentMethod: await this.getPaymentMethod(),
             platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
@@ -301,9 +307,11 @@ class ContributionFlow extends React.Component {
         'paypalInfo.subscriptionId',
       ]);
     } else if (
-      [GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER, GQLV2_PAYMENT_METHOD_TYPES.ALIPAY].includes(
-        stepPayment.paymentMethod.type,
-      )
+      [
+        GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER,
+        GQLV2_PAYMENT_METHOD_TYPES.ALIPAY,
+        GQLV2_PAYMENT_METHOD_TYPES.CRYPTO,
+      ].includes(stepPayment.paymentMethod.type)
     ) {
       return pick(stepPayment.paymentMethod, ['type', 'service']);
     }
@@ -391,7 +399,15 @@ class ContributionFlow extends React.Component {
   /** Steps component callback  */
   onStepChange = async step => {
     this.setState({ showSignIn: false });
-    this.pushStepRoute(step.name);
+    if (this.props.verb === 'crypto') {
+      this.setState({ stepPayment: { key: 'manual', paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.CRYPTO } } });
+    }
+
+    if (step.name === 'checkout') {
+      await this.submitOrder();
+    } else {
+      await this.pushStepRoute(step.name);
+    }
   };
 
   /** Navigate to another step, ensuring all route params are preserved */

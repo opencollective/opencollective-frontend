@@ -330,6 +330,7 @@
   "collective.unarchive.button": "Unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}",
   "collective.unarchive.confirm.btn": "Розархівувати",
   "Collective.URL": "URL-адреса Колективу",
+  "collective.user.orderProcessing.crypto": "<strong>Your contribution is pending.</strong> Once the transaction is completed you will receive a confirmation email with the details.",
   "collective.user.orderProcessing.manual": "<strong>Ваш внесок очікує на розгляд.</strong> Будь ласка, дотримуйтесь настанов щодо оплати в електронному листі, щоб завершити транзакцію.",
   "Collective.VirtualCards.RequestCard": "Надіслати запит на отримання картки",
   "Collective.VirtualCards.RequestCard.Agreement": "Я згоден з усіма умовами вказаними скарбником та Open Collective",

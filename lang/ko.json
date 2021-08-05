@@ -330,6 +330,7 @@
   "collective.unarchive.button": "{type, select, EVENT {이벤트} PROJECT {프로젝트} FUND {펀드} COLLECTIVE {콜렉티브} ORGANIZATION {조직} other {계정}} 보관 해제",
   "collective.unarchive.confirm.btn": "보관 취소",
   "Collective.URL": "Collective URL",
+  "collective.user.orderProcessing.crypto": "<strong>Your contribution is pending.</strong> Once the transaction is completed you will receive a confirmation email with the details.",
   "collective.user.orderProcessing.manual": "<strong>Your contribution is pending.</strong> Please follow the payment instructions in the confirmation email to complete your transaction.",
   "Collective.VirtualCards.RequestCard": "Request a Card",
   "Collective.VirtualCards.RequestCard.Agreement": "I agree to all the terms and conditions set by the host and Open Collective",

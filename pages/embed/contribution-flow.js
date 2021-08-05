@@ -149,7 +149,7 @@ class NewContributionFlowPage extends React.Component {
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isEmbed />;
+      return <ContributionFlowSuccess collective={account} isCrypto={this.props.verb === 'crypto'} isEmbed />;
     } else {
       return (
         <Box height="100%" pt={3}>
