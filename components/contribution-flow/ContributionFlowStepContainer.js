@@ -46,6 +46,7 @@ class ContributionFlowStepContainer extends React.Component {
       stepSummary: PropTypes.object,
       stepPayment: PropTypes.object,
     }),
+    order: PropTypes.object,
   };
 
   constructor(props) {
@@ -123,7 +124,7 @@ class ContributionFlowStepContainer extends React.Component {
   }
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed, isCrypto } = this.props;
+    const { collective, mainState, tier, isEmbed, isCrypto, order } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
@@ -174,7 +175,7 @@ class ContributionFlowStepContainer extends React.Component {
           />
         );
       case 'checkout':
-        return <StepCheckout stepDetails={this.props.mainState.stepDetails} />;
+        return <StepCheckout stepDetails={this.props.mainState.stepDetails} order={order} />;
       case 'summary':
         return (
           <StepSummary

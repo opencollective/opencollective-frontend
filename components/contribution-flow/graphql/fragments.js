@@ -120,6 +120,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       id
       service
       type
+      data
     }
     platformContributionAmount {
       value

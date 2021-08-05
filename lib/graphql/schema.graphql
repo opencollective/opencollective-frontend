@@ -1995,6 +1995,7 @@ type Mutation {
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
+    @deprecated(reason: "2021-07-02: Please use inviteMember, editMember or removeMember mutations from GQLV2")
 
   """
   A mutation to edit the public message of all matching members.
@@ -2007,8 +2008,6 @@ type Mutation {
   editComment(comment: CommentAttributesInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   deleteComment(id: Int!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   refundTransaction(id: Int!): Transaction
-  addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
-    @deprecated(reason: "2021-06-01: Create a Prepaid Payment Method through a Tier or use a FUND instead.")
   createApplication(application: ApplicationInput!): Application
   deleteApplication(id: Int!): Application
 
@@ -2164,7 +2163,7 @@ type Mutation {
     Whether this invitation should be accepted or declined
     """
     accept: Boolean!
-  ): Boolean
+  ): Boolean @deprecated(reason: "2021-07-07: This endpoint has been moved to GQLV2")
   backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 
   """

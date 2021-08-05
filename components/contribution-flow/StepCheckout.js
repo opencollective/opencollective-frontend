@@ -11,7 +11,7 @@ import { Box } from '../Grid';
 import StyledButton from '../StyledButton';
 import { P, Span } from '../Text';
 
-const StepCheckout = ({ stepDetails }) => {
+const StepCheckout = ({ stepDetails, order }) => {
   const { isCopied, copy } = useClipboard();
 
   return (
@@ -31,7 +31,7 @@ const StepCheckout = ({ stepDetails }) => {
           }}
         />
         <QRCode
-          value={'1LxPL1EkdseTGgei5Vkt83SwEe5TXHpmT'} // TODO: need to change this to deposit address returned by The Giving Block
+          value={order.paymentMethod.data.depositAddress} // TODO: need to change this to deposit address returned by The Giving Block
           imageSettings={{
             src: `/static/images/crypto-logos/${stepDetails.currency.value}.svg`,
             height: 40,
@@ -43,7 +43,7 @@ const StepCheckout = ({ stepDetails }) => {
           level="L"
           includeMargin
         />
-        <P mb="16px">1LxPL1EkdseTGgei5Vkt83SwEe5TXHpmT</P>
+        <P mb="16px">{order.paymentMethod.data.depositAddress}</P>
         <StyledButton onClick={() => copy(window.location.href)} disabled={isCopied}>
           <Span mr={1}>
             <FormattedMessage
@@ -60,6 +60,7 @@ const StepCheckout = ({ stepDetails }) => {
 
 StepCheckout.propTypes = {
   stepDetails: PropTypes.object,
+  order: PropTypes.object,
 };
 
 export default StepCheckout;

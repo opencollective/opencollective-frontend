@@ -756,6 +756,7 @@ class ContributionFlow extends React.Component {
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
                     isSubmitting={isValidating || isLoading}
+                    order={this.state.submittedOrder}
                   />
                   <Box mt={40}>
                     <ContributionFlowButtons
