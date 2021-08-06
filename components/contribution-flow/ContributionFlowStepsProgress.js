@@ -28,18 +28,18 @@ const StepLabel = styled(Span)`
 `;
 
 const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCrypto }) => {
+  const currencySymbol = isCrypto ? stepDetails.currency.value : currency;
   if (stepDetails.amount) {
     const totalAmount = stepDetails.amount + (stepDetails.platformContribution || 0);
-    return !isCrypto ? (
+    return (
       <FormattedMoneyAmount
         interval={stepDetails.interval !== INTERVALS.flexible ? stepDetails.interval : null}
-        currency={currency}
+        currency={currencySymbol}
         amount={totalAmount}
         abbreviateInterval
         amountStyles={null}
+        isCrypto={isCrypto}
       />
-    ) : (
-      <Span>{`${stepDetails.amount} ${stepDetails.currency.value}`}</Span>
     );
   } else if (stepDetails.amount === 0 && isFreeTier) {
     return <FormattedMessage id="Amount.Free" defaultMessage="Free" />;
