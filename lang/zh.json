@@ -892,6 +892,7 @@
   "Expense.Type.FundingRequest": "赠予",
   "Expense.Type.Invoice": "发票",
   "Expense.Type.Receipt": "收据",
+  "Expense.Type.Settlement": "Settlement",
   "expense.type.tooltip": "Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt.",
   "Expense.Type.Unclassified": "未分类的",
   "expense.unapprove.btn": "驳回",

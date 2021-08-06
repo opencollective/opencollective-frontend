@@ -892,6 +892,7 @@
   "Expense.Type.FundingRequest": "Conceder",
   "Expense.Type.Invoice": "Fatura",
   "Expense.Type.Receipt": "Recibo",
+  "Expense.Type.Settlement": "Settlement",
   "expense.type.tooltip": "Selecione 'recibo' para ser pago por uma compra já realizada. Selecione 'invoice' se você está cobrando por seu tempo, sendo pago antecipadamente, ou se não tem um recibo.",
   "Expense.Type.Unclassified": "Não classificado",
   "expense.unapprove.btn": "Desaprovar",
