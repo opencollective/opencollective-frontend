@@ -1330,7 +1330,12 @@ type Expense implements Transaction {
   """
   Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)
   """
-  hostFeeInHostCurrency: Int
+  hostFeeInHostCurrency(
+    """
+    Fetch HOST_FEE transaction for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
 
   """
   Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
@@ -1350,7 +1355,12 @@ type Expense implements Transaction {
   """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
   """
-  netAmountInCollectiveCurrency: Int
+  netAmountInCollectiveCurrency(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
@@ -2269,7 +2279,12 @@ type Order implements Transaction {
   """
   Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)
   """
-  hostFeeInHostCurrency: Int
+  hostFeeInHostCurrency(
+    """
+    Fetch HOST_FEE transaction for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
 
   """
   Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
@@ -2289,7 +2304,12 @@ type Order implements Transaction {
   """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
   """
-  netAmountInCollectiveCurrency: Int
+  netAmountInCollectiveCurrency(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
@@ -3587,8 +3607,26 @@ interface Transaction {
   currency: String
   hostCurrency: String
   hostCurrencyFxRate: Float
-  netAmountInCollectiveCurrency: Int
-  hostFeeInHostCurrency: Int
+
+  """
+  Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
+  """
+  netAmountInCollectiveCurrency(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
+
+  """
+  Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)
+  """
+  hostFeeInHostCurrency(
+    """
+    Fetch HOST_FEE transaction for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
   platformFeeInHostCurrency: Int
   paymentProcessorFeeInHostCurrency: Int
   taxAmount: Int
