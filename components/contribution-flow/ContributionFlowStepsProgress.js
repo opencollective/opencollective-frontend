@@ -28,13 +28,12 @@ const StepLabel = styled(Span)`
 `;
 
 const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCrypto }) => {
-  const currencySymbol = isCrypto ? stepDetails.currency.value : currency;
   if (stepDetails.amount) {
     const totalAmount = stepDetails.amount + (stepDetails.platformContribution || 0);
     return (
       <FormattedMoneyAmount
         interval={stepDetails.interval !== INTERVALS.flexible ? stepDetails.interval : null}
-        currency={currencySymbol}
+        currency={currency}
         amount={totalAmount}
         abbreviateInterval
         amountStyles={null}

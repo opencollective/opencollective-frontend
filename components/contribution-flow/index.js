@@ -627,8 +627,8 @@ class ContributionFlow extends React.Component {
       error: backendError,
     } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
-    const currency = tier?.amount.currency || collective.currency;
     const isCrypto = paymentMethod === 'crypto';
+    const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
 
     return (
       <Steps
