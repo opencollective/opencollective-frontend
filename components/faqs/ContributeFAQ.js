@@ -12,23 +12,36 @@ import FAQ, { Content, Entry, Title } from './FAQ';
 /**
  * FAQ associated to the new contribution flow.
  */
-const ContributeFAQ = ({ collective, ...props }) => (
+const ContributeFAQ = ({ collective, isCrypto, ...props }) => (
   <FAQ withBorderLeft withNewButtons {...props}>
     <Entry>
       <Title>
         <FormattedMessage id="NewContributionFlow.FAQ.Secure.Title" defaultMessage="Is my contribution secure?" />
       </Title>
       <Content>
-        <FormattedMessage
-          id="ContributeFAQ.Safe"
-          defaultMessage="Open Collective doesn't store credit card numbers, instead relying on our payment processor, Stripe, a secure solution that is widely adopted. If our systems are compromised, your credit card information is not at risk, because we simply don't store it. <LearnMoreLink>Learn more</LearnMoreLink>."
-          values={{
-            LearnMoreLink: getI18nLink({
-              openInNewTab: true,
-              href: 'https://docs.opencollective.com/help/product/security#payments-security',
-            }),
-          }}
-        />
+        {isCrypto ? (
+          <FormattedMessage
+            id="ContributeFAQ.Safe.Crypto"
+            defaultMessage="Open Collective doesn't store any private information about your crypto wallet and relies on Giving Block to manage the crypto payments. If our systems are compromised your information is not at risk since we don't store any. For more information about the data that Giving Block stores please visit their <PrivacyPolicy>privacy policy</PrivacyPolicy>."
+            values={{
+              PrivacyPolicy: getI18nLink({
+                openInNewTab: true,
+                href: 'https://www.thegivingblock.com/privacypolicy',
+              }),
+            }}
+          />
+        ) : (
+          <FormattedMessage
+            id="ContributeFAQ.Safe"
+            defaultMessage="Open Collective doesn't store credit card numbers, instead relying on our payment processor, Stripe, a secure solution that is widely adopted. If our systems are compromised, your credit card information is not at risk, because we simply don't store it. <LearnMoreLink>Learn more</LearnMoreLink>."
+            values={{
+              LearnMoreLink: getI18nLink({
+                openInNewTab: true,
+                href: 'https://docs.opencollective.com/help/product/security#payments-security',
+              }),
+            }}
+          />
+        )}
       </Content>
     </Entry>
     {collective.contributionPolicy && (
@@ -113,6 +126,7 @@ ContributeFAQ.propTypes = {
       contributionPolicy: PropTypes.string,
     }),
   }),
+  isCrypto: PropTypes.bool,
 };
 
 export default ContributeFAQ;

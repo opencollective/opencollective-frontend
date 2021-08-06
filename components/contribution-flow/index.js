@@ -795,7 +795,7 @@ class ContributionFlow extends React.Component {
                         isCrypto={isCrypto}
                       />
                     </Box>
-                    <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />
+                    <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} isCrypto={isCrypto} />
                   </Box>
                 </Box>
               </Grid>
