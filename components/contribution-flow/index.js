@@ -145,7 +145,7 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
-        amount: this.props.verb === 'crypto' ? 5 : props.fixedAmount || getDefaultTierAmount(props.tier),
+        amount: this.props.verb === 'crypto' ? 0 : props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
         currency: CRYPTO_CURRENCIES[0],
       },
@@ -175,7 +175,7 @@ class ContributionFlow extends React.Component {
         variables: {
           order: {
             quantity: stepDetails.quantity,
-            amount: { valueInCents: stepDetails.amount },
+            amount: this.props.verb === 'crypto' ? { value: stepDetails.amount } : { valueInCents: stepDetails.amount },
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
             guestInfo,
             fromAccount,
