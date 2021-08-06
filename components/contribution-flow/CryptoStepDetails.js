@@ -28,6 +28,7 @@ const CryptoStepDetails = ({ onChange, data }) => {
   const intl = useIntl();
   const [currencyType, setCurrencyType] = useState(data.currency);
   const [amount, setAmount] = useState(data.amount);
+  const [touched, setTouched] = useState(false);
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
@@ -60,7 +61,9 @@ const CryptoStepDetails = ({ onChange, data }) => {
           setAmount(target.value);
           dispatchChange('amount', parseFloat(target.value));
         }}
-        error={amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
+        onBlur={() => setTouched(true)}
+        autoFocus
+        error={touched && amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
       />
     </Box>
   );
