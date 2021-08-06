@@ -433,6 +433,8 @@ class ContributionFlow extends React.Component {
     } else if (verb === 'contribute' || verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       route = `/${collective.slug}/donate/${step}`;
+    } else if (verb === 'payment' && this.props.paymentMethod === 'crypto') {
+      route = `/${collective.slug}/payment/crypto/${step}`;
     }
 
     // Reset errors if any
@@ -626,7 +628,6 @@ class ContributionFlow extends React.Component {
     } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
     const currency = tier?.amount.currency || collective.currency;
-    console.log(paymentMethod);
     const isCrypto = paymentMethod === 'crypto';
 
     return (
