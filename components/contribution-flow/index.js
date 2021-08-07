@@ -75,10 +75,6 @@ const STEP_LABELS = defineMessages({
     id: 'Summary',
     defaultMessage: 'Summary',
   },
-  checkout: {
-    id: 'contribute.step.checkout',
-    defaultMessage: 'Checkout',
-  },
 });
 
 const OTHER_MESSAGES = defineMessages({
@@ -482,7 +478,6 @@ class ContributionFlow extends React.Component {
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || stepProfile?.isGuest);
-    const isCrypto = paymentMethod === 'crypto';
 
     const steps = [
       {
@@ -537,7 +532,7 @@ class ContributionFlow extends React.Component {
     if (!noPaymentRequired) {
       steps.push({
         name: 'payment',
-        label: isCrypto ? intl.formatMessage(STEP_LABELS.checkout) : intl.formatMessage(STEP_LABELS.payment),
+        label: intl.formatMessage(STEP_LABELS.payment),
         isCompleted: !stepProfile?.contributorRejectedCategories,
         validate: action => {
           if (action === 'prev') {
