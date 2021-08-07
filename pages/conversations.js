@@ -81,9 +81,8 @@ class ConversationsPage extends React.Component {
   };
 
   /** Must only be called when dataIsReady */
-  renderConversations() {
-    const { data, collectiveSlug } = this.props;
-    const conversations = get(data, 'account.conversations.nodes', []);
+  renderConversations(conversations) {
+    const { collectiveSlug } = this.props;
     if (conversations.length > 0) {
       return <ConversationsList collectiveSlug={collectiveSlug} conversations={conversations} />;
     } else {
@@ -109,6 +108,7 @@ class ConversationsPage extends React.Component {
 
   render() {
     const { collectiveSlug, data } = this.props;
+    const conversations = get(data, 'account.conversations.nodes', []);
 
     if (!data.loading) {
       if (!data || data.error) {
@@ -144,23 +144,25 @@ class ConversationsPage extends React.Component {
                     <FormattedMessage id="conversations" defaultMessage="Conversations" />
                   </H1>
                   <Flex flexWrap="wrap" alignItems="center" mb={4} pr={2} justifyContent="space-between">
-                    <P color="black.700" css={{ flex: '0 1 70%' }}>
+                    <P color="black.700">
                       <FormattedMessage
                         id="conversations.subtitle"
                         defaultMessage="Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together."
                       />
                     </P>
-                    <Flex flex="0 0 300px" flexWrap="wrap">
-                      <Link href={`/${collectiveSlug}/conversations/new`}>
-                        <StyledButton buttonStyle="primary" m={2}>
-                          <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
-                        </StyledButton>
-                      </Link>
-                    </Flex>
+                    {conversations.length > 0 && (
+                      <Flex flex="0 0 300px" flexWrap="wrap" mt={2}>
+                        <Link href={`/${collectiveSlug}/conversations/new`}>
+                          <StyledButton buttonStyle="primary" m={2}>
+                            <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
+                          </StyledButton>
+                        </Link>
+                      </Flex>
+                    )}
                   </Flex>
                   <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between">
                     <Box mr={[null, null, null, 5]} flex="1 1 73%">
-                      {this.renderConversations()}
+                      {this.renderConversations(conversations)}
                     </Box>
                     <Box mb={3} flex="1 1 27%">
                       {collective.conversationsTags.length > 0 && (
