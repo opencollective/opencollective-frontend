@@ -429,8 +429,8 @@ class ContributionFlow extends React.Component {
     } else if (verb === 'contribute' || verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       route = `/${collective.slug}/donate/${step}`;
-    } else if (verb === 'payment' && this.props.paymentMethod === 'crypto') {
-      route = `/${collective.slug}/payment/crypto/${step}`;
+    } else if (verb === 'donate' && this.props.paymentMethod === 'crypto') {
+      route = `/${collective.slug}/donate/crypto/${step}`;
     }
 
     // Reset errors if any

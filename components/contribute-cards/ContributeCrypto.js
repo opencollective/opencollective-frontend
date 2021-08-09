@@ -20,7 +20,7 @@ const messages = defineMessages({
 const ContributeCrypto = ({ intl, collective, contributors, stats, ...props }) => {
   return (
     <Contribute
-      route={`/${collective.slug}/payment/crypto`}
+      route={`/${collective.slug}/donate/crypto`}
       type={ContributionTypes.FINANCIAL_CRYPTO}
       title={intl.formatMessage(messages.title)}
       contributors={contributors}

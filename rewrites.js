@@ -220,7 +220,7 @@ exports.REWRITES = [
     destination: createOrderPage,
   },
   {
-    source: `/:collectiveSlug/:verb(payment)/:paymentMethod(crypto)/:step(${contributionFlowSteps})?`,
+    source: `/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {
@@ -244,7 +244,7 @@ exports.REWRITES = [
     destination: '/embed/contribution-flow',
   },
   {
-    source: `/embed/:collectiveSlug/:verb(payment)/:paymentMethod(crypto)/:step(${contributionFlowSteps})?`,
+    source: `/embed/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   {
