@@ -142,7 +142,7 @@ class NewContributionFlowPage extends React.Component {
       }
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isCrypto={this.props.verb === 'crypto'} />;
+      return <ContributionFlowSuccess collective={account} isCrypto={this.props.paymentMethod === 'crypto'} />;
     } else {
       return (
         <ContributionFlowContainer

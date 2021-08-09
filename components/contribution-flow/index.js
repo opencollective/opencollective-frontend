@@ -172,7 +172,10 @@ class ContributionFlow extends React.Component {
         variables: {
           order: {
             quantity: stepDetails.quantity,
-            amount: this.props.paymentMethod === 'crypto' ? { value: stepDetails.amount } : { valueInCents: stepDetails.amount },
+            amount:
+              this.props.paymentMethod === 'crypto'
+                ? { value: stepDetails.amount }
+                : { valueInCents: stepDetails.amount },
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
             guestInfo,
             fromAccount,

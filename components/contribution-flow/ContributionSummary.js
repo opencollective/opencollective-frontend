@@ -79,7 +79,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
             </Label>
             <Amount>
               <FormattedMoneyAmount
-                amount={stepDetails.amount}
+                amount={stepDetails.amount || 0}
                 currency={currency}
                 amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 isCrypto={isCrypto}
