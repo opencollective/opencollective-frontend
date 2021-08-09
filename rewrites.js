@@ -216,11 +216,7 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:collectiveSlug/:verb(donate|pay|order)/:step(${contributionFlowSteps})?`,
-    destination: createOrderPage,
-  },
-  {
-    source: `/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)/:step(${contributionFlowSteps})?`,
+    source: `/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)?/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {
@@ -240,11 +236,7 @@ exports.REWRITES = [
   },
   // Embed
   {
-    source: `/embed/:collectiveSlug/donate/:step(${contributionFlowSteps})?`,
-    destination: '/embed/contribution-flow',
-  },
-  {
-    source: `/embed/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)/:step(${contributionFlowSteps})?`,
+    source: `/embed/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)?/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   {
