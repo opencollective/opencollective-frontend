@@ -35,7 +35,7 @@ import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
 import CollectiveTitleContainer from './CollectiveTitleContainer';
-import { STEPS } from './constants';
+import { CRYPTO_CURRENCIES, STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowStepContainer from './ContributionFlowStepContainer';
@@ -111,6 +111,7 @@ class ContributionFlow extends React.Component {
     step: PropTypes.string,
     redirect: PropTypes.string,
     verb: PropTypes.string,
+    paymentMethod: PropTypes.string,
     error: PropTypes.string,
     contributeAs: PropTypes.string,
     defaultEmail: PropTypes.string,
@@ -140,8 +141,9 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
-        amount: props.fixedAmount || getDefaultTierAmount(props.tier),
+        amount: props.paymentMethod === 'crypto' ? '' : props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
+        currency: CRYPTO_CURRENCIES[0],
       },
     };
   }
@@ -427,6 +429,8 @@ class ContributionFlow extends React.Component {
     } else if (verb === 'contribute' || verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       route = `/${collective.slug}/donate/${step}`;
+    } else if (verb === 'donate' && this.props.paymentMethod === 'crypto') {
+      route = `/${collective.slug}/donate/crypto/${step}`;
     }
 
     // Reset errors if any
@@ -468,7 +472,7 @@ class ContributionFlow extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
-    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser } = this.props;
+    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser, paymentMethod } = this.props;
     const { stepDetails, stepProfile, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
@@ -481,7 +485,14 @@ class ContributionFlow extends React.Component {
         label: intl.formatMessage(STEP_LABELS.details),
         isCompleted: Boolean(stepDetails),
         validate: () => {
-          if (!this.checkFormValidity() || !stepDetails || stepDetails.amount < minAmount || !stepDetails.quantity) {
+          if (paymentMethod === 'crypto') {
+            return true;
+          } else if (
+            !this.checkFormValidity() ||
+            !stepDetails ||
+            stepDetails.amount < minAmount ||
+            !stepDetails.quantity
+          ) {
             return false;
           } else if (!isNil(tier?.availableQuantity) && stepDetails.quantity > tier.availableQuantity) {
             return false;
@@ -607,10 +618,12 @@ class ContributionFlow extends React.Component {
       loadingLoggedInUser,
       skipStepDetails,
       isEmbed,
+      paymentMethod,
       error: backendError,
     } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
-    const currency = tier?.amount.currency || collective.currency;
+    const isCrypto = paymentMethod === 'crypto';
+    const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
 
     return (
       <Steps
@@ -657,6 +670,7 @@ class ContributionFlow extends React.Component {
                 stepDetails={stepDetails}
                 stepPayment={stepPayment}
                 stepSummary={stepSummary}
+                isCrypto={isCrypto}
                 isSubmitted={this.state.isSubmitted}
                 loading={isValidating || isSubmitted || isSubmitting}
                 currency={currency}
@@ -691,13 +705,13 @@ class ContributionFlow extends React.Component {
                       {formatErrorMessage(this.props.intl, error) || backendError}
                     </MessageBox>
                   )}
-
                   <ContributionFlowStepContainer
                     collective={collective}
                     tier={tier}
                     mainState={this.state}
                     onChange={data => this.setState(data)}
                     step={currentStep}
+                    isCrypto={isCrypto}
                     showFeesOnTop={this.canHaveFeesOnTop()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     defaultProfileSlug={this.props.contributeAs}
@@ -708,7 +722,6 @@ class ContributionFlow extends React.Component {
                     isEmbed={isEmbed}
                     isSubmitting={isValidating || isSubmitted || isSubmitting}
                   />
-
                   <Box mt={40}>
                     <ContributionFlowButtons
                       goNext={goNext}
@@ -720,6 +733,7 @@ class ContributionFlow extends React.Component {
                       paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
+                      isCrypto={isCrypto}
                     />
                   </Box>
                   <Box textAlign="center" mt={5}>
@@ -742,6 +756,7 @@ class ContributionFlow extends React.Component {
                         stepSummary={stepSummary}
                         stepPayment={stepPayment}
                         currency={currency}
+                        isCrypto={isCrypto}
                       />
                     </Box>
                     <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />
