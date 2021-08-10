@@ -198,7 +198,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 )}
                 {collective.githubHandle && (
                   <StyledLink data-cy="githubProfileUrl" href={githubProfileUrl(collective.githubHandle)} openInNewTab>
-                    <StyledRoundButton size={32} mr={3} title="Github" aria-label="Github link">
+                    <StyledRoundButton size={32} mr={3} title="GitHub" aria-label="GitHub link">
                       <Github size={12} />
                     </StyledRoundButton>
                   </StyledLink>
