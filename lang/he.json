@@ -892,6 +892,7 @@
   "Expense.Type.FundingRequest": "מענק",
   "Expense.Type.Invoice": "חשבונית",
   "Expense.Type.Receipt": "קבלה",
+  "Expense.Type.Settlement": "Settlement",
   "expense.type.tooltip": "Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt.",
   "Expense.Type.Unclassified": "Unclassified",
   "expense.unapprove.btn": "ביטול האישור",
