@@ -78,18 +78,12 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               />
             </Label>
             <Amount>
-              {!isCrypto && (
-                <FormattedMoneyAmount
-                  amount={stepDetails.amount}
-                  currency={currency}
-                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                />
-              )}
-              {isCrypto && (
-                <Span
-                  style={{ color: 'black.700', fontWeight: 400 }}
-                >{`${stepDetails.amount} ${stepDetails.currency.value}`}</Span>
-              )}
+              <FormattedMoneyAmount
+                amount={stepDetails.amount}
+                currency={currency}
+                amountStyles={{ color: 'black.700', fontWeight: 400 }}
+                isCrypto={isCrypto}
+              />
             </Amount>
           </AmountLine>
           {Boolean(stepSummary?.amount) && (
@@ -179,11 +173,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700">
-          {isCrypto ? (
-            <Span style={{ fontWeight: 700 }}>{`${stepDetails.amount} ${stepDetails.currency.value}`}</Span>
-          ) : (
-            <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
-          )}
+          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} isCrypto={isCrypto} />
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && !isCrypto && (

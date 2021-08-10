@@ -72,8 +72,6 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.TIER_EXPIRED, type: 'warning', showOtherWaysToContribute: true };
   } else if (account.settings.disableCustomContributions && !tier) {
     return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
-  } else if (account.settings.disableCryptoContributions && !tier) {
-    return { reason: CONTRIBUTION_BLOCKER.NO_CRYPTO_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
   } else if (tierHasFixedInterval(tier) && !canContributeRecurring(account, loggedInUser)) {
     return {
       reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,

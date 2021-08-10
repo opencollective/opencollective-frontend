@@ -11,20 +11,20 @@ import { CRYPTO_CURRENCIES } from './constants';
 
 const messages = defineMessages({
   cryptoCurrency: {
-    id: `CryptoStepDetails.cryptoCurrency`,
+    id: `StepDetailsCrypto.cryptoCurrency`,
     defaultMessage: 'Select your currency',
   },
   donationAmount: {
-    id: `CryptoStepDetails.donationAmount`,
+    id: `StepDetailsCrypto.donationAmount`,
     defaultMessage: 'Enter donation amount',
   },
   invalidAmount: {
-    id: `CryptoStepDetails.invalidAmount`,
+    id: `StepDetailsCrypto.invalidAmount`,
     defaultMessage: 'Please select a valid currency amount',
   },
 });
 
-const CryptoStepDetails = ({ onChange, data }) => {
+const StepDetailsCrypto = ({ onChange, data }) => {
   const intl = useIntl();
   const [currencyType, setCurrencyType] = useState(data.currency);
   const [amount, setAmount] = useState(data.amount);
@@ -69,7 +69,7 @@ const CryptoStepDetails = ({ onChange, data }) => {
   );
 };
 
-CryptoStepDetails.propTypes = {
+StepDetailsCrypto.propTypes = {
   onChange: PropTypes.func,
   data: PropTypes.shape({
     amount: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -77,4 +77,4 @@ CryptoStepDetails.propTypes = {
   }),
 };
 
-export default CryptoStepDetails;
+export default StepDetailsCrypto;

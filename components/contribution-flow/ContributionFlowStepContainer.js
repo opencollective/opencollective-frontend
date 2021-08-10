@@ -11,9 +11,9 @@ import StyledHr from '../StyledHr';
 import { H4 } from '../Text';
 import { withUser } from '../UserProvider';
 
-import CryptoStepDetails from './CryptoStepDetails';
 import StepCheckout from './StepCheckout';
 import StepDetails from './StepDetails';
+import StepDetailsCrypto from './StepDetailsCrypto';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
@@ -137,7 +137,7 @@ class ContributionFlowStepContainer extends React.Component {
             showFeesOnTop={this.props.showFeesOnTop}
           />
         ) : (
-          <CryptoStepDetails onChange={this.props.onChange} data={stepDetails} />
+          <StepDetailsCrypto onChange={this.props.onChange} data={stepDetails} />
         );
       case 'profile': {
         const personalProfile = this.getPersonalProfile();

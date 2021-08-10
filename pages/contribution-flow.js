@@ -63,6 +63,7 @@ class NewContributionFlowPage extends React.Component {
       description: query.description ? decodeURIComponent(query.description) : undefined,
       interval: query.interval,
       verb: query.verb,
+      paymentMethod: query.paymentMethod,
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
@@ -74,6 +75,7 @@ class NewContributionFlowPage extends React.Component {
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
     verb: PropTypes.string,
+    paymentMethod: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
     quantity: PropTypes.number,
@@ -149,6 +151,7 @@ class NewContributionFlowPage extends React.Component {
           tier={tier}
           step={step}
           verb={this.props.verb}
+          paymentMethod={this.props.paymentMethod}
           redirect={this.props.redirect}
           description={this.props.description}
           defaultQuantity={this.props.quantity}

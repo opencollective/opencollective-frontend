@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Currency from '../Currency';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import PayWithPaypalButton from '../PayWithPaypalButton';
 import StyledButton from '../StyledButton';
@@ -41,11 +42,7 @@ class ContributionFlowButtons extends React.Component {
       case STEPS.PROFILE:
         return <FormattedMessage id="ContributionFlow.YourInfo" defaultMessage="Your info" />;
       case STEPS.PAYMENT:
-        return this.props.isCrypto ? (
-          <FormattedMessage id="ContributionFlow.Checkout" defaultMessage="Checkout" />
-        ) : (
-          <FormattedMessage id="ContributionFlow.Payment" defaultMessage="Payment" />
-        );
+        return <FormattedMessage id="ContributionFlow.Payment" defaultMessage="Payment" />;
       case STEPS.DETAILS:
         return <FormattedMessage id="ContributionFlow.Contribution" defaultMessage="Contribution" />;
     }
@@ -91,17 +88,22 @@ class ContributionFlowButtons extends React.Component {
                   &rarr;
                 </React.Fragment>
               ) : totalAmount ? (
-                isCrypto ? (
-                  <FormattedMessage id="contribute.finish" defaultMessage="Finish" />
-                ) : (
-                  <FormattedMessage
-                    id="contribute.amount"
-                    defaultMessage="Contribute {amount}"
-                    values={{
-                      amount: <Currency value={totalAmount} currency={currency} precision="auto" />,
-                    }}
-                  />
-                )
+                <FormattedMessage
+                  id="contribute.amount"
+                  defaultMessage="Contribute {amount}"
+                  values={{
+                    amount: isCrypto ? (
+                      <FormattedMoneyAmount
+                        amount={totalAmount}
+                        currency={currency}
+                        amountStyles={{ fontWeight: 500 }}
+                        isCrypto={isCrypto}
+                      />
+                    ) : (
+                      <Currency value={totalAmount} currency={currency} precision="auto" />
+                    ),
+                  }}
+                />
               ) : (
                 <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />
               )}
