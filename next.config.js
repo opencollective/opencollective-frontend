@@ -4,7 +4,7 @@ const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
-  webpack5: true,
+  webpack5: false,
   useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true',
   productionBrowserSourceMaps: true,
   webpack: (config, { webpack, isServer, buildId }) => {

@@ -172,6 +172,7 @@ class ContributionFlowStepContainer extends React.Component {
             onNewCardFormReady={this.props.onNewCardFormReady}
             isSubmitting={this.props.isSubmitting}
             isEmbed={isEmbed}
+            isCrypto={isCrypto}
           />
         );
       case 'checkout':
