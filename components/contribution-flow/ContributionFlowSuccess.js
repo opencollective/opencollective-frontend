@@ -232,7 +232,7 @@ class ContributionFlowSuccess extends React.Component {
     );
   }
 
-  renderInformation() {
+  addSuccessInfoByPaymentMethod() {
     const { isCrypto, data } = this.props;
     const { order } = data;
     const isPendingBankTransfer = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
@@ -346,7 +346,7 @@ class ContributionFlowSuccess extends React.Component {
               </Flex>
             </ContainerWithImage>
             <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
-              {this.renderInformation()}
+              {this.addSuccessInfoByPaymentMethod()}
             </Flex>
           </Fragment>
         )}

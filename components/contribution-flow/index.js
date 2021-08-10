@@ -138,7 +138,7 @@ class ContributionFlow extends React.Component {
       stepPayment: null,
       stepSummary: null,
       showSignIn: false,
-      submittedOrder: null,
+      createdOrder: null,
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
@@ -174,7 +174,7 @@ class ContributionFlow extends React.Component {
             quantity: stepDetails.quantity,
             amount:
               this.props.paymentMethod === 'crypto'
-                ? { value: stepDetails.amount }
+                ? { valueInCents: 100 } // Insert dummy value for crypto contribution until the transaction is reconciled
                 : { valueInCents: stepDetails.amount },
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
             guestInfo,
@@ -218,7 +218,7 @@ class ContributionFlow extends React.Component {
     if (stripeError) {
       return this.handleStripeError(order, stripeError, email, guestToken);
     } else if (this.props.paymentMethod === 'crypto') {
-      this.setState({ isSubmitted: true, isSubmitting: false, submittedOrder: order });
+      this.setState({ isSubmitted: true, isSubmitting: false, createdOrder: order });
     } else {
       return this.handleSuccess(order);
     }
@@ -402,6 +402,8 @@ class ContributionFlow extends React.Component {
   /** Steps component callback  */
   onStepChange = async step => {
     this.setState({ showSignIn: false });
+    // To create an order we need a payment method to be set. This is normally set at final stage but for crypto flow we
+    // need to set this before the final step of the flow
     if (this.props.paymentMethod === 'crypto') {
       this.setState({ stepPayment: { key: 'manual', paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.CRYPTO } } });
     }
@@ -552,6 +554,7 @@ class ContributionFlow extends React.Component {
     }
 
     // Hide step payment if using a free tier with fixed price
+    // Also hide payment screen if using crypto payment method, we handle crypto flow in the `checkout` step below
     if (!noPaymentRequired && !isCrypto) {
       steps.push({
         name: 'payment',
@@ -641,8 +644,8 @@ class ContributionFlow extends React.Component {
   };
 
   cryptoOrderCompleted = () => {
-    const { submittedOrder } = this.state;
-    this.pushStepRoute('success', { OrderId: submittedOrder.id });
+    const { createdOrder } = this.state;
+    this.pushStepRoute('success', { OrderId: createdOrder.id });
   };
 
   render() {
@@ -758,7 +761,7 @@ class ContributionFlow extends React.Component {
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
                     isSubmitting={isValidating || isLoading}
-                    order={this.state.submittedOrder}
+                    order={this.state.createdOrder}
                   />
                   <Box mt={40}>
                     <ContributionFlowButtons
