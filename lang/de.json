@@ -822,6 +822,7 @@
   "ExpandDescription": "Vollständige Beschreibung lesen",
   "Expense.Activity.Approved": "Ausgabe bestätigt",
   "Expense.Activity.Error": "Ausgabe fehlerhaft",
+  "Expense.Activity.Invite.Drafted": "Expense invited",
   "Expense.Activity.MarkedAsSpam": "Expense marked as spam",
   "Expense.Activity.MarkedAsUnpaid": "Ausgabe als nicht bezahlt markiert",
   "Expense.Activity.Paid": "Ausgabe bezahlt",

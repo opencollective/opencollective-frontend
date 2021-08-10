@@ -822,6 +822,7 @@
   "ExpandDescription": "Read full description",
   "Expense.Activity.Approved": "支出被批准",
   "Expense.Activity.Error": "开支错误",
+  "Expense.Activity.Invite.Drafted": "Expense invited",
   "Expense.Activity.MarkedAsSpam": "Expense marked as spam",
   "Expense.Activity.MarkedAsUnpaid": "Expense marked as unpaid",
   "Expense.Activity.Paid": "Expense paid",
