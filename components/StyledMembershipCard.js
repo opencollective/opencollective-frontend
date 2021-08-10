@@ -15,9 +15,9 @@ import { P, Span } from './Text';
  * A card to show a user's membership.
  */
 const StyledMembershipCard = ({ membership, intl, ...props }) => {
-  const { collective, since, stats, role } = membership;
+  const { account, since, role } = membership;
   return (
-    <StyledCollectiveCard collective={collective} {...props}>
+    <StyledCollectiveCard collective={account} {...props}>
       <Container p={3}>
         <Box data-cy="caption" mb={2}>
           {role && (
@@ -41,21 +41,23 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                 {
                   /** Ideally we should breakdown amounts donated per currency, but for now
                       the API only returns the total amount in collective's currency. */
-                  formatCurrency(stats.totalDonations, collective.currency || 'USD', { precision: 0 })
+                  formatCurrency(membership.totalDonations.valueInCents, membership.totalDonations.currency || 'USD', {
+                    precision: 0,
+                  })
                 }
               </Span>
             </P>
           ) : (
             <P mt={3} fontSize="12px" lineHeight="18px">
-              {collective.stats.backers.all > 0 && (
+              {account.backers?.totalCount > 0 && (
                 <FormattedMessage
                   id="StyledMembershipCard.backers.all"
                   defaultMessage="{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}"
                   values={{
-                    count: collective.stats.backers.all,
+                    count: account.backers.totalCount,
                     prettyCount: (
                       <Span fontWeight="bold" fontSize="16px">
-                        {collective.stats.backers.all}
+                        {account.backers.totalCount}
                       </Span>
                     ),
                   }}
@@ -71,20 +73,24 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
 
 StyledMembershipCard.propTypes = {
   membership: PropTypes.shape({
+    account: {
+      id: PropTypes.string,
+      imageUrl: PropTypes.string,
+      isAdmin: PropTypes.bool,
+      isHost: PropTypes.bool,
+      isIncognito: PropTypes.bool,
+      name: PropTypes.string,
+      backers: PropTypes.shape({
+        totalCount: PropTypes.number,
+      }),
+    },
+    description: PropTypes.string,
+    id: PropTypes.string,
+    publicMessage: PropTypes.string,
     role: PropTypes.string,
     since: PropTypes.string,
-    stats: PropTypes.shape({
-      totalDonations: PropTypes.number,
-    }),
-    collective: PropTypes.shape({
-      currency: PropTypes.string,
-      stats: PropTypes.shape({
-        backers: PropTypes.shape({
-          all: PropTypes.number,
-        }),
-      }),
-    }),
-  }).isRequired,
+    totalDonations: { currency: PropTypes.string, valueInCents: PropTypes.number },
+  }),
   intl: PropTypes.object,
 };
 
