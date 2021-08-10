@@ -286,7 +286,7 @@ describe('New expense flow', () => {
         cy.login({ email: inviteeEmail, redirect: `/${collective}/expenses/${expenseId}` });
         cy.visit(`/${collective}/expenses/${expenseId}`);
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
-        cy.getByDataCy('expense-author').should('contain', 'Requested by');
+        cy.getByDataCy('expense-author').should('contain', 'Invited by');
         cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
         cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
