@@ -20,7 +20,7 @@ import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 15;
 
 const FILTERS = {
   ALL: 'ALL',
@@ -193,11 +193,11 @@ const newContributionsSectionQuery = gqlV2/* GraphQL */ `
 
 const SectionContributions = ({ collective }) => {
   const intl = useIntl();
+  const [filter, setFilter] = React.useState(FILTERS.ALL);
   const { data, loading, fetchMore } = useQuery(newContributionsSectionQuery, {
-    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0 },
+    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...FILTER_PROPS[0].where },
     context: API_V2_CONTEXT,
   });
-  const [filter, setFilter] = React.useState(FILTERS.ALL);
 
   const handleLoadMore = () => {
     const offset = memberOf.nodes.length;
