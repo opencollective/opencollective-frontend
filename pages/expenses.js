@@ -29,6 +29,7 @@ import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
 import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
+import ScheduledExpensesBanner from '../components/host-dashboard/ScheduledExpensesBanner';
 import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
@@ -120,6 +121,9 @@ class ExpensePage extends React.Component {
         offset: PropTypes.number,
         limit: PropTypes.number,
       }),
+      scheduledExpenses: PropTypes.shape({
+        totalCount: PropTypes.number,
+      }),
     }),
     router: PropTypes.object,
   };
@@ -177,6 +181,7 @@ class ExpensePage extends React.Component {
   render() {
     const { collectiveSlug, data, query, LoggedInUser } = this.props;
     const hasFilters = this.hasFilter(query);
+    const isSelfHosted = data.account?.id === data.account?.host?.id;
 
     if (!data.loading) {
       if (data.error) {
@@ -217,6 +222,9 @@ class ExpensePage extends React.Component {
                   </SearchFormContainer>
                 </Flex>
                 <StyledHr mb={26} borderWidth="0.5px" />
+                {isSelfHosted && LoggedInUser?.isHostAdmin(data.account) && data.scheduledExpenses?.totalCount > 0 && (
+                  <ScheduledExpensesBanner host={data.account} />
+                )}
                 <Box mb={34}>
                   {data.account ? (
                     <ExpensesFilters
@@ -400,6 +408,13 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       nodes {
         ...ExpensesListFieldsFragment
       }
+    }
+    scheduledExpenses: expenses(
+      host: { slug: $collectiveSlug }
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: BANK_ACCOUNT
+    ) {
+      totalCount
     }
   }
 
