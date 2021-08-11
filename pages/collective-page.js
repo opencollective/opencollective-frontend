@@ -182,7 +182,7 @@ class CollectivePage extends React.Component {
     const collective = data && data.Collective;
 
     // Don't allow /collective/apply
-    if (action === 'apply' && !collective.isHost) {
+    if (action === 'apply' && !collective?.isHost) {
       return <Custom404 />;
     }
 
