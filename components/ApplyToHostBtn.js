@@ -36,11 +36,10 @@ class ApplyToHostBtn extends React.Component {
     if (router.query.action !== 'apply' && prevProps.router.query.action === 'apply') {
       this.setState({ showModal: false });
     }
-  }
 
-  async showApplyToHostModal(router, slug) {
-    await router.push(`${slug}/apply`);
-    return this.setState({ showModal: true });
+    if (router.query.action === 'apply' && prevProps.router.query.action !== 'apply') {
+      this.setState({ showModal: true });
+    }
   }
 
   renderButton() {
@@ -67,7 +66,7 @@ class ApplyToHostBtn extends React.Component {
       <StyledButton
         buttonStyle="secondary"
         buttonSize="small"
-        onClick={() => this.showApplyToHostModal(router, hostSlug)}
+        onClick={() => router.push(`${hostSlug}/apply`)}
         minWidth={minWidth}
         data-cy="host-apply-btn"
         {...buttonProps}
@@ -85,15 +84,7 @@ class ApplyToHostBtn extends React.Component {
       <Fragment>
         {this.renderButton()}
 
-        {this.state.showModal && (
-          <ApplyToHostModal
-            hostSlug={hostSlug}
-            onClose={() => {
-              router.push(hostSlug);
-              this.setState({ showModal: false });
-            }}
-          />
-        )}
+        {this.state.showModal && <ApplyToHostModal hostSlug={hostSlug} onClose={() => router.push(hostSlug)} />}
       </Fragment>
     );
   }
