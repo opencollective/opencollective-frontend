@@ -139,19 +139,18 @@ describe('event.createOrder page', () => {
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
 
-  describe.skip('Outdated', () => {
-    // This needs to be converted to the new Page
-    it.skip("can't order if the event is over", () => {
-      cy.visit('/opensource/events/webpack-webinar/legacy');
+  describe('Outdated', () => {
+    it("can't order if the event is over", () => {
+      cy.visit('/opensource/events/webpack-webinar');
       cy.contains('Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding');
-      cy.get('.cover .cta').should('not.exist');
-      cy.get('#tickets').should('not.exist');
+      cy.get('[data-cy="financial-contributions"]').should('not.exist');
+      cy.get('[data-cy="Tickets"]').should('not.exist');
     });
 
     // This needs to be converted to the new Page
-    it.skip('makes an order for a free ticket as an existing user', () => {
+    it('makes an order for a free ticket as an existing user', () => {
       cy.clock(Date.parse('2017/10/01')); // Go back in time when the event was not over yet
-      cy.login({ redirect: '/opensource/events/webpack-webinar/legacy' });
+      cy.login({ redirect: '/opensource/events/webpack-webinar' });
       cy.get('#free.tier .btn.increase').click();
       cy.get('#free.tier .ctabtn').click();
       cy.location({ timeout: 15000 }).should(location => {
@@ -182,9 +181,9 @@ describe('event.createOrder page', () => {
     });
 
     // This needs to be converted to the new Page
-    it.skip('makes an order for a paying ticket as an existing user', () => {
+    it('makes an order for a paying ticket as an existing user', () => {
       cy.clock(Date.parse('2017/10/01')); // Go back in time when the event was not over yet
-      cy.signup({ redirect: '/opensource/events/webpack-webinar/legacy' });
+      cy.signup({ redirect: '/opensource/events/webpack-webinar' });
       cy.get('#silver-sponsor.tier .btn.increase').click();
       cy.get('#silver-sponsor.tier .ctabtn').click();
       cy.location({ timeout: 15000 }).should(location => {
