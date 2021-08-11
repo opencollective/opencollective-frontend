@@ -766,7 +766,7 @@ class ContributionFlow extends React.Component {
                   <Box mt={40}>
                     <ContributionFlowButtons
                       goNext={goNext}
-                      goBack={isCrypto && currentStep.name === 'checkout' ? null : goBack}
+                      goBack={isCrypto && currentStep.name === 'checkout' ? null : goBack} // for crypto flow the user should not be able to go back after the order is created at checkout step
                       step={currentStep}
                       prevStep={prevStep}
                       nextStep={nextStep}
