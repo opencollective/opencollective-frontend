@@ -112,7 +112,7 @@ class ConnectGithub extends React.Component {
                 defaultMessage="Want to apply using {altverification}? {applylink}."
                 values={{
                   applylink: (
-                    <Link href={{ pathname: `/opensource/apply-new/form`, query: { hostTos: true } }}>
+                    <Link href={{ pathname: `/opensource/create/form`, query: { hostTos: true } }}>
                       <FormattedMessage id="clickHere" defaultMessage="Click here" />
                     </Link>
                   ),
