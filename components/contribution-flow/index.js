@@ -412,6 +412,7 @@ class ContributionFlow extends React.Component {
     if (step.name === 'checkout') {
       await this.submitOrder();
     }
+
     await this.pushStepRoute(step.name);
   };
 
@@ -766,7 +767,8 @@ class ContributionFlow extends React.Component {
                   <Box mt={40}>
                     <ContributionFlowButtons
                       goNext={goNext}
-                      goBack={isCrypto && currentStep.name === 'checkout' ? null : goBack} // for crypto flow the user should not be able to go back after the order is created at checkout step
+                      // for crypto flow the user should not be able to go back after the order is created at checkout step
+                      goBack={isCrypto && currentStep.name === 'checkout' ? null : goBack}
                       step={currentStep}
                       prevStep={prevStep}
                       nextStep={nextStep}

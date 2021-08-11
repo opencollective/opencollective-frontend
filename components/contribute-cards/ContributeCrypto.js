@@ -8,7 +8,7 @@ import Contribute from './Contribute';
 
 const messages = defineMessages({
   title: {
-    id: 'Crypto',
+    id: 'CollectivePage.Contribute.Crypto.title',
     defaultMessage: 'Crypto Contribution',
   },
   description: {
