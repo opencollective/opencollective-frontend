@@ -280,6 +280,13 @@ class TiersPage extends React.Component {
                           </StyledButton>
                         </Link>
                       )}
+                      {LoggedInUser?.canEditCollective(collective) && verb === 'projects' && (
+                        <Link href={`/${collective.slug}/projects/new`}>
+                          <StyledButton buttonStyle="primary">
+                            <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
+                          </StyledButton>
+                        </Link>
+                      )}
                     </Flex>
                     {subtitle && (
                       <P color="black.700" mt={3}>
