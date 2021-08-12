@@ -15,6 +15,7 @@ class ApplyToHostBtn extends React.Component {
     buttonProps: PropTypes.object,
     buttonRenderer: PropTypes.func,
     router: PropTypes.object,
+    isHidden: PropTypes.bool,
   };
 
   constructor(props) {
@@ -47,7 +48,7 @@ class ApplyToHostBtn extends React.Component {
 
     if (buttonRenderer) {
       return buttonRenderer({
-        onClick: () => this.showApplyToHostModal(router, hostSlug),
+        onClick: () => router.push(`${hostSlug}/apply`),
         'data-cy': 'host-apply-btn',
         ...buttonProps,
         children: (
@@ -78,13 +79,15 @@ class ApplyToHostBtn extends React.Component {
   }
 
   render() {
-    const { hostSlug, router } = this.props;
+    const { hostSlug, router, isHidden } = this.props;
 
     return (
       <Fragment>
         {this.renderButton()}
 
-        {this.state.showModal && <ApplyToHostModal hostSlug={hostSlug} onClose={() => router.push(hostSlug)} />}
+        {this.state.showModal && !isHidden && (
+          <ApplyToHostModal hostSlug={hostSlug} onClose={() => router.push(hostSlug)} />
+        )}
       </Fragment>
     );
   }
