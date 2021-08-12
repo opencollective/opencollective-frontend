@@ -11,6 +11,7 @@ import StyledHr from '../StyledHr';
 import { H4 } from '../Text';
 import { withUser } from '../UserProvider';
 
+import StepCheckout from './StepCheckout';
 import StepDetails from './StepDetails';
 import StepDetailsCrypto from './StepDetailsCrypto';
 import StepPayment from './StepPayment';
@@ -45,6 +46,7 @@ class ContributionFlowStepContainer extends React.Component {
       stepSummary: PropTypes.object,
       stepPayment: PropTypes.object,
     }),
+    order: PropTypes.object,
   };
 
   constructor(props) {
@@ -122,7 +124,7 @@ class ContributionFlowStepContainer extends React.Component {
   }
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed, isCrypto } = this.props;
+    const { collective, mainState, tier, isEmbed, isCrypto, order } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
@@ -173,6 +175,8 @@ class ContributionFlowStepContainer extends React.Component {
             isCrypto={isCrypto}
           />
         );
+      case 'checkout':
+        return <StepCheckout stepDetails={this.props.mainState.stepDetails} order={order} />;
       case 'summary':
         return (
           <StepSummary
@@ -192,12 +196,12 @@ class ContributionFlowStepContainer extends React.Component {
   };
 
   render() {
-    const { LoggedInUser, step, isCrypto } = this.props;
+    const { LoggedInUser, step } = this.props;
 
     return (
       <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
         <Flex flexDirection="column" alignItems="center">
-          {!(step.name === 'payment' && isCrypto) && (
+          {step.name !== 'checkout' && (
             <Flex width="100%" mb={3}>
               <Flex alignItems="center">
                 <H4 fontSize={['20px', '24px']} fontWeight={500} py={2}>

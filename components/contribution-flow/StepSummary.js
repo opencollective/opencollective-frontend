@@ -452,7 +452,7 @@ StepSummary.propTypes = {
     /** A flag to indicate if the form is ready to be submitted */
     isReady: PropTypes.bool,
     /** The tax amount in cents */
-    amount: PropTypes.numer,
+    amount: PropTypes.number,
   }),
   /** Type of the tier. Used to check if taxes apply */
   tier: PropTypes.shape({

@@ -28,6 +28,7 @@ const StepDetailsCrypto = ({ onChange, data }) => {
   const intl = useIntl();
   const [currencyType, setCurrencyType] = useState(data.currency);
   const [amount, setAmount] = useState(data.amount);
+  const [touched, setTouched] = useState(false);
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
@@ -52,15 +53,17 @@ const StepDetailsCrypto = ({ onChange, data }) => {
         {intl.formatMessage(messages['donationAmount'])}
       </Label>
       <StyledInputGroup
-        prepend={currencyType.label}
+        prepend={currencyType.labelWithoutImage}
         type="number"
         inputMode="decimal"
         defaultValue={amount}
         onChange={({ target }) => {
           setAmount(target.value);
-          dispatchChange('amount', target.value);
+          dispatchChange('amount', parseFloat(target.value));
         }}
-        error={amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
+        onBlur={() => setTouched(true)}
+        autoFocus
+        error={touched && amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
       />
     </Box>
   );

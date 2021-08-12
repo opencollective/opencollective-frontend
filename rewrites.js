@@ -1,5 +1,5 @@
 const createOrderPage = '/contribution-flow';
-const contributionFlowSteps = '/details|profile|payment|summary|success';
+const contributionFlowSteps = '/details|profile|payment|checkout|summary|success';
 
 exports.REWRITES = [
   {

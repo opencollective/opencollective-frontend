@@ -79,6 +79,7 @@ class NewContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
+    paymentMethod: PropTypes.string,
     verb: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
@@ -149,7 +150,7 @@ class NewContributionFlowPage extends React.Component {
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isEmbed />;
+      return <ContributionFlowSuccess collective={account} isCrypto={this.props.paymentMethod === 'crypto'} isEmbed />;
     } else {
       return (
         <Box height="100%" pt={3}>
