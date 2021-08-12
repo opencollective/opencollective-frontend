@@ -3,6 +3,21 @@ import dayjs from 'dayjs';
 describe('event.createOrder page', () => {
   let collectiveSlug = null;
 
+  const createEvent = name => {
+    // Create event
+    cy.visit(`${collectiveSlug}/events/new`);
+    cy.get('.inputs input[name="name"]').type(name);
+    cy.get('.inputs .startsAt input[type="text"]')
+      .clear()
+      .type(`${dayjs().format('MM/DD/YYYY')} 7:00 PM`)
+      .blur();
+    cy.get('.inputs .endsAt input[type="text"]')
+      .clear()
+      .type(`${dayjs().add(1, 'day').format('MM/DD/YYYY')} 7:00 PM`)
+      .blur();
+    cy.contains('button', 'Create Event').click();
+  };
+
   before(() => {
     cy.createHostedCollective().then(({ slug }) => {
       collectiveSlug = slug;
@@ -11,6 +26,90 @@ describe('event.createOrder page', () => {
 
   beforeEach(() => {
     cy.login({ redirect: `/${collectiveSlug}/events/create` });
+  });
+
+  it('makes an order for a free ticket', () => {
+    createEvent('Free Ticket Event');
+
+    // Create Ticket
+    cy.contains('a', 'Create Ticket').click();
+    cy.get('.addTier').click();
+    cy.get('.EditTiers input[name="name"]').type('Free Ticket');
+    cy.get('.EditTiers input[name="amount"]').type('0');
+    cy.contains('button', 'Save').click();
+    cy.contains('a', 'view event page').click();
+
+    // Go to the contribution flow
+    cy.contains('button', 'RSVP').click();
+
+    cy.get('[data-cy="amount-picker"]').should('not.exist');
+    cy.get('[data-cy="contribution-quantity"]').should('exist');
+
+    cy.getByDataCy('cf-next-step').click();
+    cy.getByDataCy('cf-next-step').contains('Make contribution').click();
+
+    cy.wait(500);
+    cy.getByDataCy('order-success', { timeout: 20000 });
+  });
+
+  it('makes an order for a paying ticket with fixed amount', () => {
+    createEvent('Paying Ticket Event');
+
+    // Create Ticket
+    cy.contains('a', 'Create Ticket').click();
+    cy.get('.addTier').click();
+    cy.get('.EditTiers input[name="name"]').type('Paying Ticket');
+    cy.get('.EditTiers input[name="amount"]').type('10');
+    cy.contains('button', 'Save').click();
+    cy.contains('a', 'view event page').click();
+
+    // Go to the contribution flow
+    cy.contains('button', 'RSVP').click();
+
+    cy.get('[data-cy="amount-picker"]').should('not.exist');
+    cy.get('[data-cy="contribution-quantity"]').should('exist');
+
+    cy.getByDataCy('cf-next-step').click();
+
+    // Skip the step profile on the new contribution flow
+    cy.getByDataCy('cf-next-step').click();
+
+    cy.useAnyPaymentMethod();
+    cy.wait(500);
+    cy.contains('button', 'Contribute $10').click();
+    cy.wait(500);
+    cy.getByDataCy('order-success', { timeout: 20000 });
+  });
+
+  it('makes an order for a paying ticket with flexible amount', () => {
+    createEvent('Flexible Paying Ticket Event');
+
+    // Create Ticket
+    cy.contains('a', 'Create Ticket').click();
+    cy.get('.addTier').click();
+    cy.get('.EditTiers input[name="name"]').type('Flexible Paying Ticket');
+    cy.get('[data-cy="amountType"]').click();
+    cy.contains('[data-cy="select-option"]', 'flexible amount').click();
+    cy.get('.EditTiers input[name="amount"]').type('10');
+    cy.contains('button', 'Save').click();
+    cy.contains('a', 'view event page').click();
+
+    // Go to the contribution flow
+    cy.contains('button', 'RSVP').click();
+
+    cy.get('[data-cy="amount-picker"]').should('exist');
+    cy.get('[data-cy="contribution-quantity"]').should('exist');
+
+    cy.getByDataCy('cf-next-step').click();
+
+    // Skip the step profile on the new contribution flow
+    cy.getByDataCy('cf-next-step').click();
+
+    cy.useAnyPaymentMethod();
+    cy.wait(500);
+    cy.contains('button', 'Contribute $10').click();
+    cy.wait(500);
+    cy.getByDataCy('order-success', { timeout: 20000 });
   });
 
   it('makes an order for tickets with VAT', () => {
@@ -24,18 +123,8 @@ describe('event.createOrder page', () => {
     cy.contains('Saved');
 
     // Create event
-    cy.visit(`${collectiveSlug}/events/new`);
-    cy.get('.inputs input[name="name"]').type('Test Event with VAT');
-    cy.get('.inputs .startsAt input[type="text"]')
-      .clear()
-      .type(`${dayjs().format('MM/DD/YYYY')} 7:00 PM`)
-      .blur();
-    cy.get('.inputs .endsAt input[type="text"]')
-      .clear()
-      .type(`${dayjs().add(1, 'day').format('MM/DD/YYYY')} 7:00 PM`)
-      .blur();
+    createEvent('Test Event with VAT');
 
-    cy.contains('button', 'Create Event').click();
     cy.contains('a', 'Create Ticket').click();
     cy.get('.addTier').click();
 
@@ -139,75 +228,12 @@ describe('event.createOrder page', () => {
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
 
-  describe('Outdated', () => {
-    it("can't order if the event is over", () => {
+  describe('Outdated Event', () => {
+    it("can't contribute if the event is over", () => {
       cy.visit('/opensource/events/webpack-webinar');
       cy.contains('Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding');
       cy.get('[data-cy="financial-contributions"]').should('not.exist');
       cy.get('[data-cy="Tickets"]').should('not.exist');
-    });
-
-    // This needs to be converted to the new Page
-    it('makes an order for a free ticket as an existing user', () => {
-      cy.clock(Date.parse('2017/10/01')); // Go back in time when the event was not over yet
-      cy.login({ redirect: '/opensource/events/webpack-webinar' });
-      cy.get('#free.tier .btn.increase').click();
-      cy.get('#free.tier .ctabtn').click();
-      cy.location({ timeout: 15000 }).should(location => {
-        expect(location.pathname).to.eq('/opensource/events/webpack-webinar/order/78');
-        expect(location.search).to.eq('?quantity=2');
-      });
-
-      cy.get('button[data-cy="cf-next-step"]').click();
-
-      // Free per default
-      cy.get('input[type=number][name=custom-amount]').should('have.value', '0');
-      cy.get('input[type=number][name=quantity]').should('have.value', '2');
-      cy.contains('[data-cy="progress-step-details"]', 'Free');
-
-      // Has truncated event details
-      cy.contains("Time: Oct 9 at 5PM, US Pacific time. That's 8PM Eastern.");
-      cy.contains('Ask Sean questions about how to grow your com...');
-      cy.contains('Show more');
-
-      // Can submit freely
-      cy.get('button[data-cy="cf-next-step"]').click();
-      cy.contains('This is a free ticket, you can submit your order directly.');
-
-      cy.contains('button', 'Make contribution').click();
-      cy.contains(
-        'Test User Admin has registered for the event Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding (Free)',
-      );
-    });
-
-    // This needs to be converted to the new Page
-    it('makes an order for a paying ticket as an existing user', () => {
-      cy.clock(Date.parse('2017/10/01')); // Go back in time when the event was not over yet
-      cy.signup({ redirect: '/opensource/events/webpack-webinar' });
-      cy.get('#silver-sponsor.tier .btn.increase').click();
-      cy.get('#silver-sponsor.tier .ctabtn').click();
-      cy.location({ timeout: 15000 }).should(location => {
-        expect(location.pathname).to.eq('/opensource/events/webpack-webinar/order/77');
-        expect(location.search).to.eq('?quantity=2');
-      });
-
-      cy.get('button[data-cy="cf-next-step"]').click();
-
-      cy.get('input[type=number][name=custom-amount]').should('have.value', '250');
-      cy.get('input[type=number][name=quantity]').should('have.value', '2');
-      cy.contains('[data-cy="progress-step-details"]', '$250.00 x 2');
-
-      // Submit
-      cy.get('button[data-cy="cf-next-step"]').click();
-      cy.contains('You’ll contribute with the amount of $500.00.');
-      cy.wait(1000); // Wait for stripe to be loaded
-      cy.fillStripeInput();
-      cy.contains('button', 'Contribute').click();
-
-      cy.getByDataCy('order-success', { timeout: 20000 }).contains('$500.00');
-      cy.contains(
-        "You've registered for the event Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding (Silver Sponsor)",
-      );
     });
   });
 });
