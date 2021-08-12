@@ -465,12 +465,8 @@ class GoalsCover extends React.Component {
 
     return (
       <GoalContainer className={`goal ${goal.slug}`} key={slug} goal={goal} index={index}>
-        <div className="caption">
-          <div
-            className="label"
-            ref={this.labelsRefs[goal.slug]}
-            title={this.getDivTitle(goal.title, goal.description)}
-          >
+        <div className="caption" title={this.getDivTitle(goal.title, goal.description)}>
+          <div className="label" ref={this.labelsRefs[goal.slug]}>
             {goal.title ? (
               truncate(goal.title, { length: MAX_TITLE_LENGTH })
             ) : (
