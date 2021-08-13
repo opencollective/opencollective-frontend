@@ -8,7 +8,6 @@ import useClipboard from '../../lib/hooks/useClipboard';
 
 import Container from '../Container';
 import { Box } from '../Grid';
-import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import { P, Span } from '../Text';
 
@@ -47,25 +46,17 @@ const StepCheckout = ({ stepDetails, order }) => {
               includeMargin
             />
             <P mb="16px">{order.paymentMethod.data.depositAddress}</P>
+            <StyledButton onClick={() => copy(window.location.href)} disabled={isCopied}>
+              <Span mr={1}>
+                <FormattedMessage
+                  id="NewContribute.crypto.QRCodeCopyButton"
+                  defaultMessage="Click to copy wallet address"
+                />
+              </Span>
+              <IconLink size="20px" />
+            </StyledButton>
           </React.Fragment>
         )}
-        {!order?.paymentMethod?.data?.depositAddress && (
-          <MessageBox m={3} type="error" withIcon>
-            <FormattedMessage
-              id="StepCheckout.noDepositAddress"
-              defaultMessage="No deposit address returned. Please contact support@opencollective.com."
-            />
-          </MessageBox>
-        )}
-        <StyledButton onClick={() => copy(window.location.href)} disabled={isCopied}>
-          <Span mr={1}>
-            <FormattedMessage
-              id="NewContribute.crypto.QRCodeCopyButton"
-              defaultMessage="Click to copy wallet address"
-            />
-          </Span>
-          <IconLink size="20px" />
-        </StyledButton>
       </Box>
     </Container>
   );

@@ -457,7 +457,9 @@ class ContributionFlow extends React.Component {
       await this.submitOrder();
     }
 
-    await this.pushStepRoute(step.name);
+    if (!this.state.error) {
+      await this.pushStepRoute(step.name);
+    }
   };
 
   /** Navigate to another step, ensuring all route params are preserved */
