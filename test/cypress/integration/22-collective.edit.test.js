@@ -86,7 +86,7 @@ describe('edit collective', () => {
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
     cy.get('[data-cy="collective-hero"] a[href="https://twitter.com/opencollect"] [title="Twitter"]');
-    cy.get('[data-cy="collective-hero"] a[href="https://github.com/AwesomeHandle"] [title="Github"]');
+    cy.get('[data-cy="collective-hero"] a[href="https://github.com/AwesomeHandle"] [title="GitHub"]');
     cy.get('[data-cy="collective-hero"] a[href="https://opencollective.com"] [title="Website"]');
   });
 
