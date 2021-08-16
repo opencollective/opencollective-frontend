@@ -114,7 +114,7 @@ const MembershipCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
 `;
 
-const newContributionsSectionQuery = gqlV2/* GraphQL */ `
+const contributionsSectionQuery = gqlV2/* GraphQL */ `
   query ContributionsSection(
     $slug: String!
     $limit: Int!
@@ -194,7 +194,7 @@ const newContributionsSectionQuery = gqlV2/* GraphQL */ `
 const SectionContributions = ({ collective }) => {
   const intl = useIntl();
   const [filter, setFilter] = React.useState(FILTERS.ALL);
-  const { data, loading, fetchMore } = useQuery(newContributionsSectionQuery, {
+  const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
     variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...FILTER_PROPS[0].where },
     context: API_V2_CONTEXT,
   });
