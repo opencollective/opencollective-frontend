@@ -131,7 +131,10 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
         offset
         limit
         totalCount
-        roles
+        roles {
+          role
+          type
+        }
         nodes {
           id
           role
