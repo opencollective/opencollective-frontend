@@ -303,6 +303,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
                         <ApplyToHostBtn
                           hostSlug={collective.slug}
+                          isHidden={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}
                           buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
                         />
                       </MenuItem>
