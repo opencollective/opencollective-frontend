@@ -200,6 +200,7 @@ const SectionContributions = ({ collective }) => {
   const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
     variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...FILTER_PROPS[0].where },
     context: API_V2_CONTEXT,
+    notifyOnNetworkStatusChange: true,
   });
 
   const handleLoadMore = () => {
@@ -235,74 +236,65 @@ const SectionContributions = ({ collective }) => {
     });
   };
 
-  if (loading) {
-    return (
-      <Box pb={4}>
-        <ContributionsGrid entries={[...Array(5).keys()].map(id => ({ id }))}>
-          {() => <LoadingPlaceholder height={334} />}
-        </ContributionsGrid>
-      </Box>
-    );
-  }
-
-  const { memberOf, hostedAccounts, connectedAccounts } = data.account;
-  const isOrganization = data.account.type === CollectiveType.ORGANIZATION;
-  const availableFilters = getAvailableFilters(memberOf.roles);
+  const { account, memberOf, hostedAccounts, connectedAccounts } = data?.account || {};
+  const isOrganization = account?.type === CollectiveType.ORGANIZATION;
+  const availableFilters = getAvailableFilters(memberOf?.roles || []);
 
   return (
     <Box pb={4}>
-      {memberOf.totalCount > 0 && (
-        <React.Fragment>
-          <ContainerSectionContent>
-            {hostedAccounts.totalCount > 0 && (
-              <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
-                <FormattedMessage
-                  id="organization.collective.memberOf.collective.host.title"
-                  values={{ n: hostedAccounts.totalCount }}
-                  defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
-                />
-              </H3>
-            )}
-          </ContainerSectionContent>
-          {availableFilters.length > 1 && (
-            <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
-              <StyledFilters
-                filters={availableFilters}
-                getLabel={key => intl.formatMessage(I18nFilters[key])}
-                onChange={handleFilterSelect}
-                selected={filter}
-                justifyContent="left"
-                minButtonWidth={175}
-                px={Dimensions.PADDING_X}
+      <React.Fragment>
+        <ContainerSectionContent>
+          {hostedAccounts?.totalCount > 0 && (
+            <H3 fontSize={['20px', '24px', '32px']} fontWeight="normal" color="black.700">
+              <FormattedMessage
+                id="organization.collective.memberOf.collective.host.title"
+                values={{ n: hostedAccounts.totalCount }}
+                defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
               />
-            </Box>
+            </H3>
           )}
-          <Container
-            data-cy="Contributions"
-            maxWidth={Dimensions.MAX_SECTION_WIDTH}
-            px={Dimensions.PADDING_X}
-            mt={4}
-            mx="auto"
-          >
-            <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
-              {memberOf.nodes.map(membership => (
+        </ContainerSectionContent>
+        {availableFilters?.length > 1 && (
+          <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+            <StyledFilters
+              filters={availableFilters}
+              getLabel={key => intl.formatMessage(I18nFilters[key])}
+              onChange={handleFilterSelect}
+              selected={filter}
+              justifyContent="left"
+              minButtonWidth={175}
+              px={Dimensions.PADDING_X}
+            />
+          </Box>
+        )}
+        <Container
+          data-cy="Contributions"
+          maxWidth={Dimensions.MAX_SECTION_WIDTH}
+          px={Dimensions.PADDING_X}
+          mt={4}
+          mx="auto"
+        >
+          <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
+            {loading &&
+              [...Array(memberOf?.nodes.length || 5).keys()].map(id => <LoadingPlaceholder key={id} height={334} />)}
+            {!loading &&
+              memberOf.nodes.map(membership => (
                 <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                   <StyledMembershipCard membership={membership} />
                 </MembershipCardContainer>
               ))}
-            </Grid>
-          </Container>
-          {memberOf.nodes.length < memberOf.totalCount && (
-            <Flex mt={3} justifyContent="center">
-              <StyledButton data-cy="load-more" textTransform="capitalize" minWidth={170} onClick={handleLoadMore}>
-                <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
-              </StyledButton>
-            </Flex>
-          )}
-        </React.Fragment>
-      )}
+          </Grid>
+        </Container>
+        {memberOf?.nodes.length < memberOf?.totalCount && (
+          <Flex mt={3} justifyContent="center">
+            <StyledButton data-cy="load-more" textTransform="capitalize" minWidth={170} onClick={handleLoadMore}>
+              <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+            </StyledButton>
+          </Flex>
+        )}
+      </React.Fragment>
 
-      {connectedAccounts.totalCount > 0 && (
+      {connectedAccounts?.totalCount > 0 && (
         <Box mt={5}>
           <ContainerSectionContent>
             <SectionTitle textAlign="left" mb={4} fontSize={['20px', '24px', '32px']} color="black.700">
