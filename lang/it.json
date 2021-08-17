@@ -1380,6 +1380,7 @@
   "membership.totalDonations": "Importo totale contribuito",
   "membership.totalDonations.title": "Importo contribuito",
   "menu.addFunds": "Add Funds",
+  "menu.addFundsFromCollective": "Add Funds from Collective",
   "menu.applications": "Applications",
   "menu.assignCard": "Assign a Card",
   "menu.collective.none": "No Collectives yet",

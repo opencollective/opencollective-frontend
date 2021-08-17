@@ -1380,6 +1380,7 @@
   "membership.totalDonations": "Total amount contributed",
   "membership.totalDonations.title": "Amount contributed",
   "menu.addFunds": "자금 추가",
+  "menu.addFundsFromCollective": "Add Funds from Collective",
   "menu.applications": "Applications",
   "menu.assignCard": "Assign a Card",
   "menu.collective.none": "No Collectives yet",

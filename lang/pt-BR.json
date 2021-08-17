@@ -1380,6 +1380,7 @@
   "membership.totalDonations": "Valor total contribuído",
   "membership.totalDonations.title": "Quantia contribuída",
   "menu.addFunds": "Adicionar Fundos",
+  "menu.addFundsFromCollective": "Add Funds from Collective",
   "menu.applications": "Applications",
   "menu.assignCard": "Assign a Card",
   "menu.collective.none": "Sem coletivos ainda",

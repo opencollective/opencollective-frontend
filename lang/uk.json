@@ -1380,6 +1380,7 @@
   "membership.totalDonations": "Загальна сума внесків",
   "membership.totalDonations.title": "Сума внесків",
   "menu.addFunds": "Add Funds",
+  "menu.addFundsFromCollective": "Add Funds from Collective",
   "menu.applications": "Застосунки",
   "menu.assignCard": "Призначити картку",
   "menu.collective.none": "Поки що немає колективів",

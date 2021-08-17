@@ -1380,6 +1380,7 @@
   "membership.totalDonations": "总共捐款金额",
   "membership.totalDonations.title": "捐款金额",
   "menu.addFunds": "添加资金",
+  "menu.addFundsFromCollective": "Add Funds from Collective",
   "menu.applications": "Applications",
   "menu.assignCard": "Assign a Card",
   "menu.collective.none": "No Collectives yet",
