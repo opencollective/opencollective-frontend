@@ -393,6 +393,7 @@
   "CollectivePage.SectionConnect.Title": "연결",
   "CollectivePage.SectionContribute.info": "Support {collectiveName} by contributing to them once, monthly, or yearly.",
   "CollectivePage.SectionContribute.Subtitle": "재정 기여자가 되어보세요.",
+  "CollectivePage.SectionContribute.Title.TicketsWithNoCustomContribution": "Tickets",
   "CollectivePage.SectionEvents.AdminDescription": "Set up events for your community and sell tickets that go straight to your budget.",
   "CollectivePage.SectionEvents.Description": "{collectiveName} is hosting the following events.",
   "CollectivePage.SectionEvents.ViewAll": "모든 이벤트 보기",

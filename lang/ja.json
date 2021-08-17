@@ -393,6 +393,7 @@
   "CollectivePage.SectionConnect.Title": "接続",
   "CollectivePage.SectionContribute.info": "Support {collectiveName} by contributing to them once, monthly, or yearly.",
   "CollectivePage.SectionContribute.Subtitle": "Become a financial contributor.",
+  "CollectivePage.SectionContribute.Title.TicketsWithNoCustomContribution": "Tickets",
   "CollectivePage.SectionEvents.AdminDescription": "Set up events for your community and sell tickets that go straight to your budget.",
   "CollectivePage.SectionEvents.Description": "{collectiveName} is hosting the following events.",
   "CollectivePage.SectionEvents.ViewAll": "すべてのイベントを表示",

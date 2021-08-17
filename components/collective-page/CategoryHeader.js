@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
+import { CollectiveType } from '../../lib/constants/collectives';
 import i18nNavbarCategory from '../../lib/i18n/navbar-categories';
 
 import Container from '../Container';
@@ -61,7 +62,7 @@ const TypeIllustrationCircle = styled(Flex)`
   }
 `;
 
-const getCategoryData = (intl, collective, category) => {
+const getCategoryData = (intl, collective, category, isAdmin) => {
   switch (category) {
     case NAVBAR_CATEGORIES.ABOUT:
       return {
@@ -99,23 +100,31 @@ const getCategoryData = (intl, collective, category) => {
         ),
       };
     case NAVBAR_CATEGORIES.CONTRIBUTE:
-      return {
-        img: contributeSectionHeaderIcon,
-        title: i18nNavbarCategory(intl, category),
-        subtitle: (
-          <FormattedMessage
-            id="CollectivePage.SectionContribute.Subtitle"
-            defaultMessage="Become a financial contributor."
-          />
-        ),
-        info: (
-          <FormattedMessage
-            id="CollectivePage.SectionContribute.info"
-            defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
-            values={{ collectiveName: collective.name }}
-          />
-        ),
-      };
+      return isEventWithNoCustomContributions(collective) && !isAdmin
+        ? {
+            img: contributeSectionHeaderIcon,
+            title: intl.formatMessage({
+              id: 'CollectivePage.SectionContribute.Title.TicketsWithNoCustomContribution',
+              defaultMessage: 'Tickets',
+            }),
+          }
+        : {
+            img: contributeSectionHeaderIcon,
+            title: i18nNavbarCategory(intl, category),
+            subtitle: (
+              <FormattedMessage
+                id="CollectivePage.SectionContribute.Subtitle"
+                defaultMessage="Become a financial contributor."
+              />
+            ),
+            info: (
+              <FormattedMessage
+                id="CollectivePage.SectionContribute.info"
+                defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
+                values={{ collectiveName: collective.name }}
+              />
+            ),
+          };
     case NAVBAR_CATEGORIES.CONTRIBUTIONS:
       return {
         img: contributeSectionHeaderIcon,
@@ -125,6 +134,9 @@ const getCategoryData = (intl, collective, category) => {
       return null;
   }
 };
+
+export const isEventWithNoCustomContributions = collective =>
+  collective?.type === CollectiveType.EVENT && Boolean(collective?.settings?.disableCustomContributions);
 
 const CategoryHeader = React.forwardRef(({ collective, category, isAdmin, ...props }, ref) => {
   const intl = useIntl();

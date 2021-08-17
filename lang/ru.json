@@ -393,6 +393,7 @@
   "CollectivePage.SectionConnect.Title": "Связь",
   "CollectivePage.SectionContribute.info": "Поддержите {collectiveName}, внеся свой вклад один раз, ежемесячно или ежегодно.",
   "CollectivePage.SectionContribute.Subtitle": "Станьте финансовым вкладчиком.",
+  "CollectivePage.SectionContribute.Title.TicketsWithNoCustomContribution": "Tickets",
   "CollectivePage.SectionEvents.AdminDescription": "Set up events for your community and sell tickets that go straight to your budget.",
   "CollectivePage.SectionEvents.Description": "{collectiveName} is hosting the following events.",
   "CollectivePage.SectionEvents.ViewAll": "View all events",

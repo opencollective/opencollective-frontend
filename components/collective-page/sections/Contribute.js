@@ -27,6 +27,7 @@ import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
 import { H3, P } from '../../Text';
+import { isEventWithNoCustomContributions } from '../CategoryHeader';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
@@ -280,7 +281,7 @@ class SectionContribute extends React.PureComponent {
         {((isAdmin && hasHost) || (isAdmin && isHost) || (!isAdmin && isActive)) && (
           <Fragment>
             {/* Financial contributions tiers */}
-            {hasContribute && (
+            {hasContribute && (!isEventWithNoCustomContributions(collective) || isAdmin) && (
               <Fragment>
                 <ContainerSectionContent>
                   <SectionTitle>
@@ -328,13 +329,15 @@ class SectionContribute extends React.PureComponent {
             {/* Tickets for type EVENT */}
             {isEvent && !cannotOrderTickets && !hideTicketsFromNonAdmins && (
               <Box pb={4} data-cy="Tickets">
-                <ContainerSectionContent>
-                  <Flex alignItems="left" mb={3}>
-                    <H3 fontSize="20px" fontWeight="600" color="black.700">
-                      <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
-                    </H3>
-                  </Flex>
-                </ContainerSectionContent>
+                {(!isEventWithNoCustomContributions(collective) || isAdmin) && (
+                  <ContainerSectionContent>
+                    <Flex alignItems="left" mb={3}>
+                      <H3 fontSize="20px" fontWeight="600" color="black.700">
+                        <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
+                      </H3>
+                    </Flex>
+                  </ContainerSectionContent>
+                )}
                 <HorizontalScroller
                   container={ContributeCardsContainer}
                   getScrollDistance={this.getContributeCardsScrollDistance}
