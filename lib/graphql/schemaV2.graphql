@@ -131,6 +131,11 @@ interface Account {
     """
     account: AccountReferenceInput
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     limit: Int = 100
@@ -197,11 +202,6 @@ interface Account {
   The list of payment methods that this account can use to pay for Orders
   """
   paymentMethods(
-    """
-    Filter on given types (creditcard, giftcard...)
-    """
-    types: [String]
-
     """
     Filter on given types (creditcard, giftcard...)
     """
@@ -713,6 +713,11 @@ type Bot implements Account {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -775,7 +780,6 @@ type Bot implements Account {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
     type: [String]
     service: [PaymentMethodService]
 
@@ -988,6 +992,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -1050,7 +1059,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
     type: [String]
     service: [PaymentMethodService]
 
@@ -3250,6 +3258,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -3312,7 +3325,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
     type: [String]
     service: [PaymentMethodService]
 
@@ -4221,6 +4233,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -4283,7 +4300,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
     type: [String]
     service: [PaymentMethodService]
 
@@ -4573,6 +4589,11 @@ type Host implements Account & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -4635,7 +4656,6 @@ type Host implements Account & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
     type: [String]
     service: [PaymentMethodService]
 
@@ -5150,6 +5170,11 @@ type Individual implements Account {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -5212,7 +5237,6 @@ type Individual implements Account {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
     type: [String]
     service: [PaymentMethodService]
 
@@ -5483,6 +5507,15 @@ type MemberOfCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [MemberOf]
+  roles: [MemberOfCollectionRoles]
+}
+
+"""
+An existing member role and account type combination used used to filter collections
+"""
+type MemberOfCollectionRoles {
+  type: AccountType!
+  role: MemberRole!
 }
 
 """
@@ -5498,6 +5531,7 @@ enum MemberRole {
   FUNDRAISER
   FOLLOWER
   ACCOUNTANT
+  CONNECTED_ACCOUNT
 }
 
 """
@@ -6716,6 +6750,11 @@ type Organization implements Account & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -6778,7 +6817,6 @@ type Organization implements Account & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
     type: [String]
     service: [PaymentMethodService]
 
@@ -7273,6 +7311,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -7335,7 +7378,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
     type: [String]
     service: [PaymentMethodService]
 
@@ -8470,6 +8512,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -8532,7 +8579,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    types: [String]
     type: [String]
     service: [PaymentMethodService]
 

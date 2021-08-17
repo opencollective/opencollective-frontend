@@ -8,7 +8,6 @@ import {
   totalCollectiveContributionsQuery,
 } from '../hero/HeroTotalCollectiveContributionsWithData';
 import { getBudgetSectionQueryVariables } from '../sections/Budget';
-import { contributionsSectionQuery, getContributionsSectionQueryVariables } from '../sections/Contributions';
 import { conversationsSectionQuery, getConversationsSectionQueryVariables } from '../sections/Conversations';
 import { getRecurringContributionsSectionQueryVariables } from '../sections/RecurringContributions';
 import { getTransactionsSectionQueryVariables, transactionsSectionQuery } from '../sections/Transactions';
@@ -35,14 +34,7 @@ export const preloadCollectivePageGraphlQueries = async (slug, client) => {
         }),
       );
     }
-    if (sectionsNames.includes('contributions')) {
-      queries.push(
-        client.query({
-          query: contributionsSectionQuery,
-          variables: getContributionsSectionQueryVariables(slug),
-        }),
-      );
-    }
+
     if (sectionsNames.includes('transactions')) {
       queries.push(
         client.query({
