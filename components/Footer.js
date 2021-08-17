@@ -261,7 +261,6 @@ const Footer = () => {
                 alt="Open Collective logo"
                 height={28}
                 width={167}
-                style={{ maxWidth: '100%' }}
               />
             </Flex>
             <P
