@@ -279,7 +279,13 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <AddFundsBtn collective={collective} host={collective.host}>
                         {btnProps => (
                           <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps} data-cy="add-funds-btn">
+                            <StyledButton
+                              borderRadius={0}
+                              p={ITEM_PADDING}
+                              isBorderless
+                              {...btnProps}
+                              data-cy="add-funds-btn"
+                            >
                               <AttachMoney size="20px" />
                               <Span>
                                 <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
@@ -315,7 +321,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             py={1}
                             isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
                           >
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
                               <CreditCard size="20px" />
                               <Span>
                                 <FormattedMessage id="menu.assignCard" defaultMessage="Assign a Card" />
@@ -332,7 +338,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             py={1}
                             isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
                           >
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
                               <CreditCard size="20px" />
                               <Span>
                                 <FormattedMessage
