@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
+import { background } from 'styled-system';
 
 import Header from '../components/Header';
 
@@ -16,7 +17,7 @@ const Main = styled.main`
   margin: 0;
   padding: 0;
   height: 100%;
-  background: white;
+  ${background}
 `;
 
 /**
@@ -24,7 +25,7 @@ const Main = styled.main`
  * and that the footer/topbar will not be displayed, while preserving the normal DOM structure
  * and meta.
  */
-const EmbeddedPage = ({ children, description, title, canonicalURL, collective }) => {
+const EmbeddedPage = ({ children, description, title, canonicalURL, collective, background }) => {
   return (
     <Fragment>
       <GlobalStyles />
@@ -36,7 +37,7 @@ const EmbeddedPage = ({ children, description, title, canonicalURL, collective }
         withTopBar={false}
         noRobots
       />
-      <Main>{children}</Main>
+      <Main background={background}>{children}</Main>
     </Fragment>
   );
 };
@@ -44,10 +45,15 @@ const EmbeddedPage = ({ children, description, title, canonicalURL, collective }
 EmbeddedPage.propTypes = {
   children: PropTypes.node,
   description: PropTypes.string,
+  background: PropTypes.string,
   canonicalURL: PropTypes.string,
   loadingLoggedInUser: PropTypes.bool,
   title: PropTypes.string,
   collective: PropTypes.object,
+};
+
+EmbeddedPage.defaultProps = {
+  background: 'white',
 };
 
 export default withUser(EmbeddedPage);
