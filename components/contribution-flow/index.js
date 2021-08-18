@@ -779,14 +779,16 @@ class ContributionFlow extends React.Component {
                       isCrypto={isCrypto}
                     />
                   </Box>
-                  <Box textAlign="center" mt={5}>
-                    <CollectiveTitleContainer useLink={!isEmbed} collective={collective}>
-                      <FormattedMessage
-                        id="ContributionFlow.backToCollectivePage"
-                        defaultMessage="Back to Collective Page"
-                      />
-                    </CollectiveTitleContainer>
-                  </Box>
+                  {!isEmbed && (
+                    <Box textAlign="center" mt={5}>
+                      <CollectiveTitleContainer collective={collective} useLink>
+                        <FormattedMessage
+                          id="ContributionFlow.backToCollectivePage"
+                          defaultMessage="Back to Collective Page"
+                        />
+                      </CollectiveTitleContainer>
+                    </Box>
+                  )}
                 </Box>
 
                 <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
