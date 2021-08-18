@@ -293,6 +293,9 @@ class ExpensePage extends React.Component {
       await this.props.editExpense({
         variables: { expense: prepareExpenseForSubmit(editedExpense), draftKey: this.props.draftKey },
       });
+      if (this.props.data.expense?.type === expenseTypes.CHARGE) {
+        await this.props.data.refetch();
+      }
       const createdUser = editedExpense?.payee;
       this.setState({
         status: PAGE_STATUS.VIEW,
