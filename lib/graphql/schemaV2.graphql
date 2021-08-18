@@ -130,7 +130,7 @@ interface Account {
     Specific account to query the membership of.
     """
     account: AccountReferenceInput
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -718,7 +718,7 @@ type Bot implements Account {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -999,7 +999,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -3299,7 +3299,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -4276,7 +4276,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -4634,7 +4634,7 @@ type Host implements Account & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -5217,7 +5217,7 @@ type Individual implements Account {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -6491,6 +6491,30 @@ type Order {
 }
 
 """
+Possible fields you can use to order by
+"""
+enum OrderByFieldType {
+  CREATED_AT
+  MEMBER_COUNT
+  TOTAL_CONTRIBUTED
+}
+
+"""
+Input to order results
+"""
+input OrderByInput {
+  """
+  Field to order by.
+  """
+  field: OrderByFieldType!
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection!
+}
+
+"""
 A collection of "Orders"
 """
 type OrderCollection implements Collection {
@@ -6799,7 +6823,7 @@ type Organization implements Account & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -7373,7 +7397,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -8589,7 +8613,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
