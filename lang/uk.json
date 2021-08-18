@@ -1359,6 +1359,7 @@
   "Member.Role.ADMIN": "Адміністратор",
   "Member.Role.ATTENDEE": "Attendee",
   "Member.Role.BACKER": "Фінансовий помічник",
+  "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "Помічник",
   "Member.Role.FOLLOWER": "Підписник",
   "Member.Role.FUNDRAISER": "Fundraiser",

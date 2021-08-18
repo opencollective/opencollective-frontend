@@ -315,9 +315,9 @@ const SectionContributions = ({ collective }) => {
           </ContainerSectionContent>
           <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
             <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
-              {connectedAccounts.nodes.map(({ id, collective }) => (
-                <MembershipCardContainer key={id}>
-                  <StyledMembershipCard membership={{ collective }} />
+              {connectedAccounts.nodes.map(membership => (
+                <MembershipCardContainer key={membership.id}>
+                  <StyledMembershipCard membership={membership} />
                 </MembershipCardContainer>
               ))}
             </Grid>
