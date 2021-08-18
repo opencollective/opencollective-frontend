@@ -1359,6 +1359,7 @@
   "Member.Role.ADMIN": "Admin",
   "Member.Role.ATTENDEE": "出席者",
   "Member.Role.BACKER": "財政コントリビュータ",
+  "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "コントリビュータ",
   "Member.Role.FOLLOWER": "フォロワー",
   "Member.Role.FUNDRAISER": "資金調達者",
