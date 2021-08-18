@@ -1359,6 +1359,7 @@
   "Member.Role.ADMIN": "Admin",
   "Member.Role.ATTENDEE": "Účastník",
   "Member.Role.BACKER": "Financial Contributor",
+  "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "Přispěvatel",
   "Member.Role.FOLLOWER": "Sledující",
   "Member.Role.FUNDRAISER": "Fundraiser",

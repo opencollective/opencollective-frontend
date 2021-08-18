@@ -1359,6 +1359,7 @@
   "Member.Role.ADMIN": "Administrateur",
   "Member.Role.ATTENDEE": "Participant",
   "Member.Role.BACKER": "Contributeur financier",
+  "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "Contributeur",
   "Member.Role.FOLLOWER": "Abonné·e",
   "Member.Role.FUNDRAISER": "Leveur de fonds",
