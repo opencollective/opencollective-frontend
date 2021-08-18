@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -29,6 +29,7 @@ const editExpenseTagsMutation = gqlV2/* GraphQL */ `
 const ExpenseTagsForAdmins = ({ expense, suggestedTags }) => {
   const [submitTags, { loading }] = useMutation(editExpenseTagsMutation, { context: API_V2_CONTEXT });
   const { addToast } = useToasts();
+  const intl = useIntl();
   return (
     <StyledInputTags
       disabled={loading}
@@ -38,7 +39,7 @@ const ExpenseTagsForAdmins = ({ expense, suggestedTags }) => {
         try {
           await submitTags({ variables: { id: expense.id, tags: tags.map(tag => tag.value) } });
         } catch (e) {
-          addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(e) });
+          addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
         }
       }}
     />
