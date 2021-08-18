@@ -150,6 +150,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
             labelColor="black.800"
             labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
             error={Boolean(tier.availableQuantity !== null && data?.quantity > tier.availableQuantity)}
+            data-cy="contribution-quantity"
             required
           >
             {fieldProps => (
