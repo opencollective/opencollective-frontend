@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
-import { isEmail } from 'validator';
+import { isEmail, isHexColor } from 'validator';
 
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
@@ -56,6 +56,7 @@ class NewContributionFlowPage extends React.Component {
       return !amountStr ? null : floatAmountToCents(parseFloat(amountStr));
     };
 
+    const backgroundColor = query.backgroundColor ? `#${query.backgroundColor}` : null;
     return {
       collectiveSlug: query.eventSlug || query.collectiveSlug,
       totalAmount: getFloatAmount(query.amount) || parseInt(query.totalAmount) || null,
@@ -74,6 +75,7 @@ class NewContributionFlowPage extends React.Component {
       defaultName: query.defaultName,
       useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
       hideHeader: query.hideHeader ? parseToBoolean(query.hideHeader) : false,
+      backgroundColor: backgroundColor && isHexColor(backgroundColor) ? backgroundColor : null,
     };
   }
 
@@ -83,6 +85,7 @@ class NewContributionFlowPage extends React.Component {
     verb: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
+    backgroundColor: PropTypes.string,
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
     platformContribution: PropTypes.number,
@@ -191,7 +194,7 @@ class NewContributionFlowPage extends React.Component {
     } else {
       return (
         <CollectiveThemeProvider collective={useTheme ? data.account : null}>
-          <EmbeddedPage>{this.renderPageContent()}</EmbeddedPage>
+          <EmbeddedPage background={this.props.backgroundColor}>{this.renderPageContent()}</EmbeddedPage>
         </CollectiveThemeProvider>
       );
     }
