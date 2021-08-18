@@ -1621,7 +1621,6 @@
   "PayoutBankInformationForm.HolderAddress": "Bank account holder address (not the bank address)",
   "PayoutBankInformationForm.RecipientAddress": "Recipient's Address",
   "PayoutBankInformationForm.TransactionMethod": "Transaction Method",
-  "PayoutBankInformationForm.Warning.WiseNotConfigured": "Wise is not configured on the platform.",
   "PayoutMethod.AccountBalance": "Open Collective (계정 잔고)",
   "PayoutMethod.New.BankAccount": "New bank account",
   "PayoutMethod.New.default": "신규 {pmType}",

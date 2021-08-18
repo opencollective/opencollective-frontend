@@ -1621,7 +1621,6 @@
   "PayoutBankInformationForm.HolderAddress": "Bank account holder address (not the bank address)",
   "PayoutBankInformationForm.RecipientAddress": "Recipient's Address",
   "PayoutBankInformationForm.TransactionMethod": "Transaction Method",
-  "PayoutBankInformationForm.Warning.WiseNotConfigured": "Wise is not configured on the platform.",
   "PayoutMethod.AccountBalance": "Open Collective (Account Balance)",
   "PayoutMethod.New.BankAccount": "Nueva cuenta bancaria",
   "PayoutMethod.New.default": "Nuevo {pmType}",
