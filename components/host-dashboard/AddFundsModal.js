@@ -172,7 +172,7 @@ const getOptions = (amount, currency, intl) => {
   ];
 };
 
-const AddFundsModal = ({ host, collective, isFromCollective, ...props }) => {
+const AddFundsModal = ({ host, collective, isFromParent, ...props }) => {
   const { LoggedInUser } = useUser();
   const [fundDetails, setFundDetails] = useState({});
   const { addToast } = useToasts();
@@ -215,11 +215,11 @@ const AddFundsModal = ({ host, collective, isFromCollective, ...props }) => {
 
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = host.plan?.hostFees && collective.id !== host.id && !isFromCollective;
+  const canAddHostFee = host.plan?.hostFees && collective.id !== host.id && !isFromParent;
   const defaultHostFeePercent = canAddHostFee && collective.hostFeePercent ? collective.hostFeePercent : 0;
 
   // We don't want to use Platform Fees anymore for Hosts that switched to the new model
-  const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0 && !isFromCollective;
+  const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0 && !isFromParent;
   const defaultPlatformFeePercent = 0;
 
   if (!LoggedInUser) {
@@ -247,7 +247,7 @@ const AddFundsModal = ({ host, collective, isFromCollective, ...props }) => {
         initialValues={getInitialValues({
           hostFeePercent: defaultHostFeePercent,
           account: collective,
-          fromAccount: isFromCollective ? collective.parentCollective : null,
+          fromAccount: isFromParent ? collective.parentCollective : null,
         })}
         validate={validate}
         onSubmit={async values => {
@@ -321,8 +321,8 @@ const AddFundsModal = ({ host, collective, isFromCollective, ...props }) => {
                         data-cy="add-funds-source"
                         types={['USER', 'ORGANIZATION']}
                         creatable
-                        disabled={isFromCollective}
-                        getDefaultOptions={build => (isFromCollective ? build(collective.parentCollective) : null)}
+                        disabled={isFromParent}
+                        getDefaultOptions={build => (isFromParent ? build(collective.parentCollective) : null)}
                         error={field.error}
                         createCollectiveOptionalFields={['location.address', 'location.country']}
                         onBlur={() => form.setFieldTouched(field.name, true)}
@@ -463,7 +463,7 @@ const AddFundsModal = ({ host, collective, isFromCollective, ...props }) => {
                     }
                     isLargeAmount
                   />
-                  {!isFromCollective && (
+                  {!isFromParent && (
                     <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
                       <FormattedMessage
                         id="AddFundsModal.disclaimer"
@@ -625,7 +625,7 @@ AddFundsModal.propTypes = {
     slug: PropTypes.string,
     parentCollective: PropTypes.object,
   }).isRequired,
-  isFromCollective: PropTypes.bool,
+  isFromParent: PropTypes.bool,
   onClose: PropTypes.func,
 };
 

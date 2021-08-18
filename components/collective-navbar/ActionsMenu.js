@@ -290,7 +290,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       </AddFundsBtn>
                     )}
                     {callsToAction.addFundsFromCollective && (
-                      <AddFundsBtn collective={collective} host={collective.host} isFromCollective={true}>
+                      <AddFundsBtn collective={collective} host={collective.host} isFromParent={true}>
                         {btnProps => (
                           <MenuItem
                             py={1}
