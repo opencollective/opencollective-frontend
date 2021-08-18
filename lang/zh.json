@@ -1359,6 +1359,7 @@
   "Member.Role.ADMIN": "管理",
   "Member.Role.ATTENDEE": "参与者",
   "Member.Role.BACKER": "财政贡献者",
+  "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "赞助者",
   "Member.Role.FOLLOWER": "关注者",
   "Member.Role.FUNDRAISER": "筹款人",
