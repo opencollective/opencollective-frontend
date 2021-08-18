@@ -114,7 +114,8 @@ const StyledBackgroundMask = styled(MaskSVG)`
 `;
 
 const getBackground = collective => {
-  const backgroundImage = collective.backgroundImageUrl || get(collective, 'parentCollective.backgroundImageUrl');
+  const parent = collective.parentCollective || collective.parent;
+  const backgroundImage = collective.backgroundImageUrl || parent?.backgroundImageUrl;
   const primaryColor = get(collective.settings, 'collectivePage.primaryColor', '#1776E1');
   return backgroundImage ? `url(${backgroundImage}) 0 0 / cover no-repeat, ${primaryColor}` : primaryColor;
 };
@@ -211,6 +212,9 @@ StyledCollectiveCard.propTypes = {
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     }),
     parentCollective: PropTypes.shape({
+      backgroundImageUrl: PropTypes.string,
+    }),
+    parent: PropTypes.shape({
       backgroundImageUrl: PropTypes.string,
     }),
   }).isRequired,

@@ -157,7 +157,20 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
             isIncognito
             isAdmin
             isHost
-            imageUrl
+            imageUrl(height: 128)
+            backgroundImageUrl(height: 200)
+            ... on Event {
+              parent {
+                id
+                backgroundImageUrl(height: 200)
+              }
+            }
+            ... on Project {
+              parent {
+                id
+                backgroundImageUrl(height: 200)
+              }
+            }
             backers: members(role: [BACKER]) {
               totalCount
             }
@@ -196,7 +209,7 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
 
 const SectionContributions = ({ collective }) => {
   const intl = useIntl();
-  const [filter, setFilter] = React.useState(FILTERS.ALL);
+  const [filter, setFilter] = React.useState(collective.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL);
   const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
     variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...FILTER_PROPS[0].where },
     context: API_V2_CONTEXT,
@@ -331,6 +344,7 @@ const SectionContributions = ({ collective }) => {
 SectionContributions.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
+    isHost: PropTypes.bool,
   }),
 };
 
