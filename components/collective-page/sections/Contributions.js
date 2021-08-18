@@ -44,6 +44,7 @@ const FILTER_PROPS = [
         CollectiveRoles.MEMBER,
         CollectiveRoles.FUNDRAISER,
       ],
+      accountType: null,
     },
     isActive: () => true,
   },
@@ -70,17 +71,17 @@ const FILTER_PROPS = [
   },
   {
     id: FILTERS.FINANCIAL,
-    where: { role: [CollectiveRoles.BACKER] },
+    where: { role: [CollectiveRoles.BACKER], accountType: null },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.BACKER),
   },
   {
     id: FILTERS.CORE,
-    where: { role: [CollectiveRoles.ADMIN, CollectiveRoles.MEMBER] },
+    where: { role: [CollectiveRoles.ADMIN, CollectiveRoles.MEMBER], accountType: null },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.ADMIN || r.role === CollectiveRoles.MEMBER),
   },
   {
     id: FILTERS.EVENTS,
-    where: { role: [CollectiveRoles.ATTENDEE] },
+    where: { role: [CollectiveRoles.ATTENDEE], accountType: null },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.ATTENDEE),
   },
 ];
@@ -222,17 +223,20 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
 
 const SectionContributions = ({ collective }) => {
   const intl = useIntl();
+  const [isLoadingMore, setLoadingMore] = React.useState(false);
   const [filter, setFilter] = React.useState(collective.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL);
+  const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
   const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
-    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...FILTER_PROPS[0].where },
+    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...selectedFilter.where },
     context: API_V2_CONTEXT,
     notifyOnNetworkStatusChange: true,
   });
 
-  const handleLoadMore = () => {
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
     const offset = memberOf.nodes.length;
     const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
-    fetchMore({
+    await fetchMore({
       variables: { offset, ...selectedFilter.where },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
@@ -249,6 +253,7 @@ const SectionContributions = ({ collective }) => {
         });
       },
     });
+    setLoadingMore(false);
   };
 
   const handleFilterSelect = id => {
@@ -265,7 +270,7 @@ const SectionContributions = ({ collective }) => {
   const { account, memberOf, hostedAccounts, connectedAccounts } = data?.account || {};
   const isOrganization = account?.type === CollectiveType.ORGANIZATION;
   const availableFilters = getAvailableFilters(memberOf?.roles || []);
-
+  const membersLeft = memberOf && memberOf.totalCount - memberOf.nodes.length;
   return (
     <Box pb={4}>
       <React.Fragment>
@@ -290,6 +295,7 @@ const SectionContributions = ({ collective }) => {
               justifyContent="left"
               minButtonWidth={175}
               px={Dimensions.PADDING_X}
+              disabled={isLoadingMore}
             />
           </Box>
         )}
@@ -301,19 +307,27 @@ const SectionContributions = ({ collective }) => {
           mx="auto"
         >
           <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
-            {loading &&
-              [...Array(memberOf?.nodes.length || 5).keys()].map(id => <LoadingPlaceholder key={id} height={334} />)}
-            {!loading &&
+            {(!loading || (isLoadingMore && loading)) &&
               memberOf.nodes.map(membership => (
                 <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                   <StyledMembershipCard membership={membership} />
                 </MembershipCardContainer>
               ))}
+            {loading &&
+              [...Array(membersLeft < PAGE_SIZE ? membersLeft : PAGE_SIZE).keys()].map(id => (
+                <LoadingPlaceholder key={id} height={334} />
+              ))}
           </Grid>
         </Container>
         {memberOf?.nodes.length < memberOf?.totalCount && (
           <Flex mt={3} justifyContent="center">
-            <StyledButton data-cy="load-more" textTransform="capitalize" minWidth={170} onClick={handleLoadMore}>
+            <StyledButton
+              data-cy="load-more"
+              textTransform="capitalize"
+              minWidth={170}
+              onClick={handleLoadMore}
+              loading={loading}
+            >
               <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
             </StyledButton>
           </Flex>

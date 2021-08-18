@@ -33,7 +33,7 @@ const FilterButton = styled(StyledButton).attrs({
 /**
  * A controlled component to display a list of filters.
  */
-const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, ...flexProps }) => {
+const StyledFilters = ({ filters, disabled, getLabel, onChange, selected, minButtonWidth, ...flexProps }) => {
   return (
     <Flex data-cy="filters" py={1} css={{ overflowX: 'auto' }} {...flexProps}>
       {filters.map((filter, idx) => {
@@ -46,6 +46,7 @@ const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, 
               $isSelected={isSelected}
               minWidth={minButtonWidth}
               ml={idx === 0 ? 0 : 2}
+              disabled={disabled}
             >
               <Span whiteSpace="nowrap">{getLabel(filter)}</Span>
             </FilterButton>
@@ -62,6 +63,7 @@ StyledFilters.propTypes = {
   getLabel: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   selected: PropTypes.string,
+  disabled: PropTypes.bool,
   minButtonWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   selectedButtonStyle: PropTypes.oneOf(['primary', 'secondary', 'dark']),
 };
