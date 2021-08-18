@@ -25,6 +25,7 @@ const PAGE_SIZE = 15;
 const FILTERS = {
   ALL: 'ALL',
   HOSTED_COLLECTIVES: 'HOST',
+  HOSTED_FUNDS: 'FUNDS',
   HOSTED_EVENTS: 'EVENT',
   CORE: 'CORE',
   FINANCIAL: 'FINANCIAL',
@@ -53,6 +54,14 @@ const FILTER_PROPS = [
       accountType: [CollectiveType.COLLECTIVE],
     },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.HOST && r.type === CollectiveType.COLLECTIVE),
+  },
+  {
+    id: FILTERS.HOSTED_FUNDS,
+    where: {
+      role: [CollectiveRoles.HOST],
+      accountType: [CollectiveType.FUND],
+    },
+    isActive: roles => roles?.some(r => r.role === CollectiveRoles.HOST && r.type === CollectiveType.FUND),
   },
   {
     id: FILTERS.HOSTED_EVENTS,
@@ -88,6 +97,10 @@ const I18nFilters = defineMessages({
   [FILTERS.HOSTED_COLLECTIVES]: {
     id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
+  },
+  [FILTERS.HOSTED_FUNDS]: {
+    id: 'HostedFunds',
+    defaultMessage: 'Hosted Funds',
   },
   [FILTERS.HOSTED_EVENTS]: {
     id: 'HostedEvents',
