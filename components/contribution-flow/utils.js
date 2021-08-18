@@ -3,7 +3,12 @@ import { find, get, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import {
+  GQLV2_PAYMENT_METHOD_LEGACY_TYPES,
+  GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES,
+  PAYMENT_METHOD_SERVICE,
+  PAYMENT_METHOD_TYPE,
+} from '../../lib/constants/payment-methods';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,
@@ -24,9 +29,9 @@ export const generatePaymentMethodOptions = (
   isEmbed,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
-  const hostHasManual = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
-  const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL);
-  const hostHasStripe = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
+  const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
+  const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYPAL);
+  const hostHasStripe = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD);
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const interval = get(stepDetails, 'interval', null);
 
@@ -42,9 +47,11 @@ export const generatePaymentMethodOptions = (
 
   let uniquePMs = uniqBy(paymentMethodsOptions, 'id');
 
+  // TODO(paymentMethodType): remove deprecated form once migration is over
   uniquePMs = uniquePMs.filter(
     ({ paymentMethod }) =>
-      paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_TYPES.ACCOUNT_BALANCE ||
+      (paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_LEGACY_TYPES.ACCOUNT_BALANCE &&
+        paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE) ||
       collective.host.legacyId === stepProfile.host?.id,
   );
 
@@ -69,12 +76,26 @@ export const generatePaymentMethodOptions = (
   uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
     const sourcePaymentMethod = paymentMethod.sourcePaymentMethod || paymentMethod;
     const sourceProviderType = sourcePaymentMethod.providerType;
+    const sourceType = sourcePaymentMethod.type;
 
-    if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.GIFT_CARD && paymentMethod.limitedToHosts) {
+    // TODO(paymentMethodType): remove deprecated form once migration is over
+    // (no need to uppercase here because we check providerType first)
+
+    const isGiftCard =
+      paymentMethod.providerType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.GIFT_CARD ||
+      paymentMethod.type === PAYMENT_METHOD_TYPE.GIFTCARD;
+    const isSourcePrepaid =
+      sourceProviderType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PREPAID_BUDGET ||
+      sourceType === PAYMENT_METHOD_TYPE.PREPAID;
+    const isSourceCreditCard =
+      sourceProviderType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CREDIT_CARD ||
+      sourceType === PAYMENT_METHOD_TYPE.CREDITCARD;
+
+    if (isGiftCard && paymentMethod.limitedToHosts) {
       return matchesHostCollectiveId(paymentMethod);
-    } else if (sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.PREPAID_BUDGET) {
+    } else if (isSourcePrepaid) {
       return matchesHostCollectiveIdPrepaid(sourcePaymentMethod);
-    } else if (!hostHasStripe && sourceProviderType === GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD) {
+    } else if (!hostHasStripe && isSourceCreditCard) {
       return false;
     } else {
       return true;
@@ -100,17 +121,37 @@ export const generatePaymentMethodOptions = (
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
-        paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL },
-        icon: getPaymentMethodIcon({ service: 'paypal', type: 'payment' }, collective),
+        paymentMethod: {
+          // TODO(paymentMethodType): remove deprecated form
+          // Deprecated but current form
+          providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL,
+          // Future proof form
+          service: PAYMENT_METHOD_SERVICE.PAYPAL,
+          type: PAYMENT_METHOD_TYPE.PAYMENT,
+        },
+        icon: getPaymentMethodIcon(
+          { service: PAYMENT_METHOD_SERVICE.PAYPAL, type: PAYMENT_METHOD_TYPE.PAYMENT },
+          collective,
+        ),
       });
     }
 
-    if (!interval && !isEmbed && supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.ALIPAY)) {
+    if (!interval && !isEmbed && supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY)) {
       uniquePMs.push({
         key: 'alipay',
-        paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.ALIPAY },
+        paymentMethod: {
+          // TODO(paymentMethodType): remove deprecated form
+          // Deprecated but current form
+          providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.ALIPAY,
+          // Future proof form
+          service: PAYMENT_METHOD_SERVICE.STRIPE,
+          type: PAYMENT_METHOD_TYPE.ALIPAY,
+        },
         title: <FormattedMessage id="Alipay" defaultMessage="Alipay" />,
-        icon: getPaymentMethodIcon({ type: 'alipay' }, collective),
+        icon: getPaymentMethodIcon(
+          { service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY },
+          collective,
+        ),
       });
     }
 
@@ -119,8 +160,18 @@ export const generatePaymentMethodOptions = (
       uniquePMs.push({
         key: 'manual',
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || 'Bank transfer',
-        paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER },
-        icon: getPaymentMethodIcon({ type: 'manual' }, collective),
+        paymentMethod: {
+          // TODO(paymentMethodType): remove deprecated form
+          // Deprecated but current form
+          providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER,
+          // Future proof form
+          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+          type: PAYMENT_METHOD_TYPE.MANUAL,
+        },
+        icon: getPaymentMethodIcon(
+          { service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE, type: PAYMENT_METHOD_TYPE.MANUAL },
+          collective,
+        ),
         instructions: (
           <FormattedMessage
             id="NewContributionFlow.bankInstructions"

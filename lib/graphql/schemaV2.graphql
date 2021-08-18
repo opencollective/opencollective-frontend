@@ -208,6 +208,11 @@ interface Account {
     type: [String]
 
     """
+    Filter on given types (CREDITCARD, GIFTCARD...)
+    """
+    enumType: [PaymentMethodType]
+
+    """
     Filter on the given service types (opencollective, stripe, paypal...)
     """
     service: [PaymentMethodService]
@@ -782,6 +787,7 @@ type Bot implements Account {
   """
   paymentMethods(
     type: [String]
+    enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
     """
@@ -1062,6 +1068,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   paymentMethods(
     type: [String]
+    enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
     """
@@ -3361,6 +3368,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   """
   paymentMethods(
     type: [String]
+    enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
     """
@@ -4337,6 +4345,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   paymentMethods(
     type: [String]
+    enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
     """
@@ -4694,6 +4703,7 @@ type Host implements Account & AccountWithContributions {
   """
   paymentMethods(
     type: [String]
+    enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
     """
@@ -5276,6 +5286,7 @@ type Individual implements Account {
   """
   paymentMethods(
     type: [String]
+    enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
     """
@@ -6857,6 +6868,7 @@ type Organization implements Account & AccountWithContributions {
   """
   paymentMethods(
     type: [String]
+    enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
     """
@@ -7055,7 +7067,6 @@ enum PaymentMethodLegacyType {
   PREPAID_BUDGET
   ACCOUNT_BALANCE
   PAYPAL
-  PAYPAL_SUBSCRIPTION
   BANK_TRANSFER
   ADDED_FUNDS
   CRYPTO
@@ -7077,17 +7088,28 @@ enum PaymentMethodService {
 }
 
 enum PaymentMethodType {
-  alipay
-  creditcard
-  prepaid
-  payment
-  subscription
-  collective
-  host
-  adaptive
-  giftcard
-  manual
-  crypto
+  alipay @deprecated(reason: "Please use uppercase values")
+  creditcard @deprecated(reason: "Please use uppercase values")
+  prepaid @deprecated(reason: "Please use uppercase values")
+  payment @deprecated(reason: "Please use uppercase values")
+  subscription @deprecated(reason: "Please use uppercase values")
+  collective @deprecated(reason: "Please use uppercase values")
+  host @deprecated(reason: "Please use uppercase values")
+  adaptive @deprecated(reason: "Please use uppercase values")
+  giftcard @deprecated(reason: "Please use uppercase values")
+  manual @deprecated(reason: "Please use uppercase values")
+  crypto @deprecated(reason: "Please use uppercase values")
+  ALIPAY
+  CREDITCARD
+  PREPAID
+  PAYMENT
+  SUBSCRIPTION
+  COLLECTIVE
+  HOST
+  ADAPTIVE
+  GIFTCARD
+  MANUAL
+  CRYPTO
 }
 
 """
@@ -7420,6 +7442,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   """
   paymentMethods(
     type: [String]
+    enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
     """
@@ -8635,6 +8658,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   paymentMethods(
     type: [String]
+    enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
     """

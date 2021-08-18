@@ -7,6 +7,7 @@ import { Add } from '@styled-icons/material/Add';
 import { get, merge, pick, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
@@ -184,8 +185,9 @@ class EditPaymentMethods extends React.Component {
   };
 
   getPaymentMethodsToDisplay() {
+    // TODO(paymentMethodType): remove toUpperCase once migration is over
     const paymentMethods = get(this.props, 'data.Collective.paymentMethods', []).filter(
-      pm => pm.balance > 0 || (pm.type === 'giftcard' && pm.monthlyLimitPerMember),
+      pm => pm.balance > 0 || (pm.type?.toUpperCase() === PAYMENT_METHOD_TYPE.GIFTCARD && pm.monthlyLimitPerMember),
     );
     return sortBy(paymentMethods, ['type', 'id']);
   }
@@ -246,7 +248,10 @@ class EditPaymentMethods extends React.Component {
                 <EditPaymentMethod
                   paymentMethod={pm}
                   subscriptions={pm.subscriptions}
-                  hasMonthlyLimitPerMember={Collective.type === 'ORGANIZATION' && pm.type !== 'prepaid'}
+                  hasMonthlyLimitPerMember={
+                    // TODO(paymentMethodType): remove toUpperCase once migration is over
+                    Collective.type === 'ORGANIZATION' && pm.type?.toUpperCase() !== PAYMENT_METHOD_TYPE.PREPAID
+                  }
                   currency={pm.currency || Collective.currency}
                   collectiveSlug={Collective.slug}
                   onSave={pm => this.updatePaymentMethod(pm)}
@@ -342,7 +347,7 @@ const paymentMethodsQuery = gql`
         manualPayments
         name
       }
-      paymentMethods(type: ["creditcard", "giftcard", "prepaid"]) {
+      paymentMethods(type: ["CREDITCARD", "GIFTCARD", "PREPAID"]) {
         id
         uuid
         name
