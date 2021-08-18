@@ -141,7 +141,15 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
       settings
       type
       isHost # TODO: Fetch number of hosted collectives
-      memberOf(limit: $limit, offset: $offset, role: $role, accountType: $accountType, orderByRoles: true) {
+      memberOf(
+        limit: $limit
+        offset: $offset
+        role: $role
+        accountType: $accountType
+        orderByRoles: true
+        isApproved: true
+        isArchived: false
+      ) {
         offset
         limit
         totalCount
@@ -191,7 +199,7 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
           }
         }
       }
-      hostedAccounts: memberOf(role: [HOST], accountType: [COLLECTIVE]) {
+      hostedAccounts: memberOf(role: [HOST], accountType: [COLLECTIVE, FUND], isApproved: true, isArchived: false) {
         totalCount
       }
       connectedAccounts: members(role: [CONNECTED_ACCOUNT]) {
