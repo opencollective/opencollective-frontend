@@ -1359,6 +1359,7 @@
   "Member.Role.ADMIN": "관리",
   "Member.Role.ATTENDEE": "참석자",
   "Member.Role.BACKER": "Financial Contributor",
+  "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "기여자",
   "Member.Role.FOLLOWER": "팔로워",
   "Member.Role.FUNDRAISER": "Fundraiser",
