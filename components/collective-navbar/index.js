@@ -258,6 +258,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
     hasRequestGrant:
       (isFund || get(settings, 'fundingRequest') === true) && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isHostAdmin,
+    addFundsFromCollective: isAdmin && collective.type === CollectiveType.EVENT,
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
     hasSettings: isAdmin,

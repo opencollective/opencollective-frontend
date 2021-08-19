@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import AddFundsModal from './host-dashboard/AddFundsModal';
 import StyledButton from './StyledButton';
 
-const AddFundsBtn = ({ children, collective, host }) => {
+const AddFundsBtn = ({ children, collective, host, isFromParent }) => {
   const [showModal, setShowModal] = React.useState(false);
   return (
     <Fragment>
@@ -16,6 +16,7 @@ const AddFundsBtn = ({ children, collective, host }) => {
         show={showModal}
         setShow={setShowModal}
         onClose={() => setShowModal(null)}
+        isFromParent={isFromParent}
       />
     </Fragment>
   );
@@ -25,6 +26,7 @@ AddFundsBtn.propTypes = {
   children: PropTypes.func.isRequired,
   collective: PropTypes.object.isRequired,
   host: PropTypes.object.isRequired,
+  isFromParent: PropTypes.bool,
 };
 
 const DefaultAddFundsButton = props => (
