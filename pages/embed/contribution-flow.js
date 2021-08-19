@@ -75,7 +75,7 @@ class NewContributionFlowPage extends React.Component {
       defaultName: query.defaultName,
       useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
       hideHeader: query.hideHeader ? parseToBoolean(query.hideHeader) : false,
-      backgroundColor: backgroundColor && isHexColor(backgroundColor) ? backgroundColor : null,
+      backgroundColor: backgroundColor && isHexColor(backgroundColor) ? backgroundColor : undefined,
     };
   }
 
