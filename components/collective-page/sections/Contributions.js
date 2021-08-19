@@ -35,7 +35,7 @@ const FILTERS = {
 const FILTER_PROPS = [
   {
     id: FILTERS.ALL,
-    where: {
+    args: {
       role: [
         CollectiveRoles.HOST,
         CollectiveRoles.ADMIN,
@@ -45,43 +45,62 @@ const FILTER_PROPS = [
         CollectiveRoles.FUNDRAISER,
       ],
       accountType: null,
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
     },
     isActive: () => true,
   },
   {
     id: FILTERS.HOSTED_COLLECTIVES,
-    where: {
+    args: {
       role: [CollectiveRoles.HOST],
       accountType: [CollectiveType.COLLECTIVE],
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
     },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.HOST && r.type === CollectiveType.COLLECTIVE),
   },
   {
     id: FILTERS.HOSTED_FUNDS,
-    where: {
+    args: {
       role: [CollectiveRoles.HOST],
       accountType: [CollectiveType.FUND],
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
     },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.HOST && r.type === CollectiveType.FUND),
   },
   {
     id: FILTERS.HOSTED_EVENTS,
-    where: { role: [CollectiveRoles.HOST], accountType: [CollectiveType.EVENT] },
+    args: {
+      role: [CollectiveRoles.HOST],
+      accountType: [CollectiveType.EVENT],
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
+    },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.HOST && r.type === 'EVENT'),
   },
   {
     id: FILTERS.FINANCIAL,
-    where: { role: [CollectiveRoles.BACKER], accountType: null },
+    args: {
+      role: [CollectiveRoles.BACKER],
+      accountType: null,
+      orderBy: { field: 'TOTAL_CONTRIBUTED', direction: 'DESC' },
+    },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.BACKER),
   },
   {
     id: FILTERS.CORE,
-    where: { role: [CollectiveRoles.ADMIN, CollectiveRoles.MEMBER], accountType: null },
+    args: {
+      role: [CollectiveRoles.ADMIN, CollectiveRoles.MEMBER],
+      accountType: null,
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
+    },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.ADMIN || r.role === CollectiveRoles.MEMBER),
   },
   {
     id: FILTERS.EVENTS,
-    where: { role: [CollectiveRoles.ATTENDEE], accountType: null },
+    args: {
+      role: [CollectiveRoles.ATTENDEE],
+      accountType: null,
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
+    },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.ATTENDEE),
   },
 ];
@@ -135,6 +154,7 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
     $offset: Int
     $role: [MemberRole]
     $accountType: [AccountType]
+    $orderBy: OrderByInput
   ) {
     account(slug: $slug) {
       id
@@ -149,6 +169,7 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
         orderByRoles: true
         isApproved: true
         isArchived: false
+        orderBy: $orderBy
       ) {
         offset
         limit
@@ -235,7 +256,7 @@ const SectionContributions = ({ collective }) => {
   const [filter, setFilter] = React.useState(collective.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL);
   const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
   const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
-    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...selectedFilter.where },
+    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...selectedFilter.args },
     context: API_V2_CONTEXT,
     notifyOnNetworkStatusChange: true,
   });
@@ -245,7 +266,7 @@ const SectionContributions = ({ collective }) => {
     const offset = memberOf.nodes.length;
     const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
     await fetchMore({
-      variables: { offset, ...selectedFilter.where },
+      variables: { offset, ...selectedFilter.args },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prev;
@@ -268,7 +289,7 @@ const SectionContributions = ({ collective }) => {
     setFilter(id);
     const selectedFilter = FILTER_PROPS.find(f => f.id === id);
     fetchMore({
-      variables: { offset: 0, ...selectedFilter.where },
+      variables: { offset: 0, ...selectedFilter.args },
       updateQuery: (prev, { fetchMoreResult }) => {
         return fetchMoreResult ? fetchMoreResult : prev;
       },
