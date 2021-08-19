@@ -270,6 +270,7 @@ interface Account {
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
 }
 
 """
@@ -837,6 +838,7 @@ type Bot implements Account {
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
 }
 
 """
@@ -1116,6 +1118,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
 
   """
   Returns the Fiscal Host
@@ -2811,13 +2814,15 @@ This represents a Credit transaction
 type Credit implements Transaction {
   id: String!
   legacyId: Int!
-  uuid: String
-  type: TransactionType
+  uuid: String! @deprecated(reason: "2021-08-15: Use id instead.")
+  group: String!
+  type: TransactionType!
   kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount: Amount!
+  netAmountInHostCurrency: Amount!
   taxAmount: Amount!
 
   """
@@ -2826,8 +2831,29 @@ type Credit implements Transaction {
   taxInfo: TaxInfo
   platformFee: Amount!
   hostFee: Amount!
+
+  """
+  Payment Processor Fee (usually in host currency)
+  """
   paymentProcessorFee: Amount!
   host: Account
+
+  """
+  The account on the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
+  """
+  account: Account
+
+  """
+  The account on the opposite side of the transaction (CREDIT -> sender, DEBIT -> recipient)
+  """
+  oppositeAccount: Account
+  fromAccount: Account
+  toAccount: Account
+
+  """
+  Account that emitted the gift card used for this transaction (if any)
+  """
+  giftCardEmitterAccount: Account
   createdAt: DateTime
   updatedAt: DateTime
   expense: Expense
@@ -2840,11 +2866,6 @@ type Credit implements Transaction {
   The permissions given to current logged in user for this transaction
   """
   permissions: TransactionPermissions!
-
-  """
-  Account that emitted the gift card used for this transaction (if any)
-  """
-  giftCardEmitterAccount: Account
   isOrderRejected: Boolean!
   refundTransaction: Transaction
   relatedTransactions(
@@ -2853,8 +2874,6 @@ type Credit implements Transaction {
     """
     kind: [TransactionKind]
   ): [Transaction]!
-  fromAccount: Account
-  toAccount: Account
 }
 
 input CreditCardCreateInput {
@@ -3065,13 +3084,15 @@ This represents a Debit transaction
 type Debit implements Transaction {
   id: String!
   legacyId: Int!
-  uuid: String
-  type: TransactionType
+  uuid: String! @deprecated(reason: "2021-08-15: Use id instead.")
+  group: String!
+  type: TransactionType!
   kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount: Amount!
+  netAmountInHostCurrency: Amount!
   taxAmount: Amount!
 
   """
@@ -3080,8 +3101,29 @@ type Debit implements Transaction {
   taxInfo: TaxInfo
   platformFee: Amount!
   hostFee: Amount!
+
+  """
+  Payment Processor Fee (usually in host currency)
+  """
   paymentProcessorFee: Amount!
   host: Account
+
+  """
+  The account on the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
+  """
+  account: Account
+
+  """
+  The account on the opposite side of the transaction (CREDIT -> sender, DEBIT -> recipient)
+  """
+  oppositeAccount: Account
+  fromAccount: Account
+  toAccount: Account
+
+  """
+  Account that emitted the gift card used for this transaction (if any)
+  """
+  giftCardEmitterAccount: Account
   createdAt: DateTime
   updatedAt: DateTime
   expense: Expense
@@ -3094,11 +3136,6 @@ type Debit implements Transaction {
   The permissions given to current logged in user for this transaction
   """
   permissions: TransactionPermissions!
-
-  """
-  Account that emitted the gift card used for this transaction (if any)
-  """
-  giftCardEmitterAccount: Account
   isOrderRejected: Boolean!
   refundTransaction: Transaction
   relatedTransactions(
@@ -3107,8 +3144,6 @@ type Debit implements Transaction {
     """
     kind: [TransactionKind]
   ): [Transaction]!
-  fromAccount: Account
-  toAccount: Account
 }
 
 """
@@ -3382,6 +3417,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
 
   """
   Returns the Fiscal Host
@@ -4357,6 +4393,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
 
   """
   Returns the Fiscal Host
@@ -4713,6 +4750,7 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
 
   """
   Number of unique financial contributors.
@@ -5296,6 +5334,7 @@ type Individual implements Account {
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   firstName: String @deprecated(reason: "2020-10-12: Use the name field")
   lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
@@ -6516,6 +6555,11 @@ input OrderCreateInput {
   Some context about how this order was created
   """
   context: OrderContextInput
+
+  """
+  Whether this is transferring the remaining balance from a project/event
+  """
+  isBalanceTransfer: Boolean
 }
 
 """
@@ -6876,6 +6920,7 @@ type Organization implements Account & AccountWithContributions {
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
 
   """
   Number of unique financial contributors.
@@ -7435,6 +7480,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
 
   """
   Returns the Fiscal Host
@@ -7841,22 +7887,23 @@ type Query {
     type: TransactionType
 
     """
-    Reference of the account that submitted this expense
+    Reference of the account assigned to the other side of the transaction
+    (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
 
     """
-    Reference of the account where this expense was submitted
+    Reference of the account assigned to the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
     """
     account: AccountReferenceInput
 
     """
-    Reference of the host where this expense was submitted
+    Reference of the host accounting the transaction
     """
     host: AccountReferenceInput
 
     """
-    Only expenses that match these tags
+    NOT IMPLEMENTED. Only return transactions that match these tags.
     """
     tags: [String]
 
@@ -7866,22 +7913,22 @@ type Query {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
-    Only return expenses where the amount is greater than or equal to this value (in cents)
+    Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
 
     """
-    Only return expenses where the amount is lower than or equal to this value (in cents)
+    Only return transactions where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
 
     """
-    Only return expenses that were created after this date
+    Only return transactions that were created after this date
     """
     dateFrom: DateTime
 
     """
-    Only return expenses that were created before this date
+    Only return transactions that were created before this date
     """
     dateTo: DateTime
 
@@ -7891,12 +7938,12 @@ type Query {
     searchTerm: String
 
     """
-    Transaction is attached to Expense
+    Only return transactions with an Expense attached
     """
     hasExpense: Boolean
 
     """
-    Transaction is attached to Order
+    Only return transactions with an Order attached
     """
     hasOrder: Boolean
 
@@ -8077,13 +8124,15 @@ Transaction interface shared by all kind of transactions (Debit, Credit)
 interface Transaction {
   id: String!
   legacyId: Int!
-  uuid: String
-  type: TransactionType
+  uuid: String! @deprecated(reason: "2021-08-15: Use id instead.")
+  group: String!
+  type: TransactionType!
   kind: TransactionKind
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount: Amount!
+  netAmountInHostCurrency: Amount!
   taxAmount: Amount!
 
   """
@@ -8094,7 +8143,17 @@ interface Transaction {
   hostFee: Amount
   paymentProcessorFee: Amount
   host: Account
+  account: Account
+  oppositeAccount: Account
+
+  """
+  The sender of a transaction (on CREDIT = oppositeAccount, DEBIT = account)
+  """
   fromAccount: Account
+
+  """
+  The recipient of a transaction (on CREDIT = account, DEBIT = oppositeAccount)
+  """
   toAccount: Account
   giftCardEmitterAccount: Account
   createdAt: DateTime
@@ -8127,6 +8186,7 @@ type TransactionCollection implements Collection {
 
 enum TransactionKind {
   ADDED_FUNDS
+  BALANCE_TRANSFER
   CONTRIBUTION
   EXPENSE
   HOST_FEE
@@ -8636,6 +8696,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     dateTo: DateTime = null
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
 
   """
   Returns the Fiscal Host

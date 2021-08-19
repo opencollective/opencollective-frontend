@@ -58,9 +58,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
       description,
       paymentMethod: { id: paymentMethods[0].id },
       frequency: 'ONETIME',
-      customData: {
-        isBalanceTransfer: true,
-      },
+      isBalanceTransfer: true,
     };
     try {
       await this.props.sendMoneyToCollective({
