@@ -261,7 +261,6 @@ type Collective implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
     type: [String]
     orderBy: PaymenMethodOrderField = type
 
@@ -611,11 +610,6 @@ interface CollectiveInterface {
     Only return confirmed payment methods
     """
     isConfirmed: Boolean = true
-
-    """
-    Filter on given types  (creditcard, giftcard, etc.)
-    """
-    types: [String]
 
     """
     Filter on given types  (creditcard, giftcard, etc.)
@@ -1260,7 +1254,6 @@ type Event implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
     type: [String]
     orderBy: PaymenMethodOrderField = type
 
@@ -1645,7 +1638,6 @@ type Fund implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
     type: [String]
     orderBy: PaymenMethodOrderField = type
 
@@ -2683,7 +2675,6 @@ type Organization implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
     type: [String]
     orderBy: PaymenMethodOrderField = type
 
@@ -3069,7 +3060,6 @@ type Project implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
     type: [String]
     orderBy: PaymenMethodOrderField = type
 
@@ -3911,7 +3901,6 @@ type User implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
     type: [String]
     orderBy: PaymenMethodOrderField = type
 
@@ -4202,7 +4191,6 @@ type Vendor implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
     type: [String]
     orderBy: PaymenMethodOrderField = type
 
