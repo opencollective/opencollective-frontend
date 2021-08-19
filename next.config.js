@@ -31,6 +31,7 @@ const nextConfig = {
         REJECTED_CATEGORIES: false,
         CHANGE_LOG_UPDATES_ENABLED: false,
         WISE_ENVIRONMENT: 'sandbox',
+        ADD_FUNDS_FROM_COLLECTIVE: false,
       }),
     );
 
