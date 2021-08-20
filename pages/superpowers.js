@@ -1,25 +1,91 @@
 import React from 'react';
+import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
+import styled, { css } from 'styled-components';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
-import { Flex } from '../components/Grid';
+import Container from '../components/Container';
+import { Box, Grid } from '../components/Grid';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
 import ClearCacheForAccountForm from '../components/superpowers/ClearCacheForAccountForm';
-import { H1, H2 } from '../components/Text';
+import MergeAccountsForm from '../components/superpowers/MergeAccountsForm';
+import { H1, H2, H3, P, Span } from '../components/Text';
+
+const GRID_TEMPLATE_COLUMNS = ['minmax(220px, 1fr) 6fr'];
+
+const MENU = [
+  { id: 'Clear cache', title: 'Clear cache for account', Component: ClearCacheForAccountForm },
+  { id: 'Merge accounts', isDangerous: true, Component: MergeAccountsForm },
+];
+
+const MenuEntry = styled.button`
+  background: white;
+  padding: 16px;
+  cursor: pointer;
+  background: none;
+  color: inherit;
+  border: none;
+  font: inherit;
+  outline: inherit;
+  width: 100%;
+  text-align: left;
+
+  ${props =>
+    props.isActive &&
+    css`
+      font-weight: 800;
+      background: #f3f3f3;
+    `}
+
+  &: hover {
+    background: #f9f9f9;
+  }
+`;
 
 const SuperPowersPage = () => {
+  const [selectedMenuEntry, setSelectedMenuEntry] = React.useState(MENU[0]);
   return (
     <AuthenticatedPage disableSignup rootOnly>
-      <Flex flexDirection="column" maxWidth="550px" alignItems="center" mx="auto" px={2} py={5}>
-        <H1 mb={5}>Root actions</H1>
-        <StyledCard p={4} width="100%">
-          <H2 lineHeight="30px" fontSize="20px">
-            Clear cache for account
-          </H2>
-          <StyledHr borderColor="#DCDEE0" mb={3} mt={2} />
-          <ClearCacheForAccountForm />
-        </StyledCard>
-      </Flex>
+      <Container maxWidth="1000px" m="0 auto" mt={4} borderBottom="1px solid #e5e5e5">
+        <H1 textAlign="left" fontSize="32px" py={2}>
+          Root actions
+        </H1>
+      </Container>
+      <Grid gridGap={64} gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
+        <Container minHeight="600px" borderRight="1px solid #e5e5e5">
+          {MENU.map(menuEntry => (
+            <MenuEntry
+              key={menuEntry.id}
+              title={menuEntry.title || menuEntry.id}
+              isActive={selectedMenuEntry.id === menuEntry.id}
+              onClick={() => setSelectedMenuEntry(menuEntry)}
+            >
+              {menuEntry.id}
+            </MenuEntry>
+          ))}
+        </Container>
+        <Box py={4}>
+          {selectedMenuEntry.isDangerous && (
+            <Container textAlign="center" mb={4}>
+              <H2 fontSize="30px" css={{ textShadow: '0px 2px 2px red' }}>
+                <ExclamationTriangle color="red" size={30} />
+                <Span ml={3} css={{ verticalAlign: 'middle' }}>
+                  DANGEROUS ACTION
+                </Span>
+              </H2>
+              <P mt={2}>Please be super careful with the action below, and double check everything you do.</P>
+              <StyledHr width="100%" mt={4} />
+            </Container>
+          )}
+          <StyledCard p={4} width="100%">
+            <H3 lineHeight="30px" fontSize="20px">
+              {selectedMenuEntry.title || selectedMenuEntry.id}
+            </H3>
+            <StyledHr borderColor="#DCDEE0" mb={3} mt={2} />
+            <selectedMenuEntry.Component />
+          </StyledCard>
+        </Box>
+      </Grid>
     </AuthenticatedPage>
   );
 };
