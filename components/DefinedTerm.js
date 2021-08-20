@@ -39,7 +39,7 @@ const TranslatedTerms = defineMessages({
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard',
-    defaultMessage: 'Gift card',
+    defaultMessage: 'Gift Card',
   },
   [Terms.ESTIMATED_BUDGET]: {
     id: 'CollectivePage.SectionBudget.Annual',

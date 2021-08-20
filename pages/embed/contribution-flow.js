@@ -5,7 +5,7 @@ import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
 import { isEmail, isHexColor } from 'validator';
 
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { floatAmountToCents } from '../../lib/math';
@@ -124,7 +124,7 @@ class NewContributionFlowPage extends React.Component {
 
   loadExternalScripts() {
     const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
-    if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
+    if (supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
       this.props.loadStripe();
     }
   }

@@ -11,7 +11,11 @@ import styled from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import {
+  GQLV2_PAYMENT_METHOD_LEGACY_TYPES,
+  PAYMENT_METHOD_SERVICE,
+  PAYMENT_METHOD_TYPE,
+} from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -289,35 +293,63 @@ class ContributionFlow extends React.Component {
 
     if (!stepPayment?.paymentMethod) {
       return null;
-    } else if (stepPayment.paymentMethod.id) {
-      return pick(stepPayment.paymentMethod, ['id']);
+    }
+
+    const paymentMethod = {
+      // TODO: cleanup after this version is deployed in production
+
+      // Migration Step 1
+      type: stepPayment.paymentMethod.providerType,
+      legacyType: stepPayment.paymentMethod.providerType,
+      service: stepPayment.paymentMethod.service,
+      newType: stepPayment.paymentMethod.type,
+
+      // Migration Step 2
+      // legacyType: stepPayment.paymentMethod.providerType,
+      // service: stepPayment.paymentMethod.service,
+      // type: stepPayment.paymentMethod.type,
+
+      // Migration Step 3
+      // service: stepPayment.paymentMethod.service,
+      // type: stepPayment.paymentMethod.type,
+    };
+
+    // Payment Method already registered
+    if (stepPayment.paymentMethod.id) {
+      paymentMethod.id = stepPayment.paymentMethod.id;
+
+      // New Credit Card
     } else if (stepPayment.key === NEW_CREDIT_CARD_KEY) {
       const cardElement = stripeElements.getElement(CardElement);
       const { token } = await stripe.createToken(cardElement);
       const pm = stripeTokenToPaymentMethod(token);
-      return {
-        name: pm.name,
-        isSavedForLater: stepPayment.paymentMethod.isSavedForLater,
-        creditCardInfo: { token: pm.token, ...pm.data },
-      };
-    } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
-      return pick(stepPayment.paymentMethod, [
-        'type',
-        'paypalInfo.token',
-        'paypalInfo.data',
-        'paypalInfo.isNewApi',
-        'paypalInfo.orderId',
-        'paypalInfo.subscriptionId',
-      ]);
+
+      paymentMethod.name = pm.name;
+      paymentMethod.isSavedForLater = stepPayment.paymentMethod.isSavedForLater;
+      paymentMethod.creditCardInfo = { token: pm.token, ...pm.data };
+
+      // PayPal
     } else if (
-      [
-        GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER,
-        GQLV2_PAYMENT_METHOD_TYPES.ALIPAY,
-        GQLV2_PAYMENT_METHOD_TYPES.CRYPTO,
-      ].includes(stepPayment.paymentMethod.type)
+      // TODO(paymentMethodType): remove deprecated form
+      // Deprecated form
+      stepPayment.paymentMethod.providerType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL ||
+      // Future proof form (no need to convert to uppercase here)
+      stepPayment.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL
     ) {
-      return pick(stepPayment.paymentMethod, ['type', 'service']);
+      paymentMethod.paypalInfo = pick(stepPayment.paymentMethod.paypalInfo, [
+        'token',
+        'data',
+        'isNewApi',
+        'orderId',
+        'subscriptionId',
+      ]);
+      // Define the right type (doesn't matter that much today, but make it future proof)
+      if (paymentMethod.paypalInfo.isNewApi && paymentMethod.paypalInfo.subscriptionId) {
+        paymentMethod.type === PAYMENT_METHOD_TYPE.SUBSCRIPTION;
+      }
     }
+
+    return paymentMethod;
   };
 
   getEmailRedirectURL() {
@@ -405,7 +437,19 @@ class ContributionFlow extends React.Component {
     // To create an order we need a payment method to be set. This is normally set at final stage but for crypto flow we
     // need to set this before the final step of the flow
     if (this.props.paymentMethod === 'crypto') {
-      this.setState({ stepPayment: { key: 'manual', paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.CRYPTO } } });
+      this.setState({
+        stepPayment: {
+          key: 'crypto',
+          paymentMethod: {
+            // TODO(paymentMethodType): remove deprecated form
+            // Deprecated but current form
+            providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CRYPTO,
+            // Future proof form
+            service: PAYMENT_METHOD_SERVICE.THEGIVINGBLOCK,
+            type: PAYMENT_METHOD_TYPE.CRYPTO,
+          },
+        },
+      });
     }
 
     // This checkout step is where the QR code is displayed for crypto
@@ -589,7 +633,13 @@ class ContributionFlow extends React.Component {
 
   getPaypalButtonProps({ currency }) {
     const { stepPayment, stepDetails, stepSummary } = this.state;
-    if (stepPayment?.paymentMethod?.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
+    if (
+      // TODO(paymentMethodType): remove deprecated form
+      // Deprecated but current form
+      stepPayment?.paymentMethod?.providerType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL ||
+      // Future proof form (no need to convert to uppercase here)
+      stepPayment?.paymentMethod?.service === PAYMENT_METHOD_SERVICE.PAYPAL
+    ) {
       const { host, collective, tier } = this.props;
       return {
         host: host,
@@ -609,7 +659,12 @@ class ContributionFlow extends React.Component {
               stepPayment: {
                 ...state.stepPayment,
                 paymentMethod: {
-                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
+                  // TODO(paymentMethodType): remove deprecated form
+                  // Deprecated but current form
+                  providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL,
+                  // Future proof form
+                  service: PAYMENT_METHOD_SERVICE.PAYPAL,
+                  type: PAYMENT_METHOD_TYPE.PAYMENT,
                   paypalInfo: { isNewApi: true, ...paypalInfo },
                 },
               },

@@ -3,7 +3,12 @@ import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import {
+  GQLV2_PAYMENT_METHOD_LEGACY_TYPES,
+  GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES,
+  PAYMENT_METHOD_SERVICE,
+  PAYMENT_METHOD_TYPE,
+} from '../../lib/constants/payment-methods';
 import { getIntervalFromContributionFrequency } from '../../lib/date-utils';
 
 import CreditCard from '../../components/icons/CreditCard';
@@ -21,11 +26,13 @@ export const getSubscriptionStartDate = order => {
   }
 };
 
+const STRIPE = 'stripe';
+
 const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodInfo, order, isSubmitting }) => {
   const host = order.toAccount.host;
-  const hasStripe = host.supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
-  const hasPaypal = host.supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL);
-  const defaultProvider = hasStripe && !hasPaypal ? 'stripe' : null;
+  const hasStripe = host.supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD);
+  const hasPaypal = host.supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYPAL);
+  const defaultProvider = hasStripe && !hasPaypal ? STRIPE : null;
   const [selectedProvider, setSelectedProvider] = React.useState(defaultProvider);
   const { addToast } = useToasts();
 
@@ -36,7 +43,7 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
           <StyledButton
             buttonSize="small"
             data-cy="add-pm-select-provider-credit-card-btn"
-            onClick={() => setSelectedProvider('stripe')}
+            onClick={() => setSelectedProvider(STRIPE)}
             mb={2}
           >
             <CreditCard size={24} />
@@ -58,7 +65,12 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
             onError={e => addToast({ type: TOAST_TYPE.ERROR, title: e.message })}
             onSuccess={({ subscriptionId }) => {
               onPaypalSuccess({
-                type: 'PAYPAL',
+                // TODO(paymentMethodType): remove deprecated form
+                // Deprecated but current form
+                providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL,
+                // Future proof form
+                service: PAYMENT_METHOD_SERVICE.PAYPAL,
+                type: PAYMENT_METHOD_TYPE.SUBSCRIPTION,
                 paypalInfo: {
                   subscriptionId,
                   isNewApi: true,
@@ -69,7 +81,7 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
         )}
       </Flex>
     );
-  } else if (selectedProvider === 'stripe') {
+  } else if (selectedProvider === STRIPE) {
     return (
       <NewCreditCardForm
         name="newCreditCardInfo"

@@ -8,6 +8,7 @@ import { first, get, merge, pick, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
@@ -64,7 +65,7 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
     account(id: $accountId) {
       id
-      paymentMethods(type: ["creditcard", "giftcard", "prepaid"]) {
+      paymentMethods(enumType: [CREDITCARD, GIFTCARD, PREPAID]) {
         ...UpdatePaymentMethodFragment
       }
     }
@@ -204,7 +205,7 @@ const useUpdatePaymentMethod = contribution => {
       try {
         if (hasUpdate) {
           const variables = { order: { id: contribution.id } };
-          if (paymentMethod.type === 'PAYPAL') {
+          if (paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL) {
             variables.paypalSubscriptionId = paymentMethod.paypalInfo.subscriptionId;
           } else {
             variables.paymentMethod = { id: paymentMethod.value ? paymentMethod.value.id : paymentMethod.id };
