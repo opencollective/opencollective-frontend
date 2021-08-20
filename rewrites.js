@@ -310,6 +310,10 @@ exports.REWRITES = [
     source: '/applications',
     destination: '/applications',
   },
+  {
+    source: '/superpowers',
+    destination: '/superpowers',
+  },
   // Collective
   // ----------
   // Collective page
