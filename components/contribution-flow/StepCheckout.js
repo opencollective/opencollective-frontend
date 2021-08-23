@@ -46,7 +46,7 @@ const StepCheckout = ({ stepDetails, order }) => {
               includeMargin
             />
             <P mb="16px">{order.paymentMethod.data.depositAddress}</P>
-            <StyledButton onClick={() => copy(window.location.href)} disabled={isCopied}>
+            <StyledButton onClick={() => copy(order.paymentMethod.data.depositAddress)} disabled={isCopied}>
               <Span mr={1}>
                 <FormattedMessage
                   id="NewContribute.crypto.QRCodeCopyButton"
