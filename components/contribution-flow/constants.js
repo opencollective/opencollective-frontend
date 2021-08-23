@@ -10,6 +10,7 @@ export const STEPS = {
   PAYMENT: 'payment',
   SUMMARY: 'summary',
   SUCCESS: 'success',
+  CHECKOUT: 'checkout',
 };
 
 export const CRYPTO_CURRENCIES = [
