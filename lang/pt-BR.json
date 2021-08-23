@@ -393,7 +393,6 @@
   "CollectivePage.SectionConnect.Title": "Conectar",
   "CollectivePage.SectionContribute.info": "Apoie {collectiveName} contribuindo com ele uma vez, mensalmente ou anualmente.",
   "CollectivePage.SectionContribute.Subtitle": "Torne-se um contribuinte financeiro.",
-  "CollectivePage.SectionContribute.Title.TicketsWithNoCustomContribution": "Tickets",
   "CollectivePage.SectionEvents.AdminDescription": "Set up events for your community and sell tickets that go straight to your budget.",
   "CollectivePage.SectionEvents.Description": "{collectiveName} is hosting the following events.",
   "CollectivePage.SectionEvents.ViewAll": "Visualizar todos eventos",

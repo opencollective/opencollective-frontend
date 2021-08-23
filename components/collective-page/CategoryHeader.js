@@ -104,7 +104,7 @@ const getCategoryData = (intl, collective, category, isAdmin) => {
         ? {
             img: contributeSectionHeaderIcon,
             title: intl.formatMessage({
-              id: 'CollectivePage.SectionContribute.Title.TicketsWithNoCustomContribution',
+              id: 'section.tickets.title',
               defaultMessage: 'Tickets',
             }),
           }
@@ -136,7 +136,9 @@ const getCategoryData = (intl, collective, category, isAdmin) => {
 };
 
 export const isEventWithNoCustomContributions = collective =>
-  collective?.type === CollectiveType.EVENT && Boolean(collective?.settings?.disableCustomContributions);
+  collective?.type === CollectiveType.EVENT &&
+  collective?.tiers?.length === 0 &&
+  Boolean(collective?.settings?.disableCustomContributions);
 
 const CategoryHeader = React.forwardRef(({ collective, category, isAdmin, ...props }, ref) => {
   const intl = useIntl();

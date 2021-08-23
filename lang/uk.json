@@ -393,7 +393,6 @@
   "CollectivePage.SectionConnect.Title": "Під'єднати",
   "CollectivePage.SectionContribute.info": "Підтримайте {collectiveName} своїм щомісячним або щорічним внеском.",
   "CollectivePage.SectionContribute.Subtitle": "Стати фінансовим помічником.",
-  "CollectivePage.SectionContribute.Title.TicketsWithNoCustomContribution": "Tickets",
   "CollectivePage.SectionEvents.AdminDescription": "Створюйте заходи для своєї спільноти та продавайте квитки, кошти за які надходять прямо до вашого бюджету.",
   "CollectivePage.SectionEvents.Description": "{collectiveName} розміщує такі події.",
   "CollectivePage.SectionEvents.ViewAll": "Переглянути всі події",
