@@ -6566,6 +6566,11 @@ input OrderCreateInput {
   Some context about how this order was created
   """
   context: OrderContextInput
+
+  """
+  Whether this is transferring the remaining balance from a project/event
+  """
+  isBalanceTransfer: Boolean
 }
 
 """
@@ -8205,6 +8210,7 @@ type TransactionCollection implements Collection {
 
 enum TransactionKind {
   ADDED_FUNDS
+  BALANCE_TRANSFER
   CONTRIBUTION
   EXPENSE
   HOST_FEE
