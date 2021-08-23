@@ -47,7 +47,7 @@
   "AddFundsModal.cancel": "Cancelar",
   "AddFundsModal.description": "Descripción",
   "AddFundsModal.Details": "Detalles",
-  "AddFundsModal.disclaimer": "By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective.",
+  "AddFundsModal.disclaimer": "Haciendo clic a continuación, usted se compromete a destinar {amount} con cargo a su cuenta bancaria en nombre del colectivo.",
   "AddFundsModal.finish": "Terminar",
   "AddFundsModal.ForThePurpose": "For the purpose of",
   "AddFundsModal.FromTheSource": "From the source",
