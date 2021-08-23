@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import AddFundsFromParentModal from './host-dashboard/AddFundsFromParentModal';
 import AddFundsModal from './host-dashboard/AddFundsModal';
 import StyledButton from './StyledButton';
 
@@ -10,14 +11,24 @@ const AddFundsBtn = ({ children, collective, host, isFromParent }) => {
   return (
     <Fragment>
       {children({ onClick: () => setShowModal(true) })}
-      <AddFundsModal
-        collective={collective}
-        host={host}
-        show={showModal}
-        setShow={setShowModal}
-        onClose={() => setShowModal(null)}
-        isFromParent={isFromParent}
-      />
+      {!isFromParent && (
+        <AddFundsModal
+          collective={collective}
+          host={host}
+          show={showModal}
+          setShow={setShowModal}
+          onClose={() => setShowModal(null)}
+        />
+      )}
+      {isFromParent && (
+        <AddFundsFromParentModal
+          collective={collective}
+          host={host}
+          show={showModal}
+          setShow={setShowModal}
+          onClose={() => setShowModal(null)}
+        />
+      )}
     </Fragment>
   );
 };
