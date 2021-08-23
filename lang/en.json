@@ -107,6 +107,7 @@
   "AudienceBreakdown.hostedAdmins": "The admins of {count} {count, plural, one {hosted account} other {hosted accounts}}",
   "AudienceBreakdown.individuals": "{count} {count, plural, one {individual} other {individuals}}",
   "AudienceBreakdown.organizationAdmins": "The admins of {count} {count, plural, one {organization} other {organizations}}",
+  "AuthenticatedPage.RootOnly": "This page is limited to site administrators",
   "authorization.loginRequired": "You need to be logged in to continue.",
   "Back": "Back",
   "BalanceAmount": "Balance {balance}",
