@@ -43,7 +43,7 @@ const MenuEntry = styled.button`
   }
 `;
 
-const SuperPowersPage = () => {
+const RootActionsPage = () => {
   const [selectedMenuEntry, setSelectedMenuEntry] = React.useState(MENU[0]);
   const router = useRouter();
   const showHiddenActions = Boolean(router.query.showHiddenActions);
@@ -93,6 +93,6 @@ const SuperPowersPage = () => {
   );
 };
 
-SuperPowersPage.propTypes = {};
+RootActionsPage.propTypes = {};
 
-export default SuperPowersPage;
+export default RootActionsPage;
