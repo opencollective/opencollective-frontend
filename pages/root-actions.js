@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
+import { useRouter } from 'next/router';
 import styled, { css } from 'styled-components';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -15,7 +16,7 @@ const GRID_TEMPLATE_COLUMNS = ['minmax(220px, 1fr) 6fr'];
 
 const MENU = [
   { id: 'Clear cache', title: 'Clear cache for account', Component: ClearCacheForAccountForm },
-  { id: 'Merge accounts', isDangerous: true, Component: MergeAccountsForm },
+  { id: 'Merge accounts', isDangerous: true, Component: MergeAccountsForm, isHidden: true },
 ];
 
 const MenuEntry = styled.button`
@@ -44,6 +45,8 @@ const MenuEntry = styled.button`
 
 const SuperPowersPage = () => {
   const [selectedMenuEntry, setSelectedMenuEntry] = React.useState(MENU[0]);
+  const router = useRouter();
+  const showHiddenActions = Boolean(router.query.showHiddenActions);
   return (
     <AuthenticatedPage disableSignup rootOnly>
       <Container maxWidth="1000px" m="0 auto" mt={4} borderBottom="1px solid #e5e5e5">
@@ -53,7 +56,7 @@ const SuperPowersPage = () => {
       </Container>
       <Grid gridGap={64} gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
         <Container minHeight="600px" borderRight="1px solid #e5e5e5">
-          {MENU.map(menuEntry => (
+          {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry => (
             <MenuEntry
               key={menuEntry.id}
               title={menuEntry.title || menuEntry.id}
