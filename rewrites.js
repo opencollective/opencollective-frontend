@@ -311,8 +311,8 @@ exports.REWRITES = [
     destination: '/applications',
   },
   {
-    source: '/superpowers',
-    destination: '/superpowers',
+    source: '/opencollective/root-actions',
+    destination: '/root-actions',
   },
   // Collective
   // ----------
