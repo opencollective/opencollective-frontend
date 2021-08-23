@@ -4,7 +4,7 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { GQLV2_PAYMENT_METHOD_LEGACY_TYPES } from '../../lib/constants/payment-methods';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 import { toPx } from '../../lib/theme/helpers';
 
@@ -182,7 +182,8 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                 <Span fontSize="11px" lineHeight="16px" color="black.700">
                   {i18nPaymentMethodProviderType(
                     intl,
-                    order.paymentMethod?.providerType || GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER,
+                    // TODO(paymentMethodType): migrate to service+type
+                    order.paymentMethod?.providerType || GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER,
                   )}
                 </Span>
               )}

@@ -1,5 +1,5 @@
 const createOrderPage = '/contribution-flow';
-const contributionFlowSteps = '/details|profile|payment|summary|success';
+const contributionFlowSteps = '/details|profile|payment|checkout|summary|success';
 
 exports.REWRITES = [
   {
@@ -15,7 +15,7 @@ exports.REWRITES = [
     destination: '/staticPage',
   },
   {
-    source: '/foundation/apply/:step(intro|fees|form|success)?',
+    source: '/foundation/apply/:step(intro|fees|form|success)',
     destination: '/ocf-host-application',
   },
   {
@@ -167,7 +167,7 @@ exports.REWRITES = [
   // New Create Collective Flow
   {
     source:
-      '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
+      '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
     destination: '/create-collective',
   },
   // Events and Projects using collective page
@@ -216,7 +216,7 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:collectiveSlug/:verb(donate|pay|order)/:step(${contributionFlowSteps})?`,
+    source: `/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)?/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {
@@ -236,7 +236,7 @@ exports.REWRITES = [
   },
   // Embed
   {
-    source: `/embed/:collectiveSlug/donate/:step(${contributionFlowSteps})?`,
+    source: `/embed/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)?/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   {
@@ -318,7 +318,7 @@ exports.REWRITES = [
     destination: '/collective-page',
   },
   {
-    source: '/:slug/:mode(onboarding)?/:step(administrators|contact-info|success)?',
+    source: '/:slug/:action(apply)?/:mode(onboarding)?/:step(administrators|contact-info|success)?',
     destination: '/collective-page',
   },
 ];

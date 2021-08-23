@@ -65,6 +65,7 @@ class InlineEditField extends Component {
     isEditing: PropTypes.bool,
     /** Add a confirm if trying to leave the form with unsaved changes */
     warnIfUnsavedChanges: PropTypes.bool,
+    required: PropTypes.bool,
     /** Max field length */
     maxLength: PropTypes.number,
     /** Gets passed the item, the new value and must return the mutation variables */
@@ -167,7 +168,8 @@ class InlineEditField extends Component {
     const { draft, isEditing } = this.state;
     const { buttonsMinWidth } = this.props;
     const value = get(values, field);
-    const isValid = draft !== value && draft !== '';
+    const touched = draft !== value;
+    const isValid = !this.props.required ? touched : touched && Boolean(draft);
 
     if (!isEditing) {
       return (

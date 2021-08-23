@@ -65,7 +65,7 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.contains('Your email has been confirmed');
 
     // Redirected to profile, contains all transactions
-    cy.location('pathname').should('include', '/user-');
+    cy.location('pathname').should('include', '/guest-'); // Slug should not change
     cy.contains('Incognito'); // Default user name
     cy.contains('[data-cy="hero-total-amount-contributed"]', '$10.00 USD');
     cy.contains('[data-cy="transaction-item"]', 'Financial contribution to APEX').should('have.length', 1);
@@ -194,7 +194,7 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.contains('Your email has been confirmed');
 
       // Redirected to profile, contains all transactions
-      cy.location('pathname').should('include', '/rick-astley'); // Used name to generate the profile
+      cy.location('pathname').should('include', '/guest-'); // Slug should not change
       cy.contains('Rick Astley');
       cy.contains('[data-cy="hero-total-amount-contributed"]', '$510.00 USD');
       cy.get('[data-cy="transaction-item"]').should('have.length', 2);

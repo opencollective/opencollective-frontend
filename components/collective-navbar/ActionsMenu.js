@@ -16,10 +16,10 @@ import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective.lib';
 import { getSettingsRoute } from '../../lib/url_helpers';
+import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
-import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
 import Container from '../Container';
@@ -33,6 +33,8 @@ import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
+
+const ADD_FUNDS_FROM_COLLECTIVE = parseToBoolean(process.env.ADD_FUNDS_FROM_COLLECTIVE);
 
 //  Styled components
 const MenuItem = styled('li')`
@@ -280,7 +282,13 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <AddFundsBtn collective={collective} host={collective.host}>
                         {btnProps => (
                           <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps} data-cy="add-funds-btn">
+                            <StyledButton
+                              borderRadius={0}
+                              p={ITEM_PADDING}
+                              isBorderless
+                              {...btnProps}
+                              data-cy="add-funds-btn"
+                            >
                               <AttachMoney size="20px" />
                               <Span>
                                 <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
@@ -290,22 +298,30 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         )}
                       </AddFundsBtn>
                     )}
-                    {callsToAction.addPrepaidBudget && (
-                      <AddPrepaidBudgetBtn collective={collective}>
+                    {ADD_FUNDS_FROM_COLLECTIVE && callsToAction.addFundsFromCollective && (
+                      <AddFundsBtn collective={collective} host={collective.host} isFromParent={true}>
                         {btnProps => (
                           <MenuItem
                             py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET}
+                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS_FROM_COLLECTIVE}
                           >
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                            <StyledButton
+                              p={ITEM_PADDING}
+                              isBorderless
+                              {...btnProps}
+                              data-cy="add-funds-from-collective-btn"
+                            >
                               <AttachMoney size="20px" />
                               <Span>
-                                <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
+                                <FormattedMessage
+                                  id="menu.addFundsFromCollective"
+                                  defaultMessage="Add Funds from Collective"
+                                />
                               </Span>
                             </StyledButton>
                           </MenuItem>
                         )}
-                      </AddPrepaidBudgetBtn>
+                      </AddFundsBtn>
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
@@ -321,6 +337,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
                         <ApplyToHostBtn
                           hostSlug={collective.slug}
+                          isHidden={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}
                           buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
                         />
                       </MenuItem>
@@ -332,7 +349,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             py={1}
                             isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
                           >
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
                               <CreditCard size="20px" />
                               <Span>
                                 <FormattedMessage id="menu.assignCard" defaultMessage="Assign a Card" />
@@ -349,7 +366,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             py={1}
                             isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
                           >
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
                               <CreditCard size="20px" />
                               <Span>
                                 <FormattedMessage
@@ -403,8 +420,8 @@ CollectiveNavbarActionsMenu.propTypes = {
     hasContribute: PropTypes.bool,
     /** Add funds to a collective */
     addFunds: PropTypes.bool,
-    /** Add prepaid budget to an organization */
-    addPrepaidBudget: PropTypes.bool,
+    /** Add funds from the parent Collective to an event */
+    addFundsFromCollective: PropTypes.bool,
     /** Add new card to Collective */
     assignVirtualCard: PropTypes.bool,
     /** Request card to Collective */

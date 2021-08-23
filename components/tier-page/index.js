@@ -194,14 +194,14 @@ class TierPage extends Component {
             top={Dimensions.COVER_HEIGHT}
           />
         </Container>
-        {/** ---- Description ---- */}
         <Flex justifyContent="center">
           <Flex flex="0 1 1400px" px={[2, 4]} justifyContent="space-evenly" mb={64}>
+            {/** ---- Description ---- */}
             <Container display="flex" flexDirection="column" flex="0 1 800px" mb={4} mx={[0, null, 3]}>
               <Bubbles />
               <Container
                 background="white"
-                borderRadius={8}
+                borderRadius="12px"
                 px={[3, 4]}
                 py={[4, 5]}
                 boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
@@ -214,6 +214,7 @@ class TierPage extends Component {
                     field="name"
                     maxLength={255}
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
+                    required
                   />
                 </H1>
                 <H2
@@ -253,8 +254,8 @@ class TierPage extends Component {
             </Container>
 
             {/** ---- Contribute desktop ---- */}
-            <Hide xs sm md flex="0 1 416px">
-              <Container width="100%" pt={114}>
+            <Hide xs sm md flex="0 1 416px" position="relative" pt={112}>
+              <Container width="100%" position="sticky" top={80} pb={32}>
                 <Container
                   width={1}
                   background="white"
@@ -276,7 +277,7 @@ class TierPage extends Component {
                                   amount={tier.goal}
                                   currency={tier.currency}
                                   interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                                  abbreviateAmount={tier.goal > 1000000}
+                                  formatWithSeparators={tier.goal > 1000000}
                                   abbreviateInterval
                                   amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
                                   precision={0}
@@ -424,7 +425,7 @@ class TierPage extends Component {
                           amount={tier.goal}
                           currency={tier.currency}
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                          abbreviateAmount={tier.goal > 1000000}
+                          formatWithSeparators={tier.goal > 1000000}
                           abbreviateInterval
                           amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
                           precision={0}
@@ -453,7 +454,7 @@ class TierPage extends Component {
                           currency={tier.currency}
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                           amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
-                          abbreviateAmount={amountRaised > 1000000}
+                          formatWithSeparators={amountRaised > 1000000}
                           precision={0}
                           abbreviateInterval
                         />

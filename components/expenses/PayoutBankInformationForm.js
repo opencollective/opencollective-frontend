@@ -30,22 +30,6 @@ export const msg = defineMessages({
   },
 });
 
-const accountHolderFieldOptions = {
-  name: 'Account Holder Name',
-  group: [
-    {
-      required: true,
-      key: 'accountHolderName',
-      name: 'Account Holder Name',
-      type: 'text',
-      example: 'Jane Doe',
-      hint: 'Full name, no abbreviations and without titles.',
-      validationRegexp: '^[^!@#$%&*+]+$',
-      validationError: 'Special characters are not allowed. (!@#$%&*+)',
-    },
-  ],
-};
-
 const requiredFieldsQuery = gqlV2/* GraphQL */ `
   query PayoutBankInformationRequiredFields($slug: String, $currency: String!, $accountDetails: JSON) {
     host(slug: $slug) {
@@ -109,6 +93,33 @@ const Input = props => {
                 <StyledInput
                   {...field}
                   placeholder={input.example}
+                  error={(meta.touched || disabled) && meta.error}
+                  disabled={disabled}
+                  width="100%"
+                  value={get(formik.values, field.name) || ''}
+                />
+              )}
+            </StyledInputField>
+          )}
+        </Field>
+      </Box>
+    );
+  } else if (input.type === 'date') {
+    return (
+      <Box key={input.key} mt={2} flex="1">
+        <Field name={fieldName} validate={validate}>
+          {({ field, meta }) => (
+            <StyledInputField
+              label={input.name}
+              labelFontSize="13px"
+              required={input.required}
+              error={(meta.touched || disabled) && meta.error}
+              hint={input.hint}
+            >
+              {() => (
+                <StyledInput
+                  {...field}
+                  type="date"
                   error={(meta.touched || disabled) && meta.error}
                   disabled={disabled}
                   width="100%"
@@ -265,21 +276,6 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           <FormattedMessage id="PayoutBankInformationForm.AccountInfo" defaultMessage="Account Information" />
         </P>
       </Box>
-      {
-        // Displays the account holder field only if the other fields are also loaded
-        Boolean(availableMethods?.fields.length) && (
-          <FieldGroup
-            currency={currency}
-            disabled={disabled}
-            field={accountHolderFieldOptions}
-            formik={formik}
-            getFieldName={getFieldName}
-            host={host}
-            key={kebabCase(accountHolderFieldOptions.name)}
-            refetch={refetch}
-          />
-        )
-      }
       {otherFields.map(field => (
         <FieldGroup
           currency={currency}
@@ -293,32 +289,36 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           refetch={refetch}
         />
       ))}
-      <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
-        <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
-        <StyledTooltip
-          content={
-            <FormattedMessage
-              id="PayoutBankInformationForm.HolderAddress"
-              defaultMessage="Bank account holder address (not the bank address)"
+      {Boolean(addressFields.length) && (
+        <React.Fragment>
+          <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
+            <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
+            <StyledTooltip
+              content={
+                <FormattedMessage
+                  id="PayoutBankInformationForm.HolderAddress"
+                  defaultMessage="Bank account holder address (not the bank address)"
+                />
+              }
+            >
+              <Info size={16} />
+            </StyledTooltip>
+          </Box>
+          {addressFields.map(field => (
+            <FieldGroup
+              currency={currency}
+              disabled={disabled}
+              field={field}
+              formik={formik}
+              getFieldName={getFieldName}
+              host={host}
+              key={kebabCase(field.name)}
+              loading={loading}
+              refetch={refetch}
             />
-          }
-        >
-          <Info size={16} />
-        </StyledTooltip>
-      </Box>
-      {addressFields.map(field => (
-        <FieldGroup
-          currency={currency}
-          disabled={disabled}
-          field={field}
-          formik={formik}
-          getFieldName={getFieldName}
-          host={host}
-          key={kebabCase(field.name)}
-          loading={loading}
-          refetch={refetch}
-        />
-      ))}
+          ))}
+        </React.Fragment>
+      )}
     </Flex>
   );
 };
@@ -362,6 +362,12 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   // Display spinner if loading
   if (loading) {
     return <StyledSpinner />;
+  } else if (host.slug === TW_API_COLLECTIVE_SLUG && !host?.transferwise) {
+    return (
+      <MessageBox fontSize="12px" type="warning">
+        Wise is not configured on the platform.
+      </MessageBox>
+    );
   } else if (!host.transferwise?.availableCurrencies && !fixedCurrency) {
     return null;
   }

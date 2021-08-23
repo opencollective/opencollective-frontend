@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import ApplyToHostModal from './ApplyToHostModal';
@@ -13,6 +14,8 @@ class ApplyToHostBtn extends React.Component {
     withoutIcon: PropTypes.bool,
     buttonProps: PropTypes.object,
     buttonRenderer: PropTypes.func,
+    router: PropTypes.object,
+    isHidden: PropTypes.bool,
   };
 
   constructor(props) {
@@ -20,12 +23,32 @@ class ApplyToHostBtn extends React.Component {
     this.state = { showModal: false };
   }
 
+  componentDidMount() {
+    const { router } = this.props;
+
+    if (router.query.action === 'apply') {
+      this.setState({ showModal: true });
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { router } = this.props;
+
+    if (router.query.action !== 'apply' && prevProps.router.query.action === 'apply') {
+      this.setState({ showModal: false });
+    }
+
+    if (router.query.action === 'apply' && prevProps.router.query.action !== 'apply') {
+      this.setState({ showModal: true });
+    }
+  }
+
   renderButton() {
-    const { buttonRenderer, withoutIcon, buttonProps, minWidth } = this.props;
+    const { buttonRenderer, withoutIcon, buttonProps, minWidth, hostSlug, router } = this.props;
 
     if (buttonRenderer) {
       return buttonRenderer({
-        onClick: () => this.setState({ showModal: true }),
+        onClick: () => router.push(`${hostSlug}/apply`),
         'data-cy': 'host-apply-btn',
         ...buttonProps,
         children: (
@@ -44,7 +67,7 @@ class ApplyToHostBtn extends React.Component {
       <StyledButton
         buttonStyle="secondary"
         buttonSize="small"
-        onClick={() => this.setState({ showModal: true })}
+        onClick={() => router.push(`${hostSlug}/apply`)}
         minWidth={minWidth}
         data-cy="host-apply-btn"
         {...buttonProps}
@@ -56,18 +79,18 @@ class ApplyToHostBtn extends React.Component {
   }
 
   render() {
-    const { hostSlug } = this.props;
+    const { hostSlug, router, isHidden } = this.props;
 
     return (
       <Fragment>
         {this.renderButton()}
 
-        {this.state.showModal && (
-          <ApplyToHostModal hostSlug={hostSlug} onClose={() => this.setState({ showModal: false })} />
+        {this.state.showModal && !isHidden && (
+          <ApplyToHostModal hostSlug={hostSlug} onClose={() => router.push(hostSlug)} />
         )}
       </Fragment>
     );
   }
 }
 
-export default ApplyToHostBtn;
+export default withRouter(ApplyToHostBtn);

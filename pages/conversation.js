@@ -310,6 +310,7 @@ class ConversationPage extends React.Component {
                               values={conversation}
                               field="title"
                               maxLength={255}
+                              required
                               placeholder={
                                 <FormattedMessage
                                   id="CreateConversation.Title.Placeholder"

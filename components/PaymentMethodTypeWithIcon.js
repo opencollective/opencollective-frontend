@@ -6,7 +6,7 @@ import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
 import { useIntl } from 'react-intl';
 
-import { PaymentMethodType } from '../lib/constants/payment-methods';
+import { PAYMENT_METHOD_TYPE } from '../lib/constants/payment-methods';
 import { i18nPaymentMethodType } from '../lib/i18n/payment-method-type';
 
 import GiftCard from './icons/GiftCard';
@@ -23,40 +23,37 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
     return <LoadingPlaceholder height={15} width={90} />;
   }
 
+  // TODO(paymentMethodType): remove toUpperCase once migration is over
+  type = type?.toUpperCase();
+
   switch (type) {
-    case PaymentMethodType.GIFT_CARD:
+    case PAYMENT_METHOD_TYPE.GIFTCARD:
       return (
         <Flex alignItems="center">
           <GiftCard size={iconSize} color="#9D9FA3" />
           <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
         </Flex>
       );
-    case PaymentMethodType.CREDIT_CARD:
+    case PAYMENT_METHOD_TYPE.CREDITCARD:
       return (
         <Flex alignItems="center">
           <CreditCard size={iconSize} color="#9D9FA3" />
           <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
         </Flex>
       );
-    case PaymentMethodType.ALIPAY:
+    case PAYMENT_METHOD_TYPE.ALIPAY:
       return (
         <Flex alignItems="center">
           <Alipay size={iconSize} color="#9D9FA3" />
-          <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
+          <Span ml={2}>Alipay</Span>
         </Flex>
       );
-    case PaymentMethodType.PAYMENT:
+    case PAYMENT_METHOD_TYPE.PAYMENT:
+    case PAYMENT_METHOD_TYPE.SUBSCRIPTION:
       return (
         <Flex alignItems="center">
           <PaypalIcon size={iconSize} color="#192f86" />
           <Span ml={2}>PayPal</Span>
-        </Flex>
-      );
-    case PaymentMethodType.COLLECTIVE:
-      return (
-        <Flex alignItems="center">
-          <OtherIcon size={iconSize} color="#9D9FA3" />
-          <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
         </Flex>
       );
     default:
@@ -71,7 +68,7 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
 
 PaymentMethodTypeWithIcon.propTypes = {
   isLoading: PropTypes.bool,
-  type: PropTypes.oneOf(Object.values(PaymentMethodType)),
+  type: PropTypes.oneOf(Object.values(PAYMENT_METHOD_TYPE)),
   iconSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 

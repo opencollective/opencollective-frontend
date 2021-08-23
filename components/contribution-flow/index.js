@@ -11,9 +11,14 @@ import styled from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import {
+  GQLV2_PAYMENT_METHOD_LEGACY_TYPES,
+  PAYMENT_METHOD_SERVICE,
+  PAYMENT_METHOD_TYPE,
+} from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { TransactionTypes } from '../../lib/constants/transactions';
+import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
@@ -34,7 +39,7 @@ import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
 import CollectiveTitleContainer from './CollectiveTitleContainer';
-import { STEPS } from './constants';
+import { CRYPTO_CURRENCIES, STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowStepContainer from './ContributionFlowStepContainer';
@@ -76,10 +81,19 @@ const STEP_LABELS = defineMessages({
   },
 });
 
+const OTHER_MESSAGES = defineMessages({
+  tipLargerThanContributionWarning: {
+    id: 'Warning.TipLargerThanContribution',
+    defaultMessage:
+      'You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. This means the tip is larger than the contribution, when usually the reverse is intended.{newLine}{newLine}Are you sure you want to do this?',
+  },
+});
+
 class ContributionFlow extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
       platformContributionAvailable: PropTypes.bool,
       parent: PropTypes.shape({
@@ -101,6 +115,7 @@ class ContributionFlow extends React.Component {
     step: PropTypes.string,
     redirect: PropTypes.string,
     verb: PropTypes.string,
+    paymentMethod: PropTypes.string,
     error: PropTypes.string,
     contributeAs: PropTypes.string,
     defaultEmail: PropTypes.string,
@@ -127,11 +142,13 @@ class ContributionFlow extends React.Component {
       stepPayment: null,
       stepSummary: null,
       showSignIn: false,
+      createdOrder: null,
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
-        amount: props.fixedAmount || getDefaultTierAmount(props.tier),
+        amount: props.paymentMethod === 'crypto' ? '' : props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
+        currency: CRYPTO_CURRENCIES[0],
       },
     };
   }
@@ -159,12 +176,21 @@ class ContributionFlow extends React.Component {
         variables: {
           order: {
             quantity: stepDetails.quantity,
-            amount: { valueInCents: stepDetails.amount },
+            amount:
+              this.props.paymentMethod === 'crypto'
+                ? { valueInCents: 100 } // Insert dummy value for crypto contribution until the transaction is reconciled
+                : { valueInCents: stepDetails.amount },
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
             guestInfo,
             fromAccount,
             toAccount: pick(this.props.collective, ['id']),
-            customData: stepDetails.customData,
+            customData:
+              this.props.paymentMethod === 'crypto'
+                ? {
+                    pledgeAmount: stepDetails.amount,
+                    pledgeCurrency: stepDetails.currency.value,
+                  }
+                : stepDetails.customData,
             paymentMethod: await this.getPaymentMethod(),
             platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
@@ -195,6 +221,8 @@ class ContributionFlow extends React.Component {
 
     if (stripeError) {
       return this.handleStripeError(order, stripeError, email, guestToken);
+    } else if (this.props.paymentMethod === 'crypto') {
+      this.setState({ isSubmitted: true, isSubmitting: false, createdOrder: order });
     } else {
       return this.handleSuccess(order);
     }
@@ -265,33 +293,63 @@ class ContributionFlow extends React.Component {
 
     if (!stepPayment?.paymentMethod) {
       return null;
-    } else if (stepPayment.paymentMethod.id) {
-      return pick(stepPayment.paymentMethod, ['id']);
+    }
+
+    const paymentMethod = {
+      // TODO: cleanup after this version is deployed in production
+
+      // Migration Step 1
+      type: stepPayment.paymentMethod.providerType,
+      legacyType: stepPayment.paymentMethod.providerType,
+      service: stepPayment.paymentMethod.service,
+      newType: stepPayment.paymentMethod.type,
+
+      // Migration Step 2
+      // legacyType: stepPayment.paymentMethod.providerType,
+      // service: stepPayment.paymentMethod.service,
+      // type: stepPayment.paymentMethod.type,
+
+      // Migration Step 3
+      // service: stepPayment.paymentMethod.service,
+      // type: stepPayment.paymentMethod.type,
+    };
+
+    // Payment Method already registered
+    if (stepPayment.paymentMethod.id) {
+      paymentMethod.id = stepPayment.paymentMethod.id;
+
+      // New Credit Card
     } else if (stepPayment.key === NEW_CREDIT_CARD_KEY) {
       const cardElement = stripeElements.getElement(CardElement);
       const { token } = await stripe.createToken(cardElement);
       const pm = stripeTokenToPaymentMethod(token);
-      return {
-        name: pm.name,
-        isSavedForLater: stepPayment.paymentMethod.isSavedForLater,
-        creditCardInfo: { token: pm.token, ...pm.data },
-      };
-    } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
-      return pick(stepPayment.paymentMethod, [
-        'type',
-        'paypalInfo.token',
-        'paypalInfo.data',
-        'paypalInfo.isNewApi',
-        'paypalInfo.orderId',
-        'paypalInfo.subscriptionId',
-      ]);
+
+      paymentMethod.name = pm.name;
+      paymentMethod.isSavedForLater = stepPayment.paymentMethod.isSavedForLater;
+      paymentMethod.creditCardInfo = { token: pm.token, ...pm.data };
+
+      // PayPal
     } else if (
-      [GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER, GQLV2_PAYMENT_METHOD_TYPES.ALIPAY].includes(
-        stepPayment.paymentMethod.type,
-      )
+      // TODO(paymentMethodType): remove deprecated form
+      // Deprecated form
+      stepPayment.paymentMethod.providerType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL ||
+      // Future proof form (no need to convert to uppercase here)
+      stepPayment.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL
     ) {
-      return pick(stepPayment.paymentMethod, ['type', 'service']);
+      paymentMethod.paypalInfo = pick(stepPayment.paymentMethod.paypalInfo, [
+        'token',
+        'data',
+        'isNewApi',
+        'orderId',
+        'subscriptionId',
+      ]);
+      // Define the right type (doesn't matter that much today, but make it future proof)
+      if (paymentMethod.paypalInfo.isNewApi && paymentMethod.paypalInfo.subscriptionId) {
+        paymentMethod.type === PAYMENT_METHOD_TYPE.SUBSCRIPTION;
+      }
     }
+
+    return paymentMethod;
   };
 
   getEmailRedirectURL() {
@@ -376,7 +434,30 @@ class ContributionFlow extends React.Component {
   /** Steps component callback  */
   onStepChange = async step => {
     this.setState({ showSignIn: false });
-    this.pushStepRoute(step.name);
+    // To create an order we need a payment method to be set. This is normally set at final stage but for crypto flow we
+    // need to set this before the final step of the flow
+    if (this.props.paymentMethod === 'crypto') {
+      this.setState({
+        stepPayment: {
+          key: 'crypto',
+          paymentMethod: {
+            // TODO(paymentMethodType): remove deprecated form
+            // Deprecated but current form
+            providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CRYPTO,
+            // Future proof form
+            service: PAYMENT_METHOD_SERVICE.THEGIVINGBLOCK,
+            type: PAYMENT_METHOD_TYPE.CRYPTO,
+          },
+        },
+      });
+    }
+
+    // This checkout step is where the QR code is displayed for crypto
+    if (step.name === 'checkout') {
+      await this.submitOrder();
+    }
+
+    await this.pushStepRoute(step.name);
   };
 
   /** Navigate to another step, ensuring all route params are preserved */
@@ -417,6 +498,8 @@ class ContributionFlow extends React.Component {
     } else if (verb === 'contribute' || verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       route = `/${collective.slug}/donate/${step}`;
+    } else if (verb === 'donate' && this.props.paymentMethod === 'crypto') {
+      route = `/${collective.slug}/donate/crypto/${step}`;
     }
 
     // Reset errors if any
@@ -458,12 +541,13 @@ class ContributionFlow extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
-    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser } = this.props;
+    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser, paymentMethod } = this.props;
     const { stepDetails, stepProfile, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || stepProfile?.isGuest);
+    const isCrypto = paymentMethod === 'crypto';
 
     const steps = [
       {
@@ -471,10 +555,29 @@ class ContributionFlow extends React.Component {
         label: intl.formatMessage(STEP_LABELS.details),
         isCompleted: Boolean(stepDetails),
         validate: () => {
-          if (!this.checkFormValidity() || !stepDetails || stepDetails.amount < minAmount || !stepDetails.quantity) {
+          if (isCrypto) {
+            return true;
+          } else if (
+            !this.checkFormValidity() ||
+            !stepDetails ||
+            stepDetails.amount < minAmount ||
+            !stepDetails.quantity
+          ) {
             return false;
+          } else if (!isNil(tier?.availableQuantity) && stepDetails.quantity > tier.availableQuantity) {
+            return false;
+          } else if (stepDetails.platformContribution && stepDetails.platformContribution > stepDetails.amount) {
+            const currency = tier?.amount.currency || collective.currency;
+            return confirm(
+              intl.formatMessage(OTHER_MESSAGES.tipLargerThanContributionWarning, {
+                contributionAmount: formatCurrency(stepDetails.amount, currency),
+                tipAmount: formatCurrency(stepDetails.platformContribution, currency),
+                accountName: collective.name,
+                newLine: '\n',
+              }),
+            );
           } else {
-            return isNil(tier?.availableQuantity) || stepDetails.quantity <= tier.availableQuantity;
+            return true;
           }
         },
       },
@@ -496,7 +599,8 @@ class ContributionFlow extends React.Component {
     }
 
     // Hide step payment if using a free tier with fixed price
-    if (!noPaymentRequired) {
+    // Also hide payment screen if using crypto payment method, we handle crypto flow in the `checkout` step below
+    if (!noPaymentRequired && !isCrypto) {
       steps.push({
         name: 'payment',
         label: intl.formatMessage(STEP_LABELS.payment),
@@ -516,12 +620,26 @@ class ContributionFlow extends React.Component {
       });
     }
 
+    if (isCrypto) {
+      steps.push({
+        name: 'checkout',
+        label: intl.formatMessage(STEP_LABELS.payment),
+        isCompleted: !stepProfile?.contributorRejectedCategories,
+      });
+    }
+
     return steps;
   }
 
   getPaypalButtonProps({ currency }) {
     const { stepPayment, stepDetails, stepSummary } = this.state;
-    if (stepPayment?.paymentMethod?.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
+    if (
+      // TODO(paymentMethodType): remove deprecated form
+      // Deprecated but current form
+      stepPayment?.paymentMethod?.providerType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL ||
+      // Future proof form (no need to convert to uppercase here)
+      stepPayment?.paymentMethod?.service === PAYMENT_METHOD_SERVICE.PAYPAL
+    ) {
       const { host, collective, tier } = this.props;
       return {
         host: host,
@@ -541,7 +659,12 @@ class ContributionFlow extends React.Component {
               stepPayment: {
                 ...state.stepPayment,
                 paymentMethod: {
-                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
+                  // TODO(paymentMethodType): remove deprecated form
+                  // Deprecated but current form
+                  providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL,
+                  // Future proof form
+                  service: PAYMENT_METHOD_SERVICE.PAYPAL,
+                  type: PAYMENT_METHOD_TYPE.PAYMENT,
                   paypalInfo: { isNewApi: true, ...paypalInfo },
                 },
               },
@@ -576,6 +699,11 @@ class ContributionFlow extends React.Component {
     }
   };
 
+  cryptoOrderCompleted = () => {
+    const { createdOrder } = this.state;
+    this.pushStepRoute('success', { OrderId: createdOrder.id });
+  };
+
   render() {
     const {
       collective,
@@ -585,17 +713,20 @@ class ContributionFlow extends React.Component {
       loadingLoggedInUser,
       skipStepDetails,
       isEmbed,
+      paymentMethod,
       error: backendError,
     } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
-    const currency = tier?.amount.currency || collective.currency;
+    const isCrypto = paymentMethod === 'crypto';
+    const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
+    const isLoading = isCrypto ? isSubmitting : isSubmitted || isSubmitting;
 
     return (
       <Steps
         steps={this.getSteps()}
         currentStepName={this.props.step}
         onStepChange={this.onStepChange}
-        onComplete={this.submitOrder}
+        onComplete={isCrypto && isSubmitted ? this.cryptoOrderCompleted : this.submitOrder}
         skip={skipStepDetails ? ['details'] : null}
       >
         {({
@@ -635,8 +766,9 @@ class ContributionFlow extends React.Component {
                 stepDetails={stepDetails}
                 stepPayment={stepPayment}
                 stepSummary={stepSummary}
+                isCrypto={isCrypto}
                 isSubmitted={this.state.isSubmitted}
-                loading={isValidating || isSubmitted || isSubmitting}
+                loading={isValidating || isLoading}
                 currency={currency}
                 isFreeTier={this.getTierMinAmount(tier) === 0}
               />
@@ -669,13 +801,13 @@ class ContributionFlow extends React.Component {
                       {formatErrorMessage(this.props.intl, error) || backendError}
                     </MessageBox>
                   )}
-
                   <ContributionFlowStepContainer
                     collective={collective}
                     tier={tier}
                     mainState={this.state}
                     onChange={data => this.setState(data)}
                     step={currentStep}
+                    isCrypto={isCrypto}
                     showFeesOnTop={this.canHaveFeesOnTop()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     defaultProfileSlug={this.props.contributeAs}
@@ -684,30 +816,34 @@ class ContributionFlow extends React.Component {
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
-                    isSubmitting={isValidating || isSubmitted || isSubmitting}
+                    isSubmitting={isValidating || isLoading}
+                    order={this.state.createdOrder}
                   />
-
                   <Box mt={40}>
                     <ContributionFlowButtons
                       goNext={goNext}
-                      goBack={goBack}
+                      // for crypto flow the user should not be able to go back after the order is created at checkout step
+                      goBack={isCrypto && currentStep.name === 'checkout' ? null : goBack}
                       step={currentStep}
                       prevStep={prevStep}
                       nextStep={nextStep}
-                      isValidating={isValidating || isSubmitted || isSubmitting}
+                      isValidating={isValidating || isLoading}
                       paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
+                      isCrypto={isCrypto}
                     />
                   </Box>
-                  <Box textAlign="center" mt={5}>
-                    <CollectiveTitleContainer useLink={!isEmbed} collective={collective}>
-                      <FormattedMessage
-                        id="ContributionFlow.backToCollectivePage"
-                        defaultMessage="Back to Collective Page"
-                      />
-                    </CollectiveTitleContainer>
-                  </Box>
+                  {!isEmbed && (
+                    <Box textAlign="center" mt={5}>
+                      <CollectiveTitleContainer collective={collective} useLink>
+                        <FormattedMessage
+                          id="ContributionFlow.backToCollectivePage"
+                          defaultMessage="Back to Collective Page"
+                        />
+                      </CollectiveTitleContainer>
+                    </Box>
+                  )}
                 </Box>
 
                 <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
@@ -720,9 +856,10 @@ class ContributionFlow extends React.Component {
                         stepSummary={stepSummary}
                         stepPayment={stepPayment}
                         currency={currency}
+                        isCrypto={isCrypto}
                       />
                     </Box>
-                    <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} />
+                    <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} isCrypto={isCrypto} />
                   </Box>
                 </Box>
               </Grid>

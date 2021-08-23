@@ -18,7 +18,11 @@ const load = async app => {
     return;
   }
 
-  const client = redis.createClient(redisServerUrl);
+  const redisOptions = {};
+  if (redisServerUrl.includes('rediss://')) {
+    redisOptions.tls = { rejectUnauthorized: false };
+  }
+  const client = redis.createClient(redisServerUrl, redisOptions);
   const rateLimiter = expressLimiter(app, client);
 
   const whitelist = req =>

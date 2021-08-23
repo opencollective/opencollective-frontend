@@ -1,4 +1,4 @@
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 
 export const openSourceHost = {
   id: 11004,
@@ -14,9 +14,9 @@ export const openSourceHost = {
   },
   __typename: 'Organization',
   supportedPaymentMethods: [
-    GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD,
-    GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
-    GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER,
+    GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD,
+    GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYPAL,
+    GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER,
   ],
 };
 

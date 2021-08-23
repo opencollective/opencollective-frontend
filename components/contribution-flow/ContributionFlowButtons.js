@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Currency from '../Currency';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import PayWithPaypalButton from '../PayWithPaypalButton';
 import StyledButton from '../StyledButton';
@@ -21,6 +22,7 @@ class ContributionFlowButtons extends React.Component {
     paypalButtonProps: PropTypes.object,
     totalAmount: PropTypes.number,
     currency: PropTypes.string,
+    isCrypto: PropTypes.bool,
   };
 
   state = { isLoadingNext: false };
@@ -47,7 +49,7 @@ class ContributionFlowButtons extends React.Component {
   }
 
   render() {
-    const { goBack, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency } = this.props;
+    const { goBack, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency, isCrypto } = this.props;
     return (
       <Flex flexWrap="wrap" justifyContent="center">
         <Fragment>
@@ -73,6 +75,7 @@ class ContributionFlowButtons extends React.Component {
               minWidth={!nextStep ? 185 : 145}
               buttonStyle="primary"
               onClick={this.goNext}
+              disabled={isCrypto && totalAmount <= 0}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
               type="submit"
@@ -89,7 +92,16 @@ class ContributionFlowButtons extends React.Component {
                   id="contribute.amount"
                   defaultMessage="Contribute {amount}"
                   values={{
-                    amount: <Currency value={totalAmount} currency={currency} precision="auto" />,
+                    amount: isCrypto ? (
+                      <FormattedMoneyAmount
+                        amount={totalAmount}
+                        currency={currency}
+                        amountStyles={{ fontWeight: 500 }}
+                        isCrypto={isCrypto}
+                      />
+                    ) : (
+                      <Currency value={totalAmount} currency={currency} precision="auto" />
+                    ),
                   }}
                 />
               ) : (

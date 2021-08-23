@@ -150,6 +150,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
             labelColor="black.800"
             labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
             error={Boolean(tier.availableQuantity !== null && data?.quantity > tier.availableQuantity)}
+            data-cy="contribution-quantity"
             required
           >
             {fieldProps => (
@@ -199,7 +200,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
           <StyledHr borderColor="black.300" mt={16} mb={32} />
         </React.Fragment>
       )}
-      {showFeesOnTop && (
+      {showFeesOnTop && data?.amount > 0 && (
         <Box mt={28}>
           <FeesOnTopInput
             currency={currency}

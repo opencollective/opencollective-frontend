@@ -11,7 +11,9 @@ import StyledHr from '../StyledHr';
 import { H4 } from '../Text';
 import { withUser } from '../UserProvider';
 
+import StepCheckout from './StepCheckout';
 import StepDetails from './StepDetails';
+import StepDetailsCrypto from './StepDetailsCrypto';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
@@ -35,6 +37,7 @@ class ContributionFlowStepContainer extends React.Component {
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
+    isCrypto: PropTypes.bool,
     mainState: PropTypes.shape({
       stepDetails: PropTypes.object,
       stepProfile: PropTypes.shape({
@@ -43,6 +46,7 @@ class ContributionFlowStepContainer extends React.Component {
       stepSummary: PropTypes.object,
       stepPayment: PropTypes.object,
     }),
+    order: PropTypes.object,
   };
 
   constructor(props) {
@@ -120,11 +124,11 @@ class ContributionFlowStepContainer extends React.Component {
   }
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed } = this.props;
+    const { collective, mainState, tier, isEmbed, isCrypto, order } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
-        return (
+        return !isCrypto ? (
           <StepDetails
             collective={collective}
             tier={tier}
@@ -132,6 +136,8 @@ class ContributionFlowStepContainer extends React.Component {
             data={stepDetails}
             showFeesOnTop={this.props.showFeesOnTop}
           />
+        ) : (
+          <StepDetailsCrypto onChange={this.props.onChange} data={stepDetails} />
         );
       case 'profile': {
         const personalProfile = this.getPersonalProfile();
@@ -166,8 +172,11 @@ class ContributionFlowStepContainer extends React.Component {
             onNewCardFormReady={this.props.onNewCardFormReady}
             isSubmitting={this.props.isSubmitting}
             isEmbed={isEmbed}
+            isCrypto={isCrypto}
           />
         );
+      case 'checkout':
+        return <StepCheckout stepDetails={this.props.mainState.stepDetails} order={order} />;
       case 'summary':
         return (
           <StepSummary
@@ -192,16 +201,18 @@ class ContributionFlowStepContainer extends React.Component {
     return (
       <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
         <Flex flexDirection="column" alignItems="center">
-          <Flex width="100%" mb={3}>
-            <Flex alignItems="center">
-              <H4 fontSize={['20px', '24px']} fontWeight={500} py={2}>
-                {this.renderHeader(step.name, LoggedInUser)}
-              </H4>
+          {step.name !== 'checkout' && (
+            <Flex width="100%" mb={3}>
+              <Flex alignItems="center">
+                <H4 fontSize={['20px', '24px']} fontWeight={500} py={2}>
+                  {this.renderHeader(step.name, LoggedInUser)}
+                </H4>
+              </Flex>
+              <Flex flexGrow={1} alignItems="center" justifyContent="center">
+                <StyledHr width="100%" ml={3} borderColor="black.300" />
+              </Flex>
             </Flex>
-            <Flex flexGrow={1} alignItems="center" justifyContent="center">
-              <StyledHr width="100%" ml={3} borderColor="black.300" />
-            </Flex>
-          </Flex>
+          )}
           {this.renderStep(step.name)}
         </Flex>
       </StyledCard>

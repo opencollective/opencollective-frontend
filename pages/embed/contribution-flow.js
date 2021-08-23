@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
-import { isEmail } from 'validator';
+import { isEmail, isHexColor } from 'validator';
 
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { floatAmountToCents } from '../../lib/math';
@@ -56,6 +56,7 @@ class NewContributionFlowPage extends React.Component {
       return !amountStr ? null : floatAmountToCents(parseFloat(amountStr));
     };
 
+    const backgroundColor = query.backgroundColor ? `#${query.backgroundColor}` : null;
     return {
       collectiveSlug: query.eventSlug || query.collectiveSlug,
       totalAmount: getFloatAmount(query.amount) || parseInt(query.totalAmount) || null,
@@ -74,14 +75,17 @@ class NewContributionFlowPage extends React.Component {
       defaultName: query.defaultName,
       useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
       hideHeader: query.hideHeader ? parseToBoolean(query.hideHeader) : false,
+      backgroundColor: backgroundColor && isHexColor(backgroundColor) ? backgroundColor : undefined,
     };
   }
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
+    paymentMethod: PropTypes.string,
     verb: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
+    backgroundColor: PropTypes.string,
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
     platformContribution: PropTypes.number,
@@ -120,7 +124,7 @@ class NewContributionFlowPage extends React.Component {
 
   loadExternalScripts() {
     const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
-    if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
+    if (supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
       this.props.loadStripe();
     }
   }
@@ -149,7 +153,7 @@ class NewContributionFlowPage extends React.Component {
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isEmbed />;
+      return <ContributionFlowSuccess collective={account} isCrypto={this.props.paymentMethod === 'crypto'} isEmbed />;
     } else {
       return (
         <Box height="100%" pt={3}>
@@ -190,7 +194,7 @@ class NewContributionFlowPage extends React.Component {
     } else {
       return (
         <CollectiveThemeProvider collective={useTheme ? data.account : null}>
-          <EmbeddedPage>{this.renderPageContent()}</EmbeddedPage>
+          <EmbeddedPage background={this.props.backgroundColor}>{this.renderPageContent()}</EmbeddedPage>
         </CollectiveThemeProvider>
       );
     }

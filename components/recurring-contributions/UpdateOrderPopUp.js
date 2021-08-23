@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import INTERVALS from '../../lib/constants/intervals';
+import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { AmountTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../../lib/date-utils';
@@ -158,7 +159,7 @@ const getContributeOptions = (intl, contribution, tiers, disableCustomContributi
     .map(tier => ({
       key: `${contribution.id}-tier-${tier.id}`,
       title: tier.name,
-      flexible: tier.amountType === AmountTypes.FLEXIBLE ? true : false,
+      flexible: tier.amountType === AmountTypes.FLEXIBLE,
       amount: tier.amountType === AmountTypes.FLEXIBLE ? tier.minimumAmount.valueInCents : tier.amount.valueInCents,
       id: tier.id,
       currency: tier.amount.currency,
@@ -294,7 +295,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
     setSelectedContributeOption,
   } = contributeOptionsState;
   const selectedTier = selectedContributeOption?.isCustom ? null : selectedContributeOption;
-  const isPaypal = contribution.paymentMethod.service === 'PAYPAL';
+  const isPaypal = contribution.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
 
   // When we change the amount option (One of the presets or Other)
   const setSelectedAmountOption = ({ label, value }) => {

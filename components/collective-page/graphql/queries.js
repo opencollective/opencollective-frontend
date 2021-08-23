@@ -102,6 +102,7 @@ export const collectivePageQuery = gql`
           hostFeeSharePercent
         }
         features {
+          id
           VIRTUAL_CARDS
         }
       }

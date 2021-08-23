@@ -13,6 +13,7 @@ const getExpenseStatusMsgType = status => {
   switch (status) {
     case expenseStatus.REJECTED:
     case expenseStatus.SPAM:
+    case expenseStatus.ERROR:
       return 'error';
     case expenseStatus.PENDING:
     case expenseStatus.UNVERIFIED:

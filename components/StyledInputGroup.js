@@ -87,6 +87,7 @@ const StyledInputGroup = ({
   prependProps,
   appendProps,
   innerRef,
+  autoFocus,
   ...inputProps
 }) => {
   const [focused, setFocus] = useState(false);
@@ -119,6 +120,7 @@ const StyledInputGroup = ({
         )}
         <StyledInput
           bare
+          autoFocus={autoFocus}
           color={getColor({ error, success })}
           type="text"
           overflow="scroll"
@@ -189,6 +191,8 @@ StyledInputGroup.propTypes = {
   appendProps: PropTypes.object,
   /** Max Width */
   maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  /** Whether to auto focus this element **/
+  autoFocus: PropTypes.bool,
   innerRef: PropTypes.any,
 };
 

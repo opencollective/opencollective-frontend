@@ -18,7 +18,7 @@ export const DEFAULT_AMOUNT_STYLES = { letterSpacing: 0, fontWeight: 'bold', col
  * internationalization support.
  */
 const FormattedMoneyAmount = ({
-  abbreviateAmount,
+  formatWithSeparators,
   abbreviateInterval,
   currency,
   precision,
@@ -28,6 +28,7 @@ const FormattedMoneyAmount = ({
   amountStyles,
   showCurrencyCode,
   currencyCodeStyles,
+  isCrypto,
 }) => {
   const formattedAmount =
     isNaN(amount) || isNil(amount) ? (
@@ -37,7 +38,7 @@ const FormattedMoneyAmount = ({
         value={amount}
         currency={currency}
         precision={precision}
-        abbreviate={abbreviateAmount}
+        formatWithSeparators={formatWithSeparators}
         {...amountStyles}
       />
     );
@@ -47,7 +48,9 @@ const FormattedMoneyAmount = ({
   }
 
   const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
-  if (!interval || interval === INTERVALS.flexible) {
+  if (isCrypto) {
+    return <Span {...amountStyles}>{`${amount} ${currency}`}</Span>;
+  } else if (!interval || interval === INTERVALS.flexible) {
     return (
       <FormattedMessage
         id="Amount"
@@ -79,8 +82,6 @@ FormattedMoneyAmount.propTypes = {
   amount: PropTypes.number,
   /** The currency (eg. `USD`, `EUR`...etc) */
   currency: PropTypes.string.isRequired,
-  /** Abbreviate the name to display 100k instead of 100.000 */
-  abbreviateAmount: PropTypes.bool,
   /** Abbreviate the interval (eg. year => yr.) */
   abbreviateInterval: PropTypes.bool,
   /** Whether to show the full currency code (ie. USD) */

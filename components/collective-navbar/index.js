@@ -24,7 +24,6 @@ import { getSettingsRoute } from '../../lib/url_helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
-import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Avatar from '../Avatar';
 import { Dimensions, Sections } from '../collective-page/_constants';
@@ -247,7 +246,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
   }
 
   const isFund = collective.type === CollectiveType.FUND;
-  const { type, features, settings, host } = collective;
+  const { features, settings, host } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
     hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
@@ -258,8 +257,8 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
       (isFund || get(settings, 'fundingRequest') === true) && expenseSubmissionAllowed(collective, LoggedInUser),
-    addPrepaidBudget: LoggedInUser?.isRoot() && type === CollectiveType.ORGANIZATION,
     addFunds: isHostAdmin,
+    addFundsFromCollective: isAdmin && collective.type === CollectiveType.EVENT,
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
     hasSettings: isAdmin,
@@ -394,26 +393,12 @@ const getMainAction = (collective, callsToAction) => {
         </AddFundsBtn>
       ),
     };
-  } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET)) {
-    return {
-      type: NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET,
-      component: (
-        <AddPrepaidBudgetBtn collective={collective}>
-          {btnProps => (
-            <ActionButton {...btnProps}>
-              <AttachMoney size="1em" />
-              <Span>
-                <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
-              </Span>
-            </ActionButton>
-          )}
-        </AddPrepaidBudgetBtn>
-      ),
-    };
   } else {
     return null;
   }
 };
+
+export const NAVBAR_HEIGHT = [56, 64];
 
 /**
  * The NavBar that displays all the individual sections.
@@ -468,7 +453,7 @@ const CollectiveNavbar = ({
         mx="auto"
         maxWidth={Dimensions.MAX_SECTION_WIDTH}
         maxHeight="100vh"
-        minHeight={[56, 64]}
+        minHeight={NAVBAR_HEIGHT}
       >
         {/** Collective info */}
         <InfosContainer px={[3, 0]} py={[2, 1]}>

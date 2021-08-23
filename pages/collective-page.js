@@ -19,6 +19,8 @@ import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
+import Custom404 from './404';
+
 /** A page rendered when collective is pledged and not active yet */
 const PledgedCollectivePage = dynamic(
   () => import(/* webpackChunkName: 'PledgedCollectivePage' */ '../components/PledgedCollectivePage'),
@@ -52,7 +54,7 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class CollectivePage extends React.Component {
-  static async getInitialProps({ client, req, res, query: { slug, status, step, mode } }) {
+  static async getInitialProps({ client, req, res, query: { slug, status, step, mode, action } }) {
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
@@ -65,7 +67,7 @@ class CollectivePage extends React.Component {
       skipDataFromTree = true;
     }
 
-    return { slug, status, step, mode, skipDataFromTree };
+    return { slug, status, step, mode, skipDataFromTree, action };
   }
 
   static propTypes = {
@@ -80,6 +82,7 @@ class CollectivePage extends React.Component {
     ]),
     step: PropTypes.string,
     mode: PropTypes.string,
+    action: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -157,7 +160,7 @@ class CollectivePage extends React.Component {
   }
 
   render() {
-    const { slug, data, LoggedInUser, status, step, mode } = this.props;
+    const { slug, data, LoggedInUser, status, step, mode, action } = this.props;
     const { showOnboardingModal } = this.state;
 
     const loading = data.loading && !data.Collective;
@@ -177,6 +180,11 @@ class CollectivePage extends React.Component {
     }
 
     const collective = data && data.Collective;
+
+    // Don't allow /collective/apply
+    if (action === 'apply' && !collective?.isHost) {
+      return <Custom404 />;
+    }
 
     return (
       <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)}>
