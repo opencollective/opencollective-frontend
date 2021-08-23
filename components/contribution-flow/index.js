@@ -299,15 +299,15 @@ class ContributionFlow extends React.Component {
       // TODO: cleanup after this version is deployed in production
 
       // Migration Step 1
-      type: stepPayment.paymentMethod.providerType,
+      // type: stepPayment.paymentMethod.providerType,
+      // legacyType: stepPayment.paymentMethod.providerType,
+      // service: stepPayment.paymentMethod.service,
+      // newType: stepPayment.paymentMethod.type,
+
+      // Migration Step 2
       legacyType: stepPayment.paymentMethod.providerType,
       service: stepPayment.paymentMethod.service,
       newType: stepPayment.paymentMethod.type,
-
-      // Migration Step 2
-      // legacyType: stepPayment.paymentMethod.providerType,
-      // service: stepPayment.paymentMethod.service,
-      // type: stepPayment.paymentMethod.type,
 
       // Migration Step 3
       // service: stepPayment.paymentMethod.service,
