@@ -25,6 +25,7 @@ const PAGE_SIZE = 15;
 const FILTERS = {
   ALL: 'ALL',
   HOSTED_COLLECTIVES: 'HOST',
+  HOSTED_FUNDS: 'FUNDS',
   HOSTED_EVENTS: 'EVENT',
   CORE: 'CORE',
   FINANCIAL: 'FINANCIAL',
@@ -34,7 +35,7 @@ const FILTERS = {
 const FILTER_PROPS = [
   {
     id: FILTERS.ALL,
-    where: {
+    args: {
       role: [
         CollectiveRoles.HOST,
         CollectiveRoles.ADMIN,
@@ -43,35 +44,65 @@ const FILTER_PROPS = [
         CollectiveRoles.MEMBER,
         CollectiveRoles.FUNDRAISER,
       ],
+      accountType: null,
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
     },
     isActive: () => true,
   },
   {
     id: FILTERS.HOSTED_COLLECTIVES,
-    where: {
+    args: {
       role: [CollectiveRoles.HOST],
       accountType: [CollectiveType.COLLECTIVE],
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
     },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.HOST && r.type === CollectiveType.COLLECTIVE),
   },
   {
+    id: FILTERS.HOSTED_FUNDS,
+    args: {
+      role: [CollectiveRoles.HOST],
+      accountType: [CollectiveType.FUND],
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
+    },
+    isActive: roles => roles?.some(r => r.role === CollectiveRoles.HOST && r.type === CollectiveType.FUND),
+  },
+  {
     id: FILTERS.HOSTED_EVENTS,
-    where: { role: [CollectiveRoles.HOST], accountType: [CollectiveType.EVENT] },
-    isActive: roles => roles?.some(r => r.role === CollectiveRoles.HOST && r.type === 'EVENT'),
+    args: {
+      role: [CollectiveRoles.HOST],
+      accountType: [CollectiveType.EVENT],
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
+    },
+    isActive: (roles, account) =>
+      account?.type !== CollectiveType.COLLECTIVE &&
+      roles?.some(r => r.role === CollectiveRoles.HOST && r.type === 'EVENT'),
   },
   {
     id: FILTERS.FINANCIAL,
-    where: { role: [CollectiveRoles.BACKER] },
+    args: {
+      role: [CollectiveRoles.BACKER],
+      accountType: null,
+      orderBy: { field: 'TOTAL_CONTRIBUTED', direction: 'DESC' },
+    },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.BACKER),
   },
   {
     id: FILTERS.CORE,
-    where: { role: [CollectiveRoles.ADMIN, CollectiveRoles.MEMBER] },
+    args: {
+      role: [CollectiveRoles.ADMIN, CollectiveRoles.MEMBER],
+      accountType: null,
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
+    },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.ADMIN || r.role === CollectiveRoles.MEMBER),
   },
   {
     id: FILTERS.EVENTS,
-    where: { role: [CollectiveRoles.ATTENDEE] },
+    args: {
+      role: [CollectiveRoles.ATTENDEE],
+      accountType: null,
+      orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
+    },
     isActive: roles => roles?.some(r => r.role === CollectiveRoles.ATTENDEE),
   },
 ];
@@ -88,6 +119,10 @@ const I18nFilters = defineMessages({
   [FILTERS.HOSTED_COLLECTIVES]: {
     id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
+  },
+  [FILTERS.HOSTED_FUNDS]: {
+    id: 'HostedFunds',
+    defaultMessage: 'Hosted Funds',
   },
   [FILTERS.HOSTED_EVENTS]: {
     id: 'HostedEvents',
@@ -114,6 +149,49 @@ const MembershipCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
 `;
 
+const contributionsSectionStaticQuery = gqlV2/* GraphQL */ `
+  query ContributionsSectionStatic($slug: String!) {
+    account(slug: $slug) {
+      id
+      settings
+      type
+      isHost
+      hostedAccounts: memberOf(
+        role: [HOST]
+        accountType: [COLLECTIVE, FUND]
+        isApproved: true
+        isArchived: false
+        limit: 1
+      ) {
+        totalCount
+      }
+      connectedAccounts: members(role: [CONNECTED_ACCOUNT]) {
+        totalCount
+        nodes {
+          id
+          role
+          tier {
+            name
+            description
+          }
+          publicMessage
+          description
+          account {
+            id
+            name
+            slug
+            type
+            isIncognito
+            isAdmin
+            isHost
+            imageUrl
+          }
+        }
+      }
+    }
+  }
+`;
+
 const contributionsSectionQuery = gqlV2/* GraphQL */ `
   query ContributionsSection(
     $slug: String!
@@ -121,13 +199,23 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
     $offset: Int
     $role: [MemberRole]
     $accountType: [AccountType]
+    $orderBy: OrderByInput
   ) {
     account(slug: $slug) {
       id
       settings
       type
-      isHost # TODO: Fetch number of hosted collectives
-      memberOf(limit: $limit, offset: $offset, role: $role, accountType: $accountType, orderByRoles: true) {
+      isHost
+      memberOf(
+        limit: $limit
+        offset: $offset
+        role: $role
+        accountType: $accountType
+        orderByRoles: true
+        isApproved: true
+        isArchived: false
+        orderBy: $orderBy
+      ) {
         offset
         limit
         totalCount
@@ -171,35 +259,9 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
                 backgroundImageUrl(height: 200)
               }
             }
-            backers: members(role: [BACKER]) {
+            backers: members(role: [BACKER], limit: 1) {
               totalCount
             }
-          }
-        }
-      }
-      hostedAccounts: memberOf(role: [HOST], accountType: [COLLECTIVE]) {
-        totalCount
-      }
-      connectedAccounts: members(role: [CONNECTED_ACCOUNT]) {
-        totalCount
-        nodes {
-          id
-          role
-          tier {
-            name
-            description
-          }
-          publicMessage
-          description
-          account {
-            id
-            name
-            slug
-            type
-            isIncognito
-            isAdmin
-            isHost
-            imageUrl
           }
         }
       }
@@ -209,18 +271,25 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
 
 const SectionContributions = ({ collective }) => {
   const intl = useIntl();
+  const [isLoadingMore, setLoadingMore] = React.useState(false);
   const [filter, setFilter] = React.useState(collective.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL);
+  const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
   const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
-    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...FILTER_PROPS[0].where },
+    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...selectedFilter.args },
     context: API_V2_CONTEXT,
     notifyOnNetworkStatusChange: true,
   });
+  const { data: staticData } = useQuery(contributionsSectionStaticQuery, {
+    variables: { slug: collective.slug },
+    context: API_V2_CONTEXT,
+  });
 
-  const handleLoadMore = () => {
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
     const offset = memberOf.nodes.length;
     const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
-    fetchMore({
-      variables: { offset, ...selectedFilter.where },
+    await fetchMore({
+      variables: { offset, ...selectedFilter.args },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prev;
@@ -236,23 +305,25 @@ const SectionContributions = ({ collective }) => {
         });
       },
     });
+    setLoadingMore(false);
   };
 
   const handleFilterSelect = id => {
     setFilter(id);
     const selectedFilter = FILTER_PROPS.find(f => f.id === id);
     fetchMore({
-      variables: { offset: 0, ...selectedFilter.where },
+      variables: { offset: 0, ...selectedFilter.args },
       updateQuery: (prev, { fetchMoreResult }) => {
         return fetchMoreResult ? fetchMoreResult : prev;
       },
     });
   };
 
-  const { account, memberOf, hostedAccounts, connectedAccounts } = data?.account || {};
+  const { account, memberOf } = data?.account || {};
+  const { hostedAccounts, connectedAccounts } = staticData?.account || {};
   const isOrganization = account?.type === CollectiveType.ORGANIZATION;
-  const availableFilters = getAvailableFilters(memberOf?.roles || []);
-
+  const availableFilters = getAvailableFilters(memberOf?.roles || [], account);
+  const membersLeft = memberOf && memberOf.totalCount - memberOf.nodes.length;
   return (
     <Box pb={4}>
       <React.Fragment>
@@ -277,6 +348,7 @@ const SectionContributions = ({ collective }) => {
               justifyContent="left"
               minButtonWidth={175}
               px={Dimensions.PADDING_X}
+              disabled={isLoadingMore}
             />
           </Box>
         )}
@@ -288,19 +360,27 @@ const SectionContributions = ({ collective }) => {
           mx="auto"
         >
           <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
-            {loading &&
-              [...Array(memberOf?.nodes.length || 5).keys()].map(id => <LoadingPlaceholder key={id} height={334} />)}
-            {!loading &&
+            {(!loading || (isLoadingMore && loading)) &&
               memberOf.nodes.map(membership => (
                 <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                   <StyledMembershipCard membership={membership} />
                 </MembershipCardContainer>
               ))}
+            {loading &&
+              [...Array(membersLeft < PAGE_SIZE ? membersLeft : PAGE_SIZE).keys()].map(id => (
+                <LoadingPlaceholder key={id} height={334} />
+              ))}
           </Grid>
         </Container>
         {memberOf?.nodes.length < memberOf?.totalCount && (
           <Flex mt={3} justifyContent="center">
-            <StyledButton data-cy="load-more" textTransform="capitalize" minWidth={170} onClick={handleLoadMore}>
+            <StyledButton
+              data-cy="load-more"
+              textTransform="capitalize"
+              minWidth={170}
+              onClick={handleLoadMore}
+              loading={loading}
+            >
               <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
             </StyledButton>
           </Flex>
