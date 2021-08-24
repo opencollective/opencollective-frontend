@@ -306,6 +306,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS_FROM_COLLECTIVE}
                           >
                             <StyledButton
+                              borderRadius={0}
                               p={ITEM_PADDING}
                               isBorderless
                               {...btnProps}

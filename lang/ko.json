@@ -42,6 +42,7 @@
   "actions.submitApplication": "신청 제출",
   "actions.unfollow": "팔로우 취소",
   "addfunds.fromCollective.host": "재정 ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Add Funds",
   "AddFundsModal.amount": "Amount",
   "AddFundsModal.cancel": "Cancel",

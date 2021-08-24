@@ -42,6 +42,7 @@
   "actions.submitApplication": "Отправить заявку",
   "actions.unfollow": "Отписаться",
   "addfunds.fromCollective.host": "Представитель ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Пополнить Счет",
   "AddFundsModal.amount": "Сумма",
   "AddFundsModal.cancel": "Отменить",

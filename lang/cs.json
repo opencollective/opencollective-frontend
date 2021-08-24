@@ -42,6 +42,7 @@
   "actions.submitApplication": "Odeslat žádost",
   "actions.unfollow": "Přestat sledovat",
   "addfunds.fromCollective.host": "Hostitel ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Přidat finanční prostředky",
   "AddFundsModal.amount": "Částka",
   "AddFundsModal.cancel": "Zrušit",

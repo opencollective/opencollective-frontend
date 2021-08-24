@@ -42,6 +42,7 @@
   "actions.submitApplication": "Надіслати заявку",
   "actions.unfollow": "Не стежити",
   "addfunds.fromCollective.host": "Скарбник ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Поповнити",
   "AddFundsModal.amount": "Сума",
   "AddFundsModal.cancel": "Скасувати",

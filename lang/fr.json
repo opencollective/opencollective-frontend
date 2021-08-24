@@ -42,6 +42,7 @@
   "actions.submitApplication": "Envoyer la candidature",
   "actions.unfollow": "Se désabonner",
   "addfunds.fromCollective.host": "hôte ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Ajoutez des fonds",
   "AddFundsModal.amount": "Montant",
   "AddFundsModal.cancel": "Annuler",

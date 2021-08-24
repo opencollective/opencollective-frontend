@@ -42,6 +42,7 @@
   "actions.submitApplication": "Invia la richiesta",
   "actions.unfollow": "Smetti di seguire",
   "addfunds.fromCollective.host": "Organizzatore ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Add Funds",
   "AddFundsModal.amount": "Amount",
   "AddFundsModal.cancel": "Cancel",

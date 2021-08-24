@@ -42,6 +42,7 @@
   "actions.submitApplication": "Bewerbung einreichen",
   "actions.unfollow": "Nicht mehr folgen",
   "addfunds.fromCollective.host": "Host ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Geld hinzufügen",
   "AddFundsModal.amount": "Betrag",
   "AddFundsModal.cancel": "Abbrechen",

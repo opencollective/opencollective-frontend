@@ -42,6 +42,7 @@
   "actions.submitApplication": "Enviar solicitação",
   "actions.unfollow": "Parar de seguir",
   "addfunds.fromCollective.host": "Administrador Fiscal ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Adicionar Fundos",
   "AddFundsModal.amount": "Quantidade",
   "AddFundsModal.cancel": "Cancelar",

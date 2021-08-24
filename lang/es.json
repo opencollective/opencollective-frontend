@@ -42,6 +42,7 @@
   "actions.submitApplication": "Enviar aplicación",
   "actions.unfollow": "Dejar de seguir",
   "addfunds.fromCollective.host": "Anfitrión ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Añadir fondos",
   "AddFundsModal.amount": "Monto",
   "AddFundsModal.cancel": "Cancelar",

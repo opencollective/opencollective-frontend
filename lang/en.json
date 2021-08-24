@@ -42,6 +42,7 @@
   "actions.submitApplication": "Submit application",
   "actions.unfollow": "Unfollow",
   "addfunds.fromCollective.host": "Host ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "Add Funds",
   "AddFundsModal.amount": "Amount",
   "AddFundsModal.cancel": "Cancel",

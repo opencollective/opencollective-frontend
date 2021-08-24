@@ -42,6 +42,7 @@
   "actions.submitApplication": "申請内容を送信",
   "actions.unfollow": "フォロー解除",
   "addfunds.fromCollective.host": "ホスト ({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "資金の追加",
   "AddFundsModal.amount": "金額",
   "AddFundsModal.cancel": "キャンセル",

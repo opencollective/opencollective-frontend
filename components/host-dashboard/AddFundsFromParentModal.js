@@ -59,32 +59,15 @@ AmountDetailsLine.propTypes = {
 };
 
 const addFundsMutation = gqlV2/* GraphQL */ `
-  mutation AddFunds(
-    $fromAccount: AccountReferenceInput!
-    $account: AccountReferenceInput!
-    $amount: AmountInput!
-    $description: String!
-    $hostFeePercent: Float!
-    $platformFeePercent: Float
-  ) {
-    addFunds(
-      account: $account
-      fromAccount: $fromAccount
-      amount: $amount
-      description: $description
-      hostFeePercent: $hostFeePercent
-      platformFeePercent: $platformFeePercent
-    ) {
-      id
-      transactions {
+  mutation SendMoneyFromCollective($order: OrderCreateInput!) {
+    createOrder(order: $order) {
+      order {
         id
-        type
-      }
-      toAccount {
-        id
-        stats {
-          balance {
-            valueInCents
+        fromAccount {
+          stats {
+            balance {
+              valueInCents
+            }
           }
         }
       }
@@ -155,11 +138,13 @@ const AddFundsFromParentModal = ({ host, collective, ...props }) => {
         onSubmit={async values => {
           await submitAddFunds({
             variables: {
-              ...values,
-              amount: { valueInCents: values.amount },
-              platformTip: { valueInCents: 0 },
-              fromAccount: buildAccountReference(values.fromAccount),
-              account: buildAccountReference(values.account),
+              order: {
+                amount: { valueInCents: values.amount },
+                fromAccount: buildAccountReference(values.fromAccount),
+                toAccount: buildAccountReference(values.account),
+                frequency: 'ONETIME',
+                isParentToChildTransfer: true,
+              },
             },
           });
           setFundDetails({
@@ -181,7 +166,10 @@ const AddFundsFromParentModal = ({ host, collective, ...props }) => {
             return (
               <Form>
                 <h3>
-                  <FormattedMessage id="AddFundsModal.SubHeading" defaultMessage="Add Funds to the Collective" />
+                  <FormattedMessage
+                    id="AddFundsFromParentModal.SubHeading"
+                    defaultMessage="Add Funds from the Collective"
+                  />
                 </h3>
                 <ModalBody>
                   <StyledInputFormikField
@@ -322,7 +310,7 @@ const AddFundsFromParentModal = ({ host, collective, ...props }) => {
                       mx={2}
                       mb={1}
                       minWidth={120}
-                      loading={isSubmitting}
+                      onClick={handleClose}
                     >
                       <FormattedMessage id="AddFundsModal.finish" defaultMessage="Finish" />
                     </StyledButton>

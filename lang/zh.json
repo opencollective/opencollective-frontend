@@ -42,6 +42,7 @@
   "actions.submitApplication": "提交你的申请",
   "actions.unfollow": "取消关注",
   "addfunds.fromCollective.host": "主管({host})",
+  "AddFundsFromParentModal.SubHeading": "Add Funds from the Collective",
   "AddFundsModal.addFunds": "添加资金",
   "AddFundsModal.amount": "金额",
   "AddFundsModal.cancel": "取消",
