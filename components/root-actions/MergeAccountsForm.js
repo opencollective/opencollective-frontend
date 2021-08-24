@@ -58,6 +58,7 @@ const MergeAccountsForm = () => {
     } catch (e) {
       addToast({
         type: TOAST_TYPE.ERROR,
+        variant: 'light',
         message: i18nGraphqlException(intl, e),
       });
     }

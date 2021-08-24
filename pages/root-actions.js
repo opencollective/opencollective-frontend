@@ -12,7 +12,7 @@ import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
 import { H1, H2, H3, P, Span } from '../components/Text';
 
-const GRID_TEMPLATE_COLUMNS = ['minmax(220px, 1fr) 6fr'];
+const GRID_TEMPLATE_COLUMNS = ['1fr', 'minmax(220px, 1fr) 6fr'];
 
 const MENU = [
   { id: 'Clear cache', title: 'Clear cache for account', Component: ClearCacheForAccountForm },
@@ -50,12 +50,12 @@ const RootActionsPage = () => {
   return (
     <AuthenticatedPage disableSignup rootOnly>
       <Container maxWidth="1000px" m="0 auto" mt={4} borderBottom="1px solid #e5e5e5">
-        <H1 textAlign="left" fontSize="32px" py={2}>
+        <H1 textAlign="left" fontSize="32px" py={2} pl={2}>
           Root actions
         </H1>
       </Container>
-      <Grid gridGap={64} gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
-        <Container minHeight="600px" borderRight="1px solid #e5e5e5">
+      <Grid gridGap={[0, null, 64]} gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
+        <Container borderRight="1px solid #e5e5e5">
           {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry => (
             <MenuEntry
               key={menuEntry.id}
@@ -67,9 +67,9 @@ const RootActionsPage = () => {
             </MenuEntry>
           ))}
         </Container>
-        <Box py={4}>
+        <Box py={3} px={3}>
           {selectedMenuEntry.isDangerous && (
-            <Container textAlign="center" mb={4}>
+            <Container textAlign="center" mb={4} mt={2}>
               <H2 fontSize="30px" css={{ textShadow: '0px 2px 2px red' }}>
                 <ExclamationTriangle color="red" size={30} />
                 <Span ml={3} css={{ verticalAlign: 'middle' }}>
@@ -80,7 +80,7 @@ const RootActionsPage = () => {
               <StyledHr width="100%" mt={4} />
             </Container>
           )}
-          <StyledCard p={4} width="100%">
+          <StyledCard p={4} my={4} width="100%">
             <H3 lineHeight="30px" fontSize="20px">
               {selectedMenuEntry.title || selectedMenuEntry.id}
             </H3>
