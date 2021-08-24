@@ -74,7 +74,9 @@ const FILTER_PROPS = [
       accountType: [CollectiveType.EVENT],
       orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },
     },
-    isActive: roles => roles?.some(r => r.role === CollectiveRoles.HOST && r.type === 'EVENT'),
+    isActive: (roles, account) =>
+      account?.type !== CollectiveType.COLLECTIVE &&
+      roles?.some(r => r.role === CollectiveRoles.HOST && r.type === 'EVENT'),
   },
   {
     id: FILTERS.FINANCIAL,
@@ -320,7 +322,7 @@ const SectionContributions = ({ collective }) => {
   const { account, memberOf } = data?.account || {};
   const { hostedAccounts, connectedAccounts } = staticData?.account || {};
   const isOrganization = account?.type === CollectiveType.ORGANIZATION;
-  const availableFilters = getAvailableFilters(memberOf?.roles || []);
+  const availableFilters = getAvailableFilters(memberOf?.roles || [], account);
   const membersLeft = memberOf && memberOf.totalCount - memberOf.nodes.length;
   return (
     <Box pb={4}>
