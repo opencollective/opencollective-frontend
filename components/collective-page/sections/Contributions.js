@@ -214,13 +214,19 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
                 backgroundImageUrl(height: 200)
               }
             }
-            backers: members(role: [BACKER]) {
+            backers: members(role: [BACKER], limit: 1) {
               totalCount
             }
           }
         }
       }
-      hostedAccounts: memberOf(role: [HOST], accountType: [COLLECTIVE, FUND], isApproved: true, isArchived: false) {
+      hostedAccounts: memberOf(
+        role: [HOST]
+        accountType: [COLLECTIVE, FUND]
+        isApproved: true
+        isArchived: false
+        limit: 1
+      ) {
         totalCount
       }
       connectedAccounts: members(role: [CONNECTED_ACCOUNT]) {
