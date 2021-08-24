@@ -36,6 +36,10 @@ const desiredServiceLevel = Number(process.env.SERVICE_LEVEL) || 100;
 
 const start = id =>
   nextApp.prepare().then(() => {
+    // Not much documentation on this,
+    // but we should ensure this goes to the default Next.js handler
+    app.get('/__nextjs_original-stack-frame', nextApp.getRequestHandler());
+
     // app.buildId is only available after app.prepare(), hence why we setup here
     app.use(Sentry.Handlers.requestHandler());
 
