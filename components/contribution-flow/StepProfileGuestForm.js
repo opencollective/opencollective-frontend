@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
@@ -18,6 +19,8 @@ import { P } from '../Text';
 import StepProfileInfoMessage from './StepProfileInfoMessage';
 import { getTotalAmount } from './utils';
 
+const HCAPTCHA_SITEKEY = process.env.HCAPTCHA_SITEKEY;
+
 const shouldRequireAllInfo = amount => {
   return Boolean(amount && amount >= 500000);
 };
@@ -27,6 +30,10 @@ export const validateGuestProfile = (stepProfile, stepDetails) => {
     if (!stepProfile.name || !stepProfile.location?.address || !stepProfile.location?.country) {
       return false;
     }
+  }
+
+  if (HCAPTCHA_SITEKEY && !stepProfile.captcha) {
+    return false;
   }
 
   if (!stepProfile.email || !isEmail(stepProfile.email)) {
@@ -142,7 +149,12 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
         />
       </P>
       <StepProfileInfoMessage amount={totalAmount} interval={stepDetails.interval} />
-      <P color="black.500" fontSize="12px" mt={4} data-cy="join-conditions">
+      {HCAPTCHA_SITEKEY && (
+        <Flex justifyContent="center">
+          <HCaptcha sitekey={HCAPTCHA_SITEKEY} onVerify={(token, ekey) => dispatchChange('captcha', { token, ekey })} />
+        </Flex>
+      )}
+      <P color="black.500" fontSize="12px" mt={HCAPTCHA_SITEKEY ? 2 : 4} data-cy="join-conditions">
         <FormattedMessage
           id="SignIn.legal"
           defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
