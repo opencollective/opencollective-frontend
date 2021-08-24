@@ -32,6 +32,7 @@ const nextConfig = {
         CHANGE_LOG_UPDATES_ENABLED: false,
         WISE_ENVIRONMENT: 'sandbox',
         ADD_FUNDS_FROM_COLLECTIVE: false,
+        HCAPTCHA_SITEKEY: false,
       }),
     );
 

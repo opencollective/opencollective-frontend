@@ -25,6 +25,8 @@ const COMMON_DIRECTIVES = {
   styleSrc: [
     SELF,
     UNSAFE_INLINE, // For styled-components. TODO: Limit for nonce
+    'https://hcaptcha.com',
+    'https://*.hcaptcha.com',
   ],
   connectSrc: [
     SELF,
@@ -38,6 +40,8 @@ const COMMON_DIRECTIVES = {
     'country-service.shopifycloud.com',
     'https://transferwise.com',
     'https://sandbox.transferwise.tech',
+    'https://hcaptcha.com',
+    'https://*.hcaptcha.com',
   ],
   scriptSrc: [
     SELF,
@@ -47,6 +51,8 @@ const COMMON_DIRECTIVES = {
     'js.stripe.com',
     '*.paypal.com',
     '*.paypalobjects.com',
+    'https://hcaptcha.com',
+    'https://*.hcaptcha.com',
   ],
   frameSrc: [
     'www.youtube.com',
@@ -58,6 +64,8 @@ const COMMON_DIRECTIVES = {
     '*.openstreetmap.org',
     'https://transferwise.com',
     'https://sandbox.transferwise.tech',
+    'https://hcaptcha.com',
+    'https://*.hcaptcha.com',
   ],
   objectSrc: ['opencollective.com'],
 };

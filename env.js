@@ -29,6 +29,7 @@ const defaults = {
   OC_ENV: process.env.NODE_ENV || 'development',
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
   WISE_ENVIRONMENT: process.env.OC_ENV === 'production' ? 'production' : 'sandbox',
+  HCAPTCHA_SITEKEY: '10000000-ffff-ffff-ffff-000000000001',
   ADD_FUNDS_FROM_COLLECTIVE: false,
 };
 

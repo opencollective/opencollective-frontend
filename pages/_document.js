@@ -88,6 +88,7 @@ export default class IntlDocument extends Document {
       'RECAPTCHA_SITE_KEY',
       'RECAPTCHA_ENABLED',
       'WISE_ENVIRONMENT',
+      'HCAPTCHA_SITEKEY',
     ]);
   }
 
