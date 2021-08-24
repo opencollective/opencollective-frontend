@@ -147,6 +147,49 @@ const MembershipCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
 `;
 
+const contributionsSectionStaticQuery = gqlV2/* GraphQL */ `
+  query ContributionsSectionStatic($slug: String!) {
+    account(slug: $slug) {
+      id
+      settings
+      type
+      isHost
+      hostedAccounts: memberOf(
+        role: [HOST]
+        accountType: [COLLECTIVE, FUND]
+        isApproved: true
+        isArchived: false
+        limit: 1
+      ) {
+        totalCount
+      }
+      connectedAccounts: members(role: [CONNECTED_ACCOUNT]) {
+        totalCount
+        nodes {
+          id
+          role
+          tier {
+            name
+            description
+          }
+          publicMessage
+          description
+          account {
+            id
+            name
+            slug
+            type
+            isIncognito
+            isAdmin
+            isHost
+            imageUrl
+          }
+        }
+      }
+    }
+  }
+`;
+
 const contributionsSectionQuery = gqlV2/* GraphQL */ `
   query ContributionsSection(
     $slug: String!
@@ -160,7 +203,7 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
       id
       settings
       type
-      isHost # TODO: Fetch number of hosted collectives
+      isHost
       memberOf(
         limit: $limit
         offset: $offset
@@ -220,38 +263,6 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
           }
         }
       }
-      hostedAccounts: memberOf(
-        role: [HOST]
-        accountType: [COLLECTIVE, FUND]
-        isApproved: true
-        isArchived: false
-        limit: 1
-      ) {
-        totalCount
-      }
-      connectedAccounts: members(role: [CONNECTED_ACCOUNT]) {
-        totalCount
-        nodes {
-          id
-          role
-          tier {
-            name
-            description
-          }
-          publicMessage
-          description
-          account {
-            id
-            name
-            slug
-            type
-            isIncognito
-            isAdmin
-            isHost
-            imageUrl
-          }
-        }
-      }
     }
   }
 `;
@@ -265,6 +276,10 @@ const SectionContributions = ({ collective }) => {
     variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...selectedFilter.args },
     context: API_V2_CONTEXT,
     notifyOnNetworkStatusChange: true,
+  });
+  const { data: staticData } = useQuery(contributionsSectionStaticQuery, {
+    variables: { slug: collective.slug },
+    context: API_V2_CONTEXT,
   });
 
   const handleLoadMore = async () => {
@@ -302,7 +317,8 @@ const SectionContributions = ({ collective }) => {
     });
   };
 
-  const { account, memberOf, hostedAccounts, connectedAccounts } = data?.account || {};
+  const { account, memberOf } = data?.account || {};
+  const { hostedAccounts, connectedAccounts } = staticData?.account || {};
   const isOrganization = account?.type === CollectiveType.ORGANIZATION;
   const availableFilters = getAvailableFilters(memberOf?.roles || []);
   const membersLeft = memberOf && memberOf.totalCount - memberOf.nodes.length;
