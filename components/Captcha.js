@@ -8,6 +8,7 @@ import useRecaptcha from '../lib/hooks/useRecaptcha';
 
 import { Box } from './Grid';
 import StyledButton from './StyledButton';
+import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const isTrue = str => str === 'true' || str === 'TRUE' || str === '1';
 
@@ -27,6 +28,7 @@ const ReCaptcha = ({ onVerify, ...props }) => {
   const { verify } = useRecaptcha();
   const [loading, setLoading] = React.useState(false);
   const [verified, setVerified] = React.useState(false);
+  const { addToast } = useToasts();
   const handleClick = async () => {
     setLoading(true);
     try {
@@ -36,7 +38,7 @@ const ReCaptcha = ({ onVerify, ...props }) => {
         setVerified(true);
       }
     } catch (e) {
-      console.error(e);
+      addToast({ type: TOAST_TYPE.ERROR, message: e.message });
     }
     setLoading(false);
   };
