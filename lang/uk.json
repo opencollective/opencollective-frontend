@@ -191,6 +191,8 @@
   "button.submit": "Підтвердити",
   "ByUser": "Від {userName}",
   "CancelEdit": "Скасувати зміни",
+  "Captcha.Button.Verified": "Verified Human.",
+  "Captcha.Button.Verify": "I'm not a Robot.",
   "ChangelogNotification.firstLine": "Маємо для вас новинки!",
   "ChangelogNotification.secondLine": "Натисніть на {image}, щоб подивитися",
   "ChangelogTrigger.tooltip.content": "Що нового в Open Collective",
