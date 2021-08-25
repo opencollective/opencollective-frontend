@@ -42,6 +42,7 @@ const COMMON_DIRECTIVES = {
     'https://sandbox.transferwise.tech',
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
+    'https://www.google.com',
   ],
   scriptSrc: [
     SELF,
@@ -53,6 +54,7 @@ const COMMON_DIRECTIVES = {
     '*.paypalobjects.com',
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
+    'https://www.google.com',
   ],
   frameSrc: [
     'www.youtube.com',
@@ -66,6 +68,7 @@ const COMMON_DIRECTIVES = {
     'https://sandbox.transferwise.tech',
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
+    'https://www.google.com',
   ],
   objectSrc: ['opencollective.com'],
 };
