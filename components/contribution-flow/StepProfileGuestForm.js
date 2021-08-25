@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
+import Captcha, { isCaptchaEnabled } from '../Captcha';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
@@ -32,7 +32,7 @@ export const validateGuestProfile = (stepProfile, stepDetails) => {
     }
   }
 
-  if (HCAPTCHA_SITEKEY && !stepProfile.captcha) {
+  if (isCaptchaEnabled() && !stepProfile.captcha) {
     return false;
   }
 
@@ -149,9 +149,9 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
         />
       </P>
       <StepProfileInfoMessage amount={totalAmount} interval={stepDetails.interval} />
-      {HCAPTCHA_SITEKEY && (
+      {isCaptchaEnabled() && (
         <Flex justifyContent="center">
-          <HCaptcha sitekey={HCAPTCHA_SITEKEY} onVerify={(token, ekey) => dispatchChange('captcha', { token, ekey })} />
+          <Captcha onVerify={result => dispatchChange('captcha', result)} />
         </Flex>
       )}
       <P color="black.500" fontSize="12px" mt={HCAPTCHA_SITEKEY ? 2 : 4} data-cy="join-conditions">
