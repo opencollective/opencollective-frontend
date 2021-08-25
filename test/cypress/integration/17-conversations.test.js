@@ -37,8 +37,12 @@ describe('Conversations', () => {
       // Conversation page
       cy.contains('Hello World 👋');
       cy.getByDataCy('comment-body').should(
-        'have.html',
-        '<div>Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋<br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.</div>',
+        'contain.html',
+        '<div>Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋',
+      );
+      cy.getByDataCy('comment-body').should(
+        'contain.text',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.',
       );
 
       // Edit tags
