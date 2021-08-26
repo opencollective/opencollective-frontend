@@ -33,7 +33,7 @@ describe('New users profiles', () => {
 
       cy.get('[data-cy=load-more]').click();
       cy.wait(300);
-      cy.get('[data-cy=collective-contribution]').its('length').should('eq', 20);
+      cy.get('[data-cy=collective-contribution]').its('length').should('eq', 19);
     });
 
     it('Can filter by contribution type (admin, financial...etc)', () => {
