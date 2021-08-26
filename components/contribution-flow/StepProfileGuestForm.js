@@ -25,7 +25,7 @@ const shouldRequireAllInfo = amount => {
   return Boolean(amount && amount >= 500000);
 };
 
-export const validateGuestProfile = (stepProfile, stepDetails) => {
+export const validateGuestProfile = (stepProfile, stepDetails, showError) => {
   if (shouldRequireAllInfo(getTotalAmount(stepDetails))) {
     if (!stepProfile.name || !stepProfile.location?.address || !stepProfile.location?.country) {
       return false;
@@ -33,6 +33,7 @@ export const validateGuestProfile = (stepProfile, stepDetails) => {
   }
 
   if (isCaptchaEnabled() && !stepProfile.captcha) {
+    showError('Captcha is required.');
     return false;
   }
 

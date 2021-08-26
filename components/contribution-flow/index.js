@@ -365,7 +365,11 @@ class ContributionFlow extends React.Component {
 
   /** Validate step profile, create new incognito/org if necessary */
   validateStepProfile = async action => {
-    const { stepProfile, stepDetails } = this.state;
+    const { stepProfile, stepDetails, error } = this.state;
+
+    if (error) {
+      this.setState({ error: null });
+    }
 
     if (!this.checkFormValidity()) {
       return false;
@@ -375,7 +379,7 @@ class ContributionFlow extends React.Component {
     if (!stepProfile) {
       return action === 'prev';
     } else if (stepProfile.isGuest) {
-      return validateGuestProfile(stepProfile, stepDetails);
+      return validateGuestProfile(stepProfile, stepDetails, this.showError);
     }
 
     // Check if we're creating a new profile
