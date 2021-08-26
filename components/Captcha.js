@@ -5,12 +5,11 @@ import { FormattedMessage } from 'react-intl';
 
 import { getEnvVar } from '../lib/env-utils';
 import useRecaptcha from '../lib/hooks/useRecaptcha';
+import { parseToBoolean } from '../lib/utils';
 
 import { Box } from './Grid';
 import StyledButton from './StyledButton';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
-
-const isTrue = str => str === 'true' || str === 'TRUE' || str === '1';
 
 export const PROVIDERS = {
   HCAPTCHA: 'HCAPTCHA',
@@ -21,7 +20,7 @@ export const isCaptchaEnabled = () => {
   const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
   const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
   const RECAPTCHA_ENABLED = getEnvVar('RECAPTCHA_ENABLED');
-  return HCAPTCHA_SITEKEY || (RECAPTCHA_SITE_KEY && isTrue(RECAPTCHA_ENABLED));
+  return HCAPTCHA_SITEKEY || (RECAPTCHA_SITE_KEY && parseToBoolean(RECAPTCHA_ENABLED));
 };
 
 const ReCaptcha = ({ onVerify, ...props }) => {
