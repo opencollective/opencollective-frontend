@@ -13,7 +13,7 @@
   "dependencies": {
     "@apollo/client": "3.3.21",
     "@formatjs/intl-relativetimeformat": "9.2.3",
-    "@hyperwatch/hyperwatch": "3.8.1",
+    "@hyperwatch/hyperwatch": "3.8.2",
     "@material-ui/core": "4.12.3",
     "@opencollective/taxes": "3.1.0",
     "@popperjs/core": "2.9.3",
