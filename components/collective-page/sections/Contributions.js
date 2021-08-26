@@ -156,6 +156,7 @@ const contributionsSectionStaticQuery = gqlV2/* GraphQL */ `
       settings
       type
       isHost
+      # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
       hostedAccounts: memberOf(
         role: [HOST]
         accountType: [COLLECTIVE, FUND]
@@ -259,6 +260,7 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
                 backgroundImageUrl(height: 200)
               }
             }
+            # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
             backers: members(role: [BACKER], limit: 1) {
               totalCount
             }
