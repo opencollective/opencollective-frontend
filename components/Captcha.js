@@ -70,6 +70,10 @@ const Captcha = ({ onVerify, provider, ...props }) => {
     onVerify({ ...obj, provider });
   };
 
+  React.useEffect(() => {
+    onVerify(null);
+  }, []);
+
   let captcha = null;
   if (provider === PROVIDERS.HCAPTCHA && HCAPTCHA_SITEKEY) {
     captcha = <HCaptcha sitekey={HCAPTCHA_SITEKEY} onVerify={token => handleVerify({ token })} />;
