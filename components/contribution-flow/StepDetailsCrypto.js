@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
 import StyledInputGroup from '../StyledInputGroup';
@@ -26,14 +27,57 @@ const messages = defineMessages({
   },
 });
 
-const StepDetailsCrypto = ({ onChange, data }) => {
+/*
+ * Calculates the approximate value for 1 unit of a given crypto currency in the collective currency.
+ * Uses the Cryptonator API (https://www.cryptonator.com/api/)
+ */
+const getCryptoExchangeRate = async (cryptoCurrency, collectiveCurrency) => {
+  if (!cryptoCurrency || !collectiveCurrency) {
+    return null;
+  } else {
+    let body;
+    try {
+      const response = await fetch(`https://api.cryptonator.com/api/ticker/${cryptoCurrency}-${collectiveCurrency}`);
+      body = await response.json();
+      if (!body.success || body.error !== '') {
+        return null;
+      }
+    } catch (error) {
+      // we don't want the user to see any errors; simply don't show the conversion amount
+      return null;
+    }
+    return body.ticker.price;
+  }
+};
+
+const StepDetailsCrypto = ({ onChange, data, currency }) => {
   const intl = useIntl();
-  const [currencyType, setCurrencyType] = useState(data.currency);
+  const [cryptoCurrencyType, setCryptoCurrencyType] = useState(data.currency);
   const [amount, setAmount] = useState(data.amount);
+  const [convertedAmount, setConvertedAmount] = useState(data.convertedAmount?.amount);
+  const [cryptoExchangeRate, setCryptoExchangeRate] = useState(null);
   const [touched, setTouched] = useState(false);
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
+
+  const storeCryptoExchangeRate = async (cryptoCurrency, collectiveCurrency) => {
+    const exchangeRate = await getCryptoExchangeRate(cryptoCurrency.value, collectiveCurrency);
+    setCryptoExchangeRate(exchangeRate);
+  };
+
+  useEffect(() => {
+    storeCryptoExchangeRate(cryptoCurrencyType, currency);
+  }, []);
+
+  useEffect(() => {
+    dispatchChange('convertedAmount', { amount: convertedAmount, currency });
+  }, [convertedAmount]);
+
+  useEffect(() => {
+    setConvertedAmount(amount * cryptoExchangeRate);
+  }, [amount, cryptoExchangeRate]);
+
   return (
     <Box width={1}>
       <Label htmlFor="crypto-currency" mb={2}>
@@ -42,9 +86,10 @@ const StepDetailsCrypto = ({ onChange, data }) => {
       <StyledSelect
         inputId="crypto-currency"
         options={CRYPTO_CURRENCIES}
-        defaultValue={currencyType}
-        onChange={value => {
-          setCurrencyType(value);
+        defaultValue={cryptoCurrencyType}
+        onChange={async value => {
+          setCryptoCurrencyType(value);
+          storeCryptoExchangeRate(value, currency);
           dispatchChange('currency', value);
         }}
         isSearchable={false}
@@ -55,7 +100,7 @@ const StepDetailsCrypto = ({ onChange, data }) => {
         {intl.formatMessage(messages['donationAmount'])}
       </Label>
       <StyledInputGroup
-        prepend={currencyType.labelWithoutImage}
+        prepend={cryptoCurrencyType.labelWithoutImage}
         type="number"
         inputMode="decimal"
         defaultValue={amount}
@@ -67,6 +112,16 @@ const StepDetailsCrypto = ({ onChange, data }) => {
         autoFocus
         error={touched && amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
       />
+      {convertedAmount > 0 && (
+        <Box mt={2}>
+          ~
+          <FormattedMoneyAmount
+            amount={convertedAmount * 100}
+            currency={currency}
+            amountStyles={{ fontWeight: '400' }}
+          />
+        </Box>
+      )}
       <StyledLink href="https://www.thegivingblock.com/" openInNewTabNoFollow>
         <Flex pt="36px" flexDirection="column" alignItems="center" fontSize="14px" fontWeight={500}>
           <Box>
@@ -84,10 +139,19 @@ const StepDetailsCrypto = ({ onChange, data }) => {
 
 StepDetailsCrypto.propTypes = {
   onChange: PropTypes.func,
+  /*
+   * Crypto amount and Crypto currency type.
+   */
   data: PropTypes.shape({
     amount: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     currency: PropTypes.object,
+    convertedAmount: PropTypes.shape({
+      amount: PropTypes.number,
+      currency: PropTypes.string,
+    }),
   }),
+  // The Collective currency.
+  currency: PropTypes.string,
 };
 
 export default StepDetailsCrypto;

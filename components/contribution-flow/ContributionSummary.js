@@ -86,6 +86,20 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               />
             </Amount>
           </AmountLine>
+          {isCrypto && stepDetails.convertedAmount && stepDetails.convertedAmount.amount > 0 && (
+            <AmountLine color="black.700">
+              <Label>
+                <FormattedMessage id="CurrencyConversion" defaultMessage="Currency conversion" />
+              </Label>
+              <Amount>
+                <FormattedMoneyAmount
+                  amount={stepDetails.convertedAmount.amount * 100 || 0}
+                  currency={stepDetails.convertedAmount.currency}
+                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
+                />
+              </Amount>
+            </AmountLine>
+          )}
           {Boolean(stepSummary?.amount) && (
             <AmountLine color="black.700">
               <Label>{i18nTaxType(intl, stepSummary.taxType)}</Label>

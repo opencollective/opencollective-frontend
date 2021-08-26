@@ -43,6 +43,7 @@ const COMMON_DIRECTIVES = {
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
     'https://www.google.com',
+    'https://api.cryptonator.com',
   ],
   scriptSrc: [
     SELF,

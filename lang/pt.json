@@ -683,6 +683,7 @@
   "Crypto": "Crypto",
   "Currency": "Moeda",
   "currency": "moeda",
+  "CurrencyConversion": "Currency conversion",
   "Date.BeforeShort": "Antes {date, date, short}",
   "Date.DateRange": "{dateFrom, date, short} to {dateTo, date, short}",
   "Date.SinceShort": "Since {date, date, short}",
