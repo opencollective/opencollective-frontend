@@ -172,7 +172,7 @@ const getOptions = (amount, currency, intl) => {
   ];
 };
 
-const AddFundsModal = ({ host, collective, isFromParent, ...props }) => {
+const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
   const [fundDetails, setFundDetails] = useState({});
   const { addToast } = useToasts();
@@ -215,11 +215,11 @@ const AddFundsModal = ({ host, collective, isFromParent, ...props }) => {
 
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = host.plan?.hostFees && collective.id !== host.id && !isFromParent;
+  const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
   const defaultHostFeePercent = canAddHostFee && collective.hostFeePercent ? collective.hostFeePercent : 0;
 
   // We don't want to use Platform Fees anymore for Hosts that switched to the new model
-  const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0 && !isFromParent;
+  const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0;
   const defaultPlatformFeePercent = 0;
 
   if (!LoggedInUser) {
@@ -244,11 +244,7 @@ const AddFundsModal = ({ host, collective, isFromParent, ...props }) => {
     >
       <CollectiveModalHeader collective={collective} onClick={handleClose} />
       <Formik
-        initialValues={getInitialValues({
-          hostFeePercent: defaultHostFeePercent,
-          account: collective,
-          fromAccount: isFromParent ? collective.parentCollective : null,
-        })}
+        initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
         validate={validate}
         onSubmit={async values => {
           if (!fundDetails.showPlatformTipModal) {
@@ -321,8 +317,6 @@ const AddFundsModal = ({ host, collective, isFromParent, ...props }) => {
                         data-cy="add-funds-source"
                         types={['USER', 'ORGANIZATION']}
                         creatable
-                        disabled={isFromParent}
-                        getDefaultOptions={build => (isFromParent ? build(collective.parentCollective) : null)}
                         error={field.error}
                         createCollectiveOptionalFields={['location.address', 'location.country']}
                         onBlur={() => form.setFieldTouched(field.name, true)}
@@ -463,15 +457,13 @@ const AddFundsModal = ({ host, collective, isFromParent, ...props }) => {
                     }
                     isLargeAmount
                   />
-                  {!isFromParent && (
-                    <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
-                      <FormattedMessage
-                        id="AddFundsModal.disclaimer"
-                        defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
-                        values={{ amount: formatCurrency(values.amount, collective.currency) }}
-                      />
-                    </P>
-                  )}
+                  <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
+                    <FormattedMessage
+                      id="AddFundsModal.disclaimer"
+                      defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
+                      values={{ amount: formatCurrency(values.amount, collective.currency) }}
+                    />
+                  </P>
                   {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
                 </ModalBody>
                 <ModalFooter isFullWidth>
@@ -623,9 +615,7 @@ AddFundsModal.propTypes = {
     hostFeePercent: PropTypes.number,
     platformFeePercent: PropTypes.number,
     slug: PropTypes.string,
-    parentCollective: PropTypes.object,
   }).isRequired,
-  isFromParent: PropTypes.bool,
   onClose: PropTypes.func,
 };
 

@@ -295,31 +295,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         )}
                       </AddFundsBtn>
                     )}
-                    {callsToAction.addFundsFromCollective && (
-                      <AddFundsBtn collective={collective} host={collective.host} isFromParent={true}>
-                        {btnProps => (
-                          <MenuItem
-                            py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS_FROM_COLLECTIVE}
-                          >
-                            <StyledButton
-                              p={ITEM_PADDING}
-                              isBorderless
-                              {...btnProps}
-                              data-cy="add-funds-from-collective-btn"
-                            >
-                              <AttachMoney size="20px" />
-                              <Span>
-                                <FormattedMessage
-                                  id="menu.addFundsFromCollective"
-                                  defaultMessage="Add Funds from Collective"
-                                />
-                              </Span>
-                            </StyledButton>
-                          </MenuItem>
-                        )}
-                      </AddFundsBtn>
-                    )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
                         <StyledLink as={Link} href={`/${collective.slug}/contact`}>
@@ -417,8 +392,6 @@ CollectiveNavbarActionsMenu.propTypes = {
     hasContribute: PropTypes.bool,
     /** Add funds to a collective */
     addFunds: PropTypes.bool,
-    /** Add funds from the parent Collective to an event */
-    addFundsFromCollective: PropTypes.bool,
     /** Add new card to Collective */
     assignVirtualCard: PropTypes.bool,
     /** Request card to Collective */
