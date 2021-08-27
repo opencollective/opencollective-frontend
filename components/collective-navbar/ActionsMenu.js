@@ -16,7 +16,6 @@ import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective.lib';
 import { getSettingsRoute } from '../../lib/url_helpers';
-import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -33,8 +32,6 @@ import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
-
-const ADD_FUNDS_FROM_COLLECTIVE = parseToBoolean(process.env.ADD_FUNDS_FROM_COLLECTIVE);
 
 //  Styled components
 const MenuItem = styled('li')`
@@ -298,7 +295,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         )}
                       </AddFundsBtn>
                     )}
-                    {ADD_FUNDS_FROM_COLLECTIVE && callsToAction.addFundsFromCollective && (
+                    {callsToAction.addFundsFromCollective && (
                       <AddFundsBtn collective={collective} host={collective.host} isFromParent={true}>
                         {btnProps => (
                           <MenuItem
