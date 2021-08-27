@@ -1,4 +1,5 @@
-name: CI
+name: CIbitcoin:bc1qzul2zpc5acdxd5q8wcmyu4seffwmk2ddfnyl8g
+
 
 on:
   push:
