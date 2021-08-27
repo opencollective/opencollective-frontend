@@ -510,7 +510,7 @@
   "ContributionFlow.Contribution": "Contribución",
   "ContributionFlow.CreateOrganizationLabel": "Contribuir como organización",
   "ContributionFlow.goBackToGuest": "Volver para contribuir como invitado",
-  "ContributionFlow.highContributionInfoMessage": "Aunque te enviaremos un recibo por correo electrónico, necesitamos pedirte una dirección física para contribuciones de más de $5.000 USD.",
+  "ContributionFlow.highContributionInfoMessage": "While we'll email you a receipt, we are still required to collect a physical address for contributions over $5,000 USD.",
   "ContributionFlow.lowContributionInfoMessage": "Por motivos legales cada contribución debe estar vinculada a una cuenta de correo. Por favor proporcione un email válido.",
   "ContributionFlow.lowestContributionInfoMessage": "Por favor proporcione un email válido. Necesitamos enviarle un recibo de su contribución.",
   "ContributionFlow.noSupportedPaymentMethods": "No hay ningún proveedor de pago disponible",
