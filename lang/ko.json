@@ -852,6 +852,7 @@
   "Expense.InvoiceItems": "청구서 항목",
   "Expense.JoinAndSubmit": "Join and Submit",
   "expense.markAsPaid": "Mark as paid",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses. Are you sure?",
   "Expense.markAsUnpaid": "Mark expense as unpaid",
   "expense.markAsUnpaid.btn": "Mark as unpaid",
   "Expense.markAsUnpaid.details": "The amount will be credited back to the Collective balance.",

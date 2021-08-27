@@ -852,6 +852,7 @@
   "Expense.InvoiceItems": "Rechnungsposten",
   "Expense.JoinAndSubmit": "Beitreten und Absenden",
   "expense.markAsPaid": "Als bezahlt markieren",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses. Are you sure?",
   "Expense.markAsUnpaid": "Ausgabe als unbezahlt markieren",
   "expense.markAsUnpaid.btn": "Als unbezahlt markieren",
   "Expense.markAsUnpaid.details": "The amount will be credited back to the Collective balance.",

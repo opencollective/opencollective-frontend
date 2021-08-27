@@ -852,6 +852,7 @@
   "Expense.InvoiceItems": "Faturas",
   "Expense.JoinAndSubmit": "Participe e envie",
   "expense.markAsPaid": "Marcar como paga",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses. Are you sure?",
   "Expense.markAsUnpaid": "Marcar despesa como não paga",
   "expense.markAsUnpaid.btn": "Marcar como não paga",
   "Expense.markAsUnpaid.details": "O valor será creditado de volta ao saldo do coletivo.",
