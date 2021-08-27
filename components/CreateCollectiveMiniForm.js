@@ -62,6 +62,10 @@ const msg = defineMessages({
     id: 'Organization.Name',
     defaultMessage: 'Organization name',
   },
+  legalName: {
+    id: 'Organization.LegalName',
+    defaultMessage: 'Legal Name 🔒',
+  },
   fullName: {
     id: 'User.FullName',
     defaultMessage: 'Full name',
@@ -113,10 +117,10 @@ const prepareMutationVariables = collective => {
   const locationFields = includeLocation ? ['location.address', 'location.country'] : [];
 
   if (collective.type === CollectiveType.USER) {
-    return { user: pick(collective, ['name', 'email', ...locationFields]) };
+    return { user: pick(collective, ['name', 'legalName', 'email', ...locationFields]) };
   } else if (collective.type === CollectiveType.ORGANIZATION) {
     collective.members.forEach(member => (member.role = roles.ADMIN));
-    return { collective: pick(collective, ['name', 'type', 'website', 'members', ...locationFields]) };
+    return { collective: pick(collective, ['name', 'legalName', 'type', 'website', 'members', ...locationFields]) };
   } else {
     return { collective: pick(collective, ['name', 'type', 'website', ...locationFields]) };
   }
@@ -229,7 +233,7 @@ const CreateCollectiveMiniForm = ({
     let values;
     if (excludeAdminFields) {
       const clonedValues = cloneDeep({ ...formValues, type });
-      const assignAdmin = pick(clonedValues, ['name', 'website', 'type']);
+      const assignAdmin = pick(clonedValues, ['name', 'legalName', 'website', 'type']);
       values = assign(assignAdmin, { members: [{ member: { id: LoggedInUser.CollectiveId } }] });
     } else {
       values = cloneDeep({ ...formValues, type });
@@ -316,6 +320,25 @@ const CreateCollectiveMiniForm = ({
                   />
                 )}
               </StyledInputField>
+              {(isUser || isOrganization) && (
+                <StyledInputField
+                  name="legalName"
+                  htmlFor="legalName"
+                  label={formatMessage(msg.legalName)}
+                  mt={3}
+                  value={values.legalName}
+                >
+                  {inputProps => (
+                    <Field
+                      as={StyledInput}
+                      {...inputProps}
+                      placeholder="e.g. Open Collective Inc."
+                      width="100%"
+                      data-cy="mini-form-legalName-field"
+                    />
+                  )}
+                </StyledInputField>
+              )}
               {!isUser && (
                 <StyledInputField
                   name="website"

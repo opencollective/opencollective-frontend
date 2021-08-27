@@ -31,7 +31,16 @@ interface Account {
   The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL/VENDOR)
   """
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -608,7 +617,16 @@ type Bot implements Account {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -917,7 +935,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -3217,7 +3244,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -4199,7 +4235,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -4562,7 +4607,16 @@ type Host implements Account & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -5145,7 +5199,16 @@ type Individual implements Account {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -6803,7 +6866,16 @@ type Organization implements Account & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -7101,6 +7173,7 @@ type Organization implements Account & AccountWithContributions {
 
 input OrganizationCreateInput {
   name: String!
+  legalName: String
   slug: String!
   description: String!
   website: String
@@ -7377,7 +7450,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -8594,7 +8676,16 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]

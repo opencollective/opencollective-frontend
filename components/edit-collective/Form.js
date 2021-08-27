@@ -98,6 +98,7 @@ class EditCollectiveForm extends React.Component {
       },
       'type.label': { id: 'collective.type.label', defaultMessage: 'Type' },
       'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
+      'legalName.label': { id: 'Organization.LegalName', defaultMessage: 'Legal Name 🔒' },
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
         id: 'host.tos',
@@ -629,10 +630,16 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
         },
         {
+          name: 'legalName',
+          placeholder: '',
+          maxLength: 255,
+          when: () => collective.type === CollectiveType.USER || CollectiveType.ORGANIZATION,
+        },
+        {
           name: 'company',
           placeholder: '',
           maxLength: 255,
-          when: () => collective.type === 'USER',
+          when: () => collective.type === CollectiveType.USER,
         },
         {
           name: 'description',
