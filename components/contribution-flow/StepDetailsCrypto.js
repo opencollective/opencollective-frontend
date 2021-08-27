@@ -34,20 +34,21 @@ const messages = defineMessages({
 const getCryptoExchangeRate = async (cryptoCurrency, collectiveCurrency) => {
   if (!cryptoCurrency || !collectiveCurrency) {
     return null;
-  } else {
-    let body;
-    try {
-      const response = await fetch(`https://api.cryptonator.com/api/ticker/${cryptoCurrency}-${collectiveCurrency}`);
-      body = await response.json();
-      if (!body.success || body.error !== '') {
-        return null;
-      }
-    } catch (error) {
-      // we don't want the user to see any errors; simply don't show the conversion amount
-      return null;
-    }
-    return body.ticker.price;
   }
+  let body;
+  try {
+    const response = await fetch(`https://api.cryptonator.com/api/ticker/${cryptoCurrency}-${collectiveCurrency}`);
+    body = await response.json();
+    if (!body.success || body.error !== '') {
+      throw new Error(`Cryptonator Error: ${body.error}`);
+    }
+  } catch (error) {
+    // we don't want the user to see any errors; simply don't show the conversion amount
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return null;
+  }
+  return body.ticker.price;
 };
 
 const StepDetailsCrypto = ({ onChange, data, currency }) => {

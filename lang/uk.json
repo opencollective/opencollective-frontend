@@ -683,7 +683,6 @@
   "Crypto": "Crypto",
   "Currency": "Валюта",
   "currency": "валюта",
-  "CurrencyConversion": "Currency conversion",
   "Date.BeforeShort": "До {date, date, short}",
   "Date.DateRange": "З {dateFrom, date, short} до {dateTo, date, short}",
   "Date.SinceShort": "З {date, date, short}",
