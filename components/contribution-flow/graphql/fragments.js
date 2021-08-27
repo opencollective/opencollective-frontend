@@ -151,7 +151,8 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       isHost
       settings
       ... on AccountWithContributions {
-        contributors {
+        # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
+        contributors(limit: 1) {
           totalCount
         }
       }
@@ -164,7 +165,8 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
         host {
           ...OrderSuccessHostFragment
           ... on AccountWithContributions {
-            contributors {
+            # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
+            contributors(limit: 1) {
               totalCount
             }
           }

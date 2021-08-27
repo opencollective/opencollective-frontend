@@ -409,10 +409,12 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         ...ExpensesListFieldsFragment
       }
     }
+    # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
     scheduledExpenses: expenses(
       host: { slug: $collectiveSlug }
       status: SCHEDULED_FOR_PAYMENT
       payoutMethodType: BANK_ACCOUNT
+      limit: 1
     ) {
       totalCount
     }
