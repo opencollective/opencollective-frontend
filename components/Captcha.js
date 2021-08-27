@@ -8,7 +8,7 @@ import useRecaptcha from '../lib/hooks/useRecaptcha';
 import { parseToBoolean } from '../lib/utils';
 
 import { Box } from './Grid';
-import StyledButton from './StyledButton';
+import StyledCheckbox from './StyledCheckbox';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 export const PROVIDERS = {
@@ -42,24 +42,26 @@ const ReCaptcha = ({ onVerify, ...props }) => {
     setLoading(false);
   };
   return (
-    <StyledButton
-      loading={loading}
-      onClick={handleClick}
+    <StyledCheckbox
+      checked={verified}
+      onChange={handleClick}
+      isLoading={loading}
+      size={18}
+      label={
+        verified ? (
+          <FormattedMessage id="Captcha.Button.Verified" defaultMessage="Verified Human." />
+        ) : (
+          <FormattedMessage id="Captcha.Button.Verify" defaultMessage="I'm not a Robot." />
+        )
+      }
       {...props}
       disabled={verified}
-      buttonStyle={verified ? 'success' : 'primary'}
-    >
-      {verified ? (
-        <FormattedMessage id="Captcha.Button.Verified" defaultMessage="Verified Human." />
-      ) : (
-        <FormattedMessage id="Captcha.Button.Verify" defaultMessage="I'm not a Robot." />
-      )}
-    </StyledButton>
+    />
   );
 };
 
 ReCaptcha.propTypes = {
-  onVerify: PropTypes.function,
+  onVerify: PropTypes.func,
 };
 
 const Captcha = ({ onVerify, provider, ...props }) => {
@@ -84,7 +86,7 @@ const Captcha = ({ onVerify, provider, ...props }) => {
 };
 
 Captcha.propTypes = {
-  onVerify: PropTypes.function,
+  onVerify: PropTypes.func,
   provider: PropTypes.string,
 };
 
