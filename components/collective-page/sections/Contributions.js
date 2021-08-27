@@ -363,7 +363,7 @@ const SectionContributions = ({ collective }) => {
         >
           <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
             {(!loading || (isLoadingMore && loading)) &&
-              memberOf.nodes.map(membership => (
+              memberOf?.nodes.map(membership => (
                 <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                   <StyledMembershipCard membership={membership} />
                 </MembershipCardContainer>
