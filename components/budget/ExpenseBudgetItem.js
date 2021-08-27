@@ -6,11 +6,13 @@ import { get, includes, size } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { toPx } from '../../lib/theme/helpers';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
+import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import ExpenseFilesPreviewModal from '../expenses/ExpenseFilesPreviewModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
@@ -57,8 +59,7 @@ const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
 
 const ExpenseContainer = styled.div`
   padding: 16px 27px;
-
-  @media (hover: hover) {
+  position: 'relative' @media (hover: hover) {
     &:not(:hover):not(:focus-within) ${ButtonsContainer} {
       opacity: 0.24;
     }
@@ -210,14 +211,28 @@ const ExpenseBudgetItem = ({
               {isAdminView && (
                 <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
               )}
-              <ExpenseStatusTag
-                status={expense.status}
-                fontSize="9px"
-                lineHeight="14px"
-                p="3px 8px"
-                showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
-                showTaxFormMsg={expense.payee.isAdmin}
-              />
+              {[expenseStatus.REJECTED, expenseStatus.PAID].includes(expense.status) ? (
+                <AdminExpenseStatusTag
+                  host={host}
+                  collective={expense.account || collective}
+                  expense={expense}
+                  onSuccess={onProcess}
+                  fontSize="12px"
+                  lineHeight="16px"
+                  p="3px 8px"
+                />
+              ) : (
+                <ExpenseStatusTag
+                  status={expense.status}
+                  fontSize="12px"
+                  fontWeight="bold"
+                  letterSpacing="0.06em"
+                  lineHeight="16px"
+                  p="3px 8px"
+                  showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+                  showTaxFormMsg={expense.payee.isAdmin}
+                />
+              )}
             </Flex>
           )}
         </Flex>
@@ -279,18 +294,20 @@ const ExpenseBudgetItem = ({
             />
           )}
         </Box>
-        {showProcessActions && expense?.permissions && (
-          <ButtonsContainer>
-            <ProcessExpenseButtons
-              host={host}
-              collective={expense.account || collective}
-              expense={expense}
-              permissions={expense.permissions}
-              buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
-              onSuccess={onProcess}
-            />
-          </ButtonsContainer>
-        )}
+        {showProcessActions &&
+          expense?.permissions &&
+          ![expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status) && (
+            <ButtonsContainer>
+              <ProcessExpenseButtons
+                host={host}
+                collective={expense.account || collective}
+                expense={expense}
+                permissions={expense.permissions}
+                buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
+                onSuccess={onProcess}
+              />
+            </ButtonsContainer>
+          )}
       </Flex>
       {hasFilesPreview && (
         <ExpenseFilesPreviewModal
