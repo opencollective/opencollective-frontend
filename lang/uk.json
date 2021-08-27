@@ -852,6 +852,7 @@
   "Expense.InvoiceItems": "Елементи рахунку-фактури",
   "Expense.JoinAndSubmit": "Join and Submit",
   "expense.markAsPaid": "Позначити оплаченим",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses. Are you sure?",
   "Expense.markAsUnpaid": "Позначити витрати неоплаченими",
   "expense.markAsUnpaid.btn": "Позначити несплаченим",
   "Expense.markAsUnpaid.details": "Кошти буде повернено на рахунок колективу.",

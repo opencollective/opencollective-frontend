@@ -852,6 +852,7 @@
   "Expense.InvoiceItems": "Invoice items",
   "Expense.JoinAndSubmit": "Join and Submit",
   "expense.markAsPaid": "Marcar como pago",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses. Are you sure?",
   "Expense.markAsUnpaid": "Mark expense as unpaid",
   "expense.markAsUnpaid.btn": "Marcar como não pago",
   "Expense.markAsUnpaid.details": "The amount will be credited back to the Collective balance.",

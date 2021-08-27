@@ -852,6 +852,7 @@
   "Expense.InvoiceItems": "发票项目",
   "Expense.JoinAndSubmit": "加入并提交",
   "expense.markAsPaid": "标记为已支付",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses. Are you sure?",
   "Expense.markAsUnpaid": "标记为未支付",
   "expense.markAsUnpaid.btn": "标记为未支付",
   "Expense.markAsUnpaid.details": "The amount will be credited back to the Collective balance.",

@@ -852,6 +852,7 @@
   "Expense.InvoiceItems": "Invoice items",
   "Expense.JoinAndSubmit": "Join and Submit",
   "expense.markAsPaid": "支払い済みにする",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses. Are you sure?",
   "Expense.markAsUnpaid": "Mark expense as unpaid",
   "expense.markAsUnpaid.btn": "未支払いにする",
   "Expense.markAsUnpaid.details": "The amount will be credited back to the Collective balance.",
