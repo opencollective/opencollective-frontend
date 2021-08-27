@@ -247,6 +247,7 @@ class TransactionsPage extends React.Component {
             >
               <TransactionsFilters
                 filters={query}
+                kinds={transactions?.kinds}
                 collective={collective}
                 onChange={queryParams => this.updateFilters({ ...queryParams, offset: null })}
               />

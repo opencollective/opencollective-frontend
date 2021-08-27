@@ -5,6 +5,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
     totalCount
     offset
     limit
+    kinds
     nodes {
       id
       uuid
