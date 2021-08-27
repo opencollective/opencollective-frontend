@@ -19,8 +19,6 @@ import { P } from '../Text';
 import StepProfileInfoMessage from './StepProfileInfoMessage';
 import { getTotalAmount } from './utils';
 
-const HCAPTCHA_SITEKEY = process.env.HCAPTCHA_SITEKEY;
-
 const shouldRequireAllInfo = amount => {
   return Boolean(amount && amount >= 500000);
 };
@@ -155,7 +153,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
           <Captcha onVerify={result => dispatchChange('captcha', result)} />
         </Flex>
       )}
-      <P color="black.500" fontSize="12px" mt={HCAPTCHA_SITEKEY ? 2 : 4} data-cy="join-conditions">
+      <P color="black.500" fontSize="12px" mt={isCaptchaEnabled() ? 3 : 4} data-cy="join-conditions">
         <FormattedMessage
           id="SignIn.legal"
           defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
