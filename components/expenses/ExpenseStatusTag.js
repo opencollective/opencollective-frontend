@@ -9,7 +9,7 @@ import { Flex } from '../Grid';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
 
-const getExpenseStatusMsgType = status => {
+export const getExpenseStatusMsgType = status => {
   switch (status) {
     case expenseStatus.REJECTED:
     case expenseStatus.SPAM:
