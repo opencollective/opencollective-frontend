@@ -163,8 +163,7 @@ class SectionContribute extends React.PureComponent {
   getFinancialContributions = memoizeOne(sortedTiers => {
     const { collective, contributors, contributorsStats, isAdmin } = this.props;
     const hasNoContributor = !this.hasContributors(contributors);
-    const canContribute =
-      (collective.isActive && !isPastEvent(collective)) || (collective.type === CollectiveType.EVENT && isAdmin);
+    const canContribute = collective.isActive && (!isPastEvent(collective) || isAdmin);
     const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
     const hasCryptoContribution =
       !get(collective, 'settings.disableCryptoContributions', true) &&
