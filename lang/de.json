@@ -191,6 +191,8 @@
   "button.submit": "Absenden",
   "ByUser": "Von {userName}",
   "CancelEdit": "Bearbeitung abbrechen",
+  "Captcha.Button.Verified": "Verified Human.",
+  "Captcha.Button.Verify": "I'm not a Robot.",
   "ChangelogNotification.firstLine": "Wir haben Neues für Sie!",
   "ChangelogNotification.secondLine": "Klicken Sie auf das {Bild}, um einen Blick darauf zu werfen",
   "ChangelogTrigger.tooltip.content": "Was ist neu bei Open Collective",
