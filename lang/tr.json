@@ -191,6 +191,8 @@
   "button.submit": "Gönder",
   "ByUser": "{userName} tarafından",
   "CancelEdit": "Düzenlemeyi iptal et",
+  "Captcha.Button.Verified": "Verified Human.",
+  "Captcha.Button.Verify": "I'm not a Robot.",
   "ChangelogNotification.firstLine": "Sizin için yeni ürünlerimiz var!",
   "ChangelogNotification.secondLine": "Göz atmak için {image} üzerine tıklayın",
   "ChangelogTrigger.tooltip.content": "Open Collective'deki yenilikler",
