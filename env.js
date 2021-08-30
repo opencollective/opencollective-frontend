@@ -18,7 +18,9 @@ const defaults = {
   STRIPE_KEY: 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8',
   GOOGLE_MAPS_API_KEY: 'AIzaSyAZJnIxtBw5bxnu2QoCUiLCjV1nk84Vnk0',
   RECAPTCHA_SITE_KEY: '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
-  RECAPTCHA_ENABLED: false,
+  HCAPTCHA_SITEKEY: '10000000-ffff-ffff-ffff-000000000001',
+  CAPTCHA_ENABLED: true,
+  CAPTCHA_PROVIDER: 'HCAPTCHA',
   CLIENT_ANALYTICS_ENABLED: false,
   ONBOARDING_MODAL: true,
   NEW_HOST_APPLICATION_FLOW: false,
@@ -29,7 +31,6 @@ const defaults = {
   OC_ENV: process.env.NODE_ENV || 'development',
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
   WISE_ENVIRONMENT: process.env.OC_ENV === 'production' ? 'production' : 'sandbox',
-  HCAPTCHA_SITEKEY: '10000000-ffff-ffff-ffff-000000000001',
   ADD_FUNDS_FROM_COLLECTIVE: false,
 };
 

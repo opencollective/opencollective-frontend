@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { toUpper } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { getEnvVar } from '../lib/env-utils';
@@ -16,11 +17,10 @@ export const PROVIDERS = {
   RECAPTCHA: 'RECAPTCHA',
 };
 
+const CAPTCHA_PROVIDER = PROVIDERS[toUpper(getEnvVar('CAPTCHA_PROVIDER'))] || PROVIDERS.HCAPTCHA;
+
 export const isCaptchaEnabled = () => {
-  const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
-  const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
-  const RECAPTCHA_ENABLED = getEnvVar('RECAPTCHA_ENABLED');
-  return HCAPTCHA_SITEKEY || (RECAPTCHA_SITE_KEY && parseToBoolean(RECAPTCHA_ENABLED));
+  return parseToBoolean(getEnvVar('CAPTCHA_ENABLED'));
 };
 
 const ReCaptcha = ({ onVerify, ...props }) => {
@@ -67,7 +67,6 @@ ReCaptcha.propTypes = {
 const Captcha = ({ onVerify, provider, ...props }) => {
   const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
   const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
-  const RECAPTCHA_ENABLED = getEnvVar('RECAPTCHA_ENABLED');
   const handleVerify = obj => {
     onVerify({ ...obj, provider });
   };
@@ -76,10 +75,14 @@ const Captcha = ({ onVerify, provider, ...props }) => {
     onVerify(null);
   }, []);
 
+  if (!isCaptchaEnabled()) {
+    return null;
+  }
+
   let captcha = null;
   if (provider === PROVIDERS.HCAPTCHA && HCAPTCHA_SITEKEY) {
     captcha = <HCaptcha sitekey={HCAPTCHA_SITEKEY} onVerify={token => handleVerify({ token })} />;
-  } else if (provider === PROVIDERS.RECAPTCHA && RECAPTCHA_SITE_KEY && RECAPTCHA_ENABLED) {
+  } else if (provider === PROVIDERS.RECAPTCHA && RECAPTCHA_SITE_KEY) {
     captcha = <ReCaptcha onVerify={handleVerify} {...props} />;
   }
   return <Box data-cy="captcha">{captcha}</Box>;
@@ -91,7 +94,7 @@ Captcha.propTypes = {
 };
 
 Captcha.defaultProps = {
-  provider: PROVIDERS.HCAPTCHA,
+  provider: CAPTCHA_PROVIDER,
 };
 
 export default Captcha;

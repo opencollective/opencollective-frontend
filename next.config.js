@@ -33,6 +33,8 @@ const nextConfig = {
         WISE_ENVIRONMENT: 'sandbox',
         ADD_FUNDS_FROM_COLLECTIVE: false,
         HCAPTCHA_SITEKEY: false,
+        CAPTCHA_ENABLED: true,
+        CAPTCHA_PROVIDER: 'HCAPTCHA',
       }),
     );
 
