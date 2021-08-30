@@ -191,6 +191,8 @@
   "button.submit": "הגשה",
   "ByUser": "על ידי {userName}",
   "CancelEdit": "ביטול עריכה",
+  "Captcha.Button.Verified": "Verified Human.",
+  "Captcha.Button.Verify": "I'm not a Robot.",
   "ChangelogNotification.firstLine": "יש לנו דברים חדשים בשבילך!",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "ChangelogTrigger.tooltip.content": "מה חדש ב־Open Collective",
