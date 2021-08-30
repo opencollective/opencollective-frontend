@@ -191,6 +191,8 @@
   "button.submit": "提交",
   "ByUser": "由 {userName}",
   "CancelEdit": "取消编辑",
+  "Captcha.Button.Verified": "Verified Human.",
+  "Captcha.Button.Verify": "I'm not a Robot.",
   "ChangelogNotification.firstLine": "我们为您提供了新的东西！",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "ChangelogTrigger.tooltip.content": "What's new with Open Collective",
