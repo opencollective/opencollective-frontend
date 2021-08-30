@@ -2134,6 +2134,7 @@
   "warning.discardUnsavedChanges": "Você tem certeza de que quer descartar suas alterações não salvas?",
   "Warning.Important": "Importante",
   "warning.limitedAccount": "Sua conta atualmente está limitada. Se você acha que isso é um erro, por favor entre em contato com support@opencollective.com.",
+  "Warning.PastEvent": "You're contributing to a past event",
   "Warning.TipLargerThanContribution": "You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. This means the tip is larger than the contribution, when usually the reverse is intended.{newLine}{newLine}Are you sure you want to do this?",
   "WarningUnsavedChanges": "Você tem alterações não salvas. Tem certeza que deseja sair desta página?",
   "WebhookEvents.All": "All",

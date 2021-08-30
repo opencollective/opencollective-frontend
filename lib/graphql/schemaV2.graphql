@@ -90,7 +90,7 @@ interface Account {
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
   members(
     limit: Int = 100
     offset: Int = 0
@@ -276,6 +276,12 @@ interface Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+}
+
+enum AccountCacheType {
+  CLOUDFLARE
+  GRAPHQL_QUERIES
+  CONTRIBUTORS
 }
 
 """
@@ -657,7 +663,7 @@ type Bot implements Account {
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
 
   """
   Get all members (admins, members, backers, followers)
@@ -938,7 +944,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
 
   """
   Get all members (admins, members, backers, followers)
@@ -3238,7 +3244,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
 
   """
   Get all members (admins, members, backers, followers)
@@ -3504,6 +3510,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   The Collective hosting this Event
   """
   parentCollective: Collective @deprecated(reason: "2020/07/01 - Use parent instead.")
+
+  """
+  The Event end date and time
+  """
+  endsAt: DateTime
 }
 
 """
@@ -4215,7 +4226,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
 
   """
   Get all members (admins, members, backers, followers)
@@ -4573,7 +4584,7 @@ type Host implements Account & AccountWithContributions {
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
 
   """
   Get all members (admins, members, backers, followers)
@@ -5156,7 +5167,7 @@ type Individual implements Account {
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
 
   """
   Get all members (admins, members, backers, followers)
@@ -5582,6 +5593,18 @@ enum MemberRole {
   FOLLOWER
   ACCOUNTANT
   CONNECTED_ACCOUNT
+}
+
+type MergeAccountsResponse {
+  """
+  The resulting account
+  """
+  account: Account!
+
+  """
+  A message to display to the user about the result
+  """
+  message: String
 }
 
 """
@@ -6012,6 +6035,41 @@ type Mutation {
     """
     account: AccountUpdateInput!
   ): Host!
+
+  """
+  [Root only] Clears the cache for a given account
+  """
+  clearCacheForAccount(
+    """
+    Account to clear the cache for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Types of cache to clear
+    """
+    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
+  ): Account!
+
+  """
+  [Root only] Merge two accounts, returns the result account
+  """
+  mergeAccounts(
+    """
+    Account to merge from
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Account to merge to
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean! = true
+  ): MergeAccountsResponse!
 
   """
   Sends an email for guest to confirm their emails and create their Open Collective account
@@ -6592,7 +6650,7 @@ input OrderCreateInput {
   context: OrderContextInput
 
   """
-  Whether this is transferring the remaining balance from a project/event
+  Whether this is transferring the remaining balance from a project/event/collective
   """
   isBalanceTransfer: Boolean
 }
@@ -6767,7 +6825,7 @@ type Organization implements Account & AccountWithContributions {
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
 
   """
   Get all members (admins, members, backers, followers)
@@ -7341,7 +7399,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
 
   """
   Get all members (admins, members, backers, followers)
@@ -8558,7 +8616,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     roles: [MemberRole]
     TierId: Int
     tierSlug: String
-  ): [Member]
+  ): [Member] @deprecated(reason: "2021-08-25: This should not have been introduced, use \"members\"")
 
   """
   Get all members (admins, members, backers, followers)

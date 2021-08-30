@@ -9,6 +9,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
 import {
@@ -20,6 +21,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
+import { isPastEvent } from '../../lib/events';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
@@ -87,6 +89,10 @@ const OTHER_MESSAGES = defineMessages({
     defaultMessage:
       'You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. This means the tip is larger than the contribution, when usually the reverse is intended.{newLine}{newLine}Are you sure you want to do this?',
   },
+  pastEventWarning: {
+    id: 'Warning.PastEvent',
+    defaultMessage: `You're contributing to a past event`,
+  },
 });
 
 class ContributionFlow extends React.Component {
@@ -94,6 +100,7 @@ class ContributionFlow extends React.Component {
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
       platformContributionAvailable: PropTypes.bool,
       parent: PropTypes.shape({
@@ -722,6 +729,7 @@ class ContributionFlow extends React.Component {
     const isCrypto = paymentMethod === 'crypto';
     const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
     const isLoading = isCrypto ? isSubmitting : isSubmitted || isSubmitting;
+    const pastEvent = collective.type === CollectiveType.EVENT && isPastEvent(collective);
 
     return (
       <Steps
@@ -801,6 +809,11 @@ class ContributionFlow extends React.Component {
                   {(error || backendError) && (
                     <MessageBox type="error" withIcon mb={3} data-cy="contribution-flow-error">
                       {formatErrorMessage(this.props.intl, error) || backendError}
+                    </MessageBox>
+                  )}
+                  {pastEvent && (
+                    <MessageBox type="warning" withIcon mb={3} data-cy="contribution-flow-warning">
+                      {this.props.intl.formatMessage(OTHER_MESSAGES.pastEventWarning)}
                     </MessageBox>
                   )}
                   <ContributionFlowStepContainer
