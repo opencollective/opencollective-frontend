@@ -540,6 +540,7 @@
   "ContributionFlow.PublicContribution": "Your name and contribution will be public.",
   "ContributionFlow.recurringAccountInfo": "Please provide a valid email. We need to create an account so you can manage your contribution.",
   "ContributionFlow.YourInfo": "Your info",
+  "ContributionFlowSuccess.Crypto.BlockchainExplorer": "You can view the status of your transaction at the Blockchain explorer: {link}",
   "Contributions": "Contribuições",
   "contributions.startAccepting": "Comece a aceitar contribuições",
   "contributions.subtitle": "To accept financial contributions, you need to complete your setup and decide where your funds will be held.",

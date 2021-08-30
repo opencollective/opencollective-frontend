@@ -540,6 +540,7 @@
   "ContributionFlow.PublicContribution": "Ваше ім'я та внесок будуть загальнодоступними.",
   "ContributionFlow.recurringAccountInfo": "Будь ласка, вкажіть дійсну адресу електронної пошти. Нам потрібно створити обліковий запис, щоб ви могли розпорядитися своїм внеском.",
   "ContributionFlow.YourInfo": "Ваші дані",
+  "ContributionFlowSuccess.Crypto.BlockchainExplorer": "You can view the status of your transaction at the Blockchain explorer: {link}",
   "Contributions": "Внески",
   "contributions.startAccepting": "Почати приймати внески",
   "contributions.subtitle": "To accept financial contributions, you need to complete your setup and decide where your funds will be held.",

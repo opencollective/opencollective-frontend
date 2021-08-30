@@ -203,7 +203,10 @@ class ContributionFlowSuccess extends React.Component {
     );
   };
 
-  renderCryptoInformation() {
+  renderCryptoInformation(order) {
+    const pledgeCurrency = order?.data?.customData?.pledgeCurrency;
+    const depositAddress = order?.paymentMethod?.data?.depositAddress;
+
     return (
       <Flex flexDirection="column" justifyContent="center" width={[1, 3 / 4]} px={[4, 0]} py={[2, 0]}>
         <MessageBox type="warning" fontSize="12px" mb={2}>
@@ -212,6 +215,22 @@ class ContributionFlowSuccess extends React.Component {
             defaultMessage="<strong>Your contribution is pending.</strong> Once the transaction is completed you will receive a confirmation email with the details."
             values={I18nFormatters}
           />
+          {` `}
+          {['BTC', 'ETH', 'BCH', 'LTC', 'ZEC'].includes(pledgeCurrency) &&
+            this.props.intl.formatMessage(
+              {
+                id: 'ContributionFlowSuccess.Crypto.BlockchainExplorer',
+                defaultMessage: 'You can view the status of your transaction at the Blockchain explorer: {link}',
+              },
+              {
+                link: (
+                  <StyledLink
+                    openInNewTab
+                    href={`https://blockchair.com/search?q=${depositAddress}`}
+                  >{`https://blockchair.com/search?q=${depositAddress}`}</StyledLink>
+                ),
+              },
+            )}
         </MessageBox>
         <Flex px={3} mt={2}>
           <P fontSize="16px" color="black.700">
@@ -237,7 +256,7 @@ class ContributionFlowSuccess extends React.Component {
     const { order } = data;
     const isPendingBankTransfer = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
     if (isCrypto) {
-      return this.renderCryptoInformation();
+      return this.renderCryptoInformation(order);
     } else if (isPendingBankTransfer) {
       return this.renderBankTransferInformation();
     } else {
