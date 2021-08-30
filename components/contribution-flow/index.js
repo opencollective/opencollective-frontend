@@ -91,7 +91,7 @@ const OTHER_MESSAGES = defineMessages({
   },
   pastEventWarning: {
     id: 'Warning.PastEvent',
-    defaultMessage: `You're contributing to a past event`,
+    defaultMessage: `You're contributing to a past event.`,
   },
 });
 
