@@ -72,6 +72,34 @@ type BackYourStackDispatchState {
 }
 
 """
+Captcha related information
+"""
+input CaptchaInput {
+  """
+  Captcha validation token
+  """
+  token: String!
+
+  """
+  HCatpcha site key
+  """
+  ekey: String
+
+  """
+  Catpcha provider
+  """
+  provider: CaptchaProvider!
+}
+
+"""
+Implemented Captcha Providers
+"""
+enum CaptchaProvider {
+  HCAPTCHA
+  RECAPTCHA
+}
+
+"""
 This represents a Collective
 """
 type Collective implements CollectiveInterface {
@@ -1701,6 +1729,11 @@ input GuestInfoInput {
   The unique guest token
   """
   token: String
+
+  """
+  Captcha validation for creating an order
+  """
+  captcha: CaptchaInput
 }
 
 """
