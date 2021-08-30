@@ -191,6 +191,8 @@
   "button.submit": "Ingeven",
   "ByUser": "By {userName}",
   "CancelEdit": "Bewerking annuleren",
+  "Captcha.Button.Verified": "Verified Human.",
+  "Captcha.Button.Verify": "I'm not a Robot.",
   "ChangelogNotification.firstLine": "We have new stuff for you!",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "ChangelogTrigger.tooltip.content": "What's new with Open Collective",
