@@ -13,6 +13,7 @@ const defaults = {
   API_URL: 'https://api-staging.opencollective.com',
   IMAGES_URL: 'https://images-staging.opencollective.com',
   WEBSITE_URL: 'http://localhost:3000',
+  REST_URL: 'https://rest-staging.opencollective.com',
   PDF_SERVICE_URL: 'https://invoices-staging.opencollective.com',
   PAYPAL_ENVIRONMENT: 'sandbox',
   STRIPE_KEY: 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8',

@@ -256,7 +256,7 @@ class TransactionsPage extends React.Component {
                     <TransactionsDownloadInvoices collective={collective} />
                   </Box>
                 )}
-                <TransactionsDownloadCSV collective={collective} />
+                <TransactionsDownloadCSV collective={collective} query={this.props.query} />
               </Flex>
             </Flex>
             {error ? (
