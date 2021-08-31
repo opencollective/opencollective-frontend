@@ -76,6 +76,7 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const intl = useIntl();
   const wrapperRef = React.useRef();
   const [showPopup, setShowPopup] = React.useState(false);
+  const [isClosable, setClosable] = React.useState(true);
 
   const onClick = () => {
     setShowPopup(true);
@@ -83,13 +84,20 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
 
   // Close when clicking outside
   useGlobalBlur(wrapperRef, outside => {
-    if (outside && showPopup && !document.getElementById('mark-expense-as-unpaid-modal')) {
+    if (outside && isClosable && showPopup && !document.getElementById('mark-expense-as-unpaid-modal')) {
       setShowPopup(false);
     }
   });
 
   // Closes the modal upon the `ESC` key press.
-  useKeyboardKey({ callback: () => setShowPopup(false), keyMatch: ESCAPE_KEY });
+  useKeyboardKey({
+    callback: () => {
+      if (isClosable) {
+        setShowPopup(false);
+      }
+    },
+    keyMatch: ESCAPE_KEY,
+  });
 
   return (
     <React.Fragment>
@@ -123,6 +131,7 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
                       collective={collective}
                       expense={expense}
                       permissions={expense.permissions}
+                      onModalToggle={isOpen => setClosable(!isOpen)}
                     />
                   </Flex>
                   <Arrow ref={arrowProps.ref} style={arrowProps.style} />

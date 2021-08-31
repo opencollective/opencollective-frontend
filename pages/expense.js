@@ -528,7 +528,6 @@ class ExpensePage extends React.Component {
                   permissions={expense?.permissions}
                   onError={error => this.setState({ error })}
                   onEdit={this.onEditBtnClick}
-                  onDelete={this.onDelete}
                 />
               )}
             </Flex>
