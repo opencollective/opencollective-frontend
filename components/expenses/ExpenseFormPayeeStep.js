@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FastField, Field } from 'formik';
 import { first, get, isEmpty, omit, partition, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -22,8 +23,10 @@ import I18nAddressFields from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
+import StyledTooltip from '../StyledTooltip';
 
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
@@ -32,6 +35,10 @@ const msg = defineMessages({
   payeeLabel: {
     id: `ExpenseForm.payeeLabel`,
     defaultMessage: 'Who is being paid for this expense?',
+  },
+  payeeLegalName: {
+    id: `ExpenseForm.payeeLegalName`,
+    defaultMessage: 'Legal name of payee {tooltip}',
   },
   payoutOptionLabel: {
     id: `ExpenseForm.PayoutOptionLabel`,
@@ -225,6 +232,29 @@ const ExpenseFormPayeeStep = ({
               </StyledInputField>
             )}
           </Field>
+          {values.payee?.legalName && (
+            <StyledInputField
+              label={formatMessage(msg.payeeLegalName, {
+                tooltip: (
+                  <StyledTooltip
+                    content={() => (
+                      <FormattedMessage
+                        id="ExpenseForm.legalName.tooltip"
+                        defaultMessage="The legal name of the payee. This can be changed in your profile settings."
+                      />
+                    )}
+                  >
+                    <InfoCircle size={16} />
+                  </StyledTooltip>
+                ),
+              })}
+              labelFontSize="13px"
+              flex="1"
+              mt={3}
+            >
+              <StyledInput value={values.payee.legalName} disabled />
+            </StyledInputField>
+          )}
           {requiresAddress && (
             <Fragment>
               <FastField name="payeeLocation.country">

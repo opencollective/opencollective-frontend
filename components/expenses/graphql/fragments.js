@@ -67,6 +67,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
   fragment ExpenseHostFields on Host {
     id
     name
+    legalName
     slug
     type
     currency
@@ -126,6 +127,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       id
       slug
       name
+      legalName
       type
       isAdmin
       location {
