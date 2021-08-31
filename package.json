@@ -69,7 +69,7 @@
     "lodash": "4.17.21",
     "memoize-one": "5.2.1",
     "moment": "2.29.1",
-    "next": "11.1.0",
+    "next": "11.1.2",
     "node-fetch": "2.6.1",
     "nprogress": "0.2.0",
     "payment": "2.4.6",
