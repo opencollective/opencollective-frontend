@@ -634,7 +634,7 @@ class EditCollectiveForm extends React.Component {
           name: 'legalName',
           placeholder: '',
           maxLength: 255,
-          when: () => collective.type === CollectiveType.USER || CollectiveType.ORGANIZATION,
+          when: () => collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION,
         },
         {
           name: 'company',
