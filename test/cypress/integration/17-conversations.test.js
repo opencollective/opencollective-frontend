@@ -65,8 +65,12 @@ describe('Conversations', () => {
       cy.contains('Hello World 👋');
       cy.getByDataCy('replies-count').contains('2');
       cy.getByDataCy('conversation-preview').should(
-        'have.html',
-        'Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋 Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, lev...',
+        'contain.html',
+        'Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋',
+      );
+      cy.getByDataCy('conversation-preview').should(
+        'contain.text',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, lev...',
       );
     });
   });
