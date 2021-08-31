@@ -31,15 +31,6 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
           </Span>
         </Flex>
       );
-    case PayoutMethodType.CREDIT_CARD:
-      return (
-        <Flex alignItems="center">
-          <CreditCard size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            <FormattedMessage id="CreditCard" defaultMessage="Credit Card" />
-          </Span>
-        </Flex>
-      );
     case PayoutMethodType.BANK_ACCOUNT:
       return (
         <Flex alignItems="center">
