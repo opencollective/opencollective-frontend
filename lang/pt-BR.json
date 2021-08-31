@@ -1572,7 +1572,7 @@
   "organization.created": "Sua Organização foi criada.",
   "organization.created.description": "Agora você pode fazer contribuições financeiras como uma Organização. Você também pode editar seu perfil, adicionar membros da equipe e associar um cartão de crédito a um limite mensal.",
   "Organization.CreateNew": "Criar Nova Organização",
-  "Organization.LegalName": "Legal Name 🔒",
+  "Organization.LegalName": "Legal Name {privacyIcon}",
   "Organization.Name": "Nome da organização",
   "OSC.description": "Para projetos de código aberto",
   "OtherInfo": "Outras Informações",

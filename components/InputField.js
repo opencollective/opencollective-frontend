@@ -668,7 +668,7 @@ class InputField extends React.Component {
             name={field.name}
             maxLength={field.maxLength}
             disabled={field.disabled}
-            label={field.label && `${capitalize(field.label)}`}
+            label={typeof field.label === 'string' ? `${capitalize(field.label)}` : field.label}
             help={field.description}
             autoFocus={field.focus}
             placeholder={field.placeholder}

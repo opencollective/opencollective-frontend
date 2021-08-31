@@ -16,6 +16,7 @@ import { VAT_OPTIONS } from '../../lib/constants/vat';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import InputField from '../InputField';
 import Link from '../Link';
 import OrdersWithData from '../orders/OrdersWithData';
@@ -98,7 +99,7 @@ class EditCollectiveForm extends React.Component {
       },
       'type.label': { id: 'collective.type.label', defaultMessage: 'Type' },
       'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
-      'legalName.label': { id: 'Organization.LegalName', defaultMessage: 'Legal Name 🔒' },
+      'legalName.label': { id: 'Organization.LegalName', defaultMessage: 'Legal Name {privacyIcon}' },
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
         id: 'host.tos',
@@ -815,6 +816,10 @@ class EditCollectiveForm extends React.Component {
           field.description += ` `;
           field.description += intl.formatMessage(this.messages[`${field.name}.warning2`], collective);
         }
+        if (field.name === 'legalName') {
+          field.label = intl.formatMessage(this.messages[`${field.name}.label`], { privacyIcon: <PrivateInfoIcon /> });
+        }
+
         return field;
       });
     });

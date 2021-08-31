@@ -10,6 +10,7 @@ import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { isValidEmail } from '../lib/utils';
 
+import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
 import { Box } from './Grid';
 import InputTypeCountry from './InputTypeCountry';
@@ -64,7 +65,7 @@ const msg = defineMessages({
   },
   legalName: {
     id: 'Organization.LegalName',
-    defaultMessage: 'Legal Name 🔒',
+    defaultMessage: 'Legal Name {privacyIcon}',
   },
   fullName: {
     id: 'User.FullName',
@@ -324,7 +325,7 @@ const CreateCollectiveMiniForm = ({
                 <StyledInputField
                   name="legalName"
                   htmlFor="legalName"
-                  label={formatMessage(msg.legalName)}
+                  label={formatMessage(msg.legalName, { privacyIcon: <PrivateInfoIcon /> })}
                   mt={3}
                   value={values.legalName}
                 >

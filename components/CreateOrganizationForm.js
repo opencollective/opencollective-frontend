@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
 
 import { BackButton } from './create-collective/CreateCollectiveForm';
+import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
 import CollectivePickerAsync from './CollectivePickerAsync';
 import Container from './Container';
@@ -24,7 +25,7 @@ import { withUser } from './UserProvider';
 
 const orgMessages = defineMessages({
   nameLabel: { id: 'Organization.Name', defaultMessage: 'Organization name' },
-  legalNameLabel: { id: 'Organization.LegalName', defaultMessage: 'Legal Name 🔒' },
+  legalNameLabel: { id: 'Organization.LegalName', defaultMessage: 'Legal Name {privacyIcon}' },
   slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
@@ -208,7 +209,7 @@ const CreateOrganizationForm = props => {
                       <StyledInputField
                         name="legalName"
                         htmlFor="legalName"
-                        label={intl.formatMessage(orgMessages.legalNameLabel)}
+                        label={intl.formatMessage(orgMessages.legalNameLabel, { privacyIcon: <PrivateInfoIcon /> })}
                         labelFontSize="13px"
                         labelColor="black.700"
                         labelFontWeight="600"

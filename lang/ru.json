@@ -1572,7 +1572,7 @@
   "organization.created": "Ваша организация создана.",
   "organization.created.description": "You can now make financial contributions as an Organization. You can also edit your profile, add team members, and associate a credit card with a monthly limit.",
   "Organization.CreateNew": "Создать новую Организацию",
-  "Organization.LegalName": "Legal Name 🔒",
+  "Organization.LegalName": "Legal Name {privacyIcon}",
   "Organization.Name": "Название организации",
   "OSC.description": "Для проектов с открытым исходным кодом",
   "OtherInfo": "Другая информация",
