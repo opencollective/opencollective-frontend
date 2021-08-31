@@ -89,7 +89,7 @@ const CreateOrganizationForm = props => {
     if (values.name.length > 50) {
       errors.name = intl.formatMessage(orgMessages.errorName);
     }
-    if (values.name.length > 50) {
+    if (values.legalName.length > 256) {
       errors.legalName = intl.formatMessage(orgMessages.errorName);
     }
     if (values.slug.length > 30) {
