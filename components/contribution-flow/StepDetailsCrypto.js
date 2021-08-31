@@ -35,20 +35,19 @@ const getCryptoExchangeRate = async (cryptoCurrency, collectiveCurrency) => {
   if (!cryptoCurrency || !collectiveCurrency) {
     return null;
   }
-  let body;
   try {
     const response = await fetch(`https://api.cryptonator.com/api/ticker/${cryptoCurrency}-${collectiveCurrency}`);
-    body = await response.json();
+    const body = await response.json();
     if (!body.success || body.error !== '') {
       throw new Error(`Cryptonator Error: ${body.error}`);
     }
+    return body.ticker.price;
   } catch (error) {
     // we don't want the user to see any errors; simply don't show the conversion amount
     // eslint-disable-next-line no-console
     console.error(error);
     return null;
   }
-  return body.ticker.price;
 };
 
 const StepDetailsCrypto = ({ onChange, data, currency }) => {
@@ -72,11 +71,8 @@ const StepDetailsCrypto = ({ onChange, data, currency }) => {
   }, []);
 
   useEffect(() => {
-    dispatchChange('convertedAmount', { amount: convertedAmount, currency });
-  }, [convertedAmount]);
-
-  useEffect(() => {
     setConvertedAmount(amount * cryptoExchangeRate);
+    dispatchChange('convertedAmount', { amount: convertedAmount, currency });
   }, [amount, cryptoExchangeRate]);
 
   return (
