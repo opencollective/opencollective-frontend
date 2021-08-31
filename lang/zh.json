@@ -1967,7 +1967,7 @@
   "TierPage.ContributorsDescription": "加入我们来为这一层级做出贡献！",
   "TierPage.Share.title": "帮助 {collective} 到达他们的目标！",
   "tiers.about": "Set up contribution tiers",
-  "Tiers.CryptoTierDescription": "Enabling this will add a tier to accept Crypto donations through {theGivingBlockLink}.",
+  "Tiers.CryptoTierDescription": "Enabling this will enable support for donations with Cryptocurrencies such as Bitcoin or Ethereum.",
   "Tiers.CustomTierDescription": "A default tier that enables freely customizable contributions, so people can set their own amount and frequency without limitations. You cannot change the settings or description of this tier, but you can disable it.",
   "tiers.knowMore": "Learn about tiers",
   "To": "发送至",

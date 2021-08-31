@@ -505,10 +505,7 @@ class Tiers extends React.Component {
                         <P mb={2}>
                           <FormattedMessage
                             id="Tiers.CryptoTierDescription"
-                            defaultMessage="Enabling this will add a tier to accept Crypto donations through {theGivingBlockLink}."
-                            values={{
-                              theGivingBlockLink: <a href="https://www.thegivingblock.com/">The Giving Block</a>,
-                            }}
+                            defaultMessage="Enabling this will enable support for donations with Cryptocurrencies such as Bitcoin or Ethereum."
                           />
                         </P>
                         <StyledCheckbox
