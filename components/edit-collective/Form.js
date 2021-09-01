@@ -98,8 +98,18 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'URL slug',
       },
       'type.label': { id: 'collective.type.label', defaultMessage: 'Type' },
-      'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
+      'name.label': { id: 'Fields.displayName', defaultMessage: 'Display name' },
+      'name.description': {
+        id: 'Fields.name.description',
+        defaultMessage:
+          'The display name is used everywhere that the profile name is viewable publicly, including your profile, comments, etc.',
+      },
       'legalName.label': { id: 'Organization.LegalName', defaultMessage: 'Legal Name {privacyIcon}' },
+      'legalName.description': {
+        id: 'Organization.LegalName.description',
+        defaultMessage:
+          'The legal name is private and only shared with hosts for receipts, the payee section of expenses and the tax form system',
+      },
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
         id: 'host.tos',
