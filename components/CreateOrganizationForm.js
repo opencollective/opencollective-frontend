@@ -221,7 +221,7 @@ const CreateOrganizationForm = props => {
                         hint={
                           <FormattedMessage
                             id="legalName.description"
-                            defaultMessage="The legal name is private and only shared with hosts for receipts, the payee section of expenses and the tax form system"
+                            defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name."
                           />
                         }
                       >

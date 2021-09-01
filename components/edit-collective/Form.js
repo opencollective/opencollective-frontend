@@ -16,7 +16,6 @@ import { VAT_OPTIONS } from '../../lib/constants/vat';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import InputField from '../InputField';
 import Link from '../Link';
 import OrdersWithData from '../orders/OrdersWithData';
@@ -102,13 +101,13 @@ class EditCollectiveForm extends React.Component {
       'name.description': {
         id: 'Fields.name.description',
         defaultMessage:
-          'The display name is used everywhere that the profile name is viewable publicly, including your profile, comments, etc.',
+          'The display name is used whenever we refer to your profile publicly (your profile page, your comments, your contributions, etc). Anyone can see this name.',
       },
       'legalName.label': { id: 'LegalName', defaultMessage: 'Legal Name' },
       'legalName.description': {
         id: 'LegalName.description',
         defaultMessage:
-          'The legal name is private and only shared with hosts for receipts, the payee section of expenses and the tax form system',
+          'The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name.',
       },
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
