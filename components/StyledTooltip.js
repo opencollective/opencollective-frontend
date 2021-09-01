@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
-import { v4 as uuid } from 'uuid';
 import { verticalAlign } from 'styled-system';
+import { v4 as uuid } from 'uuid';
 
 const StyledTooltipContainer = styled(`div`)`
   max-width: 320px;
