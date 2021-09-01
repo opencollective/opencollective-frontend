@@ -73,7 +73,7 @@ const Input = props => {
           return `${input.name} is required`;
         } else if (!matches && value) {
           return input.validationError || `Invalid ${input.name}`;
-        } else if (isAccountHolderName && value.match(/^[^\s]{1}\b/)) {
+        } else if (isAccountHolderName && (!value || value.match(/^[^\s]{1}\b/))) {
           return 'Your full name is required';
         }
       };
