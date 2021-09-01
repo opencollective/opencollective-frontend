@@ -54,7 +54,7 @@ const StepDetailsCrypto = ({ onChange, data, currency }) => {
   const intl = useIntl();
   const [cryptoCurrencyType, setCryptoCurrencyType] = useState(data.currency);
   const [amount, setAmount] = useState(data.amount);
-  const [convertedAmount, setConvertedAmount] = useState(data.convertedAmount?.amount);
+  const [convertedAmount, setConvertedAmount] = useState(null);
   const [cryptoExchangeRate, setCryptoExchangeRate] = useState(null);
   const [touched, setTouched] = useState(false);
   const dispatchChange = (field, value) => {
@@ -72,9 +72,7 @@ const StepDetailsCrypto = ({ onChange, data, currency }) => {
 
   useEffect(() => {
     if (cryptoExchangeRate) {
-      const newConvertedAmount = amount * cryptoExchangeRate;
-      setConvertedAmount(newConvertedAmount);
-      dispatchChange('convertedAmount', { amount: newConvertedAmount, currency });
+      setConvertedAmount(amount * cryptoExchangeRate);
     }
   }, [amount, cryptoExchangeRate]);
 
