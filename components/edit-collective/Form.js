@@ -104,9 +104,9 @@ class EditCollectiveForm extends React.Component {
         defaultMessage:
           'The display name is used everywhere that the profile name is viewable publicly, including your profile, comments, etc.',
       },
-      'legalName.label': { id: 'Organization.LegalName', defaultMessage: 'Legal Name {privacyIcon}' },
+      'legalName.label': { id: 'LegalName', defaultMessage: 'Legal Name' },
       'legalName.description': {
-        id: 'Organization.LegalName.description',
+        id: 'LegalName.description',
         defaultMessage:
           'The legal name is private and only shared with hosts for receipts, the payee section of expenses and the tax form system',
       },
@@ -645,6 +645,7 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
           maxLength: 255,
           when: () => collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION,
+          isPrivate: true,
         },
         {
           name: 'company',
@@ -826,9 +827,6 @@ class EditCollectiveForm extends React.Component {
           field.description += ` `;
           field.description += intl.formatMessage(this.messages[`${field.name}.warning2`], collective);
         }
-        if (field.name === 'legalName') {
-          field.label = intl.formatMessage(this.messages[`${field.name}.label`], { privacyIcon: <PrivateInfoIcon /> });
-        }
 
         return field;
       });
@@ -868,6 +866,7 @@ class EditCollectiveForm extends React.Component {
                       onChange={value => this.handleChange(field.name, value)}
                       disabled={field.disabled}
                       maxLength={field.maxLength}
+                      isPrivate={field.isPrivate}
                     />
                   ))}
                 </div>

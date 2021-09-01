@@ -3,14 +3,13 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { assign, cloneDeep, get, pick } from 'lodash';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { isValidEmail } from '../lib/utils';
 
-import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
 import { Box } from './Grid';
 import InputTypeCountry from './InputTypeCountry';
@@ -64,8 +63,8 @@ const msg = defineMessages({
     defaultMessage: 'Organization name',
   },
   legalName: {
-    id: 'Organization.LegalName',
-    defaultMessage: 'Legal Name {privacyIcon}',
+    id: 'LegalName',
+    defaultMessage: 'Legal Name',
   },
   fullName: {
     id: 'User.FullName',
@@ -325,9 +324,16 @@ const CreateCollectiveMiniForm = ({
                 <StyledInputField
                   name="legalName"
                   htmlFor="legalName"
-                  label={formatMessage(msg.legalName, { privacyIcon: <PrivateInfoIcon /> })}
+                  label={formatMessage(msg.legalName)}
                   mt={3}
                   value={values.legalName}
+                  isPrivate
+                  hint={
+                    <FormattedMessage
+                      id="legalName.description"
+                      defaultMessage="The legal name is private and only shared with hosts for receipts, the payee section of expenses and the tax form system"
+                    />
+                  }
                 >
                   {inputProps => (
                     <Field

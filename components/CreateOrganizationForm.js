@@ -7,7 +7,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
 
 import { BackButton } from './create-collective/CreateCollectiveForm';
-import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
 import CollectivePickerAsync from './CollectivePickerAsync';
 import Container from './Container';
@@ -25,7 +24,7 @@ import { withUser } from './UserProvider';
 
 const orgMessages = defineMessages({
   nameLabel: { id: 'Organization.Name', defaultMessage: 'Organization name' },
-  legalNameLabel: { id: 'Organization.LegalName', defaultMessage: 'Legal Name {privacyIcon}' },
+  legalNameLabel: { id: 'LegalName', defaultMessage: 'Legal Name' },
   slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
@@ -209,7 +208,7 @@ const CreateOrganizationForm = props => {
                       <StyledInputField
                         name="legalName"
                         htmlFor="legalName"
-                        label={intl.formatMessage(orgMessages.legalNameLabel, { privacyIcon: <PrivateInfoIcon /> })}
+                        label={intl.formatMessage(orgMessages.legalNameLabel)}
                         labelFontSize="13px"
                         labelColor="black.700"
                         labelFontWeight="600"
@@ -217,7 +216,14 @@ const CreateOrganizationForm = props => {
                         value={values.legalName}
                         required={false}
                         mt={3}
+                        isPrivate
                         data-cy="cof-form-legalName"
+                        hint={
+                          <FormattedMessage
+                            id="legalName.description"
+                            defaultMessage="The legal name is private and only shared with hosts for receipts, the payee section of expenses and the tax form system"
+                          />
+                        }
                       >
                         {inputProps => (
                           <Field
