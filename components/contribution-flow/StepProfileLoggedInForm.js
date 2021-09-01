@@ -24,8 +24,8 @@ const prepareProfiles = (intl, profiles, collective, canUseIncognito) => {
       return false;
     } else if (!canUseIncognito && p.isIncognito) {
       return false;
-    } else if (p.type === 'COLLECTIVE' && (!p.host || p.host.id !== collective.host?.legacyId)) {
-      return false;
+      // } else if (p.type === 'COLLECTIVE' && (!p.host || p.host.id !== collective.host?.legacyId)) {
+      //   return false;
     } else {
       return true;
     }

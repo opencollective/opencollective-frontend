@@ -48,12 +48,12 @@ export const generatePaymentMethodOptions = (
   let uniquePMs = uniqBy(paymentMethodsOptions, 'id');
 
   // TODO(paymentMethodType): remove deprecated form once migration is over
-  uniquePMs = uniquePMs.filter(
-    ({ paymentMethod }) =>
-      (paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_LEGACY_TYPES.ACCOUNT_BALANCE &&
-        paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE) ||
-      collective.host.legacyId === stepProfile.host?.id,
-  );
+  // uniquePMs = uniquePMs.filter(
+  //   ({ paymentMethod }) =>
+  //     (paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_LEGACY_TYPES.ACCOUNT_BALANCE &&
+  //       paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE) ||
+  //     collective.host.legacyId === stepProfile.host?.id,
+  // );
 
   // prepaid budget: limited to a specific host
   const matchesHostCollectiveIdPrepaid = prepaid => {
