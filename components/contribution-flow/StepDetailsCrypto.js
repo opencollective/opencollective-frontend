@@ -71,8 +71,11 @@ const StepDetailsCrypto = ({ onChange, data, currency }) => {
   }, []);
 
   useEffect(() => {
-    setConvertedAmount(amount * cryptoExchangeRate);
-    dispatchChange('convertedAmount', { amount: convertedAmount, currency });
+    if (cryptoExchangeRate) {
+      const newConvertedAmount = amount * cryptoExchangeRate;
+      setConvertedAmount(newConvertedAmount);
+      dispatchChange('convertedAmount', { amount: newConvertedAmount, currency });
+    }
   }, [amount, cryptoExchangeRate]);
 
   return (
