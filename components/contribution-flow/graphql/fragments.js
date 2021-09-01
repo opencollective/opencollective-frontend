@@ -68,6 +68,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     ... on Event {
+      endsAt
       parent {
         id
         slug
