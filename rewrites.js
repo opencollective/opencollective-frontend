@@ -140,7 +140,7 @@ exports.REWRITES = [
   },
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(evenExpenseAdminActionsts|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
     destination: '/expense',
   },
   {
