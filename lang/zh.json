@@ -2087,7 +2087,7 @@
   "updates.new.error": "更新失败：{err}",
   "updates.new.title": "新的更新",
   "Updates.Oldest": "Oldest",
-  "UpdateSearchFilter.placeholder": "Search by user, title, html...",
+  "UpdateSearchFilter.placeholder": "Search by user, title, content...",
   "Upload": "上传",
   "UploadDocumentation": "上传文档",
   "UploadDocumentationDescription": "If you want to include any documentation, you can upload it here.",
