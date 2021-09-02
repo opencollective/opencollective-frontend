@@ -114,7 +114,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
       {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && host && (
         <PayoutBankInformationForm isNew={isNew} getFieldName={getFieldName} host={host} />
       )}
-      {isNew && (
+      {isNew && host?.transferwise && (
         <Box mt={3}>
           <Field name={getFieldName('isSaved')}>
             {({ field }) => (
@@ -130,6 +130,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
 PayoutMethodForm.propTypes = {
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
+    transferwise: PropTypes.object,
   }),
   /** Set this to nil to create a new one */
   payoutMethod: PropTypes.shape({

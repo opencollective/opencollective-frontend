@@ -229,6 +229,13 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
         {error.message && `: ${error.message}`}
       </MessageBox>
     );
+    // If transferwise is not configured we just show the warning in the details form
+  } else if (!data?.host?.transferwise) {
+    return (
+      <MessageBox fontSize="12px" type="warning">
+        Wise is not configured on the platform.
+      </MessageBox>
+    );
   }
 
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({ label: rf.title, value: rf.type }));
