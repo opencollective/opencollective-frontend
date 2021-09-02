@@ -640,7 +640,7 @@
   "CreateOrder.TitleForEvent": "Замовити квитки на {event}",
   "createOrg.form.error.slug.hyphen": "Organization URL slug cannot start or end with a hyphen (-)",
   "createOrg.form.error.website": "Enter a valid website, e.g. www.example.com or example.org",
-  "createOrg.form.webstiteLabel": "Вебсайт організації",
+  "createOrg.form.websiteLabel": "Organization website",
   "createorganization.authorization.label": "Я підтверджую, що маю право представляти цю організацію.",
   "createPledge.collectiveDetails": "Подробиці про новий колектив:",
   "createPledge.conditions": "На цей час ви можете створювати зобов'язання лише для проєктів з відкритим джерельним кодом з репозиторієм або організацією GitHub. Ми просимо проєкт мати принаймні 100 зірок на GitHub!",
