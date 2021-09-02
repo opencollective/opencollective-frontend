@@ -4,12 +4,15 @@ import { graphql } from '@apollo/client/react/hoc';
 import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
 import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
 import { Grid as HostedCollectivesIcon } from '@styled-icons/feather/Grid';
+import { PieChart as ReportsIcon } from '@styled-icons/feather/PieChart';
 import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { getEnvVar } from '../lib/env-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { parseToBoolean } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
@@ -17,6 +20,7 @@ import { Box, Flex } from '../components/Grid';
 import { HOST_SECTIONS } from '../components/host-dashboard/constants';
 import HostDashboardExpenses from '../components/host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../components/host-dashboard/HostDashboardHostedCollectives';
+import HostDashboardReports from '../components/host-dashboard/HostDashboardReports';
 import PendingApplications from '../components/host-dashboard/PendingApplications';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
@@ -76,7 +80,8 @@ class HostDashboardPage extends React.Component {
     }),
     loadingLoggedInUser: PropTypes.bool.isRequired, // from withUser
     LoggedInUser: PropTypes.object, // from withUser
-    view: PropTypes.oneOf(['expenses', 'hosted-collectives', 'donations', 'pending-applications']).isRequired,
+    view: PropTypes.oneOf(['expenses', 'hosted-collectives', 'donations', 'pending-applications', 'reports'])
+      .isRequired,
   };
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -126,6 +131,8 @@ class HostDashboardPage extends React.Component {
         return <OrdersWithData accountSlug={host.slug} showPlatformTip />;
       case HOST_SECTIONS.HOSTED_COLLECTIVES:
         return <HostDashboardHostedCollectives hostSlug={host.slug} />;
+      case HOST_SECTIONS.REPORTS:
+        return <HostDashboardReports hostSlug={host.slug} />;
       default:
         return <HostDashboardExpenses hostSlug={host.slug} />;
     }
@@ -187,6 +194,14 @@ class HostDashboardPage extends React.Component {
                   <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
                 </LinkContainer>
               </Link>
+              {parseToBoolean(getEnvVar('HOST_DASHBOARD_REPORTS')) && (
+                <Link href={`/${slug}/dashboard/${HOST_SECTIONS.REPORTS}`}>
+                  <LinkContainer isActive={view === HOST_SECTIONS.REPORTS}>
+                    <ReportsIcon size="1.2em" />
+                    <FormattedMessage id="Reports" defaultMessage="Reports" />
+                  </LinkContainer>
+                </Link>
+              )}
             </Container>
             <Box py={['32px', '60px']}>{this.renderView(host)}</Box>
           </React.Fragment>
