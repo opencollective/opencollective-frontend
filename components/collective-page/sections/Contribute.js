@@ -239,7 +239,8 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
-    const cannotOrderTickets = (!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin);
+    const cannotOrderTickets =
+      (!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin) || isPastEvent(collective);
 
     /*
     cases
