@@ -9,6 +9,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
     imageUrl
     type
     name
+    legalName
     location {
       address
       country
