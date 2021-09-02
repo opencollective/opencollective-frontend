@@ -16,7 +16,7 @@ const GRID_TEMPLATE_COLUMNS = ['1fr', 'minmax(220px, 1fr) 6fr'];
 
 const MENU = [
   { id: 'Clear cache', title: 'Clear cache for account', Component: ClearCacheForAccountForm },
-  { id: 'Merge accounts', isDangerous: true, Component: MergeAccountsForm, isHidden: true },
+  { id: 'Merge accounts', isDangerous: true, Component: MergeAccountsForm },
 ];
 
 const MenuEntry = styled.button`

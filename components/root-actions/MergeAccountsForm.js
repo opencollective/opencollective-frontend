@@ -46,14 +46,20 @@ const MergeAccountsForm = () => {
         },
       });
 
+      const resultMessage = result.data.mergeAccounts.message;
       if (dryRun) {
-        setMergeSummary(result.data.mergeAccounts.message);
+        setMergeSummary(resultMessage);
       } else {
-        setMergeSummary(null);
+        const successMessage = `@${fromAccount.slug} has been merged into @${toAccount.slug}`;
         addToast({
           type: TOAST_TYPE.SUCCESS,
-          message: `@${fromAccount.slug} has been merged into @${toAccount.slug}`,
+          message: !resultMessage ? successMessage : `${successMessage}\n${resultMessage}`,
         });
+
+        // Reset the form
+        setMergeSummary(null);
+        setFromAccount(null);
+        setToAccount(null);
       }
     } catch (e) {
       addToast({
@@ -68,7 +74,15 @@ const MergeAccountsForm = () => {
     <div>
       <Flex alignItems="flex-end">
         <StyledInputField htmlFor="merge-account-1" label="Merge Account..." flex="1 1">
-          {({ id }) => <CollectivePickerAsync inputId={id} onChange={({ value }) => setFromAccount(value)} />}
+          {({ id }) => (
+            <CollectivePickerAsync
+              inputId={id}
+              onChange={option => setFromAccount(option?.value || null)}
+              collective={fromAccount}
+              isClearable
+              noCache // Don't cache to prevent showing merged collectives
+            />
+          )}
         </StyledInputField>
       </Flex>
       <Flex alignItems="flex-end" mt={3}>
@@ -76,8 +90,12 @@ const MergeAccountsForm = () => {
           {({ id }) => (
             <CollectivePickerAsync
               inputId={id}
-              onChange={({ value }) => setToAccount(value)}
+              onChange={option => setToAccount(option?.value || null)}
               filterResults={accounts => (!fromAccount ? accounts : accounts.filter(a => a.id !== fromAccount.id))}
+              collective={toAccount}
+              types={fromAccount ? [fromAccount.type] : undefined}
+              isClearable
+              noCache // Don't cache to prevent showing merged collectives
             />
           )}
         </StyledInputField>
