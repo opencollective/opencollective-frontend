@@ -127,7 +127,7 @@ exports.REWRITES = [
     destination: '/host.dashboard',
   },
   {
-    source: '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations)?',
+    source: '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations|reports)?',
     destination: '/host.dashboard',
   },
   {

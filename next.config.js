@@ -31,6 +31,7 @@ const nextConfig = {
         REJECT_CONTRIBUTION: false,
         REJECTED_CATEGORIES: false,
         CHANGE_LOG_UPDATES_ENABLED: false,
+        HOST_DASHBOARD_REPORTS: false,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
         CAPTCHA_ENABLED: true,
