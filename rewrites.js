@@ -310,10 +310,6 @@ exports.REWRITES = [
     source: '/applications',
     destination: '/applications',
   },
-  {
-    source: '/opencollective/root-actions',
-    destination: '/root-actions',
-  },
   // Collective
   // ----------
   // Collective page
@@ -324,5 +320,10 @@ exports.REWRITES = [
   {
     source: '/:slug/:action(apply)?/:mode(onboarding)?/:step(administrators|contact-info|success)?',
     destination: '/collective-page',
+  },
+  // Root actions
+  {
+    source: '/opencollective/root-actions',
+    destination: '/root-actions',
   },
 ];
