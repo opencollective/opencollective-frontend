@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, orderBy, set } from 'lodash';
+import { cloneDeep, get, orderBy, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
@@ -17,6 +17,7 @@ import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import ContributeCardContainer, { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
+import ContributeCrypto from '../../contribute-cards/ContributeCrypto';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import CreateNew from '../../contribute-cards/CreateNew';
@@ -30,6 +31,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../graphql/queries';
+import SectionTitle from '../SectionTitle';
 
 // Dynamic imports
 const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {
@@ -159,10 +161,13 @@ class SectionContribute extends React.PureComponent {
   });
 
   getFinancialContributions = memoizeOne(sortedTiers => {
-    const { collective, contributors, contributorsStats } = this.props;
+    const { collective, contributors, contributorsStats, isAdmin } = this.props;
     const hasNoContributor = !this.hasContributors(contributors);
-    const canContribute = collective.isActive && !isPastEvent(collective);
-    const hasCustomContribution = !collective.settings?.disableCustomContributions;
+    const canContribute = collective.isActive && (!isPastEvent(collective) || isAdmin);
+    const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
+    const hasCryptoContribution =
+      !get(collective, 'settings.disableCryptoContributions', true) &&
+      get(collective, 'host.settings.cryptoEnabled', false);
     const waysToContribute = [];
 
     sortedTiers.forEach(tier => {
@@ -176,6 +181,17 @@ class SectionContribute extends React.PureComponent {
               contributors: this.getFinancialContributorsWithoutTier(contributors),
               stats: contributorsStats,
               hideContributors: hasNoContributor,
+              disableCTA: !canContribute,
+            },
+          });
+        }
+        if (hasCryptoContribution) {
+          waysToContribute.push({
+            key: 'crypto',
+            Component: ContributeCrypto,
+            componentProps: {
+              collective,
+              hideContributors: true, // for the MVP we shall not display the financial contributors for crypto
               disableCTA: !canContribute,
             },
           });
@@ -197,7 +213,7 @@ class SectionContribute extends React.PureComponent {
   });
 
   filterTickets = memoizeOne(tiers => {
-    return tiers.filter(tier => tier.type == TierTypes.TICKET);
+    return tiers.filter(tier => tier.type === TierTypes.TICKET);
   });
 
   render() {
@@ -208,8 +224,12 @@ class SectionContribute extends React.PureComponent {
     const isEvent = collective.type === CollectiveType.EVENT;
     const isProject = collective.type === CollectiveType.PROJECT;
     const isFund = collective.type === CollectiveType.FUND;
-    const hasCustomContribution = !collective.settings?.disableCustomContributions;
-    const hasContribute = isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution));
+    const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
+    const hasCryptoContribution =
+      !get(collective, 'settings.disableCryptoContributions', true) &&
+      get(collective, 'host.settings.cryptoEnabled', false);
+    const hasContribute =
+      isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution || hasCryptoContribution));
     const hasOtherWaysToContribute =
       !isEvent && !isProject && !isFund && (isAdmin || events.length > 0 || connectedCollectives.length > 0);
     const isActive = collective.isActive;
@@ -261,41 +281,48 @@ class SectionContribute extends React.PureComponent {
           <Fragment>
             {/* Financial contributions tiers */}
             {hasContribute && (
-              <Box pb={4} data-cy="financial-contributions">
-                <HorizontalScroller
-                  getScrollDistance={this.getContributeCardsScrollDistance}
-                  container={ContributeCardsContainer}
-                  containerProps={{ disableScrollSnapping: Boolean(draggingContributionsOrder) }}
-                >
-                  <React.Fragment>
-                    {isSaving && (
-                      <ContainerOverlay position="fixed" top={0} alignItems="center">
-                        <StyledSpinner size={64} />
-                        <P mt={3} fontSize="15px">
-                          <FormattedMessage id="Saving" defaultMessage="Saving..." />
-                        </P>
-                      </ContainerOverlay>
-                    )}
-                    {!(isAdmin && showTiersAdmin) &&
-                      waysToContribute.map(({ key, Component, componentProps }) => (
-                        <ContributeCardContainer key={key}>
-                          <Component {...componentProps} />
-                        </ContributeCardContainer>
-                      ))}
-                    {isAdmin && (
-                      <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
-                        <AdminContributeCardsContainer
-                          collective={collective}
-                          cards={waysToContribute}
-                          onContributionCardMove={this.onContributionCardMove}
-                          onContributionCardDrop={this.onContributionCardDrop}
-                          onMount={this.onTiersAdminReady}
-                        />
-                      </Container>
-                    )}
-                  </React.Fragment>
-                </HorizontalScroller>
-              </Box>
+              <Fragment>
+                <ContainerSectionContent>
+                  <SectionTitle>
+                    <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
+                  </SectionTitle>
+                </ContainerSectionContent>
+                <Box pb={4} data-cy="financial-contributions">
+                  <HorizontalScroller
+                    getScrollDistance={this.getContributeCardsScrollDistance}
+                    container={ContributeCardsContainer}
+                    containerProps={{ disableScrollSnapping: Boolean(draggingContributionsOrder) }}
+                  >
+                    <React.Fragment>
+                      {isSaving && (
+                        <ContainerOverlay position="fixed" top={0} alignItems="center">
+                          <StyledSpinner size={64} />
+                          <P mt={3} fontSize="15px">
+                            <FormattedMessage id="Saving" defaultMessage="Saving..." />
+                          </P>
+                        </ContainerOverlay>
+                      )}
+                      {!(isAdmin && showTiersAdmin) &&
+                        waysToContribute.map(({ key, Component, componentProps }) => (
+                          <ContributeCardContainer key={key}>
+                            <Component {...componentProps} />
+                          </ContributeCardContainer>
+                        ))}
+                      {isAdmin && (
+                        <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
+                          <AdminContributeCardsContainer
+                            collective={collective}
+                            cards={waysToContribute}
+                            onContributionCardMove={this.onContributionCardMove}
+                            onContributionCardDrop={this.onContributionCardDrop}
+                            onMount={this.onTiersAdminReady}
+                          />
+                        </Container>
+                      )}
+                    </React.Fragment>
+                  </HorizontalScroller>
+                </Box>
+              </Fragment>
             )}
 
             {/* Tickets for type EVENT */}
@@ -334,7 +361,7 @@ class SectionContribute extends React.PureComponent {
             )}
 
             {/* "View all ways to contribute" button */}
-            {!isEvent && (
+            {(tiers.length > 6 || hasOtherWaysToContribute) && (
               <ContainerSectionContent pb={4}>
                 <Link href={`/${collective.slug}/contribute`}>
                   <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">

@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { canContributeRecurring } from '../../lib/collective.lib';
 import { isTierExpired } from '../../lib/tier-utils';
 
+import Container from '../Container';
 import { Flex } from '../Grid';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
@@ -17,6 +19,7 @@ export const CONTRIBUTION_BLOCKER = {
   TIER_MISSING: 'TIER_MISSING',
   TIER_EXPIRED: 'TIER_EXPIRED',
   NO_CUSTOM_CONTRIBUTION: 'NO_CUSTOM_CONTRIBUTION',
+  NO_CRYPTO_CONTRIBUTION: 'NO_CRYPTO_CONTRIBUTION',
 };
 
 const msg = defineMessages({
@@ -41,10 +44,16 @@ const msg = defineMessages({
     defaultMessage: 'There are no more {type, select, TICKET {tickets} other {units}} for {name}',
   },
   [CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION]: {
-    id: 'Tier.disableCustomContirbution',
+    id: 'Tier.disableCustomContribution',
     defaultMessage: 'This collective requires you to select a tier to contribute.',
   },
+  [CONTRIBUTION_BLOCKER.NO_CRYPTO_CONTRIBUTION]: {
+    id: 'Tier.disableCryptoContribution',
+    defaultMessage: 'This collective does not allow crypto contributions. Please select another tier.',
+  },
 });
+
+const tierHasFixedInterval = tier => tier?.interval && tier.interval !== 'flexible';
 
 /**
  * From received params, see if there's anything preventing the contribution
@@ -54,28 +63,6 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.NO_HOST };
   } else if (!account.isActive) {
     return { reason: CONTRIBUTION_BLOCKER.NOT_ACTIVE };
-  } else if (!account.host.supportedPaymentMethods?.length) {
-    return {
-      reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
-      content: (
-        <React.Fragment>
-          <strong>
-            <FormattedMessage
-              id="ContributionFlow.noSupportedPaymentMethods"
-              defaultMessage="There is no payment provider available"
-            />
-          </strong>
-          <br />
-          {loggedInUser?.isHostAdmin(account) && (
-            <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
-              <StyledButton buttonStyle="primary" mt={3}>
-                <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
-              </StyledButton>
-            </Link>
-          )}
-        </React.Fragment>
-      ),
-    };
   } else if (tier?.availableQuantity === 0) {
     const intlParams = { type: tier.type, name: <q>{tier.name}</q> };
     return { reason: CONTRIBUTION_BLOCKER.TIER_EMPTY, intlParams, showOtherWaysToContribute: true };
@@ -85,9 +72,39 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.TIER_EXPIRED, type: 'warning', showOtherWaysToContribute: true };
   } else if (account.settings.disableCustomContributions && !tier) {
     return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
+  } else if (tierHasFixedInterval(tier) && !canContributeRecurring(account, loggedInUser)) {
+    return {
+      reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
+      type: 'warning',
+      showOtherWaysToContribute: true,
+      content: paymentMethodUnavailableWarning(loggedInUser, account),
+    };
   } else {
     return null;
   }
+};
+
+const paymentMethodUnavailableWarning = (loggedInUser, account) => {
+  return (
+    <React.Fragment>
+      <strong>
+        <FormattedMessage
+          id="ContributionFlow.noSupportedPaymentMethods"
+          defaultMessage="There is no payment provider available"
+        />
+      </strong>
+      <br />
+      {loggedInUser?.isHostAdmin(account) && (
+        <Container textAlign="center">
+          <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
+            <StyledButton buttonStyle="primary" mt={3}>
+              <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
+            </StyledButton>
+          </Link>
+        </Container>
+      )}
+    </React.Fragment>
+  );
 };
 
 const ContributionBlocker = ({ account, blocker }) => {

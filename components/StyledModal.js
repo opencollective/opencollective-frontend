@@ -13,7 +13,7 @@ import Avatar from './Avatar';
 import Container from './Container';
 import { Flex } from './Grid';
 import { fadeIn } from './StyledKeyframes';
-import { P } from './Text';
+import { P, Span } from './Text';
 
 const Wrapper = styled(Flex)`
   position: fixed;
@@ -21,7 +21,7 @@ const Wrapper = styled(Flex)`
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 3000;
+  z-index: ${props => props.zindex || 3000};
 
   justify-content: center;
   align-items: center;
@@ -107,18 +107,22 @@ const Divider = styled.div`
     `}
 `;
 
-const CloseIcon = styled(Times)`
-  font-size: 12px;
-  width: 15px;
-  height: 15px;
-  color: #dadada;
+export const CloseIcon = styled(Times)`
+  height: 12px;
+  width: 12px;
+  color: #76777a;
+  vertical-align: middle;
   cursor: pointer;
 `;
 
 export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
   <Header {...props}>
     {children || <div />}
-    {!hideCloseIcon && <CloseIcon onClick={onClose} />}
+    {!hideCloseIcon && (
+      <Span style={{ alignItems: 'center', display: 'flex' }}>
+        <CloseIcon onClick={onClose} />
+      </Span>
+    )}
   </Header>
 );
 
@@ -209,7 +213,7 @@ const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }
     return createPortal(
       <React.Fragment>
         <GlobalModalStyle />
-        <Wrapper>
+        <Wrapper zindex={props.zindex}>
           <TrapContainer focusTrapOptions={{ clickOutsideDeactivates: true }}>
             <Modal {...props}>
               {React.Children.map(children, child => {
@@ -255,6 +259,8 @@ StyledModal.propTypes = {
   minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** height of the modal component */
   minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** zindex of the modal component */
+  zindex: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
   /** whether to render the modal at the root with a portal */

@@ -4,7 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
 
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
+import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { floatAmountToCents } from '../lib/math';
@@ -63,16 +63,19 @@ class NewContributionFlowPage extends React.Component {
       description: query.description ? decodeURIComponent(query.description) : undefined,
       interval: query.interval,
       verb: query.verb,
+      paymentMethod: query.paymentMethod,
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
+      error: query.error,
     };
   }
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
     verb: PropTypes.string,
+    paymentMethod: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
     quantity: PropTypes.number,
@@ -81,6 +84,7 @@ class NewContributionFlowPage extends React.Component {
     interval: PropTypes.string,
     tierId: PropTypes.number,
     customData: PropTypes.object,
+    error: PropTypes.string,
     contributeAs: PropTypes.string,
     skipStepDetails: PropTypes.bool,
     data: PropTypes.shape({
@@ -93,7 +97,6 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
-    hasNewPaypal: PropTypes.bool,
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -110,7 +113,7 @@ class NewContributionFlowPage extends React.Component {
 
   loadExternalScripts() {
     const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
-    if (supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
+    if (supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
       this.props.loadStripe();
     }
   }
@@ -121,7 +124,7 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, LoggedInUser } = this.props;
+    const { data = {}, step, LoggedInUser, error } = this.props;
     const { account, tier } = data;
 
     if (data.loading) {
@@ -139,7 +142,7 @@ class NewContributionFlowPage extends React.Component {
       }
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} />;
+      return <ContributionFlowSuccess collective={account} isCrypto={this.props.paymentMethod === 'crypto'} />;
     } else {
       return (
         <ContributionFlowContainer
@@ -148,6 +151,7 @@ class NewContributionFlowPage extends React.Component {
           tier={tier}
           step={step}
           verb={this.props.verb}
+          paymentMethod={this.props.paymentMethod}
           redirect={this.props.redirect}
           description={this.props.description}
           defaultQuantity={this.props.quantity}
@@ -157,7 +161,7 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
-          hasNewPaypal={!get(account, 'host.settings.useLegacyPayPalPayments', false)}
+          error={error}
         />
       );
     }

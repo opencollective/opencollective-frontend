@@ -4,23 +4,24 @@ import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
+import { canContributeRecurring, hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 
-import { Box, Flex } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
 import StyledInputAmount from '../../components/StyledInputAmount';
 import StyledInputField from '../../components/StyledInputField';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { Box, Flex } from '../Grid';
 import StyledAmountPicker, { OTHER_AMOUNT_KEY } from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
+import { useUser } from '../UserProvider';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
 import FeesOnTopInput from './FeesOnTopInput';
@@ -37,6 +38,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
   const minAmount = getTierMinAmount(tier);
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
+  const { LoggedInUser } = useUser();
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
@@ -50,7 +52,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
 
   return (
     <Box width={1}>
-      {(!tier || tier.amountType === AmountTypes.FLEXIBLE) && (
+      {(!tier || tier.interval === 'flexible') && canContributeRecurring(collective, LoggedInUser) && (
         <StyledButtonSet
           id="interval"
           justifyContent="center"
@@ -148,6 +150,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
             labelColor="black.800"
             labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
             error={Boolean(tier.availableQuantity !== null && data?.quantity > tier.availableQuantity)}
+            data-cy="contribution-quantity"
             required
           >
             {fieldProps => (
@@ -197,7 +200,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
           <StyledHr borderColor="black.300" mt={16} mb={32} />
         </React.Fragment>
       )}
-      {showFeesOnTop && (
+      {showFeesOnTop && data?.amount > 0 && (
         <Box mt={28}>
           <FeesOnTopInput
             currency={currency}
@@ -240,6 +243,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
 StepDetails.propTypes = {
   onChange: PropTypes.func,
   showFeesOnTop: PropTypes.bool,
+  LoggedInUser: PropTypes.object,
   data: PropTypes.shape({
     amount: PropTypes.number,
     platformContribution: PropTypes.number,

@@ -8,6 +8,7 @@ import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex, Grid } from './Grid';
 import I18nFormatters from './I18nFormatters';
+import Image from './Image';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
@@ -94,7 +95,7 @@ const PledgedCollectivePage = ({ collective }) => {
         py={4}
       >
         <Flex alignItems="center" flexDirection="column">
-          <img src={defaultPledgedLogo} alt="Pledged Collective" />
+          <Image src={defaultPledgedLogo} alt="Pledged Collective" height={128} width={128} />
 
           <H2 as="h1">{collective.name}</H2>
 
@@ -147,7 +148,7 @@ const PledgedCollectivePage = ({ collective }) => {
                 />
               ),
             }}
-            defaultMessage="{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }} already pledged a total of {amount} {currency}"
+            defaultMessage="{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} other { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }} already pledged a total of {amount} {currency}"
           />
         </H3>
 
@@ -173,7 +174,7 @@ const PledgedCollectivePage = ({ collective }) => {
           <Container position="relative" key={pledge.id} data-cy="contributers">
             {index === 0 && (
               <Container position="absolute" right={15} top={-10}>
-                <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />
+                <Image src="/static/icons/first-pledge-badge.svg" alt="first pledge" width={32} height={32} />
               </Container>
             )}
             <PledgeCard {...pledge} />

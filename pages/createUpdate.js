@@ -3,15 +3,16 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { addCollectiveCoverData } from '../lib/graphql/queries';
+import { addCollectiveNavbarData } from '../lib/graphql/queries';
 import { compose } from '../lib/utils';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
+import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../components/collective-page/sections/Updates';
 import Container from '../components/Container';
 import EditUpdateForm from '../components/EditUpdateForm';
 import ErrorPage from '../components/ErrorPage';
@@ -21,7 +22,9 @@ import Header from '../components/Header';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
+import StyledButtonSet from '../components/StyledButtonSet';
 import { H1 } from '../components/Text';
+import { getUpdatesVariables, UPDATES_PER_PAGE, updatesQuery } from '../components/UpdatesWithData';
 import { withUser } from '../components/UserProvider';
 
 const BackButtonWrapper = styled(Container)`
@@ -40,37 +43,67 @@ const CreateUpdateWrapper = styled(Flex)`
   }
 `;
 
+const UPDATE_TYPE_MSGS = defineMessages({
+  normal: {
+    id: 'update.type.normal',
+    defaultMessage: 'Normal Update',
+  },
+  changelog: { id: 'update.type.changelog', defaultMessage: 'Changelog Entry' },
+});
+const UPDATE_TYPES = Object.keys(UPDATE_TYPE_MSGS);
+
 class CreateUpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
     return { slug: collectiveSlug, action };
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveCoverData
+    slug: PropTypes.string, // for addCollectiveNavbarData
     action: PropTypes.string, // not used atm, not clear where it's coming from, not in the route
     createUpdate: PropTypes.func, // from addMutation/createUpdateQuery
-    data: PropTypes.object.isRequired, // from withData
+    data: PropTypes.shape({
+      account: PropTypes.object,
+    }).isRequired, // from withData
     LoggedInUser: PropTypes.object,
     router: PropTypes.object,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.state = { update: {}, status: '', error: '' };
+    this.state = {
+      update: {},
+      status: '',
+      error: '',
+      updateType: props.data?.account?.slug === 'opencollective' ? UPDATE_TYPES[1] : UPDATE_TYPES[0],
+    };
   }
 
   createUpdate = async update => {
-    const {
-      data: { Collective },
-    } = this.props;
+    const { data } = this.props;
+    const { account } = data;
 
     this.setState({ error: '', status: 'submitting' });
 
     try {
-      update.account = { legacyId: Collective.id };
-      const res = await this.props.createUpdate({ variables: { update } });
+      update.account = { id: account.id };
+      update.isChangelog = this.isChangelog();
+      if (update.isChangelog) {
+        update.isPrivate = false;
+      }
+      const res = await this.props.createUpdate({
+        variables: { update },
+        refetchQueries: [
+          {
+            query: updatesQuery,
+            context: API_V2_CONTEXT,
+            variables: getUpdatesVariables(this.props.slug, UPDATES_PER_PAGE, true),
+          },
+          { query: updatesSectionQuery, variables: getUpdatesSectionQueryVariables(this.props.slug, true) },
+        ],
+      });
       this.setState({ isModified: false });
-      return this.props.router.push(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
+      return this.props.router.push(`/${account.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
       this.setState({ status: 'error', error: e.message });
     }
@@ -82,15 +115,18 @@ class CreateUpdatePage extends React.Component {
     this.setState({ update, isModified: true });
   };
 
-  render() {
-    const { data } = this.props;
-    const { LoggedInUser } = this.props;
+  isChangelog = () => {
+    return this.state.updateType === UPDATE_TYPES[1];
+  };
 
-    if (!data.Collective) {
+  render() {
+    const { data, LoggedInUser, intl } = this.props;
+
+    if (!data.account) {
       return <ErrorPage data={data} />;
     }
 
-    const collective = data.Collective;
+    const collective = data.account;
     const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
@@ -116,7 +152,7 @@ class CreateUpdatePage extends React.Component {
                   <p>
                     <FormattedMessage
                       id="updates.create.login"
-                      defaultMessage="You need to be logged in as a core contributor of this collective to be able to create an update."
+                      defaultMessage="You need to be logged in as an admin of this collective to be able to create an update."
                     />
                   </p>
                   <p>
@@ -133,7 +169,19 @@ class CreateUpdatePage extends React.Component {
                   </H1>
                 </Container>
               )}
-              {isAdmin && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
+              {collective.slug === 'opencollective' && isAdmin && (
+                <StyledButtonSet
+                  size="medium"
+                  items={UPDATE_TYPES}
+                  selected={this.state.updateType}
+                  onChange={value => this.setState({ updateType: value })}
+                >
+                  {({ item }) => intl.formatMessage(UPDATE_TYPE_MSGS[item])}
+                </StyledButtonSet>
+              )}
+              {isAdmin && (
+                <EditUpdateForm collective={collective} onSubmit={this.createUpdate} isChangelog={this.isChangelog()} />
+              )}
               {this.state.status === 'error' && (
                 <MessageBox type="error" withIcon>
                   <FormattedMessage
@@ -165,6 +213,7 @@ const createUpdateMutation = gqlV2/* GraphQL */ `
       updatedAt
       tags
       isPrivate
+      isChangelog
       makePublicOn
       account {
         id
@@ -187,6 +236,6 @@ const addCreateUpdateMutation = graphql(createUpdateMutation, {
   },
 });
 
-const addGraphql = compose(addCollectiveCoverData, addCreateUpdateMutation);
+const addGraphql = compose(addCollectiveNavbarData, addCreateUpdateMutation);
 
-export default withUser(addGraphql(withRouter(CreateUpdatePage)));
+export default withUser(addGraphql(withRouter(injectIntl(CreateUpdatePage))));

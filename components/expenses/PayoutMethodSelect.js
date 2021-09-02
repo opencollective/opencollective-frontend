@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
-import { get, groupBy, truncate } from 'lodash';
+import { get, groupBy, isEmpty, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -198,7 +198,7 @@ class PayoutMethodSelect extends React.Component {
   getOptions = memoizeOne((payoutMethods, payee) => {
     const hostSupportedPayoutMethods = this.props.collective.host?.supportedPayoutMethods || [PayoutMethodType.OTHER];
     const groupedPms = groupBy(payoutMethods, 'type');
-    const payeeIsSelfHosted = payee && payee.id == payee.host?.id;
+    const payeeIsSelfHosted = payee && payee.id === payee.host?.id;
     const payeeIsCollectiveFamilyType =
       payee &&
       AccountTypesWithHost.includes(payee.type) &&
@@ -213,7 +213,7 @@ class PayoutMethodSelect extends React.Component {
             if (
               type === PayoutMethodType.ACCOUNT_BALANCE &&
               hostSupportedPayoutMethods.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
-              payee?.host?.id != this.props.collective.host?.id
+              payee?.host?.id !== this.props.collective.host?.id
             ) {
               return false;
             } else {
@@ -241,7 +241,7 @@ class PayoutMethodSelect extends React.Component {
   render() {
     const { payoutMethods, defaultPayoutMethod, payoutMethod, ...props } = this.props;
     const { removingPayoutMethod } = this.state;
-    const value = payoutMethod && this.getOptionFromPayoutMethod(payoutMethod);
+    const value = !isEmpty(payoutMethod) && this.getOptionFromPayoutMethod(payoutMethod);
     return (
       <React.Fragment>
         <StyledSelect

@@ -10,7 +10,6 @@ import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
-import themeGet from '@styled-system/theme-get';
 import { pickBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -18,8 +17,8 @@ import styled, { css } from 'styled-components';
 import { getContributeRoute } from '../../lib/collective.lib';
 import { getSettingsRoute } from '../../lib/url_helpers';
 
+import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
-import AddPrepaidBudgetBtn from '../AddPrepaidBudgetBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
 import Container from '../Container';
@@ -51,25 +50,46 @@ const MenuItem = styled('li')`
     letter-spacing: -0.4px;
     outline: none;
 
+    @media (max-width: 40em) {
+      font-size: 14px;
+    }
+
     &:not(:hover) {
       color: #313233;
     }
 
-    &:hover:not(:disabled):not(:active) {
-      background: none;
-      color: ${props => props.theme.colors.primary[600]};
+    &:hover:not(:disabled) {
+      background: white;
+      color: ${props => props.theme.colors.black[800]};
+      &:not(:active) {
+        background: white;
+        text-decoration: underline;
+      }
     }
 
     &:focus {
       box-shadow: none;
       outline: none;
-      text-decoration: underline;
-      background: none;
-      color: ${props => props.theme.colors.primary[600]};
+      background: white;
+      text-shadow: 0px 0px 1px black; /** Using text-shadow rather than font-weight to prevent size changes */
     }
 
     &:disabled {
       color: #8c8c8c;
+    }
+  }
+
+  a,
+  button {
+    &:not(:active) {
+      margin-right: 24px;
+    }
+
+    &:active {
+      outline: 1px solid #e8e9eb;
+      margin-left: 12px;
+      margin-right: 12px;
+      background: white;
     }
   }
 
@@ -89,6 +109,10 @@ const MenuItem = styled('li')`
 `;
 
 const ActionsDropdown = styled(Dropdown)`
+  ${DropdownContent} {
+    padding: 8px 0;
+  }
+
   @media screen and (min-width: 40em) and (max-width: 88em) {
     ${DropdownContent} {
       right: 50px;
@@ -104,7 +128,15 @@ const ActionsDropdown = styled(Dropdown)`
       position: relative;
       box-shadow: none;
       border: none;
-      padding-left: 14px;
+      padding-top: 0;
+      text-transform: uppercase;
+      button {
+        text-transform: uppercase;
+      }
+
+      svg {
+        margin-right: 16px;
+      }
     }
   }
 
@@ -117,42 +149,9 @@ const ActionsDropdown = styled(Dropdown)`
     `}
 `;
 
-const StyledActionButton = styled(StyledButton).attrs({ buttonSize: 'tiny' })`
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  padding: 5px 10px;
-  text-transform: uppercase;
-  background: white;
-  border-radius: 8px;
-  border: 2px solid white;
-  color: ${themeGet('colors.primary.700')};
-
+const StyledActionButton = styled(ActionButton).attrs({ isSecondary: true })`
   svg {
     stroke-width: 2;
-  }
-
-  &:hover {
-    background: ${themeGet('colors.primary.100')};
-  }
-
-  &:hover:not(:focus) {
-    border: 2px solid white;
-  }
-
-  &:active,
-  &:focus,
-  &:hover {
-    background: ${themeGet('colors.primary.100')};
-    color: ${themeGet('colors.primary.700')};
-  }
-
-  &:active,
-  &:focus {
-    border: 2px solid ${themeGet('colors.primary.700')};
-    box-shadow: none;
   }
 
   span {
@@ -190,6 +189,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
       alignItems="center"
       order={[-1, 0]}
       borderTop={['1px solid #e1e1e1', 'none']}
+      ml={1}
     >
       <Box px={1}>
         <ActionsDropdown trigger="click" $isHiddenOnNonMobile={enabledCTAs.length <= 2}>
@@ -258,7 +258,9 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         <StyledLink as={Link} href={`/${collective.slug}/recurring-contributions`}>
                           <Container p={ITEM_PADDING}>
                             <Stack size="20px" />
-                            <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                            <span>
+                              <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                            </span>
                           </Container>
                         </StyledLink>
                       </MenuItem>
@@ -277,7 +279,13 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <AddFundsBtn collective={collective} host={collective.host}>
                         {btnProps => (
                           <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps} data-cy="add-funds-btn">
+                            <StyledButton
+                              borderRadius={0}
+                              p={ITEM_PADDING}
+                              isBorderless
+                              {...btnProps}
+                              data-cy="add-funds-btn"
+                            >
                               <AttachMoney size="20px" />
                               <Span>
                                 <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
@@ -286,23 +294,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                           </MenuItem>
                         )}
                       </AddFundsBtn>
-                    )}
-                    {callsToAction.addPrepaidBudget && (
-                      <AddPrepaidBudgetBtn collective={collective}>
-                        {btnProps => (
-                          <MenuItem
-                            py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_PREPAID_BUDGET}
-                          >
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
-                              <AttachMoney size="20px" />
-                              <Span>
-                                <FormattedMessage id="menu.addPrepaidBudget" defaultMessage="Add Prepaid Budget" />
-                              </Span>
-                            </StyledButton>
-                          </MenuItem>
-                        )}
-                      </AddPrepaidBudgetBtn>
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
@@ -318,6 +309,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
                         <ApplyToHostBtn
                           hostSlug={collective.slug}
+                          isHidden={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}
                           buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
                         />
                       </MenuItem>
@@ -329,7 +321,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             py={1}
                             isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
                           >
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
                               <CreditCard size="20px" />
                               <Span>
                                 <FormattedMessage id="menu.assignCard" defaultMessage="Assign a Card" />
@@ -346,7 +338,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             py={1}
                             isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
                           >
-                            <StyledButton p={ITEM_PADDING} isBorderless {...btnProps}>
+                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
                               <CreditCard size="20px" />
                               <Span>
                                 <FormattedMessage
@@ -400,8 +392,6 @@ CollectiveNavbarActionsMenu.propTypes = {
     hasContribute: PropTypes.bool,
     /** Add funds to a collective */
     addFunds: PropTypes.bool,
-    /** Add prepaid budget to an organization */
-    addPrepaidBudget: PropTypes.bool,
     /** Add new card to Collective */
     assignVirtualCard: PropTypes.bool,
     /** Request card to Collective */

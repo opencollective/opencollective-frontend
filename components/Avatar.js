@@ -12,14 +12,17 @@ import { Flex } from './Grid';
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 
 const StyledAvatar = styled(Flex).attrs(props => ({
-  style: { backgroundImage: props.src ? `url(${props.src})` : null },
+  style: {
+    backgroundImage: props.src ? `url(${props.src})` : null,
+    backgroundSize: props.backgroundSize || 'cover',
+    backgroundColor: props.backgroundColor,
+  },
 }))`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
   color: ${themeGet('colors.black.400')};
   background-position: center center;
   background-repeat: no-repeat;
-  background-size: cover;
   border-radius: ${({ type }) => getAvatarBorderRadius(type)};
   ${border}
   font-weight: 600;
@@ -70,11 +73,15 @@ Avatar.propTypes = {
   /** Collective image url */
   src: PropTypes.string,
   /** Collective type */
-  type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS', 'VENDOR']),
+  type: PropTypes.oneOf(Object.keys(CollectiveType)),
   /** Avatar size */
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** Duration to transition size. Disabled if 0, null or undefined */
   animationDuration: PropTypes.number,
+  /* Size of the avatar image */
+  backgroundSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /* Color of the background */
+  backgroundColor: PropTypes.string,
 };
 
 const shouldUseDefaultGuestAvatar = name => {
@@ -105,7 +112,7 @@ ContributorAvatar.propTypes = {
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
     isGuest: PropTypes.bool,
-    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+    type: PropTypes.oneOf(Object.keys(CollectiveType)),
   }).isRequired,
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 };

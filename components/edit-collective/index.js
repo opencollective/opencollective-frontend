@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { defaultBackgroundImage } from '../../lib/constants/collectives';
@@ -10,6 +10,7 @@ import { getErrorFromGraphqlException } from '../../lib/errors';
 import Body from '../Body';
 import CollectiveNavbar from '../collective-navbar';
 import Footer from '../Footer';
+import { Box } from '../Grid';
 import Header from '../Header';
 import NotificationBar from '../NotificationBar';
 import SignInOrJoinFree from '../SignInOrJoinFree';
@@ -145,17 +146,26 @@ class EditCollective extends React.Component {
               description={notification.description}
             />
           )}
-          <CollectiveNavbar collective={collective} isAdmin={canEditCollective} />
+          <CollectiveNavbar
+            collective={collective}
+            isAdmin={canEditCollective}
+            callsToAction={{ hasSettings: false }} // We're already in the settings
+          />
           <div className="content">
             {!canEditCollective && (
-              <div className="login">
+              <Box className="login" my={6}>
                 <p>
-                  You need to be logged in as the creator of this collective
-                  <br />
-                  or as a core contributor of the {collective.name} collective.
+                  <FormattedMessage
+                    id="RecurringContributions.permissionError"
+                    defaultMessage="You need to be logged in as the admin of this account to view this page."
+                  />
                 </p>
-                <SignInOrJoinFree />
-              </div>
+                {!LoggedInUser && (
+                  <Box mt={5}>
+                    <SignInOrJoinFree />
+                  </Box>
+                )}
+              </Box>
             )}
             {canEditCollective && (
               <div>

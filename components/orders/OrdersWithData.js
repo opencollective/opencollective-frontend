@@ -33,7 +33,8 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
     $status: OrderStatus
     $minAmount: Int
     $maxAmount: Int
-    $dateFrom: ISODateTime
+    $dateFrom: DateTime
+    $dateTo: DateTime
     $searchTerm: String
   ) {
     account(slug: $accountSlug) {
@@ -50,6 +51,7 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
       limit: $limit
       offset: $offset
       dateFrom: $dateFrom
+      dateTo: $dateTo
       minAmount: $minAmount
       maxAmount: $maxAmount
     ) {
@@ -85,6 +87,7 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
           imageUrl
         }
         permissions {
+          id
           canMarkAsExpired
           canMarkAsPaid
         }
@@ -101,7 +104,7 @@ const isValidStatus = status => {
 
 const getVariablesFromQuery = (query, forcedStatus) => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom] = getDateRangeFromPeriod(query.period);
+  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || ORDERS_PER_PAGE,
@@ -109,6 +112,7 @@ const getVariablesFromQuery = (query, forcedStatus) => {
     minAmount: amountRange[0] && amountRange[0] * 100,
     maxAmount: amountRange[1] && amountRange[1] * 100,
     dateFrom,
+    dateTo,
     searchTerm: query.searchTerm,
   };
 };

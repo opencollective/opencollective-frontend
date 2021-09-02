@@ -18,11 +18,12 @@ describe('Conversations', () => {
       // Test rich text formatting
       cy.get('[data-cy="RichTextEditor"] trix-editor', { timeout: 30000 }).as('editor');
       cy.get('@editor').type(
-        'Hello from https://opencollective.com/opencollective 👋👋👋\nLorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.',
+        'Hello from https://opencollective.com/opencollective 👋👋👋{enter}Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.',
       );
+
       cy.get('@editor').should(
-        'have.html',
-        '<div><!--block-->Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋</div><div><!--block-->Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.</div>',
+        'contain.html',
+        'Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋',
       );
 
       // Add tags
@@ -36,8 +37,12 @@ describe('Conversations', () => {
       // Conversation page
       cy.contains('Hello World 👋');
       cy.getByDataCy('comment-body').should(
-        'have.html',
-        '<div>Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋</div><div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.</div>',
+        'contain.html',
+        '<div>Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋',
+      );
+      cy.getByDataCy('comment-body').should(
+        'contain.text',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.',
       );
 
       // Edit tags
@@ -60,8 +65,12 @@ describe('Conversations', () => {
       cy.contains('Hello World 👋');
       cy.getByDataCy('replies-count').contains('2');
       cy.getByDataCy('conversation-preview').should(
-        'have.html',
-        'Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levi...',
+        'contain.html',
+        'Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋',
+      );
+      cy.getByDataCy('conversation-preview').should(
+        'contain.text',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, lev...',
       );
     });
   });

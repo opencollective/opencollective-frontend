@@ -113,6 +113,7 @@ class ContributionFlowSuccess extends React.Component {
     router: PropTypes.object,
     isEmbed: PropTypes.bool,
     data: PropTypes.object,
+    isCrypto: PropTypes.bool,
   };
 
   renderCallsToAction = () => {
@@ -148,10 +149,12 @@ class ContributionFlowSuccess extends React.Component {
   renderBankTransferInformation = () => {
     const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
     const bankAccount = get(this.props.data, 'order.toAccount.host.bankAccount.data', null);
-    // The order Total Amount already considers the amount donated to the platform.
-    const amount = get(this.props.data, 'order.amount.value') * 100;
+
+    const amount = get(this.props.data, 'order.amount.valueInCents', 0);
+    const platformContributionAmount = get(this.props.data, 'order.platformContributionAmount.valueInCents', 0);
+    const totalAmount = amount + platformContributionAmount;
     const currency = get(this.props.data, 'order.amount.currency');
-    const formattedAmount = formatCurrency(amount, currency);
+    const formattedAmount = formatCurrency(totalAmount, currency);
 
     const formatValues = {
       account: bankAccount ? formatAccountDetails(bankAccount) : '',
@@ -200,11 +203,52 @@ class ContributionFlowSuccess extends React.Component {
     );
   };
 
+  renderCryptoInformation() {
+    return (
+      <Flex flexDirection="column" justifyContent="center" width={[1, 3 / 4]} px={[4, 0]} py={[2, 0]}>
+        <MessageBox type="warning" fontSize="12px" mb={2}>
+          <FormattedMessage
+            id="collective.user.orderProcessing.crypto"
+            defaultMessage="<strong>Your contribution is pending.</strong> Once the transaction is completed you will receive a confirmation email with the details."
+            values={I18nFormatters}
+          />
+        </MessageBox>
+        <Flex px={3} mt={2}>
+          <P fontSize="16px" color="black.700">
+            <FormattedMessage
+              id="NewContributionFlow.InTheMeantime"
+              defaultMessage="In the meantime, you can see what {collective} is up to <CollectiveLink>on their Collective page</CollectiveLink>."
+              values={{
+                collective: this.props.data.order.toAccount.name,
+                CollectiveLink: getI18nLink({
+                  as: Link,
+                  href: `/${this.props.data.order.toAccount.slug}`,
+                }),
+              }}
+            />
+          </P>
+        </Flex>
+      </Flex>
+    );
+  }
+
+  renderInfoByPaymentMethod() {
+    const { isCrypto, data } = this.props;
+    const { order } = data;
+    const isPendingBankTransfer = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
+    if (isCrypto) {
+      return this.renderCryptoInformation();
+    } else if (isPendingBankTransfer) {
+      return this.renderBankTransferInformation();
+    } else {
+      return this.renderCallsToAction();
+    }
+  }
+
   render() {
     const { LoggedInUser, collective, data, intl, isEmbed } = this.props;
     const { order } = data;
     const shareURL = `${process.env.WEBSITE_URL}/${collective.slug}`;
-    const isPendingBankTransfer = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
 
     if (!data.loading && !order) {
       return (
@@ -247,21 +291,31 @@ class ContributionFlowSuccess extends React.Component {
                   <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
                     <FormattedMessage
                       id="NewContributionFlow.Success.NowSupporting"
-                      defaultMessage="You are now supporting {collective}."
-                      values={{ collective: order.toAccount.name }}
+                      defaultMessage="You are now supporting <link>{collective}</link>."
+                      values={{
+                        collective: order.toAccount.name,
+                        link: value => <Link href={{ pathname: order.toAccount.slug }}>{value}</Link>,
+                      }}
                     />
                   </P>
                 </Box>
-                <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={!isEmbed} />
+                {isEmbed ? (
+                  <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
+                ) : (
+                  <StyledLink as={Link} color="black.800" href={{ pathname: order.toAccount.slug }}>
+                    <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
+                  </StyledLink>
+                )}
                 {!isEmbed && (
                   <Box my={4}>
                     <Link href={{ pathname: '/discover', query: { show: getMainTag(order.toAccount) } }}>
                       <P color="black.800" fontWeight={500}>
                         <FormattedMessage
                           id="NewContributionFlow.Success.DiscoverMore"
-                          defaultMessage="Discover more Collectives like {collective} &rarr;"
+                          defaultMessage="Discover more Collectives like {collective}"
                           values={{ collective: order.toAccount.name }}
                         />
+                        &nbsp;&rarr;
                       </P>
                     </Link>
                   </Box>
@@ -292,7 +346,7 @@ class ContributionFlowSuccess extends React.Component {
               </Flex>
             </ContainerWithImage>
             <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
-              {isPendingBankTransfer ? this.renderBankTransferInformation() : this.renderCallsToAction()}
+              {this.renderInfoByPaymentMethod()}
             </Flex>
           </Fragment>
         )}

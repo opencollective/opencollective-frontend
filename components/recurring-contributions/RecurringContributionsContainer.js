@@ -7,6 +7,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 
 import Container from '../Container';
 import { Flex, Grid } from '../Grid';
+import Image from '../Image';
 import { fadeIn } from '../StyledKeyframes';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
@@ -78,7 +79,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, accou
         </Grid>
       ) : (
         <Flex flexDirection="column" alignItems="center" py={4}>
-          <img src={EmptyCollectivesSectionImageSVG} alt="" />
+          <Image src={EmptyCollectivesSectionImageSVG} alt="" width={309} height={200} />
           <P color="black.600" fontSize="16px" mt={5}>
             <FormattedMessage
               id="RecurringContributions.none"

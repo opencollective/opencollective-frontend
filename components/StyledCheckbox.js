@@ -46,6 +46,7 @@ const CheckboxContainer = styled.div`
   display: flex;
   align-items: ${props => props.alignItems};
   line-height: 1.4em;
+  cursor: pointer;
   ${typography}
   width: ${props => props.width};
 
@@ -144,19 +145,8 @@ class StyledCheckbox extends React.Component {
   }
 
   render() {
-    const {
-      name,
-      checked,
-      label,
-      disabled,
-      size,
-      inputId,
-      width,
-      alignItems,
-      isLoading,
-      fontSize,
-      ...props
-    } = this.props;
+    const { name, checked, label, disabled, size, inputId, width, alignItems, isLoading, fontSize, ...props } =
+      this.props;
     const realChecked = checked === undefined ? this.state.checked : checked;
 
     return (

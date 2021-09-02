@@ -5,7 +5,6 @@ import { FormattedMessage } from 'react-intl';
 import Currency from '../Currency';
 import { Box, Flex } from '../Grid';
 import PayWithPaypalButton from '../PayWithPaypalButton';
-import PayWithPaypalLegacyButton from '../PayWithPaypalLegacyButton';
 import StyledButton from '../StyledButton';
 
 import { STEPS } from './constants';
@@ -22,7 +21,7 @@ class ContributionFlowButtons extends React.Component {
     paypalButtonProps: PropTypes.object,
     totalAmount: PropTypes.number,
     currency: PropTypes.string,
-    hasNewPaypal: PropTypes.bool,
+    isCrypto: PropTypes.bool,
   };
 
   state = { isLoadingNext: false };
@@ -49,7 +48,7 @@ class ContributionFlowButtons extends React.Component {
   }
 
   render() {
-    const { goBack, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency } = this.props;
+    const { goBack, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency, isCrypto } = this.props;
     return (
       <Flex flexWrap="wrap" justifyContent="center">
         <Fragment>
@@ -75,6 +74,7 @@ class ContributionFlowButtons extends React.Component {
               minWidth={!nextStep ? 185 : 145}
               buttonStyle="primary"
               onClick={this.goNext}
+              disabled={isCrypto && totalAmount <= 0}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
               type="submit"
@@ -86,6 +86,8 @@ class ContributionFlowButtons extends React.Component {
                   )}{' '}
                   &rarr;
                 </React.Fragment>
+              ) : isCrypto ? (
+                <FormattedMessage id="Finish" defaultMessage="Finish" />
               ) : totalAmount ? (
                 <FormattedMessage
                   id="contribute.amount"
@@ -100,11 +102,7 @@ class ContributionFlowButtons extends React.Component {
             </StyledButton>
           ) : (
             <Box mx={[1, null, 2]} minWidth={200} mt={2}>
-              {this.props.hasNewPaypal ? (
-                <PayWithPaypalButton {...paypalButtonProps} isSubmitting={isValidating || this.state.isLoadingNext} />
-              ) : (
-                <PayWithPaypalLegacyButton {...paypalButtonProps} />
-              )}
+              <PayWithPaypalButton {...paypalButtonProps} isSubmitting={isValidating || this.state.isLoadingNext} />
             </Box>
           )}
         </Fragment>

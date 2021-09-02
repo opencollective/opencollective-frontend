@@ -19,13 +19,14 @@ import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
 import ContributeCollective from '../components/contribute-cards/ContributeCollective';
+import ContributeCrypto from '../components/contribute-cards/ContributeCrypto';
 import ContributeCustom from '../components/contribute-cards/ContributeCustom';
 import ContributeEvent from '../components/contribute-cards/ContributeEvent';
 import ContributeProject from '../components/contribute-cards/ContributeProject';
 import ContributeTier from '../components/contribute-cards/ContributeTier';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
-import { Box, Grid } from '../components/Grid';
+import { Box, Flex, Grid } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
@@ -108,6 +109,15 @@ class TiersPage extends React.Component {
               collective: collective,
               contributors: this.getFinancialContributorsWithoutTier(collective.contributors),
               stats: collective.stats.backers,
+            },
+          });
+        } else if (tier === 'crypto') {
+          waysToContribute.push({
+            ContributeCardComponent: ContributeCrypto,
+            key: 'contribute-tier-crypto',
+            props: {
+              hideContributors: true,
+              collective: collective,
             },
           });
         } else {
@@ -259,7 +269,25 @@ class TiersPage extends React.Component {
                 />
                 <Container maxWidth={1260} my={5} px={[15, 30]} mx="auto">
                   <Box my={5}>
-                    <H2 fontWeight="normal">{title}</H2>
+                    <Flex flexWrap="wrap" justifyContent="space-between">
+                      <H2 fontWeight="normal" mb={2}>
+                        {title}
+                      </H2>
+                      {LoggedInUser?.canEditCollective(collective) && verb === 'events' && (
+                        <Link href={`/${collective.slug}/events/new`}>
+                          <StyledButton buttonStyle="primary">
+                            <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+                          </StyledButton>
+                        </Link>
+                      )}
+                      {LoggedInUser?.canEditCollective(collective) && verb === 'projects' && (
+                        <Link href={`/${collective.slug}/projects/new`}>
+                          <StyledButton buttonStyle="primary">
+                            <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
+                          </StyledButton>
+                        </Link>
+                      )}
+                    </Flex>
                     {subtitle && (
                       <P color="black.700" mt={3}>
                         {subtitle}

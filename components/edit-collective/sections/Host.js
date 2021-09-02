@@ -102,7 +102,7 @@ class Host extends React.Component {
           <p>
             <FormattedMessage
               id="editCollective.selfHost.label"
-              defaultMessage="{type, select, COLLECTIVE {Your Collective} FUND {Your Fund}} hold its own funds; it doesn't use a Fiscal Host."
+              defaultMessage="{type, select, COLLECTIVE {Your Collective} FUND {Your Fund} other {Your Account}} hold its own funds; it doesn't use a Fiscal Host."
               values={{
                 type: collective.type,
               }}
@@ -121,7 +121,7 @@ class Host extends React.Component {
                 />{' '}
                 <FormattedMessage
                   id="editCollective.selfHost.change.balanceNotEmpty"
-                  defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}} by submitting and paying expenses."
+                  defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {your balance}} by submitting and paying expenses."
                   values={{
                     type: collective.type,
                   }}
@@ -152,8 +152,8 @@ class Host extends React.Component {
 
       return (
         <Fragment>
-          <Flex>
-            <Box p={1} mr={3}>
+          <Flex flexDirection={['column', 'row']}>
+            <Box p={1} mr={3} width={[1, 1 / 2]}>
               <CollectiveCard collective={collective.host} membership={hostMembership} />
             </Box>
             <Box>
@@ -201,7 +201,7 @@ class Host extends React.Component {
                     <p>
                       <FormattedMessage
                         id="editCollective.host.balance"
-                        defaultMessage="It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund}}."
+                        defaultMessage="It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {your Account}}."
                         values={{
                           balance: formatCurrency(collective.stats.balance, collective.currency),
                           type: collective.type,
@@ -213,7 +213,7 @@ class Host extends React.Component {
                     <p>
                       <FormattedMessage
                         id="editCollective.host.change.balanceNotEmpty"
-                        defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}}. You can do this by submitting expenses, making financial contributions, or sending the balance to your Fiscal Host using the {emptyBalanceLink} feature."
+                        defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {your balance}}. You can do this by submitting expenses, making financial contributions, or sending the balance to your Fiscal Host using the {emptyBalanceLink} feature."
                         values={{
                           type: collective.type,
                           emptyBalanceLink: (
@@ -240,7 +240,7 @@ class Host extends React.Component {
                       <Fineprint>
                         <FormattedMessage
                           id="editCollective.host.change.removeFirst"
-                          defaultMessage="Without a Fiscal Host, {type, select, COLLECTIVE {your Collective} FUND {your Fund}} won't be able to accept financial contributions. You will be able to apply to another Fiscal Host."
+                          defaultMessage="Without a Fiscal Host, {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {}} won't be able to accept financial contributions. You will be able to apply to another Fiscal Host."
                           values={{ type: collective.type }}
                         />
                       </Fineprint>
@@ -293,11 +293,8 @@ class Host extends React.Component {
                   <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
                 </StyledButton>
                 <StyledButton buttonStyle="primary" onClick={() => this.changeHost()} data-cy="continue">
-                  <FormattedMessage
-                    id="collective.editHost.continue.btn"
-                    values={{ action }}
-                    defaultMessage={'{action}'}
-                  />
+                  {/** TODO(i18n): This should be internationalized */}
+                  {action}
                 </StyledButton>
               </Container>
             </ModalFooter>

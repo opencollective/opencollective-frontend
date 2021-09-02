@@ -4,6 +4,7 @@ import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
+import Captcha, { isCaptchaEnabled } from '../Captcha';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
@@ -22,11 +23,16 @@ const shouldRequireAllInfo = amount => {
   return Boolean(amount && amount >= 500000);
 };
 
-export const validateGuestProfile = (stepProfile, stepDetails) => {
+export const validateGuestProfile = (stepProfile, stepDetails, showError) => {
   if (shouldRequireAllInfo(getTotalAmount(stepDetails))) {
     if (!stepProfile.name || !stepProfile.location?.address || !stepProfile.location?.country) {
       return false;
     }
+  }
+
+  if (isCaptchaEnabled() && !stepProfile.captcha) {
+    showError('Captcha is required.');
+    return false;
   }
 
   if (!stepProfile.email || !isEmail(stepProfile.email)) {
@@ -56,12 +62,12 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
 
   return (
     <Container border="none" width={1} py={3}>
-      <Flex justifyContent="space-between">
-        <Box width={1 / 2} mb={3} mr={1}>
+      <Flex flexDirection={['column', 'row']} justifyContent="space-between">
+        <Box mb={3} mr={1} width={[1, 1 / 2]}>
           <StyledInputField
             label={<FormattedMessage id="User.FullName" defaultMessage="Full name" />}
             htmlFor="name"
-            required={totalAmount < 25000 ? false : true}
+            required={totalAmount >= 25000}
           >
             {inputProps => (
               <StyledInput
@@ -74,7 +80,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
             )}
           </StyledInputField>
         </Box>
-        <Box width="50%" minWidth={185} flex="1 1 50%" mb={3} mr={1}>
+        <Box mb={3}>
           <StyledInputField
             label={<FormattedMessage id="Email" defaultMessage="Email" />}
             htmlFor="email"
@@ -142,7 +148,12 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
         />
       </P>
       <StepProfileInfoMessage amount={totalAmount} interval={stepDetails.interval} />
-      <P color="black.500" fontSize="12px" mt={4} data-cy="join-conditions">
+      {isCaptchaEnabled() && (
+        <Flex justifyContent="center">
+          <Captcha onVerify={result => dispatchChange('captcha', result)} />
+        </Flex>
+      )}
+      <P color="black.500" fontSize="12px" mt={isCaptchaEnabled() ? 3 : 4} data-cy="join-conditions">
         <FormattedMessage
           id="SignIn.legal"
           defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."

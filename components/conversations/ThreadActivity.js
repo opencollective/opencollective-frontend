@@ -5,6 +5,7 @@ import { Ban as RejectedIcon } from '@styled-icons/fa-solid/Ban';
 import { Cogs as CogsIcon } from '@styled-icons/fa-solid/Cogs';
 import { AlertOctagon as ErrorIcon } from '@styled-icons/feather/AlertOctagon';
 import { Edit as EditIcon } from '@styled-icons/feather/Edit';
+import { FileText as InvitedIcon } from '@styled-icons/feather/FileText';
 import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
 import { Update as UpdateIcon } from '@styled-icons/material/Update';
@@ -42,6 +43,10 @@ const ACTIVITIES_INFO = {
     type: 'error',
     icon: RejectedIcon,
   },
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
+    type: 'info',
+    icon: InvitedIcon,
+  },
   COLLECTIVE_EXPENSE_PAID: {
     type: 'success',
     icon: CheckIcon,
@@ -72,6 +77,10 @@ const MESSAGES = defineMessages({
   COLLECTIVE_EXPENSE_REJECTED: {
     id: 'Expense.Activity.Rejected',
     defaultMessage: 'Expense rejected',
+  },
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
+    id: 'Expense.Activity.Invite.Drafted',
+    defaultMessage: 'Expense invited',
   },
   COLLECTIVE_EXPENSE_APPROVED: {
     id: 'Expense.Activity.Approved',

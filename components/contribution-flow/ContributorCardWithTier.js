@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
@@ -62,15 +63,19 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
             <P textTransform="uppercase" fontSize="10px" lineHeight="14px" fontWeight="400" color="black.500">
               <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
             </P>
-            <Flex>
+            <Flex flexDirection="column">
               <P fontSize="14px" lineHeight="20px" fontWeight="bold">
                 <FormattedMoneyAmount
-                  amount={contribution.amount.value * 100}
+                  amount={
+                    !isNil(contribution.platformContributionAmount?.valueInCents)
+                      ? contribution.amount.valueInCents + contribution.platformContributionAmount.valueInCents
+                      : contribution.amount.valueInCents
+                  }
                   currency={contribution.amount.currency}
                   frequency={contribution.frequency}
                 />
               </P>
-              {contribution.platformContributionAmount?.value && (
+              {!isNil(contribution.platformContributionAmount?.valueInCents) && (
                 <StyledTooltip
                   content={() => (
                     <FormattedMessage
@@ -82,7 +87,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                   <P fontSize="12px" lineHeight="20px" color="primary.600" ml={1}>
                     (
                     <FormattedMoneyAmount
-                      amount={(contribution.amount.value - contribution.platformContributionAmount?.value) * 100}
+                      amount={contribution.amount.valueInCents}
                       currency={contribution.amount.currency}
                       showCurrencyCode={false}
                       precision={2}
@@ -90,7 +95,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                     />{' '}
                     +{' '}
                     <FormattedMoneyAmount
-                      amount={contribution.platformContributionAmount?.value * 100}
+                      amount={contribution.platformContributionAmount.valueInCents}
                       currency={contribution.amount.currency}
                       showCurrencyCode={false}
                       precision={2}

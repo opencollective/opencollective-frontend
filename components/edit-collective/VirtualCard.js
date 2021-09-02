@@ -1,21 +1,19 @@
-import React from 'react';
+/* eslint-disable camelcase */
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
 import { FormattedMessage } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { formatCurrency } from '../../lib/currency-utils';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import Avatar from '../Avatar';
-import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
-import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -37,10 +35,9 @@ const CardContainer = styled(Flex)`
   }
 
   > div {
-    z-index: 100;
+    z-index: 1;
   }
   > div:first-child {
-    z-index: 1;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -106,66 +103,16 @@ const StateLabel = styled(Box)`
   line-height: 12px;
 `;
 
-const pauseCardMutation = gqlV2/* GraphQL */ `
-  mutation PauseVirtualCard($virtualCard: VirtualCardReferenceInput!) {
-    pauseVirtualCard(virtualCard: $virtualCard) {
-      id
-      data
-    }
-  }
-`;
-
-const resumeCardMutation = gqlV2/* GraphQL */ `
-  mutation ResumeVirtualCard($virtualCard: VirtualCardReferenceInput!) {
-    resumeVirtualCard(virtualCard: $virtualCard) {
-      id
-      data
-    }
-  }
-`;
-
-const deleteCardMutation = gqlV2/* GraphQL */ `
-  mutation DeleteVirtualCard($virtualCard: VirtualCardReferenceInput!) {
-    deleteVirtualCard(virtualCard: $virtualCard)
-  }
-`;
-
 const ActionsButton = props => {
   const wrapperRef = React.useRef();
   const arrowRef = React.useRef();
   const [displayActions, setDisplayActions] = React.useState(false);
-  const [displayDeleteModal, setDeleteModal] = React.useState(false);
-
-  const [pauseCard, { loading: pauseLoading }] = useMutation(pauseCardMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [resumeCard, { loading: resumeLoading }] = useMutation(resumeCardMutation, {
-    context: API_V2_CONTEXT,
-  });
-
-  const [deleteCard] = useMutation(deleteCardMutation, {
-    context: API_V2_CONTEXT,
-  });
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {
       setDisplayActions(false);
     }
   });
-
-  const isPaused = props.state !== 'OPEN';
-  const isLoading = pauseLoading || resumeLoading;
-
-  const handlePauseUnpause = async () => {
-    if (isPaused) {
-      await resumeCard({ variables: { virtualCard: { id: props.id } } });
-    } else {
-      await pauseCard({ variables: { virtualCard: { id: props.id } } });
-    }
-    if (props.onUpdate) {
-      await props.onUpdate();
-    }
-  };
 
   return (
     <div ref={wrapperRef}>
@@ -195,7 +142,6 @@ const ActionsButton = props => {
                 ref={ref}
                 style={{
                   ...style,
-                  zIndex: 9999,
                 }}
               >
                 <StyledCard
@@ -203,23 +149,14 @@ const ActionsButton = props => {
                   mb={2}
                   overflow="auto"
                   overflowY="auto"
-                  {...props}
                   padding="12px 15px"
                   width="180px"
                   borderWidth="0px"
                   boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
                 >
                   <Flex flexDirection="column" fontSize="13px" lineHeight="16px" fontWeight="500">
-                    <Action onClick={handlePauseUnpause} disabled={isLoading}>
-                      {isPaused ? (
-                        <FormattedMessage id="VirtualCards.ResumeCard" defaultMessage="Resume Card" />
-                      ) : (
-                        <FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />
-                      )}{' '}
-                      {isLoading && <StyledSpinner size="0.9em" mb="2px" />}
-                    </Action>
-                    <Action color="red" mt="20px" onClick={() => setDeleteModal(true)}>
-                      <FormattedMessage id="VirtualCards.DeleteCard" defaultMessage="Delete Card" />
+                    <Action onClick={props.editHandler}>
+                      <FormattedMessage id="VirtualCards.EditCardDetails" defaultMessage="Edit Card Details" />
                     </Action>
                   </Flex>
                   <Arrow ref={arrowRef} {...arrowProps} />
@@ -229,30 +166,6 @@ const ActionsButton = props => {
           </Popper>
         )}
       </Manager>
-      <ConfirmationModal
-        show={displayDeleteModal}
-        width="100%"
-        maxWidth="570px"
-        onClose={() => {
-          setDeleteModal(false);
-        }}
-        header={<FormattedMessage id="VirtualCards.DeleteCard" defaultMessage="Delete Card" />}
-        continueHandler={async () => {
-          await deleteCard({ variables: { virtualCard: { id: props.id } } });
-          if (props.onUpdate) {
-            await props.onUpdate();
-          }
-        }}
-        continueLabel="Delete"
-        isDanger
-      >
-        <P fontSize="14px" lineHeight="18px" mt={2}>
-          <FormattedMessage
-            id="VirtualCards.DeleteCard.Description"
-            defaultMessage="Deleting a card is permament both in the platform and in your provider, you won't be able to restore it later."
-          />
-        </P>
-      </ConfirmationModal>
     </div>
   );
 };
@@ -260,7 +173,37 @@ const ActionsButton = props => {
 ActionsButton.propTypes = {
   id: PropTypes.string,
   state: PropTypes.string,
-  onUpdate: PropTypes.func,
+  onSuccess: PropTypes.func,
+  editHandler: PropTypes.func,
+};
+
+const getLimitString = ({ spend_limit, spend_limit_duration }) => {
+  const value = formatCurrency(spend_limit, 'USD');
+  if (spend_limit === 0) {
+    return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
+  }
+  switch (spend_limit_duration) {
+    case 'MONTHLY':
+      return (
+        <Fragment>
+          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
+          &nbsp;
+          {value}/<FormattedMessage id="Frequency.Monthly.Short" defaultMessage="mo." />
+        </Fragment>
+      );
+    case 'ANNUALLY':
+      return (
+        <Fragment>
+          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
+          &nbsp;
+          {value}/<FormattedMessage id="Frequency.Yearly.Short" defaultMessage="yr." />
+        </Fragment>
+      );
+    case 'TRANSACTION':
+    case 'FOREVER':
+    default:
+      return value;
+  }
 };
 
 const VirtualCard = props => {
@@ -343,6 +286,8 @@ const VirtualCard = props => {
                   createdAt: new Date(props.createdAt),
                 }}
               />
+              &nbsp;&middot;&nbsp;
+              {getLimitString(props.data)}
             </P>
           </React.Fragment>
         )}
@@ -356,7 +301,14 @@ const VirtualCard = props => {
         alignItems="center"
         shrink={0}
       >
-        {props.hasActions && <ActionsButton id={props.id} state={props.data.state} onUpdate={props.onUpdate} />}
+        {props.hasActions && (
+          <ActionsButton
+            id={props.id}
+            state={props.data.state}
+            onSuccess={props.onSuccess}
+            editHandler={props.editHandler}
+          />
+        )}
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
           {displayDetails ? (
             <React.Fragment>
@@ -364,7 +316,10 @@ const VirtualCard = props => {
               <DismissIcon height="12px" width="12px" ml={2} mb="2px" />
             </React.Fragment>
           ) : (
-            <FormattedMessage id="VirtualCards.DisplayDetails" defaultMessage="View Card Details &rarr;" />
+            <React.Fragment>
+              <FormattedMessage id="VirtualCards.DisplayDetails" defaultMessage="View Card Details" />
+              &nbsp;&rarr;
+            </React.Fragment>
           )}
         </Action>
       </Flex>
@@ -374,7 +329,8 @@ const VirtualCard = props => {
 
 VirtualCard.propTypes = {
   hasActions: PropTypes.bool,
-  onUpdate: PropTypes.func,
+  onSuccess: PropTypes.func,
+  editHandler: PropTypes.func,
 
   account: PropTypes.shape({
     id: PropTypes.string,

@@ -11,6 +11,7 @@ import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
 import { parseToBoolean } from '../../lib/utils';
 
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import LinkCollective from '../LinkCollective';
@@ -46,6 +47,11 @@ const rejectAndRefundTooltipContent = (showRefundHelp, showRejectHelp) => (
   </Box>
 );
 
+// Check whether transfer is child collective to parent or if the transfer is from host to one of its collectives
+const isInternalTransfer = (fromAccount, toAccount) => {
+  return fromAccount.parent?.id === toAccount.id || fromAccount.id === toAccount.host?.id;
+};
+
 const DetailTitle = styled.p`
   margin: 8px 8px 4px 8px;
   color: #76777a;
@@ -57,7 +63,7 @@ const DetailTitle = styled.p`
 `;
 
 const DetailDescription = styled.div`
-  margin: 0 8px 8px 8px;
+  margin: 0 8px 12px 8px;
   font-size: 12px;
   color: #4e5052;
   letter-spacing: -0.04px;
@@ -110,7 +116,8 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     parseToBoolean(getEnvVar('REJECT_CONTRIBUTION')) || collectiveHasRejectContributionFeature;
   const showRefundButton = permissions?.canRefund && !isRefunded;
   const showRejectButton = permissions?.canReject && !isOrderRejected && showRejectContribution;
-  const showDownloadInvoiceButton = permissions?.canDownloadInvoice;
+  const showDownloadInvoiceButton = permissions?.canDownloadInvoice && !isInternalTransfer(fromAccount, toAccount);
+  const hostFeeTransaction = transaction.relatedTransactions?.find(t => t.kind === 'HOST_FEE' && t.type === 'CREDIT');
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
@@ -155,8 +162,29 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               hasOrder,
               toAccount,
               fromAccount,
+              taxAmount: transaction.taxAmount,
+              taxInfo: transaction.taxInfo,
               intl,
             })}
+            {transaction.kind !== 'HOST_FEE' && hostFeeTransaction && (
+              <React.Fragment>
+                <br />
+                <FormattedMessage
+                  id="TransactionDetails.HostFee"
+                  defaultMessage="This transaction includes {amount} host fees"
+                  values={{
+                    amount: (
+                      <FormattedMoneyAmount
+                        amount={hostFeeTransaction.netAmount.valueInCents}
+                        currency={hostFeeTransaction.netAmount.currency}
+                        showCurrencyCode={false}
+                        amountStyles={null}
+                      />
+                    ),
+                  }}
+                />
+              </React.Fragment>
+            )}
           </DetailDescription>
           {displayActions && ( // Let us overide so we can hide buttons in the collective page
             <React.Fragment>
@@ -204,6 +232,7 @@ TransactionDetails.propTypes = {
   displayActions: PropTypes.bool,
   transaction: PropTypes.shape({
     isRefunded: PropTypes.bool,
+    kind: PropTypes.string,
     isOrderRejected: PropTypes.bool,
     fromAccount: PropTypes.shape({
       id: PropTypes.string,
@@ -234,7 +263,8 @@ TransactionDetails.propTypes = {
     currency: PropTypes.string,
     description: PropTypes.string,
     createdAt: PropTypes.string,
-    taxAmount: PropTypes.number,
+    taxAmount: PropTypes.object,
+    taxInfo: PropTypes.object,
     paymentMethod: PropTypes.shape({
       type: PropTypes.string,
     }),
@@ -264,6 +294,7 @@ TransactionDetails.propTypes = {
       canReject: PropTypes.bool,
     }),
     usingGiftCardFromCollective: PropTypes.object,
+    relatedTransactions: PropTypes.array,
   }),
   isHostAdmin: PropTypes.bool,
   isRoot: PropTypes.bool,

@@ -68,6 +68,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     ... on Event {
+      endsAt
       parent {
         id
         slug
@@ -113,15 +114,19 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
     frequency
     amount {
       value
+      valueInCents
       currency
     }
     paymentMethod {
       id
       service
       type
+      data
     }
     platformContributionAmount {
       value
+      valueInCents
+      currency
     }
     tier {
       id
@@ -147,7 +152,8 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       isHost
       settings
       ... on AccountWithContributions {
-        contributors {
+        # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
+        contributors(limit: 1) {
           totalCount
         }
       }
@@ -160,7 +166,8 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
         host {
           ...OrderSuccessHostFragment
           ... on AccountWithContributions {
-            contributors {
+            # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
+            contributors(limit: 1) {
               totalCount
             }
           }

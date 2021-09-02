@@ -83,10 +83,6 @@ const messages = defineMessages({
     id: 'event.over.sendMoneyToParent.description',
     defaultMessage: 'Spend it by submitting event expenses, or transfer the remaining balance to the main budget.',
   },
-  'event.over.sendMoneyToParent.transaction.description': {
-    id: 'event.over.sendMoneyToParent.transaction.description',
-    defaultMessage: 'Balance of {event}',
-  },
 });
 
 const getNotification = (intl, status, collective, host, LoggedInUser) => {
@@ -155,9 +151,6 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
           fromCollective={collective}
           toCollective={collective.parentCollective}
           LoggedInUser={LoggedInUser}
-          description={intl.formatMessage(messages['event.over.sendMoneyToParent.transaction.description'], {
-            event: collective.name,
-          })}
           amount={collective.stats.balance}
           currency={collective.currency}
         />,

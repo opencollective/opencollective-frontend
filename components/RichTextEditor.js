@@ -30,7 +30,7 @@ const TrixEditorContainer = styled.div`
     margin-top: 8px;
     padding-top: 8px;
     outline-offset: 0.5em;
-    overflow-y: auto;
+    overflow-y: scroll;
 
     // Outline (only when there's no border)
     ${props =>
@@ -100,9 +100,10 @@ const TrixEditorContainer = styled.div`
         '.trix-button-group--file-tools': {
           display: 'none',
         },
-        '.trix-button-group--block-tools .trix-button:not(.trix-button--icon-number-list):not(.trix-button--icon-bullet-list)': {
-          display: 'none',
-        },
+        '.trix-button-group--block-tools .trix-button:not(.trix-button--icon-number-list):not(.trix-button--icon-bullet-list)':
+          {
+            display: 'none',
+          },
         '.trix-button--icon-bullet-list': {
           borderLeft: 'none',
         },
@@ -148,8 +149,8 @@ const TrixEditorContainer = styled.div`
       pointerEvents: 'none',
       cursor: 'not-allowed',
       background: '#f3f3f3',
-      'trix-toolbar': {
-        background: '#f3f3f3',
+      'trix-toolbar,.trix-button-group': {
+        background: '#f3f3f3 !important',
       },
     })}
 `;
@@ -304,6 +305,8 @@ export default class RichTextEditor extends React.Component {
       const attachment = new this.Trix.Attachment({ content: iframe });
       this.getEditor().insertAttachment(attachment);
       lastIndex = match.index + iframe.length;
+      const postText = value.substring(lastIndex, value.length);
+      this.getEditor().insertHTML(postText);
     }
   };
 
@@ -350,9 +353,7 @@ export default class RichTextEditor extends React.Component {
       return `https://www.youtube-nocookie.com/embed/${id}`;
     } /* else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
-    } */ else if (
-      service === 'anchorFm'
-    ) {
+    } */ else if (service === 'anchorFm') {
       return `https://anchor.fm/${id}`;
     } else {
       return null;

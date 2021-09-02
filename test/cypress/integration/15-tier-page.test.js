@@ -46,7 +46,7 @@ describe('Tier page', () => {
 
   it('Goes to the contribution flow when we click on "Contribute"', () => {
     cy.login({ redirect: tierUrl });
-    cy.get('[data-cy="ContributeBtn"]').click();
+    cy.get('[data-cy="ContributeBtn"]:visible').click();
     cy.location('pathname').should('equal', `${tierUrl}/checkout`);
   });
 });

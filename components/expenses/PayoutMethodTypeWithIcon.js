@@ -6,7 +6,7 @@ import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
 import { University as BankIcon } from '@styled-icons/fa-solid/University';
 import { FormattedMessage } from 'react-intl';
 
-import { INVITE, PayoutMethodType } from '../../lib/constants/payout-method';
+import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
 
 import Avatar from '../Avatar';
 import { Flex } from '../Grid';
@@ -16,7 +16,7 @@ import { Span } from '../Text';
 /**
  * Shows the data of the given payout method
  */
-const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color, iconSize }) => {
+const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color, iconSize, name }) => {
   if (isLoading) {
     return <LoadingPlaceholder height={15} width={90} />;
   }
@@ -28,15 +28,6 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
           <PaypalIcon size={iconSize} color="#192f86" />
           <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
             PayPal
-          </Span>
-        </Flex>
-      );
-    case PayoutMethodType.CREDIT_CARD:
-      return (
-        <Flex alignItems="center">
-          <CreditCard size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            <FormattedMessage id="CreditCard" defaultMessage="Credit Card" />
           </Span>
         </Flex>
       );
@@ -67,6 +58,15 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
           </Span>
         </Flex>
       );
+    case VIRTUAL_CARD:
+      return (
+        <Flex alignItems="center">
+          <CreditCard size={iconSize} color="#9D9FA3" />
+          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
+            {name || <FormattedMessage id="PayoutMethod.Type.VirtualCard" defaultMessage="Virtual Card" />}
+          </Span>
+        </Flex>
+      );
     case PayoutMethodType.OTHER:
     default:
       return (
@@ -87,6 +87,7 @@ PayoutMethodTypeWithIcon.propTypes = {
   fontWeight: PropTypes.string,
   color: PropTypes.string,
   iconSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  name: PropTypes.string,
 };
 
 PayoutMethodTypeWithIcon.defaultProps = {

@@ -10,7 +10,7 @@ import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { expenseSubmissionAllowed, getCollectiveTypeForUrl } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
 import expenseTypes from '../lib/constants/expenseTypes';
-import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
+import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
@@ -203,7 +203,7 @@ class CreateExpensePage extends React.Component {
         this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
       }
     } catch (e) {
-      this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
+      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });
     }
   };
 
@@ -241,7 +241,8 @@ class CreateExpensePage extends React.Component {
       });
       window.scrollTo(0, 0);
     } catch (e) {
-      this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
+      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });
+      this.setState({ isSubmitting: false });
     }
   };
 
@@ -275,7 +276,7 @@ class CreateExpensePage extends React.Component {
   });
 
   render() {
-    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router, intl } = this.props;
+    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
     const { step } = this.state;
 
     if (!data.loading) {
@@ -369,11 +370,6 @@ class CreateExpensePage extends React.Component {
                                 onChange={this.onNotesChanges}
                                 defaultValue={this.state.expense.privateMessage}
                               />
-                              {this.state.error && (
-                                <MessageBox type="error" withIcon mt={3}>
-                                  {formatErrorMessage(intl, this.state.error)}
-                                </MessageBox>
-                              )}
                               <Flex flexWrap="wrap" mt={4}>
                                 <StyledButton
                                   mt={2}

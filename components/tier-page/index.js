@@ -17,6 +17,7 @@ import { Sections } from '../collective-page/_constants';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import Hide from '../Hide';
 import InlineEditField from '../InlineEditField';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -54,10 +55,10 @@ const TierCover = styled.div`
 /** The little bubbles displayed above the tier's description */
 const Bubbles = styled.div`
   background: url(${BubblesSVG}) no-repeat;
-  height: 260px;
+  height: 112px;
   background-size: 75% auto;
   background-position-x: right;
-  background-position-y: 90px;
+  background-position-y: 25px;
 
   @media (max-width: ${themeGet('breakpoints.0')}) {
     height: 130px;
@@ -74,6 +75,8 @@ const ProgressInfoContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   flex: 0 1 50%;
+  min-height: 90px;
+  margin-bottom: 12px;
 `;
 
 /** A mutation with all the info that user is allowed to edit on this page */
@@ -152,7 +155,7 @@ class TierPage extends Component {
     const pageUrl = `${getWebsiteUrl()}${this.props.router.asPath}`;
     return (
       <div>
-        <P fontSize="16px" color="black.700" fontWeight="bold" mt={4} mb={3}>
+        <P fontSize="16px" color="black.700" fontWeight="bold" mb={3}>
           <FormattedMessage id="Share" defaultMessage="Share" />
         </P>
         <ShareButtons pageUrl={pageUrl} collective={this.props.collective} />
@@ -168,7 +171,7 @@ class TierPage extends Component {
     const isPassed = isTierExpired(tier);
 
     return (
-      <Container pb={4}>
+      <Container>
         {/** ---- Hero / Banner ---- */}
         <Container position="sticky" top={0} zIndex={999}>
           <CollectiveNavbar
@@ -191,24 +194,17 @@ class TierPage extends Component {
             top={Dimensions.COVER_HEIGHT}
           />
         </Container>
-        {/** ---- Description ---- */}
         <Flex justifyContent="center">
-          <Flex flex="0 1 1800px" px={[2, 4]} justifyContent="space-evenly" mb={64}>
-            <Container
-              display="flex"
-              flexDirection="column"
-              justifyContent="flex-end"
-              flex="0 1 800px"
-              mb={4}
-              mx={[0, null, 3]}
-            >
+          <Flex flex="0 1 1400px" px={[2, 4]} justifyContent="space-evenly" mb={64}>
+            {/** ---- Description ---- */}
+            <Container display="flex" flexDirection="column" flex="0 1 800px" mb={4} mx={[0, null, 3]}>
               <Bubbles />
               <Container
                 background="white"
-                borderRadius={8}
+                borderRadius="12px"
                 px={[3, 4]}
                 py={[4, 5]}
-                boxShadow="-3px 11px 13px rgba(75, 75, 75, 0.1)"
+                boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
               >
                 <H1 fontSize="40px" textAlign="left" color="black.900" wordBreak="break-word" mb={3} data-cy="TierName">
                   <InlineEditField
@@ -218,6 +214,7 @@ class TierPage extends Component {
                     field="name"
                     maxLength={255}
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
+                    required
                   />
                 </H1>
                 <H2
@@ -240,136 +237,149 @@ class TierPage extends Component {
                     }
                   />
                 </H2>
+                <Hide lg>
+                  <Box my={24}>
+                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
+                  </Box>
+                </Hide>
                 <Container display="flex" flexDirection="column-reverse" position="relative" flexWrap="wrap">
                   <div>
                     <TierLongDescription tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </div>
-                  <Container
-                    position={['relative', null, null, 'absolute']}
-                    right={[null, null, null, -390, -490]}
-                    width={['100%', null, null, 380, 472]}
-                    mb={[4, 5]}
-                    top={[0, null, null, -50]}
-                  >
-                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
-                  </Container>
                 </Container>
-                <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
+                <Container display={['block', null, null, 'none']} mt={4} maxWidth={275}>
                   {shareBlock}
                 </Container>
               </Container>
             </Container>
 
-            {/** ---- Contribute ---- */}
-            <Container
-              position={['fixed', null, null, 'relative']}
-              bottom={0}
-              width={1}
-              display="flex"
-              flexDirection={['row', null, null, 'column']}
-              justifyContent="space-between"
-              background="white"
-              height={[72, null, 82, Dimensions.COVER_HEIGHT]}
-              zIndex={9}
-              flex="0 1 385px"
-              p={['0 16px', '0 24px', null, '60px 32px']}
-              boxShadow={['0px -3px 5px rgba(70, 70, 70, 0.15)', null, null, 'none']}
-            >
-              {/** Tier progress */}
-              <ProgressInfoContainer>
-                {tier.goal && (
-                  <P
-                    fontSize={['12px', '14px', null, '20px']}
-                    color="black.500"
-                    lineHeight={['24px', null, null, '36px']}
-                    mb={[0, null, null, 3]}
-                    truncateOverflow
-                  >
-                    <FormattedMessage
-                      id="TierPage.AmountGoal"
-                      defaultMessage="{amountWithInterval} goal"
-                      values={{
-                        amountWithInterval: (
-                          <FormattedMoneyAmount
-                            amount={tier.goal}
-                            currency={tier.currency}
-                            interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                            abbreviateAmount={tier.goal > 1000000}
-                            abbreviateInterval
-                            amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
-                            precision={0}
-                          />
-                        ),
-                      }}
-                    />
-                  </P>
-                )}
-                <P
-                  fontSize={['10px', '14px']}
-                  color="black.500"
-                  lineHeight={['18px', null, '24px']}
-                  mb={[0, null, null, 2]}
-                  truncateOverflow
+            {/** ---- Contribute desktop ---- */}
+            <Hide xs sm md flex="0 1 416px" position="relative" pt={112}>
+              <Container width="100%" position="sticky" top={80} pb={32}>
+                <Container
+                  width={1}
+                  background="white"
+                  p="24px"
+                  borderRadius="12px"
+                  boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
                 >
-                  {amountRaised > 0 && (
-                    <FormattedMessage
-                      id="TierPage.AmountRaised"
-                      defaultMessage="{amountWithInterval} raised"
-                      values={{
-                        amountWithInterval: (
-                          <FormattedMoneyAmount
-                            color="black.700"
-                            amount={amountRaised}
-                            currency={tier.currency}
-                            interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                            amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
-                            abbreviateAmount={amountRaised > 1000000}
-                            precision={0}
-                            abbreviateInterval
+                  {/** Tier progress */}
+                  {Boolean(tier.goal) && (
+                    <ProgressInfoContainer>
+                      {tier.goal && (
+                        <P fontSize="24px" fontWeight="700" color="black.900" lineHeight="32px" truncateOverflow mb={2}>
+                          <FormattedMessage
+                            id="Tier.Goal"
+                            defaultMessage="Goal {amountWithInterval}"
+                            values={{
+                              amountWithInterval: (
+                                <FormattedMoneyAmount
+                                  amount={tier.goal}
+                                  currency={tier.currency}
+                                  interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
+                                  formatWithSeparators={tier.goal > 1000000}
+                                  abbreviateInterval
+                                  amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
+                                  precision={0}
+                                />
+                              ),
+                            }}
                           />
-                        ),
-                      }}
-                    />
+                        </P>
+                      )}
+                      {tier.goal && (
+                        <Box mt={1} mb={2}>
+                          <StyledProgressBar percentage={amountRaised / tier.goal} height="8px" />
+                        </Box>
+                      )}
+                      {amountRaised > 0 && (
+                        <Flex mt={2} justifyContent="space-between">
+                          <Box>
+                            <P color="black.700" fontSize="14px" fontWeight="700" lineHeight="20px" mb={1}>
+                              <FormattedMessage id="AmountRaised" defaultMessage="Amount raised" />
+                            </P>
+                            <P color="black.700" fontSize="14px" fontWeight="500">
+                              <FormattedMoneyAmount
+                                amount={amountRaised}
+                                currency={tier.currency}
+                                interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
+                                amountStyles={null}
+                              />
+                            </P>
+                          </Box>
+                          {Boolean(tier.goal && amountRaised < tier.goal) && (
+                            <Box>
+                              <P
+                                color="black.700"
+                                fontSize="14px"
+                                fontWeight="700"
+                                lineHeight="20px"
+                                mb={1}
+                                textAlign="right"
+                              >
+                                <FormattedMessage id="Goal.StillToContribute" defaultMessage="Still to contribute" />
+                              </P>
+                              <P color="black.700" fontSize="14px" fontWeight="500" textAlign="right">
+                                <FormattedMoneyAmount
+                                  amount={tier.goal - amountRaised}
+                                  currency={tier.currency}
+                                  interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
+                                  amountStyles={null}
+                                />
+                              </P>
+                            </Box>
+                          )}
+                        </Flex>
+                      )}
+                    </ProgressInfoContainer>
                   )}
-                  {tier.goal && ` (${Math.round((amountRaised / tier.goal) * 100)}%)`}
-                </P>
-                {tier.goal && (
-                  <Box mt={1} mb={2}>
-                    <StyledProgressBar percentage={amountRaised / tier.goal} />
+                  {/** Contribute button */}
+                  <Flex alignItems="center" mb={24}>
+                    <Box width={1}>
+                      {isPassed ? (
+                        <P textAlign="center">
+                          <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
+                          <Link href={{ pathname: `/${collective.slug}/contribute`, query: { redirect } }}>
+                            <FormattedMessage
+                              id="createOrder.backToTier"
+                              defaultMessage="View all the other ways to contribute"
+                            />
+                            .
+                          </Link>
+                        </P>
+                      ) : (
+                        <Link
+                          href={{
+                            pathname: `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
+                            query: { redirect },
+                          }}
+                        >
+                          <StyledButton
+                            buttonStyle="primary"
+                            buttonSize={['small', 'medium']}
+                            width={1}
+                            minWidth={128}
+                            data-cy="ContributeBtn"
+                          >
+                            {tier.button ? (
+                              tier.button
+                            ) : (
+                              <FormattedMessage id="Contribute" defaultMessage="Contribute" />
+                            )}
+                          </StyledButton>
+                        </Link>
+                      )}
+                    </Box>
+                  </Flex>
+                  {/** Video */}
+                  <Box my={24}>
+                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </Box>
-                )}
-              </ProgressInfoContainer>
-              {/** Contribute button */}
-              <Flex alignItems="center">
-                <Box width={1}>
-                  {isPassed ? (
-                    <P textAlign="center">
-                      <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
-                      <Link href={{ pathname: `/${collective.slug}/contribute`, query: { redirect } }}>
-                        <FormattedMessage
-                          id="createOrder.backToTier"
-                          defaultMessage="View all the other ways to contribute"
-                        />
-                        .
-                      </Link>
-                    </P>
-                  ) : (
-                    <Link
-                      href={{
-                        pathname: `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
-                        query: { redirect },
-                      }}
-                    >
-                      <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
-                        {tier.button ? tier.button : <FormattedMessage id="Contribute" defaultMessage="Contribute" />}
-                      </StyledButton>
-                    </Link>
-                  )}
-                </Box>
-              </Flex>
-              {/** Share buttons (desktop only) */}
-              <Container display={['none', null, null, 'block']}>{shareBlock}</Container>
-            </Container>
+                  {/** Share buttons (desktop only) */}
+                  <Container display={['none', null, null, 'block']}>{shareBlock}</Container>
+                </Container>
+              </Container>
+            </Hide>
           </Flex>
         </Flex>
         {contributors && contributors.length > 0 && (
@@ -381,6 +391,124 @@ class TierPage extends Component {
             collectiveId={collective.id}
           />
         )}
+        <Container
+          display={['flex', null, null, 'none']}
+          position="sticky"
+          bottom={0}
+          left={0}
+          width={1}
+          flexDirection="row"
+          justifyContent={tier.goal || amountRaised ? 'space-between' : 'center'}
+          background="white"
+          height={[72, null, 82]}
+          zIndex={9}
+          flex="0 1 385px"
+          p={['0 16px', '0 24px', null]}
+          boxShadow="0px -3px 5px rgba(70, 70, 70, 0.15)"
+        >
+          {/** Tier progress */}
+          {Boolean(tier.goal || amountRaised) && (
+            <ProgressInfoContainer>
+              {tier.goal && (
+                <P
+                  fontSize={['12px', '14px', null]}
+                  color="black.500"
+                  lineHeight={['24px', null, null]}
+                  truncateOverflow
+                >
+                  <FormattedMessage
+                    id="TierPage.AmountGoal"
+                    defaultMessage="{amountWithInterval} goal"
+                    values={{
+                      amountWithInterval: (
+                        <FormattedMoneyAmount
+                          amount={tier.goal}
+                          currency={tier.currency}
+                          interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
+                          formatWithSeparators={tier.goal > 1000000}
+                          abbreviateInterval
+                          amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
+                          precision={0}
+                        />
+                      ),
+                    }}
+                  />
+                </P>
+              )}
+              <P
+                fontSize={['10px', '14px']}
+                color="black.500"
+                lineHeight={['18px', null, '24px']}
+                mb={[0, null, null, 2]}
+                truncateOverflow
+              >
+                {amountRaised > 0 && (
+                  <FormattedMessage
+                    id="TierPage.AmountRaised"
+                    defaultMessage="{amountWithInterval} raised"
+                    values={{
+                      amountWithInterval: (
+                        <FormattedMoneyAmount
+                          color="black.700"
+                          amount={amountRaised}
+                          currency={tier.currency}
+                          interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
+                          amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
+                          formatWithSeparators={amountRaised > 1000000}
+                          precision={0}
+                          abbreviateInterval
+                        />
+                      ),
+                    }}
+                  />
+                )}
+                {tier.goal && ` (${Math.round((amountRaised / tier.goal) * 100)}%)`}
+              </P>
+              {tier.goal && (
+                <Box mt={1} mb={2}>
+                  <StyledProgressBar percentage={amountRaised / tier.goal} />
+                </Box>
+              )}
+            </ProgressInfoContainer>
+          )}
+          {/** Contribute button */}
+          <Flex alignItems="center">
+            <Box width={1}>
+              {isPassed ? (
+                <P textAlign="center">
+                  <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
+                  <Link href={{ pathname: `/${collective.slug}/contribute`, query: { redirect } }}>
+                    <FormattedMessage
+                      id="createOrder.backToTier"
+                      defaultMessage="View all the other ways to contribute"
+                    />
+                    .
+                  </Link>
+                </P>
+              ) : (
+                <Link
+                  href={{
+                    pathname: `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
+                    query: { redirect },
+                  }}
+                >
+                  <StyledButton
+                    buttonStyle="primary"
+                    buttonSize={['small', 'medium']}
+                    width={1}
+                    my={4}
+                    minWidth={128}
+                    data-cy="ContributeBtn"
+                  >
+                    {tier.button ? tier.button : <FormattedMessage id="Contribute" defaultMessage="Contribute" />}
+                  </StyledButton>
+                </Link>
+              )}
+            </Box>
+          </Flex>
+          {/** Share buttons (desktop only) */}
+          <Container display={['none', null, null, 'block']}>{shareBlock}</Container>
+        </Container>
       </Container>
     );
   }

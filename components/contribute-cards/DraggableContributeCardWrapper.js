@@ -6,14 +6,12 @@ import styled, { css } from 'styled-components';
 
 import DRAG_AND_DROP_TYPES from '../../lib/constants/drag-and-drop';
 
+import StyledRoundButton from '../StyledRoundButton';
+
 const MainContainer = styled.div`
   position: relative;
   display: flex;
   height: 100%;
-
-  & > * {
-    transition: opacity 0.2s;
-  }
 
   ${props =>
     props.isDragging &&
@@ -28,9 +26,9 @@ const MainContainer = styled.div`
 `;
 
 const DragHandle = React.forwardRef((props, ref) => (
-  <div {...props} ref={ref}>
+  <StyledRoundButton size={32} {...props} ref={ref}>
     <MoveIcon size={10} />
-  </div>
+  </StyledRoundButton>
 ));
 
 DragHandle.displayName = 'DragHandle';
@@ -38,19 +36,11 @@ DragHandle.displayName = 'DragHandle';
 const StyledDragHandle = styled(DragHandle)`
   position: absolute;
   cursor: move;
-  top: 8px;
+  top: 17px;
   margin-left: 270px;
   box-shadow: 0px 4px 6px rgba(26, 27, 31, 0.16);
-  height: 32px;
-  width: 32px;
-  background: white;
-  border: 1px solid #dcdee0;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   &:hover {
-    background: #f7f8fa;
+    color: ${props => props.theme.colors.primary[700]};
   }
 
   /** Hide on touchscreens */

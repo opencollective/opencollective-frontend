@@ -9,9 +9,12 @@ import { Box, Flex } from '../Grid';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
 
+import CollectiveTitleContainer from './CollectiveTitleContainer';
+
 class NewContributionFlowHeader extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
+      slug: PropTypes.string,
       currency: PropTypes.string,
       name: PropTypes.string,
       contributors: PropTypes.shape({
@@ -26,10 +29,11 @@ class NewContributionFlowHeader extends React.Component {
     }).isRequired,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
+    isEmbed: PropTypes.bool,
   };
 
   render() {
-    const { collective } = this.props;
+    const { collective, isEmbed } = this.props;
     const contributors = collective.contributors?.nodes;
 
     return (
@@ -38,19 +42,21 @@ class NewContributionFlowHeader extends React.Component {
           <Avatar collective={collective} radius={[65, null, 96]} />
         </Box>
         <Flex flexDirection="column" alignItems="center">
-          <H1
-            textAlign="center"
-            fontSize={['28px', null, '32px']}
-            lineHeight="40px"
-            fontWeight={500}
-            title={collective.name}
-          >
-            <FormattedMessage
-              id="CreateOrder.Title"
-              defaultMessage="Contribute to {collective}"
-              values={{ collective: truncate(collective.name, { length: 60 }) }}
-            />
-          </H1>
+          <CollectiveTitleContainer useLink={!isEmbed} collective={collective} linkColor="#333">
+            <H1
+              textAlign="center"
+              fontSize={['28px', null, '32px']}
+              lineHeight="40px"
+              fontWeight={500}
+              title={collective.name}
+            >
+              <FormattedMessage
+                id="CreateOrder.Title"
+                defaultMessage="Contribute to {collective}"
+                values={{ collective: truncate(collective.name, { length: 60 }) }}
+              />
+            </H1>
+          </CollectiveTitleContainer>
           {contributors?.length > 0 && (
             <Fragment>
               <P fontSize="16px" lineHeight="24px" fontWeight={400} color="black.500" py={2}>

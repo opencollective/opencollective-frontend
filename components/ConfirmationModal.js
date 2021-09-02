@@ -78,9 +78,8 @@ const ConfirmationModal = ({
               try {
                 setSubmitting(true);
                 await continueHandler();
-              } catch (e) {
+              } finally {
                 setSubmitting(false);
-                throw e;
               }
             }}
           >

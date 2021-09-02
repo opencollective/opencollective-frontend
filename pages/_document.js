@@ -79,6 +79,7 @@ export default class IntlDocument extends Document {
       'IMAGES_URL',
       'REJECT_CONTRIBUTION',
       'REJECTED_CATEGORIES',
+      'HOST_DASHBOARD_REPORTS',
       'PAYPAL_ENVIRONMENT',
       'STRIPE_KEY',
       'SENTRY_DSN',
@@ -87,6 +88,10 @@ export default class IntlDocument extends Document {
       'GOOGLE_MAPS_API_KEY',
       'RECAPTCHA_SITE_KEY',
       'RECAPTCHA_ENABLED',
+      'WISE_ENVIRONMENT',
+      'HCAPTCHA_SITEKEY',
+      'CAPTCHA_ENABLED',
+      'CAPTCHA_PROVIDER',
     ]);
   }
 

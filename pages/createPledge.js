@@ -23,6 +23,7 @@ import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import I18nFormatters from '../components/I18nFormatters';
+import Image from '../components/Image';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
@@ -377,7 +378,7 @@ class CreatePledgePage extends React.Component {
 
                       <Container position="relative">
                         <Container position="absolute" left={-45} top={0}>
-                          <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />
+                          <Image src="/static/icons/first-pledge-badge.svg" alt="first pledge" height={32} width={32} />
                         </Container>
 
                         <P fontWeight="bold">
@@ -514,8 +515,7 @@ class CreatePledgePage extends React.Component {
                   order={[1, null, 2]}
                   width={[1, null, 0.5]}
                 >
-                  <img src={defaultPledgedLogo} alt="Pledged Collective" />
-
+                  <Image src={defaultPledgedLogo} alt="Pledged Collective" width={128} height={128} />
                   <H3 mt={3} mb={1}>
                     {data.Collective.name}
                   </H3>
@@ -546,7 +546,7 @@ class CreatePledgePage extends React.Component {
                         totalCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE + pledgeStats.USER,
                       }}
                       defaultMessage={
-                        'by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# backer } other {# backers }}'
+                        'by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} other { and }} {userCount, plural, =0 {} one {# backer } other {# backers }}'
                       }
                     />
                   </P>

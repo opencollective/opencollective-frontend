@@ -19,6 +19,7 @@ import Modal, { ModalBody, ModalFooter, ModalHeader, ModalOverlay } from '../../
 import { H1, P } from '../../components/Text';
 
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 
 import OnboardingContentBox from './OnboardingContentBox';
 import OnboardingNavButtons from './OnboardingNavButtons';
@@ -100,15 +101,15 @@ const FormWithStyles = styled(Form)`
 
 const params = {
   0: {
-    height: '114px',
+    height: 114,
     src: '/static/images/create-collective/onboardingWelcomeIllustration.png',
   },
   1: {
-    height: '112px',
+    height: 112,
     src: '/static/images/create-collective/onboardingAdminsIllustration.png',
   },
   2: {
-    height: '119px',
+    height: 119,
     src: '/static/images/create-collective/onboardingContactIllustration.png',
   },
 };
@@ -343,9 +344,9 @@ class OnboardingModal extends React.Component {
                   <FormWithStyles>
                     <ResponsiveModalBody>
                       <Flex flexDirection="column" alignItems="center">
-                        <img
+                        <Image
                           alt="OnBoarding"
-                          width={'160px'}
+                          width={160}
                           height={this.getStepParams(step, 'height')}
                           src={this.getStepParams(step, 'src')}
                         />

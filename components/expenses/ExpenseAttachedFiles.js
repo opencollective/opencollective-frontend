@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import expenseTypes from '../../lib/constants/expenseTypes';
 
 import { Box, Flex } from '../Grid';
-import StyledButton from '../StyledButton';
+import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseInvoiceDownloadHelper, { getExpenseInvoiceFilename } from './ExpenseInvoiceDownloadHelper';
@@ -14,32 +14,27 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
   return (
     <Flex flexWrap="wrap">
       {showInvoice && expense.type === expenseTypes.INVOICE && (
-        <Box mr={3}>
+        <Box mr={3} mb={3}>
           <ExpenseInvoiceDownloadHelper expense={expense} collective={collective}>
             {({ isLoading, downloadInvoice }) => (
               <UploadedFilePreview
                 onClick={downloadInvoice}
                 isDownloading={isLoading}
-                title={getExpenseInvoiceFilename(collective, expense)}
+                fileName={getExpenseInvoiceFilename(collective, expense)}
                 size={88}
+                showFileName
               />
             )}
           </ExpenseInvoiceDownloadHelper>
         </Box>
       )}
       {files.map((file, idx) => (
-        <Box key={file.id || file.url} mr={3}>
-          <UploadedFilePreview size={88} url={file.url} />
+        <Box key={file.id || file.url} mr={3} mb={3}>
+          <UploadedFilePreview size={88} url={file.url} fileName={file.name} showFileName />
           {onRemove && (
-            <StyledButton
-              isBorderless
-              buttonStyle="dangerSecondary"
-              buttonSize="tiny"
-              mt={1}
-              onClick={() => onRemove(idx)}
-            >
+            <StyledLinkButton variant="danger" fontSize="12px" mt={1} onClick={() => onRemove(idx)}>
               <FormattedMessage id="Remove" defaultMessage="Remove" />
-            </StyledButton>
+            </StyledLinkButton>
           )}
         </Box>
       ))}

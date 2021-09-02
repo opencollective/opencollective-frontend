@@ -11,13 +11,13 @@ import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import Body from '../components/Body';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
@@ -31,6 +31,7 @@ import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
 import StyledHr from '../components/StyledHr';
 import { H1 } from '../components/Text';
+import { getDefaultKinds, parseTransactionKinds } from '../components/transactions/filters/TransactionsKindFilter';
 import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
 import TransactionsDownloadCSV from '../components/transactions/TransactionsDownloadCSV';
 import TransactionsDownloadInvoices from '../components/transactions/TransactionsDownloadInvoices';
@@ -46,9 +47,23 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
     $type: TransactionType
     $minAmount: Int
     $maxAmount: Int
-    $dateFrom: ISODateTime
+    $dateFrom: DateTime
+    $dateTo: DateTime
     $searchTerm: String
+    $kind: [TransactionKind]
   ) {
+    account(slug: $slug) {
+      id
+      legacyId
+      slug
+      name
+      type
+      imageUrl(height: 256)
+      currency
+      features {
+        ...NavbarFields
+      }
+    }
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -57,13 +72,16 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       minAmount: $minAmount
       maxAmount: $maxAmount
       dateFrom: $dateFrom
+      dateTo: $dateTo
       searchTerm: $searchTerm
+      kind: $kind
       includeIncognitoTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
     }
   }
   ${transactionsQueryCollectionFragment}
+  ${collectiveNavbarFieldsFragment}
 `;
 
 const TransactionPageWrapper = styled.div`
@@ -79,7 +97,7 @@ const EXPENSES_PER_PAGE = 15;
 
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom] = getDateRangeFromPeriod(query.period);
+  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
@@ -90,7 +108,9 @@ const getVariablesFromQuery = query => {
     maxAmount: amountRange[1] && amountRange[1] * 100,
     payoutMethodType: query.payout,
     dateFrom,
+    dateTo,
     searchTerm: query.searchTerm,
+    kind: query.kind ? parseTransactionKinds(query.kind) : getDefaultKinds(),
   };
 };
 
@@ -100,9 +120,15 @@ class TransactionsPage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string, // from getInitialProps, for addCollectiveCoverData
-    data: PropTypes.object.isRequired, // from withData
-    transactionsData: PropTypes.object,
+    slug: PropTypes.string, // from getInitialProps, for addCollectiveNavbarData
+    data: PropTypes.shape({
+      account: PropTypes.object,
+      transactions: PropTypes.object,
+      variables: PropTypes.object,
+      loading: PropTypes.bool,
+      refetch: PropTypes.func,
+      error: PropTypes.any,
+    }).isRequired, // from withData
     LoggedInUser: PropTypes.object,
     query: PropTypes.object,
     router: PropTypes.object,
@@ -110,12 +136,12 @@ class TransactionsPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { Collective: get(props, 'data.Collective') };
+    this.state = { Collective: get(props, 'data.account') };
   }
 
   async componentDidMount() {
     const { data } = this.props;
-    const Collective = (data && data.Collective) || this.state.collective;
+    const Collective = (data && data.account) || this.state.collective;
     this.setState({ Collective });
   }
 
@@ -124,20 +150,20 @@ class TransactionsPage extends React.Component {
     // null because of a bug in Apollo where it strips the `Collective` from data
     // during re-hydratation.
     // See https://github.com/opencollective/opencollective/issues/1872
-    const currentCollective = get(this.props, 'data.Collective');
-    if (currentCollective && get(oldProps, 'data.Collective') !== currentCollective) {
+    const currentCollective = get(this.props, 'data.account');
+    if (currentCollective && get(oldProps, 'data.account') !== currentCollective) {
       this.setState({ Collective: currentCollective });
     }
 
     // Refetch to get permissions with the currently logged in user
     if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
-      this.props.transactionsData?.refetch();
+      this.props.data?.refetch();
     }
   }
 
   canDownloadInvoices() {
     const { LoggedInUser } = this.props;
-    const collective = get(this.props, 'data.Collective') || this.state.Collective;
+    const collective = get(this.props, 'data.account') || this.state.Collective;
     if (!collective || !LoggedInUser) {
       return false;
     } else if (collective.type !== 'ORGANIZATION' && collective.type !== 'USER') {
@@ -160,9 +186,9 @@ class TransactionsPage extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, query, transactionsData, data, slug } = this.props;
-    const collective = get(this.props, 'data.Collective') || this.state.Collective;
-    const { transactions, error, loading, variables, refetch } = transactionsData;
+    const { LoggedInUser, query, data, slug } = this.props;
+    const collective = get(this.props, 'data.account') || this.state.Collective;
+    const { transactions, error, loading, variables, refetch } = data || {};
     const hasFilters = Object.entries(query).some(([key, value]) => {
       return !['view', 'offset', 'limit', 'slug'].includes(key) && value;
     });
@@ -190,7 +216,7 @@ class TransactionsPage extends React.Component {
         <Header
           collective={collective}
           LoggedInUser={LoggedInUser}
-          noRobots={collective.type === 'USER' && !collective.isHost}
+          noRobots={['USER', 'INDIVIDUAL'].includes(collective.type) && !collective.isHost}
         />
         <Body>
           <CollectiveNavbar
@@ -230,7 +256,7 @@ class TransactionsPage extends React.Component {
                     <TransactionsDownloadInvoices collective={collective} />
                   </Box>
                 )}
-                <TransactionsDownloadCSV collective={collective} />
+                <TransactionsDownloadCSV collective={collective} query={this.props.query} />
               </Flex>
             </Flex>
             {error ? (
@@ -288,7 +314,6 @@ class TransactionsPage extends React.Component {
 }
 
 const addTransactionsData = graphql(transactionsPageQuery, {
-  name: 'transactionsData',
   options: props => {
     return {
       variables: { slug: props.slug, ...getVariablesFromQuery(props.query) },
@@ -297,4 +322,4 @@ const addTransactionsData = graphql(transactionsPageQuery, {
   },
 });
 
-export default withUser(addTransactionsData(addCollectiveCoverData(withRouter(TransactionsPage))));
+export default withUser(addTransactionsData(withRouter(TransactionsPage)));

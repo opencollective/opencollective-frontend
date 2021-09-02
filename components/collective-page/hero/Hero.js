@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
@@ -97,6 +97,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
     }
   };
 
+  // Cancel edit mode when user navigates out to another collective
+  useEffect(() => {
+    editCover(false);
+    showColorPicker(false);
+  }, [collective.id]);
+
   return (
     <Fragment>
       {message && (
@@ -192,7 +198,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 )}
                 {collective.githubHandle && (
                   <StyledLink data-cy="githubProfileUrl" href={githubProfileUrl(collective.githubHandle)} openInNewTab>
-                    <StyledRoundButton size={32} mr={3} title="Github" aria-label="Github link">
+                    <StyledRoundButton size={32} mr={3} title="GitHub" aria-label="GitHub link">
                       <Github size={12} />
                     </StyledRoundButton>
                   </StyledLink>

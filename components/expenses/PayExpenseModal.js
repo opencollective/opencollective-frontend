@@ -33,17 +33,22 @@ const getPayoutLabel = (intl, type) => {
 const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return { forceManual: true, action: 'PAY' };
+  } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
+    return { forceManual: true, action: 'PAY' };
   } else if (!isAuto) {
     return { forceManual: true, action: 'PAY' };
   } else {
+    const isPaypalPayouts =
+      hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
+      payoutMethodType === PayoutMethodType.PAYPAL &&
+      host.supportedPayoutMethods?.includes(PayoutMethodType.PAYPAL);
+    const isWiseOTT =
+      payoutMethodType === PayoutMethodType.BANK_ACCOUNT &&
+      host.supportedPayoutMethods?.includes(PayoutMethodType.BANK_ACCOUNT) &&
+      hasFeature(host, FEATURES.TRANSFERWISE_OTT);
     return {
       forceManual: false,
-      action:
-        hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
-        payoutMethodType === PayoutMethodType.PAYPAL &&
-        host.supportedPayoutMethods?.includes('PAYPAL')
-          ? 'SCHEDULE_FOR_PAYMENT'
-          : 'PAY',
+      action: isPaypalPayouts || isWiseOTT ? 'SCHEDULE_FOR_PAYMENT' : 'PAY',
     };
   }
 };
@@ -113,6 +118,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const formik = useFormik({ initialValues, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
+  const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
+  const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
 
   return (
     <StyledModal
@@ -137,7 +144,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
           <PayoutMethodTypeWithIcon type={payoutMethodType} />
         </Box>
         <PayoutMethodData payoutMethod={expense.payoutMethod} showLabel={false} />
-        {payoutMethodType !== PayoutMethodType.OTHER && (
+        {payoutMethodType !== PayoutMethodType.OTHER && !hasBankInfoWithoutWise && (
           <StyledButtonSet
             items={['AUTO', 'MANUAL']}
             buttonProps={{ width: '50%' }}
@@ -276,8 +283,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             <P mt={2} fontSize="12px" lineHeight="18px">
               <FormattedMessage
                 id="PayExpenseModal.ManualPayoutWarning"
-                defaultMessage="By clicking below, you acknowledge that this expense has already been paid via {payoutMethod}."
-                values={{ payoutMethod: payoutMethodLabel }}
+                defaultMessage="By clicking below, you acknowledge that this expense has already been paid {payoutMethod}."
+                values={{ payoutMethod: hasBankInfoWithoutWise ? 'manually' : `via ${payoutMethodLabel}` }}
               />
             </P>
           </MessageBox>
@@ -298,6 +305,12 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                   <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
                 </Span>
               </React.Fragment>
+            ) : isScheduling ? (
+              <FormattedMessage
+                id="expense.schedule.btn"
+                defaultMessage="Schedule to Pay with {paymentMethod}"
+                values={{ paymentMethod: payoutMethodLabel }}
+              />
             ) : (
               <FormattedMessage
                 id="expense.pay.btn"
@@ -329,6 +342,7 @@ PayExpenseModal.propTypes = {
   host: PropTypes.shape({
     plan: PropTypes.object,
     slug: PropTypes.string,
+    transferwise: PropTypes.object,
   }),
   onClose: PropTypes.func.isRequired,
   /** Function called when users click on one of the "Pay" buttons */

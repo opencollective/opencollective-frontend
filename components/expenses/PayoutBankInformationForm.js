@@ -21,27 +21,14 @@ import { P } from '../Text';
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
 
+const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
+
 export const msg = defineMessages({
   currency: {
     id: 'Currency',
     defaultMessage: 'Currency',
   },
 });
-
-const accountHolderFieldOptions = {
-  name: 'Account Holder Name',
-  group: [
-    {
-      required: true,
-      key: 'accountHolderName',
-      name: 'Account Holder Name',
-      type: 'text',
-      example: 'Jane Doe',
-      validationRegexp: '^[^!@#$%&*+]+$',
-      validationError: 'Special characters are not allowed. (!@#$%&*+)',
-    },
-  ],
-};
 
 const requiredFieldsQuery = gqlV2/* GraphQL */ `
   query PayoutBankInformationRequiredFields($slug: String, $currency: String!, $accountDetails: JSON) {
@@ -74,17 +61,20 @@ const requiredFieldsQuery = gqlV2/* GraphQL */ `
 
 const Input = props => {
   const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
-  const fieldName =
-    input.key === 'accountHolderName' ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
+  const isAccountHolderName = input.key === 'accountHolderName';
+  const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
   let validate = input.required ? value => (value ? undefined : `${input.name} is required`) : undefined;
   if (input.type === 'text') {
     if (input.validationRegexp) {
       validate = value => {
         const matches = new RegExp(input.validationRegexp).test(value);
+        // TODO(intl): This should be internationalized, ideally with `formatFormErrorMessage`
         if (!value && input.required) {
           return `${input.name} is required`;
         } else if (!matches && value) {
           return input.validationError || `Invalid ${input.name}`;
+        } else if (isAccountHolderName && (!value || value.match(/^[^\s]{1}\b/))) {
+          return 'Your full name is required';
         }
       };
     }
@@ -97,11 +87,39 @@ const Input = props => {
               labelFontSize="13px"
               required={input.required}
               error={(meta.touched || disabled) && meta.error}
+              hint={input.hint}
             >
               {() => (
                 <StyledInput
                   {...field}
                   placeholder={input.example}
+                  error={(meta.touched || disabled) && meta.error}
+                  disabled={disabled}
+                  width="100%"
+                  value={get(formik.values, field.name) || ''}
+                />
+              )}
+            </StyledInputField>
+          )}
+        </Field>
+      </Box>
+    );
+  } else if (input.type === 'date') {
+    return (
+      <Box key={input.key} mt={2} flex="1">
+        <Field name={fieldName} validate={validate}>
+          {({ field, meta }) => (
+            <StyledInputField
+              label={input.name}
+              labelFontSize="13px"
+              required={input.required}
+              error={(meta.touched || disabled) && meta.error}
+              hint={input.hint}
+            >
+              {() => (
+                <StyledInput
+                  {...field}
+                  type="date"
                   error={(meta.touched || disabled) && meta.error}
                   disabled={disabled}
                   width="100%"
@@ -217,7 +235,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   // Some currencies offer different methods for the transaction
   // e.g. USD allows ABA and SWIFT transactions.
   const availableMethods = data.host.transferwise.requiredFields.find(
-    method => method.type == get(formik.values, getFieldName(`data.type`)),
+    method => method.type === get(formik.values, getFieldName(`data.type`)),
   );
   const [addressFields, otherFields] = partition(availableMethods?.fields, field =>
     field.group.every(g => g.key.includes('address.')),
@@ -227,7 +245,15 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     <Flex flexDirection="column">
       <Field name={getFieldName('data.type')}>
         {({ field }) => (
-          <StyledInputField name={field.name} label="Transaction Method" labelFontSize="13px" mt={3} mb={2}>
+          <StyledInputField
+            name={field.name}
+            label={
+              <FormattedMessage id="PayoutBankInformationForm.TransactionMethod" defaultMessage="Transaction Method" />
+            }
+            labelFontSize="13px"
+            mt={3}
+            mb={2}
+          >
             {({ id }) => (
               <StyledSelect
                 inputId={id}
@@ -247,24 +273,9 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
       </Field>
       <Box mt={3} flex="1">
         <P fontSize="14px" fontWeight="bold">
-          Account Information
+          <FormattedMessage id="PayoutBankInformationForm.AccountInfo" defaultMessage="Account Information" />
         </P>
       </Box>
-      {
-        // Displays the account holder field only if the other fields are also loaded
-        Boolean(availableMethods?.fields.length) && (
-          <FieldGroup
-            currency={currency}
-            disabled={disabled}
-            field={accountHolderFieldOptions}
-            formik={formik}
-            getFieldName={getFieldName}
-            host={host}
-            key={kebabCase(accountHolderFieldOptions.name)}
-            refetch={refetch}
-          />
-        )
-      }
       {otherFields.map(field => (
         <FieldGroup
           currency={currency}
@@ -278,25 +289,36 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           refetch={refetch}
         />
       ))}
-      <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
-        Recipient&apos;s Address&nbsp;
-        <StyledTooltip content="Bank account holder address (not the bank address)">
-          <Info size={16} />
-        </StyledTooltip>
-      </Box>
-      {addressFields.map(field => (
-        <FieldGroup
-          currency={currency}
-          disabled={disabled}
-          field={field}
-          formik={formik}
-          getFieldName={getFieldName}
-          host={host}
-          key={kebabCase(field.name)}
-          loading={loading}
-          refetch={refetch}
-        />
-      ))}
+      {Boolean(addressFields.length) && (
+        <React.Fragment>
+          <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
+            <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
+            <StyledTooltip
+              content={
+                <FormattedMessage
+                  id="PayoutBankInformationForm.HolderAddress"
+                  defaultMessage="Bank account holder address (not the bank address)"
+                />
+              }
+            >
+              <Info size={16} />
+            </StyledTooltip>
+          </Box>
+          {addressFields.map(field => (
+            <FieldGroup
+              currency={currency}
+              disabled={disabled}
+              field={field}
+              formik={formik}
+              getFieldName={getFieldName}
+              host={host}
+              key={kebabCase(field.name)}
+              loading={loading}
+              refetch={refetch}
+            />
+          ))}
+        </React.Fragment>
+      )}
     </Flex>
   );
 };
@@ -329,8 +351,8 @@ const availableCurrenciesQuery = gqlV2/* GraphQL */ `
 const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: host.slug, ignoreBlockedCurrencies },
-    // Skip fetching/loading if the currency is fixed or avaialbleCurrencies was pre-loaded
+    variables: { slug: host?.transferwise ? host.slug : TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
+    // Skip fetching/loading if the currency is fixed or availableCurrencies was pre-loaded
     skip: Boolean(fixedCurrency || host.transferwise?.availableCurrencies),
   });
   const formik = useFormikContext();

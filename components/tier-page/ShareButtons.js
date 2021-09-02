@@ -47,24 +47,24 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
   });
 
   return (
-    <Flex justifyContent="space-between">
+    <Flex>
       <StyledLink title="Facebook" href={facebookShareURL({ u: pageUrl })} openInNewTab>
-        <StyledRoundButton size={40}>
+        <StyledRoundButton size={40} mr="12px">
           <Facebook size={14} />
         </StyledRoundButton>
       </StyledLink>
       <StyledLink title="Twitter" href={tweetURL({ url: pageUrl, text: twitterShareMsg })} openInNewTab>
-        <StyledRoundButton size={40}>
+        <StyledRoundButton size={40} mr="12px">
           <Twitter size={14} />
         </StyledRoundButton>
       </StyledLink>
       <StyledLink title="Linkedin" href={linkedInShareURL({ url: pageUrl, title: defaultShareTitle })} openInNewTab>
-        <StyledRoundButton size={40}>
+        <StyledRoundButton size={40} mr="12px">
           <Linkedin size={14} />
         </StyledRoundButton>
       </StyledLink>
       <StyledLink title="Mail" href={mailToURL('', { subject: defaultShareTitle })} openInNewTab>
-        <StyledRoundButton size={40}>
+        <StyledRoundButton size={40} mr="12px">
           <Mail size={14} />
         </StyledRoundButton>
       </StyledLink>

@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { cloneDeep } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+
+import UpdateFilters from './updates/UpdateFilters';
 import Container from './Container';
 import Error from './Error';
 import { Box, Flex } from './Grid';
@@ -21,6 +24,8 @@ class UpdatesWithData extends React.Component {
     LoggedInUser: PropTypes.object,
     data: PropTypes.object,
     fetchMore: PropTypes.func,
+    onChange: PropTypes.func,
+    query: PropTypes.object,
   };
 
   constructor(props) {
@@ -31,8 +36,7 @@ class UpdatesWithData extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { data, collective } = this.props;
-    const { LoggedInUser } = this.props;
+    const { data, collective, LoggedInUser } = this.props;
     if (!prevProps.LoggedInUser && LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       // We refetch the data to get the updates that are not published yet
       data.refetch({ options: { fetchPolicy: 'network-only' } });
@@ -40,13 +44,13 @@ class UpdatesWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective, compact } = this.props;
+    const { data, LoggedInUser, collective, compact, onChange, query } = this.props;
 
     if (data.error) {
       return <Error message={data.error.message} />;
     }
 
-    const updates = data.allUpdates;
+    const updates = data.account?.updates;
     return (
       <div className="UpdatesContainer">
         {!compact && (
@@ -71,6 +75,7 @@ class UpdatesWithData extends React.Component {
             )}
           </Flex>
         )}
+        <UpdateFilters values={query} onChange={onChange} />
         <Box mt={4} mb={5}>
           <Updates
             collective={collective}
@@ -85,67 +90,88 @@ class UpdatesWithData extends React.Component {
   }
 }
 
-const updatesQuery = gql`
-  query Updates($CollectiveId: Int!, $limit: Int, $offset: Int) {
-    allUpdates(CollectiveId: $CollectiveId, limit: $limit, offset: $offset) {
+export const updatesQuery = gqlV2/* GraphQL */ `
+  query Updates(
+    $collectiveSlug: String!
+    $limit: Int
+    $offset: Int
+    $searchTerm: String
+    $orderBy: ChronologicalOrderInput
+  ) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
       id
-      slug
-      title
-      summary
-      createdAt
-      publishedAt
-      updatedAt
-      userCanSeeUpdate
-      tags
-      image
-      isPrivate
-      makePublicOn
-      collective {
-        id
-        slug
-      }
-      fromCollective {
-        id
-        type
-        name
-        slug
-        imageUrl
+      updates(limit: $limit, offset: $offset, searchTerm: $searchTerm, orderBy: $orderBy) {
+        totalCount
+        nodes {
+          id
+          slug
+          title
+          summary
+          createdAt
+          publishedAt
+          updatedAt
+          userCanSeeUpdate
+          tags
+          isPrivate
+          isChangelog
+          makePublicOn
+          fromAccount {
+            id
+            type
+            name
+            slug
+            imageUrl
+          }
+        }
       }
     }
   }
 `;
 
-const getUpdatesVariables = props => {
+export const getUpdatesVariables = (slug, limit, includeHostedCollectives, orderBy, searchTerm) => {
   return {
-    CollectiveId: props.collective.id,
+    collectiveSlug: slug,
     offset: 0,
-    limit: props.limit || UPDATES_PER_PAGE * 2,
-    includeHostedCollectives: props.includeHostedCollectives || false,
+    limit: limit || UPDATES_PER_PAGE * 2,
+    includeHostedCollectives: includeHostedCollectives || false,
+    orderBy: { field: 'CREATED_AT', direction: orderBy === 'oldest' ? 'ASC' : 'DESC' },
+    searchTerm: searchTerm,
   };
 };
 
-const UPDATES_PER_PAGE = 10;
+export const UPDATES_PER_PAGE = 10;
 
 export const addUpdatesData = graphql(updatesQuery, {
   options: props => ({
-    variables: getUpdatesVariables(props),
+    context: API_V2_CONTEXT,
+    variables: getUpdatesVariables(
+      props.collective.slug,
+      props.limit,
+      props.includeHostedCollectives,
+      props.query?.orderBy,
+      props.query?.searchTerm,
+    ),
   }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {
       return data.fetchMore({
         variables: {
-          offset: data.allUpdates.length,
+          offset: data.account.updates.nodes.length,
           limit: UPDATES_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
             return previousResult;
           }
-          return Object.assign({}, previousResult, {
+          const previousResultNodes = Object.assign({}, previousResult.account.updates, {
             // Append the new posts results to the old one
-            allUpdates: [...previousResult.allUpdates, ...fetchMoreResult.allUpdates],
+            nodes: [...previousResult.account.updates.nodes, ...fetchMoreResult.account.updates.nodes],
           });
+
+          const previousResultClone = cloneDeep(previousResult);
+          previousResultClone.account.updates.nodes = previousResultNodes.nodes;
+          return previousResultClone;
         },
       });
     },

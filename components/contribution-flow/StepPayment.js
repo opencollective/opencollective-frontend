@@ -16,7 +16,6 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import NewCreditCardForm from '../NewCreditCardForm';
 import StyledRadioList from '../StyledRadioList';
 import { P } from '../Text';
-import { useUser } from '../UserProvider';
 
 import BlockedContributorMessage from './BlockedContributorMessage';
 import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
@@ -38,10 +37,11 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query ContributionFlowPaymentMethods($slug: String) {
     account(slug: $slug) {
       id
-      paymentMethods(types: ["creditcard", "giftcard", "prepaid", "collective"], includeExpired: true) {
+      paymentMethods(enumType: [CREDITCARD, GIFTCARD, PREPAID, COLLECTIVE], includeExpired: true) {
         id
         name
         data
+        service
         type
         expiryDate
         providerType
@@ -49,6 +49,7 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
           id
           name
           data
+          service
           type
           expiryDate
           providerType
@@ -89,9 +90,9 @@ const StepPayment = ({
   collective,
   onChange,
   isSubmitting,
+  isEmbed,
   hideCreditCardPostalCode,
   onNewCardFormReady,
-  hasNewPaypal,
 }) => {
   // GraphQL mutations and queries
   const { loading, data, error } = useQuery(paymentMethodsQuery, {
@@ -102,21 +103,9 @@ const StepPayment = ({
   });
 
   // data handling
-  const { LoggedInUser } = useUser();
-  const isRoot = Boolean(LoggedInUser?.isRoot());
   const paymentMethods = get(data, 'account.paymentMethods', null) || [];
-  const paymentOptions = React.useMemo(
-    () =>
-      generatePaymentMethodOptions(
-        paymentMethods,
-        stepProfile,
-        stepDetails,
-        stepSummary,
-        collective,
-        isRoot,
-        hasNewPaypal,
-      ),
-    [paymentMethods, stepProfile, stepDetails, collective, isRoot, hasNewPaypal],
+  const paymentOptions = React.useMemo(() =>
+    generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective, isEmbed),
   );
 
   const setNewPaymentMethod = (key, paymentMethod) => {
@@ -215,8 +204,8 @@ StepPayment.propTypes = {
   onChange: PropTypes.func,
   onNewCardFormReady: PropTypes.func,
   hideCreditCardPostalCode: PropTypes.bool,
-  hasNewPaypal: PropTypes.bool,
   isSubmitting: PropTypes.bool,
+  isEmbed: PropTypes.bool,
 };
 
 StepPayment.defaultProps = {

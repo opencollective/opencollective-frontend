@@ -2,17 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
-import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { TransactionKind } from '../../../lib/constants/transactions';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
 import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
 import Container from '../../Container';
-import { expensesListFieldsFragment } from '../../expenses/graphql/fragments';
+import { expenseHostFields, expensesListFieldsFragment } from '../../expenses/graphql/fragments';
 import { Box, Flex } from '../../Grid';
+import Image from '../../Image';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledCard from '../../StyledCard';
@@ -23,10 +24,14 @@ import TransactionItem from '../../transactions/TransactionItem';
 import { withUser } from '../../UserProvider';
 import BudgetStats from '../BudgetStats';
 import ContainerSectionContent from '../ContainerSectionContent';
+import { budgetSectionQuery } from '../graphql/queries';
 
-export const budgetSectionQuery = gqlV2/* GraphQL */ `
-  query BudgetSection($slug: String!, $limit: Int!) {
-    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false) {
+export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
+  query BudgetSectionWithHost($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
+    host(slug: $hostSlug) {
+      ...ExpenseHostFields
+    }
+    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kind: $kind) {
       ...TransactionsQueryCollectionFragment
     }
     expenses(account: { slug: $slug }, limit: $limit) {
@@ -38,10 +43,19 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
 `;
 
-export const getBudgetSectionQueryVariables = slug => {
-  return { slug, limit: 3 };
+const DEFAULT_KINDS = [
+  TransactionKind.ADDED_FUNDS,
+  TransactionKind.CONTRIBUTION,
+  TransactionKind.EXPENSE,
+  TransactionKind.PLATFORM_TIP,
+];
+
+// Any change here should be reflected in API's `server/graphql/cache.js`
+export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug) => {
+  return { slug: collectiveSlug, hostSlug, limit: 3, kind: DEFAULT_KINDS };
 };
 
 const BudgetItemContainer = styled.div`
@@ -114,8 +128,9 @@ ViewAllLink.propTypes = {
  */
 const SectionBudget = ({ collective, stats, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
-  const budgetQueryResult = useQuery(budgetSectionQuery, {
-    variables: getBudgetSectionQueryVariables(collective.slug),
+  const budgetQuery = collective.host ? budgetSectionWithHostQuery : budgetSectionQuery;
+  const budgetQueryResult = useQuery(budgetQuery, {
+    variables: getBudgetSectionQueryVariables(collective.slug, collective.host?.slug),
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;
@@ -179,7 +194,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
                         <ExpenseBudgetItem
                           expense={item}
                           collective={collective}
-                          host={collective.host}
+                          host={data?.host}
                           showAmountSign
                           showProcessActions
                         />

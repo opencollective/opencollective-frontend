@@ -2,15 +2,18 @@ import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import themeGet from '@styled-system/theme-get';
-import { first, get, startCase } from 'lodash';
+import { first, get, last, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import INTERVALS from '../../lib/constants/intervals';
+import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
+import { AmountTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { DEFAULT_MINIMUM_AMOUNT, DEFAULT_PRESETS } from '../../lib/tier-utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -63,32 +66,40 @@ const updateOrderMutation = gqlV2/* GraphQL */ `
 
 const tiersQuery = gqlV2/* GraphQL */ `
   query UpdateOrderPopUpTiers($slug: String!) {
-    collective(slug: $slug) {
+    account(slug: $slug) {
       id
       slug
       name
       type
       currency
       settings
-      tiers {
-        nodes {
-          id
-          name
-          interval
-          amount {
-            value
-            currency
+      ... on AccountWithContributions {
+        tiers {
+          nodes {
+            id
+            name
+            interval
+            amount {
+              value
+              valueInCents
+              currency
+            }
+            minimumAmount {
+              value
+              valueInCents
+              currency
+            }
+            amountType
+            presets
           }
-          minimumAmount {
-            value
-          }
-          amountType
-          presets
         }
       }
     }
   }
 `;
+
+// TODO: internationalize me
+const OTHER_LABEL = 'Other';
 
 const useUpdateOrder = ({ contribution, onSuccess }) => {
   const { addToast } = useToasts();
@@ -102,7 +113,7 @@ const useUpdateOrder = ({ contribution, onSuccess }) => {
             order: { id: contribution.id },
             paypalSubscriptionId,
             amount: {
-              value: selectedAmountOption.label === 'Other' ? inputAmountValue / 100 : selectedAmountOption.value / 100,
+              valueInCents: selectedAmountOption.label === OTHER_LABEL ? inputAmountValue : selectedAmountOption.value,
             },
             tier: {
               id: selectedTier?.id || null,
@@ -135,8 +146,10 @@ const getTierAmountOptions = (selectedTier, contribution) => {
   if (selectedTier && !selectedTier?.flexible) {
     return [buildOptionFromAmount(selectedTier.amount)];
   } else {
-    const presets = selectedTier?.presets || [500, 1000, 2000, 5000];
-    return [...presets.map(buildOptionFromAmount), { label: 'Other', value: 100 }];
+    // TODO: use getTierPresets from tier-utils
+    const presets = selectedTier?.presets || DEFAULT_PRESETS;
+    const otherValue = null; // The way it's currently implemented, it doesn't need a value
+    return [...presets.map(buildOptionFromAmount), { label: OTHER_LABEL, value: otherValue }];
   }
 };
 
@@ -146,25 +159,26 @@ const getContributeOptions = (intl, contribution, tiers, disableCustomContributi
     .map(tier => ({
       key: `${contribution.id}-tier-${tier.id}`,
       title: tier.name,
-      flexible: tier.amountType === 'FLEXIBLE' ? true : false,
-      amount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.value * 100 : tier.amount.value * 100,
+      flexible: tier.amountType === AmountTypes.FLEXIBLE,
+      amount: tier.amountType === AmountTypes.FLEXIBLE ? tier.minimumAmount.valueInCents : tier.amount.valueInCents,
       id: tier.id,
       currency: tier.amount.currency,
       interval: tier.interval,
       presets: tier.presets,
-      minimumAmount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.value * 100 : 100,
+      minimumAmount:
+        tier.amountType === AmountTypes.FLEXIBLE ? tier.minimumAmount.valueInCents : DEFAULT_MINIMUM_AMOUNT,
     }));
   if (!disableCustomContributions) {
     tierOptions.unshift({
       key: `${contribution.id}-custom-tier`,
       title: intl.formatMessage(messages.customTier),
       flexible: true,
-      amount: 100,
+      amount: DEFAULT_MINIMUM_AMOUNT,
       id: null,
       currency: contribution.amount.currency,
       interval: contribution.frequency.toLowerCase().slice(0, -2),
-      presets: [500, 1000, 2000, 5000],
-      minimumAmount: 100,
+      presets: DEFAULT_PRESETS,
+      minimumAmount: DEFAULT_MINIMUM_AMOUNT,
       isCustom: true,
     });
   }
@@ -183,28 +197,38 @@ const getDefaultContributeOption = (contribution, tiersOptions) => {
   }
 };
 
-const useContributeOptions = (order, tiers, disableCustomContributions) => {
+const useContributeOptions = (order, tiers, tiersLoading, disableCustomContributions) => {
   const intl = useIntl();
   const [loading, setLoading] = useState(true);
   const [selectedContributeOption, setSelectedContributeOption] = useState(null);
   const [amountOptions, setAmountOptions] = useState(null);
   const [selectedAmountOption, setSelectedAmountOption] = useState(null);
+  const [inputAmountValue, setInputAmountValue] = useState(null);
+
   const contributeOptions = React.useMemo(() => {
     return getContributeOptions(intl, order, tiers, disableCustomContributions);
   }, [intl, order, tiers, disableCustomContributions]);
 
-  useEffect(() => {
-    if (contributeOptions && !selectedContributeOption) {
-      setSelectedContributeOption(getDefaultContributeOption(order, contributeOptions));
-      setLoading(false);
-    }
-  }, [contributeOptions]);
+  if (contributeOptions && !selectedContributeOption && !tiersLoading) {
+    setSelectedContributeOption(getDefaultContributeOption(order, contributeOptions));
+    setLoading(false);
+  }
 
   useEffect(() => {
     if (selectedContributeOption !== null) {
-      const options = getTierAmountOptions(selectedContributeOption?.value, order);
+      const options = getTierAmountOptions(selectedContributeOption, order);
       setAmountOptions(options);
-      setSelectedAmountOption(first(options));
+
+      let option;
+      if ((selectedContributeOption.id || null) !== (order.tier?.id || null)) {
+        // Just pick first if tier is different than current one
+        option = first(options);
+      } else {
+        // Find one of the presets, or default to the last one which is supposed to be "Other" by convention
+        option = options.find(option => option.value === order.amount.valueInCents) || last(options);
+      }
+      setSelectedAmountOption(option);
+      setInputAmountValue(option.value || order.amount.valueInCents);
     }
   }, [selectedContributeOption]);
 
@@ -214,8 +238,10 @@ const useContributeOptions = (order, tiers, disableCustomContributions) => {
     amountOptions,
     selectedContributeOption,
     selectedAmountOption,
+    inputAmountValue,
     setSelectedContributeOption,
     setSelectedAmountOption,
+    setInputAmountValue,
   };
 };
 
@@ -248,21 +274,38 @@ const ContributionInterval = ({ tier, contribution }) => {
   }
 };
 
-const UpdateOrderPopUp = ({ setMenuState, contribution, onCloseEdit }) => {
+const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   // GraphQL mutations and queries
   const queryVariables = { slug: contribution.toAccount.slug };
-  const { data } = useQuery(tiersQuery, { variables: queryVariables, context: API_V2_CONTEXT });
+  const { data, loading: tiersLoading } = useQuery(tiersQuery, { variables: queryVariables, context: API_V2_CONTEXT });
 
   // state management
   const { addToast } = useToasts();
-  const [inputAmountValue, setInputAmountValue] = useState(100);
   const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution, onSuccess: onCloseEdit });
-  const tiers = get(data, 'collective.tiers.nodes', null);
-  const disableCustomContributions = get(data, 'collective.settings.disableCustomContributions', false);
-  const contributeOptionsState = useContributeOptions(contribution, tiers, disableCustomContributions);
-  const { selectedContributeOption, selectedAmountOption } = contributeOptionsState;
+  const tiers = get(data, 'account.tiers.nodes', null);
+  const disableCustomContributions = get(data, 'account.settings.disableCustomContributions', false);
+  const contributeOptionsState = useContributeOptions(contribution, tiers, tiersLoading, disableCustomContributions);
+  const {
+    amountOptions,
+    inputAmountValue,
+    contributeOptions,
+    selectedContributeOption,
+    selectedAmountOption,
+    setInputAmountValue,
+    setSelectedContributeOption,
+  } = contributeOptionsState;
   const selectedTier = selectedContributeOption?.isCustom ? null : selectedContributeOption;
-  const isPaypal = contribution.paymentMethod.service === 'PAYPAL';
+  const isPaypal = contribution.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
+
+  // When we change the amount option (One of the presets or Other)
+  const setSelectedAmountOption = ({ label, value }) => {
+    // Always set "Other" input value to the last one selected
+    // "Other" itself doesn't have a pre-defined value
+    if (label !== OTHER_LABEL) {
+      setInputAmountValue(value);
+    }
+    contributeOptionsState.setSelectedAmountOption({ label, value });
+  };
 
   return (
     <Fragment>
@@ -274,15 +317,15 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, onCloseEdit }) => {
           <StyledHr width="100%" mx={2} />
         </Flex>
       </Flex>
-      {contributeOptionsState.loading ? (
+      {tiersLoading || contributeOptionsState.loading ? (
         <LoadingPlaceholder height={100} />
       ) : (
         <StyledRadioList
           id="ContributionTier"
           name={`${contribution.id}-ContributionTier`}
           keyGetter="key"
-          options={contributeOptionsState.contributeOptions}
-          onChange={({ value }) => contributeOptionsState.setSelectedContributeOption(value)}
+          options={contributeOptions}
+          onChange={({ value }) => setSelectedContributeOption(value)}
           value={selectedContributeOption?.key}
         >
           {({
@@ -306,16 +349,16 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, onCloseEdit }) => {
                         <StyledSelect
                           inputId={`tier-amount-select-${contribution.id}`}
                           data-cy="tier-amount-select"
-                          onChange={contributeOptionsState.setSelectedAmountOption}
+                          onChange={setSelectedAmountOption}
                           value={selectedAmountOption}
-                          options={contributeOptionsState.amountOptions}
+                          options={amountOptions}
                           my={2}
                           minWidth={150}
                           isSearchable={false}
                         />
                       </div>
                       <ContributionInterval contribution={contribution} tier={{ id, interval }} />
-                      {selectedAmountOption?.label === 'Other' && (
+                      {selectedAmountOption?.label === OTHER_LABEL && (
                         <Flex flexDirection="column">
                           <P fontSize="12px" fontWeight="600" my={2}>
                             <FormattedMessage id="RecurringContributions.customAmount" defaultMessage="Custom amount" />
@@ -323,11 +366,12 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, onCloseEdit }) => {
                           <Box>
                             <StyledInputAmount
                               type="number"
+                              data-cy="recurring-contribution-custom-amount-input"
                               currency={currency}
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
-                              min={100}
-                              precision={3}
+                              min={DEFAULT_MINIMUM_AMOUNT}
+                              precision={2}
                               px="2px"
                             />
                           </Box>
@@ -367,14 +411,14 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, onCloseEdit }) => {
         </Flex>
       </Flex>
       <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" minHeight={50}>
-        <StyledButton buttonSize="tiny" minWidth={75} onClick={() => setMenuState('mainMenu')} height={25} mr={2}>
+        <StyledButton buttonSize="tiny" minWidth={75} onClick={onCloseEdit} height={25} mr={2}>
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         </StyledButton>
         {isPaypal && selectedAmountOption ? (
           <PayWithPaypalButton
             isLoading={!selectedAmountOption}
             isSubmitting={isSubmittingOrder}
-            totalAmount={selectedAmountOption?.label === 'Other' ? inputAmountValue : selectedAmountOption?.value}
+            totalAmount={selectedAmountOption?.label === OTHER_LABEL ? inputAmountValue : selectedAmountOption?.value}
             currency={contribution.amount.currency}
             interval={
               selectedContributeOption?.interval || getIntervalFromContributionFrequency(contribution.frequency)
@@ -408,8 +452,6 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, onCloseEdit }) => {
 };
 
 UpdateOrderPopUp.propTypes = {
-  data: PropTypes.object,
-  setMenuState: PropTypes.func,
   contribution: PropTypes.object.isRequired,
   onCloseEdit: PropTypes.func,
 };

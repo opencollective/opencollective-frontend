@@ -61,6 +61,14 @@ const TranslatedTags = defineMessages({
     id: 'Tags.ORGANIZATION',
     defaultMessage: 'Organization',
   },
+  [CollectiveCategory.FUND]: {
+    id: 'Tags.FUND',
+    defaultMessage: 'Fund',
+  },
+  [CollectiveCategory.PROJECT]: {
+    id: 'Tags.PROJECT',
+    defaultMessage: 'Project',
+  },
 });
 
 /** Translates a list of tags */

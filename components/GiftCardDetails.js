@@ -72,9 +72,10 @@ class GiftCardDetails extends React.Component {
     this.setState(state => ({ expended: !state.expended }));
   }
 
-  getStatusColor(isConfirmed, balance) {
+  getStatusColor(isConfirmed, balance, isExpired) {
     const { colors } = this.props.theme;
-    if (balance === 0) {
+
+    if (balance === 0 || isExpired) {
       return colors.black[200];
     }
 
@@ -145,7 +146,8 @@ class GiftCardDetails extends React.Component {
   }
 
   render() {
-    const { isConfirmed, collective, balance, currency, data } = this.props.giftCard;
+    const { isConfirmed, collective, balance, currency, expiryDate, data } = this.props.giftCard;
+    const isExpired = Boolean(expiryDate && new Date(expiryDate) < new Date());
 
     return (
       <Flex data-cy="vc-details">
@@ -154,12 +156,16 @@ class GiftCardDetails extends React.Component {
           {isConfirmed ? (
             <Link href={`/${collective.slug}`} title={collective.name}>
               <Container>
-                <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
+                <GiftCard
+                  alignSelf="center"
+                  size="2.5em"
+                  color={this.getStatusColor(isConfirmed, balance, isExpired)}
+                />
                 <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />
               </Container>
             </Link>
           ) : (
-            <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
+            <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance, isExpired)} />
           )}
         </Box>
         {/* Infos + details column */}
@@ -175,6 +181,12 @@ class GiftCardDetails extends React.Component {
                 defaultMessage="Balance: {balance}"
                 values={{ balance: formatCurrency(balance, currency) }}
               />
+              {isExpired && (
+                <React.Fragment>
+                  <Box mx={1}>|</Box>
+                  <FormattedMessage id="GiftCard.Expired" defaultMessage="Expired" />
+                </React.Fragment>
+              )}
               <Box mx={1}>|</Box>
               <StyledButton
                 isBorderless

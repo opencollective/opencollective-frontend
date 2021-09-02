@@ -26,6 +26,7 @@ const MarkExpenseAsUnpaidButton = ({ onConfirm, ...props }) => {
       {button}
       <ConfirmationModal
         show
+        id="mark-expense-as-unpaid-modal"
         header={<FormattedMessage id="Expense.markAsUnpaid" defaultMessage="Mark expense as unpaid" />}
         width="100%"
         minWidth={280}

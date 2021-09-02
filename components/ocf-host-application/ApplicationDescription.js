@@ -36,8 +36,7 @@ const ApplicationDescription = () => (
             color: '#396C6F',
             textDecoration: 'underline',
             openInNewTab: true,
-            href:
-              'https://docs.google.com/document/u/2/d/e/2PACX-1vQ_fs7IOojAHaMBKYtaJetlTXJZLnJ7flIWkwxUSQtTkWUMtwFYC2ssb-ooBnT-Ldl6wbVhNQiCkSms/pub',
+            href: 'https://docs.google.com/document/u/2/d/e/2PACX-1vQ_fs7IOojAHaMBKYtaJetlTXJZLnJ7flIWkwxUSQtTkWUMtwFYC2ssb-ooBnT-Ldl6wbVhNQiCkSms/pub',
           }),
         }}
         defaultMessage="Please take a moment to read our <InfoGuideLink>Info guide</InfoGuideLink> and <TOSLink>Terms and Conditions</TOSLink> before applying. We want to make this process as easy for you as possible; you will need to know a few things to have a smooth experience."

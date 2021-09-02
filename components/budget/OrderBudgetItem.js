@@ -4,8 +4,9 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { GQLV2_PAYMENT_METHOD_LEGACY_TYPES } from '../../lib/constants/payment-methods';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
+import { toPx } from '../../lib/theme/helpers';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
@@ -80,8 +81,10 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                 value={order.description}
                 maxLength={255}
                 minFontSizeInPx={12}
-                maxFontSizeInPx={14}
+                maxFontSizeInPx={16}
                 lengthThreshold={72}
+                mobileRatio={0.875}
+                valueFormatter={toPx}
               >
                 {({ value, fontSize }) => (
                   <H3
@@ -89,7 +92,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                     lineHeight="1.5em"
                     textDecoration="none"
                     color="black.900"
-                    fontSize={`${fontSize}px`}
+                    fontSize={fontSize}
                     data-cy="expense-title"
                   >
                     {value}
@@ -126,9 +129,9 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                       currency={order.amount.currency}
                       precision={2}
                       amount={
-                        showPlatformTip
-                          ? order.amount.valueInCents
-                          : order.amount.valueInCents - (order.platformContributionAmount?.valueInCents || 0)
+                        showPlatformTip && order.platformContributionAmount?.valueInCents
+                          ? order.amount.valueInCents + order.platformContributionAmount.valueInCents
+                          : order.amount.valueInCents
                       }
                     />
                   </Span>
@@ -179,7 +182,8 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                 <Span fontSize="11px" lineHeight="16px" color="black.700">
                   {i18nPaymentMethodProviderType(
                     intl,
-                    order.paymentMethod?.providerType || GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER,
+                    // TODO(paymentMethodType): migrate to service+type
+                    order.paymentMethod?.providerType || GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER,
                   )}
                 </Span>
               )}
@@ -201,7 +205,6 @@ OrderBudgetItem.propTypes = {
   isLoading: PropTypes.bool,
   /** Set this to true to invert who's displayed (payee or collective) */
   isInverted: PropTypes.bool,
-  usePreviewModal: PropTypes.bool,
   showAmountSign: PropTypes.bool,
   onDelete: PropTypes.func,
   onProcess: PropTypes.func,

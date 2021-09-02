@@ -19,7 +19,10 @@ const TagIcon = styled(PriceTags)`
   margin-right: 4px;
 `;
 
-const EditTag = styled(StyledTag)`
+const EditTag = styled(StyledTag).attrs({
+  variant: 'rounded-right',
+  tabIndex: 0,
+})`
   border: 1px dashed;
   cursor: pointer;
   position: relative;
@@ -27,17 +30,27 @@ const EditTag = styled(StyledTag)`
   background-color: ${props => props.theme.colors.white.full};
   border-color: ${props => props.theme.colors.black[200]};
   color: ${props => props.theme.colors.black[700]};
+  margin-right: 4px;
+  margin-bottom: 4px;
 
-  &:hover,
-  &:focus {
-    background-color: ${props => props.theme.colors.white.full};
-    border-color: ${props => props.theme.colors.blue[500]};
-    svg {
-      color: ${props => props.theme.colors.blue[500]};
+  &:not([disabled]) {
+    &:hover,
+    &:focus {
+      background-color: ${props => props.theme.colors.white.full};
+      border-color: ${props => props.theme.colors.blue[500]};
+      svg {
+        color: ${props => props.theme.colors.blue[500]};
+      }
     }
   }
+
   &:focus {
     outline: 0;
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+    background: #f0f1f2;
   }
 
   ${props =>
@@ -89,13 +102,18 @@ const TagActionButton = styled.button`
   border: none;
   padding: 5px;
   line-height: inherit;
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 const AddTagButton = styled(TagActionButton)`
-  color: ${props => props.theme.colors.blue[400]};
-  &:hover,
-  &:focus {
-    color: ${props => props.theme.colors.blue[600]};
+  &:not([disabled]) {
+    color: ${props => props.theme.colors.blue[400]};
+    &:hover,
+    &:focus {
+      color: ${props => props.theme.colors.blue[600]};
+    }
   }
 `;
 
@@ -129,7 +147,7 @@ const getOptions = tags => {
   }
 };
 
-const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, defaultValue, ...props }) => {
+const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, defaultValue, disabled, ...props }) => {
   const { formatMessage } = useIntl();
   const inputRef = React.useRef();
   const wrapperRef = React.useRef();
@@ -187,8 +205,10 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
             variant="rounded-right"
             mr="4px"
             mb="4px"
+            color={disabled ? 'black.500' : 'black.700'}
             closeButtonProps={{
               onClick: () => removeTag(tag.value, true),
+              disabled,
             }}
           >
             {tag.label}
@@ -199,12 +219,9 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
             <Flex ref={ref}>
               <EditTag
                 data-cy="styled-input-tags-open"
-                variant="rounded-right"
-                mr="4px"
-                mb="4px"
                 active={isOpen}
                 onClick={handleToggleInput}
-                tabIndex={0}
+                disabled={disabled}
                 onKeyDown={e => {
                   if (e.key === ' ') {
                     e.preventDefault();
@@ -241,6 +258,7 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                     <TagIcon size="16px" />
                     <Input
                       data-cy="styled-input-tags-input"
+                      disabled={disabled}
                       placeholder={formatMessage(messages.placeholder)}
                       ref={inputRef}
                       value={inputValue}
@@ -279,6 +297,7 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                               </StyledTag>
                               <AddTagButton
                                 data-cy={`styled-input-tags-add-suggestion-${st}`}
+                                disabled={disabled}
                                 onClick={() => {
                                   addTag(st);
                                   // When adding the last suggested tag, focus the input
@@ -300,6 +319,7 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                             <StyledTag variant="rounded-right">{tag.label}</StyledTag>
                             <DeleteTagButton
                               data-cy={`styled-input-tags-remove-${tag.value}`}
+                              disabled={disabled}
                               onClick={() => {
                                 removeTag(tag.value);
                               }}
@@ -324,7 +344,7 @@ StyledInputTags.propTypes = {
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
   defaultValue: PropTypes.arrayOf(PropTypes.string),
   value: PropTypes.arrayOf(PropTypes.string),
-  /** True if tags should be rendered despite the value (while still being added/edited) */
+  disabled: PropTypes.bool,
   renderUpdatedTags: PropTypes.bool,
   onChange: PropTypes.func,
   ...StyledCard.propTypes,

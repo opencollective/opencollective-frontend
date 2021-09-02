@@ -1,10 +1,12 @@
 require('./env');
 
-const withSourceMaps = require('@zeit/next-source-maps')();
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
+  eslint: { ignoreDuringBuilds: true },
+  webpack5: false,
   useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true',
+  productionBrowserSourceMaps: true,
   webpack: (config, { webpack, isServer, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
@@ -20,12 +22,20 @@ const nextConfig = {
         PDF_SERVICE_URL: null,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
+        NEXT_IMAGES_URL: null,
+        REST_URL: null,
         SENTRY_DSN: null,
         ONBOARDING_MODAL: true,
         NEW_HOST_APPLICATION_FLOW: null,
         TW_API_COLLECTIVE_SLUG: null,
         REJECT_CONTRIBUTION: false,
         REJECTED_CATEGORIES: false,
+        CHANGE_LOG_UPDATES_ENABLED: false,
+        HOST_DASHBOARD_REPORTS: false,
+        WISE_ENVIRONMENT: 'sandbox',
+        HCAPTCHA_SITEKEY: false,
+        CAPTCHA_ENABLED: true,
+        CAPTCHA_PROVIDER: 'HCAPTCHA',
       }),
     );
 
@@ -119,6 +129,32 @@ const nextConfig = {
   async rewrites() {
     return REWRITES;
   },
+  async headers() {
+    return process.env.IS_VERCEL === 'true'
+      ? [
+          // Prevent indexing of our Vercel deployments
+          {
+            source: '/(.*?)',
+            headers: [
+              {
+                key: 'x-robots-tag',
+                value: 'none',
+              },
+            ],
+          },
+          // Exception for "Next images", if on the configured domain
+          {
+            source: '/_next/image(.*?)',
+            headers: [
+              {
+                key: 'x-robots-tag',
+                value: 'all',
+              },
+            ],
+          },
+        ]
+      : [];
+  },
 };
 
-module.exports = withSourceMaps(nextConfig);
+module.exports = nextConfig;

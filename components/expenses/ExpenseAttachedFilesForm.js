@@ -39,8 +39,8 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, des
         {files?.length > 0 && (
           <AddNewAttachedFilesButton
             disabled={disabled}
-            onSuccess={urls => {
-              const uploadedFiles = [...files, ...urls.map(url => ({ url }))];
+            onSuccess={newFiles => {
+              const uploadedFiles = [...files, ...newFiles];
               setFiles(uploadedFiles);
               onChange(uploadedFiles);
             }}
@@ -66,8 +66,7 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, des
           name="attachedFiles"
           disabled={disabled}
           minHeight={72}
-          onSuccess={urls => {
-            const uploadedFiles = urls.map(url => ({ url }));
+          onSuccess={uploadedFiles => {
             setFiles(uploadedFiles);
             onChange(uploadedFiles);
           }}

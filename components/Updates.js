@@ -29,7 +29,7 @@ const LoadingContainer = styled.div`
 class Updates extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
-    updates: PropTypes.array,
+    updates: PropTypes.object,
     fetchMore: PropTypes.func,
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
@@ -56,6 +56,7 @@ class Updates extends React.Component {
 
   render() {
     const { collective, updates } = this.props;
+    const showLoadMore = updates?.nodes.length < updates?.totalCount;
 
     if (!updates) {
       return <div />;
@@ -69,7 +70,7 @@ class Updates extends React.Component {
               <FormattedMessage id="loading" defaultMessage="loading" />
             </LoadingContainer>
           )}
-          {updates.map((update, index) => (
+          {updates.nodes.map((update, index) => (
             <Container key={update.id} padding="0">
               <StyledUpdate
                 update={update}
@@ -79,12 +80,12 @@ class Updates extends React.Component {
               />
             </Container>
           ))}
-          {updates.length === 0 && (
+          {updates.nodes.length === 0 && (
             <Container color="black.700" p={4}>
               <FormattedMessage id="updates.empty" defaultMessage="No Updates" />
             </Container>
           )}
-          {updates.length >= 10 && updates.length % 10 === 0 && (
+          {showLoadMore && (
             <Container margin="1rem" textAlign="center">
               <StyledButton onClick={this.fetchMore}>
                 {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}

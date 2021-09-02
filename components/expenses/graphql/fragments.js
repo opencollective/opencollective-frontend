@@ -89,6 +89,9 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     plan {
       id
     }
+    transferwise {
+      id
+    }
   }
 `;
 
@@ -240,13 +243,20 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       data
       isSaved
     }
+    virtualCard {
+      id
+      name
+      last4
+    }
     comments(limit: 300) {
       nodes {
         ...CommentFields
       }
     }
     permissions {
+      id
       canEdit
+      canEditTags
       canDelete
       canSeeInvoiceInfo
       canApprove
@@ -256,6 +266,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       canPay
       canMarkAsUnpaid
       canComment
+      canUnschedulePayment
     }
     activities {
       id
@@ -289,6 +300,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     type
     requiredLegalDocuments
     permissions {
+      id
       canDelete
       canApprove
       canUnapprove
@@ -297,6 +309,8 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       canPay
       canMarkAsUnpaid
       canSeeInvoiceInfo
+      canEditTags
+      canUnschedulePayment
     }
     payoutMethod {
       id

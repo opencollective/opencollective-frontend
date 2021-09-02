@@ -8,6 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getSuggestedTags } from '../lib/collective.lib';
 import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
@@ -26,8 +27,9 @@ import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
-import { expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
+import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
+import ScheduledExpensesBanner from '../components/host-dashboard/ScheduledExpensesBanner';
 import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
@@ -76,7 +78,7 @@ class ExpensePage extends React.Component {
         offset: parseInt(offset) || undefined,
         limit: parseInt(limit) || undefined,
         type: has(expenseTypes, type) ? type : undefined,
-        status: has(expenseStatus, status) ? status : undefined,
+        status: has(expenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
         payout: has(PayoutMethodType, payout) ? payout : undefined,
         period,
         amount,
@@ -118,6 +120,9 @@ class ExpensePage extends React.Component {
         totalCount: PropTypes.number,
         offset: PropTypes.number,
         limit: PropTypes.number,
+      }),
+      scheduledExpenses: PropTypes.shape({
+        totalCount: PropTypes.number,
       }),
     }),
     router: PropTypes.object,
@@ -171,9 +176,12 @@ class ExpensePage extends React.Component {
     }
   };
 
+  getSuggestedTags = memoizeOne(getSuggestedTags);
+
   render() {
     const { collectiveSlug, data, query, LoggedInUser } = this.props;
     const hasFilters = this.hasFilter(query);
+    const isSelfHosted = data.account?.id === data.account?.host?.id;
 
     if (!data.loading) {
       if (data.error) {
@@ -214,6 +222,9 @@ class ExpensePage extends React.Component {
                   </SearchFormContainer>
                 </Flex>
                 <StyledHr mb={26} borderWidth="0.5px" />
+                {isSelfHosted && LoggedInUser?.isHostAdmin(data.account) && data.scheduledExpenses?.totalCount > 0 && (
+                  <ScheduledExpensesBanner host={data.account} />
+                )}
                 <Box mb={34}>
                   {data.account ? (
                     <ExpensesFilters
@@ -251,6 +262,7 @@ class ExpensePage extends React.Component {
                       host={data.account?.isHost ? data.account : data.account?.host}
                       expenses={data.expenses?.nodes}
                       nbPlaceholders={data.variables.limit}
+                      suggestedTags={this.getSuggestedTags(data.account)}
                     />
                     <Flex mt={5} justifyContent="center">
                       <Pagination
@@ -317,7 +329,8 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
-    $dateFrom: ISODateTime
+    $dateFrom: DateTime
+    $dateTo: DateTime
     $searchTerm: String
   ) {
     account(slug: $collectiveSlug) {
@@ -347,15 +360,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
-          id
-          name
-          slug
-          type
-          supportedPayoutMethods
-          settings
-          plan {
-            id
-          }
+          ...ExpenseHostFields
         }
       }
 
@@ -394,6 +399,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       maxAmount: $maxAmount
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
+      dateTo: $dateTo
       searchTerm: $searchTerm
     ) {
       totalCount
@@ -403,19 +409,28 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         ...ExpensesListFieldsFragment
       }
     }
+    # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
+    scheduledExpenses: expenses(
+      host: { slug: $collectiveSlug }
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: BANK_ACCOUNT
+      limit: 1
+    ) {
+      totalCount
+    }
   }
 
   ${expensesListFieldsFragment}
   ${collectiveNavbarFieldsFragment}
+  ${expenseHostFields}
 `;
 
 const addExpensesPageData = graphql(expensesPageQuery, {
   options: props => {
     const amountRange = parseAmountRange(props.query.amount);
-    const [dateFrom] = getDateRangeFromPeriod(props.query.period);
+    const [dateFrom, dateTo] = getDateRangeFromPeriod(props.query.period);
     return {
       context: API_V2_CONTEXT,
-      fetchPolicy: 'cache-and-network',
       variables: {
         collectiveSlug: props.collectiveSlug,
         offset: props.query.offset || 0,
@@ -427,6 +442,7 @@ const addExpensesPageData = graphql(expensesPageQuery, {
         maxAmount: amountRange[1] && amountRange[1] * 100,
         payoutMethodType: props.query.payout,
         dateFrom,
+        dateTo,
         searchTerm: props.query.searchTerm,
       },
     };

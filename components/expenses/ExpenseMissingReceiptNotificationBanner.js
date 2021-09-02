@@ -13,19 +13,21 @@ const ExpenseMissingReceiptNotificationBanner = props => {
       <Flex>
         <Flex ml={[0, 2]} flexDirection="column">
           <H4 mb="10px" fontWeight="500">
-            <FormattedMessage id="AttachReceipt" defaultMessage="Attach missing receipt" />
+            <FormattedMessage id="AttachReceipt" defaultMessage="Submit receipt" />
           </H4>
           <P lineHeight="20px">
             <FormattedMessage
               id="AttachReceiptInstructions"
-              defaultMessage="This charge was automatically created from your credit card transactions and is missing its receipt photograph and description. Please edit this expense and add the missing information."
+              defaultMessage="This expense was automatically created by charging a linked credit card. To complete the process, add a description and upload the receipt. All charges must have receipts."
             />
           </P>
-          <Box mt="10px">
-            <StyledButton buttonSize="tiny" mr={1} onClick={props.onEdit}>
-              <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
-            </StyledButton>
-          </Box>
+          {props.onEdit && (
+            <Box mt="10px">
+              <StyledButton buttonSize="tiny" mr={1} onClick={props.onEdit}>
+                <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
+              </StyledButton>
+            </Box>
+          )}
         </Flex>
       </Flex>
     </MessageBox>
@@ -33,7 +35,7 @@ const ExpenseMissingReceiptNotificationBanner = props => {
 };
 
 ExpenseMissingReceiptNotificationBanner.propTypes = {
-  onEdit: PropTypes.func.isRequired,
+  onEdit: PropTypes.func,
 };
 
 export default ExpenseMissingReceiptNotificationBanner;

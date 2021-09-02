@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { FormattedMessage } from 'react-intl';
 
 import { Box, Flex } from './Grid';
@@ -14,6 +15,7 @@ const StyledInputField = ({
   htmlFor,
   name,
   error,
+  hint,
   success,
   disabled,
   required,
@@ -23,6 +25,7 @@ const StyledInputField = ({
   labelColor,
   labelProps,
   hideOptionalLabel,
+  useRequiredLabel,
   ...props
 }) => {
   const labelContent = label && <Span color={labelColor}>{label}</Span>;
@@ -30,7 +33,7 @@ const StyledInputField = ({
   htmlFor = htmlFor || (name ? `input-${name}` : undefined);
 
   const displayOptionalLabel = hideOptionalLabel ? false : required === false;
-  const displayRequiredLabel = hideOptionalLabel ? required === true : false;
+  const displayRequiredLabel = useRequiredLabel ? required === true : false;
 
   return (
     <Box {...props}>
@@ -76,9 +79,19 @@ const StyledInputField = ({
           : children}
       </Flex>
       {error && typeof error === 'string' && (
-        <Span display="block" color="red.500" pt={2} fontSize="10px">
-          {error}
-        </Span>
+        <Box pt={2}>
+          <ExclamationCircle color="#E03F6A" size={16} />
+          <Span ml={1} color="black.700" fontSize="14px" css={{ verticalAlign: 'middle' }}>
+            {error}
+          </Span>
+        </Box>
+      )}
+      {hint && !error && (
+        <Box pt={0}>
+          <Span ml={1} fontSize="12px" color="black.500" css={{ verticalAlign: 'middle' }}>
+            {hint}
+          </Span>
+        </Box>
       )}
     </Box>
   );
@@ -91,6 +104,8 @@ StyledInputField.propTypes = {
   disabled: PropTypes.bool,
   /** text to display below the input or error status */
   error: PropTypes.any,
+  /** text to display below the input when there's no error */
+  hint: PropTypes.any,
   /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
   htmlFor: PropTypes.string,
   /** By default name is equal to htmlFor, but you can use this prop to override it */
@@ -103,7 +118,7 @@ StyledInputField.propTypes = {
   success: PropTypes.bool,
   /** If set to false, the field will be marked as optional */
   required: PropTypes.bool,
-  /** If set to true, will hide the (optional) label tag even if required is false and display * if required */
+  /** If set to true, will hide the (optional) label tag even if required is false and display "*" if required */
   useRequiredLabel: PropTypes.bool,
   /** Font size for the label */
   labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),

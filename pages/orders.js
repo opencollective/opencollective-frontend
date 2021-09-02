@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { addCollectiveCoverData } from '../lib/graphql/queries';
+import { addCollectiveNavbarData } from '../lib/graphql/queries';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
@@ -16,23 +16,26 @@ class OrdersPage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveCoverData
+    slug: PropTypes.string, // for addCollectiveNavbarData
     filter: PropTypes.string,
     value: PropTypes.string,
-    data: PropTypes.object.isRequired, // from withData
+    data: PropTypes.shape({
+      account: PropTypes.object,
+      loading: PropTypes.bool,
+    }).isRequired, // from withData
     LoggedInUser: PropTypes.object,
   };
 
   render() {
     const { slug, data, LoggedInUser } = this.props;
-    const collective = data?.collective;
+    const collective = data?.account;
     return (
       <Page>
-        {(data?.loading || data?.Collective) && (
+        {(data?.loading || data?.account) && (
           <Container mb={4}>
             <CollectiveNavbar
               isLoading={data.loading}
-              collective={data.Collective}
+              collective={data.account}
               isAdmin={LoggedInUser?.canEditCollective(collective)}
             />
           </Container>
@@ -45,10 +48,4 @@ class OrdersPage extends React.Component {
   }
 }
 
-export default withUser(
-  addCollectiveCoverData(OrdersPage, {
-    options: props => ({
-      variables: { slug: props.slug, throwIfMissing: false },
-    }),
-  }),
-);
+export default withUser(addCollectiveNavbarData(OrdersPage));

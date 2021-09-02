@@ -25,9 +25,10 @@ const SectionTitle = styled.h2`
 `;
 
 SectionTitle.defaultProps = {
-  fontSize: '24px',
-  lineHeight: '32px',
-  color: 'black.900',
+  fontSize: '32px',
+  lineHeight: '40px',
+  color: 'black.800',
+  fontWeight: 500,
   mb: 3,
 };
 

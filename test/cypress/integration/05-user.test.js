@@ -23,25 +23,31 @@ describe('New users profiles', () => {
       cy.hash().should('eq', '#category-CONTRIBUTIONS');
       cy.get('[data-cy=contribution-date-since]').first().contains('Admin since');
       cy.get('[data-cy=contribution-date-since]').first().contains('August 2016');
-      cy.get('[data-cy=amount-contributed]').first().contains('Amount contributed');
-      cy.get('[data-cy=amount-contributed]').first().contains('€267');
     });
 
-    it.skip('Can load more', () => {
-      // TODO
+    // Deactivating this due to lack of dummy date on our DB
+    xit('Can load more', () => {
+      cy.get('a[href="#category-CONTRIBUTIONS"]').click();
+      cy.wait(50);
+      cy.get('[data-cy=collective-contribution]').its('length').should('eq', 15);
+
+      cy.get('[data-cy=load-more]').click();
+      cy.wait(300);
+      cy.get('[data-cy=collective-contribution]').its('length').should('eq', 19);
     });
 
     it('Can filter by contribution type (admin, financial...etc)', () => {
       cy.get('[data-cy=filters]');
       cy.get('[data-cy="filter-button core"]').click();
-      cy.get('[data-cy=collective-contribution]').first().get('[data-cy=caption]').contains('Admin since');
+      cy.wait(300);
+      cy.get('[data-cy=contribution-date-since]').first().contains('Admin since');
+      cy.get('[data-cy=contribution-date-since]').first().contains('August 2016');
+
       cy.get('[data-cy="filter-button financial"]').click();
-      cy.get('[data-cy=collective-contribution]')
-        .first()
-        .get('[data-cy=caption]')
-        .contains('Financial Contributor since');
-      cy.get('[data-cy="filter-button events"]').click();
-      cy.get('[data-cy=collective-contribution]').first().get('[data-cy=caption]').contains('Attendee since');
+      cy.wait(300);
+      cy.get('[data-cy=contribution-date-since]').first().contains('Financial Contributor since');
+      cy.get('[data-cy=amount-contributed]').first().contains('Amount contributed');
+      cy.get('[data-cy=amount-contributed]').first().contains('€5,140');
     });
   });
 

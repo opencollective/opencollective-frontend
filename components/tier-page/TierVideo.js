@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import InlineEditField from '../InlineEditField';
 import VideoPlayer from '../VideoPlayer';
 
-// Dynamicly load heavy inputs only if user can edit the page
+// Dynamically load heavy inputs only if user can edit the page
 const VideoLinkerBox = dynamic(() => import(/* webpackChunkName: 'VideoLinkerBox' */ '../VideoLinkerBox'));
 
 /**
@@ -20,6 +20,7 @@ const TierVideo = ({ tier, editMutation, canEdit }) => {
       mutation={editMutation}
       canEdit={canEdit}
       showEditIcon={Boolean(tier.videoUrl)}
+      buttonsMinWidth={150}
     >
       {({ isEditing, value, setValue, enableEditor, disableEditor }) => {
         if (isEditing || (!value && canEdit)) {

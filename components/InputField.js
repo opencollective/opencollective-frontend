@@ -18,8 +18,6 @@ import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
 import TimezonePicker from './TimezonePicker';
 
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
 let DateTime;
@@ -45,7 +43,16 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
           <label>{label}</label>
         </Box>
         <Box width={[1, 10 / 12]}>
-          <StyledInputGroup prepend={pre} append={post} success={validationState} {...inputProps} />
+          <StyledInputGroup
+            prepend={pre}
+            append={post}
+            success={validationState}
+            onWheel={e => {
+              e.preventDefault();
+              e.target.blur();
+            }}
+            {...inputProps}
+          />
           {after && <div className="after">{after}</div>}
           {button && <StyledButton>{button}</StyledButton>}
           {help && <HelpBlock>{help}</HelpBlock>}
@@ -61,7 +68,16 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
           </Box>
         )}
         <Box width={1}>
-          <StyledInputGroup prepend={pre} append={post} success={validationState} {...inputProps} />
+          <StyledInputGroup
+            prepend={pre}
+            append={post}
+            success={validationState}
+            onWheel={e => {
+              e.preventDefault();
+              e.target.blur();
+            }}
+            {...inputProps}
+          />
           {button && <StyledButton>{button}</StyledButton>}
         </Box>
         {help && <HelpBlock>{help}</HelpBlock>}

@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/client';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -51,9 +51,17 @@ export const hasProcessButtons = permissions => {
     permissions.canUnapprove ||
     permissions.canReject ||
     permissions.canPay ||
-    permissions.canMarkAsUnpaid
+    permissions.canMarkAsUnpaid ||
+    permissions.canMarkAsSpam
   );
 };
+
+const messages = defineMessages({
+  markAsSpamWarning: {
+    id: 'Expense.MarkAsSpamWarning',
+    defaultMessage: 'This will prevent the submitter account to post new expenses. Are you sure?',
+  },
+});
 
 const getErrorContent = (intl, error, host, LoggedInUser) => {
   // TODO: The proper way to check for error types is with error.type, not the message
@@ -112,7 +120,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
  */
 const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps, onSuccess }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache);
+  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
   const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
@@ -130,19 +138,21 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
     try {
       const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
       await processExpense({ variables });
+      return true;
     } catch (e) {
       // Display a toast with light variant since we're in a modal
       addToast({ type: TOAST_TYPE.ERROR, variant: 'light', ...getErrorContent(intl, e, host, LoggedInUser) });
+      return false;
     }
   };
 
-  const getButtonProps = (action, hasOnClick = true) => {
+  const getButtonProps = action => {
     const isSelectedAction = selectedAction === action;
     return {
       ...buttonProps,
       disabled: loading && !isSelectedAction,
       loading: loading && isSelectedAction,
-      onClick: hasOnClick ? () => triggerAction(action) : undefined,
+      onClick: () => triggerAction(action),
     };
   };
 
@@ -165,7 +175,16 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
         </StyledButton>
       )}
       {permissions.canMarkAsSpam && (
-        <StyledButton {...getButtonProps('MARK_AS_SPAM')} buttonStyle="dangerSecondary" data-cy="spam-button">
+        <StyledButton
+          {...getButtonProps('MARK_AS_SPAM')}
+          buttonStyle="dangerSecondary"
+          data-cy="spam-button"
+          onClick={() => {
+            if (confirm(intl.formatMessage(messages.markAsSpamWarning))) {
+              triggerAction('MARK_AS_SPAM');
+            }
+          }}
+        >
           <RejectIcon size={14} />
           <ButtonLabel>
             <FormattedMessage id="actions.spam" defaultMessage="Mark as Spam" />
@@ -174,7 +193,8 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
       )}
       {permissions.canPay && (
         <PayExpenseButton
-          {...getButtonProps('PAY', false)}
+          {...getButtonProps('PAY')}
+          onClick={null}
           onSubmit={triggerAction}
           expense={expense}
           collective={collective}
@@ -190,10 +210,23 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
           </ButtonLabel>
         </StyledButton>
       )}
+      {permissions.canUnschedulePayment && (
+        <StyledButton
+          {...getButtonProps('UNSCHEDULE_PAYMENT')}
+          buttonStyle="dangerSecondary"
+          data-cy="unapprove-button"
+        >
+          <UnapproveIcon size={12} />
+          <ButtonLabel>
+            <FormattedMessage id="expense.unschedulePayment.btn" defaultMessage="Unschedule Payment" />
+          </ButtonLabel>
+        </StyledButton>
+      )}
       {permissions.canMarkAsUnpaid && (
         <MarkExpenseAsUnpaidButton
           data-cy="mark-as-unpaid-button"
-          {...getButtonProps('MARK_AS_UNPAID', false)}
+          {...getButtonProps('MARK_AS_UNPAID')}
+          onClick={null}
           onConfirm={hasPaymentProcessorFeesRefunded =>
             triggerAction('MARK_AS_UNPAID', {
               paymentProcessorFee: hasPaymentProcessorFeesRefunded ? 1 : 0,
@@ -213,6 +246,7 @@ ProcessExpenseButtons.propTypes = {
     canMarkAsSpam: PropTypes.bool,
     canPay: PropTypes.bool,
     canMarkAsUnpaid: PropTypes.bool,
+    canUnschedulePayment: PropTypes.bool,
   }).isRequired,
   expense: PropTypes.shape({
     id: PropTypes.string,

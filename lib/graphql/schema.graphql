@@ -72,6 +72,34 @@ type BackYourStackDispatchState {
 }
 
 """
+Captcha related information
+"""
+input CaptchaInput {
+  """
+  Captcha validation token
+  """
+  token: String!
+
+  """
+  HCatpcha site key
+  """
+  ekey: String
+
+  """
+  Catpcha provider
+  """
+  provider: CaptchaProvider!
+}
+
+"""
+Implemented Captcha Providers
+"""
+enum CaptchaProvider {
+  HCAPTCHA
+  RECAPTCHA
+}
+
+"""
 This represents a Collective
 """
 type Collective implements CollectiveInterface {
@@ -261,7 +289,7 @@ type Collective implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -336,9 +364,13 @@ input CollectiveAttributesInputType {
 }
 
 """
-Describes the features enabled and available for this collective
+Describes the features enabled and available for this account
 """
 type CollectiveFeatures {
+  """
+  The id of the account
+  """
+  id: String!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
   TRANSACTIONS: CollectiveFeatureStatus
@@ -351,6 +383,7 @@ type CollectiveFeatures {
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
   CONVERSATIONS: CollectiveFeatureStatus
   UPDATES: CollectiveFeatureStatus
+  ABOUT: CollectiveFeatureStatus
   TEAM: CollectiveFeatureStatus
   ORDER: CollectiveFeatureStatus
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
@@ -362,6 +395,9 @@ type CollectiveFeatures {
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
+  ALIPAY: CollectiveFeatureStatus
+  VIRTUAL_CARDS: CollectiveFeatureStatus
+  REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -606,7 +642,7 @@ interface CollectiveInterface {
     """
     Filter on given types  (creditcard, giftcard, etc.)
     """
-    types: [String]
+    type: [String]
 
     """
     Order entries based on given column. Set to null for no ordering.
@@ -819,7 +855,6 @@ Input type for CommentType
 """
 input CommentAttributesInputType {
   id: Int
-  markdown: String
   html: String
   UpdateId: Int
 }
@@ -829,7 +864,6 @@ Input type for CommentType
 """
 input CommentInputType {
   id: Int
-  markdown: String
   html: String
 
   """
@@ -1248,7 +1282,7 @@ type Event implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -1302,6 +1336,7 @@ type Expense implements Transaction {
   refundTransaction: Transaction
   uuid: String
   type: String
+  kind: String
   amount: Int
   currency: String
   hostCurrency: String
@@ -1316,7 +1351,12 @@ type Expense implements Transaction {
   """
   Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)
   """
-  hostFeeInHostCurrency: Int
+  hostFeeInHostCurrency(
+    """
+    Fetch HOST_FEE transaction for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
 
   """
   Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
@@ -1336,7 +1376,12 @@ type Expense implements Transaction {
   """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
   """
-  netAmountInCollectiveCurrency: Int
+  netAmountInCollectiveCurrency(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
@@ -1621,7 +1666,7 @@ type Fund implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -1684,6 +1729,11 @@ input GuestInfoInput {
   The unique guest token
   """
   token: String
+
+  """
+  Captcha validation for creating an order
+  """
+  captcha: CaptchaInput
 }
 
 """
@@ -1980,6 +2030,7 @@ type Mutation {
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
+    @deprecated(reason: "2021-07-02: Please use inviteMember, editMember or removeMember mutations from GQLV2")
 
   """
   A mutation to edit the public message of all matching members.
@@ -1992,7 +2043,6 @@ type Mutation {
   editComment(comment: CommentAttributesInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   deleteComment(id: Int!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
   refundTransaction(id: Int!): Transaction
-  addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
   createApplication(application: ApplicationInput!): Application
   deleteApplication(id: Int!): Application
 
@@ -2148,7 +2198,7 @@ type Mutation {
     Whether this invitation should be accepted or declined
     """
     accept: Boolean!
-  ): Boolean
+  ): Boolean @deprecated(reason: "2021-07-07: This endpoint has been moved to GQLV2")
   backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 
   """
@@ -2237,6 +2287,7 @@ type Order implements Transaction {
   refundTransaction: Transaction
   uuid: String
   type: String
+  kind: String
   amount: Int
   currency: String
   hostCurrency: String
@@ -2251,7 +2302,12 @@ type Order implements Transaction {
   """
   Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)
   """
-  hostFeeInHostCurrency: Int
+  hostFeeInHostCurrency(
+    """
+    Fetch HOST_FEE transaction for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
 
   """
   Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
@@ -2271,7 +2327,12 @@ type Order implements Transaction {
   """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
   """
-  netAmountInCollectiveCurrency: Int
+  netAmountInCollectiveCurrency(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
@@ -2647,7 +2708,7 @@ type Organization implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -3032,7 +3093,7 @@ type Project implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -3122,6 +3183,7 @@ type Query {
     offset: Int
     dateFrom: String
     dateTo: String
+    kinds: [String]
 
     """
     If false, only the transactions not linked to an expense (orders/refunds) will be returned
@@ -3566,8 +3628,26 @@ interface Transaction {
   currency: String
   hostCurrency: String
   hostCurrencyFxRate: Float
-  netAmountInCollectiveCurrency: Int
-  hostFeeInHostCurrency: Int
+
+  """
+  Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
+  """
+  netAmountInCollectiveCurrency(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
+
+  """
+  Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)
+  """
+  hostFeeInHostCurrency(
+    """
+    Fetch HOST_FEE transaction for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Int
   platformFeeInHostCurrency: Int
   paymentProcessorFeeInHostCurrency: Int
   taxAmount: Int
@@ -3578,6 +3658,7 @@ interface Transaction {
   usingGiftCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
   type: String
+  kind: String
   description: String
   createdAt: DateString
   updatedAt: DateString
@@ -3642,6 +3723,7 @@ type UpdateType {
   slug: String
   image: String
   isPrivate: Boolean
+  isChangelog: Boolean!
   notificationAudience: UpdateAudienceTypeEnum
   makePublicOn: IsoDateString
 
@@ -3852,7 +3934,7 @@ type User implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """
@@ -3928,6 +4010,7 @@ type UserDetails {
   Returns true if user account is limited (user can't use any feature)
   """
   isLimited: Boolean
+  hasSeenLatestChangelogEntry: Boolean!
 }
 
 """
@@ -4141,7 +4224,7 @@ type Vendor implements CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
-    types: [String]
+    type: [String]
     orderBy: PaymenMethodOrderField = type
 
     """

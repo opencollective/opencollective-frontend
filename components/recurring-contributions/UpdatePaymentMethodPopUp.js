@@ -8,6 +8,7 @@ import { first, get, merge, pick, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
@@ -64,7 +65,7 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
     account(id: $accountId) {
       id
-      paymentMethods(types: ["creditcard", "giftcard", "prepaid"]) {
+      paymentMethods(enumType: [CREDITCARD, GIFTCARD, PREPAID]) {
         ...UpdatePaymentMethodFragment
       }
     }
@@ -204,7 +205,7 @@ const useUpdatePaymentMethod = contribution => {
       try {
         if (hasUpdate) {
           const variables = { order: { id: contribution.id } };
-          if (paymentMethod.type === 'PAYPAL') {
+          if (paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL) {
             variables.paypalSubscriptionId = paymentMethod.paypalInfo.subscriptionId;
           } else {
             variables.paymentMethod = { id: paymentMethod.value ? paymentMethod.value.id : paymentMethod.id };
@@ -230,7 +231,7 @@ const useUpdatePaymentMethod = contribution => {
   };
 };
 
-const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loadStripe, account }) => {
+const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, account }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
 
@@ -419,8 +420,8 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
               buttonSize="tiny"
               minWidth={75}
               onClick={() => {
-                setShowAddPaymentMethod(false);
                 setNewPaymentMethodInfo(null);
+                onCloseEdit();
               }}
             >
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
@@ -480,13 +481,7 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
           </Fragment>
         ) : (
           <Fragment>
-            <StyledButton
-              buttonSize="tiny"
-              minWidth={75}
-              onClick={() => {
-                setMenuState('mainMenu');
-              }}
-            >
+            <StyledButton buttonSize="tiny" minWidth={75} onClick={onCloseEdit}>
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
             <StyledButton
@@ -509,8 +504,6 @@ const UpdatePaymentMethodPopUp = ({ setMenuState, contribution, onCloseEdit, loa
 
 UpdatePaymentMethodPopUp.propTypes = {
   data: PropTypes.object,
-  setMenuState: PropTypes.func,
-  router: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
   onCloseEdit: PropTypes.func,
   loadStripe: PropTypes.func.isRequired,

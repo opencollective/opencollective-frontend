@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { matchPm, PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants/payment-methods';
 import { getCurrencySymbol } from '../../lib/currency-utils';
 import { paymentMethodLabelWithIcon } from '../../lib/payment_method_label';
 import { capitalize } from '../../lib/utils';
@@ -84,9 +85,8 @@ class EditPaymentMethod extends React.Component {
 
   render() {
     const { intl, paymentMethod, currency, isSaving, subscriptions } = this.props;
-    const { service, type } = paymentMethod;
     const hasSubscriptions = subscriptions && subscriptions.length > 0;
-    const isStripeCreditCard = service === 'stripe' && type === 'creditcard';
+    const isStripeCreditCard = matchPm(paymentMethod, PAYMENT_METHOD_SERVICE.STRIPE, PAYMENT_METHOD_TYPE.CREDITCARD);
     const canRemove = !hasSubscriptions && isStripeCreditCard;
     const saved = this.state.paymentMethod.monthlyLimitPerMember === paymentMethod.monthlyLimitPerMember;
     const hasActions = !saved || canRemove || hasSubscriptions;
@@ -98,8 +98,8 @@ class EditPaymentMethod extends React.Component {
             <Box minWidth="150px" as="label" className="control-label">
               <FormattedMessage
                 id="paymentMethod.typeSelect"
-                values={{ type }}
-                defaultMessage="{type, select, giftcard {Gift card} creditcard {Credit card} prepaid {Prepaid}}"
+                values={{ type: paymentMethod.type.toLowerCase() }}
+                defaultMessage="{type, select, giftcard {Gift card} creditcard {Credit card} prepaid {Prepaid} other {}}"
               />
             </Box>
             <Box>

@@ -25,7 +25,7 @@ const STATUS = {
   ERROR: 'ERROR',
 };
 
-const confirmGuestAccountMutation = gqlV2`
+const confirmGuestAccountMutation = gqlV2/* GraphQL */ `
   mutation ConfirmGuestAccount($email: EmailAddress!, $token: String!) {
     confirmGuestAccount(email: $email, emailConfirmationToken: $token) {
       accessToken

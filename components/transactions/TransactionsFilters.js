@@ -7,6 +7,7 @@ import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Box, Flex } from '../Grid';
 
+import TransactionsKindFilter from './filters/TransactionsKindFilter';
 import TransactionsTypeFilter from './filters/TransactionsTypeFilter';
 
 const FilterContainer = styled(Box)`
@@ -50,6 +51,12 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
           <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
         </FilterLabel>
         <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
+      </FilterContainer>
+      <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+        <FilterLabel htmlFor="transactions-filter-kind">
+          <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />
+        </FilterLabel>
+        <TransactionsKindFilter {...getFilterProps('kind')} />
       </FilterContainer>
     </Flex>
   );

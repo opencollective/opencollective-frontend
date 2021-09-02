@@ -13,12 +13,14 @@
     ]
   ],
   "plugins": [
+    "babel-plugin-react-docgen",
     "babel-plugin-styled-components",
     "lodash",
     [
-      "react-intl",
+      "babel-plugin-formatjs",
       {
-        "messagesDir": "./dist/messages/"
+        "ast": true,
+        "idInterpolationPattern": "[sha512:contenthash:base64:6]"
       }
     ]
   ],
