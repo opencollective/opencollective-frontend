@@ -96,9 +96,11 @@ const CollectivePickerAsync = ({
   searchQuery,
   invitable,
   emptyCustomOptions,
+  noCache,
   ...props
 }) => {
-  const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery);
+  const fetchPolicy = noCache ? 'network-only' : undefined;
+  const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery, { fetchPolicy });
   const [term, setTerm] = React.useState(null);
   const intl = useIntl();
   const collectives = ((term || preload) && data?.search?.collectives) || [];
@@ -147,6 +149,8 @@ CollectivePickerAsync.propTypes = {
   hostCollectiveIds: PropTypes.arrayOf(PropTypes.number),
   /** If true, a query will be triggered even if search is empty */
   preload: PropTypes.bool,
+  /** If true, results won't be cached (Apollo "network-only" mode) */
+  noCache: PropTypes.bool,
   /** Query to use for the search. Override to add custom fields */
   searchQuery: PropTypes.any.isRequired,
   /** Custom options that are displayed when the field is empty */

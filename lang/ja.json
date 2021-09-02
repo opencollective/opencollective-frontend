@@ -107,6 +107,7 @@
   "AudienceBreakdown.hostedAdmins": "The admins of {count} {count, plural, one {hosted account} other {hosted accounts}}",
   "AudienceBreakdown.individuals": "{count} {count, plural, one {individual} other {individuals}}",
   "AudienceBreakdown.organizationAdmins": "The admins of {count} {count, plural, one {organization} other {organizations}}",
+  "AuthenticatedPage.RootOnly": "This page is limited to site administrators",
   "authorization.loginRequired": "続けるにはログインする必要があります",
   "Back": "戻る",
   "BalanceAmount": "残高 {balance}",

@@ -310,6 +310,10 @@ exports.REWRITES = [
     source: '/applications',
     destination: '/applications',
   },
+  {
+    source: '/opencollective/root-actions',
+    destination: '/root-actions',
+  },
   // Collective
   // ----------
   // Collective page

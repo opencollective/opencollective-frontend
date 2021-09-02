@@ -46,6 +46,7 @@ const CheckboxContainer = styled.div`
   display: flex;
   align-items: ${props => props.alignItems};
   line-height: 1.4em;
+  cursor: pointer;
   ${typography}
   width: ${props => props.width};
 
