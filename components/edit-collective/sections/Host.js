@@ -13,6 +13,7 @@ import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import HostsWithData from '../../HostsWithData';
 import Link from '../../Link';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledLink from '../../StyledLink';
@@ -494,6 +495,17 @@ class Host extends React.Component {
               )}
             </Box>
           </Flex>
+        </div>
+        <div>
+          <MessageBox type="info" fontSize="13px" withIcon mb={4}>
+            <FormattedMessage
+              id="collective.edit.host.legalName.info"
+              defaultMessage="Please set the legal name of the host in the {LegalNameSettingLink}. This is useful for tax and accounting purposes."
+              values={{
+                LegalNameSettingLink: <Link href={`/${collective.slug}/edit/info`}>info section</Link>,
+              }}
+            />
+          </MessageBox>
         </div>
       </EditCollectiveHostSection>
     );

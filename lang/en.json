@@ -277,6 +277,7 @@
   "collective.edit.backToProfile": "view {type} page",
   "collective.edit.host.findHost.description": "You won't need to hold funds or set up a legal entity and bank account for your project. The Fiscal Host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (which you can review before choosing a Host).",
   "collective.edit.host.findHost.title": "Apply to an existing Fiscal Host",
+  "collective.edit.host.legalName.info": "Please set the legal name of the host in the {LegalNameSettingLink}. This is useful for tax and accounting purposes.",
   "collective.edit.host.noHost.description": "You can't receive financial contributions or use the budget features. You can still edit your profile page, submit expenses to be paid later, and post updates.",
   "collective.edit.host.noHost.title": "No one",
   "collective.edit.host.selfHost.description": "Simply connect a bank account for a single Collective. You will be responsible for accounting, taxes, payments, and liability.",
