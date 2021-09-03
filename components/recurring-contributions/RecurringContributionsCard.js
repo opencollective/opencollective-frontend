@@ -100,12 +100,7 @@ const RecurringContributionsCard = ({
                   >
                     {getPaymentMethodName(contribution.paymentMethod)}
                   </P>
-                  <P
-                    fontSize="11px"
-                    color="black.700"
-                    truncateOverflow
-                    title={getPaymentMethodMetadata(contribution.paymentMethod)}
-                  >
+                  <P fontSize="11px" color="black.700" truncateOverflow>
                     {getPaymentMethodMetadata(contribution.paymentMethod)}
                   </P>
                 </Flex>
