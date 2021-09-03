@@ -2087,7 +2087,7 @@
   "updates.new.error": "Не вдалося оновити: {err}",
   "updates.new.title": "Нові оновлення",
   "Updates.Oldest": "Найдавніші",
-  "UpdateSearchFilter.placeholder": "Шукати за користувачем, заголовком, html...",
+  "UpdateSearchFilter.placeholder": "Search by user, title, content...",
   "Upload": "Завантажити",
   "UploadDocumentation": "Вивантажити документацію",
   "UploadDocumentationDescription": "Якщо ви хочете включити будь-яку документацію, ви можете завантажити її звідси.",

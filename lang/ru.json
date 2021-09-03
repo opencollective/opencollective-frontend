@@ -2087,7 +2087,7 @@
   "updates.new.error": "Не удалось обновить: {err}",
   "updates.new.title": "Новое обновление",
   "Updates.Oldest": "Oldest",
-  "UpdateSearchFilter.placeholder": "Search by user, title, html...",
+  "UpdateSearchFilter.placeholder": "Search by user, title, content...",
   "Upload": "Загрузить",
   "UploadDocumentation": "Загрузить документацию",
   "UploadDocumentationDescription": "If you want to include any documentation, you can upload it here.",
