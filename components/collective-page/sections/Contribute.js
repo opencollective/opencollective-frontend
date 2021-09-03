@@ -9,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { canOrderTicketsFromEvent, isPastEvent } from '../../../lib/events';
+import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { getCollectiveContributionCardsOrder, sortTiers, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
 
@@ -239,8 +239,7 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
-    const cannotOrderTickets =
-      (!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin) || isPastEvent(collective);
+    const cannotOrderTickets = (!hasContribute && !isAdmin) || isPastEvent(collective);
 
     /*
     cases
