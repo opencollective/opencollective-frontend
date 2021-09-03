@@ -72,6 +72,7 @@ class NewContributionFlowPage extends React.Component {
         ? query.disabledPaymentMethodTypes.split(',')
         : undefined,
       error: query.error,
+      tags: query.tags ? query.tags.split(',') : undefined,
     };
   }
 
@@ -101,6 +102,7 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    tags: PropTypes.arrayOf(PropTypes.string),
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -166,6 +168,7 @@ class NewContributionFlowPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
+          tags={this.props.tags}
           error={error}
         />
       );
