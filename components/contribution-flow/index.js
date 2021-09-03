@@ -112,6 +112,7 @@ class ContributionFlow extends React.Component {
     intl: PropTypes.object,
     createOrder: PropTypes.func.isRequired,
     confirmOrder: PropTypes.func.isRequired,
+    disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
     fixedInterval: PropTypes.string,
     fixedAmount: PropTypes.number,
     platformContribution: PropTypes.number,
@@ -475,11 +476,14 @@ class ContributionFlow extends React.Component {
 
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, queryParams = {}) => {
-    const { collective, tier, isEmbed } = this.props;
+    const { collective, tier, isEmbed, disabledPaymentMethodTypes } = this.props;
     const verb = this.props.verb || 'donate';
     const step = stepName === 'details' ? '' : stepName;
     const allQueryParams = {
       interval: this.props.fixedInterval,
+      disabledPaymentMethodTypes: disabledPaymentMethodTypes
+        ? disabledPaymentMethodTypes.join(',')
+        : disabledPaymentMethodTypes,
       ...pick(this.props, [
         'interval',
         'description',
@@ -837,6 +841,7 @@ class ContributionFlow extends React.Component {
                     isEmbed={isEmbed}
                     isSubmitting={isValidating || isLoading}
                     order={this.state.createdOrder}
+                    disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
                   />
                   <Box mt={40}>
                     <ContributionFlowButtons

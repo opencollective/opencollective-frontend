@@ -32,6 +32,7 @@ class ContributionFlowStepContainer extends React.Component {
     defaultEmail: PropTypes.string,
     isEmbed: PropTypes.bool,
     defaultName: PropTypes.string,
+    disabledPaymentMethodTypes: PropTypes.array,
     isSubmitting: PropTypes.bool,
     taxes: PropTypes.array,
     step: PropTypes.shape({
@@ -173,6 +174,7 @@ class ContributionFlowStepContainer extends React.Component {
             isSubmitting={this.props.isSubmitting}
             isEmbed={isEmbed}
             isCrypto={isCrypto}
+            disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
           />
         );
       case 'checkout':

@@ -27,6 +27,7 @@ export const generatePaymentMethodOptions = (
   stepSummary,
   collective,
   isEmbed,
+  disabledPaymentMethodTypes,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
@@ -91,7 +92,9 @@ export const generatePaymentMethodOptions = (
       sourceProviderType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CREDIT_CARD ||
       sourceType === PAYMENT_METHOD_TYPE.CREDITCARD;
 
-    if (isGiftCard && paymentMethod.limitedToHosts) {
+    if (disabledPaymentMethodTypes?.includes(paymentMethod.type)) {
+      return false;
+    } else if (isGiftCard && paymentMethod.limitedToHosts) {
       return matchesHostCollectiveId(paymentMethod);
     } else if (isSourcePrepaid) {
       return matchesHostCollectiveIdPrepaid(sourcePaymentMethod);
@@ -117,7 +120,7 @@ export const generatePaymentMethodOptions = (
     }
 
     // Paypal
-    if (hostHasPaypal) {
+    if (hostHasPaypal && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.PAYMENT)) {
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
@@ -136,7 +139,12 @@ export const generatePaymentMethodOptions = (
       });
     }
 
-    if (!interval && !isEmbed && supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY)) {
+    if (
+      !interval &&
+      !isEmbed &&
+      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY) &&
+      !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.ALIPAY)
+    ) {
       uniquePMs.push({
         key: 'alipay',
         paymentMethod: {
@@ -156,7 +164,7 @@ export const generatePaymentMethodOptions = (
     }
 
     // Manual (bank transfer)
-    if (hostHasManual && !interval) {
+    if (hostHasManual && !interval && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
       uniquePMs.push({
         key: 'manual',
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || 'Bank transfer',
