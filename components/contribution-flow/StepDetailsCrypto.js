@@ -104,13 +104,15 @@ const StepDetailsCrypto = ({ onChange, data, currency }) => {
         defaultValue={amount}
         onChange={({ target }) => {
           setAmount(target.value);
-          dispatchChange('amount', parseFloat(target.value));
+          if (target.value > 0) {
+            dispatchChange('amount', parseFloat(target.value));
+          }
         }}
         onBlur={() => setTouched(true)}
         autoFocus
         error={touched && amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
       />
-      {convertedAmount > 0 && (
+      {convertedAmount !== null && convertedAmount > 0 && (
         <Box mt={2}>
           ~
           <FormattedMoneyAmount
