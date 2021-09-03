@@ -78,8 +78,9 @@ class UpdatesWithData extends React.Component {
         )}
         <UpdateFilters values={query} onChange={onChange} />
         <Box mt={4} mb={5}>
-          {data.loading && <Loading />}
-          {!data.loading && (
+          {data.loading ? (
+            <Loading />
+          ) : (
             <Updates
               collective={collective}
               updates={updates}
