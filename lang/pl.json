@@ -2087,7 +2087,7 @@
   "updates.new.error": "Aktualizacja nie powiodła się: {err}",
   "updates.new.title": "Nowa aktualizacja",
   "Updates.Oldest": "Oldest",
-  "UpdateSearchFilter.placeholder": "Search by user, title, html...",
+  "UpdateSearchFilter.placeholder": "Search by user, title, content...",
   "Upload": "Prześlij",
   "UploadDocumentation": "Prześlij dokumentację",
   "UploadDocumentationDescription": "If you want to include any documentation, you can upload it here.",
