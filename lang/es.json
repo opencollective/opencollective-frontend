@@ -2087,7 +2087,7 @@
   "updates.new.error": "Actualización fallida: {err}",
   "updates.new.title": "Nueva actualización",
   "Updates.Oldest": "Oldest",
-  "UpdateSearchFilter.placeholder": "Search by user, title, html...",
+  "UpdateSearchFilter.placeholder": "Search by user, title, content...",
   "Upload": "Subir",
   "UploadDocumentation": "Subir documentación",
   "UploadDocumentationDescription": "Si quieres incluir documentación, puedes hacerlo aquí.",
