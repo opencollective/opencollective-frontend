@@ -15,7 +15,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const connectAccountsMutation = gqlV2/* GraphQL */ `
   mutation ConnectAccounts($memberAccount: AccountReferenceInput!, $account: AccountReferenceInput!) {
-    inviteMember(memberAccount: $memberAccount, account: $account, role: CONNECTED_ACCOUNT) {
+    createMember(memberAccount: $memberAccount, account: $account, role: CONNECTED_ACCOUNT) {
       id
     }
   }
