@@ -2008,6 +2008,7 @@
   "transaction.reject.info.cannotRefund": "Utilisez cette option uniquement si vous ne souhaitez pas que ce contributeur fasse partie de votre Collectif. Cela les enlèvera de votre Collectif.",
   "transaction.reject.info.canRefund": "Si vous essayez de rembourser une opération erronée, utilisez plutôt le bouton « Rembourser ».",
   "transaction.reject.yes.btn": "Oui, rejeter",
+  "Transaction.to": "to {name}",
   "Transaction.Type.Credit": "Crédit",
   "transaction.usingGiftCardFrom": "avec une {giftCard} de {collective}",
   "TransactionDetails.HostFee": "This transaction includes {amount} host fees",

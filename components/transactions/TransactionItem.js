@@ -93,7 +93,8 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const Item = isCredit ? CreditItem : DebitItem;
   const legacyCollectiveId = collective.legacyId || collective.id;
   const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === legacyCollectiveId;
-  const avatarCollective = hasOrder ? (isCredit ? fromAccount : toAccount) : isCredit ? fromAccount : toAccount;
+  const avatarCollective = isCredit ? fromAccount : toAccount;
+
   const displayedAmount = getDisplayedAmount(transaction, collective);
 
   return (
@@ -134,7 +135,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
               </Container>
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
-                {hasOrder ? (
+                {isCredit ? (
                   <FormattedMessage
                     id="Transaction.from"
                     defaultMessage="from {name}"
@@ -142,8 +143,8 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   />
                 ) : (
                   <FormattedMessage
-                    id="CreatedBy"
-                    defaultMessage="by {name}"
+                    id="Transaction.to"
+                    defaultMessage="to {name}"
                     values={{ name: <StyledLink as={LinkCollective} collective={toAccount} /> }}
                   />
                 )}
