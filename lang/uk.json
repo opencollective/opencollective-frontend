@@ -107,7 +107,7 @@
   "AudienceBreakdown.hostedAdmins": "Адміністратор {count} {count, plural, one {колективу} other {колективів}}",
   "AudienceBreakdown.individuals": "{count} {count, plural, one {особа} few {особи} many {осіб} other {осіб}}",
   "AudienceBreakdown.organizationAdmins": "Адміністратори {count} {count, plural, one {організації} few {організацій} many {організацій} other {організацій}}",
-  "AuthenticatedPage.RootOnly": "This page is limited to site administrators",
+  "AuthenticatedPage.RootOnly": "Доступ до сторінки обмежують адміністратори сайту",
   "authorization.loginRequired": "Увійдіть, щоб продовжити.",
   "Back": "Назад",
   "BalanceAmount": "Баланс {balance}",
