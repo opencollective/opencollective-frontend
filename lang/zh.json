@@ -1994,6 +1994,7 @@
   "Transaction.kind.HOST_FEE": "Host fee",
   "Transaction.kind.HOST_FEE_SHARE": "Host fee share",
   "Transaction.kind.HOST_FEE_SHARE_DEBT": "Host fee share debt",
+  "Transaction.kind.PAYMENT_PROCESSOR_COVER": "Payment processor cover",
   "Transaction.kind.PAYMENT_PROCESSOR_FEE": "Payment processor fee",
   "Transaction.kind.PLATFORM_FEE": "Platform fee",
   "Transaction.kind.PLATFORM_TIP": "Platform tip",
