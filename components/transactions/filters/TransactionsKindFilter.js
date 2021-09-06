@@ -77,10 +77,11 @@ const REACT_SELECT_COMPONENT_OVERRIDE = {
   MultiValue: () => null, // Items will be displayed as a truncated string in `TruncatedValueContainer `
 };
 
-const TransactionsKindFilter = ({ onChange, value, ...props }) => {
+const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
   const intl = useIntl();
   const getOption = (value, idx) => ({ label: i18nTransactionKind(intl, value), value, idx });
-  const options = React.useMemo(() => Object.values(DISPLAYED_TRANSACTION_KINDS).map(getOption), [intl]);
+  const displayedKinds = kinds || Object.values(DISPLAYED_TRANSACTION_KINDS);
+  const options = displayedKinds.map(getOption);
   const selectedOptions = React.useMemo(
     () => (!value ? getDefaultKinds() : parseTransactionKinds(value)).map(getOption),
     [value],
@@ -105,6 +106,7 @@ const TransactionsKindFilter = ({ onChange, value, ...props }) => {
 TransactionsKindFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
+  kinds: PropTypes.array,
 };
 
 export default TransactionsKindFilter;
