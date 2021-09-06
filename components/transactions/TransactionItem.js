@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
@@ -135,13 +135,19 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
               </Container>
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
-                {isCredit ? (
-                  <FormattedMessage
-                    id="Transaction.from"
-                    defaultMessage="from {name}"
-                    values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} /> }}
-                  />
-                ) : (
+                {transaction.type}
+                &nbsp;
+                {(collective.slug !== fromAccount.slug || true) && (
+                  <Fragment>
+                    <FormattedMessage
+                      id="Transaction.from"
+                      defaultMessage="from {name}"
+                      values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} /> }}
+                    />
+                    &nbsp;
+                  </Fragment>
+                )}
+                {(collective.slug !== toAccount.slug || true) && (
                   <FormattedMessage
                     id="Transaction.to"
                     defaultMessage="to {name}"

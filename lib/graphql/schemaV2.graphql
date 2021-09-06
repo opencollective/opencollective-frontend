@@ -8271,6 +8271,12 @@ type Query {
     hasOrder: Boolean
 
     """
+    Whether to include regular transactions from the account (turn false if you
+    only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
+
+    """
     If the account is a user and this field is true, contributions from the
     incognito profile will be included too (admins only)
     """
