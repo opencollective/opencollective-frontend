@@ -13,6 +13,8 @@ import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { H1, H2 } from '../Text';
 
+import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
+
 const mainReportsQuery = gqlV2/* GraphQL */ `
   query ReportsPageQuery($hostSlug: String!) {
     host(slug: $hostSlug) {
@@ -63,17 +65,13 @@ const HostDashboardReports = ({ hostSlug }) => {
       </Flex>
       <StyledCard mb={5} borderRadius="12px" padding="32px 24px" borderColor="black.400">
         <Container mb={38}>
-          <SectionTitle
-            hint={
-              <FormattedMessage
-                id="Host.Metrics.TotalMoneyManages.description"
-                defaultMessage="Total amount held in your bank account for the Host and its Collectives."
-              />
-            }
-          >
-            <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
-          </SectionTitle>
-          <StyledCard height={200} />
+          <TotalMoneyManagedSection
+            currentAmount={471662893}
+            projectedAmount={474662693}
+            totalCollectiveFunds={400000000}
+            totalHostFunds={71662893}
+            currency="USD"
+          />
         </Container>
         <Container mb={38}>
           <SectionTitle>
