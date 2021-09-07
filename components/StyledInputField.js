@@ -3,8 +3,16 @@ import PropTypes from 'prop-types';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { FormattedMessage } from 'react-intl';
 
+import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Box, Flex } from './Grid';
 import { P, Span } from './Text';
+
+const PrivateIconWithSpace = () => (
+  <React.Fragment>
+    &nbsp;
+    <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-bottom' }} />
+  </React.Fragment>
+);
 
 /**
  * Form field to display an input element with a label and errors. Uses [renderProps](https://reactjs.org/docs/render-props.html#using-props-other-than-render) to pass field props like 'name' and 'id' to child input.
@@ -26,6 +34,7 @@ const StyledInputField = ({
   labelProps,
   hideOptionalLabel,
   useRequiredLabel,
+  isPrivate,
   ...props
 }) => {
   const labelContent = label && <Span color={labelColor}>{label}</Span>;
@@ -34,7 +43,6 @@ const StyledInputField = ({
 
   const displayOptionalLabel = hideOptionalLabel ? false : required === false;
   const displayRequiredLabel = useRequiredLabel ? required === true : false;
-
   return (
     <Box {...props}>
       <Flex flexDirection={isCheckbox ? 'row-reverse' : 'column'} justifyContent="flex-end">
@@ -58,11 +66,17 @@ const StyledInputField = ({
                   defaultMessage="{field} (optional)"
                   values={{ field: labelContent }}
                 />
+                {isPrivate && <PrivateIconWithSpace />}
               </Span>
             ) : displayRequiredLabel ? (
-              <Span color="black.500">{labelContent} *</Span>
+              <Span color="black.500">
+                {labelContent} * {isPrivate && <PrivateIconWithSpace />}
+              </Span>
             ) : (
-              labelContent
+              <React.Fragment>
+                {labelContent}
+                {isPrivate && <PrivateIconWithSpace />}
+              </React.Fragment>
             )}
           </P>
         )}
@@ -102,6 +116,8 @@ StyledInputField.propTypes = {
   children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
   /** Show disabled state for field */
   disabled: PropTypes.bool,
+  /** If true, a "Private" lock icon will be displayed next to the label */
+  isPrivate: PropTypes.bool,
   /** text to display below the input or error status */
   error: PropTypes.any,
   /** text to display below the input when there's no error */

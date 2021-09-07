@@ -24,6 +24,7 @@ import { withUser } from './UserProvider';
 
 const orgMessages = defineMessages({
   nameLabel: { id: 'Organization.Name', defaultMessage: 'Organization name' },
+  legalNameLabel: { id: 'LegalName', defaultMessage: 'Legal Name' },
   slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
@@ -63,6 +64,7 @@ const orgMessages = defineMessages({
 
 const placeholders = {
   name: { id: 'placeholder.name', defaultMessage: 'e.g. Salesforce, Airbnb' },
+  legalName: { id: 'placeholder.legalName', defaultMessage: 'e.g. Salesforce.com, Inc., Airbnb, Inc.' },
   slug: { id: 'placeholder.slug', defaultMessage: 'Airbnb' },
   description: { id: 'placeholderdescription', defaultMessage: 'Making a world a better place' },
   website: { id: 'placeholder.website', defaultMessage: 'www.example.com' },
@@ -75,6 +77,7 @@ const CreateOrganizationForm = props => {
   const [admins, setAdmins] = useState([{ role: 'ADMIN', member: LoggedInUser.collective }]);
   const initialValues = {
     name: '',
+    legalName: '',
     slug: '',
     description: '',
     website: '',
@@ -85,6 +88,9 @@ const CreateOrganizationForm = props => {
 
     if (values.name.length > 50) {
       errors.name = intl.formatMessage(orgMessages.errorName);
+    }
+    if (values.legalName.length > 255) {
+      errors.legalName = intl.formatMessage(orgMessages.errorName);
     }
     if (values.slug.length > 30) {
       errors.slug = intl.formatMessage(orgMessages.errorSlug);
@@ -103,8 +109,8 @@ const CreateOrganizationForm = props => {
     return errors;
   };
   const submit = values => {
-    const { name, slug, description, website } = values;
-    onSubmit({ name, slug, description, website, authorization });
+    const { name, legalName, slug, description, website } = values;
+    onSubmit({ name, legalName, slug, description, website, authorization });
   };
 
   const removeAdmin = collective => {
@@ -197,6 +203,34 @@ const CreateOrganizationForm = props => {
                       >
                         {inputProps => (
                           <Field as={StyledInput} {...inputProps} placeholder={intl.formatMessage(placeholders.name)} />
+                        )}
+                      </StyledInputField>
+                      <StyledInputField
+                        name="legalName"
+                        htmlFor="legalName"
+                        label={intl.formatMessage(orgMessages.legalNameLabel)}
+                        labelFontSize="13px"
+                        labelColor="black.700"
+                        labelFontWeight="600"
+                        fontSize="18px"
+                        value={values.legalName}
+                        required={false}
+                        mt={3}
+                        isPrivate
+                        data-cy="cof-form-legalName"
+                        hint={
+                          <FormattedMessage
+                            id="legalName.description"
+                            defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name."
+                          />
+                        }
+                      >
+                        {inputProps => (
+                          <Field
+                            as={StyledInput}
+                            {...inputProps}
+                            placeholder={intl.formatMessage(placeholders.legalName)}
+                          />
                         )}
                       </StyledInputField>
                       <StyledInputField

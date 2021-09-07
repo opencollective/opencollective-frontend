@@ -97,7 +97,18 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'URL slug',
       },
       'type.label': { id: 'collective.type.label', defaultMessage: 'Type' },
-      'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
+      'name.label': { id: 'Fields.displayName', defaultMessage: 'Display name' },
+      'name.description': {
+        id: 'Fields.name.description',
+        defaultMessage:
+          'The display name is used whenever we refer to your profile publicly (your profile page, your comments, your contributions, etc). Anyone can see this name.',
+      },
+      'legalName.label': { id: 'LegalName', defaultMessage: 'Legal Name' },
+      'legalName.description': {
+        id: 'legalName.description',
+        defaultMessage:
+          'The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name.',
+      },
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
         id: 'host.tos',
@@ -629,10 +640,17 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
         },
         {
+          name: 'legalName',
+          placeholder: '',
+          maxLength: 255,
+          when: () => collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION,
+          isPrivate: true,
+        },
+        {
           name: 'company',
           placeholder: '',
           maxLength: 255,
-          when: () => collective.type === 'USER',
+          when: () => collective.type === CollectiveType.USER,
         },
         {
           name: 'description',
@@ -808,6 +826,7 @@ class EditCollectiveForm extends React.Component {
           field.description += ` `;
           field.description += intl.formatMessage(this.messages[`${field.name}.warning2`], collective);
         }
+
         return field;
       });
     });
@@ -846,6 +865,7 @@ class EditCollectiveForm extends React.Component {
                       onChange={value => this.handleChange(field.name, value)}
                       disabled={field.disabled}
                       maxLength={field.maxLength}
+                      isPrivate={field.isPrivate}
                     />
                   ))}
                 </div>

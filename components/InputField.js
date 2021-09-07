@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import { capitalize } from '../lib/utils';
 
+import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Box, Flex } from './Grid';
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
@@ -27,7 +28,18 @@ if (process.env.DYNAMIC_IMPORT) {
   DateTime = require('./DateTime').default;
 }
 
-function FieldGroup({ label, help, pre, post, after, button, className, ...props }) {
+const Label = ({ label, isPrivate }) => (
+  <label>
+    {label}&nbsp;{isPrivate && <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-bottom' }} />}
+  </label>
+);
+
+Label.propTypes = {
+  label: PropTypes.node,
+  isPrivate: PropTypes.bool,
+};
+
+function FieldGroup({ label, help, pre, post, after, button, className, isPrivate, ...props }) {
   const validationState = props.validationState === 'error' ? 'error' : null;
   delete props.validationState;
 
@@ -40,7 +52,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
     return (
       <Flex flexWrap="wrap" p={1}>
         <Box width={[1, 2 / 12]}>
-          <label>{label}</label>
+          <Label label={label} isPrivate={isPrivate} />
         </Box>
         <Box width={[1, 10 / 12]}>
           <StyledInputGroup
@@ -64,7 +76,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, ...props
       <Flex flexWrap="wrap" p={1}>
         {label && (
           <Box width={1}>
-            <label>{label}</label>
+            <Label label={label} isPrivate={isPrivate} />
           </Box>
         )}
         <Box width={1}>
@@ -106,8 +118,9 @@ const HelpBlock = styled(Box)`
 class InputField extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
-    label: PropTypes.string,
+    label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     description: PropTypes.string,
+    isPrivate: PropTypes.bool,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object, PropTypes.array]),
     defaultValue: PropTypes.oneOfType([
       PropTypes.string,
@@ -679,6 +692,7 @@ class InputField extends React.Component {
             step={field.step}
             min={field.min}
             max={field.max}
+            isPrivate={field.isPrivate}
           />
         );
         break;
