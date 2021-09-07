@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { omit, size } from 'lodash';
+import { intersection, omit, size } from 'lodash';
 import { useIntl } from 'react-intl';
 import { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
@@ -83,7 +83,7 @@ const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
   const displayedKinds = kinds || Object.values(DISPLAYED_TRANSACTION_KINDS);
   const options = displayedKinds.map(getOption);
   const selectedOptions = React.useMemo(
-    () => (!value ? getDefaultKinds() : parseTransactionKinds(value)).map(getOption),
+    () => (!value ? intersection(getDefaultKinds(), displayedKinds) : parseTransactionKinds(value)).map(getOption),
     [value],
   );
   return (
