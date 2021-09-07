@@ -79,6 +79,8 @@ class NewContributionFlowPage extends React.Component {
       useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
       hideHeader: query.hideHeader ? parseToBoolean(query.hideHeader) : false,
       backgroundColor: backgroundColor && isHexColor(backgroundColor) ? backgroundColor : undefined,
+      error: query.error,
+      tags: query.tags ? query.tags.split(',') : undefined,
     };
   }
 
@@ -96,6 +98,7 @@ class NewContributionFlowPage extends React.Component {
     interval: PropTypes.string,
     tierId: PropTypes.number,
     customData: PropTypes.object,
+    error: PropTypes.string,
     contributeAs: PropTypes.string,
     defaultEmail: PropTypes.string,
     defaultName: PropTypes.string,
@@ -112,6 +115,7 @@ class NewContributionFlowPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     useTheme: PropTypes.bool,
     hideHeader: PropTypes.bool,
+    tags: PropTypes.arrayOf(PropTypes.string),
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -182,6 +186,8 @@ class NewContributionFlowPage extends React.Component {
             contributeAs={this.props.contributeAs}
             defaultEmail={this.props.defaultEmail}
             defaultName={this.props.defaultName}
+            tags={this.props.tags}
+            error={this.props.error}
           />
         </Box>
       );

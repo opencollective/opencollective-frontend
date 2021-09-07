@@ -122,6 +122,7 @@ class ContributionFlow extends React.Component {
     isEmbed: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
     verb: PropTypes.string,
     paymentMethod: PropTypes.string,
     error: PropTypes.string,
@@ -203,6 +204,7 @@ class ContributionFlow extends React.Component {
             platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
             context: { isEmbed: this.props.isEmbed || false },
+            tags: this.props.tags,
             taxes: stepSummary && [
               {
                 type: stepSummary.taxType,
@@ -476,14 +478,14 @@ class ContributionFlow extends React.Component {
 
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, queryParams = {}) => {
-    const { collective, tier, isEmbed, disabledPaymentMethodTypes } = this.props;
+    const { collective, tier, isEmbed } = this.props;
+    const encodeListArg = list => (!list?.length ? undefined : list.join(','));
     const verb = this.props.verb || 'donate';
     const step = stepName === 'details' ? '' : stepName;
     const allQueryParams = {
       interval: this.props.fixedInterval,
-      disabledPaymentMethodTypes: disabledPaymentMethodTypes
-        ? disabledPaymentMethodTypes.join(',')
-        : disabledPaymentMethodTypes,
+      disabledPaymentMethodTypes: encodeListArg(this.props.disabledPaymentMethodTypes),
+      tags: encodeListArg(this.props.tags),
       ...pick(this.props, [
         'interval',
         'description',
