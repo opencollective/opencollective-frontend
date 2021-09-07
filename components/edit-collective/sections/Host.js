@@ -496,17 +496,16 @@ class Host extends React.Component {
             </Box>
           </Flex>
         </div>
-        <div>
-          <MessageBox type="info" fontSize="13px" withIcon mb={4}>
-            <FormattedMessage
-              id="collective.edit.host.legalName.info"
-              defaultMessage="Please set the legal name of the host in the {LegalNameSettingLink}. This is useful for tax and accounting purposes."
-              values={{
-                LegalNameSettingLink: <Link href={`/${collective.slug}/edit/info`}>info section</Link>,
-              }}
-            />
-          </MessageBox>
-        </div>
+        {(selectedOption === 'selfHost' || selectedOption === 'ownHost') && (
+          <div>
+            <MessageBox type="info" fontSize="13px" withIcon mb={4}>
+              <FormattedMessage
+                id="collective.edit.host.legalName.info"
+                defaultMessage="Please set the legal name of the host in the Info section under Settings. This is useful for tax and accounting purposes."
+              />
+            </MessageBox>
+          </div>
+        )}
       </EditCollectiveHostSection>
     );
   }
