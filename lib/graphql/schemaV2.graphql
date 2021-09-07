@@ -6300,6 +6300,28 @@ type Mutation {
   ): Member!
 
   """
+  [Root only] Create a member entry directly. For non-root users, use `inviteMember`
+  """
+  createMember(
+    """
+    Reference to an account for the member
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    memberAccount will become a member of this account
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of the member
+    """
+    role: MemberRole!
+    description: String
+    since: DateTime
+  ): Member!
+
+  """
   Edit an existing member of the Collective
   """
   editMember(
