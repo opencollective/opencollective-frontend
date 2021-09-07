@@ -501,7 +501,7 @@ class Host extends React.Component {
             <MessageBox type="info" fontSize="13px" withIcon mb={4}>
               <FormattedMessage
                 id="collective.edit.host.legalName.info"
-                defaultMessage="Please set the legal name of the host in the Info section under Settings. This is useful for tax and accounting purposes."
+                defaultMessage="Please set the legal name of the host in the Info section under Settings. This is required if your legal name is different than your display name for tax and accounting purposes."
               />
             </MessageBox>
           </div>
