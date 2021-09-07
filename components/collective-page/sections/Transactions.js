@@ -12,6 +12,7 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
 import StyledLinkButton from '../../StyledLinkButton';
+import { getDefaultKinds } from '../../transactions/filters/TransactionsKindFilter';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionsList from '../../transactions/TransactionsList';
 import { Dimensions } from '../_constants';
@@ -37,8 +38,14 @@ const I18nFilters = defineMessages({
 });
 
 export const transactionsSectionQuery = gqlV2/* GraphQL */ `
-  query TransactionsSection($slug: String!, $limit: Int!, $hasOrder: Boolean, $hasExpense: Boolean) {
-    transactions(account: { slug: $slug }, limit: $limit, hasOrder: $hasOrder, hasExpense: $hasExpense) {
+  query TransactionsSection(
+    $slug: String!
+    $limit: Int!
+    $hasOrder: Boolean
+    $hasExpense: Boolean
+    $kind: [TransactionKind]
+  ) {
+    transactions(account: { slug: $slug }, limit: $limit, hasOrder: $hasOrder, hasExpense: $hasExpense, kind: $kind) {
       ...TransactionsQueryCollectionFragment
     }
   }
@@ -46,7 +53,7 @@ export const transactionsSectionQuery = gqlV2/* GraphQL */ `
 `;
 
 export const getTransactionsSectionQueryVariables = slug => {
-  return { slug, limit: NB_DISPLAYED };
+  return { slug, limit: NB_DISPLAYED, kind: getDefaultKinds() };
 };
 
 const SectionTransactions = props => {
