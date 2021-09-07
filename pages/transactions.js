@@ -76,6 +76,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       searchTerm: $searchTerm
       kind: $kind
       includeIncognitoTransactions: true
+      includeGiftCardTransactions: true
       includeDebts: true
     ) {
       ...TransactionsQueryCollectionFragment

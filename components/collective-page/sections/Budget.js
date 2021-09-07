@@ -31,7 +31,13 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
     host(slug: $hostSlug) {
       ...ExpenseHostFields
     }
-    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kind: $kind) {
+    transactions(
+      account: { slug: $slug }
+      limit: $limit
+      hasExpense: false
+      kind: $kind
+      includeGiftCardTransactions: true
+    ) {
       ...TransactionsQueryCollectionFragment
     }
     expenses(account: { slug: $slug }, limit: $limit) {

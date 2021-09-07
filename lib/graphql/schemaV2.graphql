@@ -8092,6 +8092,11 @@ type Query {
     includeIncognitoTransactions: Boolean! = false
 
     """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
