@@ -71,6 +71,9 @@ class NewContributionFlowPage extends React.Component {
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
+      disabledPaymentMethodTypes: query.disabledPaymentMethodTypes
+        ? query.disabledPaymentMethodTypes.split(',')
+        : undefined,
       defaultEmail: query.defaultEmail && isEmail(query.defaultEmail) ? query.defaultEmail : null,
       defaultName: query.defaultName,
       useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
@@ -86,6 +89,7 @@ class NewContributionFlowPage extends React.Component {
     redirect: PropTypes.string,
     description: PropTypes.string,
     backgroundColor: PropTypes.string,
+    disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
     platformContribution: PropTypes.number,
@@ -169,6 +173,7 @@ class NewContributionFlowPage extends React.Component {
             redirect={this.props.redirect}
             description={this.props.description}
             defaultQuantity={this.props.quantity}
+            disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
             fixedInterval={this.props.interval}
             fixedAmount={this.props.totalAmount}
             platformContribution={this.props.platformContribution}
