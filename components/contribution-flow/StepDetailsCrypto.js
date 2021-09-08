@@ -50,24 +50,25 @@ const getCryptoExchangeRate = async (cryptoCurrency, collectiveCurrency) => {
   }
 };
 
-const StepDetailsCrypto = ({ onChange, data, currency }) => {
+const StepDetailsCrypto = ({ onChange, data, collective }) => {
   const intl = useIntl();
-  const [cryptoCurrencyType, setCryptoCurrencyType] = useState(data.currency);
+  const [selectedCryptoCurrency, setSelectedCryptoCurrency] = useState(data.currency);
   const [amount, setAmount] = useState(data.amount);
   const [convertedAmount, setConvertedAmount] = useState(null);
   const [cryptoExchangeRate, setCryptoExchangeRate] = useState(null);
   const [touched, setTouched] = useState(false);
+  const collectiveCurrency = collective.currency;
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
   const storeCryptoExchangeRate = async (cryptoCurrency, collectiveCurrency) => {
-    const exchangeRate = await getCryptoExchangeRate(cryptoCurrency.value, collectiveCurrency);
+    const exchangeRate = await getCryptoExchangeRate(cryptoCurrency, collectiveCurrency);
     setCryptoExchangeRate(exchangeRate);
   };
 
   useEffect(() => {
-    storeCryptoExchangeRate(cryptoCurrencyType, currency);
+    storeCryptoExchangeRate(selectedCryptoCurrency, collectiveCurrency);
   }, []);
 
   useEffect(() => {
@@ -84,11 +85,11 @@ const StepDetailsCrypto = ({ onChange, data, currency }) => {
       <StyledSelect
         inputId="crypto-currency"
         options={CRYPTO_CURRENCIES}
-        defaultValue={cryptoCurrencyType}
-        onChange={async value => {
-          setCryptoCurrencyType(value);
-          storeCryptoExchangeRate(value, currency);
-          dispatchChange('currency', value);
+        defaultValue={selectedCryptoCurrency}
+        onChange={cryptoCurrency => {
+          setSelectedCryptoCurrency(cryptoCurrency);
+          storeCryptoExchangeRate(cryptoCurrency.value, collectiveCurrency);
+          dispatchChange('currency', cryptoCurrency);
         }}
         isSearchable={false}
         maxWidth={'100%'}
@@ -98,14 +99,15 @@ const StepDetailsCrypto = ({ onChange, data, currency }) => {
         {intl.formatMessage(messages['donationAmount'])}
       </Label>
       <StyledInputGroup
-        prepend={cryptoCurrencyType.labelWithoutImage}
+        prepend={selectedCryptoCurrency.labelWithoutImage}
         type="number"
         inputMode="decimal"
         defaultValue={amount}
         onChange={({ target }) => {
-          setAmount(target.value);
-          if (target.value > 0) {
-            dispatchChange('amount', parseFloat(target.value));
+          const amount = parseFloat(target.value);
+          setAmount(amount);
+          if (amount > 0) {
+            dispatchChange('amount', amount);
           }
         }}
         onBlur={() => setTouched(true)}
@@ -117,7 +119,7 @@ const StepDetailsCrypto = ({ onChange, data, currency }) => {
           ~
           <FormattedMoneyAmount
             amount={convertedAmount * 100}
-            currency={currency}
+            currency={collectiveCurrency}
             amountStyles={{ fontWeight: '400' }}
           />
         </Box>
@@ -150,8 +152,9 @@ StepDetailsCrypto.propTypes = {
       currency: PropTypes.string,
     }),
   }),
-  // The Collective currency.
-  currency: PropTypes.string,
+  collective: PropTypes.shape({
+    currency: PropTypes.object,
+  }),
 };
 
 export default StepDetailsCrypto;
