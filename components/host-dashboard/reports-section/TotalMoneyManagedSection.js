@@ -38,8 +38,10 @@ const FundAmounts = styled.div`
   border-radius: 10px;
   background-color: #9a7bf1;
   border-right: 350px solid #46347f;
+  padding-top: 10px;
+  padding-left: 5px;
 
-  @media (max-width: 750px) {
+  @media (max-width: 1025px) {
     height: 130px;
     background-color: #9a7bf1;
     border-right: 0px;
@@ -47,13 +49,14 @@ const FundAmounts = styled.div`
   }
 `;
 
-const TotalFundsLabel = styled.div`
-  width: 210px;
+const TotalFundsLabel = styled(Container)`
+  display: table-cell;
+  padding-left: 10px;
   height: 26px;
   border-radius: 5px;
   background-color: white;
   opacity: 80%;
-  vertical-align: center;
+  vertical-align: middle;
 `;
 
 const TotalMoneyManagedSection = ({
@@ -95,13 +98,21 @@ const TotalMoneyManagedSection = ({
         </P>
         <Container mt={18} mb={12}>
           <FundAmounts>
-            {/* TODO: Align the items */}
-            {/* <TotalFundsLabel>*/}
-            {/*  {`${formatCurrency(totalCollectiveFunds, currency)} | My Collectives`}*/}
-            {/* </TotalFundsLabel>*/}
-            {/* <TotalFundsLabel>*/}
-            {/*  {formatCurrency(totalHostFunds, currency)}*/}
-            {/* </TotalFundsLabel>*/}
+            <TotalFundsLabel minWidth="210px">
+              <P>
+                <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> | Collectives
+              </P>
+            </TotalFundsLabel>
+            <TotalFundsLabel
+              minWidth="230px"
+              position="relative"
+              left={['-210px', '-210px', '-210px', '320px']}
+              top={['85px', '85px', '85px', '0px']}
+            >
+              <P>
+                <Span fontWeight="700">{formatCurrency(totalHostFunds, currency)}</Span> | Host Organization
+              </P>
+            </TotalFundsLabel>
           </FundAmounts>
         </Container>
         <P minHeight="18px" fontSize="12px" fontWeight="400" lineHeight="18px" pt={12} pb={16}>
