@@ -45,7 +45,14 @@ export const transactionsSectionQuery = gqlV2/* GraphQL */ `
     $hasExpense: Boolean
     $kind: [TransactionKind]
   ) {
-    transactions(account: { slug: $slug }, limit: $limit, hasOrder: $hasOrder, hasExpense: $hasExpense, kind: $kind) {
+    transactions(
+      account: { slug: $slug }
+      limit: $limit
+      hasOrder: $hasOrder
+      hasExpense: $hasExpense
+      kind: $kind
+      includeGiftCardTransactions: true
+    ) {
       ...TransactionsQueryCollectionFragment
     }
   }
