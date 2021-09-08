@@ -71,6 +71,7 @@ const HostDashboardReports = ({ hostSlug }) => {
             totalCollectiveFunds={400000000}
             totalHostFunds={71662893}
             currency="USD"
+            hostSlug={hostSlug}
           />
         </Container>
         <Container mb={38}>

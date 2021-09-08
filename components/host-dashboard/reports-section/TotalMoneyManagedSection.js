@@ -1,17 +1,58 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/client';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
+import Loading from '../../Loading';
 import StyledCard from '../../StyledCard';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
+
+const metricsQuery = gqlV2/* GraphQL */ `
+  query HostMetricsQuery($slug: String) {
+    host(slug: $slug) {
+      id
+      hostMetrics {
+        hostFees {
+          value
+          currency
+        }
+        platformFees {
+          value
+          currency
+        }
+        pendingPlatformFees {
+          value
+          currency
+        }
+        platformTips {
+          value
+          currency
+        }
+        pendingPlatformTips {
+          value
+          currency
+        }
+        pendingHostFeeShare {
+          value
+          currency
+        }
+        totalMoneyManaged {
+          value
+          currency
+        }
+      }
+    }
+  }
+`;
 
 const Messages = defineMessages({
   heading: {
@@ -59,14 +100,30 @@ const TotalFundsLabel = styled(Container)`
   vertical-align: middle;
 `;
 
-const TotalMoneyManagedSection = ({
-  currentAmount,
-  projectedAmount,
-  totalCollectiveFunds,
-  totalHostFunds,
-  currency,
-}) => {
+const TotalMoneyManagedSection = ({ currency, hostSlug }) => {
   const intl = useIntl();
+  const { loading, data } = useQuery(metricsQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug: hostSlug },
+  });
+  if (loading) {
+    return <Loading />;
+  }
+  const {
+    totalMoneyManaged,
+    pendingPlatformFees,
+    pendingPlatformTips,
+    pendingHostFeeShare,
+    platformTips,
+    hostFees,
+    platformFees,
+  } = data?.host.hostMetrics;
+  const currentAmount = totalMoneyManaged.value * 100;
+  const projectedAmount =
+    (totalMoneyManaged.value + pendingPlatformFees.value + pendingPlatformTips.value + pendingHostFeeShare.value) * 100;
+  const totalCollectiveFunds =
+    (totalMoneyManaged.value - platformTips.value - platformFees.value - hostFees.value) * 100;
+  const totalHostFunds = hostFees.value * 100;
   return (
     <StyledCard borderColor="#46347F">
       <Container pl={27} pr={24} pt={16} pb={16} backgroundColor="#F6F5FF">
@@ -129,6 +186,7 @@ TotalMoneyManagedSection.propTypes = {
   totalCollectiveFunds: PropTypes.number,
   totalHostFunds: PropTypes.number,
   currency: PropTypes.string,
+  hostSlug: PropTypes.string,
 };
 
 export default TotalMoneyManagedSection;
