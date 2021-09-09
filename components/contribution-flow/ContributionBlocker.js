@@ -58,7 +58,7 @@ const tierHasFixedInterval = tier => tier?.interval && tier.interval !== 'flexib
 /**
  * From received params, see if there's anything preventing the contribution
  */
-export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier) => {
+export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier, isCrypto = false) => {
   if (!account.host) {
     return { reason: CONTRIBUTION_BLOCKER.NO_HOST };
   } else if (!account.isActive) {
@@ -70,7 +70,9 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.TIER_MISSING, type: 'warning', showOtherWaysToContribute: true };
   } else if (tier && isTierExpired(tier)) {
     return { reason: CONTRIBUTION_BLOCKER.TIER_EXPIRED, type: 'warning', showOtherWaysToContribute: true };
-  } else if (account.settings.disableCustomContributions && !tier) {
+  } else if (account.settings.disableCryptoContributions && isCrypto) {
+    return { reason: CONTRIBUTION_BLOCKER.NO_CRYPTO_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
+  } else if (account.settings.disableCustomContributions && !isCrypto && !tier) {
     return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
   } else if (tierHasFixedInterval(tier) && !canContributeRecurring(account, loggedInUser)) {
     return {

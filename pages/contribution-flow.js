@@ -130,8 +130,9 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, LoggedInUser, error } = this.props;
+    const { data = {}, step, paymentMethod, LoggedInUser, error } = this.props;
     const { account, tier } = data;
+    const isCrypto = paymentMethod === 'crypto';
 
     if (data.loading) {
       return (
@@ -141,14 +142,20 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    const contributionBlocker = getContributionBlocker(
+      LoggedInUser,
+      account,
+      tier,
+      Boolean(this.props.tierId),
+      isCrypto,
+    );
     if (contributionBlocker) {
       if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
         return <Redirect to={`/${account.slug}/contribute`} />;
       }
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isCrypto={this.props.paymentMethod === 'crypto'} />;
+      return <ContributionFlowSuccess collective={account} isCrypto={isCrypto} />;
     } else {
       return (
         <ContributionFlowContainer
