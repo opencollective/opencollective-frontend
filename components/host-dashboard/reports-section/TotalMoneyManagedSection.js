@@ -1,77 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { defineMessages, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
-import Loading from '../../Loading';
 import StyledCard from '../../StyledCard';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
-
-const metricsQuery = gqlV2/* GraphQL */ `
-  query HostMetricsQuery($slug: String) {
-    host(slug: $slug) {
-      id
-      hostMetrics {
-        hostFees {
-          value
-          currency
-        }
-        platformFees {
-          value
-          currency
-        }
-        pendingPlatformFees {
-          value
-          currency
-        }
-        platformTips {
-          value
-          currency
-        }
-        pendingPlatformTips {
-          value
-          currency
-        }
-        pendingHostFeeShare {
-          value
-          currency
-        }
-        totalMoneyManaged {
-          value
-          currency
-        }
-      }
-    }
-  }
-`;
-
-const Messages = defineMessages({
-  heading: {
-    id: 'TotalMoneyManagedSection.heading',
-    defaultMessage: 'Total Money Managed',
-  },
-  subHeading: {
-    id: 'TotalMoneyManagedSection.subHeading',
-    defaultMessage: 'My Organization and My Collectives',
-  },
-  totalAmountHeld: {
-    id: 'TotalMoneyManagedSection.totalAmountHeld',
-    defaultMessage: 'Total amount held in your bank account for the Host and its Collectives',
-  },
-  titleDescription: {
-    id: 'TotalMoneyManagedSection.titleTooltip',
-    defaultMessage: 'Total amount held in your bank account for the Host and its Collectives.',
-  },
-});
 
 const FundAmounts = styled.div`
   width: 100%;
@@ -100,15 +40,7 @@ const TotalFundsLabel = styled(Container)`
   vertical-align: middle;
 `;
 
-const TotalMoneyManagedSection = ({ currency, hostSlug }) => {
-  const intl = useIntl();
-  const { loading, data } = useQuery(metricsQuery, {
-    context: API_V2_CONTEXT,
-    variables: { slug: hostSlug },
-  });
-  if (loading) {
-    return <Loading />;
-  }
+const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
   const {
     totalMoneyManaged,
     pendingPlatformFees,
@@ -117,7 +49,7 @@ const TotalMoneyManagedSection = ({ currency, hostSlug }) => {
     platformTips,
     hostFees,
     platformFees,
-  } = data?.host.hostMetrics;
+  } = hostMetrics;
   const currentAmount = totalMoneyManaged.value * 100;
   const projectedAmount =
     (totalMoneyManaged.value + pendingPlatformFees.value + pendingPlatformTips.value + pendingHostFeeShare.value) * 100;
@@ -129,7 +61,7 @@ const TotalMoneyManagedSection = ({ currency, hostSlug }) => {
       <Container pl={27} pr={24} pt={16} pb={16} backgroundColor="#F6F5FF">
         <P minHeight="16px" fontSize="12px" fontWeight="500" lineHeight="16px" textTransform="uppercase">
           <Dollar size={14} color="#1300AB" />
-          {intl.formatMessage(Messages.heading)}
+          <FormattedMessage id="TotalMoneyManagedSection.heading" defaultMessage="Total Money Managed" />
         </P>
         <Flex flexWrap="wrap" mt={12} mb={14}>
           <Span fontSize={18} fontWeight="500">
@@ -142,13 +74,25 @@ const TotalMoneyManagedSection = ({ currency, hostSlug }) => {
             {formatCurrency(projectedAmount, currency)}
           </Span>
           <Span fontSize={12} fontWeight="500" lineHeight="27px" ml="8px">
-            Projected
+            <FormattedMessage id="TotalMoneyManagedSection.projected" defaultMessage="Projected" />
           </Span>
         </Flex>
         <P minHeight="12px" fontSize="11px" fontWeight="700" lineHeight="12px" textTransform="uppercase">
-          <Span style={{ verticalAlign: 'middle' }}>{intl.formatMessage(Messages.subHeading)}</Span>
+          <Span style={{ verticalAlign: 'middle' }}>
+            <FormattedMessage
+              id="TotalMoneyManagedSection.subHeading"
+              defaultMessage="My Organization and My Collectives"
+            />
+          </Span>
           <Span ml={1}>
-            <StyledTooltip content={() => intl.formatMessage(Messages.titleDescription)}>
+            <StyledTooltip
+              content={() => (
+                <FormattedMessage
+                  id="TotalMoneyManagedSection.titleTooltip"
+                  defaultMessage="Total amount held in your bank account for the Host and its Collectives."
+                />
+              )}
+            >
               <InfoCircle size={14} />
             </StyledTooltip>
           </Span>
@@ -173,7 +117,10 @@ const TotalMoneyManagedSection = ({ currency, hostSlug }) => {
           </FundAmounts>
         </Container>
         <P minHeight="18px" fontSize="12px" fontWeight="400" lineHeight="18px" pt={12} pb={16}>
-          {intl.formatMessage(Messages.titleDescription)}
+          <FormattedMessage
+            id="TotalMoneyManagedSection.titleTooltip"
+            defaultMessage="Total amount held in your bank account for the Host and its Collectives."
+          />
         </P>
       </Container>
     </StyledCard>
@@ -181,12 +128,8 @@ const TotalMoneyManagedSection = ({ currency, hostSlug }) => {
 };
 
 TotalMoneyManagedSection.propTypes = {
-  currentAmount: PropTypes.number,
-  projectedAmount: PropTypes.number,
-  totalCollectiveFunds: PropTypes.number,
-  totalHostFunds: PropTypes.number,
   currency: PropTypes.string,
-  hostSlug: PropTypes.string,
+  hostMetrics: PropTypes.object,
 };
 
 export default TotalMoneyManagedSection;

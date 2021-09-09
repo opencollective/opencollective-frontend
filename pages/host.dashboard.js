@@ -10,6 +10,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { getEnvVar } from '../lib/env-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { parseToBoolean } from '../lib/utils';
 
@@ -193,7 +194,7 @@ class HostDashboardPage extends React.Component {
                   <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
                 </LinkContainer>
               </Link>
-              {parseToBoolean(process.env.HOST_DASHBOARD_REPORTS) && (
+              {parseToBoolean(getEnvVar('HOST_DASHBOARD_REPORTS')) && (
                 <Link href={`/${slug}/dashboard/${HOST_SECTIONS.REPORTS}`}>
                   <LinkContainer isActive={view === HOST_SECTIONS.REPORTS}>
                     <ReportsIcon size="1.2em" />

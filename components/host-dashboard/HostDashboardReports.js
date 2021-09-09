@@ -8,6 +8,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Loading from '../Loading';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
@@ -26,6 +27,36 @@ const mainReportsQuery = gqlV2/* GraphQL */ `
       isHost
       type
       hostFeePercent
+      hostMetrics {
+        hostFees {
+          value
+          currency
+        }
+        platformFees {
+          value
+          currency
+        }
+        pendingPlatformFees {
+          value
+          currency
+        }
+        platformTips {
+          value
+          currency
+        }
+        pendingPlatformTips {
+          value
+          currency
+        }
+        pendingHostFeeShare {
+          value
+          currency
+        }
+        totalMoneyManaged {
+          value
+          currency
+        }
+      }
     }
   }
 `;
@@ -53,7 +84,11 @@ SectionTitle.propTypes = {
 
 const HostDashboardReports = ({ hostSlug }) => {
   // TODO: Use common data from this query with the hook below
-  useQuery(mainReportsQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const { data, loading } = useQuery(mainReportsQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  if (loading) {
+    return <Loading />;
+  }
+  const hostMetrics = data?.host.hostMetrics;
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
@@ -65,14 +100,7 @@ const HostDashboardReports = ({ hostSlug }) => {
       </Flex>
       <StyledCard mb={5} borderRadius="12px" padding="32px 24px" borderColor="black.400">
         <Container mb={38}>
-          <TotalMoneyManagedSection
-            currentAmount={471662893}
-            projectedAmount={474662693}
-            totalCollectiveFunds={400000000}
-            totalHostFunds={71662893}
-            currency="USD"
-            hostSlug={hostSlug}
-          />
+          <TotalMoneyManagedSection currency="USD" hostMetrics={hostMetrics} />
         </Container>
         <Container mb={38}>
           <SectionTitle>
