@@ -827,6 +827,7 @@
   "Events": "Події",
   "events": "Мої події",
   "events.create.login": "Ви повинні увійти в якості учасника команди цього Колективу, щоб створити подію.",
+  "examples": "e.g. {examples}",
   "ExepenseAttachments.count": "{count, plural, one {# вкладення} few {# вкладення} many {# вкладень} other {# вкладень}}",
   "ExpandDescription": "Читати повний опис",
   "Expense.Activity.Approved": "Витрати затверджено",

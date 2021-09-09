@@ -827,6 +827,7 @@
   "Events": "事件",
   "events": "我的活动",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",
+  "examples": "e.g. {examples}",
   "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "ExpandDescription": "Read full description",
   "Expense.Activity.Approved": "支出被批准",

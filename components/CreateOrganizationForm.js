@@ -64,7 +64,7 @@ const orgMessages = defineMessages({
 
 const placeholders = {
   name: { id: 'placeholder.name', defaultMessage: 'e.g. Salesforce, Airbnb' },
-  legalName: { id: 'placeholder.legalName', defaultMessage: 'e.g. Salesforce.com, Inc., Airbnb, Inc.' },
+  examples: { id: 'examples', defaultMessage: 'e.g. {examples}' },
   slug: { id: 'placeholder.slug', defaultMessage: 'Airbnb' },
   description: { id: 'placeholderdescription', defaultMessage: 'Making a world a better place' },
   website: { id: 'placeholder.website', defaultMessage: 'www.example.com' },
@@ -229,7 +229,9 @@ const CreateOrganizationForm = props => {
                           <Field
                             as={StyledInput}
                             {...inputProps}
-                            placeholder={intl.formatMessage(placeholders.legalName)}
+                            placeholder={intl.formatMessage(placeholders.examples, {
+                              examples: 'Salesforce.com, Inc., Airbnb, Inc.',
+                            })}
                           />
                         )}
                       </StyledInputField>

@@ -827,6 +827,7 @@
   "Events": "Eventos",
   "events": "Meus eventos",
   "events.create.login": "Você precisa estar logado como um membro do time deste coletivo para poder criar um evento.",
+  "examples": "e.g. {examples}",
   "ExepenseAttachments.count": "{count, plural, one {# Anexo} other {# Anexos}}",
   "ExpandDescription": "Ler descrição completa",
   "Expense.Activity.Approved": "Despesa aprovada",
