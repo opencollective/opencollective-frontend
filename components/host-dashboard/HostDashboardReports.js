@@ -14,6 +14,7 @@ import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { H1, H2 } from '../Text';
 
+import HostFeesSection from './reports-section/HostFeesSection';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
 
 const mainReportsQuery = gqlV2/* GraphQL */ `
@@ -92,7 +93,7 @@ const HostDashboardReports = ({ hostSlug }) => {
   const hostMetrics = data?.host.hostMetrics;
 
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
+    <Box maxWidth={800} m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Reports" defaultMessage="Reports" />
@@ -117,7 +118,9 @@ const HostDashboardReports = ({ hostSlug }) => {
           <SectionTitle>
             <FormattedMessage id="Host.FeesCollective" defaultMessage="Host fees (collected)" />
           </SectionTitle>
-          <StyledCard height={200} />
+          <StyledCard minHeight={200}>
+            <HostFeesSection hostSlug={hostSlug} />
+          </StyledCard>
         </Container>
         <Container mb={38}>
           <SectionTitle>
