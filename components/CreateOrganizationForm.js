@@ -230,7 +230,7 @@ const CreateOrganizationForm = props => {
                             as={StyledInput}
                             {...inputProps}
                             placeholder={intl.formatMessage(placeholders.examples, {
-                              examples: 'Salesforce.com, Inc., Airbnb, Inc.',
+                              examples: 'Salesforce, Inc., Airbnb, Inc.',
                             })}
                           />
                         )}

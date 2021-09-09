@@ -647,7 +647,7 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'legalName',
           placeholder: intl.formatMessage(this.messages.examples, {
-            examples: isUser ? 'Maria Gracia' : 'Salesforce.com, Inc., Airbnb, Inc.',
+            examples: isUser ? 'Maria Gracia' : 'Salesforce, Inc., Airbnb, Inc.',
           }),
           maxLength: 255,
           when: () => isUser || collective.type === CollectiveType.ORGANIZATION,
