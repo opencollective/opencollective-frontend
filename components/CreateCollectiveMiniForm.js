@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { assign, cloneDeep, get, pick } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
-import { getErrorFromGraphqlException } from '../lib/errors';
+import { i18nGraphqlException } from '../lib/errors';
 import { isValidEmail } from '../lib/utils';
 
 import Container from './Container';
@@ -62,10 +62,6 @@ const msg = defineMessages({
     id: 'Organization.Name',
     defaultMessage: 'Organization name',
   },
-  legalName: {
-    id: 'LegalName',
-    defaultMessage: 'Legal Name',
-  },
   fullName: {
     id: 'User.FullName',
     defaultMessage: 'Full name',
@@ -117,10 +113,10 @@ const prepareMutationVariables = collective => {
   const locationFields = includeLocation ? ['location.address', 'location.country'] : [];
 
   if (collective.type === CollectiveType.USER) {
-    return { user: pick(collective, ['name', 'legalName', 'email', ...locationFields]) };
+    return { user: pick(collective, ['name', 'email', ...locationFields]) };
   } else if (collective.type === CollectiveType.ORGANIZATION) {
     collective.members.forEach(member => (member.role = roles.ADMIN));
-    return { collective: pick(collective, ['name', 'legalName', 'type', 'website', 'members', ...locationFields]) };
+    return { collective: pick(collective, ['name', 'type', 'website', 'members', ...locationFields]) };
   } else {
     return { collective: pick(collective, ['name', 'type', 'website', ...locationFields]) };
   }
@@ -131,6 +127,7 @@ const createCollectiveMutation = gql`
     createCollective(collective: $collective) {
       id
       name
+      legalName
       slug
       type
       imageUrl(height: 64)
@@ -159,6 +156,7 @@ const createUserMutation = gql`
         collective {
           id
           name
+          legalName
           slug
           type
           location {
@@ -196,7 +194,8 @@ const CreateCollectiveMiniForm = ({
   const noAdminFields = isOrganization && excludeAdminFields;
   const mutation = isUser ? createUserMutation : createCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
+  const { formatMessage } = intl;
 
   const initialValues = {
     members: [{ member: { email, name } }],
@@ -233,7 +232,7 @@ const CreateCollectiveMiniForm = ({
     let values;
     if (excludeAdminFields) {
       const clonedValues = cloneDeep({ ...formValues, type });
-      const assignAdmin = pick(clonedValues, ['name', 'legalName', 'website', 'type']);
+      const assignAdmin = pick(clonedValues, ['name', 'website', 'type']);
       values = assign(assignAdmin, { members: [{ member: { id: LoggedInUser.CollectiveId } }] });
     } else {
       values = cloneDeep({ ...formValues, type });
@@ -320,32 +319,6 @@ const CreateCollectiveMiniForm = ({
                   />
                 )}
               </StyledInputField>
-              {(isUser || isOrganization) && (
-                <StyledInputField
-                  name="legalName"
-                  htmlFor="legalName"
-                  label={formatMessage(msg.legalName)}
-                  mt={3}
-                  value={values.legalName}
-                  isPrivate
-                  hint={
-                    <FormattedMessage
-                      id="legalName.description"
-                      defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name."
-                    />
-                  }
-                >
-                  {inputProps => (
-                    <Field
-                      as={StyledInput}
-                      {...inputProps}
-                      placeholder="e.g. Open Collective Inc."
-                      width="100%"
-                      data-cy="mini-form-legalName-field"
-                    />
-                  )}
-                </StyledInputField>
-              )}
               {!isUser && (
                 <StyledInputField
                   name="website"
@@ -397,7 +370,7 @@ const CreateCollectiveMiniForm = ({
             </Box>
             {submitError && (
               <MessageBox type="error" withIcon mt={2}>
-                {getErrorFromGraphqlException(submitError).message}
+                {i18nGraphqlException(intl, submitError)}
               </MessageBox>
             )}
             <Container
