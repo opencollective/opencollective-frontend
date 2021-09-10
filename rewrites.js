@@ -127,7 +127,7 @@ exports.REWRITES = [
     destination: '/host.dashboard',
   },
   {
-    source: '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations)?',
+    source: '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations|reports)?',
     destination: '/host.dashboard',
   },
   {
@@ -140,7 +140,7 @@ exports.REWRITES = [
   },
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(evenExpenseAdminActionsts|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
     destination: '/expense',
   },
   {
@@ -320,5 +320,10 @@ exports.REWRITES = [
   {
     source: '/:slug/:action(apply)?/:mode(onboarding)?/:step(administrators|contact-info|success)?',
     destination: '/collective-page',
+  },
+  // Root actions
+  {
+    source: '/opencollective/root-actions',
+    destination: '/root-actions',
   },
 ];

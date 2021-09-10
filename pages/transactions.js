@@ -76,6 +76,8 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       searchTerm: $searchTerm
       kind: $kind
       includeIncognitoTransactions: true
+      includeGiftCardTransactions: true
+      includeDebts: true
     ) {
       ...TransactionsQueryCollectionFragment
     }
@@ -247,6 +249,7 @@ class TransactionsPage extends React.Component {
             >
               <TransactionsFilters
                 filters={query}
+                kinds={transactions?.kinds}
                 collective={collective}
                 onChange={queryParams => this.updateFilters({ ...queryParams, offset: null })}
               />
@@ -256,7 +259,7 @@ class TransactionsPage extends React.Component {
                     <TransactionsDownloadInvoices collective={collective} />
                   </Box>
                 )}
-                <TransactionsDownloadCSV collective={collective} />
+                <TransactionsDownloadCSV collective={collective} query={this.props.query} />
               </Flex>
             </Flex>
             {error ? (

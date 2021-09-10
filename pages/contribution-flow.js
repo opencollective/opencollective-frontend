@@ -68,7 +68,11 @@ class NewContributionFlowPage extends React.Component {
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
+      disabledPaymentMethodTypes: query.disabledPaymentMethodTypes
+        ? query.disabledPaymentMethodTypes.split(',')
+        : undefined,
       error: query.error,
+      tags: query.tags ? query.tags.split(',') : undefined,
     };
   }
 
@@ -78,6 +82,7 @@ class NewContributionFlowPage extends React.Component {
     paymentMethod: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
+    disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
     platformContribution: PropTypes.number,
@@ -97,6 +102,7 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    tags: PropTypes.arrayOf(PropTypes.string),
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -155,12 +161,14 @@ class NewContributionFlowPage extends React.Component {
           redirect={this.props.redirect}
           description={this.props.description}
           defaultQuantity={this.props.quantity}
+          disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
           fixedInterval={this.props.interval}
           fixedAmount={this.props.totalAmount}
           platformContribution={this.props.platformContribution}
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
+          tags={this.props.tags}
           error={error}
         />
       );

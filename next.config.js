@@ -23,6 +23,7 @@ const nextConfig = {
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
         NEXT_IMAGES_URL: null,
+        REST_URL: null,
         SENTRY_DSN: null,
         ONBOARDING_MODAL: true,
         NEW_HOST_APPLICATION_FLOW: null,
@@ -30,8 +31,11 @@ const nextConfig = {
         REJECT_CONTRIBUTION: false,
         REJECTED_CATEGORIES: false,
         CHANGE_LOG_UPDATES_ENABLED: false,
+        HOST_DASHBOARD_REPORTS: false,
         WISE_ENVIRONMENT: 'sandbox',
-        ADD_FUNDS_FROM_COLLECTIVE: false,
+        HCAPTCHA_SITEKEY: false,
+        CAPTCHA_ENABLED: true,
+        CAPTCHA_PROVIDER: 'HCAPTCHA',
       }),
     );
 

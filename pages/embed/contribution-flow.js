@@ -71,11 +71,16 @@ class NewContributionFlowPage extends React.Component {
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
+      disabledPaymentMethodTypes: query.disabledPaymentMethodTypes
+        ? query.disabledPaymentMethodTypes.split(',')
+        : undefined,
       defaultEmail: query.defaultEmail && isEmail(query.defaultEmail) ? query.defaultEmail : null,
       defaultName: query.defaultName,
       useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
       hideHeader: query.hideHeader ? parseToBoolean(query.hideHeader) : false,
       backgroundColor: backgroundColor && isHexColor(backgroundColor) ? backgroundColor : undefined,
+      error: query.error,
+      tags: query.tags ? query.tags.split(',') : undefined,
     };
   }
 
@@ -86,12 +91,14 @@ class NewContributionFlowPage extends React.Component {
     redirect: PropTypes.string,
     description: PropTypes.string,
     backgroundColor: PropTypes.string,
+    disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
     platformContribution: PropTypes.number,
     interval: PropTypes.string,
     tierId: PropTypes.number,
     customData: PropTypes.object,
+    error: PropTypes.string,
     contributeAs: PropTypes.string,
     defaultEmail: PropTypes.string,
     defaultName: PropTypes.string,
@@ -108,6 +115,7 @@ class NewContributionFlowPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     useTheme: PropTypes.bool,
     hideHeader: PropTypes.bool,
+    tags: PropTypes.arrayOf(PropTypes.string),
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -169,6 +177,7 @@ class NewContributionFlowPage extends React.Component {
             redirect={this.props.redirect}
             description={this.props.description}
             defaultQuantity={this.props.quantity}
+            disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
             fixedInterval={this.props.interval}
             fixedAmount={this.props.totalAmount}
             platformContribution={this.props.platformContribution}
@@ -177,6 +186,8 @@ class NewContributionFlowPage extends React.Component {
             contributeAs={this.props.contributeAs}
             defaultEmail={this.props.defaultEmail}
             defaultName={this.props.defaultName}
+            tags={this.props.tags}
+            error={this.props.error}
           />
         </Box>
       );

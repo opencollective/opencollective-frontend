@@ -9,6 +9,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
 import {
@@ -20,6 +21,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
+import { isPastEvent } from '../../lib/events';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
@@ -87,6 +89,10 @@ const OTHER_MESSAGES = defineMessages({
     defaultMessage:
       'You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. This means the tip is larger than the contribution, when usually the reverse is intended.{newLine}{newLine}Are you sure you want to do this?',
   },
+  pastEventWarning: {
+    id: 'Warning.PastEvent',
+    defaultMessage: `You're contributing to a past event.`,
+  },
 });
 
 class ContributionFlow extends React.Component {
@@ -94,6 +100,7 @@ class ContributionFlow extends React.Component {
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
       platformContributionAvailable: PropTypes.bool,
       parent: PropTypes.shape({
@@ -105,6 +112,7 @@ class ContributionFlow extends React.Component {
     intl: PropTypes.object,
     createOrder: PropTypes.func.isRequired,
     confirmOrder: PropTypes.func.isRequired,
+    disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
     fixedInterval: PropTypes.string,
     fixedAmount: PropTypes.number,
     platformContribution: PropTypes.number,
@@ -114,6 +122,7 @@ class ContributionFlow extends React.Component {
     isEmbed: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
     verb: PropTypes.string,
     paymentMethod: PropTypes.string,
     error: PropTypes.string,
@@ -166,7 +175,7 @@ class ContributionFlow extends React.Component {
 
     let fromAccount, guestInfo;
     if (stepProfile.isGuest) {
-      guestInfo = pick(stepProfile, ['email', 'name', 'location']);
+      guestInfo = pick(stepProfile, ['email', 'name', 'location', 'captcha']);
     } else {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     }
@@ -195,6 +204,7 @@ class ContributionFlow extends React.Component {
             platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
             context: { isEmbed: this.props.isEmbed || false },
+            tags: this.props.tags,
             taxes: stepSummary && [
               {
                 type: stepSummary.taxType,
@@ -299,15 +309,15 @@ class ContributionFlow extends React.Component {
       // TODO: cleanup after this version is deployed in production
 
       // Migration Step 1
-      type: stepPayment.paymentMethod.providerType,
+      // type: stepPayment.paymentMethod.providerType,
+      // legacyType: stepPayment.paymentMethod.providerType,
+      // service: stepPayment.paymentMethod.service,
+      // newType: stepPayment.paymentMethod.type,
+
+      // Migration Step 2
       legacyType: stepPayment.paymentMethod.providerType,
       service: stepPayment.paymentMethod.service,
       newType: stepPayment.paymentMethod.type,
-
-      // Migration Step 2
-      // legacyType: stepPayment.paymentMethod.providerType,
-      // service: stepPayment.paymentMethod.service,
-      // type: stepPayment.paymentMethod.type,
 
       // Migration Step 3
       // service: stepPayment.paymentMethod.service,
@@ -365,7 +375,11 @@ class ContributionFlow extends React.Component {
 
   /** Validate step profile, create new incognito/org if necessary */
   validateStepProfile = async action => {
-    const { stepProfile, stepDetails } = this.state;
+    const { stepProfile, stepDetails, error } = this.state;
+
+    if (error) {
+      this.setState({ error: null });
+    }
 
     if (!this.checkFormValidity()) {
       return false;
@@ -375,7 +389,7 @@ class ContributionFlow extends React.Component {
     if (!stepProfile) {
       return action === 'prev';
     } else if (stepProfile.isGuest) {
-      return validateGuestProfile(stepProfile, stepDetails);
+      return validateGuestProfile(stepProfile, stepDetails, this.showError);
     }
 
     // Check if we're creating a new profile
@@ -465,10 +479,13 @@ class ContributionFlow extends React.Component {
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, queryParams = {}) => {
     const { collective, tier, isEmbed } = this.props;
+    const encodeListArg = list => (!list?.length ? undefined : list.join(','));
     const verb = this.props.verb || 'donate';
     const step = stepName === 'details' ? '' : stepName;
     const allQueryParams = {
       interval: this.props.fixedInterval,
+      disabledPaymentMethodTypes: encodeListArg(this.props.disabledPaymentMethodTypes),
+      tags: encodeListArg(this.props.tags),
       ...pick(this.props, [
         'interval',
         'description',
@@ -722,6 +739,7 @@ class ContributionFlow extends React.Component {
     const isCrypto = paymentMethod === 'crypto';
     const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
     const isLoading = isCrypto ? isSubmitting : isSubmitted || isSubmitting;
+    const pastEvent = collective.type === CollectiveType.EVENT && isPastEvent(collective);
 
     return (
       <Steps
@@ -803,6 +821,11 @@ class ContributionFlow extends React.Component {
                       {formatErrorMessage(this.props.intl, error) || backendError}
                     </MessageBox>
                   )}
+                  {pastEvent && (
+                    <MessageBox type="warning" withIcon mb={3} data-cy="contribution-flow-warning">
+                      {this.props.intl.formatMessage(OTHER_MESSAGES.pastEventWarning)}
+                    </MessageBox>
+                  )}
                   <ContributionFlowStepContainer
                     collective={collective}
                     tier={tier}
@@ -820,6 +843,7 @@ class ContributionFlow extends React.Component {
                     isEmbed={isEmbed}
                     isSubmitting={isValidating || isLoading}
                     order={this.state.createdOrder}
+                    disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
                   />
                   <Box mt={40}>
                     <ContributionFlowButtons

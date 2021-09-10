@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { omit, size } from 'lodash';
+import { intersection, omit, size } from 'lodash';
 import { useIntl } from 'react-intl';
 import { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
@@ -77,12 +77,13 @@ const REACT_SELECT_COMPONENT_OVERRIDE = {
   MultiValue: () => null, // Items will be displayed as a truncated string in `TruncatedValueContainer `
 };
 
-const TransactionsKindFilter = ({ onChange, value, ...props }) => {
+const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
   const intl = useIntl();
   const getOption = (value, idx) => ({ label: i18nTransactionKind(intl, value), value, idx });
-  const options = React.useMemo(() => Object.values(DISPLAYED_TRANSACTION_KINDS).map(getOption), [intl]);
+  const displayedKinds = kinds || Object.values(DISPLAYED_TRANSACTION_KINDS);
+  const options = displayedKinds.map(getOption);
   const selectedOptions = React.useMemo(
-    () => (!value ? getDefaultKinds() : parseTransactionKinds(value)).map(getOption),
+    () => (!value ? intersection(getDefaultKinds(), displayedKinds) : parseTransactionKinds(value)).map(getOption),
     [value],
   );
   return (
@@ -105,6 +106,7 @@ const TransactionsKindFilter = ({ onChange, value, ...props }) => {
 TransactionsKindFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
+  kinds: PropTypes.array,
 };
 
 export default TransactionsKindFilter;

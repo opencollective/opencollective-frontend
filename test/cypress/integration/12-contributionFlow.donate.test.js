@@ -1,6 +1,5 @@
 import { CreditCards } from '../../stripe-helpers';
 import mockRecaptcha from '../mocks/recaptcha';
-import { defaultTestUserEmail } from '../support/data';
 
 const donateRoute = '/apex/donate';
 const visitParams = { onBeforeLoad: mockRecaptcha };
@@ -175,9 +174,8 @@ describe('Contribution Flow: Donate', () => {
   );
 
   it('Shows Stripe errors in the frontend', () => {
-    cy.visit(donateRoute);
+    cy.signup({ redirect: donateRoute, visitParams, user: { name: 'John Doe' } });
     cy.get('button[data-cy="cf-next-step"]').click();
-    cy.get('input[name=email]').type(defaultTestUserEmail);
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.wait(3000); // Wait for stripe to be loaded
     cy.fillStripeInput({ card: CreditCards.CARD_DECLINED });

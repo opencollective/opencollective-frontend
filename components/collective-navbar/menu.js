@@ -12,7 +12,6 @@ export const NAVBAR_ACTION_TYPE = {
   APPLY: 'hasApply',
   CONTACT: 'hasContact',
   ADD_FUNDS: 'addFunds',
-  ADD_FUNDS_FROM_COLLECTIVE: 'addFundsFromCollective',
   ASSIGN_CARD: 'assignCard',
   REQUEST_CARD: 'requestCard',
   CONTRIBUTE: 'hasContribute',

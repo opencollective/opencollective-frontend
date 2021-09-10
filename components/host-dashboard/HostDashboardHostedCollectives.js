@@ -28,7 +28,7 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
     $hostSlug: String!
     $limit: Int!
     $offset: Int!
-    $orderBy: ChronologicalOrderInput!
+    $orderBy: OrderByInput
     $hostFeesStructure: HostFeeStructure
     $searchTerm: String
   ) {

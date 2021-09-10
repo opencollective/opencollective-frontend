@@ -107,8 +107,8 @@ class Members extends React.Component {
   componentDidUpdate(oldProps) {
     const invitations = get(this.props.data, 'memberInvitations', null);
     const oldInvitations = get(oldProps.data, 'memberInvitations', null);
-    const members = get(this.props.data, 'account.accountMembers', null);
-    const oldMembers = get(oldProps.data, 'account.accountMembers', null);
+    const members = get(this.props.data, 'account.members.nodes', null);
+    const oldMembers = get(oldProps.data, 'account.members.nodes', null);
 
     if (invitations !== oldInvitations || members !== oldMembers) {
       this.setState({ members: this.getMembersFromProps(this.props) });
@@ -118,7 +118,7 @@ class Members extends React.Component {
   getMembersFromProps(props) {
     const pendingInvitations = get(props.data, 'memberInvitations', EMPTY_MEMBERS);
     const pendingInvitationsMembersData = pendingInvitations.map(i => omit(i, ['id']));
-    const members = get(props.data, 'account.accountMembers', EMPTY_MEMBERS);
+    const members = get(props.data, 'account.members.nodes', EMPTY_MEMBERS);
     const all = [...members, ...pendingInvitationsMembersData];
     return all.length === 0 ? EMPTY_MEMBERS : all;
   }
@@ -379,8 +379,10 @@ export const coreContributorsQuery = gqlV2/* GraphQL */ `
         type
         name
       }
-      accountMembers(roles: [ADMIN, MEMBER, ACCOUNTANT]) {
-        ...MemberFields
+      members(role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
+        nodes {
+          ...MemberFields
+        }
       }
     }
     memberInvitations(account: $account) {

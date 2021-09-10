@@ -5,7 +5,6 @@ import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { TransactionKind } from '../../../lib/constants/transactions';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
@@ -19,6 +18,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledCard from '../../StyledCard';
 import StyledFilters from '../../StyledFilters';
 import { P } from '../../Text';
+import { getDefaultKinds } from '../../transactions/filters/TransactionsKindFilter';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionItem from '../../transactions/TransactionItem';
 import { withUser } from '../../UserProvider';
@@ -31,7 +31,13 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
     host(slug: $hostSlug) {
       ...ExpenseHostFields
     }
-    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kind: $kind) {
+    transactions(
+      account: { slug: $slug }
+      limit: $limit
+      hasExpense: false
+      kind: $kind
+      includeGiftCardTransactions: true
+    ) {
       ...TransactionsQueryCollectionFragment
     }
     expenses(account: { slug: $slug }, limit: $limit) {
@@ -46,16 +52,9 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
   ${expenseHostFields}
 `;
 
-const DEFAULT_KINDS = [
-  TransactionKind.ADDED_FUNDS,
-  TransactionKind.CONTRIBUTION,
-  TransactionKind.EXPENSE,
-  TransactionKind.PLATFORM_TIP,
-];
-
 // Any change here should be reflected in API's `server/graphql/cache.js`
 export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug) => {
-  return { slug: collectiveSlug, hostSlug, limit: 3, kind: DEFAULT_KINDS };
+  return { slug: collectiveSlug, hostSlug, limit: 3, kind: getDefaultKinds() };
 };
 
 const BudgetItemContainer = styled.div`

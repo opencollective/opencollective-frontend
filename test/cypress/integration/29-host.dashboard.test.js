@@ -80,10 +80,11 @@ describe('host dashboard', () => {
       cy.getByDataCy('pay-expense-modal').as('payExpenseModal');
       cy.get('@payExpenseModal').find('[data-cy="pay-type-MANUAL"]').click();
       cy.get('@payExpenseModal').find('[data-cy="mark-as-paid-button"]').click();
-      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Paid');
+      cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Paid');
 
       // Mark as unpaid
-      cy.get('@currentExpense').find('[data-cy="mark-as-unpaid-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').click();
+      cy.getByDataCy('mark-as-unpaid-button').click();
       cy.getByDataCy('mark-expense-as-unpaid-modal').as('markAsUnpaidModal');
       cy.get('@markAsUnpaidModal').find('[data-cy="confirmation-modal-continue"]').click();
       cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Approved');
@@ -94,7 +95,7 @@ describe('host dashboard', () => {
 
       // Reject
       cy.get('@currentExpense').find('[data-cy="reject-button"]').click();
-      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Rejected');
+      cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Rejected');
     });
   });
 

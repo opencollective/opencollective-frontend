@@ -23,7 +23,10 @@ const SearchFormContainer = styled(Box)`
 `;
 
 const messages = defineMessages({
-  searchFilterPlaceholder: { id: 'UpdateSearchFilter.placeholder', defaultMessage: 'Search by user, title, html...' },
+  searchFilterPlaceholder: {
+    id: 'UpdateSearchFilter.placeholder',
+    defaultMessage: 'Search by user, title, content...',
+  },
 });
 
 const UpdateSearchFilter = ({ searchTerm, onChange }) => {

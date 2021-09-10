@@ -7,7 +7,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
-import { getErrorFromGraphqlException } from '../lib/errors';
+import { i18nGraphqlException } from '../lib/errors';
 import { isValidEmail } from '../lib/utils';
 
 import Container from './Container';
@@ -127,6 +127,7 @@ const createCollectiveMutation = gql`
     createCollective(collective: $collective) {
       id
       name
+      legalName
       slug
       type
       imageUrl(height: 64)
@@ -155,6 +156,7 @@ const createUserMutation = gql`
         collective {
           id
           name
+          legalName
           slug
           type
           location {
@@ -192,7 +194,8 @@ const CreateCollectiveMiniForm = ({
   const noAdminFields = isOrganization && excludeAdminFields;
   const mutation = isUser ? createUserMutation : createCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
+  const { formatMessage } = intl;
 
   const initialValues = {
     members: [{ member: { email, name } }],
@@ -367,7 +370,7 @@ const CreateCollectiveMiniForm = ({
             </Box>
             {submitError && (
               <MessageBox type="error" withIcon mt={2}>
-                {getErrorFromGraphqlException(submitError).message}
+                {i18nGraphqlException(intl, submitError)}
               </MessageBox>
             )}
             <Container

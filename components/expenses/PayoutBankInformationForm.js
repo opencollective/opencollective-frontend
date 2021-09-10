@@ -73,7 +73,7 @@ const Input = props => {
           return `${input.name} is required`;
         } else if (!matches && value) {
           return input.validationError || `Invalid ${input.name}`;
-        } else if (isAccountHolderName && value.match(/^[^\s]{1}\b/)) {
+        } else if (isAccountHolderName && (!value || value.match(/^[^\s]{1}\b/))) {
           return 'Your full name is required';
         }
       };
@@ -362,12 +362,6 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   // Display spinner if loading
   if (loading) {
     return <StyledSpinner />;
-  } else if (host.slug === TW_API_COLLECTIVE_SLUG && !host?.transferwise) {
-    return (
-      <MessageBox fontSize="12px" type="warning">
-        Wise is not configured on the platform.
-      </MessageBox>
-    );
   } else if (!host.transferwise?.availableCurrencies && !fixedCurrency) {
     return null;
   }

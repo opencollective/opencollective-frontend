@@ -11,6 +11,7 @@ import Container from './Container';
 import Error from './Error';
 import { Box, Flex } from './Grid';
 import Link from './Link';
+import Loading from './Loading';
 import StyledButton from './StyledButton';
 import { H1, P } from './Text';
 import Updates from './Updates';
@@ -77,13 +78,17 @@ class UpdatesWithData extends React.Component {
         )}
         <UpdateFilters values={query} onChange={onChange} />
         <Box mt={4} mb={5}>
-          <Updates
-            collective={collective}
-            updates={updates}
-            editable={!compact}
-            fetchMore={this.props.fetchMore}
-            LoggedInUser={LoggedInUser}
-          />
+          {data.loading ? (
+            <Loading />
+          ) : (
+            <Updates
+              collective={collective}
+              updates={updates}
+              editable={!compact}
+              fetchMore={this.props.fetchMore}
+              LoggedInUser={LoggedInUser}
+            />
+          )}
         </Box>
       </div>
     );

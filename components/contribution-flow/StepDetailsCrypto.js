@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import StyledInputGroup from '../StyledInputGroup';
+import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
-import { Label } from '../Text';
+import { Label, Span } from '../Text';
 
 import { CRYPTO_CURRENCIES } from './constants';
 
@@ -65,6 +67,17 @@ const StepDetailsCrypto = ({ onChange, data }) => {
         autoFocus
         error={touched && amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
       />
+      <StyledLink href="https://www.thegivingblock.com/" openInNewTabNoFollow>
+        <Flex pt="36px" flexDirection="column" alignItems="center" fontSize="14px" fontWeight={500}>
+          <Box>
+            <Span pr={1}>In partnership with</Span>
+            <Span pt="8px" style={{ verticalAlign: 'middle' }}>
+              <Image alt="Giving Block Logo" width={24} height={24} src="/static/images/giving-block-logo.svg" />
+            </Span>
+            <Span pl={1}>The Giving Block</Span>
+          </Box>
+        </Flex>
+      </StyledLink>
     </Box>
   );
 };

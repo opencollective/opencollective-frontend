@@ -151,7 +151,7 @@ const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentM
   const getIsDisabled = pm => pm.balance.valueInCents < minBalance;
 
   // Make sure we always include the current payment method
-  if (!uniquePMs.some(pm => pm.id === existingPaymentMethod.id)) {
+  if (existingPaymentMethod && !uniquePMs.some(pm => pm.id === existingPaymentMethod.id)) {
     uniquePMs.unshift(existingPaymentMethod);
   }
 

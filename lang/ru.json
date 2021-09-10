@@ -827,6 +827,7 @@
   "Events": "Мероприятия",
   "events": "My Events",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",
+  "examples": "e.g. {examples}",
   "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "ExpandDescription": "Посмотреть полное описание",
   "Expense.Activity.Approved": "Расход принят",

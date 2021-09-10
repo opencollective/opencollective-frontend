@@ -463,7 +463,7 @@ class Tiers extends React.Component {
                   <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>
                     <ContributeCustom collective={collective} hideContributors />
                   </Box>
-                  <Flex flexDirection="column" minWidth={200} maxWidth={600} mt={2}>
+                  <Flex flexDirection="column" minWidth={200} maxWidth={550} mt={2}>
                     <P mb={2}>
                       <FormattedMessage
                         id="Tiers.CustomTierDescription"
@@ -492,7 +492,7 @@ class Tiers extends React.Component {
             </Mutation>
             {cryptoContributionsEnabledByHost && (
               <React.Fragment>
-                <SettingsSectionTitle mt={3}>
+                <SettingsSectionTitle mt={50}>
                   <FormattedMessage id="ContributionsType.Crypto" defaultMessage="Crypto Contributions" />
                 </SettingsSectionTitle>
                 <Mutation mutation={editCollectiveSettingsMutation}>
@@ -501,14 +501,11 @@ class Tiers extends React.Component {
                       <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>
                         <ContributeCrypto collective={collective} hideContributors />
                       </Box>
-                      <Flex flexDirection="column" minWidth={200} maxWidth={600} mt={2}>
+                      <Flex flexDirection="column" minWidth={200} maxWidth={550} mt={2}>
                         <P mb={2}>
                           <FormattedMessage
                             id="Tiers.CryptoTierDescription"
-                            defaultMessage="Enabling this will add a tier to accept Crypto donations through {theGivingBlockLink}."
-                            values={{
-                              theGivingBlockLink: <a href="https://www.thegivingblock.com/">The Giving Block</a>,
-                            }}
+                            defaultMessage="Enabling this will enable support for donations with Cryptocurrencies such as Bitcoin or Ethereum."
                           />
                         </P>
                         <StyledCheckbox

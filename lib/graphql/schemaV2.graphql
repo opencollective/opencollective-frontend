@@ -31,7 +31,16 @@ interface Account {
   The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL/VENDOR)
   """
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -78,19 +87,6 @@ interface Account {
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
   members(
     limit: Int = 100
     offset: Int = 0
@@ -130,7 +126,7 @@ interface Account {
     Specific account to query the membership of.
     """
     account: AccountReferenceInput
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -203,9 +199,9 @@ interface Account {
   """
   paymentMethods(
     """
-    Filter on given types (creditcard, giftcard...)
+    Filter on given types (CREDITCARD, GIFTCARD...)
     """
-    type: [String]
+    type: [PaymentMethodType]
 
     """
     Filter on given types (CREDITCARD, GIFTCARD...)
@@ -276,6 +272,12 @@ interface Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int = 100, offset: Int = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+}
+
+enum AccountCacheType {
+  CLOUDFLARE
+  GRAPHQL_QUERIES
+  CONTRIBUTORS
 }
 
 """
@@ -602,7 +604,16 @@ type Bot implements Account {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -645,19 +656,6 @@ type Bot implements Account {
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -718,7 +716,7 @@ type Bot implements Account {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -786,7 +784,7 @@ type Bot implements Account {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    type: [String]
+    type: [PaymentMethodType]
     enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
@@ -848,6 +846,29 @@ type Bot implements Account {
 }
 
 """
+Captcha related information
+"""
+input CaptchaInput {
+  """
+  Captcha validation token
+  """
+  token: String!
+
+  """
+  Catpcha provider
+  """
+  provider: CaptchaProvider!
+}
+
+"""
+Implemented Captcha Providers
+"""
+enum CaptchaProvider {
+  HCAPTCHA
+  RECAPTCHA
+}
+
+"""
 Input to order results chronologically
 """
 input ChronologicalOrderInput {
@@ -883,7 +904,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -926,19 +956,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -999,7 +1016,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -1067,7 +1084,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    type: [String]
+    type: [PaymentMethodType]
     enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
@@ -2828,8 +2845,18 @@ type Credit implements Transaction {
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
-  netAmount: Amount!
-  netAmountInHostCurrency: Amount!
+  netAmount(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Amount!
+  netAmountInHostCurrency(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Amount!
   taxAmount: Amount!
 
   """
@@ -2837,7 +2864,12 @@ type Credit implements Transaction {
   """
   taxInfo: TaxInfo
   platformFee: Amount!
-  hostFee: Amount!
+  hostFee(
+    """
+    Fetch HOST_FEE transaction for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Amount!
 
   """
   Payment Processor Fee (usually in host currency)
@@ -3098,8 +3130,18 @@ type Debit implements Transaction {
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
-  netAmount: Amount!
-  netAmountInHostCurrency: Amount!
+  netAmount(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Amount!
+  netAmountInHostCurrency(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Amount!
   taxAmount: Amount!
 
   """
@@ -3107,7 +3149,12 @@ type Debit implements Transaction {
   """
   taxInfo: TaxInfo
   platformFee: Amount!
-  hostFee: Amount!
+  hostFee(
+    """
+    Fetch HOST_FEE transaction for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Amount!
 
   """
   Payment Processor Fee (usually in host currency)
@@ -3183,7 +3230,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -3226,19 +3282,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -3299,7 +3342,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -3367,7 +3410,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    type: [String]
+    type: [PaymentMethodType]
     enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
@@ -3504,6 +3547,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   The Collective hosting this Event
   """
   parentCollective: Collective @deprecated(reason: "2020/07/01 - Use parent instead.")
+
+  """
+  The Event start date and time
+  """
+  startsAt: DateTime
+
+  """
+  The Event end date and time
+  """
+  endsAt: DateTime
 }
 
 """
@@ -4160,7 +4213,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -4203,19 +4265,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -4276,7 +4325,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -4344,7 +4393,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    type: [String]
+    type: [PaymentMethodType]
     enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
@@ -4504,6 +4553,11 @@ input GuestInfoInput {
   Address of the user, mandatory when amount is above $5000.
   """
   location: LocationInput
+
+  """
+  Captcha validation for creating an order
+  """
+  captcha: CaptchaInput
 }
 
 """
@@ -4518,7 +4572,16 @@ type Host implements Account & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -4561,19 +4624,6 @@ type Host implements Account & AccountWithContributions {
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -4634,7 +4684,7 @@ type Host implements Account & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -4702,7 +4752,7 @@ type Host implements Account & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    type: [String]
+    type: [PaymentMethodType]
     enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
@@ -5101,7 +5151,16 @@ type Individual implements Account {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -5144,19 +5203,6 @@ type Individual implements Account {
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -5217,7 +5263,7 @@ type Individual implements Account {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -5285,7 +5331,7 @@ type Individual implements Account {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    type: [String]
+    type: [PaymentMethodType]
     enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
@@ -5582,6 +5628,18 @@ enum MemberRole {
   FOLLOWER
   ACCOUNTANT
   CONNECTED_ACCOUNT
+}
+
+type MergeAccountsResponse {
+  """
+  The resulting account
+  """
+  account: Account!
+
+  """
+  A message to display to the user about the result
+  """
+  message: String
 }
 
 """
@@ -6014,6 +6072,41 @@ type Mutation {
   ): Host!
 
   """
+  [Root only] Clears the cache for a given account
+  """
+  clearCacheForAccount(
+    """
+    Account to clear the cache for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Types of cache to clear
+    """
+    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
+  ): Account!
+
+  """
+  [Root only] Merge two accounts, returns the result account
+  """
+  mergeAccounts(
+    """
+    Account to merge from
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Account to merge to
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean! = true
+  ): MergeAccountsResponse!
+
+  """
   Sends an email for guest to confirm their emails and create their Open Collective account
   """
   sendGuestConfirmationEmail(
@@ -6204,6 +6297,28 @@ type Mutation {
     New public message
     """
     message: String
+  ): Member!
+
+  """
+  [Root only] Create a member entry directly. For non-root users, use `inviteMember`
+  """
+  createMember(
+    """
+    Reference to an account for the member
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    memberAccount will become a member of this account
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of the member
+    """
+    role: MemberRole!
+    description: String
+    since: DateTime
   ): Member!
 
   """
@@ -6491,6 +6606,30 @@ type Order {
 }
 
 """
+Possible fields you can use to order by
+"""
+enum OrderByFieldType {
+  CREATED_AT
+  MEMBER_COUNT
+  TOTAL_CONTRIBUTED
+}
+
+"""
+Input to order results
+"""
+input OrderByInput {
+  """
+  Field to order by.
+  """
+  field: OrderByFieldType!
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection!
+}
+
+"""
 A collection of "Orders"
 """
 type OrderCollection implements Collection {
@@ -6568,7 +6707,7 @@ input OrderCreateInput {
   context: OrderContextInput
 
   """
-  Whether this is transferring the remaining balance from a project/event
+  Whether this is transferring the remaining balance from a project/event/collective
   """
   isBalanceTransfer: Boolean
 }
@@ -6688,7 +6827,16 @@ type Organization implements Account & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -6731,19 +6879,6 @@ type Organization implements Account & AccountWithContributions {
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -6804,7 +6939,7 @@ type Organization implements Account & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -6872,7 +7007,7 @@ type Organization implements Account & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    type: [String]
+    type: [PaymentMethodType]
     enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
@@ -6986,6 +7121,7 @@ type Organization implements Account & AccountWithContributions {
 
 input OrganizationCreateInput {
   name: String!
+  legalName: String
   slug: String!
   description: String!
   website: String
@@ -7033,15 +7169,19 @@ input PaymentMethodInput {
   id: String
 
   """
+  Service of this payment method
+  """
+  service: PaymentMethodService
+
+  """
   Type of this payment method
   """
-  type: PaymentMethodLegacyType
+  type: PaymentMethodType
 
   """
   Type of this payment method
   """
   legacyType: PaymentMethodLegacyType
-  service: PaymentMethodService
   newType: PaymentMethodType
 
   """
@@ -7262,7 +7402,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -7305,19 +7454,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -7378,7 +7514,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -7446,7 +7582,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    type: [String]
+    type: [PaymentMethodType]
     enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 
@@ -7978,6 +8114,11 @@ type Query {
     includeIncognitoTransactions: Boolean! = false
 
     """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
@@ -8155,8 +8296,18 @@ interface Transaction {
   description: String
   amount: Amount!
   amountInHostCurrency: Amount!
-  netAmount: Amount!
-  netAmountInHostCurrency: Amount!
+  netAmount(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Amount!
+  netAmountInHostCurrency(
+    """
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Amount!
   taxAmount: Amount!
 
   """
@@ -8164,7 +8315,12 @@ interface Transaction {
   """
   taxInfo: TaxInfo
   platformFee: Amount!
-  hostFee: Amount
+  hostFee(
+    """
+    Fetch HOST_FEE transaction for retro-compatiblity.
+    """
+    fetchHostFee: Boolean = false
+  ): Amount
   paymentProcessorFee: Amount
   host: Account
   account: Account
@@ -8206,6 +8362,7 @@ type TransactionCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Transaction]
+  kinds: [TransactionKind]
 }
 
 enum TransactionKind {
@@ -8216,6 +8373,7 @@ enum TransactionKind {
   HOST_FEE
   HOST_FEE_SHARE
   HOST_FEE_SHARE_DEBT
+  PAYMENT_PROCESSOR_COVER
   PAYMENT_PROCESSOR_FEE
   PLATFORM_FEE
   PLATFORM_TIP
@@ -8479,7 +8637,16 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   slug: String
   type: AccountType
+
+  """
+  Public name
+  """
   name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
   description: String
   longDescription: String
   tags: [String]
@@ -8522,19 +8689,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   isAdmin: Boolean!
   parentAccount: Account
-
-  """
-  Get all the members of this account (admins, members, accountants etc.)
-  """
-  accountMembers(
-    limit: Int
-    offset: Int
-    accountType: [AccountType]
-    role: MemberRole
-    roles: [MemberRole]
-    TierId: Int
-    tierSlug: String
-  ): [Member]
 
   """
   Get all members (admins, members, backers, followers)
@@ -8595,7 +8749,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -8663,7 +8817,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   The list of payment methods that this collective can use to pay for Orders
   """
   paymentMethods(
-    type: [String]
+    type: [PaymentMethodType]
     enumType: [PaymentMethodType]
     service: [PaymentMethodService]
 

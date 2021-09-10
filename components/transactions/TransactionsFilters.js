@@ -23,7 +23,7 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const TransactionsFilters = ({ collective, filters, onChange }) => {
+const TransactionsFilters = ({ collective, filters, kinds, onChange }) => {
   const getFilterProps = name => ({
     inputId: `transactions-filter-${name}`,
     value: filters?.[name],
@@ -56,7 +56,7 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="transactions-filter-kind">
           <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />
         </FilterLabel>
-        <TransactionsKindFilter {...getFilterProps('kind')} />
+        <TransactionsKindFilter kinds={kinds} {...getFilterProps('kind')} />
       </FilterContainer>
     </Flex>
   );
@@ -65,6 +65,7 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
 TransactionsFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
+  kinds: PropTypes.array,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
   }).isRequired,

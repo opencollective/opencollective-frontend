@@ -827,6 +827,7 @@
   "Events": "Événements",
   "events": "My Events",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",
+  "examples": "e.g. {examples}",
   "ExepenseAttachments.count": "{count, plural, one {# pièce jointe} other {# pièces jointes}}",
   "ExpandDescription": "Voir la description complète",
   "Expense.Activity.Approved": "Dépense approuvée",

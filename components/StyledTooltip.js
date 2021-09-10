@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
+import { verticalAlign } from 'styled-system';
 import { v4 as uuid } from 'uuid';
 
 const StyledTooltipContainer = styled(`div`)`
@@ -83,6 +84,7 @@ const Arrow = styled('div')`
 
 const ChildrenContainer = styled.div`
   display: ${props => props.display};
+  ${verticalAlign}
   cursor: help;
   button:disabled {
     pointer-events: none;
@@ -141,6 +143,8 @@ class StyledTooltip extends React.Component {
     content: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
     /** If using a node children, this defines the parent display type */
     display: PropTypes.string,
+    /** Vertical alignment of the container */
+    containerVerticalAlign: PropTypes.string,
     delayHide: PropTypes.number,
     /** The component that will be used as a container for the children */
     childrenContainer: PropTypes.any,
@@ -206,6 +210,7 @@ class StyledTooltip extends React.Component {
                   display={this.props.display}
                   onMouseEnter={this.onMouseEnter}
                   onMouseLeave={this.onMouseLeave}
+                  verticalAlign={this.props.containerVerticalAlign}
                 >
                   {this.props.children}
                 </ChildrenContainer>

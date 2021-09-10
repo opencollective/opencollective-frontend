@@ -72,6 +72,29 @@ type BackYourStackDispatchState {
 }
 
 """
+Captcha related information
+"""
+input CaptchaInput {
+  """
+  Captcha validation token
+  """
+  token: String!
+
+  """
+  Catpcha provider
+  """
+  provider: CaptchaProvider!
+}
+
+"""
+Implemented Captcha Providers
+"""
+enum CaptchaProvider {
+  HCAPTCHA
+  RECAPTCHA
+}
+
+"""
 This represents a Collective
 """
 type Collective implements CollectiveInterface {
@@ -81,6 +104,7 @@ type Collective implements CollectiveInterface {
   type: String
   isActive: Boolean
   name: String
+  legalName: String
   company: String
   description: String
   longDescription: String
@@ -402,6 +426,7 @@ input CollectiveInputType {
   slug: String
   type: String
   name: String
+  legalName: String
   company: String
   website: String
   twitterHandle: String
@@ -448,6 +473,7 @@ interface CollectiveInterface {
   type: String
   isActive: Boolean
   name: String
+  legalName: String
   company: String
   description: String
   longDescription: String
@@ -1074,6 +1100,7 @@ type Event implements CollectiveInterface {
   type: String
   isActive: Boolean
   name: String
+  legalName: String
   company: String
   description: String
   longDescription: String
@@ -1458,6 +1485,7 @@ type Fund implements CollectiveInterface {
   type: String
   isActive: Boolean
   name: String
+  legalName: String
   company: String
   description: String
   longDescription: String
@@ -1701,6 +1729,11 @@ input GuestInfoInput {
   The unique guest token
   """
   token: String
+
+  """
+  Captcha validation for creating an order
+  """
+  captcha: CaptchaInput
 }
 
 """
@@ -2495,6 +2528,7 @@ type Organization implements CollectiveInterface {
   type: String
   isActive: Boolean
   name: String
+  legalName: String
   company: String
   description: String
   longDescription: String
@@ -2880,6 +2914,7 @@ type Project implements CollectiveInterface {
   type: String
   isActive: Boolean
   name: String
+  legalName: String
   company: String
   description: String
   longDescription: String
@@ -3721,6 +3756,7 @@ type User implements CollectiveInterface {
   type: String
   isActive: Boolean
   name: String
+  legalName: String
   company: String
   description: String
   longDescription: String
@@ -4011,6 +4047,7 @@ type Vendor implements CollectiveInterface {
   type: String
   isActive: Boolean
   name: String
+  legalName: String
   company: String
   description: String
   longDescription: String
