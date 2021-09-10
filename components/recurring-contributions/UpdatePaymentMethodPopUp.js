@@ -173,10 +173,12 @@ const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentM
     }
 
     // Put the PM that matches this recurring contribution just after the newly added
-    if (existingPaymentMethod.id === pm1.id) {
-      return -1;
-    } else if (existingPaymentMethod.id === pm2.id) {
-      return 1;
+    if (existingPaymentMethod) {
+      if (existingPaymentMethod.id === pm1.id) {
+        return -1;
+      } else if (existingPaymentMethod.id === pm2.id) {
+        return 1;
+      }
     }
 
     return 0;
@@ -201,7 +203,7 @@ const useUpdatePaymentMethod = contribution => {
   return {
     isSubmitting: loading,
     updatePaymentMethod: async paymentMethod => {
-      const hasUpdate = paymentMethod.id !== contribution.paymentMethod.id;
+      const hasUpdate = !contribution.paymentMethod || paymentMethod.id !== contribution.paymentMethod.id;
       try {
         if (hasUpdate) {
           const variables = { order: { id: contribution.id } };
@@ -325,13 +327,15 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
   );
 
   useEffect(() => {
-    if (paymentOptions && selectedPaymentMethod === null && contribution.paymentMethod) {
-      setSelectedPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
-      setLoadingSelectedPaymentMethod(false);
-    } else if (paymentOptions && addedPaymentMethod) {
-      setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.id));
-      setLoadingSelectedPaymentMethod(false);
+    if (!paymentOptions) {
+      return;
     }
+    if (selectedPaymentMethod === null && contribution.paymentMethod) {
+      setSelectedPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
+    } else if (addedPaymentMethod) {
+      setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.id));
+    }
+    setLoadingSelectedPaymentMethod(false);
   }, [paymentOptions, addedPaymentMethod]);
 
   return (
