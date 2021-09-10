@@ -73,7 +73,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
               <StyledInput
                 {...inputProps}
                 value={data?.name || ''}
-                placeholder="e.g. Thomas Anderson"
+                placeholder="e.g., Thomas Anderson"
                 onChange={e => dispatchChange(e.target.name, e.target.value)}
                 maxLength="255"
               />
@@ -91,7 +91,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
               <StyledInput
                 {...inputProps}
                 value={data?.email || ''}
-                placeholder="e.g. tanderson@thematrix.com"
+                placeholder="e.g., tanderson@thematrix.com"
                 type="email"
                 onChange={e => dispatchChange(e.target.name, e.target.value)}
               />

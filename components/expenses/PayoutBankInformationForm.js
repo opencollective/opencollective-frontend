@@ -233,7 +233,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
 
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({ label: rf.title, value: rf.type }));
   // Some currencies offer different methods for the transaction
-  // e.g. USD allows ABA and SWIFT transactions.
+  // e.g., USD allows ABA and SWIFT transactions.
   const availableMethods = data.host.transferwise.requiredFields.find(
     method => method.type === get(formik.values, getFieldName(`data.type`)),
   );

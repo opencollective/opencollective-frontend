@@ -273,7 +273,7 @@ const CreateCollectiveMiniForm = ({
                       {...inputProps}
                       type="email"
                       width="100%"
-                      placeholder="e.g. jane-smith@youremail.com"
+                      placeholder="e.g., jane-smith@youremail.com"
                       data-cy="mini-form-email-field"
                     />
                   )}
@@ -290,7 +290,7 @@ const CreateCollectiveMiniForm = ({
                   value={get(values, 'members[0].member.name')}
                 >
                   {inputProps => (
-                    <Field as={StyledInput} {...inputProps} width="100%" placeholder="e.g. Jane Doe, Frank Zappa" />
+                    <Field as={StyledInput} {...inputProps} width="100%" placeholder="e.g., Jane Doe, Frank Zappa" />
                   )}
                 </StyledInputField>
               )}
@@ -310,10 +310,10 @@ const CreateCollectiveMiniForm = ({
                     width="100%"
                     placeholder={
                       isUser
-                        ? 'e.g. Jane Doe, Frank Zappa'
+                        ? 'e.g., Jane Doe, Frank Zappa'
                         : isCollective
-                        ? 'e.g. Webpack, Babel'
-                        : 'e.g. AirBnb, TripleByte'
+                        ? 'e.g., Webpack, Babel'
+                        : 'e.g., AirBnb, TripleByte'
                     }
                     data-cy="mini-form-name-field"
                   />
@@ -332,7 +332,7 @@ const CreateCollectiveMiniForm = ({
                     <Field
                       as={StyledInput}
                       {...inputProps}
-                      placeholder="e.g. opencollective.com"
+                      placeholder="e.g., opencollective.com"
                       width="100%"
                       data-cy="mini-form-website-field"
                     />

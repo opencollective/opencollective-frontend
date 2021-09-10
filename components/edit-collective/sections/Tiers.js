@@ -66,11 +66,11 @@ class Tiers extends React.Component {
       },
       SERVICE: {
         id: 'tier.type.service',
-        defaultMessage: 'service (e.g. support)',
+        defaultMessage: 'service (e.g., support)',
       },
       PRODUCT: {
         id: 'tier.type.product',
-        defaultMessage: 'product (e.g. t-shirt)',
+        defaultMessage: 'product (e.g., t-shirt)',
       },
       DONATION: { id: 'tier.type.donation', defaultMessage: 'donation (gift)' },
       TICKET: {

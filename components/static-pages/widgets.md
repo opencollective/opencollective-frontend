@@ -6,7 +6,7 @@
 
     <script src="https://opencollective.com/:collectiveSlug/:verb/button.js" color="[white|blue]"></script>
 
-Just replace `:collectiveSlug` with the slug of your collective (e.g. webpack for https://opencollective.com/webpack).
+Just replace `:collectiveSlug` with the slug of your collective (e.g., webpack for https://opencollective.com/webpack).
 The verb can either be "donate" or "contribute".
 Example:
 
@@ -30,9 +30,9 @@ Just add this script:
 
     <script src="https://opencollective.com/:collectiveSlug/banner.js"></script>
 
-where `:collectiveSlug` is the slug of your collective, e.g. `apex` for https://opencollective.com/apex.
+where `:collectiveSlug` is the slug of your collective, e.g., `apex` for https://opencollective.com/apex.
 
-You can also add a style object (react style), e.g.
+You can also add a style object (react style), e.g.,
 
     <script src='https://opencollective.com/:collectiveSlug/banner.js?style={"a":{"color":"red"},"h2":{"fontFamily":"Verdana","fontWeight":"normal","fontSize":"20px"}}'></script>
 

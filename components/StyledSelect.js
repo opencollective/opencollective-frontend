@@ -235,7 +235,7 @@ StyledSelect.propTypes = {
   ...propTypes.space,
   /** The id of the search input */
   inputId: PropTypes.string.isRequired,
-  /** Define an id prefix for the select components e.g. {your-id}-value */
+  /** Define an id prefix for the select components e.g., {your-id}-value */
   instanceId: PropTypes.string,
   /** Placeholder for the select value */
   placeholder: PropTypes.node,

@@ -181,7 +181,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
             <Field name="payee.organization.name">
               {({ field }) => (
                 <StyledInputField name={field.name} label={formatMessage(msg.orgNameLabel)} labelFontSize="13px" mt={3}>
-                  {inputProps => <StyledInput {...inputProps} {...field} placeholder="e.g. Airbnb, Salesforce" />}
+                  {inputProps => <StyledInput {...inputProps} {...field} placeholder="e.g., Airbnb, Salesforce" />}
                 </StyledInputField>
               )}
             </Field>
