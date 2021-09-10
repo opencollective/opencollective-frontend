@@ -3,7 +3,7 @@
   "Accept": "Принять",
   "acceptContributions.addBankAccount": "Добавить банковский счет",
   "acceptContributions.bankAccount.info": "Принимайте взносы посредством банковского перевода. Бюджет будет обновляться после подтверждения получения средств.",
-  "acceptContributions.bankAccountSetUp": "Bank account set up",
+  "acceptContributions.bankAccountSetUp": "Настройка банковского счета",
   "acceptContributions.FAQ.howDoesItWorkDetails": "Инструкции по оплате автоматически высылаются участникам по эл. почте. Как только средства будут получены, администратор может подтвердить транзакцию и сумма будет зачислена в бюджет.",
   "acceptContributions.FAQ.idNotIncluded": "Что произойдет, если идентификатор ссылки не включен?",
   "acceptContributions.FAQ.idNotIncludedDetails": "Если уникальный идентификатор не включен, может быть трудно найти и подтвердить транзакцию. Если вы отправили деньги, но они не были подтверждены, свяжитесь в {email}, и мы поможем отследить их.",
