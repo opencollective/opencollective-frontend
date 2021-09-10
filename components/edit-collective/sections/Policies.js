@@ -5,11 +5,9 @@ import { useFormik } from 'formik';
 import { get, isEmpty } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
-import { getEnvVar } from '../../../lib/env-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import { parseToBoolean, stripHTML } from '../../../lib/utils';
+import { stripHTML } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -89,8 +87,6 @@ const messages = defineMessages({
 const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const { formatMessage } = useIntl();
   const [selected, setSelected] = React.useState([]);
-  const hasRejectCategoriesFeature =
-    hasFeature(collective, FEATURES.MODERATION) || parseToBoolean(getEnvVar('REJECTED_CATEGORIES'));
 
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
@@ -260,31 +256,29 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             />
           </P>
         </Container>
-        {hasRejectCategoriesFeature && (
-          <Container>
-            <SettingsSectionTitle mt={4}>
-              <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
-            </SettingsSectionTitle>
-            <P mb={2}>
-              <FormattedMessage
-                id="editCollective.rejectCategories.description"
-                defaultMessage="Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)"
-              />
-            </P>
-            <StyledSelect
-              inputId="policy-select"
-              isSearchable={false}
-              isLoading={loading}
-              placeholder={formatMessage(messages['rejectCategories.placeholder'])}
-              minWidth={300}
-              maxWidth={600}
-              options={selectOptions}
-              value={selected}
-              onChange={selectedOptions => setSelected(selectedOptions)}
-              isMulti
+        <Container>
+          <SettingsSectionTitle mt={4}>
+            <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
+          </SettingsSectionTitle>
+          <P mb={2}>
+            <FormattedMessage
+              id="editCollective.rejectCategories.description"
+              defaultMessage="Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)"
             />
-          </Container>
-        )}
+          </P>
+          <StyledSelect
+            inputId="policy-select"
+            isSearchable={false}
+            isLoading={loading}
+            placeholder={formatMessage(messages['rejectCategories.placeholder'])}
+            minWidth={300}
+            maxWidth={600}
+            options={selectOptions}
+            value={selected}
+            onChange={selectedOptions => setSelected(selectedOptions)}
+            isMulti
+          />
+        </Container>
         <Container mt={4}>
           <StyledCheckbox
             name="allow-expense-submission"

@@ -4,12 +4,9 @@ import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { TransactionTypes } from '../../lib/constants/transactions';
-import { getEnvVar } from '../../lib/env-utils';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
-import { parseToBoolean } from '../../lib/utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -111,11 +108,8 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
   const hasOrder = order !== null;
 
   // permissions
-  const collectiveHasRejectContributionFeature = hasFeature(toAccount, FEATURES.REJECT_CONTRIBUTION);
-  const showRejectContribution =
-    parseToBoolean(getEnvVar('REJECT_CONTRIBUTION')) || collectiveHasRejectContributionFeature;
   const showRefundButton = permissions?.canRefund && !isRefunded;
-  const showRejectButton = permissions?.canReject && !isOrderRejected && showRejectContribution;
+  const showRejectButton = permissions?.canReject && !isOrderRejected;
   const showDownloadInvoiceButton = permissions?.canDownloadInvoice && !isInternalTransfer(fromAccount, toAccount);
   const hostFeeTransaction = transaction.relatedTransactions?.find(t => t.kind === 'HOST_FEE' && t.type === 'CREDIT');
 

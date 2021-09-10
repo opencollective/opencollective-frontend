@@ -7,7 +7,6 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { parseToBoolean } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -65,27 +64,14 @@ class CreateCollective extends Component {
       });
       const newCollective = res.data.createCollective;
       await this.props.refetchLoggedInUser();
-      // don't show banner if we show the modal and vice versa
-      if (parseToBoolean(process.env.ONBOARDING_MODAL) === true) {
-        this.props.router
-          .push({
-            pathname: `/${newCollective.slug}/onboarding`,
-            query: {
-              CollectiveId: newCollective.legacyId,
-            },
-          })
-          .then(() => window.scrollTo(0, 0));
-      } else {
-        this.props.router
-          .push({
-            pathname: `/${newCollective.slug}`,
-            query: {
-              status: 'collectiveCreated',
-              CollectiveId: newCollective.legacyId,
-            },
-          })
-          .then(() => window.scrollTo(0, 0));
-      }
+      this.props.router
+        .push({
+          pathname: `/${newCollective.slug}/onboarding`,
+          query: {
+            CollectiveId: newCollective.legacyId,
+          },
+        })
+        .then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = i18nGraphqlException(this.props.intl, err);
       this.setState({ error: errorMsg, creating: false });
