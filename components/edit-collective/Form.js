@@ -109,6 +109,10 @@ class EditCollectiveForm extends React.Component {
         defaultMessage:
           'The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name.',
       },
+      examples: {
+        id: 'examples',
+        defaultMessage: 'e.g. {examples}',
+      },
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
         id: 'host.tos',
@@ -625,6 +629,7 @@ class EditCollectiveForm extends React.Component {
     }
 
     const isEvent = collective.type === CollectiveType.EVENT;
+    const isUser = collective.type === CollectiveType.USER;
     const currencyOptions = Currency.map(c => ({ value: c, label: c }));
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date();
@@ -641,16 +646,18 @@ class EditCollectiveForm extends React.Component {
         },
         {
           name: 'legalName',
-          placeholder: '',
+          placeholder: intl.formatMessage(this.messages.examples, {
+            examples: isUser ? 'Maria Gracia' : 'Salesforce, Inc., Airbnb, Inc.',
+          }),
           maxLength: 255,
-          when: () => collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION,
+          when: () => isUser || collective.type === CollectiveType.ORGANIZATION,
           isPrivate: true,
         },
         {
           name: 'company',
           placeholder: '',
           maxLength: 255,
-          when: () => collective.type === CollectiveType.USER,
+          when: () => isUser,
         },
         {
           name: 'description',
