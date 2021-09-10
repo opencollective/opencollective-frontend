@@ -88,6 +88,20 @@ class Host extends React.Component {
     }
   }
 
+  renderLegalNameSetInfoMessage(collective) {
+    return (
+      <MessageBox type="info" fontSize="13px" withIcon>
+        <FormattedMessage
+          id="collective.edit.host.legalName.info"
+          defaultMessage="Please set the legal name of the host in the Info section under {settingsLink}. This is required if your legal name is different than your display name for tax and accounting purposes."
+          values={{
+            settingsLink: <Link href={`/${collective.host?.slug}/edit`}>Settings</Link>,
+          }}
+        />
+      </MessageBox>
+    );
+  }
+
   render() {
     const { LoggedInUser, collective, router } = this.props;
     const { showModal, action } = this.state;
@@ -130,6 +144,7 @@ class Host extends React.Component {
               </p>
             </Fragment>
           )}
+          <Container>{this.renderLegalNameSetInfoMessage(collective)}</Container>
           {collective.stats.balance === 0 && (
             <Fragment>
               <p>
@@ -247,6 +262,7 @@ class Host extends React.Component {
                       </Fineprint>
                     </Fragment>
                   )}
+                  <Container mt={4}>{this.renderLegalNameSetInfoMessage(collective)}</Container>
                 </Fragment>
               )}
             </Box>
@@ -496,16 +512,6 @@ class Host extends React.Component {
             </Box>
           </Flex>
         </div>
-        {(selectedOption === 'selfHost' || selectedOption === 'ownHost') && (
-          <div>
-            <MessageBox type="info" fontSize="13px" withIcon mb={4}>
-              <FormattedMessage
-                id="collective.edit.host.legalName.info"
-                defaultMessage="Please set the legal name of the host in the Info section under Settings. This is required if your legal name is different than your display name for tax and accounting purposes."
-              />
-            </MessageBox>
-          </div>
-        )}
       </EditCollectiveHostSection>
     );
   }
