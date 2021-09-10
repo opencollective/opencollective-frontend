@@ -138,7 +138,7 @@ class ContributionFlowStepContainer extends React.Component {
             showFeesOnTop={this.props.showFeesOnTop}
           />
         ) : (
-          <StepDetailsCrypto onChange={this.props.onChange} data={stepDetails} />
+          <StepDetailsCrypto onChange={this.props.onChange} data={stepDetails} collective={collective} />
         );
       case 'profile': {
         const personalProfile = this.getPersonalProfile();
