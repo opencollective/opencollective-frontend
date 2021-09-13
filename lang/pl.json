@@ -584,6 +584,7 @@
   "createCollective.form.error.name": "Proszę użyć mniej niż 50 znaków",
   "createCollective.form.error.slug": "Proszę użyć mniej niż 30 znaków",
   "createCollective.form.error.slug.hyphen": "Collective slug URL cannot start or end with a hyphen",
+  "createCollective.form.error.slug.taken": "URL already taken",
   "createCollective.form.nameLabel": "Collective name",
   "createCollective.form.slugLabel": "Set your URL",
   "createCollective.form.suggestedLabel": "Polecane",
