@@ -59,6 +59,14 @@ const requiredFieldsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
+const renderWiseNotConfiguredMessage = () => {
+  return (
+    <MessageBox fontSize="12px" type="warning">
+      Wise is not configured on the platform.
+    </MessageBox>
+  );
+};
+
 const Input = props => {
   const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
   const isAccountHolderName = input.key === 'accountHolderName';
@@ -229,13 +237,9 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
         {error.message && `: ${error.message}`}
       </MessageBox>
     );
-    // If transferwise is not configured we just show the warning in the details form
-  } else if (!data?.host?.transferwise) {
-    return (
-      <MessageBox fontSize="12px" type="warning">
-        Wise is not configured on the platform.
-      </MessageBox>
-    );
+    // If Wise is not configured we show a warning in dev environments
+  } else if (!data?.host?.transferwise && process.env.OC_ENV !== 'production') {
+    return renderWiseNotConfiguredMessage();
   }
 
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({ label: rf.title, value: rf.type }));
@@ -370,7 +374,14 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   if (loading) {
     return <StyledSpinner />;
   } else if (!host.transferwise?.availableCurrencies && !fixedCurrency) {
-    return null;
+    // If Wise is not configured we show a warning in dev environments
+    if (process.env.OC_ENV !== 'production') {
+      return renderWiseNotConfiguredMessage();
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('Wise is not configured on the platform.');
+      return null;
+    }
   }
 
   const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
