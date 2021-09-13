@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
+import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { get, omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -29,12 +30,12 @@ import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
+import StyledButton from '../components/StyledButton';
 import StyledHr from '../components/StyledHr';
 import { H1 } from '../components/Text';
 import { getDefaultKinds, parseTransactionKinds } from '../components/transactions/filters/TransactionsKindFilter';
 import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
 import TransactionsDownloadCSV from '../components/transactions/TransactionsDownloadCSV';
-import TransactionsDownloadInvoices from '../components/transactions/TransactionsDownloadInvoices';
 import TransactionsFilters from '../components/transactions/TransactionsFilters';
 import TransactionsList from '../components/transactions/TransactionsList';
 import { withUser } from '../components/UserProvider';
@@ -256,7 +257,12 @@ class TransactionsPage extends React.Component {
               <Flex>
                 {canDownloadInvoices && (
                   <Box mr="8px">
-                    <TransactionsDownloadInvoices collective={collective} />
+                    <Link href={`/${collective.slug}/edit/payment-receipts`}>
+                      <StyledButton buttonSize="small" minWidth={140} isBorderless flexGrow={1}>
+                        <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
+                        <IconDownload size="13px" style={{ marginLeft: '8px' }} />
+                      </StyledButton>
+                    </Link>
                   </Box>
                 )}
                 <TransactionsDownloadCSV collective={collective} query={this.props.query} />
