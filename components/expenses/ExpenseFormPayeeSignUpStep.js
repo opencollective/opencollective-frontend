@@ -135,7 +135,7 @@ const throttledSearch = debounce((searchFunc, variables) => {
 const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, errors } = formik;
+  const { values, touched, errors } = formik;
   const stepOneCompleted =
     isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod))) &&
     (values.type === expenseTypes.RECEIPT ||
@@ -153,7 +153,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
   };
 
   React.useEffect(() => {
-    if (values.payee?.organization?.name) {
+    if (values.payee?.organization?.name && !touched.payee?.organization?.slug) {
       const slug = suggestSlug(values.payee.organization.name);
       if (values.payee.organization.slug !== slug) {
         formik.setFieldValue('payee.organization.slug', suggestSlug(values.payee.organization.name));
