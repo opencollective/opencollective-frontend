@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Query } from '@apollo/client/react/components';
+import { Exit } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { createGlobalStyle } from 'styled-components';
@@ -20,6 +22,7 @@ import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
 import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
+import StyledHr from './StyledHr';
 import StyledLink from './StyledLink';
 import { P, Span } from './Text';
 import { withUser } from './UserProvider';
@@ -43,11 +46,83 @@ const HideGlobalScroll = createGlobalStyle`
 `;
 
 const UserMenuLinkEntry = props => {
+  const { isMobileMenuLink } = props;
   return (
-    <ListItem mb="6px">
+    <ListItem mb="6px" py={isMobileMenuLink ? '2' : '0'}>
       <StyledLink as={Link} fontWeight="500" fontSize="14px" lineHeight="20px" color="black.800" {...props} />
+      {isMobileMenuLink && <StyledHr mt={2} borderStyle="solid" borderColor="rgba(49, 50, 51, 0.1)" />}
     </ListItem>
   );
+};
+
+UserMenuLinkEntry.propTypes = {
+  isMobileMenuLink: PropTypes.bool,
+};
+
+const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, logOutHandler }) => {
+  return (
+    <Box>
+      {CHANGE_LOG_UPDATES_ENABLED && (
+        <UserMenuLinkEntry as={Span} isMobileMenuLink={isMobileView} onClick={() => setShowNewsAndUpdates(true)}>
+          <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
+        </UserMenuLinkEntry>
+      )}
+      <Query
+        query={memberInvitationsCountQuery}
+        variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
+        context={API_V2_CONTEXT}
+      >
+        {({ data, loading }) =>
+          loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (
+            <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/member-invitations">
+              <FormattedMessage
+                id="menu.pendingInvitations"
+                defaultMessage="Pending Invitations ({numberOfInvitations})"
+                values={{ numberOfInvitations: data.memberInvitations.length }}
+              />
+            </UserMenuLinkEntry>
+          ) : null
+        }
+      </Query>
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/edit`}>
+        <FormattedMessage id="Settings" defaultMessage="Settings" />
+      </UserMenuLinkEntry>
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.username}/recurring-contributions`}>
+        <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+      </UserMenuLinkEntry>
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.username}/transactions`}>
+        <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
+      </UserMenuLinkEntry>
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/applications">
+        <FormattedMessage id="menu.applications" defaultMessage="Applications" />
+      </UserMenuLinkEntry>
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} as="a" href="https://docs.opencollective.com">
+        <FormattedMessage id="menu.help" defaultMessage="Help" />
+      </UserMenuLinkEntry>
+      {isMobileView ? (
+        <UserMenuLinkEntry profileMenuLink as="a" data-cy="logout" onClick={logOutHandler}>
+          <Flex alignItems="center">
+            <P color="#7A0F2B" fontWeight="500" pr={2} whiteSpace="nowrap">
+              <FormattedMessage id="menu.logout" defaultMessage="Log out" />
+            </P>
+            <Exit size={13} color="#7A0F2B" />
+          </Flex>
+        </UserMenuLinkEntry>
+      ) : (
+        <UserMenuLinkEntry as="a" data-cy="logout" onClick={logOutHandler}>
+          <FormattedMessage id="menu.logout" defaultMessage="Log out" /> →
+        </UserMenuLinkEntry>
+      )}
+    </Box>
+  );
+};
+
+UserAccountLinks.propTypes = {
+  LoggedInUser: PropTypes.object,
+  setShowNewsAndUpdates: PropTypes.func,
+  logOutHandler: PropTypes.func,
+  profileMenuLink: PropTypes.bool,
+  isMobileView: PropTypes.bool,
 };
 
 class TopBarProfileMenu extends React.Component {
@@ -60,7 +135,7 @@ class TopBarProfileMenu extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showProfileMenu: false, loading: true };
+    this.state = { showProfileMenu: false, loading: true, showUserAccount: false };
   }
 
   componentDidMount() {
@@ -81,28 +156,36 @@ class TopBarProfileMenu extends React.Component {
     if (key === 'Escape' || key === 'Esc' || keyCode === 27) {
       this.setState({
         showProfileMenu: false,
+        showUserAccount: false,
       });
     }
   };
 
   logout = () => {
-    this.setState({ showProfileMenu: false, status: 'loggingout' });
+    this.setState({ showProfileMenu: false, showUserAccount: false, status: 'loggingout' });
     this.props.logout();
     this.setState({ status: 'loggedout' });
   };
 
   onClickOutside = () => {
-    this.setState({ showProfileMenu: false });
+    this.setState({ showProfileMenu: false, showUserAccount: false });
   };
 
   toggleProfileMenu = e => {
-    this.setState(state => ({ showProfileMenu: !state.showProfileMenu }));
+    this.setState(state => ({ showProfileMenu: !state.showProfileMenu, showUserAccount: false }));
     // don't propagate to onClickOutside
     e.nativeEvent.stopImmediatePropagation();
   };
 
+  toggleAccountInfo = e => {
+    this.setState(state => ({ showUserAccount: !state.showUserAccount }));
+    e.stopPropagation();
+  };
+
   renderProfileMenu() {
     const { LoggedInUser, setShowNewsAndUpdates } = this.props;
+    const { showUserAccount } = this.state;
+
     return (
       <Container
         bg="white.full"
@@ -120,69 +203,139 @@ class TopBarProfileMenu extends React.Component {
         css={{ overflow: 'hidden' }}
       >
         <Flex flexDirection={['column', 'row']} maxHeight={['calc(100vh - 68px)', '100%']}>
-          <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={3} bg="#F7F8FA">
-            <Hide xs>
-              <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
-              <P mt={2} color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
-                {LoggedInUser.collective.name}
-              </P>
-              <P mt="2px" mb={5} wordBreak="break-all" color="black.700" fontSize="13px">
-                {LoggedInUser.email}
-              </P>
+          {showUserAccount && (
+            <Hide lg md sm>
+              <Box px={3} mx={2} mb={0} mt={3} onClick={this.toggleAccountInfo}>
+                <Flex alignItems="center">
+                  <P
+                    color="black.700"
+                    fontSize="12px"
+                    fontWeight="500"
+                    letterSpacing="0.06em"
+                    pr={2}
+                    textTransform="uppercase"
+                    whiteSpace="nowrap"
+                    onClick={this.toggleAccountInfo}
+                  >
+                    ← <FormattedMessage id="Back" defaultMessage="Back" />
+                  </P>
+                </Flex>
+                <Flex py={3} mt={1} alignItems="center" justifyContent="space-between">
+                  <Flex>
+                    <Avatar collective={LoggedInUser.collective} radius={40} mr={2} />
+                    <Box>
+                      <P color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
+                        {LoggedInUser.collective.name}
+                      </P>
+                      <P mt="2px" wordBreak="break-all" color="black.700" fontSize="13px">
+                        {LoggedInUser.email}
+                      </P>
+                    </Box>
+                  </Flex>
+                </Flex>
+              </Box>
             </Hide>
-            <P color="black.900" fontSize="12px" fontWeight="700" letterSpacing="1px" textTransform="uppercase">
-              <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
-            </P>
-            <Box as="ul" p={0} my={2}>
-              {CHANGE_LOG_UPDATES_ENABLED && (
-                <UserMenuLinkEntry as={Span} onClick={() => setShowNewsAndUpdates(true)}>
-                  <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
-                </UserMenuLinkEntry>
-              )}
-              <UserMenuLinkEntry href={`/${LoggedInUser.username}`}>
-                <FormattedMessage id="menu.profile" defaultMessage="Profile" />
-              </UserMenuLinkEntry>
-              <Query
-                query={memberInvitationsCountQuery}
-                variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
-                fetchPolicy="network-only"
-                context={API_V2_CONTEXT}
+          )}
+
+          {!showUserAccount ? (
+            <React.Fragment>
+              <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={3} display={['none', 'flex']} bg="#F7F8FA">
+                <Hide xs>
+                  <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
+                  <P mt={2} color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
+                    {LoggedInUser.collective.name}
+                  </P>
+                  <P mt="2px" mb={5} wordBreak="break-all" color="black.700" fontSize="13px">
+                    {LoggedInUser.email}
+                  </P>
+                  <P color="black.900" fontSize="12px" fontWeight="700" letterSpacing="1px" textTransform="uppercase">
+                    <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
+                  </P>
+                  <Box as="ul" p={0} my={2}>
+                    <UserAccountLinks
+                      isMobileView={false}
+                      LoggedInUser={LoggedInUser}
+                      setShowNewsAndUpdates={setShowNewsAndUpdates}
+                      logOutHandler={this.logout}
+                    />
+                  </Box>
+                </Hide>
+              </Box>
+              <Box
+                order={[1, 2]}
+                flex="1 1 50%"
+                width={[1, 1, 1 / 2]}
+                p={[1, 3]}
+                maxHeight={['100%', '450px']}
+                overflowY={['hidden', 'auto']}
               >
-                {({ data, loading }) =>
-                  loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (
-                    <UserMenuLinkEntry href="/member-invitations">
-                      <FormattedMessage
-                        id="menu.pendingInvitations"
-                        defaultMessage="Pending Invitations ({numberOfInvitations})"
-                        values={{ numberOfInvitations: data.memberInvitations.length }}
-                      />
-                    </UserMenuLinkEntry>
-                  ) : null
-                }
-              </Query>
-              <UserMenuLinkEntry href={`/${LoggedInUser.collective.slug}/edit`}>
-                <FormattedMessage id="Settings" defaultMessage="Settings" />
-              </UserMenuLinkEntry>
-              <UserMenuLinkEntry href={`/${LoggedInUser.username}/recurring-contributions`}>
-                <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
-              </UserMenuLinkEntry>
-              <UserMenuLinkEntry href={`/${LoggedInUser.username}/transactions`}>
-                <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
-              </UserMenuLinkEntry>
-              <UserMenuLinkEntry href="/applications">
-                <FormattedMessage id="menu.applications" defaultMessage="Applications" />
-              </UserMenuLinkEntry>
-              <UserMenuLinkEntry as="a" href="https://docs.opencollective.com">
-                <FormattedMessage id="menu.help" defaultMessage="Help" />
-              </UserMenuLinkEntry>
-              <UserMenuLinkEntry as="a" data-cy="logout" onClick={this.logout}>
-                <FormattedMessage id="menu.logout" defaultMessage="Log out" /> →
-              </UserMenuLinkEntry>
-            </Box>
-          </Box>
-          <Box order={[1, 2]} flex="1 1 50%" width={[1, 1, 1 / 2]} p={3} maxHeight="450px" overflowY="auto">
-            <ProfileMenuMemberships user={LoggedInUser} />
-          </Box>
+                <Hide lg md sm>
+                  <Box height="100vh" p={3} overflowY="auto" onClick={this.toggleAccountInfo}>
+                    <Flex alignItems="center">
+                      {showUserAccount ? (
+                        <P
+                          color="black.700"
+                          fontSize="12px"
+                          fontWeight="500"
+                          letterSpacing="0.06em"
+                          pr={2}
+                          textTransform="uppercase"
+                          whiteSpace="nowrap"
+                          onClick={this.toggleAccountInfo}
+                        >
+                          ← <FormattedMessage id="Back" defaultMessage="Back" />
+                        </P>
+                      ) : (
+                        <React.Fragment>
+                          <P
+                            color="black.700"
+                            fontSize="12px"
+                            fontWeight="500"
+                            letterSpacing="0.06em"
+                            pr={2}
+                            textTransform="uppercase"
+                            whiteSpace="nowrap"
+                          >
+                            <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
+                          </P>
+                          <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                        </React.Fragment>
+                      )}
+                    </Flex>
+                    <Flex py={3} pb={2} my={3} alignItems="center" justifyContent="space-between">
+                      <Flex position="relative">
+                        <Avatar collective={LoggedInUser.collective} radius={40} mr={2} />
+                        <Box>
+                          <P color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
+                            {LoggedInUser.collective.name}
+                          </P>
+                          <P mt="2px" wordBreak="break-all" color="black.700" fontSize="13px">
+                            {LoggedInUser.email}
+                          </P>
+                        </Box>
+                      </Flex>
+                      {!showUserAccount ? <ChevronRight size={20} color="#76777A" /> : ''}
+                    </Flex>
+                    <ProfileMenuMemberships user={LoggedInUser} />
+                  </Box>
+                </Hide>
+                <Hide xs>
+                  <ProfileMenuMemberships user={LoggedInUser} />
+                </Hide>
+              </Box>
+            </React.Fragment>
+          ) : (
+            <Hide sm md lg>
+              <Box height="100vh" mt={0} mx={3} as="ul" px={2}>
+                <UserAccountLinks
+                  isMobileView
+                  LoggedInUser={LoggedInUser}
+                  setShowNewsAndUpdates={setShowNewsAndUpdates}
+                  logOutHandler={this.logout}
+                />
+              </Box>
+            </Hide>
+          )}
         </Flex>
       </Container>
     );
