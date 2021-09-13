@@ -584,6 +584,7 @@
   "createCollective.form.error.name": "Введіть до 50 символів",
   "createCollective.form.error.slug": "Введіть до 30 символів",
   "createCollective.form.error.slug.hyphen": "Collective slug URL cannot start or end with a hyphen",
+  "createCollective.form.error.slug.taken": "URL already taken",
   "createCollective.form.nameLabel": "Назва Колективу",
   "createCollective.form.slugLabel": "Вкажіть вашу URL-адресу",
   "createCollective.form.suggestedLabel": "Пропоноване",
