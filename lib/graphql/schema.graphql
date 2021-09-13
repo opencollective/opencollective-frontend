@@ -2452,7 +2452,7 @@ type OrderType {
   description: String
 
   """
-  Custom user message to show with the order, e.g., a special dedication, "in
+  Custom user message to show with the order, e.g. a special dedication, "in
   memory of", or to add a custom one liner when RSVP for an event
   """
   publicMessage: String
