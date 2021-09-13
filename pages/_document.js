@@ -77,8 +77,6 @@ export default class IntlDocument extends Document {
     // Please, NEVER SECRETS!
     props.__NEXT_DATA__.env = pick(process.env, [
       'IMAGES_URL',
-      'REJECT_CONTRIBUTION',
-      'REJECTED_CATEGORIES',
       'PAYPAL_ENVIRONMENT',
       'STRIPE_KEY',
       'SENTRY_DSN',

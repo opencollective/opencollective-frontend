@@ -10,7 +10,6 @@ import { createGlobalStyle } from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { parseToBoolean } from '../lib/utils';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
@@ -26,8 +25,6 @@ import StyledHr from './StyledHr';
 import StyledLink from './StyledLink';
 import { P, Span } from './Text';
 import { withUser } from './UserProvider';
-
-const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES_ENABLED);
 
 const memberInvitationsCountQuery = gqlV2`
   query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {
@@ -62,11 +59,9 @@ UserMenuLinkEntry.propTypes = {
 const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, logOutHandler }) => {
   return (
     <Box>
-      {CHANGE_LOG_UPDATES_ENABLED && (
-        <UserMenuLinkEntry as={Span} isMobileMenuLink={isMobileView} onClick={() => setShowNewsAndUpdates(true)}>
-          <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
-        </UserMenuLinkEntry>
-      )}
+      <UserMenuLinkEntry as={Span} isMobileMenuLink={isMobileView} onClick={() => setShowNewsAndUpdates(true)}>
+        <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
+      </UserMenuLinkEntry>
       <Query
         query={memberInvitationsCountQuery}
         variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
