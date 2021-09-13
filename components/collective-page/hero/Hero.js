@@ -244,7 +244,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       values={{
                         FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
                         hostName: (
-                          <LinkCollective collective={host} data-cy="fiscalHostName">
+                          <LinkCollective collective={host} data-cy="fiscalHostName" noTitle>
                             <Span color="black.700">
                               <TruncatedTextWithTooltip value={host.name} />
                             </Span>

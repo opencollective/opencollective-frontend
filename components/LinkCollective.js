@@ -17,7 +17,7 @@ const getEventParentCollectiveSlug = parentCollective => {
  * Create a `Link` to the collective based on collective type.
  * It properly deals with type `EVENT` and `isIncognito`
  */
-const LinkCollective = ({ target, title, collective, children, ...props }) => {
+const LinkCollective = ({ target, title, noTitle, collective, children, ...props }) => {
   if (!collective || collective.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (collective.isGuest) {
@@ -37,13 +37,13 @@ const LinkCollective = ({ target, title, collective, children, ...props }) => {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
-    <Link href={`/${slug}`} {...props} title={title || name} target={target}>
+    <Link href={`/${slug}`} {...props} title={noTitle ? null : title || name} target={target}>
       {children || name || slug}
     </Link>
   ) : (
     <Link
       href={`/${getEventParentCollectiveSlug(parentCollective)}/events/${slug}`}
-      title={title || name}
+      title={noTitle ? null : title || name}
       target={target}
       {...props}
     >
@@ -68,6 +68,8 @@ LinkCollective.propTypes = {
   children: PropTypes.node,
   title: PropTypes.string,
   target: PropTypes.string,
+  /** Show the title as tooltip when hovering over the Link */
+  noTitle: PropTypes.bool,
 };
 
 export default LinkCollective;
