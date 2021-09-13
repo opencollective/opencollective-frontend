@@ -1770,16 +1770,6 @@ enum ImageFormat {
 }
 
 """
-Input dates and collectives for Invoice
-"""
-input InvoiceInputType {
-  dateFrom: IsoDateString
-  dateTo: IsoDateString
-  collectiveSlug: String
-  fromCollectiveSlug: String
-}
-
-"""
 This represents an Invoice
 """
 type InvoiceType {
@@ -1821,9 +1811,9 @@ type InvoiceType {
   day will be set for an invoice for a single transaction. Otherwise, prefer dateFrom, dateTo
   """
   day: Int
-  totalAmount: Int
+  totalAmount: Int @deprecated(reason: "2021-09-09: Not used, so we stop computing it.")
   totalTransactions: Int
-  currency: String
+  currency: String @deprecated(reason: "2021-09-09: Not used, so we stop returning it.")
   host: CollectiveInterface
   fromCollective: CollectiveInterface
   transactions: [Transaction]
@@ -3157,13 +3147,6 @@ type Query {
   LoggedInUser: UserDetails
   AuthenticatedUser: CollectiveInterface @deprecated(reason: "2021-01-29: Not used anymore")
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]
-  InvoiceByDateRange(
-    """
-    Like the Slug of the invoice but spilt out into parts and includes dateFrom
-    + dateTo for getting an invoice over a date range.
-    """
-    invoiceInputType: InvoiceInputType!
-  ): InvoiceType @deprecated(reason: "2020-09-17: PDF service is now using the GQLV2 transactions endpoint")
   TransactionInvoice(
     """
     Slug of the transaction.
@@ -4024,6 +4007,7 @@ input UserInputType {
   email: Email
   firstName: String
   lastName: String
+  legalName: String
   name: String
   company: String
   image: String
