@@ -1,8 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { useLazyQuery } from '@apollo/client';
 import themeGet from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
-import { isEmpty, omit, pick } from 'lodash';
+import { debounce, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -10,6 +11,7 @@ import { suggestSlug } from '../../lib/collective.lib';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex, Grid } from '../Grid';
@@ -29,6 +31,15 @@ import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
 const EMPTY_ARRAY = [];
+
+const validateSlugQuery = gqlV2/* GraphQL */ `
+  query ValidateSlugQuery($slug: String) {
+    account(slug: $slug, throwIfMissing: false) {
+      id
+      slug
+    }
+  }
+`;
 
 const msg = defineMessages({
   nameLabel: {
@@ -50,6 +61,10 @@ const msg = defineMessages({
   orgSlugLabel: {
     id: 'createCollective.form.slugLabel',
     defaultMessage: 'Set your URL',
+  },
+  orgSlugErrorTaken: {
+    id: 'createCollective.form.error.slug.taken',
+    defaultMessage: 'URL already taken',
   },
   orgWebsiteLabel: {
     id: 'createOrg.form.websiteLabel',
@@ -113,10 +128,14 @@ const RadioOptionContainer = styled.label`
   }
 `;
 
+const throttledSearch = debounce((searchFunc, variables) => {
+  return searchFunc({ variables });
+}, 750);
+
 const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, errors } = formik;
+  const { values, touched, errors } = formik;
   const stepOneCompleted =
     isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod))) &&
     (values.type === expenseTypes.RECEIPT ||
@@ -124,14 +143,21 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
 
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const [payeeType, setPayeeType] = React.useState(PAYEE_TYPE.USER);
+  const [validateSlug, { data: existingSlugAccount }] = useLazyQuery(validateSlugQuery, {
+    context: API_V2_CONTEXT,
+  });
+
   const changePayeeType = e => {
     e.stopPropagation();
     setPayeeType(e.target.value);
   };
 
   React.useEffect(() => {
-    if (values.payee?.organization?.name) {
-      formik.setFieldValue('payee.organization.slug', suggestSlug(values.payee.organization.name));
+    if (values.payee?.organization?.name && !touched.payee?.organization?.slug) {
+      const slug = suggestSlug(values.payee.organization.name);
+      if (values.payee.organization.slug !== slug) {
+        formik.setFieldValue('payee.organization.slug', suggestSlug(values.payee.organization.name));
+      }
     }
   }, [values.payee?.organization?.name]);
   React.useEffect(() => {
@@ -139,6 +165,18 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
       formik.setFieldValue('payee', omit(values.payee, ['organization']));
     }
   }, [payeeType]);
+  // Slug Validation
+  React.useEffect(() => {
+    if (values.payee?.organization?.slug) {
+      throttledSearch(validateSlug, { slug: values.payee.organization.slug });
+    }
+  }, [values.payee?.organization?.slug]);
+
+  const handleSlugValidation = async value => {
+    if (value === existingSlugAccount?.account?.slug) {
+      return formatMessage(msg.orgSlugErrorTaken);
+    }
+  };
 
   return (
     <Fragment>
@@ -185,9 +223,15 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
                 </StyledInputField>
               )}
             </Field>
-            <Field name="payee.organization.slug">
+            <Field name="payee.organization.slug" validate={handleSlugValidation}>
               {({ field }) => (
-                <StyledInputField name={field.name} label={formatMessage(msg.orgSlugLabel)} labelFontSize="13px" mt={3}>
+                <StyledInputField
+                  mt={3}
+                  labelFontSize="13px"
+                  error={errors.payee?.organization?.slug}
+                  name={field.name}
+                  label={formatMessage(msg.orgSlugLabel)}
+                >
                   {inputProps => <StyledInputGroup {...inputProps} {...field} prepend="opencollective.com/" />}
                 </StyledInputField>
               )}
