@@ -204,7 +204,7 @@ class ContributionFlowSuccess extends React.Component {
   };
 
   renderCryptoInformation(order) {
-    const pledgeCurrency = order?.data?.customData?.pledgeCurrency;
+    const pledgeCurrency = order?.data?.thegivingblock?.pledgeCurrency;
     const depositAddress = order?.paymentMethod?.data?.depositAddress;
 
     return (
