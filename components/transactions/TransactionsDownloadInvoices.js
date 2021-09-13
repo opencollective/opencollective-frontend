@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 import { groupBy, sumBy, truncate, uniq } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { formatCurrency } from '../../lib/currency-utils';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { saveInvoice } from '../../lib/transactions';
 
@@ -29,8 +28,6 @@ export const invoicesQuery = gql`
       slug
       year
       month
-      totalAmount
-      currency
       fromCollective {
         slug
       }
@@ -43,15 +40,23 @@ export const invoicesQuery = gql`
   }
 `;
 
-// eslint-disable-next-line react/prop-types
 const InvoiceLabel = ({ value: invoice }) => (
   <Flex alignItems="center">
     <Avatar collective={invoice.host} radius={16} type="ORGANIZATION" />
     <Flex flexDirection="column" ml={2}>
-      {`${truncate(invoice.host.name, { length: 20 })} (${formatCurrency(invoice.totalAmount, invoice.currency)})`}
+      {`${truncate(invoice.host.name, { length: 20 })}`}
     </Flex>
   </Flex>
 );
+
+InvoiceLabel.propTypes = {
+  value: PropTypes.shape({
+    host: PropTypes.shape({
+      slug: PropTypes.string,
+      name: PropTypes.string,
+    }),
+  }).isRequired,
+};
 
 const makeLabel = invoice => ({
   value: invoice,
