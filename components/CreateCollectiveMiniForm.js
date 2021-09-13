@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { assign, cloneDeep, get, pick } from 'lodash';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
@@ -62,6 +62,10 @@ const msg = defineMessages({
     id: 'Organization.Name',
     defaultMessage: 'Organization name',
   },
+  legalName: {
+    id: 'LegalName',
+    defaultMessage: 'Legal Name',
+  },
   fullName: {
     id: 'User.FullName',
     defaultMessage: 'Full name',
@@ -94,6 +98,10 @@ const msg = defineMessages({
     id: 'error.name.invalid',
     defaultMessage: 'Name is required',
   },
+  examples: {
+    id: 'examples',
+    defaultMessage: 'e.g. {examples}',
+  },
 });
 
 const labels = defineMessages({
@@ -116,7 +124,7 @@ const prepareMutationVariables = collective => {
     return { user: pick(collective, ['name', 'email', ...locationFields]) };
   } else if (collective.type === CollectiveType.ORGANIZATION) {
     collective.members.forEach(member => (member.role = roles.ADMIN));
-    return { collective: pick(collective, ['name', 'type', 'website', 'members', ...locationFields]) };
+    return { collective: pick(collective, ['name', 'legalName', 'type', 'website', 'members', ...locationFields]) };
   } else {
     return { collective: pick(collective, ['name', 'type', 'website', ...locationFields]) };
   }
@@ -232,7 +240,7 @@ const CreateCollectiveMiniForm = ({
     let values;
     if (excludeAdminFields) {
       const clonedValues = cloneDeep({ ...formValues, type });
-      const assignAdmin = pick(clonedValues, ['name', 'website', 'type']);
+      const assignAdmin = pick(clonedValues, ['name', 'legalName', 'website', 'type']);
       values = assign(assignAdmin, { members: [{ member: { id: LoggedInUser.CollectiveId } }] });
     } else {
       values = cloneDeep({ ...formValues, type });
@@ -319,6 +327,32 @@ const CreateCollectiveMiniForm = ({
                   />
                 )}
               </StyledInputField>
+              {isOrganization && (
+                <StyledInputField
+                  name="legalName"
+                  htmlFor="legalName"
+                  label={formatMessage(msg.legalName)}
+                  mt={3}
+                  value={values.legalName}
+                  isPrivate
+                  hint={
+                    <FormattedMessage
+                      id="legalName.description"
+                      defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name."
+                    />
+                  }
+                >
+                  {inputProps => (
+                    <Field
+                      as={StyledInput}
+                      {...inputProps}
+                      placeholder={intl.formatMessage(msg.examples, { examples: 'Open Collective Inc.' })}
+                      width="100%"
+                      data-cy="mini-form-legalName-field"
+                    />
+                  )}
+                </StyledInputField>
+              )}
               {!isUser && (
                 <StyledInputField
                   name="website"
