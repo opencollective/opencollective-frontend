@@ -12,6 +12,7 @@ import CollectiveCard from '../../CollectiveCard';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import HostsWithData from '../../HostsWithData';
+import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -93,9 +94,9 @@ class Host extends React.Component {
       <MessageBox type="info" fontSize="13px" withIcon>
         <FormattedMessage
           id="collective.edit.host.legalName.info"
-          defaultMessage="Please set the legal name of the host in the Info section under {settingsLink}. This is required if your legal name is different than your display name for tax and accounting purposes."
+          defaultMessage="Please set the legal name of the host in the Info section under <SettingsLink>your settings</SettingsLink>. This is required if your legal name is different than your display name for tax and accounting purposes."
           values={{
-            settingsLink: <Link href={`/${collective.host?.slug}/edit`}>Settings</Link>,
+            SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/edit` }),
           }}
         />
       </MessageBox>

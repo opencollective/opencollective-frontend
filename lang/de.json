@@ -277,7 +277,7 @@
   "collective.edit.backToProfile": "{type} Seite anzeigen",
   "collective.edit.host.findHost.description": "Sie müssen für Ihr Projekt weder Gelder halten noch eine juristische Person und kein Bankkonto einrichten. Der Fiscal Host kümmert sich um Buchhaltung, Rechnungen, Steuern, Verwaltung, Zahlungen und Haftung. Die meisten Gastgeber berechnen für diesen Service eine Gebühr (die Sie überprüfen können, bevor Sie sich für einen Gastgeber entscheiden).",
   "collective.edit.host.findHost.title": "Bei einem bestehenden Träger bewerben",
-  "collective.edit.host.legalName.info": "Please set the legal name of the host in the Info section under {settingsLink}. This is required if your legal name is different than your display name for tax and accounting purposes.",
+  "collective.edit.host.legalName.info": "Please set the legal name of the host in the Info section under <SettingsLink>your settings</SettingsLink>. This is required if your legal name is different than your display name for tax and accounting purposes.",
   "collective.edit.host.noHost.description": "Sie können keine Finanzbeiträge erhalten oder die Budgetfunktionen nutzen. Sie können Ihre Profilseite weiterhin bearbeiten, später zu zahlende Ausgaben einreichen und Aktualisierungen veröffentlichen.",
   "collective.edit.host.noHost.title": "Niemand",
   "collective.edit.host.selfHost.description": "Verbinden Sie einfach ein Bankkonto für ein einzelnes Kollektiv. Sie sind verantwortlich für Buchhaltung, Steuern, Zahlungen und Haftung.",
