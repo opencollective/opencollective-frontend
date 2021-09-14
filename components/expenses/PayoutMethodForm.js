@@ -114,7 +114,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
       {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && host && (
         <PayoutBankInformationForm isNew={isNew} getFieldName={getFieldName} host={host} />
       )}
-      {isNew && host?.transferwise && (
+      {isNew && (
         <Box mt={3}>
           <Field name={getFieldName('isSaved')}>
             {({ field }) => (

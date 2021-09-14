@@ -237,7 +237,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
         {error.message && `: ${error.message}`}
       </MessageBox>
     );
-    // If Wise is not configured we show a warning in dev environments
+    // If Wise is not configured we show a warning in dev environments (in Settings -> Recieving Money -> Set Bank Details section)
   } else if (!data?.host?.transferwise && process.env.OC_ENV !== 'production') {
     return renderWiseNotConfiguredMessage();
   }
@@ -374,7 +374,12 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   if (loading) {
     return <StyledSpinner />;
   } else if (!host.transferwise?.availableCurrencies && !fixedCurrency) {
-    // If Wise is not configured we show a warning in dev environments
+    /*
+     * If Wise is not configured we show a warning in dev environments.
+     * The warning is displayed in the Submit Expense section when the user selects a bank payout method.
+     *
+     * For production, just console log the error and don't show the user anything.
+     */
     if (process.env.OC_ENV !== 'production') {
       return renderWiseNotConfiguredMessage();
     } else {
