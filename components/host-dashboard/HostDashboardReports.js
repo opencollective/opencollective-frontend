@@ -101,6 +101,16 @@ const HostDashboardReports = ({ hostSlug }) => {
       </Flex>
       <StyledCard mb={5} borderRadius="12px" padding="32px 24px" borderColor="black.400">
         <Container mb={38}>
+          <SectionTitle
+            hint={
+              <FormattedMessage
+                id="Host.Metrics.TotalMoneyManages.description"
+                defaultMessage="Total amount held in your bank account for the Host and its Collectives."
+              />
+            }
+          >
+            <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
+          </SectionTitle>
           <TotalMoneyManagedSection currency={currency} hostMetrics={hostMetrics} />
         </Container>
         <Container mb={38}>
