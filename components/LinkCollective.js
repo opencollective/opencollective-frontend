@@ -68,7 +68,7 @@ LinkCollective.propTypes = {
   children: PropTypes.node,
   title: PropTypes.string,
   target: PropTypes.string,
-  /** Show the title as tooltip when hovering over the Link */
+  /** Set this to true to remove the `title` attribute from the link */
   noTitle: PropTypes.bool,
 };
 

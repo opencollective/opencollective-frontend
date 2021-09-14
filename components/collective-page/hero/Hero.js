@@ -253,14 +253,14 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       }}
                     />
                   </Container>
-                  {!parentIsHost && collective.connectedTo?.length > 0 && (
+                  {!parentIsHost && collective.connectedTo.length > 0 && (
                     <Container mx={1} color="black.700" my="12px">
                       <FormattedMessage
                         id="Collective.Hero.ParentCollective"
                         defaultMessage="Part of: {parentName}"
                         values={{
                           parentName: (
-                            <LinkCollective collective={collective}>
+                            <LinkCollective collective={collective} noTitle>
                               <Span color="black.700" data-cy="parentCollectiveName">
                                 <TruncatedTextWithTooltip value={collective.connectedTo[0].collective.name} />
                               </Span>
