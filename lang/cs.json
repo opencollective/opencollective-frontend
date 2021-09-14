@@ -1357,7 +1357,7 @@
   "LearnMore": "Learn more",
   "LearnMoreAboutServiceFees": "Learn more about {service} fees",
   "LegalName": "Legal Name",
-  "legalName.description": "The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name.",
+  "legalName.description": "The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name.",
   "loading": "načítání",
   "loadMore": "načíst více",
   "location.googleAutocompleteService.unavailable": "Location field requires \"{service}\" to function.{lineBreak} Make sure \"{domain}\" is not blocked.",

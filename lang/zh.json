@@ -1357,7 +1357,7 @@
   "LearnMore": "了解更多",
   "LearnMoreAboutServiceFees": "进一步了解 {service} 费用",
   "LegalName": "Legal Name",
-  "legalName.description": "The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name.",
+  "legalName.description": "The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name.",
   "loading": "加载中",
   "loadMore": "加载更多",
   "location.googleAutocompleteService.unavailable": "Location field requires \"{service}\" to function.{lineBreak} Make sure \"{domain}\" is not blocked.",
