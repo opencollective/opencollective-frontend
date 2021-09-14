@@ -29,31 +29,31 @@ const mainReportsQuery = gqlV2/* GraphQL */ `
       hostFeePercent
       hostMetrics {
         hostFees {
-          value
+          valueInCents
           currency
         }
         platformFees {
-          value
+          valueInCents
           currency
         }
         pendingPlatformFees {
-          value
+          valueInCents
           currency
         }
         platformTips {
-          value
+          valueInCents
           currency
         }
         pendingPlatformTips {
-          value
+          valueInCents
           currency
         }
         pendingHostFeeShare {
-          value
+          valueInCents
           currency
         }
         totalMoneyManaged {
-          value
+          valueInCents
           currency
         }
       }

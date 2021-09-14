@@ -50,18 +50,21 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
     hostFees,
     platformFees,
   } = hostMetrics;
-  const currentAmount = totalMoneyManaged.value * 100;
+  const currentAmount = totalMoneyManaged.valueInCents;
   const projectedAmount =
-    (totalMoneyManaged.value + pendingPlatformFees.value + pendingPlatformTips.value + pendingHostFeeShare.value) * 100;
+    totalMoneyManaged.valueInCents +
+    pendingPlatformFees.valueInCents +
+    pendingPlatformTips.valueInCents +
+    pendingHostFeeShare.valueInCents;
   const totalCollectiveFunds =
-    (totalMoneyManaged.value - platformTips.value - platformFees.value - hostFees.value) * 100;
-  const totalHostFunds = hostFees.value * 100;
+    totalMoneyManaged.valueInCents - platformTips.valueInCents - platformFees.valueInCents - hostFees.valueInCents;
+  const totalHostFunds = hostFees.valueInCents;
   return (
     <StyledCard borderColor="#46347F">
       <Container pl={27} pr={24} pt={16} pb={16} backgroundColor="#F6F5FF">
         <P minHeight="16px" fontSize="12px" fontWeight="500" lineHeight="16px" textTransform="uppercase">
           <Dollar size={14} color="#1300AB" />
-          <FormattedMessage id="TotalMoneyManagedSection.heading" defaultMessage="Total Money Managed" />
+          <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
         </P>
         <Flex flexWrap="wrap" mt={12} mb={14}>
           <Span fontSize={18} fontWeight="500">
@@ -101,7 +104,8 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
           <FundAmounts>
             <TotalFundsLabel minWidth="210px">
               <P>
-                <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> | Collectives
+                <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> |{' '}
+                <FormattedMessage id="pricingTable.row.collectives" defaultMessage="Collectives" />
               </P>
             </TotalFundsLabel>
             <TotalFundsLabel
@@ -111,7 +115,8 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
               top={['85px', '85px', '85px', '0px']}
             >
               <P>
-                <Span fontWeight="700">{formatCurrency(totalHostFunds, currency)}</Span> | Host Organization
+                <Span fontWeight="700">{formatCurrency(totalHostFunds, currency)}</Span> |{' '}
+                <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
               </P>
             </TotalFundsLabel>
           </FundAmounts>

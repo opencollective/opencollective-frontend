@@ -1988,7 +1988,7 @@
   "TotalAmountWithoutFee": "Загальна сума (без плати за послуги)",
   "TotalDonatedSince": "{totalDonated} з {date}",
   "TotalItems": "Total Items",
-  "TotalMoneyManagedSection.heading": "Total Money Managed",
+  "TotalMoneyManagedSection.hostOrganization": "Host Organization",
   "TotalMoneyManagedSection.projected": "Projected",
   "TotalMoneyManagedSection.subHeading": "My Organization and My Collectives",
   "TotalMoneyManagedSection.titleTooltip": "Total amount held in your bank account for the Host and its Collectives.",
