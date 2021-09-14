@@ -412,6 +412,7 @@
   "company.blog": "Blog",
   "company.hiring": "Jobs",
   "company.privacyPolicy": "Datenschutzerklärung",
+  "company.securityPolicy": "Security Policy",
   "company.termsOfService": "Nutzungsbedingungen",
   "confirm": "Bestätigen",
   "confirmCollective.deletion.title": "Dein {collectiveType} wurde gelöscht.",
