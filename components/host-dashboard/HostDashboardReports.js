@@ -88,6 +88,7 @@ const HostDashboardReports = ({ hostSlug }) => {
   if (loading) {
     return <Loading />;
   }
+  const currency = data?.host.currency;
   const hostMetrics = data?.host.hostMetrics;
 
   return (
@@ -100,7 +101,7 @@ const HostDashboardReports = ({ hostSlug }) => {
       </Flex>
       <StyledCard mb={5} borderRadius="12px" padding="32px 24px" borderColor="black.400">
         <Container mb={38}>
-          <TotalMoneyManagedSection currency="USD" hostMetrics={hostMetrics} />
+          <TotalMoneyManagedSection currency={currency} hostMetrics={hostMetrics} />
         </Container>
         <Container mb={38}>
           <SectionTitle>
