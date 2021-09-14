@@ -93,7 +93,7 @@
     "react-text-mask": "^5.4.3",
     "react-window": "1.8.6",
     "redis": "3.1.2",
-    "sanitize-html": "2.5.0",
+    "sanitize-html": "2.5.1",
     "slugify": "1.6.0",
     "speakeasy": "2.0.0",
     "styled-components": "5.3.1",
