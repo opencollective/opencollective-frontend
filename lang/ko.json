@@ -412,6 +412,7 @@
   "company.blog": "블로그",
   "company.hiring": "채용",
   "company.privacyPolicy": "개인정보처리방침",
+  "company.securityPolicy": "Security Policy",
   "company.termsOfService": "서비스 약관",
   "confirm": "확인",
   "confirmCollective.deletion.title": "Your {collectiveType} has been deleted.",

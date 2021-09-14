@@ -412,6 +412,7 @@
   "company.blog": "Blog",
   "company.hiring": "Hiring",
   "company.privacyPolicy": "Privacy Policy",
+  "company.securityPolicy": "Security Policy",
   "company.termsOfService": "Terms of service",
   "confirm": "Bevestigen",
   "confirmCollective.deletion.title": "Your {collectiveType} has been deleted.",

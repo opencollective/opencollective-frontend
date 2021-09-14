@@ -412,6 +412,7 @@
   "company.blog": "Блог",
   "company.hiring": "Вакансії",
   "company.privacyPolicy": "Політика приватності",
+  "company.securityPolicy": "Security Policy",
   "company.termsOfService": "Умови користування",
   "confirm": "Підтвердити",
   "confirmCollective.deletion.title": "Ваш {collectiveType} видалено.",

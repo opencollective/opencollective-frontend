@@ -412,6 +412,7 @@
   "company.blog": "博客",
   "company.hiring": "招聘",
   "company.privacyPolicy": "隐私政策",
+  "company.securityPolicy": "Security Policy",
   "company.termsOfService": "服务条款",
   "confirm": "确认",
   "confirmCollective.deletion.title": "你的 {collectiveType} 已被删除。",
