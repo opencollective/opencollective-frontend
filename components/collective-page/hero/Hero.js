@@ -26,6 +26,7 @@ import StyledLink from '../../StyledLink';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
+import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
 import UserCompany from '../../UserCompany';
 import ContainerSectionContent from '../ContainerSectionContent';
 
@@ -85,6 +86,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   const isProject = collective.type === CollectiveType.PROJECT;
   const isFund = collective.type === CollectiveType.FUND;
+  const parentIsHost = collective.connectedTo.length !== 0 && collective.connectedTo[0].collective.id === host.id;
 
   const handleHeroMessage = msg => {
     if (!msg) {
@@ -242,25 +244,25 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       values={{
                         FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
                         hostName: (
-                          <LinkCollective collective={host}>
-                            <Span data-cy="fiscalHostName" color="black.700">
-                              {host.name}
+                          <LinkCollective collective={host} data-cy="fiscalHostName" noTitle>
+                            <Span color="black.700">
+                              <TruncatedTextWithTooltip value={host.name} />
                             </Span>
                           </LinkCollective>
                         ),
                       }}
                     />
                   </Container>
-                  {collective.connectedTo.length !== 0 && (
+                  {!parentIsHost && collective.connectedTo.length > 0 && (
                     <Container mx={1} color="black.700" my="12px">
                       <FormattedMessage
                         id="Collective.Hero.ParentCollective"
                         defaultMessage="Part of: {parentName}"
                         values={{
                           parentName: (
-                            <LinkCollective collective={collective.connectedTo[0].collective}>
-                              <Span data-cy="parentCollectiveName" color="black.700">
-                                {collective.connectedTo[0].collective.name}
+                            <LinkCollective collective={collective} noTitle>
+                              <Span color="black.700" data-cy="parentCollectiveName">
+                                <TruncatedTextWithTooltip value={collective.connectedTo[0].collective.name} />
                               </Span>
                             </LinkCollective>
                           ),
