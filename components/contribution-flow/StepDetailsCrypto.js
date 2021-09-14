@@ -68,7 +68,7 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
   };
 
   useEffect(() => {
-    storeCryptoExchangeRate(selectedCryptoCurrency, collectiveCurrency);
+    storeCryptoExchangeRate(selectedCryptoCurrency.value, collectiveCurrency);
   }, []);
 
   useEffect(() => {
