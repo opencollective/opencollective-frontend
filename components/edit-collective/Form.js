@@ -107,7 +107,7 @@ class EditCollectiveForm extends React.Component {
       'legalName.description': {
         id: 'legalName.description',
         defaultMessage:
-          'The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name.',
+          'The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name.',
       },
       examples: {
         id: 'examples',
