@@ -12,7 +12,9 @@ import CollectiveCard from '../../CollectiveCard';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import HostsWithData from '../../HostsWithData';
+import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledLink from '../../StyledLink';
@@ -87,6 +89,20 @@ class Host extends React.Component {
     }
   }
 
+  renderLegalNameSetInfoMessage(collective) {
+    return (
+      <MessageBox type="info" fontSize="13px" withIcon>
+        <FormattedMessage
+          id="collective.edit.host.legalName.info"
+          defaultMessage="Please set the legal name of the host in the Info section under <SettingsLink>your settings</SettingsLink>. This is required if your legal name is different than your display name for tax and accounting purposes."
+          values={{
+            SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/edit` }),
+          }}
+        />
+      </MessageBox>
+    );
+  }
+
   render() {
     const { LoggedInUser, collective, router } = this.props;
     const { showModal, action } = this.state;
@@ -129,6 +145,7 @@ class Host extends React.Component {
               </p>
             </Fragment>
           )}
+          <Container>{this.renderLegalNameSetInfoMessage(collective)}</Container>
           {collective.stats.balance === 0 && (
             <Fragment>
               <p>
@@ -246,6 +263,7 @@ class Host extends React.Component {
                       </Fineprint>
                     </Fragment>
                   )}
+                  <Container mt={4}>{this.renderLegalNameSetInfoMessage(collective)}</Container>
                 </Fragment>
               )}
             </Box>
