@@ -1991,7 +1991,7 @@
   "Transaction.kind.PAYMENT_PROCESSOR_COVER": "Payment processor cover",
   "Transaction.kind.PLATFORM_TIP": "Platform tip",
   "Transaction.kind.PLATFORM_TIP_DEBT": "Platform tip debt",
-  "Transaction.kind.PREPAID_PAYMENT_METHOD": "Prepaid",
+  "Transaction.kind.PREPAID_PAYMENT_METHOD": "Prepaid payment method",
   "transaction.refund.btn": "відшкодування",
   "transaction.refund.helpText": "<bold>Refund:</bold> This action will reimburse the full amount back to your contributor. They can contribute again in the future.",
   "transaction.refund.info": "The contributor will be refunded the full amount.",

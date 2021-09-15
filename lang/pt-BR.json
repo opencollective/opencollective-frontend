@@ -1991,7 +1991,7 @@
   "Transaction.kind.PAYMENT_PROCESSOR_COVER": "Payment processor cover",
   "Transaction.kind.PLATFORM_TIP": "Platform tip",
   "Transaction.kind.PLATFORM_TIP_DEBT": "Platform tip debt",
-  "Transaction.kind.PREPAID_PAYMENT_METHOD": "Prepaid",
+  "Transaction.kind.PREPAID_PAYMENT_METHOD": "Prepaid payment method",
   "transaction.refund.btn": "reembolsar",
   "transaction.refund.helpText": "<bold>Reembolso:</bold> Esta ação irá reembolsar o valor total de volta ao seu colaborador. Eles poderão contribuir de novo no futuro.",
   "transaction.refund.info": "O colaborador será reembolsado do valor total.",
