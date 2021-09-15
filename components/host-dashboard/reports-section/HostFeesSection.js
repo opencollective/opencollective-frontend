@@ -144,6 +144,7 @@ const getSeriesFromData = (intl, timeSeries) => {
 
   const hostFeeNodes = get(timeSeries, 'hostFees.nodes', []);
   const hostFeeShareNodes = get(timeSeries, 'hostFeeShare.nodes', []);
+  // TODO(HostReport): I18n the series names
   return [
     { name: 'Host profit', data: dataToSeries(getHostFeesWithoutShare(hostFeeNodes, hostFeeShareNodes)) },
     ...Object.entries(groupBy(hostFeeShareNodes, 'settlementStatus')).map(([status, nodes]) => ({
