@@ -105,13 +105,16 @@ const getChartOptions = (intl, hostCurrency) => ({
   },
   yaxis: {
     labels: {
-      minWidth: 40,
+      minWidth: 38,
       formatter: function (value) {
-        if (value >= 1000) {
-          return `${Math.round(value / 1000)}k`;
-        } else {
-          return formatCurrency(value, hostCurrency);
-        }
+        return value < 1000 ? value : `${Math.round(value / 1000)}k`;
+      },
+    },
+  },
+  tooltip: {
+    y: {
+      formatter: function (value) {
+        return formatCurrency(value * 100, hostCurrency);
       },
     },
   },
