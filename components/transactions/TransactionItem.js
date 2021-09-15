@@ -4,10 +4,12 @@ import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { MessageSquare } from '@styled-icons/feather/MessageSquare';
 import { truncate } from 'lodash';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
-import { TransactionTypes } from '../../lib/constants/transactions';
+import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
+import { i18nTransactionKind } from '../../lib/i18n/transaction';
 
 import Avatar from '../Avatar';
 import { CreditItem, DebitItem } from '../budget/DebitCreditList';
@@ -21,6 +23,7 @@ import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
+import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
@@ -28,6 +31,8 @@ import TransactionStatusTag from '../TransactionStatusTag';
 import { useUser } from '../UserProvider';
 
 import TransactionDetails from './TransactionDetails';
+
+const { CONTRIBUTION, ADDED_FUNDS } = TransactionKind;
 
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
@@ -71,6 +76,16 @@ const ItemTitleWrapper = ({ expense, children }) => {
   }
 };
 
+const KindTag = styled(StyledTag).attrs({
+  variant: 'rounded-left',
+  type: 'grey',
+  mb: '4px',
+  mr: '10px',
+  textTransform: 'uppercase',
+  fontSize: '10px',
+  fontWeight: '600',
+})``;
+
 const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
   const {
     toAccount,
@@ -96,6 +111,8 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const avatarCollective = isCredit ? fromAccount : toAccount;
 
   const displayedAmount = getDisplayedAmount(transaction, collective);
+
+  const intl = useIntl();
 
   return (
     <Item data-cy="transaction-item">
@@ -218,8 +235,11 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             {hasExpense && <ExpenseStatusTag status={expense.status} fontSize="9px" px="6px" py="2px" />}
           </Flex>
         </Flex>
-        {hasOrder && (
+        {hasOrder && [CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
           <Container borderTop={['1px solid #E8E9EB', 'none']} mt={3} pt={[2, 0]}>
+            {[ADDED_FUNDS].includes(transaction.kind) && (
+              <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
+            )}
             <StyledButton
               data-cy="transaction-details"
               buttonSize="tiny"
@@ -250,6 +270,11 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         {hasExpense && (
           <Container mt={3} pt={[2, 0]}>
             <ExpenseTags expense={expense} />
+          </Container>
+        )}
+        {!hasExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind)) && (
+          <Container mt={3} pt={[2, 0]}>
+            <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
           </Container>
         )}
       </Box>
@@ -311,6 +336,7 @@ TransactionItem.propTypes = {
     id: PropTypes.string,
     uuid: PropTypes.string,
     type: PropTypes.string,
+    kind: PropTypes.string,
     currency: PropTypes.string,
     description: PropTypes.string,
     createdAt: PropTypes.string,
