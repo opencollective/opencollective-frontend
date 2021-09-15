@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { intersection, omit, size } from 'lodash';
+import { intersection, size } from 'lodash';
 import { useIntl } from 'react-intl';
 import { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
@@ -11,12 +11,6 @@ import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import { Span } from '../../Text';
-
-const DISPLAYED_TRANSACTION_KINDS = omit(TransactionKind, [
-  'PLATFORM_FEE',
-  'PREPAID_PAYMENT_METHOD',
-  'PAYMENT_PROCESSOR_FEE',
-]);
 
 export const getDefaultKinds = () => {
   return [
@@ -80,7 +74,7 @@ const REACT_SELECT_COMPONENT_OVERRIDE = {
 const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
   const intl = useIntl();
   const getOption = (value, idx) => ({ label: i18nTransactionKind(intl, value), value, idx });
-  const displayedKinds = kinds || Object.values(DISPLAYED_TRANSACTION_KINDS);
+  const displayedKinds = kinds && kinds.length ? kinds : getDefaultKinds();
   const options = displayedKinds.map(getOption);
   const selectedOptions = React.useMemo(
     () => (!value ? intersection(getDefaultKinds(), displayedKinds) : parseTransactionKinds(value)).map(getOption),
