@@ -1318,6 +1318,7 @@
   "HostApplication.Approved": "{name} було схвалено",
   "HostApplication.Rejected": "{name} було відхилено",
   "HostApplicationMessageInfo": "The message will be public by default. If you want it to be private, tick the private checkbox.",
+  "HostDashboardReports.TransactionsOverview.description": "Transactions related to contributions and expenses.",
   "HostedCollectives": "Скарбник колективів",
   "HostedEvents": "Скарбник подій",
   "HostedFunds": "Hosted Funds",

@@ -1318,6 +1318,7 @@
   "HostApplication.Approved": "{name} foi aprovado",
   "HostApplication.Rejected": "{name} foi rejeitado",
   "HostApplicationMessageInfo": "A mensagem será pública por padrão. Se você quer que ela seja privada, marque a caixa de seleção privada.",
+  "HostDashboardReports.TransactionsOverview.description": "Transactions related to contributions and expenses.",
   "HostedCollectives": "Coletivos administrados",
   "HostedEvents": "Eventos administrados",
   "HostedFunds": "Hosted Funds",
