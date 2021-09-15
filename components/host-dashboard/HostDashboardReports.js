@@ -138,10 +138,15 @@ const HostDashboardReports = ({ hostSlug }) => {
           </StyledCard>
         </Container>
         <Container mb={38}>
-          <SectionTitle>
+          <SectionTitle hint={
+            <FormattedMessage
+              id="HostDashboardReports.TransactionsOverview.description"
+              defaultMessage="Transactions related to contributions and expenses."
+            />
+          }>
             <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
           </SectionTitle>
-          <StyledCard height={200} />
+          <TransactionsOverviewSection currency={currency}/>
         </Container>
         <Box mb={4}>
           <PlatformTipsCollected hostSlug={hostSlug} />
