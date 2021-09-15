@@ -188,10 +188,15 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
       url.searchParams.set('dateTo', dateTo);
     }
 
-    // For now, always include Gift Card and Incognito transactions
-    // What you see is what you download.
-    url.searchParams.set('includeGiftCardTransactions', '1');
-    url.searchParams.set('includeIncognitoTransactions', '1');
+    if (!query.ignoreGiftCardTransactions) {
+      url.searchParams.set('includeGiftCardTransactions', '1');
+    }
+    if (!query.ignoreIncognitoTransactions) {
+      url.searchParams.set('includeIncognitoTransactions', '1');
+    }
+    if (!query.ignoreChildrenTransactions) {
+      url.searchParams.set('includeChildrenTransactions', '1');
+    }
 
     return url.toString();
   };

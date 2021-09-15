@@ -36,6 +36,7 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
       limit: $limit
       hasExpense: false
       kind: $kind
+      includeIncognitoTransactions: true
       includeGiftCardTransactions: true
       includeChildrenTransactions: true
     ) {

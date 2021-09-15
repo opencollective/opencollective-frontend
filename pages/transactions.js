@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
-import { get, omitBy } from 'lodash';
+import { get, isNil, omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -31,6 +31,7 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
 import StyledButton from '../components/StyledButton';
+import StyledCheckbox from '../components/StyledCheckbox';
 import StyledHr from '../components/StyledHr';
 import { H1 } from '../components/Text';
 import { getDefaultKinds, parseTransactionKinds } from '../components/transactions/filters/TransactionsKindFilter';
@@ -52,6 +53,9 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
     $dateTo: DateTime
     $searchTerm: String
     $kind: [TransactionKind]
+    $includeIncognitoTransactions: Boolean
+    $includeGiftCardsTransactions: Boolean
+    $includeChildrenTransactions: Boolean
   ) {
     account(slug: $slug) {
       id
@@ -76,9 +80,9 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       dateTo: $dateTo
       searchTerm: $searchTerm
       kind: $kind
-      includeIncognitoTransactions: true
-      includeGiftCardTransactions: true
-      includeChildrenTransactions: true
+      includeIncognitoTransactions: $includeIncognitoTransactions
+      includeGiftCardTransactions: $includeGiftCardsTransactions
+      includeChildrenTransactions: $includeChildrenTransactions
       includeDebts: true
     ) {
       ...TransactionsQueryCollectionFragment
@@ -115,6 +119,9 @@ const getVariablesFromQuery = query => {
     dateTo,
     searchTerm: query.searchTerm,
     kind: query.kind ? parseTransactionKinds(query.kind) : getDefaultKinds(),
+    includeIncognitoTransactions: !query.ignoreIncognitoTransactions,
+    includeGiftCardsTransactions: !query.ignoreGiftCardsTransactions,
+    includeChildrenTransactions: !query.ignoreChildrenTransactions,
   };
 };
 
@@ -127,7 +134,9 @@ class TransactionsPage extends React.Component {
     slug: PropTypes.string, // from getInitialProps, for addCollectiveNavbarData
     data: PropTypes.shape({
       account: PropTypes.object,
-      transactions: PropTypes.object,
+      transactions: PropTypes.shape({
+        nodes: PropTypes.array,
+      }),
       variables: PropTypes.object,
       loading: PropTypes.bool,
       refetch: PropTypes.func,
@@ -157,6 +166,30 @@ class TransactionsPage extends React.Component {
     const currentCollective = get(this.props, 'data.account');
     if (currentCollective && get(oldProps, 'data.account') !== currentCollective) {
       this.setState({ Collective: currentCollective });
+    }
+
+    const hasChildren =
+      (this.props.data?.transactions?.nodes || []).some(
+        el =>
+          el.fromAccount?.parent?.id === currentCollective.id ||
+          el.toAccount?.parent?.id === this.props.data?.account?.id,
+      ) || this.props.query.ignoreChildrenTransactions;
+    if (isNil(this.state.hasChildren) && hasChildren) {
+      this.setState({ hasChildren });
+    }
+
+    const hasGiftCards =
+      (this.props.data?.transactions?.nodes || []).some(el => el.giftCardEmitterAccount?.id) ||
+      this.props.query.ignoreGiftCardsTransactions;
+    if (isNil(this.state.hasGiftCards) && hasGiftCards) {
+      this.setState({ hasGiftCards });
+    }
+
+    const hasIncognito =
+      (this.props.data?.transactions?.nodes || []).some(el => el.fromAccount?.isIncognito) ||
+      this.props.query.ignoreIncognitoTransactions;
+    if (isNil(this.state.hasIncognito) && hasIncognito) {
+      this.setState({ hasIncognito });
     }
 
     // Refetch to get permissions with the currently logged in user
@@ -242,8 +275,9 @@ class TransactionsPage extends React.Component {
               </Box>
             </Flex>
             <StyledHr my="24px" mx="8px" borderWidth="0.5px" />
+
             <Flex
-              mb={['8px', '46px']}
+              mb={['8px', '23px']}
               mx="8px"
               justifyContent="space-between"
               flexDirection={['column', 'row']}
@@ -269,6 +303,52 @@ class TransactionsPage extends React.Component {
                 <TransactionsDownloadCSV collective={collective} query={this.props.query} />
               </Flex>
             </Flex>
+
+            <Flex
+              mb={['8px', '23px']}
+              mx="8px"
+              justifyContent="space-between"
+              flexDirection={['column', 'row']}
+              alignItems={['stretch', 'flex-end']}
+            >
+              {this.state.hasChildren && (
+                <StyledCheckbox
+                  defaultChecked={this.props.query.ignoreChildrenTransactions}
+                  onChange={({ checked }) => this.updateFilters({ ignoreChildrenTransactions: checked })}
+                  label={
+                    <FormattedMessage
+                      id="transactions.excludeChildren"
+                      defaultMessage="Exclude transactions from children (Projects and Events)"
+                    />
+                  }
+                />
+              )}
+              {this.state.hasGiftCards && (
+                <StyledCheckbox
+                  defaultChecked={this.props.query.ignoreGiftCardsTransactions}
+                  onChange={({ checked }) => this.updateFilters({ ignoreGiftCardsTransactions: checked })}
+                  label={
+                    <FormattedMessage
+                      id="transactions.excludeGiftCards"
+                      defaultMessage="Exclude Gift Card transactions"
+                    />
+                  }
+                />
+              )}
+              {this.state.hasIncognito && (
+                <StyledCheckbox
+                  defaultChecked={this.props.query.ignoreIncognitoTransactions}
+                  onChange={({ checked }) => this.updateFilters({ ignoreIncognitoTransactions: checked })}
+                  label={
+                    <FormattedMessage
+                      id="transactions.excludeIncognito"
+                      defaultMessage="Exclude Incognito transactions"
+                    />
+                  }
+                />
+              )}
+            </Flex>
+
             {error ? (
               <MessageBox type="error" withIcon>
                 {getErrorFromGraphqlException(error).message}

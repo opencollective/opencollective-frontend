@@ -51,7 +51,9 @@ export const transactionsSectionQuery = gqlV2/* GraphQL */ `
       hasOrder: $hasOrder
       hasExpense: $hasExpense
       kind: $kind
+      includeIncognitoTransactions: true
       includeGiftCardTransactions: true
+      includeChildrenTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
     }
