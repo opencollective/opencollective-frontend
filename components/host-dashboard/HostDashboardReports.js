@@ -8,10 +8,13 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Loading from '../Loading';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { H1, H2 } from '../Text';
+
+import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
 
 const mainReportsQuery = gqlV2/* GraphQL */ `
   query ReportsPageQuery($hostSlug: String!) {
@@ -24,6 +27,36 @@ const mainReportsQuery = gqlV2/* GraphQL */ `
       isHost
       type
       hostFeePercent
+      hostMetrics {
+        hostFees {
+          valueInCents
+          currency
+        }
+        platformFees {
+          valueInCents
+          currency
+        }
+        pendingPlatformFees {
+          valueInCents
+          currency
+        }
+        platformTips {
+          valueInCents
+          currency
+        }
+        pendingPlatformTips {
+          valueInCents
+          currency
+        }
+        pendingHostFeeShare {
+          valueInCents
+          currency
+        }
+        totalMoneyManaged {
+          valueInCents
+          currency
+        }
+      }
     }
   }
 `;
@@ -51,7 +84,12 @@ SectionTitle.propTypes = {
 
 const HostDashboardReports = ({ hostSlug }) => {
   // TODO: Use common data from this query with the hook below
-  useQuery(mainReportsQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const { data, loading } = useQuery(mainReportsQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  if (loading) {
+    return <Loading />;
+  }
+  const currency = data?.host.currency;
+  const hostMetrics = data?.host.hostMetrics;
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
@@ -73,7 +111,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
           </SectionTitle>
-          <StyledCard height={200} />
+          <TotalMoneyManagedSection currency={currency} hostMetrics={hostMetrics} />
         </Container>
         <Container mb={38}>
           <SectionTitle>
