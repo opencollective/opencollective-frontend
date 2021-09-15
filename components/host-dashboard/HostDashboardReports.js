@@ -19,6 +19,7 @@ import { H1, H2 } from '../Text';
 import HostFeesSection from './reports-section/HostFeesSection';
 import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
+import TransactionsOverviewSection from './reports-section/TransactionsOverviewSection';
 
 const hostReportPageQuery = gqlV2/* GraphQL */ `
   query HostReportsPage($hostSlug: String!) {
@@ -134,15 +135,17 @@ const HostDashboardReports = ({ hostSlug }) => {
           </StyledCard>
         </Container>
         <Container mb={38}>
-          <SectionTitle hint={
-            <FormattedMessage
-              id="HostDashboardReports.TransactionsOverview.description"
-              defaultMessage="Transactions related to contributions and expenses."
-            />
-          }>
+          <SectionTitle
+            hint={
+              <FormattedMessage
+                id="HostDashboardReports.TransactionsOverview.description"
+                defaultMessage="Transactions related to contributions and expenses."
+              />
+            }
+          >
             <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
           </SectionTitle>
-          <TransactionsOverviewSection currency={currency}/>
+          <TransactionsOverviewSection currency={currency} />
         </Container>
         <Box mb={4}>
           <PlatformTipsCollected hostSlug={hostSlug} />
