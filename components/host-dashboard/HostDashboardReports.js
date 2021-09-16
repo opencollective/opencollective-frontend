@@ -145,7 +145,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
           </SectionTitle>
-          <TransactionsOverviewSection currency={currency} />
+          <TransactionsOverviewSection currency={currency} hostSlug={hostSlug} />
         </Container>
         <Box mb={4}>
           <PlatformTipsCollected hostSlug={hostSlug} />
