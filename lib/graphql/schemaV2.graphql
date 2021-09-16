@@ -4919,17 +4919,27 @@ type Host implements Account & AccountWithContributions {
     Superior date limit in which we're calculating the metrics
     """
     to: String
+
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
   ): HostMetrics!
   hostMetricsTimeSeries(
     """
     The start date of the time series
     """
-    startDate: DateTime!
+    dateFrom: DateTime!
 
     """
     The end date of the time series
     """
-    endDate: DateTime!
+    dateTo: DateTime!
 
     """
     The time unit of the time series
@@ -8461,12 +8471,12 @@ interface TimeSeries {
   """
   The start date of the time series
   """
-  startDate: DateTime!
+  dateFrom: DateTime!
 
   """
   The end date of the time series
   """
-  endDate: DateTime!
+  dateTo: DateTime!
 
   """
   The interval between two data points
@@ -8481,12 +8491,12 @@ type TimeSeriesAmount implements TimeSeries {
   """
   The start date of the time series
   """
-  startDate: DateTime!
+  dateFrom: DateTime!
 
   """
   The end date of the time series
   """
-  endDate: DateTime!
+  dateTo: DateTime!
 
   """
   The interval between two data points
@@ -8511,12 +8521,12 @@ type TimeSeriesAmountWithSettlement implements TimeSeries {
   """
   The start date of the time series
   """
-  startDate: DateTime!
+  dateFrom: DateTime!
 
   """
   The end date of the time series
   """
-  endDate: DateTime!
+  dateTo: DateTime!
 
   """
   The interval between two data points
