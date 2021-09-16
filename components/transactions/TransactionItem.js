@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
-import { i18nTransactionKind } from '../../lib/i18n/transaction';
+import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
 
 import Avatar from '../Avatar';
 import { CreditItem, DebitItem } from '../budget/DebitCreditList';
@@ -152,7 +152,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
               </Container>
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
-                {transaction.type}
+                {i18nTransactionType(intl, transaction.type)}
                 &nbsp;
                 {
                   <Fragment>
