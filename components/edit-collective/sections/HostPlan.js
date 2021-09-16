@@ -197,7 +197,7 @@ const HostPlan = props => {
 
   return (
     <div>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={props.contentOnly}>
         <FormattedMessage id="Host.Plan" defaultMessage="Host Plan" />
       </SettingsTitle>
 
@@ -287,6 +287,7 @@ const HostPlan = props => {
 
 HostPlan.propTypes = {
   collective: PropTypes.object.isRequired,
+  contentOnly: PropTypes.bool,
 };
 
 export default HostPlan;

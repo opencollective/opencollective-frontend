@@ -50,6 +50,7 @@ class EditPaymentMethods extends React.Component {
     editCollective: PropTypes.func.isRequired,
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -225,7 +226,7 @@ class EditPaymentMethods extends React.Component {
       <Loading />
     ) : (
       <Flex className="EditPaymentMethods" flexDirection="column">
-        <SettingsTitle>
+        <SettingsTitle contentOnly={this.props.contentOnly}>
           <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
         </SettingsTitle>
         {error && (
