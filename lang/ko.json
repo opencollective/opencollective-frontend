@@ -1287,6 +1287,7 @@
   "Host.Metrics.PlatformTips.description": "Total Platform Tips collected since the first of the month.",
   "Host.Metrics.TotalMoneyManages": "Total Money Managed",
   "Host.Metrics.TotalMoneyManages.description": "Total amount held in your bank account for the Host and its Collectives.",
+  "host.onlyActive": "This page is only available for active fiscal hosts",
   "host.organization.create": "Create an Organization",
   "Host.Plan": "호스트 플랜",
   "Host.Plan.AddedFunds.unlimited": "Unlimited added funds",

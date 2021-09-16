@@ -1287,6 +1287,7 @@
   "Host.Metrics.PlatformTips.description": "Total Platform Tips collected since the first of the month.",
   "Host.Metrics.TotalMoneyManages": "Всього отримано грошей",
   "Host.Metrics.TotalMoneyManages.description": "Total amount held in your bank account for the Host and its Collectives.",
+  "host.onlyActive": "This page is only available for active fiscal hosts",
   "host.organization.create": "Створити організацію",
   "Host.Plan": "Ціна скарбника",
   "Host.Plan.AddedFunds.unlimited": "Необмежене додавання коштів",
