@@ -100,7 +100,7 @@ const msg = defineMessages({
   },
   examples: {
     id: 'examples',
-    defaultMessage: 'e.g. {examples}',
+    defaultMessage: 'e.g., {examples}',
   },
 });
 
