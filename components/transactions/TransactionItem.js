@@ -100,8 +100,11 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
     isRefund,
     isOrderRejected,
   } = transaction;
+
   const { LoggedInUser } = useUser();
   const [isExpanded, setExpanded] = React.useState(false);
+  const intl = useIntl();
+
   const hasOrder = order !== null;
   const hasExpense = expense !== null;
   const isCredit = type === TransactionTypes.CREDIT;
@@ -111,8 +114,6 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const avatarCollective = isCredit ? fromAccount : toAccount;
 
   const displayedAmount = getDisplayedAmount(transaction, collective);
-
-  const intl = useIntl();
 
   return (
     <Item data-cy="transaction-item">
@@ -335,8 +336,8 @@ TransactionItem.propTypes = {
     }),
     id: PropTypes.string,
     uuid: PropTypes.string,
-    type: PropTypes.string,
-    kind: PropTypes.string,
+    type: PropTypes.oneOf(Object.values(TransactionTypes)),
+    kind: PropTypes.oneOf(Object.values(TransactionKind)),
     currency: PropTypes.string,
     description: PropTypes.string,
     createdAt: PropTypes.string,

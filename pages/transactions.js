@@ -143,7 +143,12 @@ class TransactionsPage extends React.Component {
       error: PropTypes.any,
     }).isRequired, // from withData
     LoggedInUser: PropTypes.object,
-    query: PropTypes.object,
+    query: PropTypes.shape({
+      searchTerm: PropTypes.string,
+      ignoreIncognitoTransactions: PropTypes.string,
+      ignoreGiftCardsTransactions: PropTypes.string,
+      ignoreChildrenTransactions: PropTypes.string,
+    }),
     router: PropTypes.object,
   };
 
@@ -186,7 +191,7 @@ class TransactionsPage extends React.Component {
     }
 
     const hasIncognito =
-      (this.props.data?.transactions?.nodes || []).some(el => el.fromAccount?.isIncognito) ||
+      (this.props.data?.transactions?.nodes || []).some(el => el.account?.isIncognito) ||
       this.props.query.ignoreIncognitoTransactions;
     if (isNil(this.state.hasIncognito) && hasIncognito) {
       this.setState({ hasIncognito });

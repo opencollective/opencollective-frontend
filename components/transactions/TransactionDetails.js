@@ -4,7 +4,7 @@ import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { TransactionTypes } from '../../lib/constants/transactions';
+import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
 
@@ -226,7 +226,7 @@ TransactionDetails.propTypes = {
   displayActions: PropTypes.bool,
   transaction: PropTypes.shape({
     isRefunded: PropTypes.bool,
-    kind: PropTypes.string,
+    kind: PropTypes.oneOf(Object.values(TransactionKind)),
     isOrderRejected: PropTypes.bool,
     fromAccount: PropTypes.shape({
       id: PropTypes.string,

@@ -188,7 +188,7 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
       url.searchParams.set('dateTo', dateTo);
     }
 
-    if (!query.ignoreGiftCardTransactions) {
+    if (!query.ignoreGiftCardsTransactions) {
       url.searchParams.set('includeGiftCardTransactions', '1');
     }
     if (!query.ignoreIncognitoTransactions) {
