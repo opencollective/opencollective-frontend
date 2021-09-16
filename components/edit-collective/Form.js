@@ -111,7 +111,7 @@ class EditCollectiveForm extends React.Component {
       },
       examples: {
         id: 'examples',
-        defaultMessage: 'e.g. {examples}',
+        defaultMessage: 'e.g., {examples}',
       },
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
@@ -132,7 +132,7 @@ class EditCollectiveForm extends React.Component {
       },
       'company.description': {
         id: 'collective.company.description',
-        defaultMessage: 'Start with @ to reference an organization (e.g. @airbnb)',
+        defaultMessage: 'Start with @ to reference an organization (e.g., @airbnb)',
       },
       'amount.label': {
         id: 'Fields.amount',

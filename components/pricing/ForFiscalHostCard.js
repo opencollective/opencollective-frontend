@@ -104,7 +104,7 @@ const messages = defineMessages({
   'pricing.outsideFunds.description': {
     id: 'pricing.accessTo.manuallyCredit',
     defaultMessage:
-      "Manually credit Collective budgets with funds received outside the platform (e.g. payments you've invoiced, cash, or third party channels like a shop).",
+      "Manually credit Collective budgets with funds received outside the platform (e.g., payments you've invoiced, cash, or third party channels like a shop).",
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',

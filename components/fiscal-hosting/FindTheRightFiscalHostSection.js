@@ -27,7 +27,7 @@ const messages = defineMessages({
   'fiscalHosting.location.description': {
     id: 'fiscalHosting.location.description',
     defaultMessage:
-      'Which country a fiscal host is based in will determine the currency you your money will be accounted in, and where you are located in a legal sense, e.g. if you are applying for an EU grant, you might need a fiscal host based in the EU.',
+      'Which country a fiscal host is based in will determine the currency you your money will be accounted in, and where you are located in a legal sense, e.g., if you are applying for an EU grant, you might need a fiscal host based in the EU.',
   },
   'fiscalHosting.legalStructure': {
     id: 'fiscalHosting.legalStructure',

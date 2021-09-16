@@ -148,7 +148,7 @@ class Export extends React.Component {
         </Container>
         {collective.tiers[0] && (
           <div>
-            e.g.
+            e.g.,
             <br />
             <a href={`/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`}>
               https://opencollective.com/
@@ -160,7 +160,7 @@ class Export extends React.Component {
         )}
         {!collective.tiers[0] && (
           <div>
-            e.g.
+            e.g.,
             <br />
             <a href={`/${collective.slug}/members/all.json?limit=10&offset=0`}>
               https://opencollective.com/

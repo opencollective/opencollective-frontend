@@ -58,13 +58,13 @@ const orgMessages = defineMessages({
   },
   errorWebsite: {
     id: 'createOrg.form.error.website',
-    defaultMessage: 'Enter a valid website, e.g. www.example.com or example.org',
+    defaultMessage: 'Enter a valid website, e.g., www.example.com or example.org',
   },
 });
 
 const placeholders = {
-  name: { id: 'placeholder.name', defaultMessage: 'e.g. Salesforce, Airbnb' },
-  examples: { id: 'examples', defaultMessage: 'e.g. {examples}' },
+  name: { id: 'placeholder.name', defaultMessage: 'e.g., Salesforce, Airbnb' },
+  examples: { id: 'examples', defaultMessage: 'e.g., {examples}' },
   slug: { id: 'placeholder.slug', defaultMessage: 'Airbnb' },
   description: { id: 'placeholderdescription', defaultMessage: 'Making a world a better place' },
   website: { id: 'placeholder.website', defaultMessage: 'www.example.com' },
