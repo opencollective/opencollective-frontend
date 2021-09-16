@@ -313,19 +313,19 @@ class TransactionsPage extends React.Component {
             >
               {this.state.hasChildren && (
                 <StyledCheckbox
-                  defaultChecked={this.props.query.ignoreChildrenTransactions}
+                  checked={this.props.query.ignoreChildrenTransactions ? true : false}
                   onChange={({ checked }) => this.updateFilters({ ignoreChildrenTransactions: checked })}
                   label={
                     <FormattedMessage
                       id="transactions.excludeChildren"
-                      defaultMessage="Exclude transactions from children (Projects and Events)"
+                      defaultMessage="Exclude transactions from Projects and Events"
                     />
                   }
                 />
               )}
               {this.state.hasGiftCards && (
                 <StyledCheckbox
-                  defaultChecked={this.props.query.ignoreGiftCardsTransactions}
+                  checked={this.props.query.ignoreGiftCardsTransactions ? true : false}
                   onChange={({ checked }) => this.updateFilters({ ignoreGiftCardsTransactions: checked })}
                   label={
                     <FormattedMessage
@@ -337,7 +337,7 @@ class TransactionsPage extends React.Component {
               )}
               {this.state.hasIncognito && (
                 <StyledCheckbox
-                  defaultChecked={this.props.query.ignoreIncognitoTransactions}
+                  checked={this.props.query.ignoreIncognitoTransactions ? true : false}
                   onChange={({ checked }) => this.updateFilters({ ignoreIncognitoTransactions: checked })}
                   label={
                     <FormattedMessage

@@ -2008,7 +2008,7 @@
   "transactions.downloadinvoicesbutton": "Завантажити квитанції",
   "transactions.empty": "Операцій немає",
   "transactions.emptysearch": "В цьому проміжку операцій немає.",
-  "transactions.excludeChildren": "Exclude transactions from children (Projects and Events)",
+  "transactions.excludeChildren": "Exclude transactions from Projects and Events",
   "transactions.excludeGiftCards": "Exclude Gift Card transactions",
   "transactions.excludeIncognito": "Exclude Incognito transactions",
   "Transactions.Modal.ExpenseLink": "Перейти до витрат",

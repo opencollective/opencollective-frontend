@@ -2008,7 +2008,7 @@
   "transactions.downloadinvoicesbutton": "Descargar Recibos",
   "transactions.empty": "No se encontraron transacciones",
   "transactions.emptysearch": "No hay transacciones en este rango de fechas.",
-  "transactions.excludeChildren": "Exclude transactions from children (Projects and Events)",
+  "transactions.excludeChildren": "Exclude transactions from Projects and Events",
   "transactions.excludeGiftCards": "Exclude Gift Card transactions",
   "transactions.excludeIncognito": "Exclude Incognito transactions",
   "Transactions.Modal.ExpenseLink": "Go to expense",

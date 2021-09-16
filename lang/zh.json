@@ -2008,7 +2008,7 @@
   "transactions.downloadinvoicesbutton": "下载收据",
   "transactions.empty": "No transactions",
   "transactions.emptysearch": "There are no transactions in this date range.",
-  "transactions.excludeChildren": "Exclude transactions from children (Projects and Events)",
+  "transactions.excludeChildren": "Exclude transactions from Projects and Events",
   "transactions.excludeGiftCards": "Exclude Gift Card transactions",
   "transactions.excludeIncognito": "Exclude Incognito transactions",
   "Transactions.Modal.ExpenseLink": "Go to expense",

@@ -154,7 +154,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
                 {transaction.type}
                 &nbsp;
-                {(collective.slug !== fromAccount.slug || true) && (
+                {
                   <Fragment>
                     <FormattedMessage
                       id="Transaction.from"
@@ -163,14 +163,14 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                     />
                     &nbsp;
                   </Fragment>
-                )}
-                {(collective.slug !== toAccount.slug || true) && (
+                }
+                {
                   <FormattedMessage
                     id="Transaction.to"
                     defaultMessage="to {name}"
                     values={{ name: <StyledLink as={LinkCollective} collective={toAccount} /> }}
                   />
-                )}
+                }
                 {giftCardEmitterAccount && (
                   <React.Fragment>
                     &nbsp;
@@ -237,7 +237,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         </Flex>
         {hasOrder && [CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
           <Container borderTop={['1px solid #E8E9EB', 'none']} mt={3} pt={[2, 0]}>
-            {[ADDED_FUNDS].includes(transaction.kind) && (
+            {[CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
               <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
             )}
             <StyledButton
