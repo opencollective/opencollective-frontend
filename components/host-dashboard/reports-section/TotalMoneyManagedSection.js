@@ -111,7 +111,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
             <TotalFundsLabel
               minWidth="230px"
               position="relative"
-              left={['-210px', '-210px', '-210px', '320px']}
+              left={['-210px', '-210px', '-210px', '130px']}
               top={['85px', '85px', '85px', '0px']}
             >
               <P>
