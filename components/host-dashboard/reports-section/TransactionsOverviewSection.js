@@ -189,7 +189,7 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
             <TotalFundsLabel
               minWidth="250px"
               position="relative"
-              left={['-280px', '-280px', '-280px', '300px']}
+              left={['-280px', '-280px', '-280px', '100px']}
               top={['85px', '85px', '85px', '0px']}
             >
               <P>
@@ -208,7 +208,7 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
               {` ${numOneTime} `}
               <FormattedMessage id="Frequency.OneTime" defaultMessage="One time" />
             </Span>
-            <Span mr={['20px', '20px', '20px', '380px']}>
+            <Span mr={['10px', '10px', '10px', '200px']}>
               <Square color="#BEFADA" />
               {` ${numRecurring} `}
               <FormattedMessage id="TransactionsOverviewSection.Recurring" defaultMessage="Recurring" />
