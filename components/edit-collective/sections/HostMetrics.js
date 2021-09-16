@@ -9,6 +9,8 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import Container from '../../Container';
 import { Box } from '../../Grid';
 import Loading from '../../Loading';
+import MessageBox from '../../MessageBox';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledCard from '../../StyledCard';
 import { P, Span } from '../../Text';
 import SettingsTitle from '../SettingsTitle';
@@ -20,6 +22,7 @@ const metricsQuery = gqlV2/* GraphQL */ `
       slug
       hostFeePercent
       platformFeePercent
+      isActive
       plan {
         id
         name
@@ -64,13 +67,21 @@ const metricsQuery = gqlV2/* GraphQL */ `
 `;
 
 const HostMetrics = props => {
-  const { loading, data } = useQuery(metricsQuery, {
+  const { loading, data, error } = useQuery(metricsQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collective.slug },
   });
 
   if (loading) {
     return <Loading />;
+  } else if (error) {
+    return <MessageBoxGraphqlError error={error} maxWidth={500} m="0 auto" />;
+  } else if (data.host && !data.host.isActive) {
+    return (
+      <MessageBox withIcon type="error" maxWidth={400} m="0 auto">
+        <FormattedMessage id="host.onlyActive" defaultMessage="This page is only available for active fiscal hosts" />
+      </MessageBox>
+    );
   }
 
   const displayHostFees = data.host.hostFeePercent || data.host.hostMetrics.hostFees.value ? true : false;

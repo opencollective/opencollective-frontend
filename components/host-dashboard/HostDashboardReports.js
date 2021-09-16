@@ -9,6 +9,8 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
+import MessageBox from '../MessageBox';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
@@ -26,6 +28,7 @@ const mainReportsQuery = gqlV2/* GraphQL */ `
       name
       currency
       isHost
+      isActive
       type
       hostFeePercent
       hostMetrics {
@@ -84,14 +87,21 @@ SectionTitle.propTypes = {
 };
 
 const HostDashboardReports = ({ hostSlug }) => {
-  // TODO: Use common data from this query with the hook below
-  const { data, loading } = useQuery(mainReportsQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const { data, loading, error } = useQuery(mainReportsQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
   if (loading) {
     return <Loading />;
+  } else if (error) {
+    return <MessageBoxGraphqlError error={error} maxWidth={500} m="0 auto" />;
+  } else if (data.host && !data.host.isActive) {
+    return (
+      <MessageBox withIcon type="error" maxWidth={400} m="0 auto">
+        <FormattedMessage id="host.onlyActive" defaultMessage="This page is only available for active fiscal hosts" />
+      </MessageBox>
+    );
   }
+
   const currency = data?.host.currency;
   const hostMetrics = data?.host.hostMetrics;
-
   return (
     <Box maxWidth={800} m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">

@@ -1287,6 +1287,7 @@
   "Host.Metrics.PlatformTips.description": "Gorjetas totais da plataforma coletadas desde o primeiro dia do mês.",
   "Host.Metrics.TotalMoneyManages": "Total de Dinheiro Gerenciado",
   "Host.Metrics.TotalMoneyManages.description": "Valor total mantido em sua conta bancária para o Host e seus Coletivos.",
+  "host.onlyActive": "This page is only available for active fiscal hosts",
   "host.organization.create": "Create an Organization",
   "Host.Plan": "Plano do Anfitrião",
   "Host.Plan.AddedFunds.unlimited": "Fundos adicionados ilimitados",
