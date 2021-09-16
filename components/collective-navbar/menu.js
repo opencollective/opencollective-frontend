@@ -26,7 +26,7 @@ const titles = defineMessages({
     defaultMessage: 'All ways to contribute',
   },
   TRANSACTIONS: {
-    id: 'SectionTransactions.Title',
+    id: 'menu.transactions',
     defaultMessage: 'Transactions',
   },
   EXPENSES: {

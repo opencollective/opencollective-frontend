@@ -63,7 +63,7 @@ const VirtualCardFilters = ({
       {isCollectiveFilter && (
         <FilterContainer mr={[0, '8px']} mb={['8px', 0]}>
           <FilterLabel htmlFor="virtual-card-filter-collective">
-            <FormattedMessage id="VirtualCard.Collective" defaultMessage="Collective" />
+            <FormattedMessage id="Collective" defaultMessage="Collective" />
           </FilterLabel>
           <CollectiveFilter
             {...getFilterProps('collectiveAccountIds')}
@@ -81,7 +81,7 @@ const VirtualCardFilters = ({
         {displayPeriodFilter && (
           <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
             <FilterLabel htmlFor="virtual-card-filter-period">
-              <FormattedMessage id="VirtualCard.Period" defaultMessage="Period" />
+              <FormattedMessage id="Period" defaultMessage="Period" />
             </FilterLabel>
             <PeriodFilter {...getFilterProps('period')} />
           </FilterContainer>

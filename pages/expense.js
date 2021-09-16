@@ -506,7 +506,7 @@ class ExpensePage extends React.Component {
                     {hasAttachedFiles && (
                       <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
                         <H5 fontSize="16px" mb={3}>
-                          <FormattedMessage id="Expense.Downloads" defaultMessage="Downloads" />
+                          <FormattedMessage id="Downloads" defaultMessage="Downloads" />
                         </H5>
                         <ExpenseAttachedFiles
                           files={expense.attachedFiles}

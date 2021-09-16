@@ -101,7 +101,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
                   fontSize="14px"
                   display="flex"
                 >
-                  <FormattedMessage id="NewsAndUpdates.link.readMore" defaultMessage="Read more" />
+                  <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                 </StyledLink>
               )}
             </Flex>
