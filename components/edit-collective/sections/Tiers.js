@@ -45,6 +45,7 @@ class Tiers extends React.Component {
     onChange: PropTypes.func.isRequired,
     intl: PropTypes.object,
     title: PropTypes.string,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -451,7 +452,9 @@ class Tiers extends React.Component {
 
     return (
       <div className="EditTiers">
-        <SettingsTitle mb={50}>{this.props.title}</SettingsTitle>
+        <SettingsTitle contentOnly={this.props.contentOnly} mb={50}>
+          {this.props.title}
+        </SettingsTitle>
         {displayContributionSettings && (
           <React.Fragment>
             <SettingsSectionTitle>

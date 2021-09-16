@@ -28,7 +28,7 @@ const messages = defineMessages({
   },
 });
 
-const InvoicesReceipts = ({ collective }) => {
+const InvoicesReceipts = ({ collective, contentOnly }) => {
   const { formatMessage } = useIntl();
 
   // For invoice Title
@@ -46,7 +46,7 @@ const InvoicesReceipts = ({ collective }) => {
 
   return (
     <Container>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={contentOnly}>
         <FormattedMessage id="becomeASponsor.invoiceReceipts" defaultMessage="Invoices & Receipts" />
       </SettingsTitle>
       <SettingsSectionTitle>
@@ -120,6 +120,7 @@ const InvoicesReceipts = ({ collective }) => {
 };
 
 InvoicesReceipts.propTypes = {
+  contentOnly: PropTypes.bool,
   collective: PropTypes.shape({
     id: PropTypes.number.isRequired,
     settings: PropTypes.object,

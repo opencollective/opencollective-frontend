@@ -98,7 +98,7 @@ const HostMetrics = props => {
 
   return (
     <Fragment>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={props.contentOnly}>
         <FormattedMessage id="Host.Metrics" defaultMessage="Host Metrics" />
       </SettingsTitle>
 
@@ -261,6 +261,7 @@ HostMetrics.propTypes = {
     slug: PropTypes.string,
   }),
   hideTopsection: PropTypes.func.isRequired,
+  contentOnly: PropTypes.bool,
 };
 
 export default injectIntl(HostMetrics);
