@@ -96,8 +96,8 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
     refetch();
   }, [dateFrom, dateTo, collectives]);
 
-  const { numContributions, numRecurring, numOneTime, dailyAvgIncome } = contributionStats;
-  const { numExpenses, numInvoices, numReimbursements, numGrants, dailyAverage } = expenseStats;
+  const { numContributions, numRecurring, numOneTime, dailyAvgIncome } = contributionStats || 0;
+  const { numExpenses, numInvoices, numReimbursements, numGrants, dailyAverage } = expenseStats || 0;
 
   const setDate = dateRange => {
     if (!dateRange) {
