@@ -105,7 +105,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
             <TotalFundsLabel minWidth="210px">
               <P>
                 <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> |{' '}
-                <FormattedMessage id="pricingTable.row.collectives" defaultMessage="Collectives" />
+                <FormattedMessage id="Collectives" defaultMessage="Collectives" />
               </P>
             </TotalFundsLabel>
             <TotalFundsLabel

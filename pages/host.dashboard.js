@@ -173,7 +173,7 @@ class HostDashboardPage extends React.Component {
               <Link href={`/${slug}/dashboard/expenses`}>
                 <LinkContainer isActive={view === 'expenses'}>
                   <ReceiptIcon size="1em" />
-                  <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+                  <FormattedMessage id="Expenses" defaultMessage="Expenses" />
                 </LinkContainer>
               </Link>
               <Link href={`/${slug}/dashboard/donations`}>

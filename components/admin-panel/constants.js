@@ -77,11 +77,11 @@ export const ALL_SECTIONS = {
 
 export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.EXPENSES]: {
-    id: 'AdminPanel.Menu.Expenses',
+    id: 'Expenses',
     defaultMessage: 'Expenses',
   },
   [ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS]: {
-    id: 'AdminPanel.Menu.FinancialContributions',
+    id: 'FinancialContributions',
     defaultMessage: 'Financial Contributions',
   },
   [ALL_SECTIONS.PENDING_APPLICATIONS]: {
@@ -93,15 +93,15 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Overview',
   },
   [ALL_SECTIONS.BUDGET_MANAGEMENT]: {
-    id: 'AdminPanel.Menu.BudgetManagement',
+    id: 'AdminPanel.Menu.Overview',
     defaultMessage: 'Overview',
   },
   [ALL_SECTIONS.COLLECTIVES]: {
-    id: 'AdminPanel.Menu.Collectives',
+    id: 'Collectives',
     defaultMessage: 'Collectives',
   },
   [ALL_SECTIONS.REPORTS]: {
-    id: 'AdminPanel.Menu.Reports',
+    id: 'Reports',
     defaultMessage: 'Reports',
   },
   [ALL_SECTIONS.ADVANCED]: {
@@ -217,7 +217,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Virtual Cards',
   },
   [ALL_SECTIONS.HOSTED_COLLECTIVES]: {
-    id: 'AdminPanel.Menu.HostedCollectives',
+    id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
   },
 });

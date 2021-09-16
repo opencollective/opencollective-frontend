@@ -31,7 +31,7 @@ const Menu = ({ collective, selectedSection }) => {
       <React.Fragment>
         <MenuGroup if={isHost(collective)} mb={24}>
           <MenuSectionHeader>
-            <FormattedMessage id="AdminPanel.HostDashboard" defaultMessage="Host Dashboard" />
+            <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
           </MenuSectionHeader>
           <MenuLink collective={collective} section={HOST_SECTIONS.EXPENSES} selectedSection={selectedSection} />
           <MenuLink
@@ -52,7 +52,7 @@ const Menu = ({ collective, selectedSection }) => {
         </MenuGroup>
         <MenuGroup if={isHost(collective) || isType(collective, ORGANIZATION)}>
           <MenuSectionHeader>
-            <FormattedMessage id="AdminPanel.Settings" defaultMessage="Settings" />
+            <FormattedMessage id="Settings" defaultMessage="Settings" />
           </MenuSectionHeader>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />}

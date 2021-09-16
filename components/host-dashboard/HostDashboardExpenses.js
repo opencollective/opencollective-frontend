@@ -174,7 +174,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
     <Box maxWidth={1000} m="0 auto" px={2}>
       <Flex mb={24} alignItems="center" flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-          <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </H1>
         <Box mx="auto" />
         <Box p={2}>

@@ -116,7 +116,7 @@ const AccountSettings = ({ account }) => {
       }
       addToast({
         type: TOAST_TYPE.SUCCESS,
-        message: <FormattedMessage id="AdminPanel.Settings.Updated" defaultMessage="Settings updated." />,
+        message: <FormattedMessage id="Settings.Updated" defaultMessage="Settings updated." />,
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;

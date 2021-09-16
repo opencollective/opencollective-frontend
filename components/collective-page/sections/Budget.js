@@ -74,7 +74,7 @@ const geFilterLabel = filter => {
     case 'all':
       return <FormattedMessage id="SectionTransactions.All" defaultMessage="All" />;
     case 'expenses':
-      return <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />;
+      return <FormattedMessage id="Expenses" defaultMessage="Expenses" />;
     case 'transactions':
       return <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />;
     default:
