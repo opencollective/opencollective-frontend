@@ -119,6 +119,10 @@ exports.REWRITES = [
     destination: '/editCollective',
   },
   {
+    source: '/:slug/admin/:section?',
+    destination: '/adminPanel',
+  },
+  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
     destination: '/collective-contact',
   },
