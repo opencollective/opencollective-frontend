@@ -1469,6 +1469,31 @@ enum ContributionFrequency {
 }
 
 """
+Contribution statistics related to the given accounts
+"""
+type ContributionStats {
+  """
+  The total number of contributions
+  """
+  numContributions: Int
+
+  """
+  Number of one time contributions
+  """
+  numOneTime: Int
+
+  """
+  Number of recurring contributions
+  """
+  numRecurring: Int
+
+  """
+  The daily average income
+  """
+  dailyAvgIncome: Float
+}
+
+"""
 A person or an entity that contributes financially or by any other mean to the mission
 of the collective. While "Member" is dedicated to permissions, this type is meant
 to surface all the public contributors.
@@ -4094,6 +4119,36 @@ input ExpenseReferenceInput {
   legacyId: Int
 }
 
+"""
+Expense statistics related to the given accounts
+"""
+type ExpenseStats {
+  """
+  The total number of expenses
+  """
+  numExpenses: Int
+
+  """
+  The daily average paid in expenses
+  """
+  dailyAverage: Float
+
+  """
+  Number of invoices
+  """
+  numInvoices: Int
+
+  """
+  Number of reimbursements
+  """
+  numReimbursements: Int
+
+  """
+  Number of grants
+  """
+  numGrants: Int
+}
+
 enum ExpenseStatus {
   DRAFT
   UNVERIFIED
@@ -5006,6 +5061,38 @@ type Host implements Account & AccountWithContributions {
   ): VirtualCardCollection!
   hostedVirtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   hostedVirtualCardCollectives(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+  contributionStats(
+    """
+    A collection of accounts for which the contribution stats should be returned.
+    """
+    accounts: [AccountReferenceInput!]
+
+    """
+    Inferior date limit in which we're calculating the contribution stats
+    """
+    from: String
+
+    """
+    Superior date limit in which we're calculating the contribution stats
+    """
+    to: String
+  ): ContributionStats!
+  expenseStats(
+    """
+    A collection of accounts for which the expense stats should be returned.
+    """
+    accounts: [AccountReferenceInput!]
+
+    """
+    Inferior date limit in which we're calculating the expense stats
+    """
+    from: String
+
+    """
+    Superior date limit in which we're calculating the expense stats
+    """
+    to: String
+  ): ExpenseStats!
 }
 
 type HostApplication {
