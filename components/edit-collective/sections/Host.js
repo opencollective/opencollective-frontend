@@ -111,6 +111,7 @@ class Host extends React.Component {
     const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
 
     const closeModal = () => this.setState({ showModal: false });
+    const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
 
     if (get(collective, 'host.id') === collective.id) {
       return (
@@ -145,7 +146,7 @@ class Host extends React.Component {
               </p>
             </Fragment>
           )}
-          <Container>{this.renderLegalNameSetInfoMessage(collective)}</Container>
+          {isHostAdmin && <Container>{this.renderLegalNameSetInfoMessage(collective)}</Container>}
           {collective.stats.balance === 0 && (
             <Fragment>
               <p>
@@ -263,7 +264,7 @@ class Host extends React.Component {
                       </Fineprint>
                     </Fragment>
                   )}
-                  <Container mt={4}>{this.renderLegalNameSetInfoMessage(collective)}</Container>
+                  {isHostAdmin && <Container mt={4}>{this.renderLegalNameSetInfoMessage(collective)}</Container>}
                 </Fragment>
               )}
             </Box>
