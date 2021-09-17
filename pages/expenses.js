@@ -342,6 +342,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       currency
       isArchived
       settings
+      createdAt
       expensesTags {
         id
         tag

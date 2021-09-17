@@ -59,6 +59,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       slug
       name
       type
+      createdAt
       imageUrl(height: 256)
       currency
       features {

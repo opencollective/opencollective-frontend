@@ -129,8 +129,9 @@ const TriggerContainer = styled(StyledButton)`
   }
 `;
 
-const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
+const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   const [dateInterval, setDateInterval] = React.useState(() => getDefaultState(value));
+  const formattedMin = formatDate(minDate, true);
   const setDate = (type, date) => {
     setDateInterval(value => ({
       ...value,
@@ -171,6 +172,7 @@ const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
                 lineHeight={1}
                 fontSize="13px"
                 defaultValue={formatDate(dateInterval.from, true)}
+                min={formattedMin}
                 onChange={e => setDate('from', e.target.value)}
               />
             )}
@@ -191,6 +193,7 @@ const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
                 lineHeight={1}
                 fontSize="13px"
                 defaultValue={formatDate(dateInterval.to, true)}
+                min={formattedMin}
                 onChange={e => setDate('to', e.target.value)}
               />
             )}
@@ -228,6 +231,7 @@ PeriodFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
   inputId: PropTypes.string,
+  minDate: PropTypes.string,
 };
 
 export default PeriodFilter;
