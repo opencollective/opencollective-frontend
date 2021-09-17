@@ -4,6 +4,7 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { displayPayeeNameWithLegalName } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -62,18 +63,6 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === expenseStatus.PAID;
 
-  /*
-   * Displays the payee name as Legal name (Display name) if legal name exists.
-   * Example: Sudharaka (Suds)
-   */
-  const renderPayeeDisplayNameString = (legalName, payeeName) => {
-    if (legalName) {
-      return `${legalName} (${payeeName})`;
-    } else {
-      return payeeName;
-    }
-  };
-
   return isLoading ? (
     <LoadingPlaceholder height={150} mt={3} />
   ) : (
@@ -104,7 +93,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             )}
             <Flex flexDirection="column" ml={2} css={{ overflow: 'hidden' }}>
               <Span color="black.900" fontWeight="bold" truncateOverflow>
-                {renderPayeeDisplayNameString(payee.legalName, payee.organization?.name || payee.name)}
+                {displayPayeeNameWithLegalName(payee.legalName, payee.organization?.name || payee.name)}
               </Span>
               {payee.type !== CollectiveType.VENDOR && (
                 <Span color="black.900" fontSize="11px" truncateOverflow>
@@ -175,13 +164,13 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <Avatar collective={host} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
                 {collective && (collective.isApproved || collective.id === host.id) ? (
-                  renderPayeeDisplayNameString(host.legalName, host.name)
+                  displayPayeeNameWithLegalName(host.legalName, host.name)
                 ) : (
                   <FormattedMessage
                     id="Fiscalhost.pending"
                     defaultMessage="{host} (pending)"
                     values={{
-                      host: renderPayeeDisplayNameString(host.legalName, host.name),
+                      host: displayPayeeNameWithLegalName(host.legalName, host.name),
                     }}
                   />
                 )}

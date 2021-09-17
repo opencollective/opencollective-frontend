@@ -36,10 +36,6 @@ const msg = defineMessages({
     id: `ExpenseForm.payeeLabel`,
     defaultMessage: 'Who is being paid for this expense?',
   },
-  payeeLegalName: {
-    id: `ExpenseForm.payeeLegalName`,
-    defaultMessage: 'Legal name of payee {tooltip}',
-  },
   payoutOptionLabel: {
     id: `ExpenseForm.PayoutOptionLabel`,
     defaultMessage: 'Payout method',
@@ -234,8 +230,10 @@ const ExpenseFormPayeeStep = ({
           </Field>
           {values.payee?.legalName && (
             <StyledInputField
-              label={formatMessage(msg.payeeLegalName, {
-                tooltip: (
+              label={
+                <React.Fragment>
+                  <FormattedMessage defaultMessage="Legal name" />
+                  &nbsp;
                   <StyledTooltip
                     content={() => (
                       <FormattedMessage
@@ -246,8 +244,8 @@ const ExpenseFormPayeeStep = ({
                   >
                     <InfoCircle size={16} />
                   </StyledTooltip>
-                ),
-              })}
+                </React.Fragment>
+              }
               labelFontSize="13px"
               flex="1"
               mt={3}
