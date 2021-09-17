@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import dayjs from '../../../lib/dayjs';
@@ -11,6 +11,7 @@ import PopupMenu from '../../PopupMenu';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
+import { StyledSelectFilter } from '../../StyledSelectFilter';
 
 /**
  * Normalize a date coming from the user input, adjusting the time to either the beginning of the day
@@ -147,6 +148,62 @@ const getNewInterval = (interval, changeField, newValue) => {
   return newInterval;
 };
 
+const PERIOD_FILTER_PRESETS = defineMessages({
+  today: {
+    id: 'Today',
+    defaultMessage: 'Today',
+  },
+  thisWeek: {
+    id: 'ThisWeek',
+    defaultMessage: 'This week',
+  },
+  lastMonth: {
+    id: 'LastMonth',
+    defaultMessage: 'Last month',
+  },
+});
+
+const PeriodFilterPresetsSelect = ({ onChange }) => {
+  const intl = useIntl();
+  const options = React.useMemo(() => {
+    return Object.keys(PERIOD_FILTER_PRESETS).map(presetKey => ({
+      value: presetKey,
+      label: intl.formatMessage(PERIOD_FILTER_PRESETS[presetKey]),
+    }));
+  }, [intl]);
+
+  return (
+    <StyledSelectFilter
+      options={options}
+      onChange={({ value }) => {
+        switch (value) {
+          case 'today':
+            return onChange({
+              from: dayjs().startOf('day'),
+              to: dayjs(),
+            });
+          case 'thisWeek':
+            return onChange({
+              from: dayjs().subtract(7, 'day').startOf('day'),
+              to: dayjs(),
+            });
+          case 'lastMonth':
+            return onChange({
+              from: dayjs().subtract(1, 'month').startOf('day'),
+              to: dayjs().subtract(1, 'month').endOf('month'),
+            });
+          default:
+            throw new Error(`Period filter not implemented: ${value}`);
+        }
+      }}
+    />
+  );
+};
+
+PeriodFilterPresetsSelect.propTypes = {
+  onChange: PropTypes.func.isRequired,
+};
+
 const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   const [dateInterval, setDateInterval] = React.useState(getDateRangeFromValue(value));
   const formattedMin = stripTime(minDate);
@@ -169,6 +226,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
     >
       {({ setOpen }) => (
         <Box mx="8px" my="16px" width="190px">
+          <PeriodFilterPresetsSelect onChange={setDateInterval} />
           <StyledInputField label="Start Date" name="dateFrom" mt="12px" labelFontSize="13px">
             {inputProps => (
               <StyledInput
