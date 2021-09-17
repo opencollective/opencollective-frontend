@@ -650,7 +650,7 @@ class EditCollectiveForm extends React.Component {
             examples: isUser ? 'Maria Gracia' : 'Salesforce, Inc., Airbnb, Inc.',
           }),
           maxLength: 255,
-          when: () => isUser || collective.type === CollectiveType.ORGANIZATION,
+          when: () => isUser || collective.type === CollectiveType.ORGANIZATION || collective.isHost,
           isPrivate: true,
         },
         {
