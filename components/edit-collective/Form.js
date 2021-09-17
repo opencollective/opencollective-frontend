@@ -101,13 +101,13 @@ class EditCollectiveForm extends React.Component {
       'name.description': {
         id: 'Fields.name.description',
         defaultMessage:
-          'The display name is used whenever we refer to your profile publicly (your profile page, your comments, your contributions, etc). Anyone can see this name.',
+          'Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc.',
       },
       'legalName.label': { id: 'LegalName', defaultMessage: 'Legal Name' },
-      'legalName.description': {
-        id: 'legalName.description',
+      'editCollective.legalName.description': {
+        id: 'editCollective.legalName.description',
         defaultMessage:
-          'The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name.',
+          'Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins.',
       },
       examples: {
         id: 'examples',
@@ -647,7 +647,7 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'legalName',
           placeholder: intl.formatMessage(this.messages.examples, {
-            examples: isUser ? 'Maria Gracia' : 'Salesforce, Inc., Airbnb, Inc.',
+            examples: isUser ? 'Maria Garcia' : 'Salesforce, Inc., Airbnb, Inc.',
           }),
           maxLength: 255,
           when: () => isUser || collective.type === CollectiveType.ORGANIZATION,
