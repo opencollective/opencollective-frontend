@@ -13,7 +13,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
-import { facebookShareURL, tweetURL } from '../../lib/url_helpers';
+import { facebookShareURL, tweetURL } from '../../lib/url-helpers';
 
 import Container from '../../components/Container';
 import { formatAccountDetails } from '../../components/edit-collective/utils';

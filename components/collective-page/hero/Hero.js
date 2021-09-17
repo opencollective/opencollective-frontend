@@ -12,7 +12,7 @@ import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url_helpers';
+import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url-helpers';
 
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';

@@ -27,7 +27,7 @@ import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
-import { objectToQueryString } from '../../lib/url_helpers';
+import { isTrustedRedirectHost, objectToQueryString } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -52,7 +52,7 @@ import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
-import { getGQLV2AmountInput, getTotalAmount, isAllowedRedirect, NEW_CREDIT_CARD_KEY } from './utils';
+import { getGQLV2AmountInput, getTotalAmount, NEW_CREDIT_CARD_KEY } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -281,7 +281,7 @@ class ContributionFlow extends React.Component {
 
       const verb = 'donate';
       const fallback = `/${this.props.collective.slug}/${verb}/success?OrderId=${order.id}`;
-      if (isAllowedRedirect(url.host)) {
+      if (isTrustedRedirectHost(url.host)) {
         window.location.href = url.href;
       } else {
         await this.props.router.push({ pathname: '/external-redirect', query: { url: url.href, fallback } });

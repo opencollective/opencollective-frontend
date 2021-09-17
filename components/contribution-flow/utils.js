@@ -211,10 +211,6 @@ export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
   }
 };
 
-export const isAllowedRedirect = host => {
-  return ['octobox.io', 'dotnetfoundation.org', 'hopin.com'].includes(host);
-};
-
 const getCanonicalURL = (collective, tier) => {
   if (!tier) {
     return `${process.env.WEBSITE_URL}/${collective.slug}/donate`;

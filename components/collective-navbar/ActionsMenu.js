@@ -15,7 +15,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective.lib';
-import { getSettingsRoute } from '../../lib/url_helpers';
+import { getSettingsRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
