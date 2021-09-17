@@ -14,7 +14,7 @@ import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 
 const normalizeDate = date => {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 };
 
 const formatDate = date => (!date ? '' : dayjs(date).format('YYYY-MM-DD'));
