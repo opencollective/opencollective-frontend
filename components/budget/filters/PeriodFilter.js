@@ -13,11 +13,24 @@ import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 
-const normalizeDate = date => {
-  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+const normalizeDate = (date, isEndOfDay = false) => {
+  const resultDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  if (isEndOfDay) {
+    resultDate.setHours(23, 59, 59, 999);
+  }
+
+  return resultDate;
 };
 
-const formatDate = date => (!date ? '' : dayjs(date).format('YYYY-MM-DD'));
+const formatDate = (date, stripTime) => {
+  if (!date) {
+    return '';
+  } else if (stripTime) {
+    return dayjs(date).format('YYYY-MM-DD');
+  } else {
+    return dayjs(date).toISOString();
+  }
+};
 
 /**
  * Parse `strValue` and returns an array like [dateFrom, dateTo]. Each value in the array
@@ -36,7 +49,7 @@ export const getDateRangeFromPeriod = strValue => {
     return [dateAddFunc(now, -value), now];
   }
 
-  // New format (dateFrom-dateTo)
+  // New format (dateFrom→dateTo)
   const parsedValue = strValue?.match(/([^→]+)(→(.+))?/);
   if (parsedValue) {
     const parseDate = dateStr => (!dateStr || dateStr === 'all' ? undefined : new Date(dateStr));
@@ -119,7 +132,10 @@ const TriggerContainer = styled(StyledButton)`
 const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
   const [dateInterval, setDateInterval] = React.useState(() => getDefaultState(value));
   const setDate = (type, date) => {
-    setDateInterval(value => ({ ...value, [type]: !date ? null : normalizeDate(new Date(date)) }));
+    setDateInterval(value => ({
+      ...value,
+      [type]: !date ? null : normalizeDate(new Date(date), type === 'to'),
+    }));
   };
 
   return (
@@ -154,7 +170,7 @@ const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                defaultValue={formatDate(dateInterval.from)}
+                defaultValue={formatDate(dateInterval.from, true)}
                 onChange={e => setDate('from', e.target.value)}
               />
             )}
@@ -174,7 +190,7 @@ const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                defaultValue={formatDate(dateInterval.to)}
+                defaultValue={formatDate(dateInterval.to, true)}
                 onChange={e => setDate('to', e.target.value)}
               />
             )}
