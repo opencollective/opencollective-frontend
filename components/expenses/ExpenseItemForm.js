@@ -125,18 +125,16 @@ const ExpenseItemForm = ({
                   label={<AttachmentLabel />}
                   data-cy="attachment-url-field"
                   required={!isOptional}
-                  error={
-                    meta.error?.type === ERROR.FORM_FIELD_REQUIRED
-                      ? formatMessage(msg.receiptRequired)
-                      : formatFormErrorMessage(intl, meta.error)
-                  }
+                  error={meta.error?.type !== ERROR.FORM_FIELD_REQUIRED && formatFormErrorMessage(intl, meta.error)}
                 >
                   <StyledDropzone
                     {...attachmentDropzoneParams}
                     data-cy={`${field.name}-dropzone`}
                     name={field.name}
                     isMulti={false}
-                    error={meta.error}
+                    error={
+                      meta.error?.type === ERROR.FORM_FIELD_REQUIRED ? formatMessage(msg.receiptRequired) : meta.error
+                    }
                     onSuccess={({ url }) => form.setFieldValue(field.name, url)}
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
                     fontSize="13px"

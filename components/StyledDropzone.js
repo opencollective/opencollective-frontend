@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { isNil, omit } from 'lodash';
 import { useDropzone } from 'react-dropzone';
@@ -13,7 +14,7 @@ import Container from './Container';
 import { Box } from './Grid';
 import { getI18nLink } from './I18nFormatters';
 import StyledSpinner from './StyledSpinner';
-import { P } from './Text';
+import { P, Span } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
 
 const Dropzone = styled(Container)`
@@ -45,7 +46,7 @@ const Dropzone = styled(Container)`
   ${props =>
     props.error &&
     css`
-      border-color: ${props.theme.colors.red[500]};
+      border: 1px solid ${props.theme.colors.red[500]};
     `}
 
   img {
@@ -151,8 +152,17 @@ const StyledDropzone = ({
           ) : (
             <React.Fragment>
               {!value ? (
-                <P color="black.500" px={2} fontSize={fontSize}>
-                  {isMulti ? (
+                <P color={error ? 'red.500' : 'black.500'} px={2} fontSize={fontSize}>
+                  {error ? (
+                    <React.Fragment>
+                      <ExclamationCircle color="#E03F6A" size={16} />
+                      <br />
+                      <Span fontWeight={600} ml={1}>
+                        {error}
+                      </Span>
+                      <br />
+                    </React.Fragment>
+                  ) : isMulti ? (
                     <FormattedMessage
                       id="DropZone.UploadBox"
                       defaultMessage="Drag and drop one or multiple files or <i18n-link>click here to select</i18n-link>."
