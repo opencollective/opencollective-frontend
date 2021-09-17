@@ -132,7 +132,9 @@ const ExpenseItemForm = ({
                     data-cy={`${field.name}-dropzone`}
                     name={field.name}
                     isMulti={false}
-                    error={meta.error?.type === ERROR.FORM_FIELD_REQUIRED && formatMessage(msg.receiptRequired)}
+                    error={
+                      meta.error?.type === ERROR.FORM_FIELD_REQUIRED ? formatMessage(msg.receiptRequired) : meta.error
+                    }
                     onSuccess={({ url }) => form.setFieldValue(field.name, url)}
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
                     fontSize="13px"
