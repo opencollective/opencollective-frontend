@@ -79,7 +79,7 @@ const msg = defineMessages({
   },
   additionalInfo: {
     id: 'ExpenseForm.inviteAdditionalInfo',
-    defaultMessage: 'If you have additional information about the payment details, you can add them by clicking below.',
+    defaultMessage: 'Want to enter payout details, such as a PayPal address or bank account?',
   },
 });
 
@@ -142,7 +142,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
               <P fontSize="12px">{formatMessage(msg.additionalInfo)}</P>
               <P fontSize="12px" mt={2}>
                 <StyledLinkButton onClick={() => setAdditionalInfo(true)}>
-                  <FormattedMessage id="ExpenseForm.inviteAdditionalInfoBtn" defaultMessage="Add Additional Details" />
+                  <FormattedMessage id="ExpenseForm.inviteAdditionalInfoBtn" defaultMessage="Add payout details" />
                 </StyledLinkButton>
               </P>
             </MessageBox>
