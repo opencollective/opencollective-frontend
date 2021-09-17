@@ -612,7 +612,7 @@ const ApplicationForm = ({
                         onSubmit={handleSubmit}
                         loading={submitting}
                       >
-                        <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+                        <FormattedMessage id="Apply" defaultMessage="Apply" />
                         &nbsp;
                         <ArrowRight2 size="14px" />
                       </OCFPrimaryButton>

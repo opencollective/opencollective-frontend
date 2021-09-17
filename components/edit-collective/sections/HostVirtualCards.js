@@ -302,7 +302,7 @@ const HostVirtualCards = props => {
 
       <Box mt={4}>
         <SettingsSectionTitle>
-          <FormattedMessage id="Host.VirtualCards.List.Title" defaultMessage="Virtual Cards" />
+          <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
         </SettingsSectionTitle>
         <P>
           <FormattedMessage

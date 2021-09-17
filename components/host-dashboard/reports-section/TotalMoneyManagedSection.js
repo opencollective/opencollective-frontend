@@ -91,7 +91,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
             <StyledTooltip
               content={() => (
                 <FormattedMessage
-                  id="TotalMoneyManagedSection.titleTooltip"
+                  id="Host.Metrics.TotalMoneyManages.description"
                   defaultMessage="Total amount held in your bank account for the Host and its Collectives."
                 />
               )}
@@ -123,7 +123,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
         </Container>
         <P minHeight="18px" fontSize="12px" fontWeight="400" lineHeight="18px" pt={12} pb={16}>
           <FormattedMessage
-            id="TotalMoneyManagedSection.titleTooltip"
+            id="Host.Metrics.TotalMoneyManages.description"
             defaultMessage="Total amount held in your bank account for the Host and its Collectives."
           />
         </P>

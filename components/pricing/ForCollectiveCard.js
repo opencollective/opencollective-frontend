@@ -132,7 +132,7 @@ const ForCollectiveCard = () => {
             fontWeight="500"
             letterSpacing={[null, '-0.008em']}
           >
-            <FormattedMessage id="pricing.collectiveCard" defaultMessage="For Collectives" />
+            <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
           </H3>
           <StyledHR my="8px" />
           <P fontSize="14px" lineHeight="20px" color="black.800">

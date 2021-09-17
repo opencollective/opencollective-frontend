@@ -21,7 +21,7 @@ const messages = defineMessages({
       'Fiscal hosts usually have specific topics or areas they are designed to serve. When it comes to the application process, their acceptance criteria will fit in that scope.',
   },
   'fiscalHosting.location': {
-    id: 'fiscalHosting.location',
+    id: 'SectionLocation.Title',
     defaultMessage: 'Location',
   },
   'fiscalHosting.location.description': {
@@ -43,7 +43,7 @@ const messages = defineMessages({
     defaultMessage: 'Services offered',
   },
   'fiscalHosting.serviceOffered.description': {
-    id: 'fiscalHosting.serviceOffered.description',
+    id: 'fiscalHosting.legalStructure.description',
     defaultMessage:
       'Do you want your host to be a charity, a company, a cooperative, or something else? E.g. a charity structure can enable tax-deductible donations, but may also have more restrictions on allowed activities.',
   },

@@ -56,7 +56,7 @@ class ApplyToHostBtn extends React.Component {
             {!withoutIcon && <CheckCircle size="1em" />}
             {!withoutIcon && ' '}
             <span>
-              <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+              <FormattedMessage id="Apply" defaultMessage="Apply" />
             </span>
           </React.Fragment>
         ),
@@ -73,7 +73,7 @@ class ApplyToHostBtn extends React.Component {
         {...buttonProps}
       >
         {!withoutIcon && <CheckCircle size="20px" color="#304CDC" />}
-        <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+        <FormattedMessage id="Apply" defaultMessage="Apply" />
       </StyledButton>
     );
   }

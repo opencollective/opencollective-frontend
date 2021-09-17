@@ -34,7 +34,7 @@ const UpdateSearchFilter = ({ searchTerm, onChange }) => {
   return (
     <Container>
       <FilterLabel htmlFor="update-filter-search">
-        <FormattedMessage id="Update.Search" defaultMessage="Search" />
+        <FormattedMessage id="Search" defaultMessage="Search" />
       </FilterLabel>
       <SearchFormContainer>
         <SearchBar

@@ -95,7 +95,7 @@ const SectionTransactions = props => {
           fontSize={['20px', '24px', '32px']}
           color="black.700"
         >
-          <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
+          <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
         </SectionTitle>
         {collectiveHasNoTransactions && (
           <MessageBox type="info" withIcon>

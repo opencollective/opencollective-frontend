@@ -23,7 +23,7 @@ const messages = defineMessages({
     defaultMessage: 'Managed funds',
   },
   apply: {
-    id: 'host.apply.create.btn',
+    id: 'Apply',
     defaultMessage: 'Apply',
   },
 });

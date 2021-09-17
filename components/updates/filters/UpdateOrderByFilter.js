@@ -18,11 +18,11 @@ const FilterLabel = styled.label`
 
 const labels = defineMessages({
   'most-recent': {
-    id: 'Updates.MostRecent',
+    id: 'Collectives.MostRecent',
     defaultMessage: 'Most recent',
   },
   oldest: {
-    id: 'Updates.Oldest',
+    id: 'Collectives.Oldest',
     defaultMessage: 'Oldest',
   },
 });
