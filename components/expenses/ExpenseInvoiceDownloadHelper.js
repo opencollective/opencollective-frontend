@@ -5,7 +5,7 @@ import { saveAs } from 'file-saver';
 import { fetchFromPDFService } from '../../lib/api';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { getErrorFromPdfService } from '../../lib/errors';
-import { expenseInvoiceUrl } from '../../lib/url_helpers';
+import { expenseInvoiceUrl } from '../../lib/url-helpers';
 
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 

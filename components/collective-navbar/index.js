@@ -20,7 +20,7 @@ import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collecti
 import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
-import { getSettingsRoute } from '../../lib/url_helpers';
+import { getSettingsRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
