@@ -329,4 +329,9 @@ exports.REWRITES = [
     source: '/opencollective/root-actions',
     destination: '/root-actions',
   },
+  // Terms of services for the host
+  {
+    source: '/:hostCollectiveSlug/terms',
+    destination: '/terms-of-fiscal-sponsorship',
+  },
 ];
