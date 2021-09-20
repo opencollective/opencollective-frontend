@@ -64,17 +64,21 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
     host(slug: $hostSlug) {
       id
       contributionStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
-        numContributions
-        numOneTime
-        numRecurring
-        dailyAvgIncome
+        contributionsCount
+        oneTimeContributionsCount
+        recurringContributionsCount
+        dailyAverageIncomeAmount {
+          value
+        }
       }
       expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
-        numExpenses
-        dailyAverage
-        numInvoices
-        numReimbursements
-        numGrants
+        expensesCount
+        dailyAverageAmount {
+          value
+        }
+        invoicesCount
+        reimbursementsCount
+        grantsCount
       }
     }
   }
@@ -96,8 +100,9 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
     refetch();
   }, [dateFrom, dateTo, collectives]);
 
-  const { numContributions, numRecurring, numOneTime, dailyAvgIncome } = contributionStats || 0;
-  const { numExpenses, numInvoices, numReimbursements, numGrants, dailyAverage } = expenseStats || 0;
+  const { contributionsCount, recurringContributionsCount, oneTimeContributionsCount, dailyAverageIncomeAmount } =
+    contributionStats || 0;
+  const { expensesCount, invoicesCount, reimbursementsCount, grantsCount, dailyAverageAmount } = expenseStats || 0;
 
   const setDate = dateRange => {
     if (!dateRange) {
@@ -112,12 +117,12 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
     if (dateFrom === 'all') {
       setDateFrom(null);
     } else {
-      setDateFrom(dateFrom);
+      setDateFrom(new Date(dateFrom));
     }
     if (dateTo === 'all') {
       setDateTo(null);
     } else {
-      setDateTo(dateTo);
+      setDateTo(new Date(dateTo));
     }
   };
 
@@ -179,11 +184,11 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
             <TotalFundsLabel minWidth="280px">
               <P>
                 <Span fontWeight="500">
-                  {numContributions} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
+                  {contributionsCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
                 </Span>{' '}
                 | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
                 {': '}
-                <Span fontWeight="700">{formatCurrency(dailyAvgIncome, currency)}</Span>
+                <Span fontWeight="700">{formatCurrency(dailyAverageIncomeAmount.value, currency)}</Span>
               </P>
             </TotalFundsLabel>
             <TotalFundsLabel
@@ -194,38 +199,38 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
             >
               <P>
                 <Span fontWeight="500">
-                  {numExpenses} <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+                  {expensesCount} <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
                 </Span>{' '}
                 | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
                 {': '}
-                <Span fontWeight="700">{formatCurrency(dailyAverage, currency)}</Span>
+                <Span fontWeight="700">{formatCurrency(dailyAverageAmount.value, currency)}</Span>
               </P>
             </TotalFundsLabel>
           </FundAmounts>
           <Container mt={2}>
             <Span mr={3}>
               <Square color="#51E094" />
-              {` ${numOneTime} `}
+              {` ${oneTimeContributionsCount} `}
               <FormattedMessage id="Frequency.OneTime" defaultMessage="One time" />
             </Span>
             <Span mr={['10px', '10px', '10px', '200px']}>
               <Square color="#BEFADA" />
-              {` ${numRecurring} `}
+              {` ${recurringContributionsCount} `}
               <FormattedMessage id="TransactionsOverviewSection.Recurring" defaultMessage="Recurring" />
             </Span>
             <Span mr={3}>
               <Square color="#CC2955" />
-              {` ${numInvoices} `}
+              {` ${invoicesCount} `}
               <FormattedMessage id="TransactionsOverviewSection.Invoices" defaultMessage="Invoices" />
             </Span>
             <Span mr={3}>
               <Square color="#F55882" />
-              {` ${numReimbursements} `}
+              {` ${reimbursementsCount} `}
               <FormattedMessage id="TransactionsOverviewSection.Reimbursements" defaultMessage="Reimbursements" />
             </Span>
             <Span mr={3}>
               <Square color="#FFC2D2" />
-              {` ${numGrants} `}
+              {` ${grantsCount} `}
               <FormattedMessage id="TransactionsOverviewSection.Grants" defaultMessage="Grants" />
             </Span>
           </Container>
@@ -241,17 +246,21 @@ TransactionsOverviewSection.propTypes = {
   filters: PropTypes.object,
   currency: PropTypes.string,
   contributionStats: PropTypes.shape({
-    numContributions: PropTypes.number,
-    numOneTime: PropTypes.number,
-    numRecurring: PropTypes.number,
-    dailyAvgIncome: PropTypes.number,
+    contributionsCount: PropTypes.number,
+    oneTimeContributionsCount: PropTypes.number,
+    recurringContributionsCount: PropTypes.number,
+    dailyAverageIncomeAmount: PropTypes.shape({
+      value: PropTypes.number,
+    }),
   }),
   expenseStats: PropTypes.shape({
-    numExpenses: PropTypes.number,
-    numInvoices: PropTypes.number,
-    numReimbursements: PropTypes.number,
-    numGrants: PropTypes.number,
-    dailyAverage: PropTypes.number,
+    expensesCount: PropTypes.number,
+    invoicesCount: PropTypes.number,
+    reimbursementsCount: PropTypes.number,
+    grantsCount: PropTypes.number,
+    dailyAverageAmount: PropTypes.shape({
+      value: PropTypes.number,
+    }),
   }),
 };
 
