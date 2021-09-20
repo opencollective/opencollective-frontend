@@ -99,6 +99,10 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         type
         imageUrl
       }
+      account {
+        id
+        isIncognito
+      }
       giftCardEmitterAccount {
         id
         name

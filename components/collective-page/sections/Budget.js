@@ -36,11 +36,13 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
       limit: $limit
       hasExpense: false
       kind: $kind
+      includeIncognitoTransactions: true
       includeGiftCardTransactions: true
+      includeChildrenTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
     }
-    expenses(account: { slug: $slug }, limit: $limit) {
+    expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
       totalCount
       nodes {
         ...ExpensesListFieldsFragment
