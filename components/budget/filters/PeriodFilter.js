@@ -134,15 +134,23 @@ const TriggerContainer = styled(StyledButton)`
   }
 `;
 
+const getNewInterval = (interval, changeField, newValue) => {
+  const newInterval = { ...interval };
+  newInterval[changeField] = normalizeDate(newValue, changeField === 'to');
+
+  // Reset interval in case fromDate is after toDate
+  if (newInterval.from && newInterval.to && newInterval.from > newInterval.to) {
+    const fieldToReset = changeField === 'from' ? 'to' : 'from';
+    newInterval[fieldToReset] = '';
+  }
+
+  return newInterval;
+};
+
 const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   const [dateInterval, setDateInterval] = React.useState(() => getDefaultState(value));
   const formattedMin = stripTime(minDate);
-  const setDate = (type, date) => {
-    setDateInterval(value => ({
-      ...value,
-      [type]: normalizeDate(date, type === 'to'),
-    }));
-  };
+  const setDate = (changeField, date) => setDateInterval(getNewInterval(dateInterval, changeField, date));
 
   return (
     <PopupMenu
@@ -176,7 +184,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                defaultValue={stripTime(dateInterval.from)}
+                value={stripTime(dateInterval.from)}
                 min={formattedMin}
                 onChange={e => setDate('from', e.target.value)}
               />
@@ -197,8 +205,9 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                defaultValue={stripTime(dateInterval.to)}
+                value={stripTime(dateInterval.to)}
                 min={formattedMin}
+                max={stripTime(new Date())}
                 onChange={e => setDate('to', e.target.value)}
               />
             )}
