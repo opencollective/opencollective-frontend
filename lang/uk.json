@@ -270,7 +270,7 @@
   "collective.edit.backToProfile": "переглянути сторінку {type}",
   "collective.edit.host.findHost.description": "Вам не потрібно буде утримувати кошти або налаштувати юридичну організацію і банківський рахунок для вашого проєкту. Скарбник піклуватиметься про бухгалтерський облік, рахунки, податки, управляння, платежі та відповідальність. Більшість скарбників отримують платню за цю послугу (яку можна переглянути, перш ніж вибрати скарбника).",
   "collective.edit.host.findHost.title": "Застосувати до наявного скарбника",
-  "collective.edit.host.legalName.info": "Please set the legal name of the host in the Info section under <SettingsLink>your settings</SettingsLink>. This is required if your legal name is different than your display name for tax and accounting purposes.",
+  "collective.edit.host.legalName.info": "Please set the legal name {isSelfHosted, select, false {of the host} other {}} in the Info section of <SettingsLink>the settings</SettingsLink>. This is required if the legal name is different than the display name for tax and accounting purposes.",
   "collective.edit.host.noHost.description": "Ви не можете отримати фінансовий внесок або використовувати бюджетні можливості. Ви досі можете редагувати сторінку профілю, затверджувати витрати, які будуть оплачені пізніше і публікувати оновлення.",
   "collective.edit.host.noHost.title": "Ніхто",
   "collective.edit.host.selfHost.description": "Simply connect a bank account for a single Collective. You will be responsible for accounting, taxes, payments, and liability.",

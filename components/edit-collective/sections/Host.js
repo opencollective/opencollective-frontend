@@ -94,9 +94,10 @@ class Host extends React.Component {
       <MessageBox type="info" fontSize="13px" withIcon>
         <FormattedMessage
           id="collective.edit.host.legalName.info"
-          defaultMessage="Please set the legal name of the host in the Info section under <SettingsLink>your settings</SettingsLink>. This is required if your legal name is different than your display name for tax and accounting purposes."
+          defaultMessage="Please set the legal name {isSelfHosted, select, false {of the host} other {}} in the Info section of <SettingsLink>the settings</SettingsLink>. This is required if the legal name is different than the display name for tax and accounting purposes."
           values={{
             SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/edit` }),
+            isSelfHosted: collective.id === collective.host?.id,
           }}
         />
       </MessageBox>
@@ -111,7 +112,7 @@ class Host extends React.Component {
     const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
 
     const closeModal = () => this.setState({ showModal: false });
-    const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
+    const showLegalNameInfoBox = LoggedInUser?.isHostAdmin(collective) && !collective?.host?.legalName;
 
     if (get(collective, 'host.id') === collective.id) {
       return (
@@ -146,7 +147,7 @@ class Host extends React.Component {
               </p>
             </Fragment>
           )}
-          {isHostAdmin && <Container>{this.renderLegalNameSetInfoMessage(collective)}</Container>}
+          {showLegalNameInfoBox && <Container>{this.renderLegalNameSetInfoMessage(collective)}</Container>}
           {collective.stats.balance === 0 && (
             <Fragment>
               <p>
@@ -264,7 +265,9 @@ class Host extends React.Component {
                       </Fineprint>
                     </Fragment>
                   )}
-                  {isHostAdmin && <Container mt={4}>{this.renderLegalNameSetInfoMessage(collective)}</Container>}
+                  {showLegalNameInfoBox && (
+                    <Container mt={4}>{this.renderLegalNameSetInfoMessage(collective)}</Container>
+                  )}
                 </Fragment>
               )}
             </Box>
