@@ -1475,22 +1475,22 @@ type ContributionStats {
   """
   The total number of contributions
   """
-  numContributions: Int
+  contributionsCount: Int!
 
   """
   Number of one time contributions
   """
-  numOneTime: Int
+  oneTimeContributionsCount: Int!
 
   """
   Number of recurring contributions
   """
-  numRecurring: Int
+  recurringContributionsCount: Int!
 
   """
   The daily average income
   """
-  dailyAvgIncome: Float
+  dailyAverageIncomeAmount: Amount!
 }
 
 """
@@ -4126,27 +4126,27 @@ type ExpenseStats {
   """
   The total number of expenses
   """
-  numExpenses: Int
+  expensesCount: Int!
 
   """
   The daily average paid in expenses
   """
-  dailyAverage: Float
+  dailyAverageAmount: Amount!
 
   """
   Number of invoices
   """
-  numInvoices: Int
+  invoicesCount: Int!
 
   """
   Number of reimbursements
   """
-  numReimbursements: Int
+  reimbursementsCount: Int!
 
   """
   Number of grants
   """
-  numGrants: Int
+  grantsCount: Int!
 }
 
 enum ExpenseStatus {
@@ -5068,12 +5068,12 @@ type Host implements Account & AccountWithContributions {
     account: [AccountReferenceInput!]
 
     """
-    Inferior date limit in which we're calculating the contribution stats
+    Calculate contribution statistics beginning from this date.
     """
     dateFrom: DateTime
 
     """
-    Superior date limit in which we're calculating the contribution stats
+    Calculate contribution statistics until this date.
     """
     dateTo: DateTime
   ): ContributionStats!
@@ -5084,12 +5084,12 @@ type Host implements Account & AccountWithContributions {
     account: [AccountReferenceInput!]
 
     """
-    Inferior date limit in which we're calculating the expense stats
+    Calculate expense statistics beginning from this date.
     """
     dateFrom: DateTime
 
     """
-    Superior date limit in which we're calculating the expense stats
+    Calculate expense statistics until this date.
     """
     dateTo: DateTime
   ): ExpenseStats!
