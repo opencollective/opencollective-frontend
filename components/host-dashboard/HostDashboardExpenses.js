@@ -76,6 +76,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
           id
           name
           slug
+          createdAt
           currency
           type
           stats {

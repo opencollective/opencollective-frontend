@@ -55,7 +55,7 @@ const ExpensesFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="expenses-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <PeriodFilter {...getFilterProps('period')} />
+        <PeriodFilter {...getFilterProps('period')} minDate={collective.createdAt} />
       </FilterContainer>
       <FilterContainer>
         <FilterLabel htmlFor="expenses-filter-amount">
@@ -78,6 +78,7 @@ ExpensesFilters.propTypes = {
   filters: PropTypes.object,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
+    createdAt: PropTypes.string,
   }).isRequired,
 };
 

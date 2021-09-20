@@ -44,7 +44,7 @@ const TransactionsFilters = ({ collective, filters, kinds, onChange }) => {
         <FilterLabel htmlFor="transactions-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <PeriodFilter {...getFilterProps('period')} />
+        <PeriodFilter {...getFilterProps('period')} minDate={collective.createdAt} />
       </FilterContainer>
       <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-amount">
@@ -68,6 +68,7 @@ TransactionsFilters.propTypes = {
   kinds: PropTypes.array,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
+    createdAt: PropTypes.string,
   }).isRequired,
 };
 
