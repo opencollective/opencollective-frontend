@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { addMonths, addYears } from '../../../lib/date-utils';
+import dayjs from '../../../lib/dayjs';
 
 import { Box, Flex } from '../../Grid';
 import PopupMenu from '../../PopupMenu';
@@ -13,54 +12,51 @@ import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 
+/**
+ * Normalize a date coming from the user input, adjusting the time to either the beginning of the day
+ * or the end of the day.
+ */
 const normalizeDate = (date, isEndOfDay = false) => {
-  const resultDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  if (isEndOfDay) {
-    resultDate.setHours(23, 59, 59, 999);
-  }
-
-  return resultDate;
-};
-
-const formatDate = (date, stripTime) => {
   if (!date) {
-    return '';
-  } else if (stripTime) {
-    return dayjs(date).format('YYYY-MM-DD');
+    return null;
   } else {
-    return dayjs(date).toISOString();
+    const resultDate = isEndOfDay ? dayjs(date).endOf('day') : dayjs(date).startOf('day');
+    return resultDate.toISOString();
   }
 };
 
 /**
- * Parse `strValue` and returns an array like [dateFrom, dateTo]. Each value in the array
- * will be `undefined` if there's no filter for it.
+ * Takes a date and returns it as a string in the format YYYY-MM-DD
+ */
+const stripTime = date => {
+  if (!date) {
+    return '';
+  } else {
+    return dayjs(date).format('YYYY-MM-DD');
+  }
+};
+
+/**
+ * Parse `strValue` in a "dateFrom→dateTo" format and returns an array like [dateFrom, dateTo].
+ * Each value in the array will be `undefined` if there's no filter for it. We consider that all values passed
+ * in this string are using UTC timezone.
  */
 export const getDateRangeFromPeriod = strValue => {
-  // Use a normalized date (without time) to better handle Apollo caching
-  const now = normalizeDate(new Date());
-
-  // Compatibility with old format ("6-month", "1-year")
-  const legacyParsedValue = strValue?.match(/((\d+)-)?(month|year)/);
-  if (legacyParsedValue) {
-    const value = parseInt(legacyParsedValue[2]) || 1;
-    const interval = legacyParsedValue[3];
-    const dateAddFunc = interval === 'month' ? addMonths : addYears;
-    return [dateAddFunc(now, -value), now];
-  }
-
-  // New format (dateFrom→dateTo)
   const parsedValue = strValue?.match(/([^→]+)(→(.+))?/);
   if (parsedValue) {
-    const parseDate = dateStr => (!dateStr || dateStr === 'all' ? undefined : new Date(dateStr));
-    return [parseDate(parsedValue[1]), parseDate(parsedValue[3])];
+    const getDateIsoString = dateStr => (!dateStr || dateStr === 'all' ? undefined : dateStr);
+    return [getDateIsoString(parsedValue[1]), getDateIsoString(parsedValue[3])];
   }
 
   return [];
 };
 
+/**
+ * Opposite of `getDateRangeFromPeriod`: takes an object like {dateFrom, dateTo} and returns a string
+ * like "dateFrom→dateTo".
+ */
 const encodePeriod = dateInterval => {
-  const stringifyDate = date => (!date ? 'all' : formatDate(date));
+  const stringifyDate = date => (!date ? 'all' : date);
   if (!dateInterval.from && !dateInterval.to) {
     return '';
   } else {
@@ -68,16 +64,13 @@ const encodePeriod = dateInterval => {
   }
 };
 
-const getDefaultDateInterval = () => {
-  return { from: '', to: '' };
-};
+const DEFAULT_INTERVAL = { from: '', to: '' };
 
 const getDefaultState = value => {
-  const defaultInterval = getDefaultDateInterval();
   const intervalFromValue = getDateRangeFromPeriod(value);
   return {
-    from: intervalFromValue[0] || defaultInterval.from,
-    to: intervalFromValue[1] || defaultInterval.to,
+    from: intervalFromValue[0] || DEFAULT_INTERVAL.from,
+    to: intervalFromValue[1] || DEFAULT_INTERVAL.to,
   };
 };
 
@@ -89,13 +82,25 @@ const DateRange = ({ from, to }) => {
       <FormattedMessage
         id="Date.DateRange"
         defaultMessage="{dateFrom, date, short} to {dateTo, date, short}"
-        values={{ dateFrom: from, dateTo: to }}
+        values={{ dateFrom: new Date(from), dateTo: new Date(to) }}
       />
     );
   } else if (from) {
-    return <FormattedMessage id="Date.SinceShort" defaultMessage="Since {date, date, short}" values={{ date: from }} />;
+    return (
+      <FormattedMessage
+        id="Date.SinceShort"
+        defaultMessage="Since {date, date, short}"
+        values={{ date: new Date(from) }}
+      />
+    );
   } else {
-    return <FormattedMessage id="Date.BeforeShort" defaultMessage="Before {date, date, short}" values={{ date: to }} />;
+    return (
+      <FormattedMessage
+        id="Date.BeforeShort"
+        defaultMessage="Before {date, date, short}"
+        values={{ date: new Date(to) }}
+      />
+    );
   }
 };
 
@@ -131,11 +136,11 @@ const TriggerContainer = styled(StyledButton)`
 
 const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   const [dateInterval, setDateInterval] = React.useState(() => getDefaultState(value));
-  const formattedMin = formatDate(minDate, true);
+  const formattedMin = stripTime(minDate);
   const setDate = (type, date) => {
     setDateInterval(value => ({
       ...value,
-      [type]: !date ? null : normalizeDate(new Date(date), type === 'to'),
+      [type]: normalizeDate(date, type === 'to'),
     }));
   };
 
@@ -171,7 +176,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                defaultValue={formatDate(dateInterval.from, true)}
+                defaultValue={stripTime(dateInterval.from)}
                 min={formattedMin}
                 onChange={e => setDate('from', e.target.value)}
               />
@@ -192,7 +197,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                defaultValue={formatDate(dateInterval.to, true)}
+                defaultValue={stripTime(dateInterval.to)}
                 min={formattedMin}
                 onChange={e => setDate('to', e.target.value)}
               />
@@ -202,7 +207,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
             buttonSize="tiny"
             mr={2}
             onClick={() => {
-              setDateInterval(getDefaultDateInterval());
+              setDateInterval(DEFAULT_INTERVAL);
               setOpen(false);
               onChange('');
             }}
