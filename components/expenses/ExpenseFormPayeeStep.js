@@ -232,7 +232,7 @@ const ExpenseFormPayeeStep = ({
             <StyledInputField
               label={
                 <React.Fragment>
-                  <FormattedMessage defaultMessage="Legal name" />
+                  <FormattedMessage id="LegalName" defaultMessage="Legal Name" />
                   &nbsp;
                   <StyledTooltip
                     content={() => (

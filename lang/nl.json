@@ -1533,7 +1533,6 @@
   "onboarding.error.website": "Please enter a valid URL.",
   "onboarding.success.header": "Welcome to your new Collective!",
   "onboarding.success.text": "You're all set! Customize the look, start accepting contributions, and interact with your community.",
-  "OozR1Y": "Legal name",
   "OpenCollectiveBalance": "Open Collective Balance",
   "OpenInbox": "Open {providerName}",
   "openSourceApply.GithubRepositories.title": "Pick a repository",
